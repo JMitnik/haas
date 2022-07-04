@@ -525,6 +525,7 @@ type Customer {
   nestedMostPopular(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
   nestedMostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
   roles: [RoleType!]
+  sessionConnection(filter: SessionConnectionFilterInput): SessionConnection
   settings: CustomerSettings
   slug: String!
 
@@ -1659,6 +1660,7 @@ type Session {
   delivery: DeliveryType
   deliveryId: String
   device: String
+  dialogue: Dialogue
   dialogueId: String!
   id: ID!
   mainScore: Float!

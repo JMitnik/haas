@@ -3,10 +3,11 @@ import {
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import { sortBy } from 'lodash';
+import { addDays, differenceInHours } from 'date-fns';
 
 import { offsetPaginate } from '../general/PaginationHelpers';
 import { TEXT_NODES } from '../questionnaire/Dialogue';
-import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
+import { NexusGenEnums, NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';
 import { Nullable, PaginationProps } from '../../types/generic';
@@ -17,17 +18,31 @@ import prisma from '../../config/prisma';
 import Sentry from '../../config/sentry';
 import SessionPrismaAdapter from './SessionPrismaAdapter';
 import AutomationService from '../automations/AutomationService';
-import { addDays, differenceInHours } from 'date-fns';
+import { CustomerService } from '../customer/CustomerService';
+
+export interface SessionConnectionFilterInput {
+  campaignVariantId?: string | null; // String
+  deliveryType?: NexusGenEnums['SessionDeliveryType'] | null; // SessionDeliveryType
+  endDate?: Date | null; // String
+  offset?: number | null; // Int
+  orderBy?: NexusGenInputs['SessionConnectionOrderByInput'] | null; // SessionConnectionOrderByInput
+  perPage?: number | null; // Int
+  scoreRange?: NexusGenInputs['SessionScoreRangeFilter'] | null; // SessionScoreRangeFilter
+  search?: string | null; // String
+  startDate?: Date | null; // String
+}
 
 class SessionService {
   private sessionPrismaAdapter: SessionPrismaAdapter;
   private triggerService: TriggerService;
   private automationService: AutomationService;
+  private workspaceService: CustomerService;
 
   constructor(prismaClient: PrismaClient) {
     this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
     this.triggerService = new TriggerService(prismaClient);
     this.automationService = new AutomationService(prismaClient);
+    this.workspaceService = new CustomerService(prismaClient);
   };
 
   /**
@@ -165,8 +180,8 @@ class SessionService {
    */
   findSessionsForDialogues = async (
     dialogueIds: string[],
-    startDateTime: Date,
-    endDateTime: Date,
+    startDateTime?: Date,
+    endDateTime?: Date,
     where?: Prisma.SessionWhereInput,
     include?: Prisma.SessionInclude
   ) => {
@@ -481,6 +496,37 @@ class SessionService {
     return sorted;
   }
 
+  getWorkspaceSessionConnection = async (
+    workspaceId: string,
+    filter?: SessionConnectionFilterInput | null
+  ): Promise<NexusGenFieldTypes['SessionConnection'] | null> => {
+    const offset = filter?.offset ?? 0;
+    const perPage = filter?.perPage ?? 5;
+
+    const dialogues = await this.workspaceService.getDialogues(workspaceId);
+    const mappedDialogueIds = dialogues.map((dialogue) => dialogue.id);
+
+    const sessions = await this.sessionPrismaAdapter.findWorkspaceSessions(mappedDialogueIds, filter);
+    const totalSessions = await this.sessionPrismaAdapter.countWorkspaceSessions(mappedDialogueIds, filter);
+
+    const {
+      totalPages, hasPrevPage, hasNextPage, nextPageOffset, pageIndex, prevPageOffset,
+    } = offsetPaginate(totalSessions, offset, perPage);
+
+    return {
+      sessions,
+      totalPages,
+      pageInfo: {
+        hasPrevPage,
+        hasNextPage,
+        prevPageOffset,
+        nextPageOffset,
+        pageIndex,
+      },
+    };
+  };
+
+
   getSessionConnection = async (
     dialogueId: string,
     filter?: NexusGenInputs['SessionConnectionFilterInput'] | null
@@ -519,8 +565,8 @@ class SessionService {
               include: {
                 values: {
                   include: { relatedField: true },
-                }
-              }
+                },
+              },
             },
             linkNodeEntry: true,
             registrationNodeEntry: true,

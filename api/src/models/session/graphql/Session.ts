@@ -37,6 +37,11 @@ export const SessionType = objectType({
       },
     });
 
+    t.field('dialogue', {
+      nullable: true,
+      type: 'Dialogue',
+    });
+
     t.int('totalTimeInSec', {
       nullable: true,
       resolve: (parent) => parent.totalTimeInSec || null,

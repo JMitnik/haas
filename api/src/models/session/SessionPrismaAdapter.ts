@@ -5,6 +5,8 @@ import { NexusGenInputs } from '../../generated/nexus';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import { CreateSessionInput } from './SessionPrismaAdapterType';
 import { generateTimeSpent } from './SessionHelpers';
+import { SessionConnectionFilterInput } from './SessionService';
+import { addDays } from 'date-fns';
 
 class SessionPrismaAdapter {
   prisma: PrismaClient;
@@ -12,6 +14,94 @@ class SessionPrismaAdapter {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   };
+
+  buildFindWorkspaceSessionsQuery = (
+    dialogueIds: string[],
+    filter?: SessionConnectionFilterInput | null
+  ) => {
+    let query: Prisma.SessionWhereInput = {
+      dialogueId: {
+        in: dialogueIds,
+      },
+    };
+
+    // Optional: filter by score range.
+    if (filter?.scoreRange?.min || filter?.scoreRange?.max) {
+      query.mainScore = {
+        gte: filter?.scoreRange?.min || undefined,
+        lte: filter?.scoreRange.max || undefined,
+      }
+    }
+
+    // Optional: filter by date
+    if (filter?.startDate || filter?.endDate) {
+      query.createdAt = {
+        gte: filter?.startDate || undefined,
+        lte: filter?.endDate ? filter.endDate : addDays(filter?.startDate as Date, 7),
+      }
+    }
+
+    // Add search filter
+    if (filter?.search) {
+      query = {
+        ...cloneDeep(query),
+        OR: [{
+          nodeEntries: {
+            some: {
+              // Allow searching in choices and form entries
+              OR: [
+                {
+                  choiceNodeEntry: { value: { contains: filter.search, mode: 'insensitive' } },
+                },
+                {
+                  formNodeEntry: {
+                    values: {
+                      some: {
+                        OR: [
+                          { longText: { contains: filter.search, mode: 'insensitive' } },
+                          { shortText: { contains: filter.search, mode: 'insensitive' } },
+                        ],
+                      },
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        }],
+      }
+    }
+
+    return query;
+  }
+
+  findWorkspaceSessions = async (dialogueIds: string[], filter?: SessionConnectionFilterInput | null) => {
+    const offset = filter?.offset ?? 0;
+    const perPage = filter?.perPage ?? 5;
+
+    const sessions = await this.prisma.session.findMany({
+      where: this.buildFindWorkspaceSessionsQuery(dialogueIds, filter),
+      skip: offset,
+      take: perPage,
+      orderBy: this.buildOrderByQuery(filter as NexusGenInputs['SessionConnectionFilterInput']),
+      include: {
+        dialogue: true,
+        nodeEntries: {
+          orderBy: {
+            depth: 'asc',
+          },
+        },
+      },
+    });
+
+    return sessions;
+  }
+
+  countWorkspaceSessions = async (dialogueIds: string[], filter?: SessionConnectionFilterInput | null) => {
+    return this.prisma.session.count({
+      where: this.buildFindWorkspaceSessionsQuery(dialogueIds, filter),
+    });
+  }
 
   /**
    * Finds sessions by customer ID between two dates

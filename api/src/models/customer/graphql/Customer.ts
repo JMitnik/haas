@@ -19,6 +19,7 @@ import { DialogueConnection, DialogueConnectionFilterInput } from '../../questio
 import { HealthScore, HealthScoreInput } from './HealthScore';
 import { Issue, IssueFilterInput } from '../../Issue/graphql';
 import { IssueValidator } from '../../Issue/IssueValidator';
+import { SessionConnectionFilterInput, SessionConnection } from '../../../models/session/graphql';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -42,6 +43,42 @@ export const CustomerType = objectType({
       async resolve(parent: Customer, args, ctx) {
         const customerSettings = await ctx.services.customerService.getCustomerSettingsByCustomerId(parent.id);
         return customerSettings;
+      },
+    });
+
+    t.field('sessionConnection', {
+      type: SessionConnection,
+      args: { filter: SessionConnectionFilterInput },
+      nullable: true,
+
+      async resolve(parent, args, ctx) {
+        if (!parent.id) return null;
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.filter?.startDate) {
+          utcStartDateTime = isValidDateTime(args.filter?.startDate, 'START_DATE') as Date;
+        }
+
+        if (args.filter?.endDate) {
+          utcEndDateTime = isValidDateTime(args.filter?.endDate, 'END_DATE');
+        }
+
+        const filter = {
+          ...args.filter,
+          startDate: utcStartDateTime,
+          endDate: utcEndDateTime,
+        };
+
+        const sessionConnection = await ctx.services.sessionService.getWorkspaceSessionConnection(
+          parent.id,
+          filter
+        );
+
+        if (!sessionConnection) return null;
+
+        return sessionConnection;
       },
     });
 
