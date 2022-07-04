@@ -1,4 +1,4 @@
-import { NodeType } from '@prisma/client';
+import { LanguageEnum, NodeType } from '@prisma/client';
 import { defaultAdminRole, defaultBotRole, defaultBusinessTextFieldForm, defaultManagerRole, defaultUserRole, DemoWorkspaceTemplate } from './TemplateTypes';
 
 export type rootTopics = 'Physical & Mental' | 'Management' | 'Home Situation' | 'Colleagues'
@@ -7,6 +7,7 @@ export type rootTopics = 'Physical & Mental' | 'Management' | 'Home Situation' |
 const businessWorkspaceTemplate: DemoWorkspaceTemplate = {
   title: 'How do you feel about us?',
   slug: 'business',
+  language: LanguageEnum.ENGLISH,
   rootLayer: ['Amsterdam', 'London'],
   subLayer: ['Legal', 'Tax', 'M&A'],
   subSubLayer: ['Sales', 'Marketing', 'Consulting'],
