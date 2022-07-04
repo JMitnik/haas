@@ -578,6 +578,13 @@ type DateHistogramItem {
   id: ID!
 }
 
+"""
+
+    A date-string follows format "dd-MM-yyyy HH:mm" or "dd-MM-yyyy", and is resolved to a relevant Date object.
+  
+"""
+scalar DateString
+
 input DeleteDialogueInputType {
   customerSlug: String
   id: ID
@@ -1686,13 +1693,13 @@ input SessionConnectionFilterInput {
   campaignVariantId: String
   deliveryType: SessionDeliveryType
   dialogueIds: [String!]
-  endDate: String
+  endDate: DateString
   offset: Int
   orderBy: SessionConnectionOrderByInput
   perPage: Int = 10
   scoreRange: SessionScoreRangeFilter
   search: String
-  startDate: String
+  startDate: DateString
 }
 
 """Fields to order SessionConnection by."""

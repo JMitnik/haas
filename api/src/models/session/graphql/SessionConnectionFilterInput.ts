@@ -40,8 +40,8 @@ export const SessionConnectionFilterInput = inputObjectType({
   definition(t) {
     // Pre-filter
     t.string('search', { required: false });
-    t.string('startDate', { required: false });
-    t.string('endDate', { required: false });
+    t.dateString('startDate', { required: false });
+    t.dateString('endDate', { required: false });
     t.field('deliveryType', { type: SessionDeliveryTypeFilter, required: false });
     t.field('scoreRange', { type: SessionScoreRangeFilter, required: false });
     t.string('campaignVariantId', { required: false });

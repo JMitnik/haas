@@ -7,6 +7,7 @@ import * as InteractionAPI from '../models/session/graphql';
 import * as NodeEntryAPI from '../models/node-entry/NodeEntry';
 import * as PaginationAPI from '../models/general/Pagination';
 import * as QuestionNodeAPI from '../models/QuestionNode';
+import * as DateAPI from '../models/Common/Date/graphql';
 import * as IssueAPI from '../models/Issue/graphql';
 import * as CommonAnalyticsAPI from '../models/Common/Analytics/graphql';
 import * as CommonStatusAPI from '../models/Common/Status/graphql';
@@ -27,6 +28,7 @@ import uploadNexus from '../models/link/graphql/UploadUpsellFileResolver';
 
 const nexus = [
   ...Array(CommonAnalyticsAPI),
+  ...Array(DateAPI),
   ...Array(CommonStatusAPI),
   ...Array(GenerateWorkspaceAPI),
   ...Array(AutodeckAPI),
