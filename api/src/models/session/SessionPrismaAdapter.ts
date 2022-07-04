@@ -745,6 +745,7 @@ class SessionPrismaAdapter {
 
     // Add search filter
     if (filter?.search) {
+      // Allow searching in choices and form entries
       const search: Prisma.SessionWhereInput = {
         nodeEntries: {
           some: {
@@ -767,7 +768,6 @@ class SessionPrismaAdapter {
             ],
           },
         },
-        // Allow searching in choices and form entries
       };
 
       if (query.AND) {
