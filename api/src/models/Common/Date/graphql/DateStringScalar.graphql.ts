@@ -9,7 +9,7 @@ export const DateStringScalar = scalarType({
   name: 'DateString',
   asNexusMethod: 'dateString',
   description: `
-    A date-string follows format "dd-MM-yyyy HH:mm" or "dd-MM-yyyy", and is resolved to a relevant Date object.
+    A date-string follows format "dd-MM-yyyy HH:mm", "dd-MM-yyyy" or ISO format, and is resolved to a relevant Date object.
   `,
   parseValue(value) {
     return DateValidator.resolveFromString(value);
