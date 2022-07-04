@@ -549,6 +549,7 @@ export interface NexusGenInputs {
     scoreRange?: NexusGenInputs['SessionScoreRangeFilter'] | null; // SessionScoreRangeFilter
     search?: string | null; // String
     startDate?: any | null; // DateString
+    withFollowUpAction?: boolean | null; // Boolean
   }
   SessionConnectionOrderByInput: { // input type
     by: NexusGenEnums['SessionConnectionOrder']; // SessionConnectionOrder!
@@ -2119,6 +2120,7 @@ export interface NexusGenFieldTypes {
     device: string | null; // String
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogueId: string; // String!
+    followUpAction: NexusGenRootTypes['FormNodeEntryType'] | null; // FormNodeEntryType
     id: string; // ID!
     mainScore: number; // Float!
     nodeEntries: NexusGenRootTypes['NodeEntry'][]; // [NodeEntry!]!

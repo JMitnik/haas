@@ -54,5 +54,6 @@ export const SessionConnectionFilterInput = inputObjectType({
     t.int('perPage', { required: false, default: 10 });
 
     t.list.string('dialogueIds', { nullable: true });
+    t.boolean('withFollowUpAction', { nullable: true });
   },
 })

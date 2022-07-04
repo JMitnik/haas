@@ -4,8 +4,8 @@ import { NexusGenInputs } from '../../generated/nexus';
 
 import NodeEntryService from '../node-entry/NodeEntryService';
 import { CreateSessionInput } from './SessionPrismaAdapterType';
-import { generateTimeSpent } from './SessionHelpers';
-import { SessionConnectionFilterInput } from './SessionTypes';
+import { generateTimeSpent } from './Session.helpers';
+import { SessionConnectionFilterInput } from './Session.types';
 import { addDays } from 'date-fns';
 
 class SessionPrismaAdapter {
@@ -33,6 +33,13 @@ class SessionPrismaAdapter {
       include: {
         dialogue: true,
         nodeEntries: {
+          include: {
+            formNodeEntry: {
+              include: {
+                values: true,
+              },
+            },
+          },
           orderBy: {
             depth: 'asc',
           },
@@ -713,13 +720,34 @@ class SessionPrismaAdapter {
       }
     }
 
-    // Add search filter
-    if (filter?.search) {
+    if (filter?.withFollowUpAction) {
       query = {
         ...cloneDeep(query),
+        AND: [
+          {
+            nodeEntries: {
+              some: {
+                AND: [
+                  {
+                    formNodeEntry: {
+                      id: {
+                        not: undefined,
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        ],
+      }
+    }
+
+    // Add search filter
+    if (filter?.search) {
+      const search: Prisma.SessionWhereInput = {
         nodeEntries: {
           some: {
-            // Allow searching in choices and form entries
             OR: [
               {
                 choiceNodeEntry: { value: { contains: filter.search, mode: 'insensitive' } },
@@ -739,7 +767,21 @@ class SessionPrismaAdapter {
             ],
           },
         },
+        // Allow searching in choices and form entries
+      };
+
+      if (query.AND) {
+        const andArray = query.AND as Prisma.SessionWhereInput[]
+        andArray.push(search);
+      } else {
+        query = {
+          ...cloneDeep(query),
+          AND: [
+            search,
+          ],
+        }
       }
+
     }
 
     return query;

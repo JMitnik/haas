@@ -1,6 +1,6 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 
-import { SessionWithEntries } from '../session/SessionTypes';
+import { SessionWithEntries } from '../session/Session.types';
 import SessionService from '../session/SessionService';
 import { CustomerService as WorkspaceService } from '../customer/CustomerService';
 import { TopicFilterInput, TopicByString } from './Topic.types';
@@ -59,9 +59,11 @@ export class TopicService {
       startDate,
       endDate,
       this.buildSessionFilter(topicFilter),
-      { nodeEntries:
-        { include:
-          { choiceNodeEntry: true, formNodeEntry: { include: {  values: { include: { relatedField: true } }} } },
+      {
+        nodeEntries:
+        {
+          include:
+            { choiceNodeEntry: true, formNodeEntry: { include: { values: { include: { relatedField: true } } } } },
         },
       }
     ) as unknown as SessionWithEntries[];

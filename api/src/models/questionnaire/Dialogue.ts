@@ -7,7 +7,7 @@ import { DialogueStatistics } from './graphql/DialogueStatistics';
 import { CustomerType } from '../customer/graphql/Customer';
 import { EdgeType } from '../edge/Edge';
 import { QuestionNodeType } from '../QuestionNode/QuestionNode';
-import { SessionConnection, SessionType } from '../session/graphql/Session';
+import { SessionConnection, SessionType } from '../session/graphql/Session.graphql';
 import { TagType, TagsInputType } from '../tag/Tag';
 import DialogueService from './DialogueService';
 import SessionService from '../session/SessionService';

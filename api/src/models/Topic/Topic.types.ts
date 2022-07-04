@@ -1,4 +1,4 @@
-import { SessionActionType } from '../session/SessionTypes';
+import { SessionActionType } from '../session/Session.types';
 import { NexusGenInputs } from '../../generated/nexus';
 import { Nullable } from 'types/generic';
 

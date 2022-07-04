@@ -1669,6 +1669,7 @@ type Session {
   device: String
   dialogue: Dialogue
   dialogueId: String!
+  followUpAction: FormNodeEntryType
   id: ID!
   mainScore: Float!
   nodeEntries: [NodeEntry!]!
@@ -1700,6 +1701,7 @@ input SessionConnectionFilterInput {
   scoreRange: SessionScoreRangeFilter
   search: String
   startDate: DateString
+  withFollowUpAction: Boolean
 }
 
 """Fields to order SessionConnection by."""
