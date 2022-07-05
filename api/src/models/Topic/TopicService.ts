@@ -3,7 +3,7 @@ import { Prisma, PrismaClient } from '@prisma/client';
 import { SessionWithEntries } from '../session/Session.types';
 import SessionService from '../session/SessionService';
 import { CustomerService as WorkspaceService } from '../customer/CustomerService';
-import { TopicFilterInput, TopicByString, TopicStatisticsByDialogueId } from './Topic.types';
+import { TopicFilterInput, TopicByString } from './Topic.types';
 
 export class TopicService {
   private prisma: PrismaClient;
@@ -16,7 +16,7 @@ export class TopicService {
     this.workspaceService = new WorkspaceService(prisma);
   }
 
-  private buildSessionFilter(topicFilter?: TopicFilterInput): Prisma.SessionWhereInput {
+  public buildSessionFilter(topicFilter?: TopicFilterInput): Prisma.SessionWhereInput {
     let query: Prisma.SessionWhereInput = {};
 
     if (topicFilter?.topicStrings?.length) {
@@ -38,43 +38,6 @@ export class TopicService {
     }
 
     return query;
-  }
-
-  /**
-   * Count topics and their frequencies for a given topic.
-   */
-  async countWorkspaceTopicsByDialogue(
-    workspaceId: string,
-    startDate: Date,
-    endDate: Date,
-    topicFilter?: TopicFilterInput
-  ): Promise<TopicStatisticsByDialogueId> {
-    const dialogueIds = (
-      await this.workspaceService.getDialogues(workspaceId, topicFilter?.dialogueStrings || undefined)
-    ).map(dialogue => dialogue.id);
-
-    // Fetch all sessions for the dialogues.
-    const sessions = await this.sessionService.findSessionsForDialogues(
-      dialogueIds,
-      startDate,
-      endDate,
-      this.buildSessionFilter(topicFilter),
-      {
-        nodeEntries:
-        {
-          include:
-            { choiceNodeEntry: true, formNodeEntry: { include: { values: { include: { relatedField: true } } } } },
-        },
-      }
-    ) as unknown as SessionWithEntries[];
-
-    // Calculate all the candidate topic-counts.
-    const dialogueStatistics = this.sessionService.extractNegativeScoresByDialogue(sessions);
-    const dialogueTopicStatistics = this.sessionService.extractTopicsByDialogue(sessions);
-
-    console.dir(dialogueStatistics, { depth: 10 });
-
-    return dialogueStatistics;
   }
 
   /**
