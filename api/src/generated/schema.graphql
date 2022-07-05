@@ -756,10 +756,6 @@ enum DialogueImpactScoreType {
   AVERAGE
 }
 
-input DialogueLinksInput {
-  workspaceId: String
-}
-
 type DialogueStatistics {
   history: [lineChartDataType!]
   mostPopularPath: topPathType

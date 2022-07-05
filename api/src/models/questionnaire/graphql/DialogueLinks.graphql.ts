@@ -1,25 +1,9 @@
-import { inputObjectType, objectType, queryField } from '@nexus/schema';
+import { objectType, queryField } from '@nexus/schema';
 import { UserInputError } from 'apollo-server-express';
 
-import { ConnectionInterface } from '../../models/general/Pagination';
-import { DialogueConnectionFilterInput } from './graphql/DialogueConnection';
-
-export const DialogueLinksInput = inputObjectType({
-  name: 'DialogueLinksInput',
-  definition(t) {
-    t.string('workspaceId');
-  },
-});
-
-export const PublicDialogueInfo = objectType({
-  name: 'PublicDialogueInfo',
-  definition(t) {
-    t.string('title');
-    t.string('slug');
-    t.string('description', { nullable: true });
-    t.string('url');
-  },
-});
+import { ConnectionInterface } from '../../general/Pagination';
+import { DialogueConnectionFilterInput } from './DialogueConnection';
+import { PublicDialogueInfo } from './PublicDialogue.graphql';
 
 export const PublicDialogueConnection = objectType({
   name: 'PublicDialogueConnection',

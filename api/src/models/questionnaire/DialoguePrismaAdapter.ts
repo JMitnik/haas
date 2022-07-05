@@ -9,6 +9,7 @@ import {
 import { CreateDialogueInput, CreateQuestionsInput, UpsertDialogueStatisticsInput, UpsertDialogueTopicCacheInput } from './DialoguePrismaAdapterType';
 import { NexusGenInputs } from 'generated/nexus';
 import { cloneDeep } from 'lodash';
+import { DialogueConnectionFilterInput } from './Dialogue.types';
 
 
 class DialoguePrismaAdapter {
@@ -18,7 +19,10 @@ class DialoguePrismaAdapter {
     this.prisma = prismaClient;
   };
 
-  createPostLeafNode = async (dialogueId: string, postLeafNodeContent: { header: string; subHeader: string }) => {
+  public async createPostLeafNode(
+    dialogueId: string,
+    postLeafNodeContent: { header: string; subHeader: string }
+  ) {
     return this.prisma.dialogue.update({
       where: {
         id: dialogueId,
@@ -42,7 +46,10 @@ class DialoguePrismaAdapter {
    * @param workspaceId
    * @returns
    */
-  findDialogueUrlsByWorkspaceId = async (workspaceId: string, filter?: NexusGenInputs['DialogueConnectionFilterInput'] | null) => {
+  public async findDialogueUrlsByWorkspaceId(
+    workspaceId: string,
+    filter?: DialogueConnectionFilterInput | null
+  ) {
     const offset = filter?.offset ?? 0;
     const perPage = filter?.perPage ?? 12;
 
@@ -831,41 +838,6 @@ class DialoguePrismaAdapter {
   };
 
   /**
-  * Build a dialogueConnection prisma query based on the filter parameters.
-  * @param customerSlug the slug of a workspace
-  * @param filter a filter containing information in regard to used search queries, date ranges and order based on column
-  */
-  buildFindDialogueLinksQuery = (workspaceId: string, filter?: NexusGenInputs['DialogueConnectionFilterInput'] | null): Prisma.DialogueWhereInput => {
-    let dialogueWhereInput: Prisma.DialogueWhereInput = {
-      customer: {
-        id: workspaceId,
-      },
-    }
-
-    if (filter?.searchTerm) {
-      dialogueWhereInput = {
-        ...cloneDeep(dialogueWhereInput),
-        OR: [
-          { title: { contains: filter.searchTerm, mode: 'insensitive' } },
-          { description: { contains: filter.searchTerm, mode: 'insensitive' } },
-          {
-            tags: {
-              some: {
-                name: {
-                  contains: filter.searchTerm,
-                  mode: 'insensitive',
-                },
-              },
-            },
-          },
-        ],
-      }
-    }
-
-    return dialogueWhereInput;
-  }
-
-  /**
    * Counts the amount of automation within specific filter boundaries
    * @param workspaceSlug the slug of a workspace
    * @param filter an filter object to determine boundaries to look within
@@ -976,6 +948,43 @@ class DialoguePrismaAdapter {
     return totalAutomations;
   }
 
+  /**
+  * Build a dialogueConnection prisma query based on the filter parameters.
+  * @param customerSlug the slug of a workspace
+  * @param filter a filter containing information in regard to used search queries, date ranges and order based on column
+  */
+  private buildFindDialogueLinksQuery(
+    workspaceId: string,
+    filter?: DialogueConnectionFilterInput | null
+  ): Prisma.DialogueWhereInput {
+    let dialogueWhereInput: Prisma.DialogueWhereInput = {
+      customer: {
+        id: workspaceId,
+      },
+    }
+
+    if (filter?.searchTerm) {
+      dialogueWhereInput = {
+        ...cloneDeep(dialogueWhereInput),
+        OR: [
+          { title: { contains: filter.searchTerm, mode: 'insensitive' } },
+          { description: { contains: filter.searchTerm, mode: 'insensitive' } },
+          {
+            tags: {
+              some: {
+                name: {
+                  contains: filter.searchTerm,
+                  mode: 'insensitive',
+                },
+              },
+            },
+          },
+        ],
+      }
+    }
+
+    return dialogueWhereInput;
+  }
 };
 
 export default DialoguePrismaAdapter;
