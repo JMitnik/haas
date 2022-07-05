@@ -42,12 +42,15 @@ class SessionService {
    */
   public extractNegativeScoresByDialogue(sessions: SessionWithEntries[]): TopicStatisticsByDialogueId {
     const negativeDialogueScoresExtracted = sessions.reduce((acc, session) => {
+      // Only add negative sessions
       if (session.mainScore < 55) {
+        // Check if topic exists in acc.
+        // If not, create a unique entry for ${dialogueId}
         if (!acc?.hasOwnProperty(session.dialogueId)) {
           acc[session.dialogueId] = this.makeTopicStatistics('', [], session);
           return acc;
         }
-        // Else, add it to the dialogue-topic combination.
+        // Else, add negative interaction info to the dialogue.
         acc[session.dialogueId] = {
           dates: [...acc[session.dialogueId].dates, session.createdAt],
           dialogueIds: [],
