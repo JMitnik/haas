@@ -83,7 +83,11 @@ export const DialogueLinkFetchOverview = () => {
           gridAutoRows="minmax(150px, 1fr)"
         >
           {filteredDialogues?.map((dialogue) => dialogue && (
-            <DialogueCard key={dialogue.slug} dialogue={dialogue} />
+            <DialogueCard
+              loading={isLoading}
+              key={dialogue.slug}
+              dialogue={dialogue}
+            />
           ))}
         </UI.Grid>
 
