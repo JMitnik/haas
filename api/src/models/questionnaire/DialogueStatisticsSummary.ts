@@ -24,6 +24,12 @@ export const DialogueStatisticsSummaryModel = objectType({
       nullable: true,
     });
 
+    t.string('title', {
+      resolve(parent) {
+        return parent.dialogue?.title as string;
+      },
+    });
+
     t.field('dialogue', { type: DialogueType, nullable: true });
   },
 });

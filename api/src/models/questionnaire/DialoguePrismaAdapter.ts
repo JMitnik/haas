@@ -596,6 +596,7 @@ class DialoguePrismaAdapter {
       data: {
         slug: input.slug,
         title: input.title,
+        language: input.language,
         isPrivate: input.isPrivate,
         description: input.description,
         postLeafNode: {
@@ -797,9 +798,6 @@ class DialoguePrismaAdapter {
 
     return this.prisma.dialogue.findMany({
       where: whereInput,
-      include: {
-        tags: true,
-      },
     });
   };
 
