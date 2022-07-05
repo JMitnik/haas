@@ -6,7 +6,7 @@ import { isPresent } from 'ts-is-present';
 import { Nullable } from 'types/generic';
 
 import { convertDatesToHistogramItems } from '../Common/Analytics/Analytics.helpers';
-import { TopicByString, TopicStatistics } from '../Topic/Topic.types';
+import { TopicByString, TopicStatistics, TopicStatisticsByDialogueId } from '../Topic/Topic.types';
 import { TopicService } from '../Topic/TopicService';
 import { Issue, IssueFilterInput } from './Issue.types';
 
@@ -87,38 +87,33 @@ export class IssueService {
    *
    * Warning: Potentially costly due to the `convertDatesToHistogramItems` call.
    */
-  private extractIssuesByDialogue(dialogues: TopicByString): Issue[] {
+  private extractIssuesByDialogue(dialogues: TopicStatisticsByDialogueId): Issue[] {
     let issues: Issue[] = [];
 
     // Split each topic based on the dialogues.
-    Object.entries(dialogues).forEach(([dialogueId, dialogueTopics]) => {
+    Object.entries(dialogues).forEach(([dialogueId, dialogueStats]) => {
       // DO SOMETHING HERE WITH ALL TOPICS (MERGE OR SOMETHING)
+      const rankScore = this.calculateScore(dialogueStats);
 
-      Object.entries(dialogueTopics).forEach(([topicName, topicStats]) => {
-        if (topicStats.score > 50) return false;
-
-        const rankScore = this.calculateScore(topicStats);
-
-        issues.push({
-          id: `${topicName}-${dialogueId}`,
-          topic: topicName,
-          basicStats: {
-            average: topicStats.score,
-            responseCount: topicStats.count,
-          },
-          dialogue: null,
-          dialogueId,
-          createdAt: topicStats.dates[0],
-          updatedAt: topicStats.dates[topicStats.dates.length - 1],
-          status: 'OPEN',
-          history: {
-            id: `${topicName}-${dialogueId}-hist`,
-            items: convertDatesToHistogramItems(topicStats.dates),
-          },
-          rankScore,
-          followUpAction: topicStats.followUpActions.find(isPresent) || null,
-        })
-      });
+      issues.push({
+        id: `${dialogueId}`,
+        topic: '',
+        basicStats: {
+          average: dialogueStats.score / dialogueStats.count,
+          responseCount: dialogueStats.count,
+        },
+        dialogue: null,
+        dialogueId,
+        createdAt: dialogueStats.dates[0],
+        updatedAt: dialogueStats.dates[dialogueStats.dates.length - 1],
+        status: 'OPEN',
+        history: {
+          id: `${dialogueId}-hist`,
+          items: convertDatesToHistogramItems(dialogueStats.dates),
+        },
+        rankScore,
+        followUpAction: dialogueStats.followUpActions.find(isPresent) || null,
+      })
     });
 
     return issues;

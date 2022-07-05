@@ -26,6 +26,8 @@ export interface TopicStatistics {
 
 export type TopicStatisticsByDialogueId = Record<string, TopicStatistics>;
 
+export type SessionStatisticsByDialogueId = Record<string, TopicStatistics[]>;
+
 /**
  * Maps topic string to dialogue-ids, which in turn have a map of topic statistics.
  *

@@ -3,7 +3,7 @@ import { Prisma, PrismaClient } from '@prisma/client';
 import { SessionWithEntries } from '../session/Session.types';
 import SessionService from '../session/SessionService';
 import { CustomerService as WorkspaceService } from '../customer/CustomerService';
-import { TopicFilterInput, TopicByString } from './Topic.types';
+import { TopicFilterInput, TopicByString, TopicStatisticsByDialogueId } from './Topic.types';
 
 export class TopicService {
   private prisma: PrismaClient;
@@ -48,7 +48,7 @@ export class TopicService {
     startDate: Date,
     endDate: Date,
     topicFilter?: TopicFilterInput
-  ): Promise<TopicByString> {
+  ): Promise<TopicStatisticsByDialogueId> {
     const dialogueIds = (
       await this.workspaceService.getDialogues(workspaceId, topicFilter?.dialogueStrings || undefined)
     ).map(dialogue => dialogue.id);
@@ -69,10 +69,12 @@ export class TopicService {
     ) as unknown as SessionWithEntries[];
 
     // Calculate all the candidate topic-counts.
+    const dialogueStatistics = this.sessionService.extractNegativeScoresByDialogue(sessions);
     const dialogueTopicStatistics = this.sessionService.extractTopicsByDialogue(sessions);
-    console.dir(dialogueTopicStatistics, { depth: 10 });
 
-    return dialogueTopicStatistics;
+    console.dir(dialogueStatistics, { depth: 10 });
+
+    return dialogueStatistics;
   }
 
   /**

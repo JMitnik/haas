@@ -6,12 +6,17 @@ import useMeasure from 'react-use-measure';
 
 import * as Modal from 'components/Common/Modal';
 import { DatePicker } from 'components/Common/DatePicker';
+import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
 import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModalCard';
 import { SimpleIssueTable } from 'components/Analytics/Issues/SimpleIssueTable';
 import { useCustomer } from 'providers/CustomerProvider';
-import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
 
+import { AlertTriangle, MessageCircle, User } from 'react-feather';
 import * as LS from './WorkspaceGrid.styles';
+import { BreadCrumb } from './BreadCrumb';
+import { DateFormat, useDate } from 'hooks/useDate';
+import { DialogueImpactScoreType, useGetIssuesQuery, useGetWorkspaceSummaryDetailsQuery } from 'types/generated-types';
+import { HealthCardWide } from '../Common/HealthCard/HealthCardWide';
 import {
   HexagonDialogueNode,
   HexagonGroupNode,
@@ -24,14 +29,9 @@ import {
   Issue,
 } from './WorkspaceGrid.types';
 import { HexagonGrid } from './HexagonGrid';
-import { createGrid, extractDialogueFragments, reconstructHistoryStack } from './WorkspaceGrid.helpers';
-import { DialogueImpactScoreType, useGetWorkspaceSummaryDetailsQuery, useGetIssuesQuery } from 'types/generated-types';
-import { DateFormat, useDate } from 'hooks/useDate';
-import { HealthCardWide } from '../Common/HealthCard/HealthCardWide';
-import { BreadCrumb } from './BreadCrumb';
 import { IssuesModal } from './IssuesModal';
-import { AlertTriangle, MessageCircle, User } from 'react-feather';
 import { Statistic } from './Statistic';
+import { createGrid, extractDialogueFragments, reconstructHistoryStack } from './WorkspaceGrid.helpers';
 import { useTranslation } from 'react-i18next';
 
 export interface DataLoadOptions {
@@ -266,7 +266,7 @@ export const WorkspaceGrid = ({
 
   const handleIssueClick = (issue: Issue) => {
     if (issue.dialogue?.id) {
-      jumpToDialogue(issue.dialogue.id, [issue.topic]);
+      jumpToDialogue(issue.dialogue.id);
     }
   };
 
@@ -298,17 +298,19 @@ export const WorkspaceGrid = ({
   const summary = data?.customer?.statistics;
 
   const { data: issuesData, loading: loadingIssues } = useGetIssuesQuery({
+    fetchPolicy: 'no-cache',
     variables: {
       workspaceId: activeCustomer?.id || '',
       filter: {
         startDate: format(startDate, DateFormat.DayFormat),
         endDate: format(endDate, DateFormat.DayFormat),
         dialogueStrings: visitedDialogueFragments,
-      }
-    }
+      },
+    },
   });
 
   const issues = issuesData?.customer?.issues || [];
+  console.log('Issues workspace grid: ', issues);
 
   // Various stats fields
   const health = summary?.health;
@@ -337,7 +339,7 @@ export const WorkspaceGrid = ({
 
         <UI.Hr />
 
-        <UI.Grid gridTemplateColumns={["1fr", "1fr", "1fr", "1fr", "2fr 1fr"]}>
+        <UI.Grid gridTemplateColumns={['1fr', '1fr', '1fr', '1fr', '2fr 1fr']}>
           <UI.Div>
             {noData && (
               <UI.IllustrationCard svg={<EmptyIll />} text={t('dashboard_no_data_with_filter')} />
@@ -345,8 +347,8 @@ export const WorkspaceGrid = ({
 
             {!!health?.nrVotes && health.nrVotes > 0 && (
               <>
-                <UI.Grid gridTemplateColumns={["1fr", "1fr", "1fr", "1fr", "1fr 1fr"]}>
-                  <UI.Grid gridTemplateColumns={["1fr 1fr 1fr", "1fr 1fr 1fr", "1fr 1fr 1fr", "1fr 1fr 1fr", "1fr"]}>
+                <UI.Grid gridTemplateColumns={['1fr', '1fr', '1fr', '1fr', '1fr 1fr']}>
+                  <UI.Grid gridTemplateColumns={['1fr 1fr 1fr', '1fr 1fr 1fr', '1fr 1fr 1fr', '1fr 1fr 1fr', '1fr']}>
                     <Statistic
                       icon={<User height={40} width={40} />}
                       themeBg="green.500"
@@ -368,7 +370,7 @@ export const WorkspaceGrid = ({
                       themeBg="main.500"
                       themeColor="white"
                       name="Total call-to-actions"
-                      value={issues.filter(issue => issue.followUpAction).length}
+                      value={issues.filter((issue) => issue.followUpAction).length}
                       isFilterEnabled={historyQueue.length > 0}
                     />
                   </UI.Grid>

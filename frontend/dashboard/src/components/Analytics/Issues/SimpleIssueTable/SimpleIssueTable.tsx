@@ -1,15 +1,14 @@
 import * as UI from '@haas/ui';
-import { AlertTriangle, Filter } from 'react-feather';
-import styled, { css } from 'styled-components';
+import { AlertTriangle } from 'react-feather';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import { EventBars } from 'components/Analytics/Common/EventBars/EventBars';
-import { ControlButton } from 'components/Analytics/WorkspaceGrid/WorkspaceGrid.styles';
 import { Issue } from 'components/Analytics/WorkspaceGrid/WorkspaceGrid.types';
 import { ScoreBox } from 'components/ScoreBox';
 
-import { IssueActionLabels } from './IssueActionLabels';
 import { FilterEnabledLabel } from 'components/Analytics/WorkspaceGrid/FilterEnabledLabel';
+import { IssueActionLabels } from './IssueActionLabels';
 
 const columns = '50px 3fr 100px 200px';
 interface SimpleIssueTableProps {
@@ -36,7 +35,14 @@ const IssueBody = styled(UI.CardBody)`
   `}
 `;
 
-export const SimpleIssueTable = ({ issues, onIssueClick, onResetFilter, onOpenIssueModal, isFilterEnabled = false, inPreview = true }: SimpleIssueTableProps) => {
+export const SimpleIssueTable = (
+  { issues,
+    onIssueClick,
+    onResetFilter,
+    onOpenIssueModal,
+    isFilterEnabled = false,
+    inPreview = true }: SimpleIssueTableProps,
+) => {
   const shownIssues = inPreview ? issues.slice(0, CUTOFF) : issues;
 
   return (
@@ -47,7 +53,13 @@ export const SimpleIssueTable = ({ issues, onIssueClick, onResetFilter, onOpenIs
           borderColor="gray.200"
         >
           <UI.Flex alignItems="center" justifyContent="space-between">
-            <UI.H4 pb={3} color="off.500" fontSize="1.2rem" fontWeight={600} style={{ display: 'flex', alignItems: 'center' }}>
+            <UI.H4
+              pb={3}
+              color="off.500"
+              fontSize="1.2rem"
+              fontWeight={600}
+              style={{ display: 'flex', alignItems: 'center' }}
+            >
               <UI.Icon mr={2}>
                 <AlertTriangle />
               </UI.Icon>
@@ -66,10 +78,10 @@ export const SimpleIssueTable = ({ issues, onIssueClick, onResetFilter, onOpenIs
             Score
           </UI.Helper>
           <UI.Helper>
-            Issue
+            Team
           </UI.Helper>
           <UI.Helper>
-            Votes
+            Quantity
           </UI.Helper>
           <UI.Helper>
             Pulse
@@ -97,13 +109,6 @@ export const SimpleIssueTable = ({ issues, onIssueClick, onResetFilter, onOpenIs
               <UI.Div>
                 <UI.Div>
                   <UI.Span fontSize="1rem" fontWeight={600} color="off.500">
-                    {issue.topic}
-                  </UI.Span>
-                </UI.Div>
-                <UI.Div>
-                  <UI.Span color="off.500" fontSize="0.8rem">
-                    in
-                    {' '}
                     {issue.dialogue?.title}
                   </UI.Span>
                 </UI.Div>
