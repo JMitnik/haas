@@ -34,7 +34,7 @@ class SessionService {
   };
 
   /**
-   * Given a list of sessions with node-entries, return an object which maps topics to their "frequency".
+   * Given a list of sessions with node-entries, return an object which maps negative dialogue interactions to their "frequency".
    *
    * Note: this can be applied both within a workspace as well as outside.
    *
@@ -62,60 +62,6 @@ class SessionService {
     }, {} as TopicStatisticsByDialogueId);
 
     return negativeDialogueScoresExtracted;
-  }
-
-  /**
-   * Given a list of sessions with node-entries, return an object which maps topics to their "frequency".
-   *
-   * Note: this can be applied both within a workspace as well as outside.
-   *
-   * Precondition: Sessions are sorted by createdAt.
-   */
-  public extractTopicsByDialogue(sessions: SessionWithEntries[]): TopicByString {
-    const topicsByString = sessions.reduce((acc, session) => {
-      const topics = session.nodeEntries.map(nodeEntry => nodeEntry.choiceNodeEntry?.value).filter(isPresent);
-
-      topics.forEach((topic) => {
-        // Check if topic exists in acc.
-        // If not, create a unique entry for ${dialogueId}
-        if (!acc.hasOwnProperty(session.dialogueId)) {
-          acc[session.dialogueId] = {
-            [topic]: this.makeTopicStatistics(topic, topics, session),
-          }
-
-          return;
-        }
-
-        // Check if topic also check if it exists for this dialogue
-        // If not, create a unique entry for dialogue
-        if (!acc[session.dialogueId].hasOwnProperty(topic)) {
-          acc[session.dialogueId][topic] = this.makeTopicStatistics(topic, topics, session);
-          return;
-        }
-
-        // Else, add it to the dialogue-topic combination.
-        acc[session.dialogueId][topic] = {
-          dates: [...acc[session.dialogueId][topic].dates, session.createdAt],
-          dialogueIds: [...acc[session.dialogueId][topic].dialogueIds, session.dialogueId],
-          count: acc[session.dialogueId][topic].count + 1,
-          score: acc[session.dialogueId][topic].score + session.mainScore,
-          relatedTopics: [...acc[session.dialogueId][topic].relatedTopics, ...topics],
-          topic: topic,
-          followUpActions: [...acc[session.dialogueId][topic].followUpActions, this.getActionFromSession(session)],
-        }
-      });
-
-      return acc;
-    }, {} as TopicByString);
-
-    // Normalize the topic counts (by averaging the cumulative `score`)
-    Object.entries(topicsByString).forEach(([topic]) => {
-      Object.entries(topicsByString[topic]).forEach(([dialogueId, topicStatistics]) => {
-        topicsByString[topic][dialogueId].score = topicStatistics.score / topicStatistics.count;
-      });
-    });
-
-    return topicsByString;
   }
 
   /**
