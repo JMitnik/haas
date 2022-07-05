@@ -54,26 +54,9 @@ export const CustomerType = objectType({
       async resolve(parent, args, ctx) {
         if (!parent.id) return null;
 
-        let utcStartDateTime: Date | undefined;
-        let utcEndDateTime: Date | undefined;
-
-        if (args.filter?.startDate) {
-          utcStartDateTime = isValidDateTime(args.filter?.startDate, 'START_DATE') as Date;
-        }
-
-        if (args.filter?.endDate) {
-          utcEndDateTime = isValidDateTime(args.filter?.endDate, 'END_DATE');
-        }
-
-        const filter = {
-          ...args.filter,
-          startDate: utcStartDateTime,
-          endDate: utcEndDateTime,
-        };
-
         const sessionConnection = await ctx.services.sessionService.getWorkspaceSessionConnection(
           parent.id,
-          filter
+          args.filter
         );
 
         if (!sessionConnection) return null;
@@ -486,12 +469,10 @@ export const WorkspaceMutations = Upload && extendType({
         const stream = new Promise<UploadApiResponse>((resolve, reject) => {
           const cld_upload_stream = cloudinary.v2.uploader.upload_stream({
             folder: 'company_logos',
-          },
-            (error, result: UploadApiResponse | undefined) => {
-              if (result) return resolve(result);
-
-              return reject(error);
-            });
+          }, (error, result: UploadApiResponse | undefined) => {
+            if (result) return resolve(result);
+            return reject(error);
+          });
 
           return createReadStream().pipe(cld_upload_stream);
         });

@@ -1,6 +1,6 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 
-import { SessionWithEntries } from '../session/SessionTypes';
+import { SessionWithEntries } from '../session/Session.types';
 import SessionService from '../session/SessionService';
 import { CustomerService as WorkspaceService } from '../customer/CustomerService';
 import { TopicFilterInput, TopicByString } from './Topic.types';

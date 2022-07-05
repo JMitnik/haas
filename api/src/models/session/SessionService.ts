@@ -11,7 +11,7 @@ import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';
 import { Nullable, PaginationProps } from '../../types/generic';
-import { SessionActionType, SessionConnectionFilterInput, SessionWithEntries } from './SessionTypes';
+import { SessionActionType, SessionConnection, SessionConnectionFilterInput, SessionWithEntries } from './Session.types';
 import { TopicByString, TopicStatistics } from '../Topic/Topic.types';
 import TriggerService from '../trigger/TriggerService';
 import prisma from '../../config/prisma';
@@ -540,10 +540,16 @@ class SessionService {
     return sorted;
   }
 
+  /**
+   * Finds a subset of workspace-wide sessions based on a filter.
+   * @param workspaceId 
+   * @param filter 
+   * @returns a list of sessions
+   */
   getWorkspaceSessionConnection = async (
     workspaceId: string,
     filter?: SessionConnectionFilterInput | null
-  ): Promise<NexusGenFieldTypes['SessionConnection'] | null> => {
+  ): Promise<SessionConnection | null> => {
     const offset = filter?.offset ?? 0;
     const perPage = filter?.perPage ?? 5;
     let dialogueIds = filter?.dialogueIds;
@@ -554,6 +560,10 @@ class SessionService {
     }
 
     const sessions = await this.sessionPrismaAdapter.findWorkspaceSessions(dialogueIds, filter);
+    const sessionWithFollowUpAction = sessions.map((session) => {
+      const followUpAction = session.nodeEntries.find((nodeEntry) => nodeEntry.formNodeEntry);
+      return { ...session, followUpAction: followUpAction?.formNodeEntry || null }
+    })
     const totalSessions = await this.sessionPrismaAdapter.countWorkspaceSessions(dialogueIds, filter);
 
     const {
@@ -561,7 +571,7 @@ class SessionService {
     } = offsetPaginate(totalSessions, offset, perPage);
 
     return {
-      sessions,
+      sessions: sessionWithFollowUpAction,
       totalPages,
       pageInfo: {
         hasPrevPage,
@@ -576,7 +586,7 @@ class SessionService {
 
   getSessionConnection = async (
     dialogueId: string,
-    filter?: NexusGenInputs['SessionConnectionFilterInput'] | null
+    filter?: SessionConnectionFilterInput | null
   ): Promise<NexusGenFieldTypes['SessionConnection'] | null> => {
     const offset = filter?.offset ?? 0;
     const perPage = filter?.perPage ?? 5;

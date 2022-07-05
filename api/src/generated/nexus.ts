@@ -8,6 +8,7 @@ import * as prisma from "@prisma/client"
 import { core } from "@nexus/schema"
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
+    dateString<FieldName extends string>(fieldName: FieldName, opts?: core.ScalarInputFieldConfig<core.GetGen3<"inputTypes", TypeName, FieldName>>): void // "DateString";
     upload<FieldName extends string>(fieldName: FieldName, opts?: core.ScalarInputFieldConfig<core.GetGen3<"inputTypes", TypeName, FieldName>>): void // "Upload";
     date<FieldName extends string>(fieldName: FieldName, opts?: core.ScalarInputFieldConfig<core.GetGen3<"inputTypes", TypeName, FieldName>>): void // "Date";
     json<FieldName extends string>(fieldName: FieldName, opts?: core.ScalarInputFieldConfig<core.GetGen3<"inputTypes", TypeName, FieldName>>): void // "JSONObject";
@@ -15,6 +16,7 @@ declare global {
 }
 declare global {
   interface NexusGenCustomOutputMethods<TypeName extends string> {
+    dateString<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // "DateString";
     upload<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // "Upload";
     date<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // "Date";
     json<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // "JSONObject";
@@ -540,13 +542,14 @@ export interface NexusGenInputs {
     campaignVariantId?: string | null; // String
     deliveryType?: NexusGenEnums['SessionDeliveryType'] | null; // SessionDeliveryType
     dialogueIds?: string[] | null; // [String!]
-    endDate?: string | null; // String
+    endDate?: any | null; // DateString
     offset?: number | null; // Int
     orderBy?: NexusGenInputs['SessionConnectionOrderByInput'] | null; // SessionConnectionOrderByInput
     perPage?: number | null; // Int
     scoreRange?: NexusGenInputs['SessionScoreRangeFilter'] | null; // SessionScoreRangeFilter
     search?: string | null; // String
-    startDate?: string | null; // String
+    startDate?: any | null; // DateString
+    withFollowUpAction?: boolean | null; // Boolean
   }
   SessionConnectionOrderByInput: { // input type
     by: NexusGenEnums['SessionConnectionOrder']; // SessionConnectionOrder!
@@ -1301,6 +1304,7 @@ export interface NexusGenRootTypes {
   Boolean: boolean;
   ID: string;
   Date: any;
+  DateString: any;
   JSONObject: any;
   Upload: any;
 }
@@ -2116,6 +2120,7 @@ export interface NexusGenFieldTypes {
     device: string | null; // String
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogueId: string; // String!
+    followUpAction: NexusGenRootTypes['FormNodeEntryType'] | null; // FormNodeEntryType
     id: string; // ID!
     mainScore: number; // Float!
     nodeEntries: NexusGenRootTypes['NodeEntry'][]; // [NodeEntry!]!
@@ -2703,7 +2708,7 @@ export type NexusGenEnumNames = "AutomationActionType" | "AutomationConditionBui
 
 export type NexusGenInterfaceNames = "ConnectionInterface" | "DeprecatedConnectionInterface";
 
-export type NexusGenScalarNames = "Boolean" | "Date" | "Float" | "ID" | "Int" | "JSONObject" | "String" | "Upload";
+export type NexusGenScalarNames = "Boolean" | "Date" | "DateString" | "Float" | "ID" | "Int" | "JSONObject" | "String" | "Upload";
 
 export type NexusGenUnionNames = never;
 
