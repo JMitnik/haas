@@ -12,15 +12,13 @@ import NodeEntryService from '../node-entry/NodeEntryService';
 import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';
 import { Nullable, PaginationProps } from '../../types/generic';
 import { SessionActionType, SessionConnection, SessionConnectionFilterInput, SessionWithEntries } from './Session.types';
-import { SessionStatisticsByDialogueId, TopicByString, TopicStatistics, TopicStatisticsByDialogueId } from '../Topic/Topic.types';
+import { TopicByString, TopicStatistics, TopicStatisticsByDialogueId } from '../Topic/Topic.types';
 import TriggerService from '../trigger/TriggerService';
 import prisma from '../../config/prisma';
 import Sentry from '../../config/sentry';
 import SessionPrismaAdapter from './SessionPrismaAdapter';
 import AutomationService from '../automations/AutomationService';
 import { CustomerService } from '../customer/CustomerService';
-
-
 
 class SessionService {
   private sessionPrismaAdapter: SessionPrismaAdapter;
@@ -43,7 +41,7 @@ class SessionService {
    * Precondition: Sessions are sorted by createdAt.
    */
   public extractNegativeScoresByDialogue(sessions: SessionWithEntries[]): TopicStatisticsByDialogueId {
-    const newExtracted = sessions.reduce((acc, session) => {
+    const negativeDialogueScoresExtracted = sessions.reduce((acc, session) => {
       if (session.mainScore < 55) {
         if (!acc?.hasOwnProperty(session.dialogueId)) {
           acc[session.dialogueId] = this.makeTopicStatistics('', [], session);
@@ -60,47 +58,11 @@ class SessionService {
           followUpActions: [...acc[session.dialogueId].followUpActions, this.getActionFromSession(session)],
         };
       }
-
-      //   // }
-
-
       return acc;
     }, {} as TopicStatisticsByDialogueId);
-    // const topicsByString = sessions.reduce((acc, session) => {
-    // if (session.mainScore <= 55) {
-    //   if (!acc?.hasOwnProperty(session.dialogueId)) {
-    //     acc = { [session.dialogueId]: this.makeTopicStatistics('', [], session) };
-    //     return;
-    //   }
 
-    //   // Else, add it to the dialogue-topic combination.
-    //   acc[session.dialogueId] = {
-    //     dates: [...acc[session.dialogueId].dates, session.createdAt],
-    //     dialogueIds: [],
-    //     count: acc[session.dialogueId].count + 1,
-    //     score: acc[session.dialogueId].score + session.mainScore,
-    //     relatedTopics: [],
-    //     topic: '',
-    //     followUpActions: [...acc[session.dialogueId].followUpActions, this.getActionFromSession(session)],
-    //   };
-    //   // }
-
-
-    //   return acc;
-    // }, {} as TopicStatisticsByDialogueId);
-
-    // // Normalize the topic counts (by averaging the cumulative `score`)
-    // Object.entries(topicsByString).forEach(([topic]) => {
-    //   Object.entries(topicsByString[topic]).forEach(([dialogueId, topicStatistics]) => {
-    //     topicsByString[topic][dialogueId].score = topicStatistics.score / topicStatistics.count;
-    //   });
-    // });
-
-    // console.log('Topics by string: ', newExtracted);
-
-    return newExtracted;
+    return negativeDialogueScoresExtracted;
   }
-
 
   /**
    * Given a list of sessions with node-entries, return an object which maps topics to their "frequency".

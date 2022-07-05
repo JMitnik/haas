@@ -1,21 +1,22 @@
 import * as UI from '@haas/ui';
+import { AlertTriangle, MessageCircle, User } from 'react-feather';
 import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { Zoom } from '@visx/zoom';
+import { useTranslation } from 'react-i18next';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import useMeasure from 'react-use-measure';
 
 import * as Modal from 'components/Common/Modal';
+import { DateFormat, useDate } from 'hooks/useDate';
 import { DatePicker } from 'components/Common/DatePicker';
+import { DialogueImpactScoreType, useGetIssuesQuery, useGetWorkspaceSummaryDetailsQuery } from 'types/generated-types';
 import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
 import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModalCard';
 import { SimpleIssueTable } from 'components/Analytics/Issues/SimpleIssueTable';
 import { useCustomer } from 'providers/CustomerProvider';
 
-import { AlertTriangle, MessageCircle, User } from 'react-feather';
 import * as LS from './WorkspaceGrid.styles';
 import { BreadCrumb } from './BreadCrumb';
-import { DateFormat, useDate } from 'hooks/useDate';
-import { DialogueImpactScoreType, useGetIssuesQuery, useGetWorkspaceSummaryDetailsQuery } from 'types/generated-types';
 import { HealthCardWide } from '../Common/HealthCard/HealthCardWide';
 import {
   HexagonDialogueNode,
@@ -32,7 +33,6 @@ import { HexagonGrid } from './HexagonGrid';
 import { IssuesModal } from './IssuesModal';
 import { Statistic } from './Statistic';
 import { createGrid, extractDialogueFragments, reconstructHistoryStack } from './WorkspaceGrid.helpers';
-import { useTranslation } from 'react-i18next';
 
 export interface DataLoadOptions {
   dialogueId?: string;
@@ -297,7 +297,7 @@ export const WorkspaceGrid = ({
 
   const summary = data?.customer?.statistics;
 
-  const { data: issuesData, loading: loadingIssues } = useGetIssuesQuery({
+  const { data: issuesData } = useGetIssuesQuery({
     fetchPolicy: 'no-cache',
     variables: {
       workspaceId: activeCustomer?.id || '',
@@ -310,7 +310,6 @@ export const WorkspaceGrid = ({
   });
 
   const issues = issuesData?.customer?.issues || [];
-  console.log('Issues workspace grid: ', issues);
 
   // Various stats fields
   const health = summary?.health;
@@ -424,7 +423,12 @@ export const WorkspaceGrid = ({
                 >
                   <UI.Div position="absolute" left={12} top={12}>
                     {historyQueue.length > 0 && (
-                      <BreadCrumb maxWidth={width * 0.8} viewMode={currentState.viewMode} historyQueue={historyQueue} onJumpToIndex={popToIndex} />
+                      <BreadCrumb
+                        maxWidth={width * 0.8}
+                        viewMode={currentState.viewMode}
+                        historyQueue={historyQueue}
+                        onJumpToIndex={popToIndex}
+                      />
                     )}
                   </UI.Div>
                 </HexagonGrid>

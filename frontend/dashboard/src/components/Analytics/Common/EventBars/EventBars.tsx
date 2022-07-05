@@ -48,8 +48,6 @@ export const EventBars = ({ events, width, height }: EventBarsProps) => {
 
   const paddedEvents = padEvents(events, getNWeekAgo(2), getNow());
 
-  console.log('Events: ', events);
-
   return (
     <EventBarsContainer>
       <svg ref={containerRef} width={width} height={height}>
