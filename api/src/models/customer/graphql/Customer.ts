@@ -19,6 +19,7 @@ import { DialogueConnection, DialogueConnectionFilterInput } from '../../questio
 import { HealthScore, HealthScoreInput } from './HealthScore';
 import { Issue, IssueFilterInput } from '../../Issue/graphql';
 import { IssueValidator } from '../../Issue/IssueValidator';
+import { SessionConnectionFilterInput, SessionConnection } from '../../../models/session/graphql';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -42,6 +43,25 @@ export const CustomerType = objectType({
       async resolve(parent: Customer, args, ctx) {
         const customerSettings = await ctx.services.customerService.getCustomerSettingsByCustomerId(parent.id);
         return customerSettings;
+      },
+    });
+
+    t.field('sessionConnection', {
+      type: SessionConnection,
+      args: { filter: SessionConnectionFilterInput },
+      nullable: true,
+
+      async resolve(parent, args, ctx) {
+        if (!parent.id) return null;
+
+        const sessionConnection = await ctx.services.sessionService.getWorkspaceSessionConnection(
+          parent.id,
+          args.filter
+        );
+
+        if (!sessionConnection) return null;
+
+        return sessionConnection;
       },
     });
 
@@ -449,12 +469,10 @@ export const WorkspaceMutations = Upload && extendType({
         const stream = new Promise<UploadApiResponse>((resolve, reject) => {
           const cld_upload_stream = cloudinary.v2.uploader.upload_stream({
             folder: 'company_logos',
-          },
-            (error, result: UploadApiResponse | undefined) => {
-              if (result) return resolve(result);
-
-              return reject(error);
-            });
+          }, (error, result: UploadApiResponse | undefined) => {
+            if (result) return resolve(result);
+            return reject(error);
+          });
 
           return createReadStream().pipe(cld_upload_stream);
         });

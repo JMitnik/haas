@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { orderBy } from 'lodash';
 
-import { SessionActionType } from 'models/session/SessionTypes';
+import { SessionActionType } from 'models/session/Session.types';
 import { isPresent } from 'ts-is-present';
 import { Nullable } from 'types/generic';
 

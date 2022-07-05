@@ -7,7 +7,7 @@ import { DialogueStatistics } from './graphql/DialogueStatistics';
 import { CustomerType } from '../customer/graphql/Customer';
 import { EdgeType } from '../edge/Edge';
 import { QuestionNodeType } from '../QuestionNode/QuestionNode';
-import { SessionConnection, SessionType } from '../session/graphql/Session';
+import { SessionConnection, SessionType } from '../session/graphql/Session.graphql';
 import { TagType, TagsInputType } from '../tag/Tag';
 import DialogueService from './DialogueService';
 import SessionService from '../session/SessionService';
@@ -399,14 +399,13 @@ export const DialogueType = objectType({
 
       async resolve(parent, args, ctx) {
         if (!parent.id) return null;
+
         const sessionConnection = await ctx.services.sessionService.getSessionConnection(
           parent.id,
           args.filter
         );
 
-        if (!sessionConnection) return null;
-
-        return sessionConnection;
+        return sessionConnection || null;
       },
     });
 

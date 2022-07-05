@@ -89,6 +89,7 @@ const authShield = shield({
     dialogueConnection: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_DIALOGUE)),
     automationConnection: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_AUTOMATIONS)),
     usersConnection: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_USERS)),
+    sessionConnection: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_DIALOGUE)),
   },
   DeliveryType: {
     deliveryRecipientFirstName: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_DELIVERIES)),
