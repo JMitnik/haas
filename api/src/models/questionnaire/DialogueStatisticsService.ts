@@ -13,7 +13,7 @@ import DialogueService from './DialogueService';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import { TopicService } from '../Topic/TopicService';
 import { TopicFilterInput } from '../Topic/Topic.types';
-import { Topic } from './DialogueTypes';
+import { Topic } from './Dialogue.types';
 import { toUTC } from '../../utils/dateUtils';
 
 const THRESHOLD = 40;

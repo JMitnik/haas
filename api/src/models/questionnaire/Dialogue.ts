@@ -1,4 +1,3 @@
-
 import { UserInputError } from 'apollo-server-express';
 import { subDays } from 'date-fns';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
@@ -13,7 +12,7 @@ import DialogueService from './DialogueService';
 import SessionService from '../session/SessionService';
 import formatDate from '../../utils/formatDate';
 import { isADate, isValidDateTime } from '../../utils/isValidDate';
-import { CopyDialogueInputType } from './DialogueTypes';
+import { CopyDialogueInputType } from './Dialogue.types';
 import { SessionConnectionFilterInput } from '../session/graphql';
 import { DialogueStatisticsSummaryModel } from './DialogueStatisticsSummary';
 import { UserType } from '../users/graphql/User';

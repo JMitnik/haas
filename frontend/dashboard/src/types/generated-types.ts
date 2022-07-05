@@ -929,10 +929,6 @@ export enum DialogueImpactScoreType {
   Average = 'AVERAGE'
 }
 
-export type DialogueLinksInput = {
-  workspaceId?: Maybe<Scalars['String']>;
-};
-
 export type DialogueStatistics = {
   __typename?: 'DialogueStatistics';
   nrInteractions: Scalars['Int'];
@@ -1879,6 +1875,13 @@ export type PreviewDataType = {
   websiteScreenshotUrl: Scalars['String'];
 };
 
+export type PublicDialogueConnection = ConnectionInterface & {
+  __typename?: 'PublicDialogueConnection';
+  totalPages?: Maybe<Scalars['Int']>;
+  pageInfo: PaginationPageInfo;
+  dialogues: Array<PublicDialogueInfo>;
+};
+
 export type PublicDialogueInfo = {
   __typename?: 'PublicDialogueInfo';
   title: Scalars['String'];
@@ -1911,7 +1914,7 @@ export type Query = {
   user?: Maybe<UserType>;
   dialogue?: Maybe<Dialogue>;
   dialogues: Array<Dialogue>;
-  dialogueLinks?: Maybe<Array<PublicDialogueInfo>>;
+  dialogueLinks?: Maybe<PublicDialogueConnection>;
   refreshAccessToken: RefreshAccessTokenOutput;
   sessions: Array<Session>;
   /** A session is one entire user-interaction */
@@ -2024,7 +2027,8 @@ export type QueryDialoguesArgs = {
 
 
 export type QueryDialogueLinksArgs = {
-  input?: Maybe<DialogueLinksInput>;
+  workspaceId?: Maybe<Scalars['String']>;
+  filter?: Maybe<DialogueConnectionFilterInput>;
 };
 
 
@@ -3352,16 +3356,24 @@ export type DuplicateQuestionMutation = (
 );
 
 export type GetDialogueLinksQueryVariables = Exact<{
-  input?: Maybe<DialogueLinksInput>;
+  workspaceId?: Maybe<Scalars['String']>;
+  filter?: Maybe<DialogueConnectionFilterInput>;
 }>;
 
 
 export type GetDialogueLinksQuery = (
   { __typename?: 'Query' }
-  & { dialogueLinks?: Maybe<Array<(
-    { __typename?: 'PublicDialogueInfo' }
-    & Pick<PublicDialogueInfo, 'title' | 'slug' | 'description' | 'url'>
-  )>> }
+  & { dialogueLinks?: Maybe<(
+    { __typename?: 'PublicDialogueConnection' }
+    & Pick<PublicDialogueConnection, 'totalPages'>
+    & { dialogues: Array<(
+      { __typename?: 'PublicDialogueInfo' }
+      & Pick<PublicDialogueInfo, 'title' | 'slug' | 'description' | 'url'>
+    )>, pageInfo: (
+      { __typename?: 'PaginationPageInfo' }
+      & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'prevPageOffset' | 'nextPageOffset' | 'pageIndex'>
+    ) }
+  )> }
 );
 
 export type DeleteDialogueMutationVariables = Exact<{
@@ -4970,12 +4982,22 @@ export type DuplicateQuestionMutationHookResult = ReturnType<typeof useDuplicate
 export type DuplicateQuestionMutationResult = Apollo.MutationResult<DuplicateQuestionMutation>;
 export type DuplicateQuestionMutationOptions = Apollo.BaseMutationOptions<DuplicateQuestionMutation, DuplicateQuestionMutationVariables>;
 export const GetDialogueLinksDocument = gql`
-    query GetDialogueLinks($input: DialogueLinksInput) {
-  dialogueLinks(input: $input) {
-    title
-    slug
-    description
-    url
+    query GetDialogueLinks($workspaceId: String, $filter: DialogueConnectionFilterInput) {
+  dialogueLinks(workspaceId: $workspaceId, filter: $filter) {
+    dialogues {
+      title
+      slug
+      description
+      url
+    }
+    totalPages
+    pageInfo {
+      hasPrevPage
+      hasNextPage
+      prevPageOffset
+      nextPageOffset
+      pageIndex
+    }
   }
 }
     `;
@@ -4992,7 +5014,8 @@ export const GetDialogueLinksDocument = gql`
  * @example
  * const { data, loading, error } = useGetDialogueLinksQuery({
  *   variables: {
- *      input: // value for 'input'
+ *      workspaceId: // value for 'workspaceId'
+ *      filter: // value for 'filter'
  *   },
  * });
  */
@@ -6035,7 +6058,9 @@ export namespace DuplicateQuestion {
 export namespace GetDialogueLinks {
   export type Variables = GetDialogueLinksQueryVariables;
   export type Query = GetDialogueLinksQuery;
-  export type DialogueLinks = NonNullable<(NonNullable<GetDialogueLinksQuery['dialogueLinks']>)[number]>;
+  export type DialogueLinks = (NonNullable<GetDialogueLinksQuery['dialogueLinks']>);
+  export type Dialogues = NonNullable<(NonNullable<(NonNullable<GetDialogueLinksQuery['dialogueLinks']>)['dialogues']>)[number]>;
+  export type PageInfo = (NonNullable<(NonNullable<GetDialogueLinksQuery['dialogueLinks']>)['pageInfo']>);
   export const Document = GetDialogueLinksDocument;
 }
 

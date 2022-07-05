@@ -1,10 +1,11 @@
-import { NodeType, LanguageEnum, NodeEntry, QuestionOption, Session, ChoiceNodeEntry, Edge } from '@prisma/client';
+import { NodeType, LanguageEnum, NodeEntry, QuestionOption, Session, ChoiceNodeEntry } from '@prisma/client';
 
 import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';
 
 export type Topic = NexusGenFieldTypes['TopicType'];
 export type DialogueStatisticsSummaryFilterInput = NexusGenInputs['DialogueStatisticsSummaryFilterInput'];
+export type DialogueConnectionFilterInput = NexusGenInputs['DialogueConnectionFilterInput'];
 
 export interface ChildNodeEntry {
   id: number;
