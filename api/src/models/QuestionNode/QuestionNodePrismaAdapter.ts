@@ -14,11 +14,11 @@ class QuestionNodePrismaAdapter {
 
   /**
    * Finds all topic question options within a list of dialogues matching a string
-   * @param dialogueIds 
-   * @param topic 
-   * @returns 
+   * @param dialogueIds
+   * @param topic
+   * @returns
    */
-  findQuestionOptionsBySelectedTopic = async (dialogueIds: string[], topic: string) => {
+  public async findQuestionOptionsBySelectedTopic (dialogueIds: string[], topic: string) {
     const questionOptions = await this.prisma.questionOption.findMany({
       where: {
         value: topic,
@@ -30,11 +30,11 @@ class QuestionNodePrismaAdapter {
         },
       },
     });
+
     return questionOptions
   }
 
-
-  findSliderNodeByDialogueId = async (dialogueId: string) => {
+  public async findSliderNodeByDialogueId (dialogueId: string) {
     return this.prisma.questionNode.findFirst({
       where: {
         questionDialogueId: dialogueId,
@@ -58,9 +58,9 @@ class QuestionNodePrismaAdapter {
 
   /**
    * Finds a cache entry of a dialogue statistics summary based on id and date range
-   * @param dialogueId 
-   * @param startDateTime 
-   * @param endDateTime 
+   * @param dialogueId
+   * @param startDateTime
+   * @param endDateTime
    * @returns DialogueStatisticsSummaryCache | null
    */
   findQuestionStatisticsSummaryByQuestionId = async (dialogueId: string, startDateTime: Date, endDateTime: Date) => {
