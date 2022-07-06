@@ -3,11 +3,13 @@
 /* eslint-disable radix */
 import '@szhsin/react-menu/dist/index.css';
 import * as UI from '@haas/ui';
-import { BooleanParam, DateTimeParam, NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
-import { Calendar, Filter, Link2, Plus, Search } from 'react-feather';
+import { AlignLeft, BarChart2, Calendar, Filter, Link2, Plus, Search, User } from 'react-feather';
+import { ArrayParam, BooleanParam, DateTimeParam, NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
 import { Flex } from '@haas/ui';
 import { ROUTES, useNavigator } from 'hooks/useNavigator';
 import { endOfDay, format, startOfDay } from 'date-fns';
+import { isPresent } from 'ts-is-present';
+import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
@@ -15,7 +17,6 @@ import * as Menu from 'components/Common/Menu';
 import * as Modal from 'components/Common/Modal';
 import * as Table from 'components/Common/Table';
 import { Avatar } from 'components/Common/Avatar';
-import { Circle } from 'components/Common/Circle';
 import {
   CompactEntriesPath,
 } from 'views/DialogueView/Modules/InteractionFeedModule/InteractionFeedEntry';
@@ -86,6 +87,7 @@ const DistributionInnerCell = ({ session }: DistributionInnerCellProps) => (
 
 export const FeedbackOverview = () => {
   const { t } = useTranslation();
+  const history = useHistory();
   const { customerSlug } = useNavigator();
   const { activeCustomer } = useCustomer();
 
@@ -99,6 +101,10 @@ export const FeedbackOverview = () => {
     perPage: withDefault(NumberParam, 10),
     orderByField: withDefault(StringParam, SessionConnectionOrder.CreatedAt),
     orderByDescending: withDefault(BooleanParam, true),
+    dialogueIds: ArrayParam,
+    minScore: withDefault(NumberParam, 0),
+    maxScore: withDefault(NumberParam, 100),
+    withFollowUpAction: withDefault(BooleanParam, false),
   });
   const [totalPages, setTotalPages] = useState<number>(0);
 
@@ -116,6 +122,12 @@ export const FeedbackOverview = () => {
           desc: filter.orderByDescending,
         },
         search: filter.search,
+        dialogueIds: filter.dialogueIds?.filter(isPresent) || [],
+        scoreRange: {
+          min: filter.minScore,
+          max: filter.maxScore,
+        },
+        withFollowUpAction: filter.withFollowUpAction,
       },
     },
     errorPolicy: 'ignore',
@@ -177,7 +189,8 @@ export const FeedbackOverview = () => {
 
   const [openModal, closeModal, isOpenModal, params] = useRouteModal<{ interactionId: string }>({
     matchUrlKey: ROUTES.WORKSPACE_INTERACTION_VIEW,
-    exitUrl: `/dashboard/b/${customerSlug}/dashboard/feedback`,
+    exitUrl: '',
+    exitCallback: () => history.goBack(),
   });
 
   return (
@@ -209,6 +222,7 @@ export const FeedbackOverview = () => {
                   tabs={[
                     { label: t('search'), icon: <Search /> },
                     { label: t('date'), icon: <Calendar /> },
+                    { label: t('score'), icon: <BarChart2 /> },
                   ]}
                 >
                   <UI.Div id="searchFilter">
@@ -244,6 +258,29 @@ export const FeedbackOverview = () => {
                       <UI.Button size="sm" onClick={() => handleDateChange(null)}>{t('reset')}</UI.Button>
                     </UI.Stack>
                   </UI.Div>
+
+                  <UI.Div id="scoreFilter">
+                    <UI.Stack spacing={2}>
+                      <UI.RadioHeader>
+                        {t('filter_by_score')}
+                      </UI.RadioHeader>
+                      <UI.Div mb={1}>
+                        <UI.Muted>{t('show_interactions_between')}</UI.Muted>
+                      </UI.Div>
+                      <UI.Div>
+                        <UI.RangeSlider
+                          stepSize={1}
+                          defaultValue={[filter.minScore || 0, filter.maxScore || 100]}
+                          min={0}
+                          max={100}
+                          onChange={(e: any) => setFilter({ pageIndex: 0, minScore: e[0], maxScore: e[1] })}
+                        />
+                      </UI.Div>
+                      <UI.Button size="sm" onClick={() => setFilter({ pageIndex: 0, minScore: 0, maxScore: 100 })}>
+                        {t('reset')}
+                      </UI.Button>
+                    </UI.Stack>
+                  </UI.Div>
                 </TabbedMenu>
               )}
             </PickerButton>
@@ -263,6 +300,25 @@ export const FeedbackOverview = () => {
                 filterKey="date"
                 value={`${formatSimpleDate(filter.startDate?.toISOString())} - ${formatSimpleDate(filter.endDate?.toISOString())}`}
                 onClose={() => setFilter({ startDate: undefined, endDate: undefined })}
+              />
+              <Table.FilterButton
+                condition={!!filter.dialogueIds?.length}
+                filterKey="team"
+                value={`${sessions.find((session) => session.dialogueId === filter.dialogueIds?.[0])?.dialogue?.title}`}
+                onClose={() => setFilter({ dialogueIds: [] })}
+              />
+              <Table.FilterButton
+                condition={filter.minScore > 0 || filter.maxScore < 100}
+                filterKey="score"
+                value={`${filter.minScore} - ${filter.maxScore}`}
+                onClose={() => setFilter({ minScore: 0, maxScore: 100 })}
+              />
+
+              <Table.FilterButton
+                condition={filter.withFollowUpAction}
+                filterKey="show"
+                value="urgent only"
+                onClose={() => setFilter({ withFollowUpAction: false })}
               />
             </UI.Stack>
           </UI.Stack>
@@ -300,6 +356,41 @@ export const FeedbackOverview = () => {
                 </UI.Icon>
                 {t('filter')}
               </Menu.Header>
+              <Menu.SubMenu label={(
+                <UI.Flex>
+                  <UI.Icon mr={1} width={10}>
+                    <AlignLeft />
+                  </UI.Icon>
+                  {t('Session')}
+                </UI.Flex>
+              )}
+              >
+                <Menu.Item
+                  disabled={!contextInteraction?.followUpAction}
+                  onClick={
+                    () => setFilter({ pageIndex: 0, withFollowUpAction: true })
+                  }
+                >
+                  Show only urgent feedback
+                </Menu.Item>
+              </Menu.SubMenu>
+              <Menu.SubMenu label={(
+                <UI.Flex>
+                  <UI.Icon mr={1} width={10}>
+                    <User />
+                  </UI.Icon>
+                  {t('Team')}
+                </UI.Flex>
+              )}
+              >
+                <Menu.Item
+                  onClick={
+                    () => setFilter({ pageIndex: 0, dialogueIds: [contextInteraction?.dialogueId as string] })
+                  }
+                >
+                  Show all from this team
+                </Menu.Item>
+              </Menu.SubMenu>
               <Menu.SubMenu label={(
                 <UI.Flex>
                   <UI.Icon mr={1} width={10}>
