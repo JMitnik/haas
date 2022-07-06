@@ -5,6 +5,7 @@ fragment SessionFragment on Session {
   originUrl
   totalTimeInSec
   device
+  dialogueId
 
   nodeEntries {
     ...NodeEntryFragment
@@ -12,5 +13,16 @@ fragment SessionFragment on Session {
 
   delivery {
     ...DeliveryFragment
+  }
+
+  dialogue {
+    title
+    slug
+  }
+
+  followUpAction {
+    values {
+      shortText
+    }
   }
 }

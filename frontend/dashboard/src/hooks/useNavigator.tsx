@@ -7,6 +7,7 @@ export const ROUTES = {
   DIALOGUE_ROOT: '/dashboard/b/:customerSlug/d/:dialogueSlug',
   INTERACTIONS_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/interactions',
   INTERACTION_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/interactions/:interactionId',
+  WORKSPACE_INTERACTION_VIEW: '/dashboard/b/:customerSlug/dashboard/feedback/:interactionId',
   CAMPAIGNS_VIEW: '/dashboard/b/:customerSlug/campaigns',
   CAMPAIGN_VIEW: '/dashboard/b/:customerSlug/campaign/:campaignId',
   DELIVERY_VIEW: '/dashboard/b/:customerSlug/campaign/:campaignId/:deliveryId',

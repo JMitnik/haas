@@ -4,14 +4,9 @@
 import '@szhsin/react-menu/dist/index.css';
 import * as UI from '@haas/ui';
 import { BooleanParam, DateTimeParam, NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
-import { Calendar, Filter, Link2, Mail, MessageCircle, Plus, Search, Smartphone } from 'react-feather';
-import { Controller, useForm } from 'react-hook-form';
+import { Calendar, Filter, Link2, Plus, Search } from 'react-feather';
 import { Flex } from '@haas/ui';
 import { ROUTES, useNavigator } from 'hooks/useNavigator';
-import {
-  Radio,
-  RadioGroup,
-} from '@chakra-ui/core';
 import { endOfDay, format, startOfDay } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
@@ -20,33 +15,25 @@ import * as Menu from 'components/Common/Menu';
 import * as Modal from 'components/Common/Modal';
 import * as Table from 'components/Common/Table';
 import { Avatar } from 'components/Common/Avatar';
-import {
-  CampaignVariantEnum,
-  SessionConnectionOrder,
-  SessionDeliveryType, SessionFragmentFragment, useGetInteractionsQueryQuery,
-} from 'types/generated-types';
 import { Circle } from 'components/Common/Circle';
 import {
   CompactEntriesPath,
 } from 'views/DialogueView/Modules/InteractionFeedModule/InteractionFeedEntry';
-import { DeliveryRecipient } from 'components/Campaign/DeliveryRecipient';
 import { PickerButton } from 'components/Common/Picker/PickerButton';
+import {
+  SessionConnectionOrder,
+  SessionFragmentFragment, useGetWorkspaceSessionsQuery,
+} from 'types/generated-types';
 import { TabbedMenu } from 'components/Common/TabMenu';
 import { View } from 'layouts/View';
 import { formatSimpleDate } from 'utils/dateUtils';
+import { useCustomer } from 'providers/CustomerProvider';
 import { useMenu } from 'components/Common/Menu/useMenu';
 import { useRouteModal } from 'components/Common/Modal';
 import SearchBar from 'components/Common/SearchBar/SearchBar';
 
-import { InteractionModalCard } from '../FeedbackView/InteractionModalCard';
-
-const undefinedToNull = (value: any) => {
-  if (value === undefined) {
-    return 'all';
-  }
-
-  return value;
-};
+import { ContactableUserCell } from './InteractionTableCells';
+import { InteractionModalCard } from '../InteractionsOverview/InteractionModalCard';
 
 const AnonymousCell = ({ sessionId }: { sessionId: string }) => {
   const { t } = useTranslation();
@@ -87,76 +74,21 @@ interface DistributionInnerCellProps {
 
 const DistributionInnerCell = ({ session }: DistributionInnerCellProps) => (
   <UI.Div>
-    {session.delivery ? (
-      <Table.InnerCell>
-        <UI.Flex>
-          <UI.Div>
-            {session.delivery.campaignVariant?.type === CampaignVariantEnum.Email ? (
-              <Circle flexShrink={0} brand="blue" mr={2}>
-                <UI.Icon>
-                  <Smartphone />
-                </UI.Icon>
-              </Circle>
-            ) : (
-              <Circle flexShrink={0} brand="blue" mr={2}>
-                <UI.Icon>
-                  <Mail />
-                </UI.Icon>
-              </Circle>
-            )}
-          </UI.Div>
-          <UI.Div>
-            <UI.Helper color="blue.500">
-              Campaign:
-              {' '}
-              {session.delivery.campaignVariant?.campaign?.label}
-            </UI.Helper>
-            <UI.Flex>
-              <UI.Muted>
-                {session.originUrl}
-              </UI.Muted>
-            </UI.Flex>
-          </UI.Div>
-        </UI.Flex>
-      </Table.InnerCell>
-    ) : (
-      <UI.Div>
-        <Table.InnerCell>
-          <UI.Div>
-            <UI.Flex>
-              <Circle flexShrink={0} brand="gray" mr={2}>
-                <UI.Icon>
-                  <Link2 />
-                </UI.Icon>
-              </Circle>
-              <UI.Div>
-                <UI.Helper color="gray.500">Link click</UI.Helper>
-                <UI.Muted>
-                  {session.originUrl}
-                </UI.Muted>
-              </UI.Div>
-            </UI.Flex>
-          </UI.Div>
-        </Table.InnerCell>
-      </UI.Div>
-    )}
+    <Table.InnerCell>
+
+      <UI.Helper color="gray.500">
+        {' '}
+        {session.dialogue?.title}
+      </UI.Helper>
+    </Table.InnerCell>
   </UI.Div>
 );
 
-interface CampaignVariant {
-  id: string;
-  label: string;
-  campaign?: {
-    id: string;
-    label: string;
-  } | null;
-}
-
-export const InteractionsOverview = () => {
+export const FeedbackOverview = () => {
   const { t } = useTranslation();
-  const { customerSlug, dialogueSlug } = useNavigator();
+  const { customerSlug } = useNavigator();
+  const { activeCustomer } = useCustomer();
 
-  const [campaignVariants, setCampaignVariants] = useState<CampaignVariant[]>([]);
   const [sessions, setSessions] = useState<SessionFragmentFragment[]>(() => []);
 
   const [filter, setFilter] = useQueryParams({
@@ -165,19 +97,16 @@ export const InteractionsOverview = () => {
     search: StringParam,
     pageIndex: withDefault(NumberParam, 0),
     perPage: withDefault(NumberParam, 10),
-    filterCampaigns: StringParam,
-    filterCampaignId: StringParam,
     orderByField: withDefault(StringParam, SessionConnectionOrder.CreatedAt),
     orderByDescending: withDefault(BooleanParam, true),
   });
   const [totalPages, setTotalPages] = useState<number>(0);
 
-  const { loading: isLoading } = useGetInteractionsQueryQuery({
+  const { loading: isLoading } = useGetWorkspaceSessionsQuery({
     fetchPolicy: 'cache-and-network',
     variables: {
-      customerSlug,
-      dialogueSlug,
-      sessionsFilter: {
+      id: activeCustomer?.id as string,
+      filter: {
         offset: filter.pageIndex * filter.perPage,
         startDate: filter.startDate ? filter.startDate?.toISOString() : undefined,
         perPage: filter.perPage,
@@ -187,32 +116,17 @@ export const InteractionsOverview = () => {
           desc: filter.orderByDescending,
         },
         search: filter.search,
-        deliveryType: filter.filterCampaigns === 'all' ? undefined : filter.filterCampaigns as SessionDeliveryType,
-        campaignVariantId: filter.filterCampaignId === 'all' ? undefined : filter.filterCampaignId,
       },
     },
     errorPolicy: 'ignore',
     onCompleted: (fetchedData) => {
-      setCampaignVariants(
-        fetchedData?.customer?.dialogue?.campaignVariants || [],
-      );
-
       setSessions(
-        fetchedData?.customer?.dialogue?.sessionConnection?.sessions || [],
+        fetchedData?.customer?.sessionConnection?.sessions || [],
       );
 
-      setTotalPages(fetchedData.customer?.dialogue?.sessionConnection?.totalPages || 0);
+      setTotalPages(fetchedData.customer?.sessionConnection?.totalPages || 0);
     },
   });
-
-  const handleCampaignVariantFilterChange = (filterValues: CampaignVariantFormProps) => {
-    setFilter({
-      ...filter,
-      filterCampaigns: filterValues.filterCampaigns as SessionDeliveryType,
-      filterCampaignId: filterValues.filterCampaignVariant,
-      pageIndex: 0,
-    });
-  };
 
   const handleDateChange = (dates: Date[] | null) => {
     if (dates) {
@@ -262,8 +176,8 @@ export const InteractionsOverview = () => {
   const columns = 'minmax(200px, 1fr) minmax(150px, 1fr) minmax(300px, 1fr) minmax(300px, 1fr)';
 
   const [openModal, closeModal, isOpenModal, params] = useRouteModal<{ interactionId: string }>({
-    matchUrlKey: ROUTES.INTERACTION_VIEW,
-    exitUrl: `/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions`,
+    matchUrlKey: ROUTES.WORKSPACE_INTERACTION_VIEW,
+    exitUrl: `/dashboard/b/${customerSlug}/dashboard/feedback`,
   });
 
   return (
@@ -295,7 +209,6 @@ export const InteractionsOverview = () => {
                   tabs={[
                     { label: t('search'), icon: <Search /> },
                     { label: t('date'), icon: <Calendar /> },
-                    { label: t('origin'), icon: <MessageCircle /> },
                   ]}
                 >
                   <UI.Div id="searchFilter">
@@ -331,18 +244,6 @@ export const InteractionsOverview = () => {
                       <UI.Button size="sm" onClick={() => handleDateChange(null)}>{t('reset')}</UI.Button>
                     </UI.Stack>
                   </UI.Div>
-                  <UI.Div id="campaignFilter">
-                    <UI.Stack>
-                      <FilterByCampaignForm
-                        defaultValues={{
-                          filterCampaignVariant: undefinedToNull(filter.filterCampaignId),
-                          filterCampaigns: undefinedToNull(filter.filterCampaigns),
-                        }}
-                        campaignVariants={campaignVariants}
-                        onApply={handleCampaignVariantFilterChange}
-                      />
-                    </UI.Stack>
-                  </UI.Div>
                 </TabbedMenu>
               )}
             </PickerButton>
@@ -363,18 +264,6 @@ export const InteractionsOverview = () => {
                 value={`${formatSimpleDate(filter.startDate?.toISOString())} - ${formatSimpleDate(filter.endDate?.toISOString())}`}
                 onClose={() => setFilter({ startDate: undefined, endDate: undefined })}
               />
-              <Table.FilterButton
-                condition={!!filter.filterCampaigns}
-                filterKey="distribution"
-                value={filter.filterCampaigns}
-                onClose={() => setFilter({ filterCampaigns: undefined })}
-              />
-              <Table.FilterButton
-                condition={!!filter.filterCampaignId}
-                filterKey="campaignVariant"
-                value={filter.filterCampaignId}
-                onClose={() => setFilter({ filterCampaignId: undefined })}
-              />
             </UI.Stack>
           </UI.Stack>
         </UI.Flex>
@@ -390,7 +279,7 @@ export const InteractionsOverview = () => {
               {t('interaction')}
             </Table.HeadingCell>
             <Table.HeadingCell>
-              {t('origin')}
+              {t('team')}
             </Table.HeadingCell>
             <Table.HeadingCell
               sorting
@@ -442,41 +331,6 @@ export const InteractionsOverview = () => {
                   {formatSimpleDate(contextInteraction?.createdAt)}
                 </Menu.Item>
               </Menu.SubMenu>
-              {contextInteraction?.delivery && (
-                <>
-                  <Menu.SubMenu label={(
-                    <UI.Flex>
-                      <UI.Icon mr={1} width={10}>
-                        <MessageCircle />
-                      </UI.Icon>
-                      {t('campaign')}
-                    </UI.Flex>
-                  )}
-                  >
-                    <Menu.Item
-                      onClick={() => handleSearchTermChange(
-                        `${contextInteraction?.delivery?.deliveryRecipientFirstName} ${contextInteraction?.delivery?.deliveryRecipientLastName}` || '',
-                      )}
-                    >
-                      {t('more_from')}
-                      {' '}
-                      {contextInteraction?.delivery?.deliveryRecipientFirstName}
-                      {' '}
-                      {contextInteraction?.delivery?.deliveryRecipientLastName}
-                    </Menu.Item>
-                    <Menu.Item onClick={() => handleCampaignVariantFilterChange({
-                      filterCampaignVariant: contextInteraction?.delivery?.campaignVariant?.id,
-                    })}
-                    >
-                      {t('more_from')}
-                      {' '}
-                      {t('campaign_variant')}
-                      {' '}
-                      {contextInteraction?.delivery?.campaignVariant?.label}
-                    </Menu.Item>
-                  </Menu.SubMenu>
-                </>
-              )}
             </Menu.Base>
 
             {sessions.map((session) => (
@@ -488,8 +342,8 @@ export const InteractionsOverview = () => {
                 onContextMenu={(e) => openMenu(e, session)}
               >
                 <Table.Cell>
-                  {session.delivery?.deliveryRecipientFirstName ? (
-                    <DeliveryRecipient delivery={session.delivery} />
+                  {session?.followUpAction ? (
+                    <ContactableUserCell followUpAction={session.followUpAction} sessionId={session.id} />
                   ) : (
                     <AnonymousCell sessionId={session.id} />
                   )}
@@ -526,94 +380,5 @@ export const InteractionsOverview = () => {
         </Modal.Root>
       </UI.ViewBody>
     </View>
-  );
-};
-
-interface CampaignVariantFormProps {
-  filterCampaigns?: string;
-  filterCampaignVariant?: string;
-}
-
-interface FilterByCampaignFormProps {
-  defaultValues: CampaignVariantFormProps;
-  campaignVariants: CampaignVariant[];
-  onApply: (filterValues: CampaignVariantFormProps) => void;
-}
-
-const FilterByCampaignForm = ({ defaultValues, campaignVariants, onApply }: FilterByCampaignFormProps) => {
-  const { t } = useTranslation();
-  const form = useForm<CampaignVariantFormProps>({
-    defaultValues: {
-      filterCampaignVariant: defaultValues.filterCampaignVariant,
-      filterCampaigns: defaultValues.filterCampaigns as SessionDeliveryType,
-    },
-  });
-
-  const filterCampaignWatch = form.watch('filterCampaigns');
-
-  const handleSubmit = () => {
-    onApply(form.getValues());
-    form.reset(form.getValues());
-  };
-
-  return (
-    <UI.Form onSubmit={form.handleSubmit(handleSubmit)}>
-      <UI.Stack>
-        <UI.Div>
-          <UI.RadioHeader>
-            {t('filter_by_origin_type')}
-          </UI.RadioHeader>
-          <Controller
-            control={form.control}
-            name="filterCampaigns"
-            defaultValue={defaultValues.filterCampaigns}
-            render={({ onChange, value }) => (
-              <RadioGroup size="sm" onChange={onChange} value={value}>
-                <Radio value="all" mb={0}>All</Radio>
-                <Radio value={SessionDeliveryType.Campaigns} mb={0}>Only campaigns</Radio>
-                <Radio value={SessionDeliveryType.NoCampaigns} mb={0}>Only link-clicks</Radio>
-              </RadioGroup>
-            )}
-          />
-
-          {filterCampaignWatch !== SessionDeliveryType.NoCampaigns && (
-            <UI.Div mt={2}>
-              <UI.RadioHeader>
-                Pick campaigns
-              </UI.RadioHeader>
-              <Controller
-                control={form.control}
-                name="filterCampaignVariant"
-                defaultValue={defaultValues.filterCampaignVariant}
-                render={({ onChange, value }) => (
-                  <RadioGroup size="sm" onChange={onChange} value={value}>
-                    <Radio value="all" mb={0}>All</Radio>
-                    {campaignVariants.map((variant) => (
-                      <Radio key={variant.id} value={variant.id} mb={0}>
-                        {variant?.campaign?.label}
-                        {' '}
-                        -
-                        {' '}
-                        {variant.label}
-                      </Radio>
-                    ))}
-                  </RadioGroup>
-                )}
-              />
-            </UI.Div>
-          )}
-        </UI.Div>
-
-        <UI.Button
-          isDisabled={!form.formState.isDirty}
-          type="submit"
-          variantColor="teal"
-          size="sm"
-          mb={4}
-        >
-          Apply filters
-        </UI.Button>
-      </UI.Stack>
-    </UI.Form>
   );
 };

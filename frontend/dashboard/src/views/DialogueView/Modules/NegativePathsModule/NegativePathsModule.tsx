@@ -44,18 +44,18 @@ const NegativePathsModule = ({ negativePaths }: { negativePaths: any }) => {
         <UI.CardBody display="flex" flexDirection="column" height="100%">
           <UI.Text fontSize="1.3rem" color="red.200">{t('dialogue:top_negative_paths')}</UI.Text>
           <UI.Flex marginTop="10px" flexGrow={1} flexDirection="column">
-            {negativePaths.length > 0 && (
-            <NegativePathsModuleList>
-              {negativePaths.map(({ answer, quantity }: { answer: string, quantity: number }) => (
-                <li key={`${answer}-${quantity}`}>
-                  {`${answer}`}
-                </li>
-              ))}
-            </NegativePathsModuleList>
+            {negativePaths?.length > 0 && (
+              <NegativePathsModuleList>
+                {negativePaths.map(({ answer, quantity }: { answer: string, quantity: number }) => (
+                  <li key={`${answer}-${quantity}`}>
+                    {`${answer}`}
+                  </li>
+                ))}
+              </NegativePathsModuleList>
             )}
           </UI.Flex>
         </UI.CardBody>
-        {!negativePaths.length && (
+        {!negativePaths?.length && (
           <FallbackContainer>
             <UI.Text
               fontWeight="600"
