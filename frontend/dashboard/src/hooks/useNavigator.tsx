@@ -50,8 +50,8 @@ export const useNavigator = () => {
       customerSlug,
     });
 
-    const restDialogues = dialogueIds.join('&dialogueIds=');
-    let targetPath = `${path}?startDate=${startDate}&endDate=${endDate}${restDialogues}`;
+    const dialogueQueryParams = dialogueIds.length > 1 ? dialogueIds.join('&dialogueIds=') : `&dialogueIds=${dialogueIds?.[0] || ''}`;
+    let targetPath = `${path}?startDate=${startDate}&endDate=${endDate}${dialogueQueryParams}`;
     if (maxScore) targetPath = `${targetPath}&maxScore=${maxScore}`;
     if (withFollowUpAction) targetPath = `${targetPath}&withFollowUpAction=1`;
 
