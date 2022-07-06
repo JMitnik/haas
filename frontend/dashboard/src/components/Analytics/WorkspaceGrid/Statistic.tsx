@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { Filter } from 'react-feather';
+import { useTranslation } from 'react-i18next';
+import React from 'react';
 
 interface StatisticsProps {
   icon: React.ReactNode;
@@ -10,6 +10,7 @@ interface StatisticsProps {
   name: string;
   value: string | number;
   isFilterEnabled?: boolean;
+  onNavigate: () => void;
 }
 
 export const Statistic = ({
@@ -18,7 +19,8 @@ export const Statistic = ({
   themeColor,
   name,
   value,
-  isFilterEnabled
+  isFilterEnabled,
+  onNavigate,
 }: StatisticsProps) => {
   const { t } = useTranslation();
 
@@ -26,6 +28,7 @@ export const Statistic = ({
     <UI.Div>
       <UI.Flex>
         <UI.Div
+          onClick={onNavigate}
           display="flex"
           alignItems="center"
           justifyContent="center"
@@ -35,6 +38,7 @@ export const Statistic = ({
           bg={themeBg}
           color={themeColor}
           style={{
+            cursor: 'pointer',
             boxShadow: '0px 2px 5px -1px rgba(50, 50, 93, 0.25), 0px 1px 3px -1px rgba(0, 0, 0, 0.3)',
           }}
         >
@@ -58,7 +62,7 @@ export const Statistic = ({
                 color="white"
                 style={{
                   boxShadow: '0px 2px 5px -1px rgba(50, 50, 93, 0.25), 0px 1px 3px -1px rgba(0, 0, 0, 0.3)',
-                  transform: 'translateX(110%)'
+                  transform: 'translateX(110%)',
                 }}
               >
                 <UI.Icon display="flex" style={{ alignItems: 'center', justifyContent: 'center', height: '100%' }}>

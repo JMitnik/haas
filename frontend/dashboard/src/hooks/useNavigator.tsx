@@ -7,6 +7,7 @@ export const ROUTES = {
   DIALOGUE_ROOT: '/dashboard/b/:customerSlug/d/:dialogueSlug',
   INTERACTIONS_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/interactions',
   INTERACTION_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/interactions/:interactionId',
+  WORKSPACE_INTERACTIONS_VIEW: '/dashboard/b/:customerSlug/dashboard/feedback',
   WORKSPACE_INTERACTION_VIEW: '/dashboard/b/:customerSlug/dashboard/feedback/:interactionId',
   CAMPAIGNS_VIEW: '/dashboard/b/:customerSlug/campaigns',
   CAMPAIGN_VIEW: '/dashboard/b/:customerSlug/campaign/:campaignId',
@@ -41,6 +42,21 @@ export const useNavigator = () => {
 
   const history = useHistory();
   const location = useLocation();
+
+  const goToWorkspaceFeedbackOverview = (
+    dialogueIds: string[], startDate: string, endDate: string, maxScore?: number, withFollowUpAction?: boolean,
+  ) => {
+    const path = generatePath(ROUTES.WORKSPACE_INTERACTIONS_VIEW, {
+      customerSlug,
+    });
+
+    const restDialogues = dialogueIds.join('&dialogueIds=');
+    let targetPath = `${path}?startDate=${startDate}&endDate=${endDate}${restDialogues}`;
+    if (maxScore) targetPath = `${targetPath}&maxScore=${maxScore}`;
+    if (withFollowUpAction) targetPath = `${targetPath}&withFollowUpAction=1`;
+
+    history.push(targetPath + location.search);
+  };
 
   const goToDialogueBuilderOverview = () => {
     const path = generatePath(ROUTES.DIALOGUE_BUILDER_OVERVIEW, {
@@ -154,6 +170,7 @@ export const useNavigator = () => {
   });
 
   return {
+    goToWorkspaceFeedbackOverview,
     goToGenerateWorkspaceOverview,
     goToNewOptionsCTAView,
     goToDialogueBuilderOverview,

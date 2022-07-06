@@ -3,10 +3,16 @@
 /* eslint-disable radix */
 import '@szhsin/react-menu/dist/index.css';
 import * as UI from '@haas/ui';
-import { AlignLeft, BarChart2, Calendar, Filter, Link2, Plus, Search, User } from 'react-feather';
-import { ArrayParam, BooleanParam, DateTimeParam, NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
+import { AlignLeft, BarChart2, Calendar, Filter, Plus, Search, User } from 'react-feather';
+import {
+  ArrayParam,
+  BooleanParam,
+  NumberParam,
+  StringParam,
+  useQueryParams,
+  withDefault,
+} from 'use-query-params';
 import { Flex } from '@haas/ui';
-import { ROUTES, useNavigator } from 'hooks/useNavigator';
 import { endOfDay, format, startOfDay } from 'date-fns';
 import { isPresent } from 'ts-is-present';
 import { useHistory } from 'react-router';
@@ -20,7 +26,9 @@ import { Avatar } from 'components/Common/Avatar';
 import {
   CompactEntriesPath,
 } from 'views/DialogueView/Modules/InteractionFeedModule/InteractionFeedEntry';
+import { DateFormat, useDate } from 'hooks/useDate';
 import { PickerButton } from 'components/Common/Picker/PickerButton';
+import { ROUTES } from 'hooks/useNavigator';
 import {
   SessionConnectionOrder,
   SessionFragmentFragment, useGetWorkspaceSessionsQuery,
@@ -88,14 +96,14 @@ const DistributionInnerCell = ({ session }: DistributionInnerCellProps) => (
 export const FeedbackOverview = () => {
   const { t } = useTranslation();
   const history = useHistory();
-  const { customerSlug } = useNavigator();
+  const { parse, format: dateFormat } = useDate();
   const { activeCustomer } = useCustomer();
 
   const [sessions, setSessions] = useState<SessionFragmentFragment[]>(() => []);
 
   const [filter, setFilter] = useQueryParams({
-    startDate: DateTimeParam,
-    endDate: DateTimeParam,
+    startDate: StringParam,
+    endDate: StringParam,
     search: StringParam,
     pageIndex: withDefault(NumberParam, 0),
     perPage: withDefault(NumberParam, 10),
@@ -114,9 +122,9 @@ export const FeedbackOverview = () => {
       id: activeCustomer?.id as string,
       filter: {
         offset: filter.pageIndex * filter.perPage,
-        startDate: filter.startDate ? filter.startDate?.toISOString() : undefined,
+        startDate: filter.startDate ? filter.startDate : undefined,
         perPage: filter.perPage,
-        endDate: filter.endDate ? filter.endDate?.toISOString() : undefined,
+        endDate: filter.endDate ? filter.endDate : undefined,
         orderBy: {
           by: filter.orderByField as SessionConnectionOrder,
           desc: filter.orderByDescending,
@@ -145,8 +153,8 @@ export const FeedbackOverview = () => {
       const [newStartDate, newEndDate] = dates;
       setFilter({
         ...filter,
-        startDate: startOfDay(newStartDate),
-        endDate: endOfDay(newEndDate),
+        startDate: dateFormat(startOfDay(newStartDate), DateFormat.DayFormat),
+        endDate: dateFormat(endOfDay(newEndDate), DateFormat.DayFormat),
         pageIndex: 0,
       });
     } else {
@@ -162,8 +170,8 @@ export const FeedbackOverview = () => {
   const handleSingleDateFilterChange = (day: Date) => {
     setFilter({
       ...filter,
-      startDate: startOfDay(day),
-      endDate: endOfDay(day),
+      startDate: dateFormat(startOfDay(day), DateFormat.DayFormat),
+      endDate: dateFormat(endOfDay(day), DateFormat.DayFormat),
       pageIndex: 0,
     });
   };
@@ -171,8 +179,8 @@ export const FeedbackOverview = () => {
   const handleMultiDateFilterChange = (newStartDate?: Date, newEndDate?: Date) => {
     setFilter({
       ...filter,
-      startDate: newStartDate,
-      endDate: newEndDate,
+      startDate: newStartDate ? dateFormat(newStartDate, DateFormat.DayFormat) : undefined,
+      endDate: newEndDate ? dateFormat(newEndDate, DateFormat.DayFormat) : undefined,
       pageIndex: 0,
     });
   };
@@ -193,6 +201,7 @@ export const FeedbackOverview = () => {
     exitCallback: () => history.goBack(),
   });
 
+  console.log('Filter: ', filter);
   return (
     <View documentTitle="haas | Interactions">
       <UI.ViewHead>
@@ -250,7 +259,10 @@ export const FeedbackOverview = () => {
                       </UI.Div>
                       <UI.Div>
                         <UI.DatePicker
-                          value={[filter.startDate, filter.endDate]}
+                          value={[
+                            filter.startDate ? parse(filter.startDate, DateFormat.DayFormat) : undefined,
+                            filter.endDate ? parse(filter.endDate, DateFormat.DayFormat) : undefined,
+                          ]}
                           onChange={handleDateChange}
                           range
                         />
@@ -298,13 +310,15 @@ export const FeedbackOverview = () => {
               <Table.FilterButton
                 condition={!!(filter.startDate || filter.endDate)}
                 filterKey="date"
-                value={`${formatSimpleDate(filter.startDate?.toISOString())} - ${formatSimpleDate(filter.endDate?.toISOString())}`}
+                value={`${filter.startDate ? format(parse(filter.startDate, DateFormat.DayFormat), DateFormat.HumanGlobalWeekDayFormat) : 'N/A'} - ${filter.endDate ? format(parse(filter.endDate, DateFormat.DayFormat), DateFormat.HumanGlobalWeekDayFormat) : 'N/A'}`}
                 onClose={() => setFilter({ startDate: undefined, endDate: undefined })}
               />
               <Table.FilterButton
                 condition={!!filter.dialogueIds?.length}
                 filterKey="team"
-                value={`${sessions.find((session) => session.dialogueId === filter.dialogueIds?.[0])?.dialogue?.title}`}
+                value={`${!!filter.dialogueIds?.length && filter?.dialogueIds?.length > 1
+                  ? 'Multiple teams'
+                  : sessions.find((session) => session.dialogueId === filter.dialogueIds?.[0])?.dialogue?.title}`}
                 onClose={() => setFilter({ dialogueIds: [] })}
               />
               <Table.FilterButton

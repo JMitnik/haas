@@ -15,6 +15,7 @@ import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModa
 import { SimpleIssueTable } from 'components/Analytics/Issues/SimpleIssueTable';
 import { useCustomer } from 'providers/CustomerProvider';
 
+import { useHistory } from 'react-router';
 import * as LS from './WorkspaceGrid.styles';
 import { BreadCrumb } from './BreadCrumb';
 import { HealthCardWide } from '../Common/HealthCard/HealthCardWide';
@@ -32,7 +33,8 @@ import {
 import { HexagonGrid } from './HexagonGrid';
 import { IssuesModal } from './IssuesModal';
 import { Statistic } from './Statistic';
-import { createGrid, extractDialogueFragments, reconstructHistoryStack } from './WorkspaceGrid.helpers';
+import { createGrid, extractDialogueFragments, findDialoguesInGroup, reconstructHistoryStack } from './WorkspaceGrid.helpers';
+import { useNavigator } from 'hooks/useNavigator';
 
 export interface DataLoadOptions {
   dialogueId?: string;
@@ -64,6 +66,8 @@ export const WorkspaceGrid = ({
   isServerLoading = false,
 }: WorkspaceGridProps) => {
   const { format } = useDate();
+  const history = useHistory();
+  const { goToWorkspaceFeedbackOverview } = useNavigator();
   const { activeCustomer } = useCustomer();
   const initialRef = React.useRef<HTMLDivElement>();
   const { t } = useTranslation();
@@ -201,7 +205,7 @@ export const WorkspaceGrid = ({
     const reconstructedHistoryStack = reconstructHistoryStack(dialogueId, initialData);
     setStateHistoryStack(reconstructedHistoryStack);
 
-    setCurrentState({ childNodes: sessions, viewMode });
+    setCurrentState({ currentNode: reconstructedHistoryStack[0].selectedNode, childNodes: sessions, viewMode });
   };
 
   /**
@@ -316,6 +320,8 @@ export const WorkspaceGrid = ({
 
   const noData = !summaryIsLoading && health?.nrVotes === 0;
 
+  console.log('Date range', startDate, endDate);
+
   return (
     <LS.WorkspaceGridContainer backgroundColor={backgroundColor}>
       <UI.Container px={4}>
@@ -355,6 +361,11 @@ export const WorkspaceGrid = ({
                       name="Total feedback"
                       value={health?.nrVotes || 0}
                       isFilterEnabled={historyQueue.length > 0}
+                      onNavigate={() => goToWorkspaceFeedbackOverview(
+                        findDialoguesInGroup([currentState.currentNode as HexagonNode]),
+                        format(startDate, DateFormat.DayFormat),
+                        format(endDate, DateFormat.DayFormat),
+                      )}
                     />
                     <Statistic
                       icon={<AlertTriangle height={40} width={40} />}
@@ -363,6 +374,12 @@ export const WorkspaceGrid = ({
                       name="Total issues"
                       value={issues.length}
                       isFilterEnabled={historyQueue.length > 0}
+                      onNavigate={() => goToWorkspaceFeedbackOverview(
+                        findDialoguesInGroup([currentState.currentNode as HexagonNode]),
+                        format(startDate, DateFormat.DayFormat),
+                        format(endDate, DateFormat.DayFormat),
+                        55,
+                      )}
                     />
                     <Statistic
                       icon={<MessageCircle height={40} width={40} />}
@@ -371,6 +388,13 @@ export const WorkspaceGrid = ({
                       name="Total call-to-actions"
                       value={issues.filter((issue) => issue.followUpAction).length}
                       isFilterEnabled={historyQueue.length > 0}
+                      onNavigate={() => goToWorkspaceFeedbackOverview(
+                        findDialoguesInGroup([currentState.currentNode as HexagonNode]),
+                        format(startDate, DateFormat.DayFormat),
+                        format(endDate, DateFormat.DayFormat),
+                        undefined,
+                        true,
+                      )}
                     />
                   </UI.Grid>
                   <UI.Div>
