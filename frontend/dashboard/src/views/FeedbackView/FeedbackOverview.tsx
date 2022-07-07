@@ -112,7 +112,6 @@ export const FeedbackOverview = () => {
   const [totalPages, setTotalPages] = useState<number>(0);
 
   const { loading: isLoading } = useGetWorkspaceSessionsQuery({
-    fetchPolicy: 'no-cache',
     variables: {
       id: activeCustomer?.id as string,
       filter: {
