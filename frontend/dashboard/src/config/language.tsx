@@ -1316,10 +1316,6 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       en: 'Create, edit and manage your teams',
       de: 'Erstellen, bearbeiten und verwalten von Dialogen',
     },
-    score: {
-      en: 'Score',
-      de: 'Ergebnis',
-    },
     export_to_csv: {
       en: 'CSV export',
       de: 'CSV Export',
