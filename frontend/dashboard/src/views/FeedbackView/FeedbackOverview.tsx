@@ -15,7 +15,6 @@ import {
 import { Flex } from '@haas/ui';
 import { endOfDay, format, startOfDay } from 'date-fns';
 import { isPresent } from 'ts-is-present';
-import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
@@ -28,7 +27,6 @@ import {
 } from 'views/DialogueView/Modules/InteractionFeedModule/InteractionFeedEntry';
 import { DateFormat, useDate } from 'hooks/useDate';
 import { PickerButton } from 'components/Common/Picker/PickerButton';
-import { ROUTES } from 'hooks/useNavigator';
 import {
   SessionConnectionOrder,
   SessionFragmentFragment, useGetWorkspaceSessionsQuery,
@@ -38,7 +36,6 @@ import { View } from 'layouts/View';
 import { formatSimpleDate } from 'utils/dateUtils';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useMenu } from 'components/Common/Menu/useMenu';
-import { useRouteModal } from 'components/Common/Modal';
 import SearchBar from 'components/Common/SearchBar/SearchBar';
 
 import { ContactableUserCell } from './InteractionTableCells';
@@ -84,9 +81,7 @@ interface DistributionInnerCellProps {
 const DistributionInnerCell = ({ session }: DistributionInnerCellProps) => (
   <UI.Div>
     <Table.InnerCell>
-
       <UI.Helper color="gray.500">
-        {' '}
         {session.dialogue?.title}
       </UI.Helper>
     </Table.InnerCell>
@@ -95,10 +90,10 @@ const DistributionInnerCell = ({ session }: DistributionInnerCellProps) => (
 
 export const FeedbackOverview = () => {
   const { t } = useTranslation();
-  const history = useHistory();
   const { parse, format: dateFormat } = useDate();
   const { activeCustomer } = useCustomer();
 
+  const [modalIsOpen, setModalIsOpen] = useState({ isOpen: false, sessionId: '' });
   const [sessions, setSessions] = useState<SessionFragmentFragment[]>(() => []);
 
   const [filter, setFilter] = useQueryParams({
@@ -117,7 +112,7 @@ export const FeedbackOverview = () => {
   const [totalPages, setTotalPages] = useState<number>(0);
 
   const { loading: isLoading } = useGetWorkspaceSessionsQuery({
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'no-cache',
     variables: {
       id: activeCustomer?.id as string,
       filter: {
@@ -140,6 +135,7 @@ export const FeedbackOverview = () => {
     },
     errorPolicy: 'ignore',
     onCompleted: (fetchedData) => {
+      console.log('Fetched sessions: ', fetchedData?.customer?.sessionConnection?.sessions);
       setSessions(
         fetchedData?.customer?.sessionConnection?.sessions || [],
       );
@@ -195,13 +191,8 @@ export const FeedbackOverview = () => {
   const { menuProps, openMenu, closeMenu, activeItem: contextInteraction } = useMenu<SessionFragmentFragment>();
   const columns = 'minmax(200px, 1fr) minmax(150px, 1fr) minmax(300px, 1fr) minmax(300px, 1fr)';
 
-  const [openModal, closeModal, isOpenModal, params] = useRouteModal<{ interactionId: string }>({
-    matchUrlKey: ROUTES.WORKSPACE_INTERACTION_VIEW,
-    exitUrl: '',
-    exitCallback: () => history.goBack(),
-  });
+  // console.log('Sessions: ', sessions);
 
-  console.log('Filter: ', filter);
   return (
     <View documentTitle="haas | Interactions">
       <UI.ViewHead>
@@ -441,7 +432,10 @@ export const FeedbackOverview = () => {
             {sessions.map((session) => (
               <Table.Row
                 isLoading={isLoading}
-                onClick={() => openModal({ interactionId: session.id })}
+                onClick={() => {
+                  setModalIsOpen({ isOpen: true, sessionId: session.id });
+                  // openModal({ interactionId: session.id });
+                }}
                 gridTemplateColumns={columns}
                 key={session.id}
                 onContextMenu={(e) => openMenu(e, session)}
@@ -478,9 +472,9 @@ export const FeedbackOverview = () => {
             )}
           </UI.Flex>
         </UI.Div>
-        <Modal.Root onClose={closeModal} open={isOpenModal}>
+        <Modal.Root onClose={() => setModalIsOpen({ isOpen: false, sessionId: '' })} open={modalIsOpen.isOpen}>
           <InteractionModalCard
-            sessionId={params?.interactionId}
+            sessionId={modalIsOpen.sessionId}
           />
         </Modal.Root>
       </UI.ViewBody>
