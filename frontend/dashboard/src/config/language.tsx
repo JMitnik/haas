@@ -17,11 +17,11 @@ const language = {
     },
     zoom_in: {
       en: 'Zoom in',
-      de: 'Zoom in'
+      de: 'Zoom in',
     },
     zoom_out: {
       en: 'Zoom out',
-      de: 'Zoom out'
+      de: 'Zoom out',
     },
     issues: {
       en: 'Issues',
@@ -362,6 +362,10 @@ const language = {
     filter_by_search: {
       en: 'Filter by search',
       de: 'Nach Suche filtern',
+    },
+    filter_by_score: {
+      en: 'Filter by score',
+      de: 'Nach Punktzahl filtern',
     },
     filter_by_date: {
       en: 'Filter by date',
@@ -1195,6 +1199,10 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       en: 'Maximum value',
       de: 'Maximalwert',
     },
+    score: {
+      en: 'Score',
+      de: 'Punktzahl',
+    },
     search: {
       en: 'Search',
       de: 'Suche',
@@ -1751,6 +1759,10 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   views: {
+    feedback: {
+      en: 'Feedback',
+      de: 'Feedback',
+    },
     dashboard: {
       en: 'Overview',
       de: 'Overview',

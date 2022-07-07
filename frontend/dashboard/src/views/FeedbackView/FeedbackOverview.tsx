@@ -194,12 +194,12 @@ export const FeedbackOverview = () => {
   // console.log('Sessions: ', sessions);
 
   return (
-    <View documentTitle="haas | Interactions">
+    <View documentTitle="haas | Feedback">
       <UI.ViewHead>
         <UI.Flex alignItems="center" justifyContent="space-between" width="100%">
           <UI.Flex alignItems="center">
             <UI.ViewTitle>
-              {t('views:interactions_view')}
+              {t('views:feedback')}
             </UI.ViewTitle>
           </UI.Flex>
 
