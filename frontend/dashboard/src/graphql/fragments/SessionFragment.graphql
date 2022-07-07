@@ -22,7 +22,6 @@ fragment SessionFragment on Session {
   }
 
   followUpAction {
-    id
     values {
       shortText
     }

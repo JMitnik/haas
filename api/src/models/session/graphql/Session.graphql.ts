@@ -39,6 +39,7 @@ export const SessionType = objectType({
     t.field('dialogue', {
       nullable: true,
       type: 'Dialogue',
+      resolve: ({ dialogueId }, _, { services }) => services.dialogueService.getDialogueById(dialogueId),
     });
 
     t.int('totalTimeInSec', {

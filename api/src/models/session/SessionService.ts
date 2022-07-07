@@ -541,8 +541,8 @@ class SessionService {
 
     const sessionWithFollowUpAction = sessions.map((session) => {
       const followUpAction = session.nodeEntries.find((nodeEntry) => nodeEntry.formNodeEntry);
-      console.log('Follow up action: ', followUpAction);
-      return { ...session, followUpAction: followUpAction?.formNodeEntry || null }
+
+      return { ...session, followUpAction: followUpAction?.formNodeEntry || null };
     });
 
     const totalSessions = await this.sessionPrismaAdapter.countWorkspaceSessions(dialogueIds, filter);

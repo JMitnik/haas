@@ -3044,7 +3044,6 @@ export type SessionFragmentFragment = (
     & Pick<Dialogue, 'id' | 'title' | 'slug'>
   )>, followUpAction?: Maybe<(
     { __typename?: 'FormNodeEntryType' }
-    & Pick<FormNodeEntryType, 'id'>
     & { values: Array<(
       { __typename?: 'FormNodeEntryValueType' }
       & Pick<FormNodeEntryValueType, 'shortText'>
@@ -3937,7 +3936,6 @@ export const SessionFragmentFragmentDoc = gql`
     slug
   }
   followUpAction {
-    id
     values {
       shortText
     }
