@@ -1,5 +1,5 @@
 import * as UI from '@haas/ui';
-import { ChevronDown } from 'react-feather';
+import { Calendar, ChevronDown } from 'react-feather';
 import { DateFormat, useDate } from 'hooks/useDate';
 import React from 'react';
 
@@ -14,7 +14,7 @@ interface CustomInputProps {
 export const RangeDatePickerButton = React.forwardRef<HTMLButtonElement, CustomInputProps>(({
   value,
   onClick,
-  dateFormat = DateFormat.HumanGlobalWeekDayFormat,
+  dateFormat = DateFormat.DayFormat,
 }: CustomInputProps, ref) => {
   const { format, parseRangeString, isValid } = useDate();
 
@@ -25,14 +25,24 @@ export const RangeDatePickerButton = React.forwardRef<HTMLButtonElement, CustomI
 
   return (
     <LS.DatePickerButton onClick={onClick} ref={ref}>
-      {valueStartDate}
-      <UI.Span mx={1}>
-        -
-      </UI.Span>
-      {valueEndDate}
-      <UI.Icon ml={2}>
-        <ChevronDown />
-      </UI.Icon>
+      <UI.Flex>
+        <UI.Div width="24px" mr={1}>
+          <UI.Icon color="off.400">
+            <Calendar />
+          </UI.Icon>
+        </UI.Div>
+
+        <UI.Div>
+          {valueStartDate}
+          <UI.Span mx={1}>
+            -
+          </UI.Span>
+          {valueEndDate}
+          <UI.Icon ml={1}>
+            <ChevronDown />
+          </UI.Icon>
+        </UI.Div>
+      </UI.Flex>
     </LS.DatePickerButton>
   );
 });

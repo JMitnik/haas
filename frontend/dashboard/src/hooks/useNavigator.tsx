@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
 import { generatePath, useHistory, useLocation, useParams, useRouteMatch } from 'react-router';
+import { useMemo } from 'react';
 
 export const ROUTES = {
   GENERATE_WORKSPACE_VIEW: '/dashboard/b/generate-workspace',
@@ -162,9 +162,11 @@ export const useNavigator = () => {
   const getDialoguesPath = () => generatePath(ROUTES.DIALOGUES_VIEW, { customerSlug });
   const getAlertsPath = () => generatePath(ROUTES.ALERTS_OVERVIEW, { customerSlug });
 
-  const dashboardPath = useMemo(() => generatePath(ROUTES.DASHBOARD_VIEW, { customerSlug }), [customerSlug]);
-  const workspaceInteractionsPath = useMemo(() => generatePath(
-    ROUTES.WORKSPACE_INTERACTIONS_VIEW, { customerSlug }
+  const dashboardPath = useMemo(() => customerSlug && generatePath(
+    ROUTES.DASHBOARD_VIEW, { customerSlug },
+  ), [customerSlug]);
+  const workspaceInteractionsPath = useMemo(() => customerSlug && generatePath(
+    ROUTES.WORKSPACE_INTERACTIONS_VIEW, { customerSlug },
   ), [customerSlug]);
 
   return {

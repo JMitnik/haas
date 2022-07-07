@@ -3051,6 +3051,28 @@ export type SessionFragmentFragment = (
   )> }
 );
 
+export type GetWorkspaceLayoutDetailsQueryVariables = Exact<{
+  workspaceId: Scalars['ID'];
+  healthInput: HealthScoreInput;
+}>;
+
+
+export type GetWorkspaceLayoutDetailsQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { statistics?: Maybe<(
+      { __typename?: 'WorkspaceStatistics' }
+      & Pick<WorkspaceStatistics, 'id'>
+      & { health: (
+        { __typename?: 'HealthScore' }
+        & Pick<HealthScore, 'nrVotes' | 'negativeResponseCount' | 'score'>
+      ) }
+    )> }
+  )> }
+);
+
 export type CreateCtaMutationVariables = Exact<{
   input?: Maybe<CreateCtaInputType>;
 }>;
@@ -4210,6 +4232,53 @@ export type GetWorkspaceSummaryDetailsLazyQueryHookResult = ReturnType<typeof us
 export type GetWorkspaceSummaryDetailsQueryResult = Apollo.QueryResult<GetWorkspaceSummaryDetailsQuery, GetWorkspaceSummaryDetailsQueryVariables>;
 export function refetchGetWorkspaceSummaryDetailsQuery(variables?: GetWorkspaceSummaryDetailsQueryVariables) {
       return { query: GetWorkspaceSummaryDetailsDocument, variables: variables }
+    }
+export const GetWorkspaceLayoutDetailsDocument = gql`
+    query GetWorkspaceLayoutDetails($workspaceId: ID!, $healthInput: HealthScoreInput!) {
+  customer(id: $workspaceId) {
+    id
+    statistics {
+      id
+      health(input: $healthInput) {
+        nrVotes
+        negativeResponseCount
+        score
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetWorkspaceLayoutDetailsQuery__
+ *
+ * To run a query within a React component, call `useGetWorkspaceLayoutDetailsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetWorkspaceLayoutDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetWorkspaceLayoutDetailsQuery({
+ *   variables: {
+ *      workspaceId: // value for 'workspaceId'
+ *      healthInput: // value for 'healthInput'
+ *   },
+ * });
+ */
+export function useGetWorkspaceLayoutDetailsQuery(baseOptions: Apollo.QueryHookOptions<GetWorkspaceLayoutDetailsQuery, GetWorkspaceLayoutDetailsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetWorkspaceLayoutDetailsQuery, GetWorkspaceLayoutDetailsQueryVariables>(GetWorkspaceLayoutDetailsDocument, options);
+      }
+export function useGetWorkspaceLayoutDetailsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceLayoutDetailsQuery, GetWorkspaceLayoutDetailsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetWorkspaceLayoutDetailsQuery, GetWorkspaceLayoutDetailsQueryVariables>(GetWorkspaceLayoutDetailsDocument, options);
+        }
+export type GetWorkspaceLayoutDetailsQueryHookResult = ReturnType<typeof useGetWorkspaceLayoutDetailsQuery>;
+export type GetWorkspaceLayoutDetailsLazyQueryHookResult = ReturnType<typeof useGetWorkspaceLayoutDetailsLazyQuery>;
+export type GetWorkspaceLayoutDetailsQueryResult = Apollo.QueryResult<GetWorkspaceLayoutDetailsQuery, GetWorkspaceLayoutDetailsQueryVariables>;
+export function refetchGetWorkspaceLayoutDetailsQuery(variables?: GetWorkspaceLayoutDetailsQueryVariables) {
+      return { query: GetWorkspaceLayoutDetailsDocument, variables: variables }
     }
 export const CreateCtaDocument = gql`
     mutation createCTA($input: CreateCTAInputType) {
@@ -6087,6 +6156,15 @@ export namespace SessionFragment {
   export type Dialogue = (NonNullable<SessionFragmentFragment['dialogue']>);
   export type FollowUpAction = (NonNullable<SessionFragmentFragment['followUpAction']>);
   export type Values = NonNullable<(NonNullable<(NonNullable<SessionFragmentFragment['followUpAction']>)['values']>)[number]>;
+}
+
+export namespace GetWorkspaceLayoutDetails {
+  export type Variables = GetWorkspaceLayoutDetailsQueryVariables;
+  export type Query = GetWorkspaceLayoutDetailsQuery;
+  export type Customer = (NonNullable<GetWorkspaceLayoutDetailsQuery['customer']>);
+  export type Statistics = (NonNullable<(NonNullable<GetWorkspaceLayoutDetailsQuery['customer']>)['statistics']>);
+  export type Health = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceLayoutDetailsQuery['customer']>)['statistics']>)['health']>);
+  export const Document = GetWorkspaceLayoutDetailsDocument;
 }
 
 export namespace CreateCta {

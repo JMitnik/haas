@@ -1,15 +1,7 @@
 import * as UI from '@haas/ui';
 import { AnimatePresence, AnimateSharedLayout, motion } from 'framer-motion';
-import {
-  GradientLightgreenGreen,
-  GradientOrangeRed,
-  GradientPinkRed,
-  GradientSteelPurple,
-  LinearGradient,
-} from '@visx/gradient';
 import { Group } from '@visx/group';
 import { MapPin, Minus, Plus } from 'react-feather';
-import { PatternCircles } from '@visx/pattern';
 import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { TooltipWithBounds, useTooltip } from '@visx/tooltip';
 import { localPoint } from '@visx/event';
@@ -28,13 +20,11 @@ import { TooltipBody } from './TooltipBody';
 interface HexagonGridProps {
   stateKey: string;
   nodes: HexagonNode[];
-  isAtRoot: boolean;
   onHexClick: (zoomHelper: ProvidedZoom<SVGElement>, node: HexagonNode) => void;
   width: number;
   height: number;
   zoom: ZoomProps;
   backgroundColor: string;
-  onGoBack: () => void;
   useBackgroundPattern: boolean;
   children?: React.ReactNode;
 }
@@ -78,8 +68,6 @@ export const HexagonGrid = ({
   zoom,
   backgroundColor,
   useBackgroundPattern = false,
-  isAtRoot = false,
-  onGoBack,
   children,
 }: HexagonGridProps) => {
   const { t } = useTranslation();
@@ -134,12 +122,6 @@ export const HexagonGrid = ({
           border: '1px solid #D6DCF2',
         }}
       >
-        <PatternCircles id="circles" height={6} width={6} stroke="black" strokeWidth={1} />
-        <GradientOrangeRed id="dots-orange" />
-        <GradientPinkRed id="dots-pink" />
-        <GradientSteelPurple id="dots-gray" />
-        <LinearGradient id="grays" from="#757F9A" to="#939bb1" />
-        <GradientLightgreenGreen id="dots-green" />
         <rect width={width} height={height} fill={backgroundColor} stroke={backgroundColor} />
 
         {useBackgroundPattern && (

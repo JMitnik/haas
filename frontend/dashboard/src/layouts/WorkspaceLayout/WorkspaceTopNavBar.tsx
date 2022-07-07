@@ -1,9 +1,25 @@
 import * as UI from '@haas/ui';
+import {
+  GradientLightgreenGreen,
+  GradientOrangeRed,
+  GradientPinkRed,
+  GradientSteelPurple,
+  LinearGradient,
+} from '@visx/gradient';
 import { NavLink } from 'react-router-dom';
+import { PatternCircles } from '@visx/pattern';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
+import { DateFormat, useDate } from 'hooks/useDate';
+import { ProgressCircle } from 'components/Analytics/WorkspaceGrid/SummaryPane/ProgressCircle';
+import {
+  getColorScoreBrandVariable,
+  getHexagonSVGFill,
+} from 'components/Analytics/WorkspaceGrid/WorkspaceGrid.helpers';
 import { useCustomer } from 'providers/CustomerProvider';
+import { useFormatter } from 'hooks/useFormatter';
+import { useGetWorkspaceLayoutDetailsQuery } from 'types/generated-types';
 import { useNavigator } from 'hooks/useNavigator';
 
 import { TopSubNavBarContainer } from './TopSubNavBar.styles';
@@ -11,34 +27,80 @@ import { TopSubNavBarContainer } from './TopSubNavBar.styles';
 export const WorkspaceTopNavBar = () => {
   const { t } = useTranslation();
   const { activeCustomer } = useCustomer();
+  const { formatFractionToPercentage } = useFormatter();
+  const { getNWeekAgo, format, getTomorrow } = useDate();
 
   const { dashboardPath, workspaceInteractionsPath } = useNavigator();
+
+  const { data } = useGetWorkspaceLayoutDetailsQuery({
+    variables: {
+      workspaceId: activeCustomer?.id || '',
+      healthInput: {
+        startDateTime: format(getNWeekAgo(1), DateFormat.DayFormat),
+        endDateTime: format(getTomorrow(), DateFormat.DayFormat),
+      },
+    },
+  });
+
+  const score = data?.customer?.statistics?.health?.score;
 
   return (
     <TopSubNavBarContainer>
       <UI.Container px={4} pt={4}>
-        <UI.Div>
-          <UI.ViewTitle>
-            {activeCustomer?.name}
-          </UI.ViewTitle>
-          <UI.ViewSubTitle>
-            See how your teams and people are doing.
-          </UI.ViewSubTitle>
+        <UI.Flex>
+          <UI.Div>
+            <svg height={0}>
+              <PatternCircles id="circles" height={6} width={6} stroke="black" strokeWidth={1} />
+              <GradientOrangeRed id="dots-orange" />
+              <GradientPinkRed id="dots-pink" />
+              <GradientSteelPurple id="dots-gray" />
+              <LinearGradient id="grays" from="#757F9A" to="#939bb1" />
+              <GradientLightgreenGreen id="dots-green" />
+            </svg>
+            <UI.Flex>
+              <UI.Div mr={4}>
+                <ProgressCircle
+                  percentage={score}
+                  stroke={getHexagonSVGFill(score)}
+                  backgroundStroke="rgba(0, 0, 0, 0.1)"
+                  size={70}
+                  radius={45}
+                  strokeWidth={10}
+                >
+                  <UI.Text fontSize="1rem" fontWeight={700} color={getColorScoreBrandVariable(score, true)}>
+                    {!!score && (
+                      <>
+                        {formatFractionToPercentage(score / 100)}
+                      </>
+                    )}
+                  </UI.Text>
+                </ProgressCircle>
+              </UI.Div>
+              <UI.Div>
+                <UI.ViewTitle>
+                  {activeCustomer?.name}
+                </UI.ViewTitle>
+                <UI.ViewSubTitle>
+                  {t('dashboard_description')}
+                </UI.ViewSubTitle>
+              </UI.Div>
+            </UI.Flex>
 
-          <UI.Div pt={4}>
-            <UI.Span>
-              <NavLink exact to={dashboardPath}>
-                Overview
-              </NavLink>
-            </UI.Span>
+            <UI.Div pt={4}>
+              <UI.Span>
+                <NavLink exact to={dashboardPath}>
+                  {t('overview')}
+                </NavLink>
+              </UI.Span>
 
-            <UI.Span>
-              <NavLink to={workspaceInteractionsPath}>
-                Interactions
-              </NavLink>
-            </UI.Span>
+              <UI.Span>
+                <NavLink to={workspaceInteractionsPath}>
+                  {t('interactions')}
+                </NavLink>
+              </UI.Span>
+            </UI.Div>
           </UI.Div>
-        </UI.Div>
+        </UI.Flex>
       </UI.Container>
     </TopSubNavBarContainer>
   );

@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 
 export const TopSubNavBarContainer = styled(UI.Div)`
   ${({ theme }) => css`
-    background-color: ${theme.colors.app.background};
+    background-color: ${theme.colors.white};
     border-bottom: 1px solid ${theme.colors.gray[200]};
 
     span a {

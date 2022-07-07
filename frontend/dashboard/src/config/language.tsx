@@ -11,6 +11,14 @@ const language = {
     },
   },
   general: {
+    dashboard_description: {
+      en: 'See how your teams and people are doing.',
+      de: 'See how your teams and people are doing.',
+    },
+    workspace_overview_description: {
+      en: 'Understand your teams and people by drilling down.',
+      de: 'Understand your teams and people by drilling down.',
+    },
     dashboard_no_data_with_filter: {
       en: 'Currently there is no data available on this date-range and filter level.',
       de: 'Currently there is no data available on this date-range and filter level.',
