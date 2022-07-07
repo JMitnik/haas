@@ -520,8 +520,8 @@ class SessionService {
 
   /**
    * Finds a subset of workspace-wide sessions based on a filter.
-   * @param workspaceId 
-   * @param filter 
+   * @param workspaceId
+   * @param filter
    * @returns a list of sessions
    */
   getWorkspaceSessionConnection = async (
@@ -538,27 +538,21 @@ class SessionService {
     }
 
     const sessions = await this.sessionPrismaAdapter.findWorkspaceSessions(dialogueIds, filter);
+
     const sessionWithFollowUpAction = sessions.map((session) => {
       const followUpAction = session.nodeEntries.find((nodeEntry) => nodeEntry.formNodeEntry);
       console.log('Follow up action: ', followUpAction);
       return { ...session, followUpAction: followUpAction?.formNodeEntry || null }
-    })
+    });
+
     const totalSessions = await this.sessionPrismaAdapter.countWorkspaceSessions(dialogueIds, filter);
 
-    const {
-      totalPages, hasPrevPage, hasNextPage, nextPageOffset, pageIndex, prevPageOffset,
-    } = offsetPaginate(totalSessions, offset, perPage);
+    const { totalPages, ...pageInfo } = offsetPaginate(totalSessions, offset, perPage);
 
     return {
       sessions: sessionWithFollowUpAction,
       totalPages,
-      pageInfo: {
-        hasPrevPage,
-        hasNextPage,
-        prevPageOffset,
-        nextPageOffset,
-        pageIndex,
-      },
+      pageInfo,
     };
   };
 

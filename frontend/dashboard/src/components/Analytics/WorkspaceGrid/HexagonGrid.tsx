@@ -212,7 +212,7 @@ export const HexagonGrid = ({
       <UI.Div display="flex" flexDirection="column" position="absolute" right={24} bottom={24}>
 
         <Tooltip.Root delayDuration={300} open={openZoomOutTooltip} onOpenChange={setOpenZoomOutTooltip}>
-          <Tooltip.Trigger>
+          <Tooltip.Trigger asChild>
             <LS.ControlButton onClick={() => zoom.scale({ scaleX: 0.8, scaleY: 0.8 })}>
               <UI.Icon>
                 <Minus />
@@ -229,7 +229,7 @@ export const HexagonGrid = ({
         </Tooltip.Root>
 
         <Tooltip.Root delayDuration={300} open={openZoomInTooltip} onOpenChange={setOpenZoomInTooltip}>
-          <Tooltip.Trigger>
+          <Tooltip.Trigger asChild>
             <LS.ControlButton mt={2} onClick={() => zoom.scale({ scaleX: 1.2, scaleY: 1.2 })}>
               <UI.Icon>
                 <Plus />
@@ -246,7 +246,7 @@ export const HexagonGrid = ({
         </Tooltip.Root>
 
         <Tooltip.Root delayDuration={300} open={openCenterHexagonTooltip} onOpenChange={setOpenCenterHexagonTooltip}>
-          <Tooltip.Trigger>
+          <Tooltip.Trigger asChild>
             <LS.ControlButton onClick={() => zoom.reset()} mt={2}>
               <UI.Icon>
                 <MapPin />

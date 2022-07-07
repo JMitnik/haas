@@ -320,8 +320,6 @@ export const WorkspaceGrid = ({
 
   const noData = !summaryIsLoading && health?.nrVotes === 0;
 
-  console.log('Date range', startDate, endDate);
-
   return (
     <LS.WorkspaceGridContainer backgroundColor={backgroundColor}>
       <UI.Container px={4}>
