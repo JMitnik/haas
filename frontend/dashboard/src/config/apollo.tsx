@@ -21,7 +21,7 @@ const authorizeLink = new ApolloLink((operation, forward) => {
 
 const client = new ApolloClient({
   link: from([
-    onError(({ graphQLErrors, networkError }) => {
+    onError(({ graphQLErrors }) => {
       if (graphQLErrors) {
         const authorizedErrors = graphQLErrors.filter((error) => (
           error?.extensions?.code === 'UNAUTHENTICATED'
