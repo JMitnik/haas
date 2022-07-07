@@ -1760,8 +1760,8 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       de: 'Feedback',
     },
     dashboard: {
-      en: 'Overview',
-      de: 'Overview',
+      en: 'Dashboard',
+      de: 'Dashboard',
     },
     configurations: {
       en: 'Configurations',

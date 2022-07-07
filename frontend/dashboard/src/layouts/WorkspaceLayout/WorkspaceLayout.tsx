@@ -11,6 +11,7 @@ import useMediaDevice from 'hooks/useMediaDevice';
 import * as LS from './WorkpaceLayout.styles';
 import { TopbarContainer, WorkspaceTopbar } from './WorkspaceTopbar';
 import NotAuthorizedView from '../NotAuthorizedView';
+import { TopSubNavBar } from './TopSubNavBar';
 
 const WorkspaceLayoutContainer = styled(UI.Div) <{ isMobile?: boolean }>`
   ${({ theme, isMobile = false }) => css`
@@ -49,6 +50,7 @@ const WorkspaceLayout = ({ children }: WorskpaceLayoutProps) => {
         )}
         <UI.Div position="relative" zIndex={100000}>
           <WorkspaceTopbar withNav />
+          <TopSubNavBar />
         </UI.Div>
         <WorkspaceLayoutContainer isMobile={device.isSmall}>
           <LS.DashboardViewContainer>

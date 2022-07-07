@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { generatePath, useHistory, useLocation, useParams, useRouteMatch } from 'react-router';
 
 export const ROUTES = {
@@ -6,6 +7,7 @@ export const ROUTES = {
   DIALOGUES_VIEW: '/dashboard/b/:customerSlug/d',
   DIALOGUE_ROOT: '/dashboard/b/:customerSlug/d/:dialogueSlug',
   INTERACTIONS_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/interactions',
+  DASHBOARD_VIEW: '/dashboard/b/:customerSlug/dashboard',
   INTERACTION_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/interactions/:interactionId',
   WORKSPACE_INTERACTIONS_VIEW: '/dashboard/b/:customerSlug/dashboard/feedback',
   WORKSPACE_INTERACTION_VIEW: '/dashboard/b/:customerSlug/dashboard/feedback/:interactionId',
@@ -32,13 +34,12 @@ interface DashboardParams {
 
 export const useNavigator = () => {
   const { customerSlug, dialogueSlug, campaignId } = useParams<DashboardParams>();
-  const dialogueMatch = useRouteMatch<{ dialogueSlug: string }>({
-    path: ROUTES.DIALOGUE_ROOT,
-  });
 
-  const userOverviewMatch = useRouteMatch<{ dialogueSlug: string }>({
-    path: ROUTES.USERS_OVERVIEW,
-  });
+  const dashboardScopeMatch = useRouteMatch<{ customerSlug: string }>({ path: ROUTES.DASHBOARD_VIEW });
+  const dialogueMatch = useRouteMatch<{ dialogueSlug: string }>({ path: ROUTES.DIALOGUE_ROOT });
+  const userOverviewMatch = useRouteMatch<{ dialogueSlug: string }>({ path: ROUTES.USERS_OVERVIEW });
+  const dialoguesMatch = useRouteMatch({ path: ROUTES.DIALOGUES_VIEW });
+  const campaignsMatch = useRouteMatch({ path: ROUTES.CAMPAIGNS_VIEW });
 
   const history = useHistory();
   const location = useLocation();
@@ -161,15 +162,14 @@ export const useNavigator = () => {
   const getDialoguesPath = () => generatePath(ROUTES.DIALOGUES_VIEW, { customerSlug });
   const getAlertsPath = () => generatePath(ROUTES.ALERTS_OVERVIEW, { customerSlug });
 
-  const dialoguesMatch = useRouteMatch({
-    path: ROUTES.DIALOGUES_VIEW,
-  });
-
-  const campaignsMatch = useRouteMatch({
-    path: ROUTES.CAMPAIGNS_VIEW,
-  });
+  const dashboardPath = useMemo(() => generatePath(ROUTES.DASHBOARD_VIEW, { customerSlug }), [customerSlug]);
+  const workspaceInteractionsPath = useMemo(() => generatePath(
+    ROUTES.WORKSPACE_INTERACTIONS_VIEW, { customerSlug }
+  ), [customerSlug]);
 
   return {
+    dashboardPath,
+    workspaceInteractionsPath,
     goToWorkspaceFeedbackOverview,
     goToGenerateWorkspaceOverview,
     goToNewOptionsCTAView,
@@ -187,6 +187,7 @@ export const useNavigator = () => {
     getAlertsPath,
     dialoguesMatch,
     dialogueMatch,
+    dashboardScopeMatch,
     customerSlug,
     dialogueSlug,
     campaignId,

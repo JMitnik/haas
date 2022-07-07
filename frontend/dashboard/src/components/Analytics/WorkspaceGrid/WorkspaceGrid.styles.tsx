@@ -2,11 +2,7 @@ import * as UI from '@haas/ui';
 import { motion } from 'framer-motion';
 import styled, { css } from 'styled-components';
 
-export const WorkspaceGridAdapterContainer = styled(UI.Div)`
-  ${({ theme }) => css`
-    border: 1px solid ${theme.colors.gray[200]};
-  `}
-`;
+export const WorkspaceGridAdapterContainer = styled(UI.Div)``;
 
 export const WidgetHeader = styled(UI.Div)`
   ${({ theme }) => css`
