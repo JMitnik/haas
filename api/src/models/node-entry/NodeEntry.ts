@@ -30,7 +30,7 @@ export const FormNodeEntryType = objectType({
   name: 'FormNodeEntryType',
 
   definition(t) {
-    t.int('id');
+    t.int('id', { nullable: true });
 
     t.list.field('values', { type: FormNodeEntryValueType });
   },

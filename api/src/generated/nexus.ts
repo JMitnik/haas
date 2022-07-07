@@ -981,7 +981,7 @@ export interface NexusGenRootTypes {
   }
   FontSettings: prisma.FontSettings;
   FormNodeEntryType: { // root type
-    id: number; // Int!
+    id?: number | null; // Int
     values: NexusGenRootTypes['FormNodeEntryValueType'][]; // [FormNodeEntryValueType!]!
   }
   FormNodeEntryValueType: { // root type
@@ -1787,7 +1787,7 @@ export interface NexusGenFieldTypes {
     id: string; // ID!
   }
   FormNodeEntryType: { // field return type
-    id: number; // Int!
+    id: number | null; // Int
     values: NexusGenRootTypes['FormNodeEntryValueType'][]; // [FormNodeEntryValueType!]!
   }
   FormNodeEntryValueType: { // field return type

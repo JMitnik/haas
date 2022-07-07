@@ -907,7 +907,7 @@ input FormNodeEntryInput {
 }
 
 type FormNodeEntryType {
-  id: Int!
+  id: Int
   values: [FormNodeEntryValueType!]!
 }
 

@@ -62,7 +62,7 @@ export const CustomerType = objectType({
 
         const endTime = performance.now();
 
-        console.dir(sessionConnection, { depth: 10 });
+        console.log(sessionConnection?.sessions.length);
         console.log('Time taken: ', endTime - startTime, 'ms');
         return sessionConnection;
       },

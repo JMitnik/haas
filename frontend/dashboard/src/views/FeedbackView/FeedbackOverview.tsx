@@ -112,6 +112,7 @@ export const FeedbackOverview = () => {
   const [totalPages, setTotalPages] = useState<number>(0);
 
   const { loading: isLoading } = useGetWorkspaceSessionsQuery({
+    fetchPolicy: 'cache-and-network',
     variables: {
       id: activeCustomer?.id as string,
       filter: {
@@ -134,12 +135,12 @@ export const FeedbackOverview = () => {
     },
     errorPolicy: 'ignore',
     onCompleted: (fetchedData) => {
-      console.log('Fetched sessions: ', fetchedData?.customer?.sessionConnection?.sessions);
+      console.log('Fetched sessions: ', fetchedData);
       setSessions(
         fetchedData?.customer?.sessionConnection?.sessions || [],
       );
 
-      setTotalPages(fetchedData.customer?.sessionConnection?.totalPages || 0);
+      setTotalPages(fetchedData?.customer?.sessionConnection?.totalPages || 0);
     },
   });
 

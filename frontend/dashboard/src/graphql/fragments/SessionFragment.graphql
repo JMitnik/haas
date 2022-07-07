@@ -16,11 +16,13 @@ fragment SessionFragment on Session {
   }
 
   dialogue {
+    id
     title
     slug
   }
 
   followUpAction {
+    # id
     values {
       shortText
     }
