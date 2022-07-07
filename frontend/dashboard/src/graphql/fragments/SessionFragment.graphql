@@ -22,7 +22,7 @@ fragment SessionFragment on Session {
   }
 
   followUpAction {
-    # id
+    id
     values {
       shortText
     }

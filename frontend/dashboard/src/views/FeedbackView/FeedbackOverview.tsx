@@ -133,7 +133,7 @@ export const FeedbackOverview = () => {
         withFollowUpAction: filter.withFollowUpAction,
       },
     },
-    errorPolicy: 'ignore',
+    // errorPolicy: 'ignore',
     onCompleted: (fetchedData) => {
       console.log('Fetched sessions: ', fetchedData);
       setSessions(
