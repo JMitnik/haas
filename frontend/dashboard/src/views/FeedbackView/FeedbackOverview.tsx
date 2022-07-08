@@ -375,6 +375,21 @@ export const FeedbackOverview = () => {
                 >
                   Show only urgent feedback
                 </Menu.Item>
+                {contextInteraction && (
+                  <Menu.Item
+                    onClick={
+                      () => setFilter({
+                        pageIndex: 0, search: getMainTopicValue(contextInteraction as SessionFragmentFragment),
+                      })
+                    }
+                  >
+                    <UI.Span>Show feedback with answer</UI.Span>
+                    <UI.Span ml="2px" fontWeight="bold" color="main">
+                      {getMainTopicValue(contextInteraction as SessionFragmentFragment)}
+                    </UI.Span>
+                  </Menu.Item>
+                )}
+
               </Menu.SubMenu>
               <Menu.SubMenu label={(
                 <UI.Flex>
