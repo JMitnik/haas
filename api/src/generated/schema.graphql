@@ -780,10 +780,6 @@ enum DialogueImpactScoreType {
   AVERAGE
 }
 
-input DialogueLinksInput {
-  workspaceId: String
-}
-
 type DialogueStatistics {
   history: [lineChartDataType!]
   mostPopularPath: topPathType
@@ -1446,6 +1442,12 @@ type PreviewDataType {
   websiteScreenshotUrl: String!
 }
 
+type PublicDialogueConnection implements ConnectionInterface {
+  dialogues: [PublicDialogueInfo!]!
+  pageInfo: PaginationPageInfo!
+  totalPages: Int
+}
+
 type PublicDialogueInfo {
   description: String
   slug: String!
@@ -1460,7 +1462,7 @@ type Query {
   customers: [Customer!]!
   delivery(deliveryId: String): DeliveryType
   dialogue(where: DialogueWhereUniqueInput): Dialogue
-  dialogueLinks(input: DialogueLinksInput): [PublicDialogueInfo!]
+  dialogueLinks(filter: DialogueConnectionFilterInput, workspaceId: String): PublicDialogueConnection
   dialogues(filter: DialogueFilterInputType): [Dialogue!]!
   edge(id: String): Edge
   getAdjustedLogo(input: AdjustedImageInput): AWSImageType
