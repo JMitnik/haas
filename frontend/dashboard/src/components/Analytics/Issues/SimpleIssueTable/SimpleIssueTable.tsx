@@ -76,7 +76,7 @@ export const SimpleIssueTable = ({
               <UI.Icon mr={2}>
                 <AlertTriangle />
               </UI.Icon>
-              Trending teams
+              Negative teams
             </UI.H4>
 
             {isFilterEnabled && (
