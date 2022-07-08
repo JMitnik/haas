@@ -198,115 +198,122 @@ export const FeedbackOverview = () => {
             </UI.Div>
           </UI.Flex>
         </UI.Div>
-        <UI.Flex mb={2} justifyContent="flex-start">
-          <PickerButton label={t('add_filter')} icon={<Plus />}>
-            {() => (
-              <TabbedMenu
-                menuHeader={t('add_filter')}
-                tabs={[
-                  { label: t('search'), icon: <Search /> },
-                  { label: t('date'), icon: <Calendar /> },
-                  { label: t('score'), icon: <BarChart2 /> },
-                ]}
-              >
-                <UI.Div id="searchFilter">
-                  <UI.Stack>
-                    <UI.RadioHeader>
-                      {t('filter_by_search')}
-                    </UI.RadioHeader>
-                    <UI.Div mb={1}>
-                      <UI.Muted>{t('filter_by_search_helper')}</UI.Muted>
-                    </UI.Div>
-                    <SearchBar
-                      search={filter.search}
-                      onSearchChange={handleSearchTermChange}
-                    />
-                  </UI.Stack>
-                </UI.Div>
-
-                <UI.Div id="dateFilter">
-                  <UI.Stack spacing={2}>
-                    <UI.RadioHeader>
-                      {t('filter_by_date')}
-                    </UI.RadioHeader>
-                    <UI.Div mb={1}>
-                      <UI.Muted>{t('show_interactions_between')}</UI.Muted>
-                    </UI.Div>
-                    <UI.Div>
-                      <UI.DatePicker
-                        value={[
-                          filter.startDate ? parse(filter.startDate, DateFormat.DayFormat) : undefined,
-                          filter.endDate ? parse(filter.endDate, DateFormat.DayFormat) : undefined,
-                        ]}
-                        onChange={handleDateChange}
-                        range
+        <UI.Flex mb={2} justifyContent="space-between" alignItems="center">
+          <UI.Flex mb={2} justifyContent="flex-start">
+            <PickerButton label={t('add_filter')} icon={<Plus />}>
+              {() => (
+                <TabbedMenu
+                  menuHeader={t('add_filter')}
+                  tabs={[
+                    { label: t('search'), icon: <Search /> },
+                    { label: t('date'), icon: <Calendar /> },
+                    { label: t('score'), icon: <BarChart2 /> },
+                  ]}
+                >
+                  <UI.Div id="searchFilter">
+                    <UI.Stack>
+                      <UI.RadioHeader>
+                        {t('filter_by_search')}
+                      </UI.RadioHeader>
+                      <UI.Div mb={1}>
+                        <UI.Muted>{t('filter_by_search_helper')}</UI.Muted>
+                      </UI.Div>
+                      <SearchBar
+                        search={filter.search}
+                        onSearchChange={handleSearchTermChange}
                       />
-                    </UI.Div>
-                    <UI.Button size="sm" onClick={() => handleDateChange(null)}>{t('reset')}</UI.Button>
-                  </UI.Stack>
-                </UI.Div>
+                    </UI.Stack>
+                  </UI.Div>
 
-                <UI.Div id="scoreFilter">
-                  <UI.Stack spacing={2}>
-                    <UI.RadioHeader>
-                      {t('filter_by_score')}
-                    </UI.RadioHeader>
-                    <UI.Div mb={1}>
-                      <UI.Muted>{t('show_interactions_between')}</UI.Muted>
-                    </UI.Div>
-                    <UI.Div>
-                      <UI.RangeSlider
-                        stepSize={1}
-                        defaultValue={[filter.minScore || 0, filter.maxScore || 100]}
-                        min={0}
-                        max={100}
-                        onChange={(e: any) => setFilter({ pageIndex: 0, minScore: e[0], maxScore: e[1] })}
-                      />
-                    </UI.Div>
-                    <UI.Button size="sm" onClick={() => setFilter({ pageIndex: 0, minScore: 0, maxScore: 100 })}>
-                      {t('reset')}
-                    </UI.Button>
-                  </UI.Stack>
-                </UI.Div>
-              </TabbedMenu>
-            )}
-          </PickerButton>
+                  <UI.Div id="dateFilter">
+                    <UI.Stack spacing={2}>
+                      <UI.RadioHeader>
+                        {t('filter_by_date')}
+                      </UI.RadioHeader>
+                      <UI.Div mb={1}>
+                        <UI.Muted>{t('show_interactions_between')}</UI.Muted>
+                      </UI.Div>
+                      <UI.Div>
+                        <UI.DatePicker
+                          value={[
+                            filter.startDate ? parse(filter.startDate, DateFormat.DayFormat) : undefined,
+                            filter.endDate ? parse(filter.endDate, DateFormat.DayFormat) : undefined,
+                          ]}
+                          onChange={handleDateChange}
+                          range
+                        />
+                      </UI.Div>
+                      <UI.Button size="sm" onClick={() => handleDateChange(null)}>{t('reset')}</UI.Button>
+                    </UI.Stack>
+                  </UI.Div>
 
-          <UI.Stack ml={4} isInline spacing={4} alignItems="center">
-            <Table.FilterButton
-              condition={!!filter.search}
-              filterKey="search"
-              value={filter.search}
-              onClose={() => setFilter({ search: '' })}
-            />
-            <Table.FilterButton
-              condition={!!(filter.startDate || filter.endDate)}
-              filterKey="date"
-              value={`${filter.startDate ? format(parse(filter.startDate, DateFormat.DayFormat), DateFormat.DayFormat) : 'N/A'} - ${filter.endDate ? format(parse(filter.endDate, DateFormat.DayFormat), DateFormat.DayFormat) : 'N/A'}`}
-              onClose={() => setFilter({ startDate: undefined, endDate: undefined })}
-            />
-            <Table.FilterButton
-              condition={!!filter.dialogueIds?.length}
-              filterKey="team"
-              value={`${!!filter.dialogueIds?.length && filter?.dialogueIds?.length > 1
-                ? 'Multiple teams'
-                : sessions.find((session) => session.dialogueId === filter.dialogueIds?.[0])?.dialogue?.title}`}
-              onClose={() => setFilter({ dialogueIds: [] })}
-            />
-            <Table.FilterButton
-              condition={filter.minScore > 0 || filter.maxScore < 100}
-              filterKey="score"
-              value={`${formatScore(filter.minScore)} - ${formatScore(filter.maxScore)}`}
-              onClose={() => setFilter({ minScore: 0, maxScore: 100 })}
-            />
+                  <UI.Div id="scoreFilter">
+                    <UI.Stack spacing={2}>
+                      <UI.RadioHeader>
+                        {t('filter_by_score')}
+                      </UI.RadioHeader>
+                      <UI.Div mb={1}>
+                        <UI.Muted>{t('show_interactions_between')}</UI.Muted>
+                      </UI.Div>
+                      <UI.Div>
+                        <UI.RangeSlider
+                          stepSize={1}
+                          defaultValue={[filter.minScore || 0, filter.maxScore || 100]}
+                          min={0}
+                          max={100}
+                          onChange={(e: any) => setFilter({ pageIndex: 0, minScore: e[0], maxScore: e[1] })}
+                        />
+                      </UI.Div>
+                      <UI.Button size="sm" onClick={() => setFilter({ pageIndex: 0, minScore: 0, maxScore: 100 })}>
+                        {t('reset')}
+                      </UI.Button>
+                    </UI.Stack>
+                  </UI.Div>
+                </TabbedMenu>
+              )}
+            </PickerButton>
 
-            <Table.FilterButton
-              condition={filter.withFollowUpAction}
-              filterKey="show"
-              value="urgent only"
-              onClose={() => setFilter({ withFollowUpAction: false })}
-            />
-          </UI.Stack>
+            <UI.Stack ml={4} isInline spacing={4} alignItems="center">
+              <Table.FilterButton
+                condition={!!filter.search}
+                filterKey="search"
+                value={filter.search}
+                onClose={() => setFilter({ search: '' })}
+              />
+              <Table.FilterButton
+                condition={!!(filter.startDate || filter.endDate)}
+                filterKey="date"
+                value={`${filter.startDate ? format(parse(filter.startDate, DateFormat.DayFormat), DateFormat.DayFormat) : 'N/A'} - ${filter.endDate ? format(parse(filter.endDate, DateFormat.DayFormat), DateFormat.DayFormat) : 'N/A'}`}
+                onClose={() => setFilter({ startDate: undefined, endDate: undefined })}
+              />
+              <Table.FilterButton
+                condition={!!filter.dialogueIds?.length}
+                filterKey="team"
+                value={`${!!filter.dialogueIds?.length && filter?.dialogueIds?.length > 1
+                  ? 'Multiple teams'
+                  : sessions.find((session) => session.dialogueId === filter.dialogueIds?.[0])?.dialogue?.title}`}
+                onClose={() => setFilter({ dialogueIds: [] })}
+              />
+              <Table.FilterButton
+                condition={filter.minScore > 0 || filter.maxScore < 100}
+                filterKey="score"
+                value={`${formatScore(filter.minScore)} - ${formatScore(filter.maxScore)}`}
+                onClose={() => setFilter({ minScore: 0, maxScore: 100 })}
+              />
+
+              <Table.FilterButton
+                condition={filter.withFollowUpAction}
+                filterKey="show"
+                value="urgent only"
+                onClose={() => setFilter({ withFollowUpAction: false })}
+              />
+            </UI.Stack>
+
+          </UI.Flex>
+          <SearchBar
+            search={filter.search}
+            onSearchChange={handleSearchTermChange}
+          />
         </UI.Flex>
         <UI.Div width="100%">
           <Table.HeadingRow gridTemplateColumns={columns}>

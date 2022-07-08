@@ -441,6 +441,10 @@ export const WorkspaceGrid = ({
         </UI.Grid>
       </UI.Container>
 
+      <UI.Div pt={4}>
+        <UI.Hr />
+      </UI.Div>
+
       <Modal.Root open={!!sessionId} onClose={() => setSessionId(undefined)}>
         <InteractionModalCard
           sessionId={sessionId || ''}
