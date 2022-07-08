@@ -348,65 +348,63 @@ export const WorkspaceGrid = ({
         <UI.Hr />
         <UI.Grid gridTemplateColumns={['1fr', '1fr', '1fr', '1fr', '2fr 1fr']}>
           <UI.Div>
-            {!!health?.nrVotes && (
-              <>
-                <UI.Grid gridTemplateColumns="1fr 1fr 1fr">
-                  <Statistic
-                    icon={<User height={40} width={40} />}
-                    themeBg="green.500"
-                    themeColor="white"
-                    name="Responses"
-                    value={health?.nrVotes || 0}
-                    isFilterEnabled={historyQueue.length > 0}
-                    onNavigate={() => goToWorkspaceFeedbackOverview(
-                      findDialoguesInGroup([currentState.currentNode as HexagonNode]),
-                      format(startDate, DateFormat.DayFormat),
-                      format(endDate, DateFormat.DayFormat),
-                    )}
-                  />
-                  <Statistic
-                    icon={<AlertTriangle height={40} width={40} />}
-                    themeBg="red.500"
-                    themeColor="white"
-                    name="Problems"
-                    value={issues.length}
-                    isFilterEnabled={historyQueue.length > 0}
-                    onNavigate={() => goToWorkspaceFeedbackOverview(
-                      findDialoguesInGroup([currentState.currentNode as HexagonNode]),
-                      format(startDate, DateFormat.DayFormat),
-                      format(endDate, DateFormat.DayFormat),
-                      55,
-                    )}
-                  />
-                  <Statistic
-                    icon={<MessageCircle height={40} width={40} />}
-                    themeBg="main.500"
-                    themeColor="white"
-                    name="Actions"
-                    value={issues.filter((issue) => issue.followUpAction).length}
-                    isFilterEnabled={historyQueue.length > 0}
-                    onNavigate={() => goToWorkspaceFeedbackOverview(
-                      findDialoguesInGroup([currentState.currentNode as HexagonNode]),
-                      format(startDate, DateFormat.DayFormat),
-                      format(endDate, DateFormat.DayFormat),
-                      undefined,
-                      true,
-                    )}
-                  />
-                </UI.Grid>
-                <UI.Div mt={4}>
-                  <SimpleIssueTable
-                    inPreview
-                    onResetFilter={() => popToIndex(0)}
-                    isFilterEnabled={historyQueue.length > 0}
-                    issues={issues}
-                    onIssueClick={handleIssueClick}
-                    isLoading={issuesLoading}
-                    onOpenIssueModal={() => setIssuesModalIsOpen(true)}
-                  />
-                </UI.Div>
-              </>
-            )}
+            <>
+              <UI.Grid gridTemplateColumns="1fr 1fr 1fr">
+                <Statistic
+                  icon={<User height={40} width={40} />}
+                  themeBg="green.500"
+                  themeColor="white"
+                  name="Responses"
+                  value={health?.nrVotes || 0}
+                  isFilterEnabled={historyQueue.length > 0}
+                  onNavigate={() => goToWorkspaceFeedbackOverview(
+                    findDialoguesInGroup([currentState.currentNode as HexagonNode]),
+                    format(startDate, DateFormat.DayFormat),
+                    format(endDate, DateFormat.DayFormat),
+                  )}
+                />
+                <Statistic
+                  icon={<AlertTriangle height={40} width={40} />}
+                  themeBg="red.500"
+                  themeColor="white"
+                  name="Problems"
+                  value={issues.length}
+                  isFilterEnabled={historyQueue.length > 0}
+                  onNavigate={() => goToWorkspaceFeedbackOverview(
+                    findDialoguesInGroup([currentState.currentNode as HexagonNode]),
+                    format(startDate, DateFormat.DayFormat),
+                    format(endDate, DateFormat.DayFormat),
+                    55,
+                  )}
+                />
+                <Statistic
+                  icon={<MessageCircle height={40} width={40} />}
+                  themeBg="main.500"
+                  themeColor="white"
+                  name="Actions"
+                  value={issues.filter((issue) => issue.followUpAction).length}
+                  isFilterEnabled={historyQueue.length > 0}
+                  onNavigate={() => goToWorkspaceFeedbackOverview(
+                    findDialoguesInGroup([currentState.currentNode as HexagonNode]),
+                    format(startDate, DateFormat.DayFormat),
+                    format(endDate, DateFormat.DayFormat),
+                    undefined,
+                    true,
+                  )}
+                />
+              </UI.Grid>
+              <UI.Div mt={4}>
+                <SimpleIssueTable
+                  inPreview
+                  onResetFilter={() => popToIndex(0)}
+                  isFilterEnabled={historyQueue.length > 0}
+                  issues={issues}
+                  onIssueClick={handleIssueClick}
+                  isLoading={issuesLoading}
+                  onOpenIssueModal={() => setIssuesModalIsOpen(true)}
+                />
+              </UI.Div>
+            </>
 
           </UI.Div>
           <UI.Div width="100%" ref={ref}>

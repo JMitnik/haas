@@ -5,7 +5,6 @@ import { User } from 'react-feather';
 import { differenceInCalendarDays, format, formatDistance } from 'date-fns';
 import React from 'react';
 
-import { Avatar } from 'components/Common/Avatar';
 import { SessionFragment } from 'types/generated-types';
 import scoreToColors from 'utils/scoreToColors';
 
@@ -22,13 +21,6 @@ export const ContactableUserCell = ({ sessionId, followUpAction }: ContactableUs
   const field = followUpAction.values.find((value) => value.shortText);
   return (
     <UI.Flex alignItems="center">
-      <UI.Div mr={2}>
-        {field?.shortText ? (
-          <Avatar name={field?.shortText} brand="blue" />
-        ) : (
-          <Avatar name="Anonymous" brand="gray" />
-        )}
-      </UI.Div>
       <UI.ColumnFlex>
         <UI.Span fontWeight={600} color="blue.500">
           {field?.shortText}

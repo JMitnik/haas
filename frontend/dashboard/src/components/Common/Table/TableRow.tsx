@@ -10,7 +10,7 @@ export const Row = styled(UI.Grid) <RowProps>`
   ${({ theme, isLoading, isDisabled }) => css`
     background: white;
     align-items: center;
-    padding: 6px 12px;
+    padding: 6px ${theme.gutter}px;
     margin-bottom: 12px;
     border-radius: 12px;
     box-shadow: ${theme.boxShadows.sm};

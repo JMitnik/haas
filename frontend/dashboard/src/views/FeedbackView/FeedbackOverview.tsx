@@ -12,7 +12,6 @@ import {
   useQueryParams,
   withDefault,
 } from 'use-query-params';
-import { Flex } from '@haas/ui';
 import { endOfDay, format, startOfDay } from 'date-fns';
 import { isPresent } from 'ts-is-present';
 import { useTranslation } from 'react-i18next';
@@ -21,12 +20,9 @@ import React, { useState } from 'react';
 import * as Menu from 'components/Common/Menu';
 import * as Modal from 'components/Common/Modal';
 import * as Table from 'components/Common/Table';
-import { Avatar } from 'components/Common/Avatar';
-import {
-  CompactEntriesPath,
-} from 'views/DialogueView/Modules/InteractionFeedModule/InteractionFeedEntry';
 import { DateFormat, useDate } from 'hooks/useDate';
 import { PickerButton } from 'components/Common/Picker/PickerButton';
+import { ScoreBox } from 'components/ScoreBox';
 import {
   SessionConnectionOrder,
   SessionFragmentFragment, useGetWorkspaceSessionsQuery,
@@ -34,7 +30,9 @@ import {
 import { TabbedMenu } from 'components/Common/TabMenu';
 import { View } from 'layouts/View';
 import { formatSimpleDate } from 'utils/dateUtils';
+import { getChoiceNodeValues, getMainTopicValue } from 'components/Session/Session.helpers';
 import { useCustomer } from 'providers/CustomerProvider';
+import { useFormatter } from 'hooks/useFormatter';
 import { useMenu } from 'components/Common/Menu/useMenu';
 import SearchBar from 'components/Common/SearchBar/SearchBar';
 
@@ -45,14 +43,11 @@ const AnonymousCell = ({ sessionId }: { sessionId: string }) => {
   const { t } = useTranslation();
   return (
     <UI.Flex alignItems="center">
-      <UI.Div mr={2}>
-        <Avatar name="A" brand="gray" />
-      </UI.Div>
       <UI.ColumnFlex>
-        <UI.Span fontWeight={600} color="gray.500">
+        <UI.Span fontWeight={600} color="off.500">
           {t('anonymous')}
         </UI.Span>
-        <UI.Span color="gray.400" fontSize="0.7rem">
+        <UI.Span color="off.400" fontSize="0.7rem">
           {sessionId}
         </UI.Span>
       </UI.ColumnFlex>
@@ -92,6 +87,7 @@ export const FeedbackOverview = () => {
   const { t } = useTranslation();
   const { parse, format: dateFormat } = useDate();
   const { activeCustomer } = useCustomer();
+  const { formatScore } = useFormatter();
 
   const [modalIsOpen, setModalIsOpen] = useState({ isOpen: false, sessionId: '' });
   const [sessions, setSessions] = useState<SessionFragmentFragment[]>(() => []);
@@ -133,9 +129,8 @@ export const FeedbackOverview = () => {
         withFollowUpAction: filter.withFollowUpAction,
       },
     },
-    // errorPolicy: 'ignore',
+    errorPolicy: 'ignore',
     onCompleted: (fetchedData) => {
-      console.log('Fetched sessions: ', fetchedData);
       setSessions(
         fetchedData?.customer?.sessionConnection?.sessions || [],
       );
@@ -189,155 +184,140 @@ export const FeedbackOverview = () => {
     }));
   };
   const { menuProps, openMenu, closeMenu, activeItem: contextInteraction } = useMenu<SessionFragmentFragment>();
-  const columns = 'minmax(200px, 1fr) minmax(150px, 1fr) minmax(300px, 1fr) minmax(300px, 1fr)';
-
-  // console.log('Sessions: ', sessions);
+  const columns = '50px minmax(200px, 1fr) minmax(150px, 1fr) minmax(300px, 1fr) minmax(300px, 1fr)';
 
   return (
     <View documentTitle="haas | Feedback">
-      <UI.ViewHead>
-        <UI.Flex alignItems="center" justifyContent="space-between" width="100%">
-          <UI.Flex alignItems="center">
-            <UI.ViewTitle>
-              {t('views:feedback')}
-            </UI.ViewTitle>
-          </UI.Flex>
-
-          <Flex alignItems="center">
-            <SearchBar
-              search={filter.search}
-              onSearchChange={handleSearchTermChange}
-            />
-          </Flex>
-        </UI.Flex>
-      </UI.ViewHead>
-
       <UI.ViewBody>
+        <UI.Div pb={4} position="relative" zIndex={10000}>
+          <UI.Flex alignItems="center" justifyContent="space-between">
+            <UI.Div>
+              <UI.H4 fontSize="1.1rem" color="off.500">
+                {t('interactions')}
+              </UI.H4>
+            </UI.Div>
+          </UI.Flex>
+        </UI.Div>
         <UI.Flex mb={2} justifyContent="flex-start">
-          <UI.Stack isInline spacing={2} alignItems="center">
-            <PickerButton label={t('add_filter')} icon={<Plus />}>
-              {() => (
-                <TabbedMenu
-                  menuHeader={t('add_filter')}
-                  tabs={[
-                    { label: t('search'), icon: <Search /> },
-                    { label: t('date'), icon: <Calendar /> },
-                    { label: t('score'), icon: <BarChart2 /> },
-                  ]}
-                >
-                  <UI.Div id="searchFilter">
-                    <UI.Stack>
-                      <UI.RadioHeader>
-                        {t('filter_by_search')}
-                      </UI.RadioHeader>
-                      <UI.Div mb={1}>
-                        <UI.Muted>{t('filter_by_search_helper')}</UI.Muted>
-                      </UI.Div>
-                      <SearchBar
-                        search={filter.search}
-                        onSearchChange={handleSearchTermChange}
+          <PickerButton label={t('add_filter')} icon={<Plus />}>
+            {() => (
+              <TabbedMenu
+                menuHeader={t('add_filter')}
+                tabs={[
+                  { label: t('search'), icon: <Search /> },
+                  { label: t('date'), icon: <Calendar /> },
+                  { label: t('score'), icon: <BarChart2 /> },
+                ]}
+              >
+                <UI.Div id="searchFilter">
+                  <UI.Stack>
+                    <UI.RadioHeader>
+                      {t('filter_by_search')}
+                    </UI.RadioHeader>
+                    <UI.Div mb={1}>
+                      <UI.Muted>{t('filter_by_search_helper')}</UI.Muted>
+                    </UI.Div>
+                    <SearchBar
+                      search={filter.search}
+                      onSearchChange={handleSearchTermChange}
+                    />
+                  </UI.Stack>
+                </UI.Div>
+
+                <UI.Div id="dateFilter">
+                  <UI.Stack spacing={2}>
+                    <UI.RadioHeader>
+                      {t('filter_by_date')}
+                    </UI.RadioHeader>
+                    <UI.Div mb={1}>
+                      <UI.Muted>{t('show_interactions_between')}</UI.Muted>
+                    </UI.Div>
+                    <UI.Div>
+                      <UI.DatePicker
+                        value={[
+                          filter.startDate ? parse(filter.startDate, DateFormat.DayFormat) : undefined,
+                          filter.endDate ? parse(filter.endDate, DateFormat.DayFormat) : undefined,
+                        ]}
+                        onChange={handleDateChange}
+                        range
                       />
-                    </UI.Stack>
-                  </UI.Div>
+                    </UI.Div>
+                    <UI.Button size="sm" onClick={() => handleDateChange(null)}>{t('reset')}</UI.Button>
+                  </UI.Stack>
+                </UI.Div>
 
-                  <UI.Div id="dateFilter">
-                    <UI.Stack spacing={2}>
-                      <UI.RadioHeader>
-                        {t('filter_by_date')}
-                      </UI.RadioHeader>
-                      <UI.Div mb={1}>
-                        <UI.Muted>{t('show_interactions_between')}</UI.Muted>
-                      </UI.Div>
-                      <UI.Div>
-                        <UI.DatePicker
-                          value={[
-                            filter.startDate ? parse(filter.startDate, DateFormat.DayFormat) : undefined,
-                            filter.endDate ? parse(filter.endDate, DateFormat.DayFormat) : undefined,
-                          ]}
-                          onChange={handleDateChange}
-                          range
-                        />
-                      </UI.Div>
-                      <UI.Button size="sm" onClick={() => handleDateChange(null)}>{t('reset')}</UI.Button>
-                    </UI.Stack>
-                  </UI.Div>
+                <UI.Div id="scoreFilter">
+                  <UI.Stack spacing={2}>
+                    <UI.RadioHeader>
+                      {t('filter_by_score')}
+                    </UI.RadioHeader>
+                    <UI.Div mb={1}>
+                      <UI.Muted>{t('show_interactions_between')}</UI.Muted>
+                    </UI.Div>
+                    <UI.Div>
+                      <UI.RangeSlider
+                        stepSize={1}
+                        defaultValue={[filter.minScore || 0, filter.maxScore || 100]}
+                        min={0}
+                        max={100}
+                        onChange={(e: any) => setFilter({ pageIndex: 0, minScore: e[0], maxScore: e[1] })}
+                      />
+                    </UI.Div>
+                    <UI.Button size="sm" onClick={() => setFilter({ pageIndex: 0, minScore: 0, maxScore: 100 })}>
+                      {t('reset')}
+                    </UI.Button>
+                  </UI.Stack>
+                </UI.Div>
+              </TabbedMenu>
+            )}
+          </PickerButton>
 
-                  <UI.Div id="scoreFilter">
-                    <UI.Stack spacing={2}>
-                      <UI.RadioHeader>
-                        {t('filter_by_score')}
-                      </UI.RadioHeader>
-                      <UI.Div mb={1}>
-                        <UI.Muted>{t('show_interactions_between')}</UI.Muted>
-                      </UI.Div>
-                      <UI.Div>
-                        <UI.RangeSlider
-                          stepSize={1}
-                          defaultValue={[filter.minScore || 0, filter.maxScore || 100]}
-                          min={0}
-                          max={100}
-                          onChange={(e: any) => setFilter({ pageIndex: 0, minScore: e[0], maxScore: e[1] })}
-                        />
-                      </UI.Div>
-                      <UI.Button size="sm" onClick={() => setFilter({ pageIndex: 0, minScore: 0, maxScore: 100 })}>
-                        {t('reset')}
-                      </UI.Button>
-                    </UI.Stack>
-                  </UI.Div>
-                </TabbedMenu>
-              )}
-            </PickerButton>
+          <UI.Stack ml={4} isInline spacing={4} alignItems="center">
+            <Table.FilterButton
+              condition={!!filter.search}
+              filterKey="search"
+              value={filter.search}
+              onClose={() => setFilter({ search: '' })}
+            />
+            <Table.FilterButton
+              condition={!!(filter.startDate || filter.endDate)}
+              filterKey="date"
+              value={`${filter.startDate ? format(parse(filter.startDate, DateFormat.DayFormat), DateFormat.DayFormat) : 'N/A'} - ${filter.endDate ? format(parse(filter.endDate, DateFormat.DayFormat), DateFormat.DayFormat) : 'N/A'}`}
+              onClose={() => setFilter({ startDate: undefined, endDate: undefined })}
+            />
+            <Table.FilterButton
+              condition={!!filter.dialogueIds?.length}
+              filterKey="team"
+              value={`${!!filter.dialogueIds?.length && filter?.dialogueIds?.length > 1
+                ? 'Multiple teams'
+                : sessions.find((session) => session.dialogueId === filter.dialogueIds?.[0])?.dialogue?.title}`}
+              onClose={() => setFilter({ dialogueIds: [] })}
+            />
+            <Table.FilterButton
+              condition={filter.minScore > 0 || filter.maxScore < 100}
+              filterKey="score"
+              value={`${formatScore(filter.minScore)} - ${formatScore(filter.maxScore)}`}
+              onClose={() => setFilter({ minScore: 0, maxScore: 100 })}
+            />
 
-            <UI.Separator bg="gray.200" />
-
-            {/* @ts-ignore */}
-            <UI.Stack isInline spacing={4} alignItems="center">
-              <Table.FilterButton
-                condition={!!filter.search}
-                filterKey="search"
-                value={filter.search}
-                onClose={() => setFilter({ search: '' })}
-              />
-              <Table.FilterButton
-                condition={!!(filter.startDate || filter.endDate)}
-                filterKey="date"
-                value={`${filter.startDate ? format(parse(filter.startDate, DateFormat.DayFormat), DateFormat.HumanGlobalWeekDayFormat) : 'N/A'} - ${filter.endDate ? format(parse(filter.endDate, DateFormat.DayFormat), DateFormat.HumanGlobalWeekDayFormat) : 'N/A'}`}
-                onClose={() => setFilter({ startDate: undefined, endDate: undefined })}
-              />
-              <Table.FilterButton
-                condition={!!filter.dialogueIds?.length}
-                filterKey="team"
-                value={`${!!filter.dialogueIds?.length && filter?.dialogueIds?.length > 1
-                  ? 'Multiple teams'
-                  : sessions.find((session) => session.dialogueId === filter.dialogueIds?.[0])?.dialogue?.title}`}
-                onClose={() => setFilter({ dialogueIds: [] })}
-              />
-              <Table.FilterButton
-                condition={filter.minScore > 0 || filter.maxScore < 100}
-                filterKey="score"
-                value={`${filter.minScore} - ${filter.maxScore}`}
-                onClose={() => setFilter({ minScore: 0, maxScore: 100 })}
-              />
-
-              <Table.FilterButton
-                condition={filter.withFollowUpAction}
-                filterKey="show"
-                value="urgent only"
-                onClose={() => setFilter({ withFollowUpAction: false })}
-              />
-            </UI.Stack>
+            <Table.FilterButton
+              condition={filter.withFollowUpAction}
+              filterKey="show"
+              value="urgent only"
+              onClose={() => setFilter({ withFollowUpAction: false })}
+            />
           </UI.Stack>
-        </UI.Flex>
-        <UI.Flex mb={4} justifyContent="flex-end">
-          {/* @ts-ignore */}
         </UI.Flex>
         <UI.Div width="100%">
           <Table.HeadingRow gridTemplateColumns={columns}>
             <Table.HeadingCell>
+              {t('score')}
+            </Table.HeadingCell>
+            <Table.HeadingCell>
               {t('user')}
             </Table.HeadingCell>
             <Table.HeadingCell>
-              {t('interaction')}
+              {t('topic')}
             </Table.HeadingCell>
             <Table.HeadingCell>
               {t('team')}
@@ -441,15 +421,24 @@ export const FeedbackOverview = () => {
                 onContextMenu={(e) => openMenu(e, session)}
               >
                 <Table.Cell>
+                  <ScoreBox score={session.score} />
+                </Table.Cell>
+                <Table.Cell>
                   {session?.followUpAction ? (
                     <ContactableUserCell followUpAction={session.followUpAction} sessionId={session.id} />
                   ) : (
                     <AnonymousCell sessionId={session.id} />
                   )}
                 </Table.Cell>
-                <Table.Cell>
-                  {/* @ts-ignore */}
-                  <CompactEntriesPath nodeEntries={session.nodeEntries} />
+                <Table.Cell maxWidth={300}>
+                  <UI.ColumnFlex>
+                    <UI.Span fontWeight={600} color="off.500">
+                      {getMainTopicValue(session)}
+                    </UI.Span>
+                    <UI.Span color="off.300">
+                      {getChoiceNodeValues(session).slice(1).join(' / ')}
+                    </UI.Span>
+                  </UI.ColumnFlex>
                 </Table.Cell>
                 <Table.Cell>
                   <DistributionInnerCell session={session} />
