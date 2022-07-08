@@ -456,11 +456,7 @@ export const FeedbackOverview = () => {
                   <ScoreBox score={session.score} />
                 </Table.Cell>
                 <Table.Cell>
-                  {session?.followUpAction ? (
-                    <ContactableUserCell followUpAction={session.followUpAction} sessionId={session.id} />
-                  ) : (
-                    <AnonymousCell sessionId={session.id} />
-                  )}
+                  <ContactableUserCell followUpAction={session.followUpAction} sessionId={session.id} />
                 </Table.Cell>
                 <Table.Cell maxWidth={300}>
                   <UI.ColumnFlex justifyContent="flex-start">

@@ -6,6 +6,7 @@ import { differenceInCalendarDays, format, formatDistance } from 'date-fns';
 import React from 'react';
 
 import { SessionFragment } from 'types/generated-types';
+import { useTranslation } from 'react-i18next';
 import scoreToColors from 'utils/scoreToColors';
 
 interface CellProps {
@@ -14,18 +15,19 @@ interface CellProps {
 
 interface ContactableUserCellProps {
   sessionId: string;
-  followUpAction: SessionFragment.FollowUpAction;
+  followUpAction?: SessionFragment.FollowUpAction | null;
 }
 
 export const ContactableUserCell = ({ sessionId, followUpAction }: ContactableUserCellProps) => {
-  const field = followUpAction.values.find((value) => value.shortText);
+  const { t } = useTranslation();
+  const field = followUpAction?.values?.find((value) => value.shortText);
   return (
     <UI.Flex alignItems="center">
       <UI.ColumnFlex>
-        <UI.Span fontWeight={600} color="blue.500">
-          {field?.shortText}
+        <UI.Span fontWeight={600} color="off.500">
+          {field?.shortText || t('anonymous')}
         </UI.Span>
-        <UI.Span color="blue.300" fontSize="0.7rem">
+        <UI.Span color="off.300" fontSize="0.7rem">
           {sessionId}
         </UI.Span>
       </UI.ColumnFlex>
