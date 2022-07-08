@@ -10,7 +10,6 @@ import * as Modal from 'components/Common/Modal';
 import { DateFormat, useDate } from 'hooks/useDate';
 import { DatePicker } from 'components/Common/DatePicker';
 import { DialogueImpactScoreType, useGetIssuesQuery, useGetWorkspaceSummaryDetailsQuery } from 'types/generated-types';
-import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
 import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModalCard';
 import { SimpleIssueTable } from 'components/Analytics/Issues/SimpleIssueTable';
 import { useCustomer } from 'providers/CustomerProvider';
@@ -274,7 +273,7 @@ export const WorkspaceGrid = ({
 
   const visitedDialogueFragments = useMemo(() => extractDialogueFragments(historyQueue), [historyQueue]);
 
-  const { data, loading: summaryIsLoading } = useGetWorkspaceSummaryDetailsQuery({
+  const { data } = useGetWorkspaceSummaryDetailsQuery({
     fetchPolicy: 'no-cache',
     variables: {
       id: activeCustomer?.id,
@@ -299,7 +298,7 @@ export const WorkspaceGrid = ({
 
   const summary = data?.customer?.statistics;
 
-  const { data: issuesData } = useGetIssuesQuery({
+  const { data: issuesData, loading: issuesLoading } = useGetIssuesQuery({
     fetchPolicy: 'no-cache',
     variables: {
       workspaceId: activeCustomer?.id || '',
@@ -315,8 +314,6 @@ export const WorkspaceGrid = ({
 
   // Various stats fields
   const health = summary?.health;
-
-  const noData = !summaryIsLoading && health?.nrVotes === 0;
 
   return (
     <LS.WorkspaceGridContainer backgroundColor={backgroundColor}>
@@ -337,7 +334,7 @@ export const WorkspaceGrid = ({
 
             <UI.Div>
               <UI.Helper>Filters</UI.Helper>
-              <UI.Div>
+              <UI.Div mt={1}>
                 <DatePicker
                   type="range"
                   startDate={startDate}
@@ -351,11 +348,7 @@ export const WorkspaceGrid = ({
         <UI.Hr />
         <UI.Grid gridTemplateColumns={['1fr', '1fr', '1fr', '1fr', '2fr 1fr']}>
           <UI.Div>
-            {noData && (
-              <UI.IllustrationCard svg={<EmptyIll />} text={t('dashboard_no_data_with_filter')} />
-            )}
-
-            {!!health?.nrVotes && health.nrVotes > 0 && (
+            {!!health?.nrVotes && (
               <>
                 <UI.Grid gridTemplateColumns="1fr 1fr 1fr">
                   <Statistic
@@ -408,6 +401,7 @@ export const WorkspaceGrid = ({
                     isFilterEnabled={historyQueue.length > 0}
                     issues={issues}
                     onIssueClick={handleIssueClick}
+                    isLoading={issuesLoading}
                     onOpenIssueModal={() => setIssuesModalIsOpen(true)}
                   />
                 </UI.Div>
@@ -435,14 +429,12 @@ export const WorkspaceGrid = ({
                   useBackgroundPattern
                 >
                   <UI.Div position="absolute" left={12} top={12}>
-                    {historyQueue.length > 0 && (
-                      <BreadCrumb
-                        maxWidth={width * 0.8}
-                        viewMode={currentState.viewMode}
-                        historyQueue={historyQueue}
-                        onJumpToIndex={popToIndex}
-                      />
-                    )}
+                    <BreadCrumb
+                      maxWidth={width * 0.8}
+                      viewMode={currentState.viewMode}
+                      historyQueue={historyQueue}
+                      onJumpToIndex={popToIndex}
+                    />
                   </UI.Div>
                 </HexagonGrid>
               )}

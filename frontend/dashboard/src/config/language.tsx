@@ -19,6 +19,10 @@ const language = {
       en: 'Understand your teams and people by drilling down.',
       de: 'Understand your teams and people by drilling down.',
     },
+    dashboard_no_issues: {
+      en: 'Good news! No problematic dialogues can be found in this date-range and filter level.',
+      de: 'Good news! No problematic dialogues can be found in this date-range and filter level.',
+    },
     dashboard_no_data_with_filter: {
       en: 'Currently there is no data available on this date-range and filter level.',
       de: 'Currently there is no data available on this date-range and filter level.',

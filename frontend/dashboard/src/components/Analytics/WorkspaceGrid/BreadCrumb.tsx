@@ -1,7 +1,6 @@
-import React, { useRef, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import * as UI from '@haas/ui';
 import { ChevronRight, Filter, Home } from 'react-feather';
+import React, { useEffect, useRef } from 'react';
 
 import * as LS from './WorkspaceGrid.styles';
 import { HexagonState, HexagonViewMode } from './WorkspaceGrid.types';
@@ -14,7 +13,6 @@ interface BreadCrumbProps {
 }
 
 export const BreadCrumb = ({ historyQueue, viewMode, onJumpToIndex, maxWidth }: BreadCrumbProps) => {
-  const { t } = useTranslation();
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -25,7 +23,13 @@ export const BreadCrumb = ({ historyQueue, viewMode, onJumpToIndex, maxWidth }: 
   }, [viewMode]);
 
   return (
-    <LS.ControlContainer ref={containerRef} width="auto" as="span" height="48px" style={{ whiteSpace: 'pre', maxWidth, overflow: 'scroll', scrollbarWidth: 'none' }}>
+    <LS.ControlContainer
+      ref={containerRef}
+      width="auto"
+      as="span"
+      height="48px"
+      style={{ whiteSpace: 'pre', maxWidth, overflow: 'scroll', scrollbarWidth: 'none' }}
+    >
       <UI.Flex alignItems="center">
         <UI.Span>
           <LS.ControlBody bg="gray.200" color="gray.400" style={{ borderRadius: '10px 0 0 10px' }}>
@@ -36,7 +40,13 @@ export const BreadCrumb = ({ historyQueue, viewMode, onJumpToIndex, maxWidth }: 
         </UI.Span>
         <LS.ControlBody>
           <UI.Flex alignItems="center">
-            <UI.Button onClick={() => onJumpToIndex(0)} isDisabled={historyQueue.length === 0} variantColor='gray' variant='ghost' size="sm">
+            <UI.Button
+              onClick={() => onJumpToIndex(0)}
+              isDisabled={historyQueue.length === 0}
+              variantColor="gray"
+              variant="ghost"
+              size="sm"
+            >
               <UI.Icon>
                 <Home />
               </UI.Icon>
@@ -48,11 +58,24 @@ export const BreadCrumb = ({ historyQueue, viewMode, onJumpToIndex, maxWidth }: 
                   <ChevronRight />
                 </UI.Icon>
 
-                <UI.Button onClick={() => onJumpToIndex(index + 1)} variantColor='gray' variant='ghost' size="sm">
+                <UI.Button onClick={() => onJumpToIndex(index + 1)} variantColor="gray" variant="ghost" size="sm">
                   {state.selectedNode?.label}
                 </UI.Button>
               </React.Fragment>
             ))}
+
+            {viewMode === HexagonViewMode.Workspace && (
+              <>
+                <UI.Icon color="gray.500">
+                  <ChevronRight />
+                </UI.Icon>
+
+                {/* TODO: Not correct, needs to be dependent on visible children */}
+                <UI.Span ref={scrollRef} color="gray.500" mx={2} pr={2}>
+                  Select a group
+                </UI.Span>
+              </>
+            )}
 
             {viewMode === HexagonViewMode.Dialogue && (
               <>
@@ -93,5 +116,5 @@ export const BreadCrumb = ({ historyQueue, viewMode, onJumpToIndex, maxWidth }: 
         </LS.ControlBody>
       </UI.Flex>
     </LS.ControlContainer>
-  )
-}
+  );
+};

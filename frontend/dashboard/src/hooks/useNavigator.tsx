@@ -169,7 +169,10 @@ export const useNavigator = () => {
     ROUTES.WORKSPACE_INTERACTIONS_VIEW, { customerSlug },
   ), [customerSlug]);
 
+  const goTo = (path: string) => history.push(path);
+
   return {
+    goTo,
     dashboardPath,
     workspaceInteractionsPath,
     goToWorkspaceFeedbackOverview,

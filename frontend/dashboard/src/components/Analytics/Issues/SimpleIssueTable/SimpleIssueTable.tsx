@@ -1,13 +1,15 @@
 import * as UI from '@haas/ui';
 import { AlertTriangle } from 'react-feather';
+import { useTranslation } from 'react-i18next';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { EventBars } from 'components/Analytics/Common/EventBars/EventBars';
+import { FilterEnabledLabel } from 'components/Analytics/WorkspaceGrid/FilterEnabledLabel';
 import { Issue } from 'components/Analytics/WorkspaceGrid/WorkspaceGrid.types';
+import { ReactComponent as NoDataIll } from 'assets/images/undraw_solution.svg';
 import { ScoreBox } from 'components/ScoreBox';
 
-import { FilterEnabledLabel } from 'components/Analytics/WorkspaceGrid/FilterEnabledLabel';
 import { IssueActionLabels } from './IssueActionLabels';
 
 const columns = '50px 3fr 100px 200px';
@@ -18,14 +20,23 @@ interface SimpleIssueTableProps {
   issues: Issue[];
   onIssueClick: (issue: Issue) => void;
   onOpenIssueModal?: () => void;
+  isLoading?: boolean;
 }
 
 const CUTOFF = 3;
 
-const IssueBody = styled(UI.CardBody)`
-  ${({ theme }) => css`
+interface IssueBodyProps {
+  isLast?: boolean;
+}
+
+const IssueBody = styled(UI.CardBody)<IssueBodyProps>`
+  ${({ theme, isLast }) => css`
     transition: all ${theme.transitions.normal};
     background-color: white;
+
+    ${isLast && css`
+      border-radius: 0 0 ${theme.borderRadiuses.lg}px ${theme.borderRadiuses.lg}px;
+    `}
 
     &:hover {
       cursor: pointer;
@@ -35,15 +46,17 @@ const IssueBody = styled(UI.CardBody)`
   `}
 `;
 
-export const SimpleIssueTable = (
-  { issues,
-    onIssueClick,
-    onResetFilter,
-    onOpenIssueModal,
-    isFilterEnabled = false,
-    inPreview = true }: SimpleIssueTableProps,
-) => {
+export const SimpleIssueTable = ({
+  issues,
+  onIssueClick,
+  onResetFilter,
+  onOpenIssueModal,
+  isFilterEnabled = false,
+  isLoading,
+  inPreview = true,
+}: SimpleIssueTableProps) => {
   const shownIssues = inPreview ? issues.slice(0, CUTOFF) : issues;
+  const { t } = useTranslation();
 
   return (
     <UI.Card border="1px solid" borderColor="off.100">
@@ -63,7 +76,7 @@ export const SimpleIssueTable = (
               <UI.Icon mr={2}>
                 <AlertTriangle />
               </UI.Icon>
-              Issues
+              Trending teams
             </UI.H4>
 
             {isFilterEnabled && (
@@ -89,12 +102,19 @@ export const SimpleIssueTable = (
         </UI.Grid>
       </UI.CardHeader>
 
+      {!isLoading && issues.length === 0 && (
+        <UI.CardBody>
+          <UI.IllustrationCard flatten svg={<NoDataIll height={200} />} text={t('dashboard_no_issues')} />
+        </UI.CardBody>
+      )}
+
       <UI.Div>
         {shownIssues.map((issue, index) => (
           <IssueBody
             key={index}
             borderBottom="1px solid"
             borderColor="off.100"
+            isLast={index === shownIssues.length - 1}
             onClick={() => onIssueClick(issue)}
           >
             <UI.Grid
@@ -139,15 +159,15 @@ export const SimpleIssueTable = (
           </IssueBody>
         ))}
 
-        <UI.CardBody>
-          {issues.length > CUTOFF && inPreview && onOpenIssueModal && (
+        {issues.length > CUTOFF && inPreview && onOpenIssueModal && (
+          <UI.CardBody>
             <UI.Flex justifyContent="center">
               <UI.Button onClick={onOpenIssueModal} variant="outline" variantColor="red">
                 Show more
               </UI.Button>
             </UI.Flex>
-          )}
-        </UI.CardBody>
+          </UI.CardBody>
+        )}
       </UI.Div>
     </UI.Card>
   );
