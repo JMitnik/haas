@@ -556,6 +556,11 @@ class SessionPrismaAdapter {
             registrationNodeEntry: true,
             relatedNode: true,
             sliderNodeEntry: true,
+            formNodeEntry: {
+              include: {
+                values: true,
+              },
+            },
           },
         },
       },

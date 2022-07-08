@@ -11,7 +11,7 @@ import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';
 import { Nullable, PaginationProps } from '../../types/generic';
-import { SessionActionType, SessionConnection, SessionConnectionFilterInput, SessionWithEntries } from './Session.types';
+import { FollowUpAction, SessionActionType, SessionConnection, SessionConnectionFilterInput, SessionWithEntries } from './Session.types';
 import { TopicByString, TopicStatistics, TopicStatisticsByDialogueId } from '../Topic/Topic.types';
 import TriggerService from '../trigger/TriggerService';
 import prisma from '../../config/prisma';
@@ -248,6 +248,16 @@ class SessionService {
       endDateTime,
       performanceThreshold
     );
+  }
+
+  /**
+   * Get actions from from noed entries
+   */
+  public actionsFromNodeEntries(nodeEntries: NodeEntryWithTypes[]): FollowUpAction | null {
+    const nodeEntry = nodeEntries.find((nodeEntry) => nodeEntry.formNodeEntry);
+
+    // @ts-ignore
+    return nodeEntry?.formNodeEntry || null;
   }
 
   /**
@@ -545,11 +555,10 @@ class SessionService {
 
     const sessions = await this.sessionPrismaAdapter.findWorkspaceSessions(dialogueIds, filter);
 
-    const sessionWithFollowUpAction = sessions.map((session) => {
-      const followUpAction = session.nodeEntries.find((nodeEntry) => nodeEntry.formNodeEntry);
-
-      return { ...session, followUpAction: followUpAction?.formNodeEntry || null };
-    });
+    const sessionWithFollowUpAction = sessions.map((session) => ({
+      ...session,
+      followUpAction: this.actionsFromNodeEntries(session.nodeEntries as NodeEntryWithTypes[]),
+    }));
 
     const totalSessions = await this.sessionPrismaAdapter.countWorkspaceSessions(dialogueIds, filter);
 

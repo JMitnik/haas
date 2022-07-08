@@ -2,6 +2,7 @@ import * as UI from '@haas/ui';
 import { AlertTriangle, MessageCircle, User } from 'react-feather';
 import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { Zoom } from '@visx/zoom';
+import { sumBy } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import useMeasure from 'react-use-measure';
@@ -384,7 +385,9 @@ export const WorkspaceGrid = ({
                   themeBg="main.500"
                   themeColor="white"
                   name="Actions"
-                  value={issues.filter((issue) => issue.followUpAction).length}
+                  value={
+                    sumBy(issues.filter((issue) => issue.followUpAction), ((issue) => issue.basicStats.responseCount))
+                  }
                   isFilterEnabled={historyQueue.length > 0}
                   onNavigate={() => goToWorkspaceFeedbackOverview(
                     findDialoguesInGroup([currentState.currentNode as HexagonNode]),
