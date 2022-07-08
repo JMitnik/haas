@@ -1897,6 +1897,7 @@ export type PathedSessionsInput = {
   path: Array<Scalars['String']>;
   startDateTime: Scalars['String'];
   endDateTime?: Maybe<Scalars['String']>;
+  issueOnly?: Maybe<Scalars['Boolean']>;
   refresh?: Maybe<Scalars['Boolean']>;
 };
 

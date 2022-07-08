@@ -474,6 +474,7 @@ export interface NexusGenInputs {
   }
   PathedSessionsInput: { // input type
     endDateTime?: string | null; // String
+    issueOnly?: boolean | null; // Boolean
     path: string[]; // [String!]!
     refresh?: boolean | null; // Boolean
     startDateTime: string; // String!

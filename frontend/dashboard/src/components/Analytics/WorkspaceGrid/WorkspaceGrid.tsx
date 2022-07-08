@@ -42,6 +42,7 @@ export interface DataLoadOptions {
   dialogueId?: string;
   topic?: string;
   topics?: string[];
+  issueOnly?: boolean;
   clickedGroup?: HexagonGroupNode;
 }
 
@@ -191,12 +192,13 @@ export const WorkspaceGrid = ({
    * - Useful for skipping groups.
    * - Allows for additional filtering, by only retrieving sessions mentioning certain `topics`.
    */
-  const jumpToDialogue = async (dialogueId: string, topics?: string[]) => {
+  const jumpToDialogue = async (dialogueId: string, topics?: string[], issueOnly: boolean = false) => {
     if (!onLoadData) return;
 
     const [sessions, viewMode] = await onLoadData({
       dialogueId,
       topics,
+      issueOnly,
     });
 
     const reconstructedHistoryStack = reconstructHistoryStack(dialogueId, initialData);
@@ -267,7 +269,7 @@ export const WorkspaceGrid = ({
 
   const handleIssueClick = (issue: Issue) => {
     if (issue.dialogue?.id) {
-      jumpToDialogue(issue.dialogue.id);
+      jumpToDialogue(issue.dialogue.id, undefined, true);
     }
   };
 

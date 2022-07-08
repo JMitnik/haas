@@ -135,6 +135,7 @@ class SessionService {
     startDateTime: Date,
     endDateTime?: Date,
     refresh: boolean = false,
+    issueOnly: boolean = false,
   ) => {
     const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
 
@@ -162,12 +163,17 @@ class SessionService {
       },
     })) : [];
 
-    const pathedSessions = await this.sessionPrismaAdapter.findPathMatchedSessions(
+    let pathedSessions = await this.sessionPrismaAdapter.findPathMatchedSessions(
       pathEntries,
       startDateTime,
       endDateTimeSet,
       dialogueId
     );
+
+    // TODO: Make this a more formal calculation
+    if (issueOnly) {
+      pathedSessions = pathedSessions.filter(session => session.mainScore < 55);
+    }
 
     // Create a pathed session cache object
     void this.sessionPrismaAdapter.upsertPathedSessionCache(

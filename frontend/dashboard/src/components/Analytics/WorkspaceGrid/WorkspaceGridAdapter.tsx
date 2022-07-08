@@ -75,6 +75,7 @@ export const WorkspaceGridAdapter = ({
         endDateTime: format(selectedEndDate, DateFormat.DayFormat),
         path: options.topics || [],
         refresh: true,
+        issueOnly: options.issueOnly,
       },
       dialogueId: options.dialogueId,
     });

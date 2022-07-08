@@ -94,7 +94,7 @@ export const SimpleIssueTable = ({
             Team
           </UI.Helper>
           <UI.Helper>
-            Quantity
+            Responses
           </UI.Helper>
           <UI.Helper>
             Pulse
