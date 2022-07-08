@@ -54,16 +54,11 @@ export const CustomerType = objectType({
       async resolve(parent, args, ctx) {
         if (!parent.id) return null;
 
-        const startTime = performance.now();
         const sessionConnection = await ctx.services.sessionService.getWorkspaceSessionConnection(
           parent.id,
           args.filter
         );
 
-        const endTime = performance.now();
-
-        console.log(sessionConnection?.sessions.length);
-        console.log('Time taken: ', endTime - startTime, 'ms');
         return sessionConnection;
       },
     });
