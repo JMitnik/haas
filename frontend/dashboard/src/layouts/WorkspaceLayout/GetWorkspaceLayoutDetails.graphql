@@ -1,0 +1,13 @@
+query GetWorkspaceLayoutDetails($workspaceId: ID!, $healthInput: HealthScoreInput!) {
+  customer(id: $workspaceId) {
+    id
+    statistics {
+      id
+      health(input: $healthInput) {
+        nrVotes
+        negativeResponseCount
+        score
+      }
+    }
+  }
+}

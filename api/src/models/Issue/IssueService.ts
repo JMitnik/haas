@@ -1,22 +1,42 @@
 import { PrismaClient } from '@prisma/client';
 import { orderBy } from 'lodash';
 
-import { SessionActionType } from 'models/session/Session.types';
 import { isPresent } from 'ts-is-present';
 import { Nullable } from 'types/generic';
 
 import { convertDatesToHistogramItems } from '../Common/Analytics/Analytics.helpers';
-import { TopicByString, TopicStatistics } from '../Topic/Topic.types';
+import { TopicByString, TopicFilterInput, TopicStatistics, TopicStatisticsByDialogueId } from '../Topic/Topic.types';
 import { TopicService } from '../Topic/TopicService';
 import { Issue, IssueFilterInput } from './Issue.types';
+import { SessionActionType, SessionWithEntries } from '../../models/session/Session.types';
+import SessionService from '../../models/session/SessionService';
+import CustomerService from '../../models/customer/CustomerService';
 
 export class IssueService {
   private prisma: PrismaClient;
   private topicService: TopicService;
+  private workspaceService: CustomerService;
+  private sessionService: SessionService;
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
     this.topicService = new TopicService(prisma);
+    this.workspaceService = new CustomerService(prisma);
+    this.sessionService = new SessionService(prisma);
+  }
+
+  /**
+   * Retrieves all workspace issues. This can be filtered, based on the required filter (startDate, endDate).
+   * @param workspaceId Workspace ID
+   */
+  public async getProblemDialoguesByWorkspace(workspaceId: string, filter: IssueFilterInput): Promise<Issue[]> {
+    const dialogues = await this.countNegativeInteractionsPerDialogue(
+      workspaceId, filter.startDate, filter.endDate, filter
+    );
+    const issues = orderBy(this.calculateDialogueIssueScore(dialogues), (topic) => topic.rankScore, 'desc');
+
+    // Filter out topics that are candidate issues.
+    return issues;
   }
 
   /**
@@ -50,6 +70,40 @@ export class IssueService {
   }
 
   /**
+   * Count negative interactions and their frequencies per dialogue within a workspace.
+   */
+  async countNegativeInteractionsPerDialogue(
+    workspaceId: string,
+    startDate: Date,
+    endDate: Date,
+    topicFilter?: TopicFilterInput
+  ): Promise<TopicStatisticsByDialogueId> {
+    const dialogueIds = (
+      await this.workspaceService.getDialogues(workspaceId, topicFilter?.dialogueStrings || undefined)
+    ).map(dialogue => dialogue.id);
+
+    // Fetch all sessions for the dialogues.
+    const sessions = await this.sessionService.findSessionsForDialogues(
+      dialogueIds,
+      startDate,
+      endDate,
+      this.topicService.buildSessionFilter(topicFilter),
+      {
+        nodeEntries:
+        {
+          include:
+            { choiceNodeEntry: true, formNodeEntry: { include: { values: { include: { relatedField: true } } } } },
+        },
+      }
+    ) as unknown as SessionWithEntries[];
+
+    // Calculate all the candidate topic-counts.
+    const dialogueStatistics = this.sessionService.extractNegativeScoresByDialogue(sessions);
+
+    return dialogueStatistics;
+  }
+
+  /**
    * Calculate part of the issue score from actions.
    *
    * We follow a certain heuristic:
@@ -66,6 +120,42 @@ export class IssueService {
     }, 0);
 
     return score;
+  }
+
+  /**
+   * Extracts all issues from a topic-by-string map.
+   *
+   * Warning: Potentially costly due to the `convertDatesToHistogramItems` call.
+   */
+  private calculateDialogueIssueScore(dialogues: TopicStatisticsByDialogueId): Issue[] {
+    let issues: Issue[] = [];
+
+    Object.entries(dialogues).forEach(([dialogueId, dialogueStats]) => {
+      const rankScore = this.calculateScore(dialogueStats);
+
+      issues.push({
+        id: `${dialogueId}`,
+        topic: '',
+        basicStats: {
+          average: dialogueStats.score / dialogueStats.count,
+          responseCount: dialogueStats.count,
+        },
+        dialogue: null,
+        dialogueId,
+        createdAt: dialogueStats.dates[0],
+        updatedAt: dialogueStats.dates[dialogueStats.dates.length - 1],
+        status: 'OPEN',
+        history: {
+          id: `${dialogueId}-hist`,
+          items: convertDatesToHistogramItems(dialogueStats.dates),
+        },
+        rankScore,
+        followUpAction: dialogueStats.followUpActions.find(isPresent) || null,
+        actionRequiredCount: dialogueStats.followUpActions.filter(isPresent).length,
+      })
+    });
+
+    return issues;
   }
 
   /**
@@ -101,6 +191,7 @@ export class IssueService {
           },
           rankScore,
           followUpAction: topicStats.followUpActions.find(isPresent) || null,
+          actionRequiredCount: topicStats.followUpActions.filter(isPresent).length,
         })
       });
     });

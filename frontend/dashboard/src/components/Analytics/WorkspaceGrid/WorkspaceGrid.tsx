@@ -1,17 +1,24 @@
 import * as UI from '@haas/ui';
+import { AlertTriangle, MessageCircle, User } from 'react-feather';
 import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { Zoom } from '@visx/zoom';
+import { sumBy } from 'lodash';
+import { useTranslation } from 'react-i18next';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import useMeasure from 'react-use-measure';
 
 import * as Modal from 'components/Common/Modal';
+import { DateFormat, useDate } from 'hooks/useDate';
 import { DatePicker } from 'components/Common/DatePicker';
+import { DialogueImpactScoreType, useGetIssuesQuery, useGetWorkspaceSummaryDetailsQuery } from 'types/generated-types';
 import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModalCard';
 import { SimpleIssueTable } from 'components/Analytics/Issues/SimpleIssueTable';
 import { useCustomer } from 'providers/CustomerProvider';
-import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
+import { useNavigator } from 'hooks/useNavigator';
 
+import { endOfDay, startOfDay } from 'date-fns';
 import * as LS from './WorkspaceGrid.styles';
+import { BreadCrumb } from './BreadCrumb';
 import {
   HexagonDialogueNode,
   HexagonGroupNode,
@@ -24,20 +31,20 @@ import {
   Issue,
 } from './WorkspaceGrid.types';
 import { HexagonGrid } from './HexagonGrid';
-import { createGrid, extractDialogueFragments, reconstructHistoryStack } from './WorkspaceGrid.helpers';
-import { DialogueImpactScoreType, useGetWorkspaceSummaryDetailsQuery, useGetIssuesQuery } from 'types/generated-types';
-import { DateFormat, useDate } from 'hooks/useDate';
-import { HealthCardWide } from '../Common/HealthCard/HealthCardWide';
-import { BreadCrumb } from './BreadCrumb';
 import { IssuesModal } from './IssuesModal';
-import { AlertTriangle, MessageCircle, User } from 'react-feather';
 import { Statistic } from './Statistic';
-import { useTranslation } from 'react-i18next';
+import {
+  createGrid,
+  extractDialogueFragments,
+  findDialoguesInGroup,
+  reconstructHistoryStack,
+} from './WorkspaceGrid.helpers';
 
 export interface DataLoadOptions {
   dialogueId?: string;
   topic?: string;
   topics?: string[];
+  issueOnly?: boolean;
   clickedGroup?: HexagonGroupNode;
 }
 
@@ -61,15 +68,14 @@ export const WorkspaceGrid = ({
   dateRange: [startDate, endDate],
   setDateRange,
   initialViewMode = HexagonViewMode.Workspace,
-  isServerLoading = false,
 }: WorkspaceGridProps) => {
   const { format } = useDate();
+  const { goToWorkspaceFeedbackOverview } = useNavigator();
   const { activeCustomer } = useCustomer();
   const initialRef = React.useRef<HTMLDivElement>();
   const { t } = useTranslation();
   // Local loading
   const [isLoading, setIsLoading] = useState(false);
-
   const [issuesModalIsOpen, setIssuesModalIsOpen] = useState(false);
 
   // Session-id if currently being tracked.
@@ -77,7 +83,7 @@ export const WorkspaceGrid = ({
 
   const [ref, bounds] = useMeasure();
   const width = bounds.width || 600;
-  const height = Math.max(bounds.height, 600);
+  const height = Math.max(bounds.height, 500);
 
   /**
    * The current state describes that state of the workspace grid component, including the node
@@ -104,8 +110,6 @@ export const WorkspaceGrid = ({
    */
   const [stateHistoryStack, setStateHistoryStack] = React.useState<HexagonState[]>([]);
   const historyQueue = [...stateHistoryStack].reverse();
-  const previousLabels: string[] = extractDialogueFragments(historyQueue);
-
   /**
    * If the last selected node was a dialogue, then the activeDialogue will point to that dialogue.
    */
@@ -190,18 +194,19 @@ export const WorkspaceGrid = ({
    * - Useful for skipping groups.
    * - Allows for additional filtering, by only retrieving sessions mentioning certain `topics`.
    */
-  const jumpToDialogue = async (dialogueId: string, topics?: string[]) => {
+  const jumpToDialogue = async (dialogueId: string, topics?: string[], issueOnly: boolean = false) => {
     if (!onLoadData) return;
 
     const [sessions, viewMode] = await onLoadData({
       dialogueId,
       topics,
+      issueOnly,
     });
 
     const reconstructedHistoryStack = reconstructHistoryStack(dialogueId, initialData);
     setStateHistoryStack(reconstructedHistoryStack);
 
-    setCurrentState({ childNodes: sessions, viewMode });
+    setCurrentState({ currentNode: reconstructedHistoryStack[0].selectedNode, childNodes: sessions, viewMode });
   };
 
   /**
@@ -266,27 +271,27 @@ export const WorkspaceGrid = ({
 
   const handleIssueClick = (issue: Issue) => {
     if (issue.dialogue?.id) {
-      jumpToDialogue(issue.dialogue.id, [issue.topic]);
+      jumpToDialogue(issue.dialogue.id, undefined, true);
     }
   };
 
   const visitedDialogueFragments = useMemo(() => extractDialogueFragments(historyQueue), [historyQueue]);
 
-  const { data, loading: summaryIsLoading } = useGetWorkspaceSummaryDetailsQuery({
+  const { data } = useGetWorkspaceSummaryDetailsQuery({
     fetchPolicy: 'no-cache',
     variables: {
       id: activeCustomer?.id,
       healthInput: {
-        startDateTime: format(startDate, DateFormat.DayFormat),
-        endDateTime: format(endDate, DateFormat.DayFormat),
+        startDateTime: format(startOfDay(startDate), DateFormat.DayTimeFormat),
+        endDateTime: format(endOfDay(endDate), DateFormat.DayTimeFormat),
         topicFilter: {
           dialogueStrings: visitedDialogueFragments,
         },
       },
       summaryInput: {
         impactType: DialogueImpactScoreType.Average,
-        startDateTime: format(startDate, DateFormat.DayFormat),
-        endDateTime: format(endDate, DateFormat.DayFormat),
+        startDateTime: format(startOfDay(startDate), DateFormat.DayTimeFormat),
+        endDateTime: format(endOfDay(endDate), DateFormat.DayTimeFormat),
         topicsFilter: {
           dialogueStrings: visitedDialogueFragments,
         },
@@ -297,106 +302,121 @@ export const WorkspaceGrid = ({
 
   const summary = data?.customer?.statistics;
 
-  const { data: issuesData, loading: loadingIssues } = useGetIssuesQuery({
+  const { data: issuesData, loading: issuesLoading } = useGetIssuesQuery({
+    fetchPolicy: 'no-cache',
     variables: {
       workspaceId: activeCustomer?.id || '',
       filter: {
-        startDate: format(startDate, DateFormat.DayFormat),
-        endDate: format(endDate, DateFormat.DayFormat),
+        startDate: format(startOfDay(startDate), DateFormat.DayTimeFormat),
+        endDate: format(endOfDay(endDate), DateFormat.DayTimeFormat),
         dialogueStrings: visitedDialogueFragments,
-      }
-    }
+      },
+    },
   });
 
   const issues = issuesData?.customer?.issues || [];
+  const issueStats = issues.reduce((acc, issue) => {
+    acc.problems += issue.basicStats.responseCount;
+    acc.actionsRequested += issue.actionRequiredCount || 0;
+    return acc;
+  }, { problems: 0, actionsRequested: 0 });
 
   // Various stats fields
   const health = summary?.health;
 
-  const noData = !summaryIsLoading && health?.nrVotes === 0;
-
   return (
     <LS.WorkspaceGridContainer backgroundColor={backgroundColor}>
-      <UI.Container px={4}>
-        <UI.Flex position="relative" zIndex={200} justifyContent="space-between" py={4} flexWrap="wrap">
-          <UI.Div>
-            <UI.H2 lineHeight="1" textAlign="left" fontWeight="900" color="main.500">
-              {activeCustomer?.name}
-            </UI.H2>
-          </UI.Div>
+      {isLoading && (
+        <UI.Loader />
+      )}
+      <UI.Container px={4} pt={4}>
+        <UI.Div pb={4} position="relative" zIndex={10000}>
+          <UI.Flex alignItems="center" justifyContent="space-between">
+            <UI.Div>
+              <UI.H4 fontSize="1.1rem" color="off.500">
+                {t('overview')}
+              </UI.H4>
+              <UI.Span color="off.400" fontWeight={500}>
+                {t('workspace_overview_description')}
+              </UI.Span>
+            </UI.Div>
 
-          <UI.Div>
-            <DatePicker
-              type="range"
-              startDate={startDate}
-              endDate={endDate}
-              onChange={setDateRange}
-            />
-          </UI.Div>
-        </UI.Flex>
-
+            <UI.Div>
+              <UI.Helper>Filters</UI.Helper>
+              <UI.Div mt={1}>
+                <DatePicker
+                  type="range"
+                  startDate={startDate}
+                  endDate={endDate}
+                  onChange={setDateRange}
+                />
+              </UI.Div>
+            </UI.Div>
+          </UI.Flex>
+        </UI.Div>
         <UI.Hr />
-
-        <UI.Grid gridTemplateColumns={["1fr", "1fr", "1fr", "1fr", "2fr 1fr"]}>
+        <UI.Grid gridTemplateColumns={['1fr', '1fr', '1fr', '1fr', '2fr 1fr']}>
           <UI.Div>
-            {noData && (
-              <UI.IllustrationCard svg={<EmptyIll />} text={t('dashboard_no_data_with_filter')} />
-            )}
-
-            {!!health?.nrVotes && health.nrVotes > 0 && (
-              <>
-                <UI.Grid gridTemplateColumns={["1fr", "1fr", "1fr", "1fr", "1fr 1fr"]}>
-                  <UI.Grid gridTemplateColumns={["1fr 1fr 1fr", "1fr 1fr 1fr", "1fr 1fr 1fr", "1fr 1fr 1fr", "1fr"]}>
-                    <Statistic
-                      icon={<User height={40} width={40} />}
-                      themeBg="green.500"
-                      themeColor="white"
-                      name="Total feedback"
-                      value={health?.nrVotes || 0}
-                      isFilterEnabled={historyQueue.length > 0}
-                    />
-                    <Statistic
-                      icon={<AlertTriangle height={40} width={40} />}
-                      themeBg="red.500"
-                      themeColor="white"
-                      name="Total issues"
-                      value={issues.length}
-                      isFilterEnabled={historyQueue.length > 0}
-                    />
-                    <Statistic
-                      icon={<MessageCircle height={40} width={40} />}
-                      themeBg="main.500"
-                      themeColor="white"
-                      name="Total call-to-actions"
-                      value={issues.filter(issue => issue.followUpAction).length}
-                      isFilterEnabled={historyQueue.length > 0}
-                    />
-                  </UI.Grid>
-                  <UI.Div>
-                    {health && (
-                      <HealthCardWide
-                        key={health.score}
-                        score={health.score}
-                        onResetFilters={() => popToIndex(0)}
-                        isFilterEnabled={historyQueue.length > 0}
-                        negativeResponseCount={health.negativeResponseCount}
-                        positiveResponseCount={health.nrVotes - health.negativeResponseCount}
-                      />
-                    )}
-                  </UI.Div>
-                </UI.Grid>
-                <UI.Div mt={4}>
-                  <SimpleIssueTable
-                    inPreview
-                    onResetFilter={() => popToIndex(0)}
-                    isFilterEnabled={historyQueue.length > 0}
-                    issues={issues}
-                    onIssueClick={handleIssueClick}
-                    onOpenIssueModal={() => setIssuesModalIsOpen(true)}
-                  />
-                </UI.Div>
-              </>
-            )}
+            <>
+              <UI.Grid gridTemplateColumns="1fr 1fr 1fr">
+                <Statistic
+                  icon={<User height={40} width={40} />}
+                  themeBg="green.500"
+                  themeColor="white"
+                  name="Responses"
+                  value={health?.nrVotes || 0}
+                  isFilterEnabled={historyQueue.length > 0}
+                  onNavigate={() => goToWorkspaceFeedbackOverview(
+                    findDialoguesInGroup([currentState.currentNode as HexagonNode]),
+                    format(startOfDay(startDate), DateFormat.DayTimeFormat),
+                    format(endOfDay(endDate), DateFormat.DayTimeFormat),
+                  )}
+                />
+                <Statistic
+                  icon={<AlertTriangle height={40} width={40} />}
+                  themeBg="red.500"
+                  themeColor="white"
+                  name="Problems"
+                  value={issueStats.problems}
+                  isFilterEnabled={historyQueue.length > 0}
+                  onNavigate={() => goToWorkspaceFeedbackOverview(
+                    findDialoguesInGroup([currentState.currentNode as HexagonNode]),
+                    format(startOfDay(startDate), DateFormat.DayTimeFormat),
+                    format(endOfDay(endDate), DateFormat.DayTimeFormat),
+                    55,
+                  )}
+                />
+                <Statistic
+                  icon={<MessageCircle height={40} width={40} />}
+                  themeBg="main.500"
+                  themeColor="white"
+                  name="Action Requests"
+                  value={
+                    issueStats.actionsRequested
+                    // sumBy(issues.filter((issue) => issue.followUpAction), ((issue) => issue.basicStats.responseCount))
+                  }
+                  isFilterEnabled={historyQueue.length > 0}
+                  onNavigate={() => goToWorkspaceFeedbackOverview(
+                    findDialoguesInGroup([currentState.currentNode as HexagonNode]),
+                    format(startOfDay(startDate), DateFormat.DayTimeFormat),
+                    format(endOfDay(endDate), DateFormat.DayTimeFormat),
+                    undefined,
+                    true,
+                  )}
+                />
+              </UI.Grid>
+              <UI.Div mt={4}>
+                <SimpleIssueTable
+                  inPreview
+                  onResetFilter={() => popToIndex(0)}
+                  isFilterEnabled={historyQueue.length > 0}
+                  issues={issues}
+                  onIssueClick={handleIssueClick}
+                  isLoading={issuesLoading}
+                  onOpenIssueModal={() => setIssuesModalIsOpen(true)}
+                />
+              </UI.Div>
+            </>
 
           </UI.Div>
           <UI.Div width="100%" ref={ref}>
@@ -417,13 +437,14 @@ export const WorkspaceGrid = ({
                   stateKey={currentState.currentNode?.id || ''}
                   zoom={zoom}
                   useBackgroundPattern
-                  onGoBack={() => popToIndex(stateHistoryStack.length - 1)}
-                  isAtRoot={historyQueue.length === 0}
                 >
                   <UI.Div position="absolute" left={12} top={12}>
-                    {historyQueue.length > 0 && (
-                      <BreadCrumb maxWidth={width * 0.8} viewMode={currentState.viewMode} historyQueue={historyQueue} onJumpToIndex={popToIndex} />
-                    )}
+                    <BreadCrumb
+                      maxWidth={width * 0.8}
+                      viewMode={currentState.viewMode}
+                      historyQueue={historyQueue}
+                      onJumpToIndex={popToIndex}
+                    />
                   </UI.Div>
                 </HexagonGrid>
               )}
@@ -431,6 +452,10 @@ export const WorkspaceGrid = ({
           </UI.Div>
         </UI.Grid>
       </UI.Container>
+
+      <UI.Div pt={4}>
+        <UI.Hr />
+      </UI.Div>
 
       <Modal.Root open={!!sessionId} onClose={() => setSessionId(undefined)}>
         <InteractionModalCard

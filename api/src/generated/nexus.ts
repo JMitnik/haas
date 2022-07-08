@@ -474,6 +474,7 @@ export interface NexusGenInputs {
   }
   PathedSessionsInput: { // input type
     endDateTime?: string | null; // String
+    issueOnly?: boolean | null; // Boolean
     path: string[]; // [String!]!
     refresh?: boolean | null; // Boolean
     startDateTime: string; // String!
@@ -738,7 +739,7 @@ export interface NexusGenEnums {
   QuestionNodeTypeEnum: "CHOICE" | "FORM" | "GENERIC" | "LINK" | "REGISTRATION" | "SHARE" | "SLIDER" | "TEXTBOX" | "VIDEO_EMBEDDED"
   RecurringPeriodType: prisma.RecurringPeriodType
   SessionActionType: "CONTACT"
-  SessionConnectionOrder: "createdAt"
+  SessionConnectionOrder: "createdAt" | "dialogueId"
   SessionDeliveryType: "campaigns" | "noCampaigns"
   StatusType: "CLOSED" | "IN_PROGRESS" | "OPEN"
   SystemPermission: "CAN_ACCESS_ADMIN_PANEL" | "CAN_ACCESS_REPORT_PAGE" | "CAN_ADD_USERS" | "CAN_ASSIGN_USERS_TO_DIALOGUE" | "CAN_BUILD_DIALOGUE" | "CAN_CREATE_AUTOMATIONS" | "CAN_CREATE_CAMPAIGNS" | "CAN_CREATE_DELIVERIES" | "CAN_CREATE_TRIGGERS" | "CAN_DELETE_DIALOGUE" | "CAN_DELETE_TRIGGERS" | "CAN_DELETE_USERS" | "CAN_DELETE_WORKSPACE" | "CAN_DOWNLOAD_REPORTS" | "CAN_EDIT_DIALOGUE" | "CAN_EDIT_USERS" | "CAN_EDIT_WORKSPACE" | "CAN_GENERATE_WORKSPACE_FROM_CSV" | "CAN_UPDATE_AUTOMATIONS" | "CAN_VIEW_AUTOMATIONS" | "CAN_VIEW_CAMPAIGNS" | "CAN_VIEW_DIALOGUE" | "CAN_VIEW_DIALOGUE_ANALYTICS" | "CAN_VIEW_USERS"
@@ -981,7 +982,7 @@ export interface NexusGenRootTypes {
   }
   FontSettings: prisma.FontSettings;
   FormNodeEntryType: { // root type
-    id: number; // Int!
+    id?: number | null; // Int
     values: NexusGenRootTypes['FormNodeEntryValueType'][]; // [FormNodeEntryValueType!]!
   }
   FormNodeEntryValueType: { // root type
@@ -1020,6 +1021,7 @@ export interface NexusGenRootTypes {
     didInvite: boolean; // Boolean!
   }
   Issue: { // root type
+    actionRequiredCount?: number | null; // Int
     basicStats: NexusGenRootTypes['BasicStatistics']; // BasicStatistics!
     createdAt: any; // Date!
     dialogueId: string; // String!
@@ -1787,7 +1789,7 @@ export interface NexusGenFieldTypes {
     id: string; // ID!
   }
   FormNodeEntryType: { // field return type
-    id: number; // Int!
+    id: number | null; // Int
     values: NexusGenRootTypes['FormNodeEntryValueType'][]; // [FormNodeEntryValueType!]!
   }
   FormNodeEntryValueType: { // field return type
@@ -1833,6 +1835,7 @@ export interface NexusGenFieldTypes {
     didInvite: boolean; // Boolean!
   }
   Issue: { // field return type
+    actionRequiredCount: number | null; // Int
     basicStats: NexusGenRootTypes['BasicStatistics']; // BasicStatistics!
     createdAt: any; // Date!
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue

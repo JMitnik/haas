@@ -167,7 +167,16 @@ export const InteractionTimeline = ({ interaction }: InteractionTimelineProps) =
             )}
           </Circle>
           <UI.Div>
-            <UI.Helper color="blue.400">{nodeEntry.relatedNode?.type}</UI.Helper>
+            {nodeEntry.relatedNode?.type === QuestionNodeTypeEnum.Form ? (
+              <UI.Flex justifyContent="space-between">
+                <UI.Helper color="blue.400">{nodeEntry.relatedNode?.type}</UI.Helper>
+
+                <UI.Helper color="red.500">Requires action</UI.Helper>
+              </UI.Flex>
+            ) : (
+              <UI.Helper color="blue.400">{nodeEntry.relatedNode?.type}</UI.Helper>
+            )}
+
             <StatusDescription nodeEntry={nodeEntry} />
           </UI.Div>
         </TimelineItem>

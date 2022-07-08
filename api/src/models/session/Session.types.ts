@@ -12,3 +12,5 @@ export type SessionActionType = NexusGenEnums['SessionActionType'];
 export type SessionConnectionFilterInput = NexusGenInputs['SessionConnectionFilterInput'];
 
 export type SessionConnection = NexusGenFieldTypes['SessionConnection'];
+
+export type FollowUpAction = NexusGenFieldTypes['FormNodeEntryType'];

@@ -14,6 +14,12 @@ export type Scalars = {
   Float: number;
   /** Date custom scalar type */
   Date: any;
+  /**
+   *
+   *     A date-string follows format "dd-MM-yyyy HH:mm", "dd-MM-yyyy" or ISO format, and is resolved to a relevant Date object.
+   *
+   */
+  DateString: any;
   /** The `Upload` scalar type represents a file upload. */
   Upload: any;
   /** The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
@@ -555,6 +561,7 @@ export type Customer = {
   slug: Scalars['String'];
   name: Scalars['String'];
   settings?: Maybe<CustomerSettings>;
+  sessionConnection?: Maybe<SessionConnection>;
   /** Workspace statistics */
   statistics?: Maybe<WorkspaceStatistics>;
   issues?: Maybe<Array<Issue>>;
@@ -576,6 +583,11 @@ export type Customer = {
   roles?: Maybe<Array<RoleType>>;
   campaign?: Maybe<CampaignType>;
   userCustomer?: Maybe<UserCustomer>;
+};
+
+
+export type CustomerSessionConnectionArgs = {
+  filter?: Maybe<SessionConnectionFilterInput>;
 };
 
 
@@ -685,6 +697,7 @@ export type DateHistogramItem = {
   date: Scalars['Date'];
   frequency: Scalars['Int'];
 };
+
 
 export type DeleteDialogueInputType = {
   id?: Maybe<Scalars['ID']>;
@@ -1084,7 +1097,7 @@ export type FormNodeEntryInput = {
 
 export type FormNodeEntryType = {
   __typename?: 'FormNodeEntryType';
-  id: Scalars['Int'];
+  id?: Maybe<Scalars['Int']>;
   values: Array<FormNodeEntryValueType>;
 };
 
@@ -1255,6 +1268,8 @@ export type Issue = {
   basicStats: BasicStatistics;
   status: StatusType;
   followUpAction?: Maybe<SessionActionType>;
+  /** Number of actions required */
+  actionRequiredCount?: Maybe<Scalars['Int']>;
   createdAt: Scalars['Date'];
   updatedAt: Scalars['Date'];
 };
@@ -1884,6 +1899,7 @@ export type PathedSessionsInput = {
   path: Array<Scalars['String']>;
   startDateTime: Scalars['String'];
   endDateTime?: Maybe<Scalars['String']>;
+  issueOnly?: Maybe<Scalars['Boolean']>;
   refresh?: Maybe<Scalars['Boolean']>;
 };
 
@@ -2299,12 +2315,14 @@ export type Session = {
   browser: Scalars['String'];
   paths: Scalars['Int'];
   score: Scalars['Float'];
+  dialogue?: Maybe<Dialogue>;
   totalTimeInSec?: Maybe<Scalars['Int']>;
   originUrl?: Maybe<Scalars['String']>;
   device?: Maybe<Scalars['String']>;
   deliveryId?: Maybe<Scalars['String']>;
   delivery?: Maybe<DeliveryType>;
   nodeEntries: Array<NodeEntry>;
+  followUpAction?: Maybe<FormNodeEntryType>;
 };
 
 /** Actions expected after session */
@@ -2321,19 +2339,22 @@ export type SessionConnection = ConnectionInterface & {
 
 export type SessionConnectionFilterInput = {
   search?: Maybe<Scalars['String']>;
-  startDate?: Maybe<Scalars['String']>;
-  endDate?: Maybe<Scalars['String']>;
+  startDate?: Maybe<Scalars['DateString']>;
+  endDate?: Maybe<Scalars['DateString']>;
   deliveryType?: Maybe<SessionDeliveryType>;
   scoreRange?: Maybe<SessionScoreRangeFilter>;
   campaignVariantId?: Maybe<Scalars['String']>;
   orderBy?: Maybe<SessionConnectionOrderByInput>;
   offset?: Maybe<Scalars['Int']>;
   perPage?: Maybe<Scalars['Int']>;
+  dialogueIds?: Maybe<Array<Scalars['String']>>;
+  withFollowUpAction?: Maybe<Scalars['Boolean']>;
 };
 
 /** Fields to order SessionConnection by. */
 export enum SessionConnectionOrder {
-  CreatedAt = 'createdAt'
+  CreatedAt = 'createdAt',
+  DialogueId = 'dialogueId'
 }
 
 /** Sorting of sessionConnection */
@@ -2875,7 +2896,7 @@ export type GetIssuesQuery = (
     & Pick<Customer, 'id'>
     & { issues?: Maybe<Array<(
       { __typename?: 'Issue' }
-      & Pick<Issue, 'id' | 'topic' | 'rankScore' | 'followUpAction'>
+      & Pick<Issue, 'id' | 'topic' | 'rankScore' | 'followUpAction' | 'actionRequiredCount'>
       & { dialogue?: Maybe<(
         { __typename?: 'Dialogue' }
         & Pick<Dialogue, 'id' | 'title'>
@@ -3015,13 +3036,44 @@ export type NodeEntryFragmentFragment = (
 
 export type SessionFragmentFragment = (
   { __typename?: 'Session' }
-  & Pick<Session, 'id' | 'createdAt' | 'score' | 'originUrl' | 'totalTimeInSec' | 'device'>
+  & Pick<Session, 'id' | 'createdAt' | 'score' | 'originUrl' | 'totalTimeInSec' | 'device' | 'dialogueId'>
   & { nodeEntries: Array<(
     { __typename?: 'NodeEntry' }
     & NodeEntryFragmentFragment
   )>, delivery?: Maybe<(
     { __typename?: 'DeliveryType' }
     & DeliveryFragmentFragment
+  )>, dialogue?: Maybe<(
+    { __typename?: 'Dialogue' }
+    & Pick<Dialogue, 'id' | 'title' | 'slug'>
+  )>, followUpAction?: Maybe<(
+    { __typename?: 'FormNodeEntryType' }
+    & { values: Array<(
+      { __typename?: 'FormNodeEntryValueType' }
+      & Pick<FormNodeEntryValueType, 'shortText'>
+    )> }
+  )> }
+);
+
+export type GetWorkspaceLayoutDetailsQueryVariables = Exact<{
+  workspaceId: Scalars['ID'];
+  healthInput: HealthScoreInput;
+}>;
+
+
+export type GetWorkspaceLayoutDetailsQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { statistics?: Maybe<(
+      { __typename?: 'WorkspaceStatistics' }
+      & Pick<WorkspaceStatistics, 'id'>
+      & { health: (
+        { __typename?: 'HealthScore' }
+        & Pick<HealthScore, 'nrVotes' | 'negativeResponseCount' | 'score'>
+      ) }
+    )> }
   )> }
 );
 
@@ -3546,19 +3598,6 @@ export type GetDialogueStatisticsQuery = (
   )> }
 );
 
-export type GenerateWorkspaceFromCsvMutationVariables = Exact<{
-  input?: Maybe<GenerateWorkspaceCsvInputType>;
-}>;
-
-
-export type GenerateWorkspaceFromCsvMutation = (
-  { __typename?: 'Mutation' }
-  & { generateWorkspaceFromCSV?: Maybe<(
-    { __typename?: 'Customer' }
-    & Pick<Customer, 'id' | 'slug'>
-  )> }
-);
-
 export type GetInteractionQueryVariables = Exact<{
   sessionId: Scalars['String'];
 }>;
@@ -3585,6 +3624,44 @@ export type GetInteractionQuery = (
       & DeliveryFragmentFragment
     )> }
     & SessionFragmentFragment
+  )> }
+);
+
+export type GetWorkspaceSessionsQueryVariables = Exact<{
+  id?: Maybe<Scalars['ID']>;
+  filter?: Maybe<SessionConnectionFilterInput>;
+}>;
+
+
+export type GetWorkspaceSessionsQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { sessionConnection?: Maybe<(
+      { __typename?: 'SessionConnection' }
+      & Pick<SessionConnection, 'totalPages'>
+      & { sessions: Array<(
+        { __typename?: 'Session' }
+        & SessionFragmentFragment
+      )>, pageInfo: (
+        { __typename?: 'PaginationPageInfo' }
+        & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'nextPageOffset' | 'prevPageOffset' | 'pageIndex'>
+      ) }
+    )> }
+  )> }
+);
+
+export type GenerateWorkspaceFromCsvMutationVariables = Exact<{
+  input?: Maybe<GenerateWorkspaceCsvInputType>;
+}>;
+
+
+export type GenerateWorkspaceFromCsvMutation = (
+  { __typename?: 'Mutation' }
+  & { generateWorkspaceFromCSV?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id' | 'slug'>
   )> }
 );
 
@@ -3872,11 +3949,22 @@ export const SessionFragmentFragmentDoc = gql`
   originUrl
   totalTimeInSec
   device
+  dialogueId
   nodeEntries {
     ...NodeEntryFragment
   }
   delivery {
     ...DeliveryFragment
+  }
+  dialogue {
+    id
+    title
+    slug
+  }
+  followUpAction {
+    values {
+      shortText
+    }
   }
 }
     ${NodeEntryFragmentFragmentDoc}
@@ -3939,6 +4027,7 @@ export const GetIssuesDocument = gql`
       topic
       rankScore
       followUpAction
+      actionRequiredCount
       dialogue {
         id
         title
@@ -4148,6 +4237,53 @@ export type GetWorkspaceSummaryDetailsLazyQueryHookResult = ReturnType<typeof us
 export type GetWorkspaceSummaryDetailsQueryResult = Apollo.QueryResult<GetWorkspaceSummaryDetailsQuery, GetWorkspaceSummaryDetailsQueryVariables>;
 export function refetchGetWorkspaceSummaryDetailsQuery(variables?: GetWorkspaceSummaryDetailsQueryVariables) {
       return { query: GetWorkspaceSummaryDetailsDocument, variables: variables }
+    }
+export const GetWorkspaceLayoutDetailsDocument = gql`
+    query GetWorkspaceLayoutDetails($workspaceId: ID!, $healthInput: HealthScoreInput!) {
+  customer(id: $workspaceId) {
+    id
+    statistics {
+      id
+      health(input: $healthInput) {
+        nrVotes
+        negativeResponseCount
+        score
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetWorkspaceLayoutDetailsQuery__
+ *
+ * To run a query within a React component, call `useGetWorkspaceLayoutDetailsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetWorkspaceLayoutDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetWorkspaceLayoutDetailsQuery({
+ *   variables: {
+ *      workspaceId: // value for 'workspaceId'
+ *      healthInput: // value for 'healthInput'
+ *   },
+ * });
+ */
+export function useGetWorkspaceLayoutDetailsQuery(baseOptions: Apollo.QueryHookOptions<GetWorkspaceLayoutDetailsQuery, GetWorkspaceLayoutDetailsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetWorkspaceLayoutDetailsQuery, GetWorkspaceLayoutDetailsQueryVariables>(GetWorkspaceLayoutDetailsDocument, options);
+      }
+export function useGetWorkspaceLayoutDetailsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceLayoutDetailsQuery, GetWorkspaceLayoutDetailsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetWorkspaceLayoutDetailsQuery, GetWorkspaceLayoutDetailsQueryVariables>(GetWorkspaceLayoutDetailsDocument, options);
+        }
+export type GetWorkspaceLayoutDetailsQueryHookResult = ReturnType<typeof useGetWorkspaceLayoutDetailsQuery>;
+export type GetWorkspaceLayoutDetailsLazyQueryHookResult = ReturnType<typeof useGetWorkspaceLayoutDetailsLazyQuery>;
+export type GetWorkspaceLayoutDetailsQueryResult = Apollo.QueryResult<GetWorkspaceLayoutDetailsQuery, GetWorkspaceLayoutDetailsQueryVariables>;
+export function refetchGetWorkspaceLayoutDetailsQuery(variables?: GetWorkspaceLayoutDetailsQueryVariables) {
+      return { query: GetWorkspaceLayoutDetailsDocument, variables: variables }
     }
 export const CreateCtaDocument = gql`
     mutation createCTA($input: CreateCTAInputType) {
@@ -5351,40 +5487,6 @@ export type GetDialogueStatisticsQueryResult = Apollo.QueryResult<GetDialogueSta
 export function refetchGetDialogueStatisticsQuery(variables?: GetDialogueStatisticsQueryVariables) {
       return { query: GetDialogueStatisticsDocument, variables: variables }
     }
-export const GenerateWorkspaceFromCsvDocument = gql`
-    mutation GenerateWorkspaceFromCSV($input: GenerateWorkspaceCSVInputType) {
-  generateWorkspaceFromCSV(input: $input) {
-    id
-    slug
-  }
-}
-    `;
-export type GenerateWorkspaceFromCsvMutationFn = Apollo.MutationFunction<GenerateWorkspaceFromCsvMutation, GenerateWorkspaceFromCsvMutationVariables>;
-
-/**
- * __useGenerateWorkspaceFromCsvMutation__
- *
- * To run a mutation, you first call `useGenerateWorkspaceFromCsvMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useGenerateWorkspaceFromCsvMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [generateWorkspaceFromCsvMutation, { data, loading, error }] = useGenerateWorkspaceFromCsvMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useGenerateWorkspaceFromCsvMutation(baseOptions?: Apollo.MutationHookOptions<GenerateWorkspaceFromCsvMutation, GenerateWorkspaceFromCsvMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<GenerateWorkspaceFromCsvMutation, GenerateWorkspaceFromCsvMutationVariables>(GenerateWorkspaceFromCsvDocument, options);
-      }
-export type GenerateWorkspaceFromCsvMutationHookResult = ReturnType<typeof useGenerateWorkspaceFromCsvMutation>;
-export type GenerateWorkspaceFromCsvMutationResult = Apollo.MutationResult<GenerateWorkspaceFromCsvMutation>;
-export type GenerateWorkspaceFromCsvMutationOptions = Apollo.BaseMutationOptions<GenerateWorkspaceFromCsvMutation, GenerateWorkspaceFromCsvMutationVariables>;
 export const GetInteractionDocument = gql`
     query GetInteraction($sessionId: String!) {
   session(id: $sessionId) {
@@ -5438,6 +5540,92 @@ export type GetInteractionQueryResult = Apollo.QueryResult<GetInteractionQuery, 
 export function refetchGetInteractionQuery(variables?: GetInteractionQueryVariables) {
       return { query: GetInteractionDocument, variables: variables }
     }
+export const GetWorkspaceSessionsDocument = gql`
+    query GetWorkspaceSessions($id: ID, $filter: SessionConnectionFilterInput) {
+  customer(id: $id) {
+    id
+    sessionConnection(filter: $filter) {
+      sessions {
+        ...SessionFragment
+      }
+      totalPages
+      pageInfo {
+        hasPrevPage
+        hasNextPage
+        nextPageOffset
+        prevPageOffset
+        pageIndex
+      }
+    }
+  }
+}
+    ${SessionFragmentFragmentDoc}`;
+
+/**
+ * __useGetWorkspaceSessionsQuery__
+ *
+ * To run a query within a React component, call `useGetWorkspaceSessionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetWorkspaceSessionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetWorkspaceSessionsQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useGetWorkspaceSessionsQuery(baseOptions?: Apollo.QueryHookOptions<GetWorkspaceSessionsQuery, GetWorkspaceSessionsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetWorkspaceSessionsQuery, GetWorkspaceSessionsQueryVariables>(GetWorkspaceSessionsDocument, options);
+      }
+export function useGetWorkspaceSessionsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceSessionsQuery, GetWorkspaceSessionsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetWorkspaceSessionsQuery, GetWorkspaceSessionsQueryVariables>(GetWorkspaceSessionsDocument, options);
+        }
+export type GetWorkspaceSessionsQueryHookResult = ReturnType<typeof useGetWorkspaceSessionsQuery>;
+export type GetWorkspaceSessionsLazyQueryHookResult = ReturnType<typeof useGetWorkspaceSessionsLazyQuery>;
+export type GetWorkspaceSessionsQueryResult = Apollo.QueryResult<GetWorkspaceSessionsQuery, GetWorkspaceSessionsQueryVariables>;
+export function refetchGetWorkspaceSessionsQuery(variables?: GetWorkspaceSessionsQueryVariables) {
+      return { query: GetWorkspaceSessionsDocument, variables: variables }
+    }
+export const GenerateWorkspaceFromCsvDocument = gql`
+    mutation GenerateWorkspaceFromCSV($input: GenerateWorkspaceCSVInputType) {
+  generateWorkspaceFromCSV(input: $input) {
+    id
+    slug
+  }
+}
+    `;
+export type GenerateWorkspaceFromCsvMutationFn = Apollo.MutationFunction<GenerateWorkspaceFromCsvMutation, GenerateWorkspaceFromCsvMutationVariables>;
+
+/**
+ * __useGenerateWorkspaceFromCsvMutation__
+ *
+ * To run a mutation, you first call `useGenerateWorkspaceFromCsvMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useGenerateWorkspaceFromCsvMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [generateWorkspaceFromCsvMutation, { data, loading, error }] = useGenerateWorkspaceFromCsvMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useGenerateWorkspaceFromCsvMutation(baseOptions?: Apollo.MutationHookOptions<GenerateWorkspaceFromCsvMutation, GenerateWorkspaceFromCsvMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<GenerateWorkspaceFromCsvMutation, GenerateWorkspaceFromCsvMutationVariables>(GenerateWorkspaceFromCsvDocument, options);
+      }
+export type GenerateWorkspaceFromCsvMutationHookResult = ReturnType<typeof useGenerateWorkspaceFromCsvMutation>;
+export type GenerateWorkspaceFromCsvMutationResult = Apollo.MutationResult<GenerateWorkspaceFromCsvMutation>;
+export type GenerateWorkspaceFromCsvMutationOptions = Apollo.BaseMutationOptions<GenerateWorkspaceFromCsvMutation, GenerateWorkspaceFromCsvMutationVariables>;
 export const GetInteractionsQueryDocument = gql`
     query GetInteractionsQuery($customerSlug: String, $dialogueSlug: String, $sessionsFilter: SessionConnectionFilterInput) {
   customer(slug: $customerSlug) {
@@ -5970,6 +6158,18 @@ export namespace SessionFragment {
   export type Fragment = SessionFragmentFragment;
   export type NodeEntries = NonNullable<(NonNullable<SessionFragmentFragment['nodeEntries']>)[number]>;
   export type Delivery = (NonNullable<SessionFragmentFragment['delivery']>);
+  export type Dialogue = (NonNullable<SessionFragmentFragment['dialogue']>);
+  export type FollowUpAction = (NonNullable<SessionFragmentFragment['followUpAction']>);
+  export type Values = NonNullable<(NonNullable<(NonNullable<SessionFragmentFragment['followUpAction']>)['values']>)[number]>;
+}
+
+export namespace GetWorkspaceLayoutDetails {
+  export type Variables = GetWorkspaceLayoutDetailsQueryVariables;
+  export type Query = GetWorkspaceLayoutDetailsQuery;
+  export type Customer = (NonNullable<GetWorkspaceLayoutDetailsQuery['customer']>);
+  export type Statistics = (NonNullable<(NonNullable<GetWorkspaceLayoutDetailsQuery['customer']>)['statistics']>);
+  export type Health = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceLayoutDetailsQuery['customer']>)['statistics']>)['health']>);
+  export const Document = GetWorkspaceLayoutDetailsDocument;
 }
 
 export namespace CreateCta {
@@ -6204,13 +6404,6 @@ export namespace GetDialogueStatistics {
   export const Document = GetDialogueStatisticsDocument;
 }
 
-export namespace GenerateWorkspaceFromCsv {
-  export type Variables = GenerateWorkspaceFromCsvMutationVariables;
-  export type Mutation = GenerateWorkspaceFromCsvMutation;
-  export type GenerateWorkspaceFromCsv = (NonNullable<GenerateWorkspaceFromCsvMutation['generateWorkspaceFromCSV']>);
-  export const Document = GenerateWorkspaceFromCsvDocument;
-}
-
 export namespace GetInteraction {
   export type Variables = GetInteractionQueryVariables;
   export type Query = GetInteractionQuery;
@@ -6220,6 +6413,23 @@ export namespace GetInteraction {
   export type Campaign = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetInteractionQuery['session']>)['delivery']>)['campaignVariant']>)['campaign']>);
   export type Events = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetInteractionQuery['session']>)['delivery']>)['events']>)[number]>;
   export const Document = GetInteractionDocument;
+}
+
+export namespace GetWorkspaceSessions {
+  export type Variables = GetWorkspaceSessionsQueryVariables;
+  export type Query = GetWorkspaceSessionsQuery;
+  export type Customer = (NonNullable<GetWorkspaceSessionsQuery['customer']>);
+  export type SessionConnection = (NonNullable<(NonNullable<GetWorkspaceSessionsQuery['customer']>)['sessionConnection']>);
+  export type Sessions = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceSessionsQuery['customer']>)['sessionConnection']>)['sessions']>)[number]>;
+  export type PageInfo = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceSessionsQuery['customer']>)['sessionConnection']>)['pageInfo']>);
+  export const Document = GetWorkspaceSessionsDocument;
+}
+
+export namespace GenerateWorkspaceFromCsv {
+  export type Variables = GenerateWorkspaceFromCsvMutationVariables;
+  export type Mutation = GenerateWorkspaceFromCsvMutation;
+  export type GenerateWorkspaceFromCsv = (NonNullable<GenerateWorkspaceFromCsvMutation['generateWorkspaceFromCSV']>);
+  export const Document = GenerateWorkspaceFromCsvDocument;
 }
 
 export namespace GetInteractionsQuery {

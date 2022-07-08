@@ -11,8 +11,8 @@ import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';
 import { Nullable, PaginationProps } from '../../types/generic';
-import { SessionActionType, SessionConnection, SessionConnectionFilterInput, SessionWithEntries } from './Session.types';
-import { TopicByString, TopicStatistics } from '../Topic/Topic.types';
+import { FollowUpAction, SessionActionType, SessionConnection, SessionConnectionFilterInput, SessionWithEntries } from './Session.types';
+import { TopicByString, TopicStatistics, TopicStatisticsByDialogueId } from '../Topic/Topic.types';
 import TriggerService from '../trigger/TriggerService';
 import prisma from '../../config/prisma';
 import Sentry from '../../config/sentry';
@@ -32,6 +32,40 @@ class SessionService {
     this.automationService = new AutomationService(prismaClient);
     this.workspaceService = new CustomerService(prismaClient);
   };
+
+  /**
+   * Given a list of sessions with node-entries, return an object which maps negative dialogue interactions to their "frequency".
+   *
+   * Note: this can be applied both within a workspace as well as outside.
+   *
+   * Precondition: Sessions are sorted by createdAt.
+   */
+  public extractNegativeScoresByDialogue(sessions: SessionWithEntries[]): TopicStatisticsByDialogueId {
+    const negativeDialogueScoresExtracted = sessions.reduce((acc, session) => {
+      // Only add negative sessions
+      if (session.mainScore < 55) {
+        // Check if topic exists in acc.
+        // If not, create a unique entry for ${dialogueId}
+        if (!acc?.hasOwnProperty(session.dialogueId)) {
+          acc[session.dialogueId] = this.makeTopicStatistics('', [], session);
+          return acc;
+        }
+        // Else, add negative interaction info to the dialogue.
+        acc[session.dialogueId] = {
+          dates: [...acc[session.dialogueId].dates, session.createdAt],
+          dialogueIds: [],
+          count: acc[session.dialogueId].count + 1,
+          score: acc[session.dialogueId].score + session.mainScore,
+          relatedTopics: [],
+          topic: '',
+          followUpActions: [...acc[session.dialogueId].followUpActions, this.getActionFromSession(session)],
+        };
+      }
+      return acc;
+    }, {} as TopicStatisticsByDialogueId);
+
+    return negativeDialogueScoresExtracted;
+  }
 
   /**
    * Given a list of sessions with node-entries, return an object which maps topics to their "frequency".
@@ -101,6 +135,7 @@ class SessionService {
     startDateTime: Date,
     endDateTime?: Date,
     refresh: boolean = false,
+    issueOnly: boolean = false,
   ) => {
     const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
 
@@ -128,12 +163,17 @@ class SessionService {
       },
     })) : [];
 
-    const pathedSessions = await this.sessionPrismaAdapter.findPathMatchedSessions(
+    let pathedSessions = await this.sessionPrismaAdapter.findPathMatchedSessions(
       pathEntries,
       startDateTime,
       endDateTimeSet,
       dialogueId
     );
+
+    // TODO: Make this a more formal calculation
+    if (issueOnly) {
+      pathedSessions = pathedSessions.filter(session => session.mainScore < 55);
+    }
 
     // Create a pathed session cache object
     void this.sessionPrismaAdapter.upsertPathedSessionCache(
@@ -208,6 +248,16 @@ class SessionService {
       endDateTime,
       performanceThreshold
     );
+  }
+
+  /**
+   * Get actions from from noed entries
+   */
+  public actionsFromNodeEntries(nodeEntries: NodeEntryWithTypes[]): FollowUpAction | null {
+    const nodeEntry = nodeEntries.find((nodeEntry) => nodeEntry.formNodeEntry);
+
+    // @ts-ignore
+    return nodeEntry?.formNodeEntry || null;
   }
 
   /**
@@ -486,8 +536,8 @@ class SessionService {
 
   /**
    * Finds a subset of workspace-wide sessions based on a filter.
-   * @param workspaceId 
-   * @param filter 
+   * @param workspaceId
+   * @param filter
    * @returns a list of sessions
    */
   getWorkspaceSessionConnection = async (
@@ -504,26 +554,20 @@ class SessionService {
     }
 
     const sessions = await this.sessionPrismaAdapter.findWorkspaceSessions(dialogueIds, filter);
-    const sessionWithFollowUpAction = sessions.map((session) => {
-      const followUpAction = session.nodeEntries.find((nodeEntry) => nodeEntry.formNodeEntry);
-      return { ...session, followUpAction: followUpAction?.formNodeEntry || null }
-    })
+
+    const sessionWithFollowUpAction = sessions.map((session) => ({
+      ...session,
+      followUpAction: this.actionsFromNodeEntries(session.nodeEntries as NodeEntryWithTypes[]),
+    }));
+
     const totalSessions = await this.sessionPrismaAdapter.countWorkspaceSessions(dialogueIds, filter);
 
-    const {
-      totalPages, hasPrevPage, hasNextPage, nextPageOffset, pageIndex, prevPageOffset,
-    } = offsetPaginate(totalSessions, offset, perPage);
+    const { totalPages, ...pageInfo } = offsetPaginate(totalSessions, offset, perPage);
 
     return {
       sessions: sessionWithFollowUpAction,
       totalPages,
-      pageInfo: {
-        hasPrevPage,
-        hasNextPage,
-        prevPageOffset,
-        nextPageOffset,
-        pageIndex,
-      },
+      pageInfo,
     };
   };
 
@@ -613,7 +657,7 @@ class SessionService {
   private getActionFromSession(session: SessionWithEntries): SessionActionType | null {
     const contactAction = session.nodeEntries.find((nodeEntry) => (
       nodeEntry.formNodeEntry?.values.find(
-        (val) => !!val.email || !!val.phoneNumber
+        (val) => !!val.email || !!val.phoneNumber || !!val.shortText
       )
     ));
 

@@ -10,8 +10,8 @@ import React, { useMemo } from 'react';
 import { DateFormat, useDate } from 'hooks/useDate';
 import mainTheme from 'config/theme';
 
+import { Event, calculateDateRange, padEvents } from './EventBars.helpers';
 import { EventBarsContainer } from './EventBars.styles';
-import { calculateDateRange, Event, padEvents } from './EventBars.helpers';
 
 interface EventBarsProps {
   width: number;

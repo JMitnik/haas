@@ -1,15 +1,7 @@
 import * as UI from '@haas/ui';
 import { AnimatePresence, AnimateSharedLayout, motion } from 'framer-motion';
-import {
-  GradientLightgreenGreen,
-  GradientOrangeRed,
-  GradientPinkRed,
-  GradientSteelPurple,
-  LinearGradient,
-} from '@visx/gradient';
 import { Group } from '@visx/group';
 import { MapPin, Minus, Plus } from 'react-feather';
-import { PatternCircles } from '@visx/pattern';
 import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { TooltipWithBounds, useTooltip } from '@visx/tooltip';
 import { localPoint } from '@visx/event';
@@ -28,13 +20,11 @@ import { TooltipBody } from './TooltipBody';
 interface HexagonGridProps {
   stateKey: string;
   nodes: HexagonNode[];
-  isAtRoot: boolean;
   onHexClick: (zoomHelper: ProvidedZoom<SVGElement>, node: HexagonNode) => void;
   width: number;
   height: number;
   zoom: ZoomProps;
   backgroundColor: string;
-  onGoBack: () => void;
   useBackgroundPattern: boolean;
   children?: React.ReactNode;
 }
@@ -78,8 +68,6 @@ export const HexagonGrid = ({
   zoom,
   backgroundColor,
   useBackgroundPattern = false,
-  isAtRoot = false,
-  onGoBack,
   children,
 }: HexagonGridProps) => {
   const { t } = useTranslation();
@@ -134,12 +122,6 @@ export const HexagonGrid = ({
           border: '1px solid #D6DCF2',
         }}
       >
-        <PatternCircles id="circles" height={6} width={6} stroke="black" strokeWidth={1} />
-        <GradientOrangeRed id="dots-orange" />
-        <GradientPinkRed id="dots-pink" />
-        <GradientSteelPurple id="dots-gray" />
-        <LinearGradient id="grays" from="#757F9A" to="#939bb1" />
-        <GradientLightgreenGreen id="dots-green" />
         <rect width={width} height={height} fill={backgroundColor} stroke={backgroundColor} />
 
         {useBackgroundPattern && (
@@ -212,7 +194,7 @@ export const HexagonGrid = ({
       <UI.Div display="flex" flexDirection="column" position="absolute" right={24} bottom={24}>
 
         <Tooltip.Root delayDuration={300} open={openZoomOutTooltip} onOpenChange={setOpenZoomOutTooltip}>
-          <Tooltip.Trigger>
+          <Tooltip.Trigger asChild>
             <LS.ControlButton onClick={() => zoom.scale({ scaleX: 0.8, scaleY: 0.8 })}>
               <UI.Icon>
                 <Minus />
@@ -229,7 +211,7 @@ export const HexagonGrid = ({
         </Tooltip.Root>
 
         <Tooltip.Root delayDuration={300} open={openZoomInTooltip} onOpenChange={setOpenZoomInTooltip}>
-          <Tooltip.Trigger>
+          <Tooltip.Trigger asChild>
             <LS.ControlButton mt={2} onClick={() => zoom.scale({ scaleX: 1.2, scaleY: 1.2 })}>
               <UI.Icon>
                 <Plus />
@@ -246,7 +228,7 @@ export const HexagonGrid = ({
         </Tooltip.Root>
 
         <Tooltip.Root delayDuration={300} open={openCenterHexagonTooltip} onOpenChange={setOpenCenterHexagonTooltip}>
-          <Tooltip.Trigger>
+          <Tooltip.Trigger asChild>
             <LS.ControlButton onClick={() => zoom.reset()} mt={2}>
               <UI.Icon>
                 <MapPin />

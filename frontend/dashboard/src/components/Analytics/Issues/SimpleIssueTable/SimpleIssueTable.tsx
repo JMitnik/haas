@@ -1,15 +1,16 @@
 import * as UI from '@haas/ui';
-import { AlertTriangle, Filter } from 'react-feather';
-import styled, { css } from 'styled-components';
+import { AlertTriangle } from 'react-feather';
+import { useTranslation } from 'react-i18next';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import { EventBars } from 'components/Analytics/Common/EventBars/EventBars';
-import { ControlButton } from 'components/Analytics/WorkspaceGrid/WorkspaceGrid.styles';
+import { FilterEnabledLabel } from 'components/Analytics/WorkspaceGrid/FilterEnabledLabel';
 import { Issue } from 'components/Analytics/WorkspaceGrid/WorkspaceGrid.types';
+import { ReactComponent as NoDataIll } from 'assets/images/undraw_solution.svg';
 import { ScoreBox } from 'components/ScoreBox';
 
 import { IssueActionLabels } from './IssueActionLabels';
-import { FilterEnabledLabel } from 'components/Analytics/WorkspaceGrid/FilterEnabledLabel';
 
 const columns = '50px 3fr 100px 200px';
 interface SimpleIssueTableProps {
@@ -19,14 +20,23 @@ interface SimpleIssueTableProps {
   issues: Issue[];
   onIssueClick: (issue: Issue) => void;
   onOpenIssueModal?: () => void;
+  isLoading?: boolean;
 }
 
 const CUTOFF = 3;
 
-const IssueBody = styled(UI.CardBody)`
-  ${({ theme }) => css`
+interface IssueBodyProps {
+  isLast?: boolean;
+}
+
+const IssueBody = styled(UI.CardBody) <IssueBodyProps>`
+  ${({ theme, isLast }) => css`
     transition: all ${theme.transitions.normal};
     background-color: white;
+
+    ${isLast && css`
+      border-radius: 0 0 ${theme.borderRadiuses.lg}px ${theme.borderRadiuses.lg}px;
+    `}
 
     &:hover {
       cursor: pointer;
@@ -36,40 +46,58 @@ const IssueBody = styled(UI.CardBody)`
   `}
 `;
 
-export const SimpleIssueTable = ({ issues, onIssueClick, onResetFilter, onOpenIssueModal, isFilterEnabled = false, inPreview = true }: SimpleIssueTableProps) => {
+export const SimpleIssueTable = ({
+  issues,
+  onIssueClick,
+  onResetFilter,
+  onOpenIssueModal,
+  isFilterEnabled = false,
+  isLoading,
+  inPreview = true,
+}: SimpleIssueTableProps) => {
   const shownIssues = inPreview ? issues.slice(0, CUTOFF) : issues;
+  const { t } = useTranslation();
 
   return (
     <UI.Card border="1px solid" borderColor="off.100">
-      <UI.CardHeader>
-        <UI.Div
-          borderBottom="1px solid"
-          borderColor="gray.200"
-        >
-          <UI.Flex alignItems="center" justifyContent="space-between">
-            <UI.H4 pb={3} color="off.500" fontSize="1.2rem" fontWeight={600} style={{ display: 'flex', alignItems: 'center' }}>
-              <UI.Icon mr={2}>
-                <AlertTriangle />
-              </UI.Icon>
-              Issues
-            </UI.H4>
+      <UI.CardHeader isInModal={!inPreview}>
+        {inPreview && (
 
-            {isFilterEnabled && (
-              <UI.Div pb={3}>
-                <FilterEnabledLabel onResetFilter={onResetFilter} />
-              </UI.Div>
-            )}
-          </UI.Flex>
-        </UI.Div>
+          <UI.Div
+            borderBottom="1px solid"
+            borderColor="gray.200"
+          >
+            <UI.Flex alignItems="center" justifyContent="space-between">
+              <UI.H4
+                pb={3}
+                color="off.500"
+                fontSize="1.2rem"
+                fontWeight={600}
+                style={{ display: 'flex', alignItems: 'center' }}
+              >
+                <UI.Icon mr={2}>
+                  <AlertTriangle />
+                </UI.Icon>
+                {t('teams_with_problems')}
+              </UI.H4>
+
+              {isFilterEnabled && (
+                <UI.Div pb={3}>
+                  <FilterEnabledLabel onResetFilter={onResetFilter} />
+                </UI.Div>
+              )}
+            </UI.Flex>
+          </UI.Div>
+        )}
         <UI.Grid pt={3} gridTemplateColumns={columns}>
           <UI.Helper>
             Score
           </UI.Helper>
           <UI.Helper>
-            Issue
+            Team
           </UI.Helper>
           <UI.Helper>
-            Votes
+            Responses
           </UI.Helper>
           <UI.Helper>
             Pulse
@@ -77,12 +105,19 @@ export const SimpleIssueTable = ({ issues, onIssueClick, onResetFilter, onOpenIs
         </UI.Grid>
       </UI.CardHeader>
 
-      <UI.Div>
+      {!isLoading && issues.length === 0 && (
+        <UI.CardBody>
+          <UI.IllustrationCard flatten svg={<NoDataIll height={200} />} text={t('dashboard_no_issues')} />
+        </UI.CardBody>
+      )}
+
+      <UI.Div maxHeight="400px" overflowY="scroll">
         {shownIssues.map((issue, index) => (
           <IssueBody
             key={index}
             borderBottom="1px solid"
             borderColor="off.100"
+            isLast={index === shownIssues.length - 1}
             onClick={() => onIssueClick(issue)}
           >
             <UI.Grid
@@ -97,13 +132,6 @@ export const SimpleIssueTable = ({ issues, onIssueClick, onResetFilter, onOpenIs
               <UI.Div>
                 <UI.Div>
                   <UI.Span fontSize="1rem" fontWeight={600} color="off.500">
-                    {issue.topic}
-                  </UI.Span>
-                </UI.Div>
-                <UI.Div>
-                  <UI.Span color="off.500" fontSize="0.8rem">
-                    in
-                    {' '}
                     {issue.dialogue?.title}
                   </UI.Span>
                 </UI.Div>
@@ -134,15 +162,15 @@ export const SimpleIssueTable = ({ issues, onIssueClick, onResetFilter, onOpenIs
           </IssueBody>
         ))}
 
-        <UI.CardBody>
-          {issues.length > CUTOFF && inPreview && onOpenIssueModal && (
+        {issues.length > CUTOFF && inPreview && onOpenIssueModal && (
+          <UI.CardBody>
             <UI.Flex justifyContent="center">
               <UI.Button onClick={onOpenIssueModal} variant="outline" variantColor="red">
                 Show more
               </UI.Button>
             </UI.Flex>
-          )}
-        </UI.CardBody>
+          </UI.CardBody>
+        )}
       </UI.Div>
     </UI.Card>
   );

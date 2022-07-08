@@ -907,7 +907,7 @@ input FormNodeEntryInput {
 }
 
 type FormNodeEntryType {
-  id: Int!
+  id: Int
   values: [FormNodeEntryValueType!]!
 }
 
@@ -1063,6 +1063,8 @@ type InviteUserOutput {
   
 """
 type Issue {
+  """Number of actions required"""
+  actionRequiredCount: Int
   basicStats: BasicStatistics!
   createdAt: Date!
   dialogue: Dialogue
@@ -1401,6 +1403,7 @@ type Path {
 
 input PathedSessionsInput {
   endDateTime: String
+  issueOnly: Boolean
   path: [String!]!
   refresh: Boolean = false
   startDateTime: String!
@@ -1707,6 +1710,7 @@ input SessionConnectionFilterInput {
 """Fields to order SessionConnection by."""
 enum SessionConnectionOrder {
   createdAt
+  dialogueId
 }
 
 """Sorting of sessionConnection"""

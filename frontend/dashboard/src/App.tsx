@@ -8,6 +8,7 @@ import { CampaignView } from 'views/CampaignView/CampaignView';
 import { DashboardView } from 'views/DashboardView';
 import { DialogueLinkFetchOverview } from 'views/DialogueLinkFetchOverview';
 import { DialogueProvider } from 'providers/DialogueProvider';
+import { FeedbackOverview } from 'views/FeedbackView/index';
 import { FirstTimeView } from 'views/FirstTimeView';
 import { GenerateWorkspaceView } from 'views/GenerateWorkspaceView';
 import { InteractionsOverview } from 'views/InteractionsOverview';
@@ -161,6 +162,11 @@ const CustomerRoutes = () => (
                     <GuardedRoute
                       path="/dashboard/b/:customerSlug/d"
                       render={() => <DialogueOverview />}
+                    />
+
+                    <GuardedRoute
+                      path="/dashboard/b/:customerSlug/dashboard/feedback"
+                      render={() => <FeedbackOverview />}
                     />
 
                     <GuardedRoute

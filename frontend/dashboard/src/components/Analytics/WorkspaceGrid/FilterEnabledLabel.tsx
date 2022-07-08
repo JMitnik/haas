@@ -1,7 +1,6 @@
-
-import React, { useState } from 'react';
 import * as UI from '@haas/ui';
 import { Filter } from 'react-feather';
+import React, { useState } from 'react';
 
 import * as Dropdown from 'components/Common/Dropdown';
 import * as Tooltip from 'components/Common/Tooltip';
@@ -17,9 +16,8 @@ export const FilterEnabledLabel = ({ onResetFilter }: FilterEnabledLabelProps) =
   return (
     <Dropdown.Root open={isPopoverOpen} onOpenChange={setPopoverIsOpen}>
       <Tooltip.Root delayDuration={300} open={isOpen} onOpenChange={setIsOpen}>
-        <Dropdown.Trigger>
-
-          <Tooltip.Trigger>
+        <Dropdown.Trigger asChild>
+          <Tooltip.Trigger asChild>
             <UI.Button size="sm" bg="gray.500" variant="solid">
               <UI.Icon>
                 <Filter />
@@ -44,4 +42,4 @@ export const FilterEnabledLabel = ({ onResetFilter }: FilterEnabledLabelProps) =
       </Dropdown.Content>
     </Dropdown.Root>
   );
-}
+};

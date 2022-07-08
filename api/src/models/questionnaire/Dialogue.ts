@@ -145,6 +145,7 @@ export const DialogueType = objectType({
           utcStartDateTime as Date,
           utcEndDateTime,
           args.input.refresh || false,
+          args.input.issueOnly || false,
         );
 
         return (pathedSessions || null) as any;

@@ -16,7 +16,6 @@ export const SessionType = objectType({
 
     t.string('browser', { resolve: (parent) => parent?.browser || '' });
 
-    // t.int('index');
     t.int('paths', {
       async resolve(parent, args, ctx) {
         const entryCount = await ctx.services.nodeEntryService.countNodeEntriesBySessionid(parent.id);
@@ -39,6 +38,7 @@ export const SessionType = objectType({
     t.field('dialogue', {
       nullable: true,
       type: 'Dialogue',
+      resolve: ({ dialogueId }, _, { services }) => services.dialogueService.getDialogueById(dialogueId),
     });
 
     t.int('totalTimeInSec', {
@@ -79,6 +79,13 @@ export const SessionType = objectType({
     t.field('followUpAction', {
       type: FormNodeEntryType,
       nullable: true,
+      useParentResolve: true,
+      resolve: (parent, _, { services }) => {
+        // @ts-ignore
+        if (parent.nodeEntries) return services.sessionService.actionsFromNodeEntries(parent.nodeEntries);
+
+        return null;
+      },
     })
   },
 });

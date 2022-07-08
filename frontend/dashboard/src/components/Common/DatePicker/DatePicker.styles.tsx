@@ -124,18 +124,16 @@ export const DatePickerContainer = styled.div`
 
 export const DatePickerButton = styled.button`
   ${({ theme }) => css`
-    padding: ${theme.gutter / 4}px ${theme.gutter / 1.5}px;
+    background-color: white;
+    padding: ${theme.gutter / 4}px ${theme.gutter / 4}px;
     border-radius: ${theme.borderRadiuses.md}px;
-    border: 1px solid ${theme.colors.off[300]};
     color: ${theme.colors.off[500]};
     transition: all ${theme.transitions.normal};
-    background-color: transparent;
-    min-width: 300px;
-    background-color: ${theme.colors.neutral[500]};
+    min-width: 200px;
+    box-shadow: ${theme.boxShadows.md};
 
     &:hover {
-      background-color: ${theme.colors.off[300]};
-      color: ${theme.colors.off[600]};
+      box-shadow: ${theme.boxShadows.lg};
       transition: all ${theme.transitions.normal};
     }
 

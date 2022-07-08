@@ -59,8 +59,6 @@ export const CustomerType = objectType({
           args.filter
         );
 
-        if (!sessionConnection) return null;
-
         return sessionConnection;
       },
     });
@@ -89,7 +87,7 @@ export const CustomerType = objectType({
 
       resolve: async (parent, args, { services }) => {
         const filter = IssueValidator.resolveFilter(args.filter);
-        return await services.issueService.getWorkspaceIssues(parent.id, filter);
+        return await services.issueService.getProblemDialoguesByWorkspace(parent.id, filter);
       },
     });
 

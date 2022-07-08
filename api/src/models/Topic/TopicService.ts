@@ -16,7 +16,7 @@ export class TopicService {
     this.workspaceService = new WorkspaceService(prisma);
   }
 
-  private buildSessionFilter(topicFilter?: TopicFilterInput): Prisma.SessionWhereInput {
+  public buildSessionFilter(topicFilter?: TopicFilterInput): Prisma.SessionWhereInput {
     let query: Prisma.SessionWhereInput = {};
 
     if (topicFilter?.topicStrings?.length) {
