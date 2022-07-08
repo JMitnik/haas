@@ -282,16 +282,16 @@ export const WorkspaceGrid = ({
     variables: {
       id: activeCustomer?.id,
       healthInput: {
-        startDateTime: format(startDate, DateFormat.DayFormat),
-        endDateTime: format(endDate, DateFormat.DayFormat),
+        startDateTime: format(startOfDay(startDate), DateFormat.DayTimeFormat),
+        endDateTime: format(endOfDay(endDate), DateFormat.DayTimeFormat),
         topicFilter: {
           dialogueStrings: visitedDialogueFragments,
         },
       },
       summaryInput: {
         impactType: DialogueImpactScoreType.Average,
-        startDateTime: format(startDate, DateFormat.DayFormat),
-        endDateTime: format(endDate, DateFormat.DayFormat),
+        startDateTime: format(startOfDay(startDate), DateFormat.DayTimeFormat),
+        endDateTime: format(endOfDay(endDate), DateFormat.DayTimeFormat),
         topicsFilter: {
           dialogueStrings: visitedDialogueFragments,
         },
@@ -307,20 +307,19 @@ export const WorkspaceGrid = ({
     variables: {
       workspaceId: activeCustomer?.id || '',
       filter: {
-        startDate: format(startDate, DateFormat.DayFormat),
-        endDate: format(endDate, DateFormat.DayFormat),
+        startDate: format(startOfDay(startDate), DateFormat.DayTimeFormat),
+        endDate: format(endOfDay(endDate), DateFormat.DayTimeFormat),
         dialogueStrings: visitedDialogueFragments,
       },
     },
   });
 
   const issues = issuesData?.customer?.issues || [];
-  const totalIssues = issues.reduce((acc, issue) => {
-    acc += issue.basicStats.responseCount;
+  const issueStats = issues.reduce((acc, issue) => {
+    acc.problems += issue.basicStats.responseCount;
+    acc.actionsRequested += issue.actionRequiredCount || 0;
     return acc;
-  }, 0);
-
-  console.log('Total issues: ', totalIssues);
+  }, { problems: 0, actionsRequested: 0 });
 
   // Various stats fields
   const health = summary?.health;
@@ -369,8 +368,8 @@ export const WorkspaceGrid = ({
                   isFilterEnabled={historyQueue.length > 0}
                   onNavigate={() => goToWorkspaceFeedbackOverview(
                     findDialoguesInGroup([currentState.currentNode as HexagonNode]),
-                    format(startDate, DateFormat.DayFormat),
-                    format(endDate, DateFormat.DayFormat),
+                    format(startOfDay(startDate), DateFormat.DayTimeFormat),
+                    format(endOfDay(endDate), DateFormat.DayTimeFormat),
                   )}
                 />
                 <Statistic
@@ -378,12 +377,12 @@ export const WorkspaceGrid = ({
                   themeBg="red.500"
                   themeColor="white"
                   name="Problems"
-                  value={totalIssues}
+                  value={issueStats.problems}
                   isFilterEnabled={historyQueue.length > 0}
                   onNavigate={() => goToWorkspaceFeedbackOverview(
                     findDialoguesInGroup([currentState.currentNode as HexagonNode]),
-                    format(startDate, DateFormat.DayFormat),
-                    format(endDate, DateFormat.DayFormat),
+                    format(startOfDay(startDate), DateFormat.DayTimeFormat),
+                    format(endOfDay(endDate), DateFormat.DayTimeFormat),
                     55,
                   )}
                 />
@@ -393,13 +392,14 @@ export const WorkspaceGrid = ({
                   themeColor="white"
                   name="Action Requests"
                   value={
-                    sumBy(issues.filter((issue) => issue.followUpAction), ((issue) => issue.basicStats.responseCount))
+                    issueStats.actionsRequested
+                    // sumBy(issues.filter((issue) => issue.followUpAction), ((issue) => issue.basicStats.responseCount))
                   }
                   isFilterEnabled={historyQueue.length > 0}
                   onNavigate={() => goToWorkspaceFeedbackOverview(
                     findDialoguesInGroup([currentState.currentNode as HexagonNode]),
-                    format(startDate, DateFormat.DayFormat),
-                    format(endDate, DateFormat.DayFormat),
+                    format(startOfDay(startDate), DateFormat.DayTimeFormat),
+                    format(endOfDay(endDate), DateFormat.DayTimeFormat),
                     undefined,
                     true,
                   )}

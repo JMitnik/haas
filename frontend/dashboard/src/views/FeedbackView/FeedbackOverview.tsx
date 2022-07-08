@@ -144,8 +144,8 @@ export const FeedbackOverview = () => {
       const [newStartDate, newEndDate] = dates;
       setFilter({
         ...filter,
-        startDate: dateFormat(startOfDay(newStartDate), DateFormat.DayFormat),
-        endDate: dateFormat(endOfDay(newEndDate), DateFormat.DayFormat),
+        startDate: dateFormat(startOfDay(newStartDate), DateFormat.DayTimeFormat),
+        endDate: dateFormat(endOfDay(newEndDate), DateFormat.DayTimeFormat),
         pageIndex: 0,
       });
     } else {
@@ -161,8 +161,8 @@ export const FeedbackOverview = () => {
   const handleSingleDateFilterChange = (day: Date) => {
     setFilter({
       ...filter,
-      startDate: dateFormat(startOfDay(day), DateFormat.DayFormat),
-      endDate: dateFormat(endOfDay(day), DateFormat.DayFormat),
+      startDate: dateFormat(startOfDay(day), DateFormat.DayTimeFormat),
+      endDate: dateFormat(endOfDay(day), DateFormat.DayTimeFormat),
       pageIndex: 0,
     });
   };
@@ -170,8 +170,8 @@ export const FeedbackOverview = () => {
   const handleMultiDateFilterChange = (newStartDate?: Date, newEndDate?: Date) => {
     setFilter({
       ...filter,
-      startDate: newStartDate ? dateFormat(newStartDate, DateFormat.DayFormat) : undefined,
-      endDate: newEndDate ? dateFormat(newEndDate, DateFormat.DayFormat) : undefined,
+      startDate: newStartDate ? dateFormat(newStartDate, DateFormat.DayTimeFormat) : undefined,
+      endDate: newEndDate ? dateFormat(newEndDate, DateFormat.DayTimeFormat) : undefined,
       pageIndex: 0,
     });
   };
@@ -236,8 +236,8 @@ export const FeedbackOverview = () => {
                       <UI.Div>
                         <UI.DatePicker
                           value={[
-                            filter.startDate ? parse(filter.startDate, DateFormat.DayFormat) : undefined,
-                            filter.endDate ? parse(filter.endDate, DateFormat.DayFormat) : undefined,
+                            filter.startDate ? parse(filter.startDate, DateFormat.DayTimeFormat) : undefined,
+                            filter.endDate ? parse(filter.endDate, DateFormat.DayTimeFormat) : undefined,
                           ]}
                           onChange={handleDateChange}
                           range
@@ -283,7 +283,7 @@ export const FeedbackOverview = () => {
               <Table.FilterButton
                 condition={!!(filter.startDate || filter.endDate)}
                 filterKey="date"
-                value={`${filter.startDate ? format(parse(filter.startDate, DateFormat.DayFormat), DateFormat.DayFormat) : 'N/A'} - ${filter.endDate ? format(parse(filter.endDate, DateFormat.DayFormat), DateFormat.DayFormat) : 'N/A'}`}
+                value={`${filter.startDate ? format(parse(filter.startDate, DateFormat.DayTimeFormat), DateFormat.DayFormat) : 'N/A'} - ${filter.endDate ? format(parse(filter.endDate, DateFormat.DayTimeFormat), DateFormat.DayFormat) : 'N/A'}`}
                 onClose={() => setFilter({ startDate: undefined, endDate: undefined })}
               />
               <Table.FilterButton

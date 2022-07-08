@@ -42,7 +42,11 @@ export const WorkspaceTopNavBar = () => {
     },
   });
 
-  const score = data?.customer?.statistics?.health?.score;
+  const health = data?.customer?.statistics?.health;
+  const score = health?.score;
+  const total = health?.nrVotes || 0;
+  const positive = total - (health?.negativeResponseCount || 0);
+  console.log('Health: ', data?.customer?.statistics?.health);
 
   return (
     <TopSubNavBarContainer>
@@ -80,9 +84,22 @@ export const WorkspaceTopNavBar = () => {
                 <UI.ViewTitle>
                   {activeCustomer?.name}
                 </UI.ViewTitle>
-                <UI.ViewSubTitle>
-                  {t('dashboard_description')}
-                </UI.ViewSubTitle>
+                {total > 0 ? (
+                  <UI.ViewSubTitle>
+                    {positive}
+                    {' '}
+                    of
+                    {' '}
+                    {total}
+                    {' '}
+                    respondents are happy
+                  </UI.ViewSubTitle>
+                ) : (
+                  <UI.ViewSubTitle>
+                    No data available at the moment
+                  </UI.ViewSubTitle>
+                )}
+
               </UI.Div>
             </UI.Flex>
 

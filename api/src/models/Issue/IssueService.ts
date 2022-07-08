@@ -151,6 +151,7 @@ export class IssueService {
         },
         rankScore,
         followUpAction: dialogueStats.followUpActions.find(isPresent) || null,
+        actionRequiredCount: dialogueStats.followUpActions.filter(isPresent).length,
       })
     });
 
@@ -190,6 +191,7 @@ export class IssueService {
           },
           rankScore,
           followUpAction: topicStats.followUpActions.find(isPresent) || null,
+          actionRequiredCount: topicStats.followUpActions.filter(isPresent).length,
         })
       });
     });

@@ -1021,6 +1021,7 @@ export interface NexusGenRootTypes {
     didInvite: boolean; // Boolean!
   }
   Issue: { // root type
+    actionRequiredCount?: number | null; // Int
     basicStats: NexusGenRootTypes['BasicStatistics']; // BasicStatistics!
     createdAt: any; // Date!
     dialogueId: string; // String!
@@ -1834,6 +1835,7 @@ export interface NexusGenFieldTypes {
     didInvite: boolean; // Boolean!
   }
   Issue: { // field return type
+    actionRequiredCount: number | null; // Int
     basicStats: NexusGenRootTypes['BasicStatistics']; // BasicStatistics!
     createdAt: any; // Date!
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue

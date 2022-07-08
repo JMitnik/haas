@@ -6,6 +6,7 @@ query GetIssues($workspaceId: ID!, $filter: IssueFilterInput) {
 			topic
 			rankScore
       followUpAction
+      actionRequiredCount
       dialogue {
         id
         title

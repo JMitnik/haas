@@ -40,6 +40,7 @@ export const Issue = objectType({
     t.field('status', { type: StatusType });
 
     t.field('followUpAction', { type: SessionActionType, nullable: true });
+    t.int('actionRequiredCount', { nullable: true, description: 'Number of actions required' });
 
     /** Timestamps */
     t.date('createdAt');
