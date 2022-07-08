@@ -1,9 +1,9 @@
 import * as UI from '@haas/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
+import React from 'react';
 
-import { SimpleIssueTable } from '../Issues/SimpleIssueTable';
 import { Issue } from './WorkspaceGrid.types';
+import { SimpleIssueTable } from '../Issues/SimpleIssueTable';
 
 interface IssuesModalProps {
   issues: Issue[];
@@ -23,10 +23,10 @@ export const IssuesModal = ({
     <>
       <UI.ModalHead>
         <UI.ModalTitle>
-          {t('issues')}
+          {t('teams_with_problems')}
         </UI.ModalTitle>
       </UI.ModalHead>
-      <UI.ModalBody>
+      <UI.ModalBody noPadding>
         <SimpleIssueTable
           issues={issues}
           onResetFilter={onResetFilters}

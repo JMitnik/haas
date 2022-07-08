@@ -29,7 +29,7 @@ interface IssueBodyProps {
   isLast?: boolean;
 }
 
-const IssueBody = styled(UI.CardBody)<IssueBodyProps>`
+const IssueBody = styled(UI.CardBody) <IssueBodyProps>`
   ${({ theme, isLast }) => css`
     transition: all ${theme.transitions.normal};
     background-color: white;
@@ -60,32 +60,35 @@ export const SimpleIssueTable = ({
 
   return (
     <UI.Card border="1px solid" borderColor="off.100">
-      <UI.CardHeader>
-        <UI.Div
-          borderBottom="1px solid"
-          borderColor="gray.200"
-        >
-          <UI.Flex alignItems="center" justifyContent="space-between">
-            <UI.H4
-              pb={3}
-              color="off.500"
-              fontSize="1.2rem"
-              fontWeight={600}
-              style={{ display: 'flex', alignItems: 'center' }}
-            >
-              <UI.Icon mr={2}>
-                <AlertTriangle />
-              </UI.Icon>
-              Negative teams
-            </UI.H4>
+      <UI.CardHeader isInModal={!inPreview}>
+        {inPreview && (
 
-            {isFilterEnabled && (
-              <UI.Div pb={3}>
-                <FilterEnabledLabel onResetFilter={onResetFilter} />
-              </UI.Div>
-            )}
-          </UI.Flex>
-        </UI.Div>
+          <UI.Div
+            borderBottom="1px solid"
+            borderColor="gray.200"
+          >
+            <UI.Flex alignItems="center" justifyContent="space-between">
+              <UI.H4
+                pb={3}
+                color="off.500"
+                fontSize="1.2rem"
+                fontWeight={600}
+                style={{ display: 'flex', alignItems: 'center' }}
+              >
+                <UI.Icon mr={2}>
+                  <AlertTriangle />
+                </UI.Icon>
+                {t('teams_with_problems')}
+              </UI.H4>
+
+              {isFilterEnabled && (
+                <UI.Div pb={3}>
+                  <FilterEnabledLabel onResetFilter={onResetFilter} />
+                </UI.Div>
+              )}
+            </UI.Flex>
+          </UI.Div>
+        )}
         <UI.Grid pt={3} gridTemplateColumns={columns}>
           <UI.Helper>
             Score
@@ -108,7 +111,7 @@ export const SimpleIssueTable = ({
         </UI.CardBody>
       )}
 
-      <UI.Div>
+      <UI.Div maxHeight="400px" overflowY="scroll">
         {shownIssues.map((issue, index) => (
           <IssueBody
             key={index}

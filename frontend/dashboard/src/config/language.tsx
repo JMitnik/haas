@@ -35,6 +35,10 @@ const language = {
       en: 'Zoom out',
       de: 'Zoom out',
     },
+    teams_with_problems: {
+      en: 'Teams with problems',
+      de: 'Mannschaften mit Problemen',
+    },
     issues: {
       en: 'Issues',
       de: 'Issues',
