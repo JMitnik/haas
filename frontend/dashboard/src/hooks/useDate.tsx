@@ -1,4 +1,4 @@
-import { format as dateFormat, isValid, parse, startOfWeek, sub } from 'date-fns';
+import { format as dateFormat, endOfDay, isValid, parse, startOfDay, startOfWeek, sub } from 'date-fns';
 
 export enum DateFormat {
   /** Example: 02-12-2021 */
@@ -25,7 +25,8 @@ export const useDate = () => ({
     }
   },
   getNow: () => new Date(),
-  getOneWeekAgo: () => sub(new Date(), { days: 7 }),
+  getEndOfToday: () => endOfDay(new Date()),
+  getOneWeekAgo: () => startOfDay(sub(new Date(), { days: 7 })),
   getNWeekAgo: (weeks: number) => sub(new Date(), { days: 7 * weeks }),
   getTomorrow: () => sub(new Date(), { days: -1 }),
   getStartOfWeek: (date = new Date()) => startOfWeek(date, {

@@ -16,6 +16,7 @@ import { SimpleIssueTable } from 'components/Analytics/Issues/SimpleIssueTable';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useNavigator } from 'hooks/useNavigator';
 
+import { endOfDay, startOfDay } from 'date-fns';
 import * as LS from './WorkspaceGrid.styles';
 import { BreadCrumb } from './BreadCrumb';
 import {
@@ -314,6 +315,12 @@ export const WorkspaceGrid = ({
   });
 
   const issues = issuesData?.customer?.issues || [];
+  const totalIssues = issues.reduce((acc, issue) => {
+    acc += issue.basicStats.responseCount;
+    return acc;
+  }, 0);
+
+  console.log('Total issues: ', totalIssues);
 
   // Various stats fields
   const health = summary?.health;
@@ -371,7 +378,7 @@ export const WorkspaceGrid = ({
                   themeBg="red.500"
                   themeColor="white"
                   name="Problems"
-                  value={issues.length}
+                  value={totalIssues}
                   isFilterEnabled={historyQueue.length > 0}
                   onNavigate={() => goToWorkspaceFeedbackOverview(
                     findDialoguesInGroup([currentState.currentNode as HexagonNode]),
@@ -384,7 +391,7 @@ export const WorkspaceGrid = ({
                   icon={<MessageCircle height={40} width={40} />}
                   themeBg="main.500"
                   themeColor="white"
-                  name="Actions"
+                  name="Action Requests"
                   value={
                     sumBy(issues.filter((issue) => issue.followUpAction), ((issue) => issue.basicStats.responseCount))
                   }

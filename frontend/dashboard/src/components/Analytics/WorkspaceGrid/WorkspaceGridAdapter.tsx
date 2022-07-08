@@ -28,10 +28,10 @@ export const WorkspaceGridAdapter = ({
   width,
   backgroundColor,
 }: WorkspaceGridAdapterProps) => {
-  const { getOneWeekAgo, format, getTomorrow } = useDate();
+  const { getOneWeekAgo, format, getEndOfToday, getTomorrow } = useDate();
   const [dateRange, setDateRange] = useState<[Date, Date]>(() => {
     const startDate = getOneWeekAgo();
-    const endDate = getTomorrow();
+    const endDate = getEndOfToday();
 
     return [startDate, endDate];
   });

@@ -16,7 +16,7 @@ const language = {
       de: 'See how your teams and people are doing.',
     },
     workspace_overview_description: {
-      en: 'Understand your teams and people by drilling down.',
+      en: 'Use the table to get to pressing issues immediately, or navigate your organisation manually via the hexagon grid.',
       de: 'Understand your teams and people by drilling down.',
     },
     dashboard_no_issues: {
