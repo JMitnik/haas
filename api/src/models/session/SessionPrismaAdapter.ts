@@ -451,6 +451,12 @@ class SessionPrismaAdapter {
       })
     }
 
+    if (filter?.orderBy?.by === 'dialogueId') {
+      orderByQuery.push({
+        dialogueId: filter.orderBy.desc ? 'desc' : 'asc',
+      })
+    }
+
     return orderByQuery;
   }
 

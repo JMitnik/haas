@@ -1710,6 +1710,7 @@ input SessionConnectionFilterInput {
 """Fields to order SessionConnection by."""
 enum SessionConnectionOrder {
   createdAt
+  dialogueId
 }
 
 """Sorting of sessionConnection"""

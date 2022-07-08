@@ -14,7 +14,7 @@ export const SessionConnectionOrderType = enumType({
   name: 'SessionConnectionOrder',
   description: 'Fields to order SessionConnection by.',
 
-  members: ['createdAt'],
+  members: ['createdAt', 'dialogueId'],
 });
 
 export const SessionDeliveryTypeFilter = enumType({

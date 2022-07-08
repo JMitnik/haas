@@ -3,7 +3,7 @@
 /* eslint-disable radix */
 import '@szhsin/react-menu/dist/index.css';
 import * as UI from '@haas/ui';
-import { AlignLeft, BarChart2, Calendar, Filter, Plus, Search, User } from 'react-feather';
+import { AlertTriangle, AlignLeft, BarChart2, Calendar, Filter, Plus, Search, User } from 'react-feather';
 import {
   ArrayParam,
   BooleanParam,
@@ -326,13 +326,23 @@ export const FeedbackOverview = () => {
             <Table.HeadingCell>
               {t('topic')}
             </Table.HeadingCell>
-            <Table.HeadingCell>
+            <Table.HeadingCell
+              sorting={filter.orderByField === SessionConnectionOrder.DialogueId}
+              descending={filter.orderByDescending || false}
+              onDescendChange={(isDescend) => setFilter({
+                orderByDescending: isDescend,
+                orderByField: SessionConnectionOrder.DialogueId,
+              })}
+            >
               {t('team')}
             </Table.HeadingCell>
             <Table.HeadingCell
-              sorting
+              sorting={filter.orderByField === SessionConnectionOrder.CreatedAt}
               descending={filter.orderByDescending || false}
-              onDescendChange={(isDescend) => setFilter({ orderByDescending: isDescend })}
+              onDescendChange={(isDescend) => setFilter({
+                orderByDescending: isDescend,
+                orderByField: SessionConnectionOrder.CreatedAt,
+              })}
             >
               {t('when')}
             </Table.HeadingCell>
@@ -438,13 +448,18 @@ export const FeedbackOverview = () => {
                   )}
                 </Table.Cell>
                 <Table.Cell maxWidth={300}>
-                  <UI.ColumnFlex>
-                    <UI.Span fontWeight={600} color="off.500">
-                      {getMainTopicValue(session)}
-                    </UI.Span>
-                    <UI.Span color="off.300">
-                      {getChoiceNodeValues(session).slice(1).join(' / ')}
-                    </UI.Span>
+                  <UI.ColumnFlex justifyContent="flex-start">
+                    <UI.Flex alignItems="center">
+                      <UI.Span fontWeight={600} color="off.500">
+                        {getMainTopicValue(session)}
+                      </UI.Span>
+                    </UI.Flex>
+
+                    {session.followUpAction && (
+                      <UI.Span fontWeight={600} color="red.500">
+                        Action requested
+                      </UI.Span>
+                    )}
                   </UI.ColumnFlex>
                 </Table.Cell>
                 <Table.Cell>
