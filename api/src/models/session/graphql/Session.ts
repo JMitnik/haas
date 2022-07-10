@@ -156,7 +156,7 @@ export const CreateSessionMutation = mutationField('createSession', {
 
     try {
       const session = await ctx.services.sessionService.createSession(args.input);
-      const res = await ctx.services.redisService.set(`session:${session.id}`, session.mainScore);
+      await ctx.services.redisService.set(`session:${session.id}`, session.mainScore);
 
       return session;
     } catch (error) {

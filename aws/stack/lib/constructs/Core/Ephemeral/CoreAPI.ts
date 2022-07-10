@@ -14,7 +14,7 @@ import { Construct } from 'constructs';
 import { IRepository } from "aws-cdk-lib/aws-ecr";
 
 import { APIOptions } from '../../../stacks/Core/CoreVariables';
-import { CoreRedis } from './CodeRedis';
+import { CoreRedis } from './CoreRedis';
 
 interface CoreApiProps {
   vpc: ec2.Vpc;

@@ -1,6 +1,6 @@
 import { Stack, aws_ec2 as ec2, aws_ecr as ecr, aws_rds as rds, App, StackProps } from "aws-cdk-lib";
 import { IRepository } from "aws-cdk-lib/aws-ecr";
-import { CoreRedis } from "../../constructs/Core/Ephemeral/CodeRedis";
+import { CoreRedis } from "../../constructs/Core/Ephemeral/CoreRedis";
 
 import { CoreAPI, } from "../../constructs/Core/Ephemeral/CoreAPI";
 import { CoreBastion } from "../../constructs/Core/Ephemeral/CoreBastion";
