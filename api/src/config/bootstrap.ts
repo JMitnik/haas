@@ -18,6 +18,7 @@ import TagService from '../models/tag/TagService'
 import TriggerService from '../models/trigger/TriggerService'
 import { CampaignService } from '../models/Campaigns/CampaignService'
 import DynamoScheduleService from '../services/DynamoScheduleService'
+import { redis } from './redis';
 import LinkService from '../models/link/LinkService';
 import AutomationService from '../models/automations/AutomationService'
 import DialogueStatisticsService from '../models/questionnaire/DialogueStatisticsService'
@@ -25,6 +26,7 @@ import QuestionStatisticsService from '../models/QuestionNode/QuestionStatistics
 import GenerateWorkspaceService from '../models/generate-workspace/GenerateWorkspaceService'
 import TemplateService from '../models/templates/TemplateService'
 import { TopicService } from '../models/Topic/TopicService'
+import { RedisService } from '../models/general/cache/RedisService'
 
 export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOptions, never>): APIServiceContainer => {
   const loginService = new LoginService(mailService);
@@ -51,8 +53,10 @@ export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOption
   const generateWorkspaceService = new GenerateWorkspaceService(prisma);
   const templateService = new TemplateService(prisma);
   const topicService = new TopicService(prisma);
+  const redisService = new RedisService(redis);
 
   return {
+    redisService,
     templateService,
     generateWorkspaceService,
     questionStatisticsService,

@@ -6,6 +6,7 @@ import * as DebugAPI from '../models/debug/Debug';
 import * as InteractionAPI from '../models/session/graphql';
 import * as NodeEntryAPI from '../models/node-entry/NodeEntry';
 import * as PaginationAPI from '../models/general/Pagination';
+import * as SandboxAPI from '../models/Common/Sandbox/graphql/SandboxMutation.graphql';
 import * as QuestionNodeAPI from '../models/QuestionNode';
 import * as UserAPI from '../models/users/graphql';
 import * as WorkspaceAPI from '../models/customer';
@@ -23,6 +24,7 @@ import triggerNexus from '../models/trigger/Trigger';
 import uploadNexus from '../models/link/graphql/UploadUpsellFileResolver';
 
 const nexus = [
+  ...Array(SandboxAPI),
   ...Array(GenerateWorkspaceAPI),
   ...Array(AutodeckAPI),
   ...linkNexus,

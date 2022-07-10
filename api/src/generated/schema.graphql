@@ -1203,6 +1203,7 @@ type Mutation {
   removePixelRange(input: RemovePixelRangeInput): AWSImageType
   requestInvite(input: RequestInviteInput): RequestInviteOutput!
   retryAutodeckJob(jobId: String): CreateWorkspaceJobType
+  sandbox(input: SandboxInput): String!
   setDialoguePrivacy(input: SetDialoguePrivacyInput): Dialogue
   singleUpload(file: Upload): ImageType!
   updateAutomation(input: CreateAutomationInput): AutomationModel!
@@ -1608,6 +1609,12 @@ type RoleType {
   nrPermissions: Int
   permissions: [SystemPermission!]
   roleId: String
+}
+
+input SandboxInput {
+  name: String
+  onlyGet: Boolean
+  value: Int
 }
 
 type Session {

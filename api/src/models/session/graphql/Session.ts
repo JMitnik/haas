@@ -148,13 +148,16 @@ export const CreateSessionMutation = mutationField('createSession', {
   type: SessionType,
   args: { input: SessionInput },
 
-  resolve(parent, args, ctx) {
+  resolve: async (parent, args, ctx) => {
     if (!args?.input) {
       throw new Error('No valid new session data provided');
     }
 
+
     try {
-      const session = ctx.services.sessionService.createSession(args.input);
+      const session = await ctx.services.sessionService.createSession(args.input);
+      const res = await ctx.services.redisService.set(`session:${session.id}`, session.mainScore);
+
       return session;
     } catch (error) {
       throw new Error(`Failed making a session due to ${error}`);
