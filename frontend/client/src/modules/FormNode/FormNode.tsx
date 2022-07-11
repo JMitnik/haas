@@ -10,6 +10,7 @@ import styled from 'styled-components';
 
 import * as RadioGroup from 'components/RadioGroup';
 
+import { FormNodeFieldTypeEnum } from 'types/generated-types';
 import { GenericQuestionNodeProps } from 'modules/Node/Node.types';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { SessionActionType } from 'types/core-types';
@@ -119,7 +120,8 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                 {fields?.map((field, index) => (
                   <UI.Div
                     key={index}
-                    gridColumn={field.type === 'longText' || field.type === 'contacts' ? 'span 2' : '1fr'}
+                    gridColumn={field.type === 'longText'
+                      || field.type === FormNodeFieldTypeEnum.Contacts ? 'span 2' : '1fr'}
                   >
                     <UI.FormControl isRequired={field.isRequired}>
                       <UI.FormLabel htmlFor={`fields.${index}.value`}>{field.label}</UI.FormLabel>
@@ -134,7 +136,7 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                           placeholder={field.placeholder || undefined}
                         />
                       )}
-                      {field.type === 'contacts' && (
+                      {field.type === FormNodeFieldTypeEnum.Contacts && (
                         <Controller
                           key="contactsradio"
                           name={`fields.${index}.value`}

@@ -1,10 +1,11 @@
-import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
+import { gql } from '@apollo/client';
+
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-const defaultOptions =  {}
+const defaultOptions = {};
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -14,10 +15,10 @@ export type Scalars = {
   Float: number;
   /** Date custom scalar type */
   Date: any;
-  /** The `Upload` scalar type represents a file upload. */
-  Upload: any;
   /** The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSONObject: any;
+  /** The `Upload` scalar type represents a file upload. */
+  Upload: any;
 };
 
 export type AdjustedImageInput = {
@@ -78,6 +79,7 @@ export type AutomationActionModel = {
   createdAt: Scalars['Date'];
   updatedAt: Scalars['Date'];
   type: AutomationActionType;
+  payload?: Maybe<Scalars['JSONObject']>;
 };
 
 export enum AutomationActionType {
@@ -85,7 +87,7 @@ export enum AutomationActionType {
   SendEmail = 'SEND_EMAIL',
   ApiCall = 'API_CALL',
   GenerateReport = 'GENERATE_REPORT',
-  Webhook = 'WEBHOOK'
+  Webhook = 'WEBHOOK',
 }
 
 export type AutomationConditionBuilderInput = {
@@ -107,7 +109,7 @@ export type AutomationConditionBuilderModel = {
 
 export enum AutomationConditionBuilderType {
   And = 'AND',
-  Or = 'OR'
+  Or = 'OR',
 }
 
 /** AutomationCondition */
@@ -149,13 +151,13 @@ export enum AutomationConditionOperatorType {
   IsNotEqual = 'IS_NOT_EQUAL',
   IsTrue = 'IS_TRUE',
   IsFalse = 'IS_FALSE',
-  EveryNThTime = 'EVERY_N_TH_TIME'
+  EveryNThTime = 'EVERY_N_TH_TIME',
 }
 
 export enum AutomationConditionScopeType {
   Question = 'QUESTION',
   Dialogue = 'DIALOGUE',
-  Workspace = 'WORKSPACE'
+  Workspace = 'WORKSPACE',
 }
 
 export type AutomationConnection = ConnectionInterface & {
@@ -183,7 +185,8 @@ export type AutomationConnectionOrderByInput = {
 /** Fields to order UserConnection by. */
 export enum AutomationConnectionOrderType {
   UpdatedAt = 'updatedAt',
-  Type = 'type'
+  Type = 'type',
+  CreatedAt = 'createdAt',
 }
 
 export type AutomationEventInput = {
@@ -211,7 +214,7 @@ export enum AutomationEventType {
   Recurring = 'RECURRING',
   NewInteractionQuestion = 'NEW_INTERACTION_QUESTION',
   NewInteractionDialogue = 'NEW_INTERACTION_DIALOGUE',
-  ApiCall = 'API_CALL'
+  ApiCall = 'API_CALL',
 }
 
 /** Automation */
@@ -225,7 +228,36 @@ export type AutomationModel = {
   description?: Maybe<Scalars['String']>;
   type: AutomationType;
   automationTrigger?: Maybe<AutomationTriggerModel>;
+  automationScheduled?: Maybe<AutomationScheduledModel>;
   workspace?: Maybe<Customer>;
+};
+
+/** AutomationScheduled */
+export type AutomationScheduledModel = {
+  __typename?: 'AutomationScheduledModel';
+  id: Scalars['ID'];
+  createdAt: Scalars['Date'];
+  updatedAt: Scalars['Date'];
+  type: RecurringPeriodType;
+  minutes: Scalars['String'];
+  hours: Scalars['String'];
+  dayOfMonth: Scalars['String'];
+  month: Scalars['String'];
+  dayOfWeek: Scalars['String'];
+  dialogueId: Scalars['String'];
+  actions?: Maybe<Array<AutomationActionModel>>;
+  activeDialogue?: Maybe<Dialogue>;
+};
+
+export type AutomationScheduleInput = {
+  id?: Maybe<Scalars['ID']>;
+  type: RecurringPeriodType;
+  minutes: Scalars['String'];
+  hours: Scalars['String'];
+  dayOfMonth: Scalars['String'];
+  month: Scalars['String'];
+  dayOfWeek: Scalars['String'];
+  dialogueId?: Maybe<Scalars['String']>;
 };
 
 /** AutomationTrigger */
@@ -234,14 +266,16 @@ export type AutomationTriggerModel = {
   id: Scalars['ID'];
   createdAt: Scalars['Date'];
   updatedAt: Scalars['Date'];
-  event: AutomationEventModel;
+  activeDialogue?: Maybe<Dialogue>;
+  event?: Maybe<AutomationEventModel>;
   conditionBuilder?: Maybe<AutomationConditionBuilderModel>;
-  actions: Array<AutomationActionModel>;
+  actions?: Maybe<Array<AutomationActionModel>>;
 };
 
 export enum AutomationType {
   Trigger = 'TRIGGER',
-  Campaign = 'CAMPAIGN'
+  Campaign = 'CAMPAIGN',
+  Scheduled = 'SCHEDULED',
 }
 
 export type AwsImageType = {
@@ -270,7 +304,6 @@ export type CampaignType = {
   deliveryConnection?: Maybe<DeliveryConnectionType>;
 };
 
-
 /** Campaign */
 export type CampaignTypeDeliveryConnectionArgs = {
   filter?: Maybe<DeliveryConnectionFilterInput>;
@@ -285,7 +318,7 @@ export type CampaignVariantCustomVariableType = {
 export enum CampaignVariantEnum {
   Sms = 'SMS',
   Email = 'EMAIL',
-  Queue = 'QUEUE'
+  Queue = 'QUEUE',
 }
 
 /** Variant of campaign */
@@ -313,7 +346,7 @@ export enum CloudReferenceType {
   Aws = 'AWS',
   Gcp = 'GCP',
   Azure = 'Azure',
-  Ibm = 'IBM'
+  Ibm = 'IBM',
 }
 
 export type ColourSettings = {
@@ -352,7 +385,7 @@ export enum ConditionPropertyAggregateType {
   Count = 'COUNT',
   Min = 'MIN',
   Max = 'MAX',
-  Avg = 'AVG'
+  Avg = 'AVG',
 }
 
 export type ConditionQuestionScopeInput = {
@@ -399,6 +432,7 @@ export type CreateAutomationInput = {
   automationType?: Maybe<AutomationType>;
   event?: Maybe<AutomationEventInput>;
   conditionBuilder?: Maybe<AutomationConditionBuilderInput>;
+  schedule?: Maybe<AutomationScheduleInput>;
   actions?: Maybe<Array<AutomationActionInput>>;
 };
 
@@ -577,62 +611,50 @@ export type Customer = {
   userCustomer?: Maybe<UserCustomer>;
 };
 
-
 export type CustomerDialogueConnectionArgs = {
   filter?: Maybe<DialogueConnectionFilterInput>;
 };
 
-
 export type CustomerAutomationConnectionArgs = {
   filter?: Maybe<AutomationConnectionFilterInput>;
 };
-
 
 export type CustomerUsersConnectionArgs = {
   customerSlug?: Maybe<Scalars['String']>;
   filter?: Maybe<UserConnectionFilterInput>;
 };
 
-
 export type CustomerNestedHealthScoreArgs = {
   input?: Maybe<HealthScoreInput>;
 };
-
 
 export type CustomerNestedMostPopularArgs = {
   input?: Maybe<DialogueStatisticsSummaryFilterInput>;
 };
 
-
 export type CustomerNestedMostChangedArgs = {
   input?: Maybe<DialogueStatisticsSummaryFilterInput>;
 };
-
 
 export type CustomerNestedMostTrendingTopicArgs = {
   input?: Maybe<DialogueStatisticsSummaryFilterInput>;
 };
 
-
 export type CustomerNestedDialogueStatisticsSummaryArgs = {
   input?: Maybe<DialogueStatisticsSummaryFilterInput>;
 };
-
 
 export type CustomerDialogueArgs = {
   where?: Maybe<DialogueWhereUniqueInput>;
 };
 
-
 export type CustomerDialoguesArgs = {
   filter?: Maybe<DialogueFilterInputType>;
 };
 
-
 export type CustomerCampaignArgs = {
   campaignId?: Maybe<Scalars['String']>;
 };
-
 
 export type CustomerUserCustomerArgs = {
   userId?: Maybe<Scalars['String']>;
@@ -664,6 +686,10 @@ export type CustomFieldType = {
   jobProcessLocationId: Scalars['String'];
 };
 
+export type DeleteAutomationInput = {
+  workspaceId: Scalars['String'];
+  automationId: Scalars['String'];
+};
 
 export type DeleteDialogueInputType = {
   id?: Maybe<Scalars['ID']>;
@@ -704,7 +730,7 @@ export type DeliveryConnectionFilterInput = {
 
 /** Fields to order DeliveryConnection by. */
 export enum DeliveryConnectionOrder {
-  CreatedAt = 'createdAt'
+  CreatedAt = 'createdAt',
 }
 
 /** Sorting of DeliveryConnection */
@@ -735,7 +761,7 @@ export enum DeliveryStatusEnum {
   Opened = 'OPENED',
   Finished = 'FINISHED',
   Failed = 'FAILED',
-  Delivered = 'DELIVERED'
+  Delivered = 'DELIVERED',
 }
 
 /** Delivery */
@@ -808,61 +834,49 @@ export type Dialogue = {
   campaignVariants: Array<CampaignVariantType>;
 };
 
-
 export type DialogueHealthScoreArgs = {
   input?: Maybe<HealthScoreInput>;
 };
-
 
 export type DialoguePathedSessionsConnectionArgs = {
   input?: Maybe<PathedSessionsInput>;
 };
 
-
 export type DialogueTopicArgs = {
   input?: Maybe<TopicInputType>;
 };
-
 
 export type DialogueMostPopularPathArgs = {
   input?: Maybe<DialogueStatisticsSummaryFilterInput>;
 };
 
-
 export type DialogueMostChangedPathArgs = {
   input?: Maybe<DialogueStatisticsSummaryFilterInput>;
 };
-
 
 export type DialogueMostTrendingTopicArgs = {
   input?: Maybe<DialogueStatisticsSummaryFilterInput>;
 };
 
-
 export type DialogueDialogueStatisticsSummaryArgs = {
   input?: Maybe<DialogueStatisticsSummaryFilterInput>;
 };
-
 
 export type DialogueAverageScoreArgs = {
   input?: Maybe<DialogueFilterInputType>;
 };
 
-
 export type DialogueSessionsArgs = {
   take?: Maybe<Scalars['Int']>;
 };
-
 
 export type DialogueStatisticsArgs = {
   input?: Maybe<DialogueFilterInputType>;
 };
 
-
 export type DialogueSessionConnectionArgs = {
   filter?: Maybe<SessionConnectionFilterInput>;
 };
-
 
 export type DialogueLeafsArgs = {
   searchTerm?: Maybe<Scalars['String']>;
@@ -872,7 +886,7 @@ export enum DialogueAspectType {
   NrInteractions = 'NR_INTERACTIONS',
   NrVisitors = 'NR_VISITORS',
   GeneralScore = 'GENERAL_SCORE',
-  LatestScore = 'LATEST_SCORE'
+  LatestScore = 'LATEST_SCORE',
 }
 
 /** DialogueConditionScope */
@@ -903,7 +917,7 @@ export type DialogueConnectionFilterInput = {
 
 /** Fields to order UserConnection by. */
 export enum DialogueConnectionOrder {
-  CreatedAt = 'createdAt'
+  CreatedAt = 'createdAt',
 }
 
 /** Sorting of DialogueConnection */
@@ -926,12 +940,8 @@ export type DialogueFinisherObjectType = {
 };
 
 export enum DialogueImpactScoreType {
-  Average = 'AVERAGE'
+  Average = 'AVERAGE',
 }
-
-export type DialogueLinksInput = {
-  workspaceId?: Maybe<Scalars['String']>;
-};
 
 export type DialogueStatistics = {
   __typename?: 'DialogueStatistics';
@@ -961,6 +971,7 @@ export type DialogueStatisticsSummaryModel = {
   endDateTime?: Maybe<Scalars['Date']>;
   nrVotes?: Maybe<Scalars['Int']>;
   impactScore?: Maybe<Scalars['Float']>;
+  title: Scalars['String'];
   dialogue?: Maybe<Dialogue>;
 };
 
@@ -970,7 +981,7 @@ export enum DialogueTemplateType {
   BusinessEng = 'BUSINESS_ENG',
   BusinessNl = 'BUSINESS_NL',
   Default = 'DEFAULT',
-  MassSeed = 'MASS_SEED'
+  MassSeed = 'MASS_SEED',
 }
 
 export type DialogueWhereUniqueInput = {
@@ -1028,6 +1039,12 @@ export type EditWorkspaceInput = {
   primaryColour: Scalars['String'];
 };
 
+export type EnableAutomationInput = {
+  workspaceId: Scalars['String'];
+  automationId: Scalars['String'];
+  state: Scalars['Boolean'];
+};
+
 export type FailedDeliveryModel = {
   __typename?: 'FailedDeliveryModel';
   record: Scalars['String'];
@@ -1052,6 +1069,7 @@ export type FormNodeEntryFieldInput = {
   url?: Maybe<Scalars['String']>;
   shortText?: Maybe<Scalars['String']>;
   longText?: Maybe<Scalars['String']>;
+  contacts?: Maybe<Scalars['String']>;
   number?: Maybe<Scalars['Int']>;
 };
 
@@ -1085,6 +1103,7 @@ export type FormNodeField = {
   isRequired: Scalars['Boolean'];
   position: Scalars['Int'];
   placeholder?: Maybe<Scalars['String']>;
+  contacts?: Maybe<Array<UserType>>;
 };
 
 export type FormNodeFieldInput = {
@@ -1094,6 +1113,7 @@ export type FormNodeFieldInput = {
   type?: Maybe<FormNodeFieldTypeEnum>;
   isRequired?: Maybe<Scalars['Boolean']>;
   position?: Maybe<Scalars['Int']>;
+  userIds?: Maybe<Array<Scalars['String']>>;
 };
 
 /** The types a field can assume */
@@ -1103,7 +1123,8 @@ export enum FormNodeFieldTypeEnum {
   Url = 'url',
   ShortText = 'shortText',
   LongText = 'longText',
-  Number = 'number'
+  Number = 'number',
+  Contacts = 'contacts',
 }
 
 export type FormNodeInputType = {
@@ -1245,7 +1266,7 @@ export type JobProcessLocations = {
 export enum JobProcessLocationType {
   OnePager = 'ONE_PAGER',
   Pitchdeck = 'PITCHDECK',
-  Brochure = 'BROCHURE'
+  Brochure = 'BROCHURE',
 }
 
 export enum JobStatusType {
@@ -1262,14 +1283,13 @@ export enum JobStatusType {
   ReadyForProcessing = 'READY_FOR_PROCESSING',
   TransformingPsdsToPngs = 'TRANSFORMING_PSDS_TO_PNGS',
   StitchingSlides = 'STITCHING_SLIDES',
-  CompressingSalesMaterial = 'COMPRESSING_SALES_MATERIAL'
+  CompressingSalesMaterial = 'COMPRESSING_SALES_MATERIAL',
 }
-
 
 export enum LanguageEnumType {
   English = 'ENGLISH',
   Dutch = 'DUTCH',
-  German = 'GERMAN'
+  German = 'GERMAN',
 }
 
 export type LineChartDataType = {
@@ -1303,7 +1323,7 @@ export enum LinkTypeEnumType {
   Linkedin = 'LINKEDIN',
   Whatsapp = 'WHATSAPP',
   Instagram = 'INSTAGRAM',
-  Twitter = 'TWITTER'
+  Twitter = 'TWITTER',
 }
 
 /** Login credential */
@@ -1364,6 +1384,10 @@ export type Mutation = {
   /** Creates a new automation. */
   createAutomation: AutomationModel;
   updateAutomation: AutomationModel;
+  enableAutomation?: Maybe<AutomationModel>;
+  deleteAutomation?: Maybe<AutomationModel>;
+  sendAutomationDialogueLink?: Maybe<Scalars['Boolean']>;
+  sendAutomationReport?: Maybe<Scalars['Boolean']>;
   createCampaign: CampaignType;
   createBatchDeliveries: CreateBatchDeliveriesOutputType;
   updateDeliveryStatus: Scalars['String'];
@@ -1411,41 +1435,33 @@ export type Mutation = {
   updateQuestion: QuestionNode;
 };
 
-
 export type MutationGenerateWorkspaceFromCsvArgs = {
   input?: Maybe<GenerateWorkspaceCsvInputType>;
 };
-
 
 export type MutationCreateJobProcessLocationArgs = {
   input?: Maybe<CreateJobProcessLocationInput>;
 };
 
-
 export type MutationGenerateAutodeckArgs = {
   input?: Maybe<GenerateAutodeckInput>;
 };
-
 
 export type MutationRetryAutodeckJobArgs = {
   jobId?: Maybe<Scalars['String']>;
 };
 
-
 export type MutationConfirmCreateWorkspaceJobArgs = {
   input?: Maybe<GenerateAutodeckInput>;
 };
-
 
 export type MutationWhitifyImageArgs = {
   input?: Maybe<AdjustedImageInput>;
 };
 
-
 export type MutationRemovePixelRangeArgs = {
   input?: Maybe<RemovePixelRangeInput>;
 };
-
 
 export type MutationUploadJobImageArgs = {
   file?: Maybe<Scalars['Upload']>;
@@ -1453,7 +1469,6 @@ export type MutationUploadJobImageArgs = {
   type?: Maybe<UploadImageEnumType>;
   disapproved?: Maybe<Scalars['Boolean']>;
 };
-
 
 export type MutationUpdateCreateWorkspaceJobArgs = {
   id?: Maybe<Scalars['String']>;
@@ -1463,12 +1478,10 @@ export type MutationUpdateCreateWorkspaceJobArgs = {
   errorMessage?: Maybe<Scalars['String']>;
 };
 
-
 export type MutationAssignTagsArgs = {
   dialogueId?: Maybe<Scalars['String']>;
   tags?: Maybe<TagsInputObjectType>;
 };
-
 
 export type MutationCreateTagArgs = {
   name?: Maybe<Scalars['String']>;
@@ -1476,43 +1489,51 @@ export type MutationCreateTagArgs = {
   type?: Maybe<TagTypeEnum>;
 };
 
-
 export type MutationDeleteTagArgs = {
   tagId?: Maybe<Scalars['String']>;
 };
-
 
 export type MutationCreateAutomationArgs = {
   input?: Maybe<CreateAutomationInput>;
 };
 
-
 export type MutationUpdateAutomationArgs = {
   input?: Maybe<CreateAutomationInput>;
 };
 
+export type MutationEnableAutomationArgs = {
+  input?: Maybe<EnableAutomationInput>;
+};
+
+export type MutationDeleteAutomationArgs = {
+  input?: Maybe<DeleteAutomationInput>;
+};
+
+export type MutationSendAutomationDialogueLinkArgs = {
+  input?: Maybe<SendAutomationDialogueLinkInput>;
+};
+
+export type MutationSendAutomationReportArgs = {
+  input?: Maybe<SendAutomationReportInput>;
+};
 
 export type MutationCreateCampaignArgs = {
   input?: Maybe<CreateCampaignInputType>;
 };
 
-
 export type MutationCreateBatchDeliveriesArgs = {
   input?: Maybe<CreateBatchDeliveriesInputType>;
 };
-
 
 export type MutationUpdateDeliveryStatusArgs = {
   deliveryId?: Maybe<Scalars['String']>;
   status?: Maybe<DeliveryStatusEnum>;
 };
 
-
 export type MutationDeleteTriggerArgs = {
   id?: Maybe<Scalars['String']>;
   customerSlug?: Maybe<Scalars['String']>;
 };
-
 
 export type MutationEditTriggerArgs = {
   triggerId?: Maybe<Scalars['String']>;
@@ -1521,88 +1542,71 @@ export type MutationEditTriggerArgs = {
   trigger?: Maybe<TriggerInputType>;
 };
 
-
 export type MutationCreateTriggerArgs = {
   input?: Maybe<CreateTriggerInputType>;
 };
-
 
 export type MutationCreatePermissionArgs = {
   data?: Maybe<PermissionInput>;
 };
 
-
 export type MutationUpdatePermissionsArgs = {
   input?: Maybe<UpdatePermissionsInput>;
 };
 
-
 export type MutationCreateRoleArgs = {
   data?: Maybe<RoleInput>;
 };
-
 
 export type MutationUpdateRolesArgs = {
   roleId?: Maybe<Scalars['String']>;
   permissions?: Maybe<PermissionIdsInput>;
 };
 
-
 export type MutationSingleUploadArgs = {
   file?: Maybe<Scalars['Upload']>;
 };
-
 
 export type MutationCreateWorkspaceArgs = {
   input?: Maybe<CreateWorkspaceInput>;
 };
 
-
 export type MutationEditWorkspaceArgs = {
   input?: Maybe<EditWorkspaceInput>;
 };
-
 
 export type MutationMassSeedArgs = {
   input?: Maybe<MassSeedInput>;
 };
 
-
 export type MutationDeleteCustomerArgs = {
   where?: Maybe<CustomerWhereUniqueInput>;
 };
 
-
 export type MutationHandleUserStateInWorkspaceArgs = {
   input?: Maybe<HandleUserStateInWorkspaceInput>;
 };
-
 
 export type MutationEditUserArgs = {
   userId?: Maybe<Scalars['String']>;
   input?: Maybe<EditUserInput>;
 };
 
-
 export type MutationDeleteUserArgs = {
   input?: Maybe<DeleteUserInput>;
 };
-
 
 export type MutationAssignUserToDialoguesArgs = {
   input?: Maybe<AssignUserToDialoguesInput>;
 };
 
-
 export type MutationCopyDialogueArgs = {
   input?: Maybe<CreateDialogueInputType>;
 };
 
-
 export type MutationCreateDialogueArgs = {
   input?: Maybe<CreateDialogueInputType>;
 };
-
 
 export type MutationEditDialogueArgs = {
   customerSlug?: Maybe<Scalars['String']>;
@@ -1617,91 +1621,73 @@ export type MutationEditDialogueArgs = {
   dialogueFinisherSubheading?: Maybe<Scalars['String']>;
 };
 
-
 export type MutationDeleteDialogueArgs = {
   input?: Maybe<DeleteDialogueInputType>;
 };
-
 
 export type MutationSetDialoguePrivacyArgs = {
   input?: Maybe<SetDialoguePrivacyInput>;
 };
 
-
 export type MutationUploadUpsellImageArgs = {
   input?: Maybe<UploadSellImageInputType>;
 };
-
 
 export type MutationAuthenticateLambdaArgs = {
   input?: Maybe<AuthenticateLambdaInput>;
 };
 
-
 export type MutationCreateAutomationTokenArgs = {
   email?: Maybe<Scalars['String']>;
 };
-
 
 export type MutationRegisterArgs = {
   input?: Maybe<RegisterInput>;
 };
 
-
 export type MutationVerifyUserTokenArgs = {
   token?: Maybe<Scalars['String']>;
 };
-
 
 export type MutationRequestInviteArgs = {
   input?: Maybe<RequestInviteInput>;
 };
 
-
 export type MutationInviteUserArgs = {
   input?: Maybe<InviteUserInput>;
 };
-
 
 export type MutationCreateSessionArgs = {
   input?: Maybe<SessionInput>;
 };
 
-
 export type MutationAppendToInteractionArgs = {
   input?: Maybe<AppendToInteractionInput>;
 };
-
 
 export type MutationDuplicateQuestionArgs = {
   questionId?: Maybe<Scalars['String']>;
 };
 
-
 export type MutationDeleteQuestionArgs = {
   input?: Maybe<DeleteNodeInputType>;
 };
-
 
 export type MutationCreateQuestionArgs = {
   input?: Maybe<CreateQuestionNodeInputType>;
 };
 
-
 export type MutationDeleteCtaArgs = {
   input?: Maybe<DeleteNodeInputType>;
 };
-
 
 export type MutationCreateCtaArgs = {
   input?: Maybe<CreateCtaInputType>;
 };
 
-
 export type MutationUpdateCtaArgs = {
   input?: Maybe<UpdateCtaInputType>;
 };
-
 
 export type MutationUpdateQuestionArgs = {
   input?: Maybe<UpdateQuestionNodeInputType>;
@@ -1751,7 +1737,7 @@ export type NodeEntryValue = {
 export enum OperandType {
   String = 'STRING',
   Int = 'INT',
-  DateTime = 'DATE_TIME'
+  DateTime = 'DATE_TIME',
 }
 
 export type OptionInputType = {
@@ -1783,7 +1769,7 @@ export enum PaginationSearchEnum {
   LastName = 'lastName',
   Email = 'email',
   Title = 'title',
-  PublicTitle = 'publicTitle'
+  PublicTitle = 'publicTitle',
 }
 
 /** Ways to sort a pagination object */
@@ -1802,7 +1788,7 @@ export enum PaginationSortByEnum {
   User = 'user',
   When = 'when',
   ScheduledAt = 'scheduledAt',
-  UpdatedAt = 'updatedAt'
+  UpdatedAt = 'updatedAt',
 }
 
 /** Sorting of pagination (type and whether it ascends) */
@@ -1871,11 +1857,24 @@ export type PermssionType = {
   customer?: Maybe<Customer>;
 };
 
+export type PickerEntryInput = {
+  label: Scalars['String'];
+  value: Scalars['String'];
+  type: Scalars['String'];
+};
+
 export type PreviewDataType = {
   __typename?: 'PreviewDataType';
   colors: Array<Scalars['String']>;
   rembgLogoUrl: Scalars['String'];
   websiteScreenshotUrl: Scalars['String'];
+};
+
+export type PublicDialogueConnection = ConnectionInterface & {
+  __typename?: 'PublicDialogueConnection';
+  totalPages?: Maybe<Scalars['Int']>;
+  pageInfo: PaginationPageInfo;
+  dialogues: Array<PublicDialogueInfo>;
 };
 
 export type PublicDialogueInfo = {
@@ -1910,7 +1909,7 @@ export type Query = {
   user?: Maybe<UserType>;
   dialogue?: Maybe<Dialogue>;
   dialogues: Array<Dialogue>;
-  dialogueLinks?: Maybe<Array<PublicDialogueInfo>>;
+  dialogueLinks?: Maybe<PublicDialogueConnection>;
   refreshAccessToken: RefreshAccessTokenOutput;
   sessions: Array<Session>;
   /** A session is one entire user-interaction */
@@ -1919,58 +1918,47 @@ export type Query = {
   edge?: Maybe<Edge>;
 };
 
-
 export type QueryGetPreviewDataArgs = {
   id?: Maybe<Scalars['String']>;
 };
-
 
 export type QueryGetJobArgs = {
   id?: Maybe<Scalars['String']>;
 };
 
-
 export type QueryGetAutodeckJobsArgs = {
   filter?: Maybe<PaginationWhereInput>;
 };
 
-
 export type QueryGetAdjustedLogoArgs = {
   input?: Maybe<AdjustedImageInput>;
 };
-
 
 export type QueryTagsArgs = {
   customerSlug?: Maybe<Scalars['String']>;
   dialogueId?: Maybe<Scalars['String']>;
 };
 
-
 export type QueryAutomationArgs = {
   where?: Maybe<GetAutomationInput>;
 };
-
 
 export type QueryAutomationsArgs = {
   where?: Maybe<GetAutomationsByWorkspaceInput>;
 };
 
-
 export type QueryDeliveryArgs = {
   deliveryId?: Maybe<Scalars['String']>;
 };
-
 
 export type QueryTriggerConnectionArgs = {
   customerSlug?: Maybe<Scalars['String']>;
   filter?: Maybe<PaginationWhereInput>;
 };
 
-
 export type QueryTriggerArgs = {
   triggerId?: Maybe<Scalars['String']>;
 };
-
 
 export type QueryTriggersArgs = {
   customerSlug?: Maybe<Scalars['String']>;
@@ -1979,68 +1967,56 @@ export type QueryTriggersArgs = {
   filter?: Maybe<PaginationWhereInput>;
 };
 
-
 export type QueryRoleArgs = {
   input?: Maybe<FindRoleInput>;
 };
-
 
 export type QueryRoleConnectionArgs = {
   customerId?: Maybe<Scalars['String']>;
   filter?: Maybe<PaginationWhereInput>;
 };
 
-
 export type QueryCustomerArgs = {
   id?: Maybe<Scalars['ID']>;
   slug?: Maybe<Scalars['String']>;
 };
 
-
 export type QueryUserOfCustomerArgs = {
   input?: Maybe<UserOfCustomerInput>;
 };
-
 
 export type QueryUsersArgs = {
   customerSlug?: Maybe<Scalars['String']>;
 };
 
-
 export type QueryUserArgs = {
   userId?: Maybe<Scalars['String']>;
 };
-
 
 export type QueryDialogueArgs = {
   where?: Maybe<DialogueWhereUniqueInput>;
 };
 
-
 export type QueryDialoguesArgs = {
   filter?: Maybe<DialogueFilterInputType>;
 };
 
-
 export type QueryDialogueLinksArgs = {
-  input?: Maybe<DialogueLinksInput>;
+  workspaceId?: Maybe<Scalars['String']>;
+  filter?: Maybe<DialogueConnectionFilterInput>;
 };
-
 
 export type QuerySessionsArgs = {
   where?: Maybe<SessionWhereUniqueInput>;
 };
 
-
 export type QuerySessionArgs = {
   id?: Maybe<Scalars['String']>;
 };
 
-
 export type QueryQuestionArgs = {
   where?: Maybe<QuestionWhereUniqueInput>;
 };
-
 
 export type QueryEdgeArgs = {
   id?: Maybe<Scalars['String']>;
@@ -2048,7 +2024,7 @@ export type QueryEdgeArgs = {
 
 export enum QuestionAspectType {
   NodeValue = 'NODE_VALUE',
-  AnswerSpeed = 'ANSWER_SPEED'
+  AnswerSpeed = 'ANSWER_SPEED',
 }
 
 /** QuestionConditionScope */
@@ -2061,7 +2037,7 @@ export type QuestionConditionScopeModel = {
 };
 
 export enum QuestionImpactScoreType {
-  Percentage = 'PERCENTAGE'
+  Percentage = 'PERCENTAGE',
 }
 
 export type QuestionNode = {
@@ -2090,11 +2066,9 @@ export type QuestionNode = {
   children: Array<Edge>;
 };
 
-
 export type QuestionNodeIndepthQuestionStatisticsSummaryArgs = {
   input?: Maybe<QuestionStatisticsSummaryFilterInput>;
 };
-
 
 export type QuestionNodeQuestionStatisticsSummaryArgs = {
   input?: Maybe<QuestionStatisticsSummaryFilterInput>;
@@ -2110,7 +2084,7 @@ export enum QuestionNodeTypeEnum {
   Textbox = 'TEXTBOX',
   Link = 'LINK',
   Share = 'SHARE',
-  VideoEmbedded = 'VIDEO_EMBEDDED'
+  VideoEmbedded = 'VIDEO_EMBEDDED',
 }
 
 export type QuestionNodeWhereInputType = {
@@ -2163,7 +2137,8 @@ export enum RecurringPeriodType {
   StartOfDay = 'START_OF_DAY',
   EndOfDay = 'END_OF_DAY',
   StartOfWeek = 'START_OF_WEEK',
-  EndOfWeek = 'END_OF_WEEK'
+  EndOfWeek = 'END_OF_WEEK',
+  Custom = 'CUSTOM',
 }
 
 export type RefreshAccessTokenOutput = {
@@ -2240,6 +2215,17 @@ export type RoleType = {
   permissions?: Maybe<Array<SystemPermission>>;
 };
 
+export type SendAutomationDialogueLinkInput = {
+  workspaceSlug: Scalars['String'];
+  automationScheduleId: Scalars['String'];
+};
+
+export type SendAutomationReportInput = {
+  workspaceSlug: Scalars['String'];
+  automationActionId: Scalars['String'];
+  reportUrl: Scalars['String'];
+};
+
 export type Session = {
   __typename?: 'Session';
   id: Scalars['ID'];
@@ -2278,7 +2264,7 @@ export type SessionConnectionFilterInput = {
 
 /** Fields to order SessionConnection by. */
 export enum SessionConnectionOrder {
-  CreatedAt = 'createdAt'
+  CreatedAt = 'createdAt',
 }
 
 /** Sorting of sessionConnection */
@@ -2290,7 +2276,7 @@ export type SessionConnectionOrderByInput = {
 /** Delivery type of session to filter by. */
 export enum SessionDeliveryType {
   Campaigns = 'campaigns',
-  NoCampaigns = 'noCampaigns'
+  NoCampaigns = 'noCampaigns',
 }
 
 /** Input for session */
@@ -2412,7 +2398,7 @@ export enum SystemPermission {
   CanUpdateAutomations = 'CAN_UPDATE_AUTOMATIONS',
   CanViewAutomations = 'CAN_VIEW_AUTOMATIONS',
   CanAccessReportPage = 'CAN_ACCESS_REPORT_PAGE',
-  CanDownloadReports = 'CAN_DOWNLOAD_REPORTS'
+  CanDownloadReports = 'CAN_DOWNLOAD_REPORTS',
 }
 
 export type Tag = {
@@ -2430,7 +2416,7 @@ export type TagsInputObjectType = {
 export enum TagTypeEnum {
   Default = 'DEFAULT',
   Location = 'LOCATION',
-  Agent = 'AGENT'
+  Agent = 'AGENT',
 }
 
 /** Input type for a textbox node */
@@ -2494,7 +2480,7 @@ export enum TriggerConditionEnum {
   HighThreshold = 'HIGH_THRESHOLD',
   InnerRange = 'INNER_RANGE',
   OuterRange = 'OUTER_RANGE',
-  TextMatch = 'TEXT_MATCH'
+  TextMatch = 'TEXT_MATCH',
 }
 
 export type TriggerConditionInputType = {
@@ -2538,7 +2524,7 @@ export type TriggerInputType = {
 export enum TriggerMediumEnum {
   Email = 'EMAIL',
   Phone = 'PHONE',
-  Both = 'BOTH'
+  Both = 'BOTH',
 }
 
 export type TriggerType = {
@@ -2555,12 +2541,13 @@ export type TriggerType = {
 
 export enum TriggerTypeEnum {
   Question = 'QUESTION',
-  Scheduled = 'SCHEDULED'
+  Scheduled = 'SCHEDULED',
 }
 
 export type UpdateCtaInputType = {
   id?: Maybe<Scalars['String']>;
   customerId?: Maybe<Scalars['ID']>;
+  customerSlug: Scalars['String'];
   title?: Maybe<Scalars['String']>;
   type?: Maybe<QuestionNodeTypeEnum>;
   links?: Maybe<CtaLinksInputType>;
@@ -2588,10 +2575,9 @@ export type UpdateQuestionNodeInputType = {
   edgeCondition?: Maybe<EdgeConditionInputType>;
 };
 
-
 export enum UploadImageEnumType {
   Logo = 'LOGO',
-  WebsiteScreenshot = 'WEBSITE_SCREENSHOT'
+  WebsiteScreenshot = 'WEBSITE_SCREENSHOT',
 }
 
 export type UploadSellImageInputType = {
@@ -2642,7 +2628,7 @@ export enum UserConnectionOrder {
   CreatedAt = 'createdAt',
   LastActivity = 'lastActivity',
   Role = 'role',
-  IsActive = 'isActive'
+  IsActive = 'isActive',
 }
 
 /** Sorting of UserConnection */
@@ -2694,7 +2680,6 @@ export type UserType = {
   role?: Maybe<RoleType>;
 };
 
-
 export type UserTypeAssignedDialoguesArgs = {
   input?: Maybe<UserOfCustomerInput>;
 };
@@ -2714,7 +2699,7 @@ export type VideoNodeEntryInput = {
 export enum WorkspaceAspectType {
   NrInteractions = 'NR_INTERACTIONS',
   NrVisitors = 'NR_VISITORS',
-  GeneralScore = 'GENERAL_SCORE'
+  GeneralScore = 'GENERAL_SCORE',
 }
 
 /** WorkspaceConditionScope */
@@ -2730,6 +2715,7 @@ export type WorkspaceConditionScopeModel = {
 export type WorkspaceStatistics = {
   __typename?: 'WorkspaceStatistics';
   id: Scalars['ID'];
+  workspaceStatisticsSummary?: Maybe<Array<DialogueStatisticsSummaryModel>>;
   /** Basic statistics of a workspace (e.g. number of responses, average general score, etc) */
   basicStats: BasicStatistics;
   /** Topics of a workspace ranked by either impact score or number of responses */
@@ -2744,36 +2730,33 @@ export type WorkspaceStatistics = {
   mostPopularPath?: Maybe<MostPopularPath>;
 };
 
+export type WorkspaceStatisticsWorkspaceStatisticsSummaryArgs = {
+  input?: Maybe<DialogueStatisticsSummaryFilterInput>;
+};
 
 export type WorkspaceStatisticsBasicStatsArgs = {
   input?: Maybe<DialogueStatisticsSummaryFilterInput>;
 };
 
-
 export type WorkspaceStatisticsRankedTopicsArgs = {
   input?: Maybe<DialogueStatisticsSummaryFilterInput>;
 };
-
 
 export type WorkspaceStatisticsHealthArgs = {
   input?: Maybe<HealthScoreInput>;
 };
 
-
 export type WorkspaceStatisticsUrgentPathArgs = {
   input?: Maybe<DialogueStatisticsSummaryFilterInput>;
 };
-
 
 export type WorkspaceStatisticsMostChangedPathArgs = {
   input?: Maybe<DialogueStatisticsSummaryFilterInput>;
 };
 
-
 export type WorkspaceStatisticsMostTrendingTopicArgs = {
   input?: Maybe<DialogueStatisticsSummaryFilterInput>;
 };
-
 
 export type WorkspaceStatisticsMostPopularPathArgs = {
   input?: Maybe<DialogueStatisticsSummaryFilterInput>;
@@ -2783,31 +2766,35 @@ export type GetDeliveryQueryVariables = Exact<{
   deliveryId?: Maybe<Scalars['String']>;
 }>;
 
-
 export type GetDeliveryQuery = (
   { __typename?: 'Query' }
-  & { delivery?: Maybe<(
-    { __typename?: 'DeliveryType' }
-    & Pick<DeliveryType, 'id'>
-    & { campaignVariant?: Maybe<(
-      { __typename?: 'CampaignVariantType' }
-      & Pick<CampaignVariantType, 'id'>
-      & { dialogue?: Maybe<(
-        { __typename?: 'Dialogue' }
-        & Pick<Dialogue, 'slug'>
-      )>, workspace?: Maybe<(
-        { __typename?: 'Customer' }
-        & Pick<Customer, 'slug'>
-      )> }
-    )> }
-  )> }
+  & {
+    delivery?: Maybe<(
+      { __typename?: 'DeliveryType' }
+      & Pick<DeliveryType, 'id'>
+      & {
+        campaignVariant?: Maybe<(
+          { __typename?: 'CampaignVariantType' }
+          & Pick<CampaignVariantType, 'id'>
+          & {
+            dialogue?: Maybe<(
+              { __typename?: 'Dialogue' }
+              & Pick<Dialogue, 'slug'>
+            )>, workspace?: Maybe<(
+              { __typename?: 'Customer' }
+              & Pick<Customer, 'slug'>
+            )>
+          }
+        )>
+      }
+    )>
+  }
 );
 
 export type UpdateDeliveryStatusMutationVariables = Exact<{
   deliveryId: Scalars['String'];
   status: DeliveryStatusEnum;
 }>;
-
 
 export type UpdateDeliveryStatusMutation = (
   { __typename?: 'Mutation' }
@@ -2818,61 +2805,71 @@ export type AppendToInteractionMutationVariables = Exact<{
   input?: Maybe<AppendToInteractionInput>;
 }>;
 
-
 export type AppendToInteractionMutation = (
   { __typename?: 'Mutation' }
-  & { appendToInteraction: (
-    { __typename?: 'Session' }
-    & Pick<Session, 'id'>
-  ) }
+  & {
+    appendToInteraction: (
+      { __typename?: 'Session' }
+      & Pick<Session, 'id'>
+    )
+  }
 );
 
 export type CreateSessionMutationVariables = Exact<{
   input?: Maybe<SessionInput>;
 }>;
 
-
 export type CreateSessionMutation = (
   { __typename?: 'Mutation' }
-  & { createSession: (
-    { __typename?: 'Session' }
-    & Pick<Session, 'id'>
-  ) }
+  & {
+    createSession: (
+      { __typename?: 'Session' }
+      & Pick<Session, 'id'>
+    )
+  }
 );
 
 export type CustomerFragmentFragment = (
   { __typename?: 'Customer' }
   & Pick<Customer, 'id' | 'name' | 'slug'>
-  & { settings?: Maybe<(
-    { __typename?: 'CustomerSettings' }
-    & Pick<CustomerSettings, 'id' | 'logoUrl' | 'logoOpacity'>
-    & { colourSettings?: Maybe<(
-      { __typename?: 'ColourSettings' }
-      & Pick<ColourSettings, 'id' | 'primary' | 'primaryAlt' | 'secondary'>
-    )> }
-  )>, dialogues?: Maybe<Array<(
-    { __typename?: 'Dialogue' }
-    & Pick<Dialogue, 'id' | 'slug' | 'description' | 'title' | 'publicTitle'>
-  )>> }
+  & {
+    settings?: Maybe<(
+      { __typename?: 'CustomerSettings' }
+      & Pick<CustomerSettings, 'id' | 'logoUrl' | 'logoOpacity'>
+      & {
+        colourSettings?: Maybe<(
+          { __typename?: 'ColourSettings' }
+          & Pick<ColourSettings, 'id' | 'primary' | 'primaryAlt' | 'secondary'>
+        )>
+      }
+    )>, dialogues?: Maybe<Array<(
+      { __typename?: 'Dialogue' }
+      & Pick<Dialogue, 'id' | 'slug' | 'description' | 'title' | 'publicTitle'>
+    )>>
+  }
 );
 
 export type EdgeFragmentFragment = (
   { __typename?: 'Edge' }
   & Pick<Edge, 'id'>
-  & { conditions?: Maybe<Array<(
-    { __typename?: 'EdgeCondition' }
-    & Pick<EdgeCondition, 'id' | 'conditionType' | 'matchValue' | 'renderMin' | 'renderMax'>
-  )>>, parentNode?: Maybe<(
-    { __typename?: 'QuestionNode' }
-    & Pick<QuestionNode, 'id' | 'title'>
-  )>, childNode?: Maybe<(
-    { __typename?: 'QuestionNode' }
-    & Pick<QuestionNode, 'id' | 'title' | 'isRoot' | 'type'>
-    & { children: Array<(
-      { __typename?: 'Edge' }
-      & Pick<Edge, 'id'>
-    )> }
-  )> }
+  & {
+    conditions?: Maybe<Array<(
+      { __typename?: 'EdgeCondition' }
+      & Pick<EdgeCondition, 'id' | 'conditionType' | 'matchValue' | 'renderMin' | 'renderMax'>
+    )>>, parentNode?: Maybe<(
+      { __typename?: 'QuestionNode' }
+      & Pick<QuestionNode, 'id' | 'title'>
+    )>, childNode?: Maybe<(
+      { __typename?: 'QuestionNode' }
+      & Pick<QuestionNode, 'id' | 'title' | 'isRoot' | 'type'>
+      & {
+        children: Array<(
+          { __typename?: 'Edge' }
+          & Pick<Edge, 'id'>
+        )>
+      }
+    )>
+  }
 );
 
 export type GetCustomerQueryVariables = Exact<{
@@ -2880,90 +2877,109 @@ export type GetCustomerQueryVariables = Exact<{
   dialogueSlug: Scalars['String'];
 }>;
 
-
 export type GetCustomerQuery = (
   { __typename?: 'Query' }
-  & { customer?: Maybe<(
-    { __typename?: 'Customer' }
-    & Pick<Customer, 'id' | 'name' | 'slug'>
-    & { dialogue?: Maybe<(
-      { __typename?: 'Dialogue' }
-      & Pick<Dialogue, 'id' | 'title' | 'slug' | 'publicTitle' | 'language' | 'creationDate' | 'updatedAt' | 'customerId'>
-      & { postLeafNode?: Maybe<(
-        { __typename?: 'DialogueFinisherObjectType' }
-        & Pick<DialogueFinisherObjectType, 'header' | 'subtext'>
-      )>, leafs: Array<(
-        { __typename?: 'QuestionNode' }
-        & QuestionFragmentFragment
-      )>, rootQuestion: (
-        { __typename?: 'QuestionNode' }
-        & QuestionFragmentFragment
-      ), questions: Array<(
-        { __typename?: 'QuestionNode' }
-        & QuestionFragmentFragment
-      )>, edges: Array<(
-        { __typename?: 'Edge' }
-        & EdgeFragmentFragment
-      )> }
-    )>, settings?: Maybe<(
-      { __typename?: 'CustomerSettings' }
-      & Pick<CustomerSettings, 'id' | 'logoUrl' | 'logoOpacity'>
-      & { colourSettings?: Maybe<(
-        { __typename?: 'ColourSettings' }
-        & Pick<ColourSettings, 'id' | 'primary' | 'primaryAlt' | 'secondary'>
-      )> }
-    )> }
-  )> }
+  & {
+    customer?: Maybe<(
+      { __typename?: 'Customer' }
+      & Pick<Customer, 'id' | 'name' | 'slug'>
+      & {
+        dialogue?: Maybe<(
+          { __typename?: 'Dialogue' }
+          & Pick<Dialogue, 'id' | 'title' | 'slug' | 'publicTitle' | 'language' | 'creationDate' | 'updatedAt' | 'customerId'>
+          & {
+            postLeafNode?: Maybe<(
+              { __typename?: 'DialogueFinisherObjectType' }
+              & Pick<DialogueFinisherObjectType, 'header' | 'subtext'>
+            )>, leafs: Array<(
+              { __typename?: 'QuestionNode' }
+              & QuestionFragmentFragment
+            )>, rootQuestion: (
+              { __typename?: 'QuestionNode' }
+              & QuestionFragmentFragment
+            ), questions: Array<(
+              { __typename?: 'QuestionNode' }
+              & QuestionFragmentFragment
+            )>, edges: Array<(
+              { __typename?: 'Edge' }
+              & EdgeFragmentFragment
+            )>
+          }
+        )>, settings?: Maybe<(
+          { __typename?: 'CustomerSettings' }
+          & Pick<CustomerSettings, 'id' | 'logoUrl' | 'logoOpacity'>
+          & {
+            colourSettings?: Maybe<(
+              { __typename?: 'ColourSettings' }
+              & Pick<ColourSettings, 'id' | 'primary' | 'primaryAlt' | 'secondary'>
+            )>
+          }
+        )>
+      }
+    )>
+  }
 );
 
 export type QuestionFragmentFragment = (
   { __typename?: 'QuestionNode' }
   & Pick<QuestionNode, 'id' | 'title' | 'isRoot' | 'isLeaf' | 'type' | 'extraContent'>
-  & { children: Array<(
-    { __typename?: 'Edge' }
-    & { parentNode?: Maybe<(
+  & {
+    children: Array<(
+      { __typename?: 'Edge' }
+      & {
+        parentNode?: Maybe<(
+          { __typename?: 'QuestionNode' }
+          & Pick<QuestionNode, 'id'>
+        )>, childNode?: Maybe<(
+          { __typename?: 'QuestionNode' }
+          & Pick<QuestionNode, 'id'>
+        )>
+      }
+      & EdgeFragmentFragment
+    )>, overrideLeaf?: Maybe<(
       { __typename?: 'QuestionNode' }
-      & Pick<QuestionNode, 'id'>
-    )>, childNode?: Maybe<(
-      { __typename?: 'QuestionNode' }
-      & Pick<QuestionNode, 'id'>
-    )> }
-    & EdgeFragmentFragment
-  )>, overrideLeaf?: Maybe<(
-    { __typename?: 'QuestionNode' }
-    & Pick<QuestionNode, 'id' | 'title' | 'type'>
-  )>, share?: Maybe<(
-    { __typename?: 'ShareNodeType' }
-    & Pick<ShareNodeType, 'id' | 'title' | 'url' | 'tooltip'>
-  )>, form?: Maybe<(
-    { __typename?: 'FormNodeType' }
-    & Pick<FormNodeType, 'id' | 'helperText'>
-    & { fields: Array<(
-      { __typename?: 'FormNodeField' }
-      & Pick<FormNodeField, 'id' | 'label' | 'type' | 'placeholder' | 'isRequired' | 'position'>
-    )> }
-  )>, links: Array<(
-    { __typename?: 'LinkType' }
-    & Pick<LinkType, 'url' | 'type' | 'title' | 'iconUrl' | 'backgroundColor' | 'buttonText' | 'header' | 'subHeader' | 'imageUrl'>
-  )>, sliderNode?: Maybe<(
-    { __typename?: 'SliderNodeType' }
-    & Pick<SliderNodeType, 'id' | 'happyText' | 'unhappyText'>
-    & { markers?: Maybe<Array<(
-      { __typename?: 'SliderNodeMarkerType' }
-      & Pick<SliderNodeMarkerType, 'id' | 'label' | 'subLabel'>
-      & { range?: Maybe<(
-        { __typename?: 'SliderNodeRangeType' }
-        & Pick<SliderNodeRangeType, 'id' | 'start' | 'end'>
-      )> }
-    )>> }
-  )>, options: Array<(
-    { __typename?: 'QuestionOption' }
-    & Pick<QuestionOption, 'id' | 'value' | 'publicValue'>
-    & { overrideLeaf?: Maybe<(
-      { __typename?: 'QuestionNode' }
-      & Pick<QuestionNode, 'id'>
-    )> }
-  )> }
+      & Pick<QuestionNode, 'id' | 'title' | 'type'>
+    )>, share?: Maybe<(
+      { __typename?: 'ShareNodeType' }
+      & Pick<ShareNodeType, 'id' | 'title' | 'url' | 'tooltip'>
+    )>, form?: Maybe<(
+      { __typename?: 'FormNodeType' }
+      & Pick<FormNodeType, 'id' | 'helperText'>
+      & {
+        fields: Array<(
+          { __typename?: 'FormNodeField' }
+          & Pick<FormNodeField, 'id' | 'label' | 'type' | 'placeholder' | 'isRequired' | 'position'>
+        )>
+      }
+    )>, links: Array<(
+      { __typename?: 'LinkType' }
+      & Pick<LinkType, 'url' | 'type' | 'title' | 'iconUrl' | 'backgroundColor' | 'buttonText' | 'header' | 'subHeader' | 'imageUrl'>
+    )>, sliderNode?: Maybe<(
+      { __typename?: 'SliderNodeType' }
+      & Pick<SliderNodeType, 'id' | 'happyText' | 'unhappyText'>
+      & {
+        markers?: Maybe<Array<(
+          { __typename?: 'SliderNodeMarkerType' }
+          & Pick<SliderNodeMarkerType, 'id' | 'label' | 'subLabel'>
+          & {
+            range?: Maybe<(
+              { __typename?: 'SliderNodeRangeType' }
+              & Pick<SliderNodeRangeType, 'id' | 'start' | 'end'>
+            )>
+          }
+        )>>
+      }
+    )>, options: Array<(
+      { __typename?: 'QuestionOption' }
+      & Pick<QuestionOption, 'id' | 'value' | 'publicValue'>
+      & {
+        overrideLeaf?: Maybe<(
+          { __typename?: 'QuestionNode' }
+          & Pick<QuestionNode, 'id'>
+        )>
+      }
+    )>
+  }
 );
 
 export const CustomerFragmentFragmentDoc = gql`
@@ -3126,19 +3142,19 @@ export const GetDeliveryDocument = gql`
  * });
  */
 export function useGetDeliveryQuery(baseOptions?: Apollo.QueryHookOptions<GetDeliveryQuery, GetDeliveryQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetDeliveryQuery, GetDeliveryQueryVariables>(GetDeliveryDocument, options);
-      }
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetDeliveryQuery, GetDeliveryQueryVariables>(GetDeliveryDocument, options);
+}
 export function useGetDeliveryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDeliveryQuery, GetDeliveryQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetDeliveryQuery, GetDeliveryQueryVariables>(GetDeliveryDocument, options);
-        }
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetDeliveryQuery, GetDeliveryQueryVariables>(GetDeliveryDocument, options);
+}
 export type GetDeliveryQueryHookResult = ReturnType<typeof useGetDeliveryQuery>;
 export type GetDeliveryLazyQueryHookResult = ReturnType<typeof useGetDeliveryLazyQuery>;
 export type GetDeliveryQueryResult = Apollo.QueryResult<GetDeliveryQuery, GetDeliveryQueryVariables>;
 export function refetchGetDeliveryQuery(variables?: GetDeliveryQueryVariables) {
-      return { query: GetDeliveryDocument, variables: variables }
-    }
+  return { query: GetDeliveryDocument, variables };
+}
 export const UpdateDeliveryStatusDocument = gql`
     mutation UpdateDeliveryStatus($deliveryId: String!, $status: DeliveryStatusEnum!) {
   updateDeliveryStatus(deliveryId: $deliveryId, status: $status)
@@ -3165,9 +3181,9 @@ export type UpdateDeliveryStatusMutationFn = Apollo.MutationFunction<UpdateDeliv
  * });
  */
 export function useUpdateDeliveryStatusMutation(baseOptions?: Apollo.MutationHookOptions<UpdateDeliveryStatusMutation, UpdateDeliveryStatusMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UpdateDeliveryStatusMutation, UpdateDeliveryStatusMutationVariables>(UpdateDeliveryStatusDocument, options);
-      }
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<UpdateDeliveryStatusMutation, UpdateDeliveryStatusMutationVariables>(UpdateDeliveryStatusDocument, options);
+}
 export type UpdateDeliveryStatusMutationHookResult = ReturnType<typeof useUpdateDeliveryStatusMutation>;
 export type UpdateDeliveryStatusMutationResult = Apollo.MutationResult<UpdateDeliveryStatusMutation>;
 export type UpdateDeliveryStatusMutationOptions = Apollo.BaseMutationOptions<UpdateDeliveryStatusMutation, UpdateDeliveryStatusMutationVariables>;
@@ -3198,9 +3214,9 @@ export type AppendToInteractionMutationFn = Apollo.MutationFunction<AppendToInte
  * });
  */
 export function useAppendToInteractionMutation(baseOptions?: Apollo.MutationHookOptions<AppendToInteractionMutation, AppendToInteractionMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<AppendToInteractionMutation, AppendToInteractionMutationVariables>(AppendToInteractionDocument, options);
-      }
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<AppendToInteractionMutation, AppendToInteractionMutationVariables>(AppendToInteractionDocument, options);
+}
 export type AppendToInteractionMutationHookResult = ReturnType<typeof useAppendToInteractionMutation>;
 export type AppendToInteractionMutationResult = Apollo.MutationResult<AppendToInteractionMutation>;
 export type AppendToInteractionMutationOptions = Apollo.BaseMutationOptions<AppendToInteractionMutation, AppendToInteractionMutationVariables>;
@@ -3231,9 +3247,9 @@ export type CreateSessionMutationFn = Apollo.MutationFunction<CreateSessionMutat
  * });
  */
 export function useCreateSessionMutation(baseOptions?: Apollo.MutationHookOptions<CreateSessionMutation, CreateSessionMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateSessionMutation, CreateSessionMutationVariables>(CreateSessionDocument, options);
-      }
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<CreateSessionMutation, CreateSessionMutationVariables>(CreateSessionDocument, options);
+}
 export type CreateSessionMutationHookResult = ReturnType<typeof useCreateSessionMutation>;
 export type CreateSessionMutationResult = Apollo.MutationResult<CreateSessionMutation>;
 export type CreateSessionMutationOptions = Apollo.BaseMutationOptions<CreateSessionMutation, CreateSessionMutationVariables>;
@@ -3303,19 +3319,19 @@ ${EdgeFragmentFragmentDoc}`;
  * });
  */
 export function useGetCustomerQuery(baseOptions: Apollo.QueryHookOptions<GetCustomerQuery, GetCustomerQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetCustomerQuery, GetCustomerQueryVariables>(GetCustomerDocument, options);
-      }
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetCustomerQuery, GetCustomerQueryVariables>(GetCustomerDocument, options);
+}
 export function useGetCustomerLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCustomerQuery, GetCustomerQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetCustomerQuery, GetCustomerQueryVariables>(GetCustomerDocument, options);
-        }
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetCustomerQuery, GetCustomerQueryVariables>(GetCustomerDocument, options);
+}
 export type GetCustomerQueryHookResult = ReturnType<typeof useGetCustomerQuery>;
 export type GetCustomerLazyQueryHookResult = ReturnType<typeof useGetCustomerLazyQuery>;
 export type GetCustomerQueryResult = Apollo.QueryResult<GetCustomerQuery, GetCustomerQueryVariables>;
 export function refetchGetCustomerQuery(variables?: GetCustomerQueryVariables) {
-      return { query: GetCustomerDocument, variables: variables }
-    }
+  return { query: GetCustomerDocument, variables };
+}
 export namespace GetDelivery {
   export type Variables = GetDeliveryQueryVariables;
   export type Query = GetDeliveryQuery;
