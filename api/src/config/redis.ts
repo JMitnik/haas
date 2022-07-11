@@ -1,8 +1,9 @@
 import Redis from 'ioredis';
 import config from './config';
+import { logger } from './logger';
 
 export const redis = new Redis(config.redisUrl);
 
 redis.on('connect', () => {
-  console.log('Connected to Redis');
-})
+  logger.logLifeCycle('Connected to Redis');
+});
