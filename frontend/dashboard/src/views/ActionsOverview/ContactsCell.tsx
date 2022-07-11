@@ -70,11 +70,11 @@ export const ContactsCell = ({ users, onClick, onRemove }: NodeCellProps) => {
       style={{ padding: '8px 12px', width: '100%', position: 'relative' }}
     >
       <UI.CloseButton onClose={removeCTAFromOption} top="5px" right="5px" />
-      <UI.Flex width="100%" alignItems="center">
+      <UI.Flex width="100%" flexDirection="column" alignItems="center">
         {nodes.map(({ nodeProps, isUser, node }) => (
-          <UI.Flex width="100%" alignItems="center" key={node.value}>
-            <UI.Div
-              display="flex"
+          <UI.Flex paddingBottom={2} width="100%" alignItems="center" key={node.value}>
+            <UI.Flex
+              flexDirection="column"
               justifyContent="center"
               bg={nodeProps.bg}
               color="white"
@@ -83,7 +83,7 @@ export const ContactsCell = ({ users, onClick, onRemove }: NodeCellProps) => {
               borderRadius="10px"
             >
               <UI.Span fontWeight="bold">{nodeProps.first}</UI.Span>
-            </UI.Div>
+            </UI.Flex>
             <UI.Div>
               <UI.Text paddingRight={2}>
                 {isUser && (
