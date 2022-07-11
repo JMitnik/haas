@@ -34,9 +34,7 @@ const adaptColor = (colorHex: string) => {
 const AdjustedColourWrapper = styled(UI.Div)`
   ${({ theme }) => css`
     font-weight: 600;
-    color: ${Color(theme.colors.primary).isDark()
-      ? Color(theme.colors.primary).mix(Color('white'), 0.9).saturate(1).hex()
-      : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
+    color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.9).saturate(1).hex() : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
   `}
 `;
 
