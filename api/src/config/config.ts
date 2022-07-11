@@ -43,7 +43,7 @@ const config: ConfigProps = {
   endpoint: process.env.APP_ENDPOINT || '/graphql',
   isDebug: Boolean(process.env.ENABLE_DEBUG) || false,
   clientUrl: process.env.CLIENT_URL || 'http://localhost:3000',
-  redisUrl: process.env.REDIS_URL || 'http://localhost:6380',
+  redisUrl: process.env.REDIS_URL || 'redis://127.0.0.1:6380',
   dashboardUrl: process.env.DASHBOARD_URL || 'http://localhost:3002',
   cloudinaryUrl: process.env.CLOUDINARY_URL || '',
   prismaUrl: process.env.PRISMA_SERVICE_ENDPOINT || 'http://localhost:4466',
