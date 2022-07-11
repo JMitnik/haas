@@ -30,7 +30,7 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
   const [createSession, {
     data: interactionData,
     loading: isCreatingSession,
-    // reset: resetSessionCache,
+    reset: resetSessionCache,
   }] = useCreateSessionMutation();
   const [appendToInteraction] = useAppendToInteractionMutation();
   const ref = qs.parse(location.search, { ignoreQueryPrefix: true })?.ref?.toString() || '';
@@ -44,7 +44,7 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
    * - The flag that will append.
    */
   const resetSession = () => {
-    // resetSessionCache();
+    resetSessionCache();
     setUploadQueue([]);
     willAppend.current = false;
   };
