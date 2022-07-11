@@ -50,6 +50,7 @@ import { useCustomer } from 'providers/CustomerProvider';
 import { useMenu } from 'components/Common/Menu/useMenu';
 import Dropdown from 'components/Dropdown';
 
+import { Switch, SwitchContainer, SwitchThumb } from 'components/Common/Switch';
 import { ActionCell } from './ActionCell';
 import { ActionEntry, CreateActionModalCard } from './CreateActionModalCard';
 import { ChildBuilderEntry } from './ChildBuilderEntry';
@@ -362,6 +363,7 @@ const AutomationForm = ({
 }: AutomationFormProps) => {
   const [createModalIsOpen, setCreateModalIsOpen] = useState<ModalState>({ isOpen: false });
   const { openMenu, closeMenu, menuProps, activeItem } = useMenu<any>();
+  const [isUTC, setIsUTC] = useState(true);
 
   const history = useHistory();
   const form = useForm<FormDataProps>({
@@ -370,7 +372,7 @@ const AutomationForm = ({
     mode: 'onChange',
     defaultValues: {
       title: automation?.label,
-      automationType: automation?.automationType || AutomationType.Trigger,
+      automationType: automation?.automationType || AutomationType.Scheduled,
       schedule: {
         type: automation?.schedule?.type,
         month: automation?.schedule?.month,
@@ -504,6 +506,8 @@ const AutomationForm = ({
     }
   };
 
+  console.log('Clicked switch: ', isUTC);
+
   return (
     <>
       <UI.FormContainer>
@@ -534,11 +538,11 @@ const AutomationForm = ({
                   <Controller
                     control={form.control}
                     name="automationType"
-                    defaultValue={AutomationType.Trigger}
+                    defaultValue={AutomationType.Scheduled}
                     render={({ field }) => (
                       <UI.RadioButtons onBlur={field.onBlur} onChange={field.onChange} value={field.value}>
                         <UI.RadioButton
-                          isDisabled={!!automation?.automationType}
+                          isDisabled
                           icon={Bell}
                           value={AutomationType.Trigger}
                           mr={2}
@@ -552,14 +556,6 @@ const AutomationForm = ({
                           mr={2}
                           text={(t('automation:recurring'))}
                           description={t('automation:recurring_helper')}
-                        />
-                        <UI.RadioButton
-                          icon={MessageSquare}
-                          isDisabled
-                          value={AutomationType.Campaign}
-                          mr={2}
-                          text={(t('automation:campaigner'))}
-                          description={t('automation:campaigner_helper')}
                         />
                       </UI.RadioButtons>
                     )}
@@ -977,7 +973,20 @@ const AutomationForm = ({
                   border="1px solid #edf2f7"
                   backgroundColor={DEPTH_BACKGROUND_COLORS[0]}
                 >
-                  <CronScheduleHeader pb={2}>Next 5 dates this automation will be ran:</CronScheduleHeader>
+                  <UI.Flex justifyContent="space-between">
+                    <CronScheduleHeader pb={2}>Next 5 dates this automation will be ran:</CronScheduleHeader>
+                    <UI.Flex>
+                      <UI.Span mr={2}>Show UTC?</UI.Span>
+                      <Switch
+                        isChecked={isUTC}
+                        onChange={() => setIsUTC((prev) => !prev)}
+                      >
+                        <SwitchThumb />
+                      </Switch>
+                    </UI.Flex>
+
+                  </UI.Flex>
+
                   {cronners?.map((entry) => <UI.Div pb={1}>{entry.toString()}</UI.Div>)}
                 </UI.Div>
 
