@@ -35,6 +35,12 @@ fragment QuestionFragment on QuestionNode {
       placeholder
       isRequired
       position
+      contacts {
+        id
+        email
+        firstName
+        lastName
+      }
     }
   }
   links {
