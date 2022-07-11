@@ -132,7 +132,7 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                           variant="outline"
                           name={`fields.${index}.value`}
                           ref={register({ required: field.isRequired })}
-                          minHeight="150px"
+                          minHeight="40px"
                           placeholder={field.placeholder || undefined}
                         />
                       )}
