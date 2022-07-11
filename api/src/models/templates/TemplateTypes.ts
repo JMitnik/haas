@@ -1,4 +1,4 @@
-import { Prisma, TagEnum } from '@prisma/client';
+import { LanguageEnum, Link, Prisma, TagEnum } from '@prisma/client';
 import { NexusGenInputs } from '../../generated/nexus';
 
 export interface Tag {
@@ -13,6 +13,7 @@ export interface RootSliderOptions {
 export interface WorkspaceTemplate {
   title: string;
   slug: string;
+  language?: LanguageEnum;
   topics: { [K in any]: string[] };
   description: string;
   primaryColor: string;
@@ -21,8 +22,8 @@ export interface WorkspaceTemplate {
   tags: Tag[];
   rootSliderOptions: {
     markers: any[];
-    happyText?: string,
-    unhappyText?: string,
+    happyText?: string;
+    unhappyText?: string;
   };
   postLeafText?: {
     header: string;
@@ -34,6 +35,25 @@ export interface DemoWorkspaceTemplate extends WorkspaceTemplate {
   rootLayer: string[];
   subLayer: string[];
   subSubLayer: string[];
+  language: LanguageEnum;
+}
+
+export const defaultSportTextFieldForm: NexusGenInputs['FormNodeInputType'] = {
+  fields: [
+    {
+      isRequired: false,
+      label: 'Leave your name and a senior leader will contact you ⇣',
+    },
+  ],
+}
+
+export const defaultBusinessTextFieldForm: NexusGenInputs['FormNodeInputType'] = {
+  fields: [
+    {
+      isRequired: false,
+      label: 'Leave your name and a senior leader will contact you ⇣',
+    },
+  ],
 }
 
 export const defaultForm: NexusGenInputs['FormNodeInputType'] = {
@@ -58,6 +78,16 @@ export const defaultForm: NexusGenInputs['FormNodeInputType'] = {
     },
   ],
 };
+
+export const singleLink: Partial<Link>[] = [
+  {
+    url: 'https://www.haas.live/',
+    type: 'SINGLE',
+    header: 'Join the stanford summer program',
+    subHeader: 'Get the best out of yourself with our 30-day fit program!',
+    imageUrl: 'https://res.cloudinary.com/haas-storage/image/upload/v1655796025/sellable_items/aa6h8testdtftgy9m3bk.png',
+  },
+]
 
 export const defaultLinks: any[] = [
   { url: 'https://facebook.com', type: 'FACEBOOK', backgroundColor: '#1877f2' },

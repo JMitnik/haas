@@ -70,6 +70,7 @@ export const GenerateWorkspaceView = () => {
       });
     },
     onError: (error) => {
+      console.log('ERROR: ', error);
       logger.logError(error, {
         tags: { section: 'campaign' },
       });
@@ -82,6 +83,14 @@ export const GenerateWorkspaceView = () => {
     name: 'generateDemoData',
     defaultValue: 0,
   });
+
+  const handleManagerCancel = () => {
+    setActiveManagerCSV(null);
+  };
+
+  const handleGroupsCancel = () => {
+    setActiveCSV(null);
+  };
 
   const handleManagerDrop = (files: File[]) => {
     if (!files.length) return;
@@ -212,6 +221,7 @@ export const GenerateWorkspaceView = () => {
               <FileDropInput
                 isDisabled={!!usesGeneratedData}
                 onDrop={handleManagerDrop}
+                onCancel={handleManagerCancel}
               />
             </UI.FormControl>
 
@@ -221,6 +231,7 @@ export const GenerateWorkspaceView = () => {
               <FileDropInput
                 isDisabled={!!usesGeneratedData}
                 onDrop={handleDrop}
+                onCancel={handleGroupsCancel}
               />
             </UI.FormControl>
           </UI.InputGrid>

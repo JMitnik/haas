@@ -506,10 +506,7 @@ export class NodeService {
     overrideLeafId: string = '',
     isLeaf: boolean = false
   ) => {
-    const qOptions = options.length > 0 ? [
-      ...options,
-    ] : [];
-
+    const qOptions = options.length > 0 ? options : [];
     const params: CreateQuestionInput =
     {
       isRoot,

@@ -1,6 +1,6 @@
 import { Dialogue, LinkTypeEnum, NodeType } from '@prisma/client';
 import { NexusGenInputs } from '../../generated/nexus';
-import { QuestionConditionProps } from '../questionnaire/DialogueTypes';
+import { QuestionConditionProps } from '../questionnaire/Dialogue.types';
 
 export enum DialogueTemplateType {
   BUSINESS_ENG = 'BUSINESS_ENG',
@@ -15,6 +15,7 @@ export interface QuestionOptionProps {
   id?: number;
   value: string;
   publicValue?: string | null;
+  isTopic?: boolean;
   overrideLeafId?: string;
   position: number | null;
 }

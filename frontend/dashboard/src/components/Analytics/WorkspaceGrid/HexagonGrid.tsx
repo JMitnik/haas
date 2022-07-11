@@ -242,14 +242,6 @@ export const HexagonGrid = ({
           </Tooltip.Trigger>
           <Tooltip.Content isOpen={openGoBackTooltip}>
             <UI.Div position="relative">
-              <UI.Div
-                position="absolute"
-                top="0"
-                left="50%"
-                padding="10px"
-                style={{ transform: 'translate(-50%, -10%) rotate(45deg)' }}
-                backgroundColor="white"
-              />
               <UI.Card padding={1} backgroundColor="white">
                 <UI.Span color="off.600">{t('go_up_one_layer')}</UI.Span>
               </UI.Card>
@@ -267,14 +259,6 @@ export const HexagonGrid = ({
           </Tooltip.Trigger>
           <Tooltip.Content isOpen={openCenterHexagonTooltip}>
             <UI.Div position="relative">
-              <UI.Div
-                position="absolute"
-                top="0"
-                left="50%"
-                padding="10px"
-                style={{ transform: 'translate(-50%, -10%) rotate(45deg)' }}
-                backgroundColor="white"
-              />
               <UI.Card padding={1} backgroundColor="white">
                 <UI.Span color="off.600">{t('center_hexagons')}</UI.Span>
               </UI.Card>

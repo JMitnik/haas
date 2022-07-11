@@ -7,14 +7,26 @@ import { useTranslation } from 'react-i18next';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+import { PublicDialogueInfo } from 'types/generated-types';
+
 import { stripPrefixFromUrl } from './DialogueLinkFetchCard.helpers';
 
-const DialogueCardContainer = styled(UI.Div)`
-  ${({ theme }) => css`
+interface DialogueCardContainerProps {
+  loading: boolean;
+}
+
+const DialogueCardContainer = styled(UI.Div)<DialogueCardContainerProps>`
+  ${({ theme, loading }) => css`
     background: white;
     box-shadow: ${theme.boxShadows.md};
     border-radius: ${theme.borderRadiuses.md}px;
     transition: all ${theme.transitions.normal};
+
+    ${loading && css`
+      opacity: 0.6;
+      pointer-events: none;
+      transition: all ${theme.transitions.normal};
+    `}
 
     &:hover {
       box-shadow: ${theme.boxShadows.lg};
@@ -24,7 +36,12 @@ const DialogueCardContainer = styled(UI.Div)`
   `}
 `;
 
-const DialogueCard = ({ dialogue }: { dialogue: any }) => {
+interface DialogueCardProps {
+  dialogue: PublicDialogueInfo;
+  loading: boolean;
+}
+
+const DialogueCard = ({ dialogue, loading }: DialogueCardProps) => {
   const toast = useToast();
   const { onCopy, hasCopied } = useClipboard(dialogue.url);
   const { t } = useTranslation();
@@ -40,6 +57,7 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
     <DialogueCardContainer
       data-cy="DialogueCard"
       bg="white"
+      loading={loading}
       onClick={() => handleCardClick()}
     >
       <UI.CardBody height="100%">

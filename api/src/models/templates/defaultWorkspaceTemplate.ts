@@ -1,5 +1,5 @@
-import { NodeType, Prisma } from '@prisma/client';
-import WorkspaceTemplate, { Tag, defaultAdminRole, defaultBotRole, defaultForm, defaultLinks, defaultManagerRole, defaultUserRole, DemoWorkspaceTemplate } from './TemplateTypes';
+import { LanguageEnum, NodeType, Prisma } from '@prisma/client';
+import WorkspaceTemplate, { Tag, defaultAdminRole, defaultBotRole, defaultForm, defaultLinks, defaultManagerRole, defaultUserRole, DemoWorkspaceTemplate, singleLink } from './TemplateTypes';
 
 export type rootTopics = 'Facilities' | 'Website/Mobile app' | 'Product/Services' | 'Customer Support'
 
@@ -15,9 +15,16 @@ export interface MassSeedTemplate extends WorkspaceTemplate {
   rootSliderOptions: any;
 }
 
+/**
+ * Single Link CTA: Positive path => Website => Any option
+ * Share CTA (Also to test overriding CTA as single link CTA is set on layer above): Positive path => Product/Services => Any option
+ * Form CTA: Neutral path => any option => any option
+ * Multi Link CTA: Positive path => Customer support => Other (It is set on question option instead of on question)
+ */
 const defaultWorkspaceTemplate: DemoWorkspaceTemplate = {
   title: 'How do you feel about us?',
   slug: 'default',
+  language: LanguageEnum.ENGLISH,
   rootLayer: ['default'],
   subLayer: [''],
   subSubLayer: [''],
@@ -51,7 +58,7 @@ const defaultWorkspaceTemplate: DemoWorkspaceTemplate = {
   ],
   postLeafText: {
     header: 'Thank you for your input!',
-    subHeader: 'Work should be fulfilling'
+    subHeader: 'Work should be fulfilling',
   },
   rootSliderOptions: {
     markers: [
@@ -84,10 +91,18 @@ const defaultWorkspaceTemplate: DemoWorkspaceTemplate = {
   },
   leafNodes: [
     {
-      title:
-        'We are happy about your positive feedback. You matter to us! Leave your contact details below to receive our newsletter.',
-      type: NodeType.TEXTBOX,
-      links: [],
+      title: 'Share CTA',
+      type: NodeType.SHARE,
+      share: {
+        title: 'Get a discount for your friend',
+        url: 'https://www.haas.live/',
+        tooltip: 'Share',
+      },
+    },
+    {
+      title: 'Single link CTA',
+      type: NodeType.LINK,
+      links: singleLink,
     },
     {
       title: 'Thank you for your elaborate feedback. Kindly appreciated!',
@@ -108,7 +123,7 @@ const defaultWorkspaceTemplate: DemoWorkspaceTemplate = {
     },
     {
       title:
-        'Thank you for your positive feedback. Follow us on Instagram and stay updated.',
+        'Thank you for your positive feedback. Follow us on Instagram or other social media and stay updated.',
       type: NodeType.LINK,
       links: defaultLinks,
     },
@@ -186,6 +201,7 @@ const defaultWorkspaceTemplate: DemoWorkspaceTemplate = {
 export const defaultMassSeedTemplate: DemoWorkspaceTemplate = {
   title: 'How do you feel about us?',
   slug: 'default',
+  language: LanguageEnum.ENGLISH,
   topics: {
     'Facilities': ['Cleanliness', 'Atmosphere', 'Location'],
     'Website/Mobile app': ['Design', 'Functionality', 'Informative'],

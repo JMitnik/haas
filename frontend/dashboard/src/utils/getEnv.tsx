@@ -1,3 +1,3 @@
 type NodeEnv = 'test' | 'development' | 'production';
 
-export const getNodeEnv = (): NodeEnv => import.meta.env.NODE_ENV as NodeEnv;
+export const getNodeEnv = (): NodeEnv => process.env.NODE_ENV as NodeEnv;

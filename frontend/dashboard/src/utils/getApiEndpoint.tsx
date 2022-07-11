@@ -1,1 +1,3 @@
-export const getApiEndpoint = () => import.meta.env.VITE_API_ENDPOINT?.toString() || 'http://localhost:4000/graphql';
+const apiEndpoint = process.env.VITE_API_ENDPOINT?.toString();
+
+export const getApiEndpoint = () => apiEndpoint || 'http://localhost:4000/graphql';

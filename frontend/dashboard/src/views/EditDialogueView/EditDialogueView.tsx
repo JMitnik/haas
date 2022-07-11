@@ -310,7 +310,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
                       </UI.InputHelper>
                       <UI.Input
                         leftEl={<Type />}
-                        placeholder="We will strive towards making you happier."
+                        placeholder="We strive to make you happier."
                         {...form.register('postLeafSubheading')}
                       />
                       <FormErrorMessage>{form.formState.errors.postLeafSubheading?.message}</FormErrorMessage>

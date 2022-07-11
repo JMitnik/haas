@@ -12,12 +12,13 @@ import {
   aws_ssm as ssm,
 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
+import { IRepository } from "aws-cdk-lib/aws-ecr";
 
 import { APIOptions } from '../../../stacks/Core/CoreVariables';
 
 interface CoreApiProps {
   vpc: ec2.Vpc;
-  repo: ecr.Repository,
+  repo: IRepository,
   domainName: string;
   databaseEndpoint: string;
   databaseUserName: string;
@@ -100,7 +101,7 @@ export class CoreAPI extends Construct {
           BASE_URL: props.apiOptions.baseUrl,
           CLIENT_URL: props.apiOptions.clientUrL,
           DASHBOARD_URL: props.apiOptions.dashboardUrl,
-          CLOUDINARY_URL: '',
+          CLOUDINARY_URL: 'cloudinary://934926832132984:uwtZjMqTGKgJL-nFzS2gsG_pnUE@haas-storage',
           MAIL_SENDER: props.apiOptions.mailSenderMail,
           ENVIRONMENT: props.apiOptions.environment,
           EVENT_BRIDGE_RUN_ALL_LAMBDAS_ROLE_ARN: runAllLambdasEventBridgeRoleArn.stringValue,

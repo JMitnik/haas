@@ -611,9 +611,7 @@ class AutomationService {
    */
   handleTriggerAutomations = async (dialogueId: string) => {
     const candidateAutomations = await this.getCandidateTriggers(dialogueId);
-    if (!candidateAutomations) {
-      return;
-    }
+    if (!candidateAutomations) return;
 
     const triggeredAutomations = await Promise.all(candidateAutomations.map(async (automationTrigger) => {
       const { trigger, workspaceSlug, dialogueSlug } = automationTrigger;
@@ -905,7 +903,7 @@ class AutomationService {
   constructCreateAutomationInput = (input: NexusGenInputs['CreateAutomationInput']): CreateAutomationInput => {
     const validatedInput = this.validateCreateAutomationInput(input);
 
-    const conditionBuilder = validatedInput. automationType === AutomationType.TRIGGER
+    const conditionBuilder = validatedInput.automationType === AutomationType.TRIGGER
       ? this.constructBuilderRecursive(input.conditionBuilder as Required<NexusGenInputs['AutomationConditionBuilderInput']>)
       : undefined;
 
