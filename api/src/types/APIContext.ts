@@ -21,6 +21,7 @@ import EdgeService from '../models/edge/EdgeService';
 import { CampaignService } from '../models/Campaigns/CampaignService';
 import LinkService from '../models/link/LinkService';
 import { TopicService } from '../models/Topic/TopicService';
+import { RedisService } from '../models/general/cache/RedisService';
 import AutomationService from '../models/automations/AutomationService';
 import QuestionStatisticsService from 'models/QuestionNode/QuestionStatisticsService';
 import GenerateWorkspaceService from '../models/generate-workspace/GenerateWorkspaceService';
@@ -48,6 +49,7 @@ export interface APIServiceContainer {
   campaignService: CampaignService;
   linkService: LinkService;
   topicService: TopicService;
+  redisService: RedisService;
   dialogueStatisticsService: DialogueStatisticsService;
   questionStatisticsService: QuestionStatisticsService;
 }
