@@ -43,6 +43,7 @@ import {
 } from 'types/generated-types';
 import { AutomationInput } from 'views/EditAutomationView/EditAutomationViewTypes';
 import { ConditionNodePicker } from 'components/NodePicker/ConditionNodePicker';
+import { DateFormat, useDate } from 'hooks/useDate';
 import { DialogueNodePicker } from 'components/NodePicker/DialogueNodePicker';
 import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
 import { NodeCell } from 'components/NodeCell';
@@ -58,6 +59,7 @@ import { ConditionCell } from './ConditionCell';
 import { ConditionEntry } from './CreateConditionModalCardTypes';
 import { CreateConditionModalCard } from './CreateConditionModalCard';
 import { CronScheduleHeader, ModalState, ModalType, OPERATORS } from './AutomationTypes';
+import { zonedTimeToUtc } from 'date-fns-tz';
 import useCronSchedule from './useCronSchedule';
 
 const schema = yup.object({
@@ -364,6 +366,7 @@ const AutomationForm = ({
   const [createModalIsOpen, setCreateModalIsOpen] = useState<ModalState>({ isOpen: false });
   const { openMenu, closeMenu, menuProps, activeItem } = useMenu<any>();
   const [isUTC, setIsUTC] = useState(true);
+  const { format, toUTC, toZonedTime, formatUTC } = useDate();
 
   const history = useHistory();
   const form = useForm<FormDataProps>({
@@ -506,7 +509,7 @@ const AutomationForm = ({
     }
   };
 
-  console.log('Clicked switch: ', isUTC);
+  console.log('Timezone offset: ', -new Date().getTimezoneOffset() / 60);
 
   return (
     <>
@@ -987,7 +990,26 @@ const AutomationForm = ({
 
                   </UI.Flex>
 
-                  {cronners?.map((entry) => <UI.Div pb={1}>{entry.toString()}</UI.Div>)}
+                  {cronners?.map((entry, index) => (
+                    <UI.Flex alignItems="center" pb={1}>
+                      <UI.Div padding="1em" mr={1} position="relative">
+                        <UI.Icon color="main.500">
+                          <Clock />
+                          <UI.Div position="absolute" bottom="0" right={5}>
+                            +
+                            {index + 1}
+                          </UI.Div>
+                        </UI.Icon>
+                      </UI.Div>
+                      <UI.Span>
+                        {isUTC
+                          ? formatUTC(entry, DateFormat.HumanMonthDateTime)
+                          : format(entry, DateFormat.HumanMonthDateTimeUTC)}
+
+                      </UI.Span>
+                    </UI.Flex>
+                  ))
+                    || <UI.Span>CRON format not correct</UI.Span>}
                 </UI.Div>
 
               </InputGrid>

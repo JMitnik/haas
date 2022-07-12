@@ -4,7 +4,7 @@ import later from '@breejs/later';
 
 // Hook
 function useCronSchedule(cronString: string) {
-  const [schedule, setSchedule] = useState<string[] | undefined>();
+  const [schedule, setSchedule] = useState<Date[] | undefined>();
 
   useEffect(
     () => {
@@ -12,9 +12,10 @@ function useCronSchedule(cronString: string) {
         if (isValidCron(cronString, { alias: true, allowSevenAsSunday: true })) {
           const cron = later.parse.cron(cronString);
           const cronSchedule = later.schedule(cron).next(5);
+          console.log('schedule', cronSchedule);
           setSchedule(cronSchedule);
         } else {
-          setSchedule(['CRON format not correct']);
+          setSchedule(undefined);
         }
       } else {
         setSchedule([]);
