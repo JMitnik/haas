@@ -1,5 +1,7 @@
 import { PrismaClient, Prisma } from '@prisma/client'
 
+import { redis } from './redis';
+import { RedisService } from '../models/general/cache/RedisService';
 import { mailService } from '../services/mailings/MailService'
 import { LoginService } from '../models/auth/LoginService'
 import { IssueService } from '../models/Issue/IssueService';
@@ -53,8 +55,10 @@ export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOption
   const templateService = new TemplateService(prisma);
   const topicService = new TopicService(prisma);
   const issueService = new IssueService(prisma);
+  const redisService = new RedisService(redis);
 
   return {
+    redisService,
     templateService,
     generateWorkspaceService,
     questionStatisticsService,
