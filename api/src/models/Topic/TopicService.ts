@@ -3,8 +3,7 @@ import { Prisma, PrismaClient } from '@prisma/client';
 import { SessionWithEntries } from '../session/Session.types';
 import SessionService from '../session/SessionService';
 import { CustomerService as WorkspaceService } from '../customer/CustomerService';
-import { TopicFilterInput, TopicByString } from './Topic.types';
-import { NexusGenInputs } from 'generated/nexus';
+import { TopicFilterInput, TopicByString, DeselectTopicInput } from './Topic.types';
 import DialogueService from '../../models/questionnaire/DialogueService';
 import QuestionNodePrismaAdapter from '../../models/QuestionNode/QuestionNodePrismaAdapter';
 
@@ -24,25 +23,25 @@ export class TopicService {
   }
 
   /**
-   * Loop over all dialogues in a workspace and deselect the question options matching the topic name
+   * Loop over all dialogues in a workspace and "undoes" the grouping of a topic.
    * @param input
    * @returns boolean
    */
-  deselectTopic = async (input: NexusGenInputs['DeselectTopicInput']) => {
+  public async hideTopic(input: DeselectTopicInput) {
     const dialoguesIds = await this.dialogueService.findDialogueIdsByCustomerId(input.workspaceId);
 
+    // Find all question-options corresponding to topic
     const questionOptions = await this.questionNodePrismaAdapter.findQuestionOptionsBySelectedTopic(
       dialoguesIds,
       input.topic
     );
 
-    const mappedOptions = questionOptions.map((option) => ({
+    // For each of the question options, set topic to `false`
+    await this.questionNodePrismaAdapter.updateQuestionOptions((questionOptions).map((option) => ({
       ...option,
       isTopic: false,
       overrideLeafId: option.overrideLeafId || undefined,
-    }));
-
-    await this.questionNodePrismaAdapter.updateQuestionOptions(mappedOptions);
+    })));
 
     return true;
   }

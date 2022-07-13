@@ -1,7 +1,8 @@
 import { SessionActionType } from '../session/Session.types';
 import { NexusGenInputs } from '../../generated/nexus';
-import { Nullable } from 'types/generic';
+import { Nullable } from '../../types/generic';
 
+export type DeselectTopicInput = NexusGenInputs['DeselectTopicInput'];
 export type TopicFilterInput = NexusGenInputs['TopicFilterInput'];
 
 /**

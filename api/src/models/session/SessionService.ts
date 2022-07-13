@@ -314,6 +314,12 @@ class SessionService {
     };
 
     try {
+      await this.triggerService.tryTriggers(session);
+    } catch (error) {
+      logger.error('Something went wrong while handling sms triggers', error);
+    };
+
+    try {
       await this.automationService.handleTriggerAutomations(dialogueId);
     } catch (error) {
       logger.error('Something went wrong checking automation triggers', error);

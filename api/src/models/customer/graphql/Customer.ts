@@ -525,25 +525,6 @@ export const WorkspaceMutations = Upload && extendType({
   },
 });
 
-export const DeselectTopicInput = inputObjectType({
-  name: 'DeselectTopicInput',
-  description: 'Deselects all question options as topic within workspace',
-  definition(t) {
-    t.id('workspaceId', { required: true });
-    t.string('topic', { required: true });
-  },
-})
-
-export const DeselectTopicMutation = mutationField('deselectTopic', {
-  type: 'Boolean',
-  nullable: true,
-  args: { input: DeselectTopicInput },
-  async resolve(parent, args, ctx) {
-    if (!args.input) throw new UserInputError('No input object!');
-    return ctx.services.topicService.deselectTopic(args.input) || null;
-  },
-});
-
 export const MassSeedInput = inputObjectType({
   name: 'MassSeedInput',
   definition(t) {

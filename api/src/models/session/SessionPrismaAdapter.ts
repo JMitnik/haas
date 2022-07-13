@@ -532,7 +532,9 @@ class SessionPrismaAdapter {
             linkNodeEntry: true,
             registrationNodeEntry: true,
             textboxNodeEntry: true,
-            relatedNode: true,
+            relatedNode: {
+              include: { options: true },
+            },
             formNodeEntry: { include: { values: true } },
             videoNodeEntry: true,
             sliderNodeEntry: true,

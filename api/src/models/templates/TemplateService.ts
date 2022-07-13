@@ -7,7 +7,7 @@ import templates from '.';
 import { CreateQuestionsInput } from '../questionnaire/DialoguePrismaAdapterType';
 import EdgeService from '../edge/EdgeService';
 import NodeService from '../QuestionNode/NodeService';
-import WorkspaceTemplate, { DemoWorkspaceTemplate } from './TemplateTypes';
+import WorkspaceTemplate from './TemplateTypes';
 
 const standardOptions = [
   { value: 'Facilities', position: 1 },
@@ -122,10 +122,10 @@ class TemplateService {
   };
 
   /**
-   * Creates a post leaf node based on template type and whether content for the node is specified. 
+   * Creates a post leaf node based on template type and whether content for the node is specified.
    * If not, default settings are used
-   * @param templateType 
-   * @param dialogueId 
+   * @param templateType
+   * @param dialogueId
    */
   createTemplatePostLeafNode = async (
     templateType: NexusGenEnums['DialogueTemplateType'],
@@ -755,19 +755,21 @@ class TemplateService {
 
     await this.edgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout,
       whatWouldYouLikeToTalkAboutToProduct, {
-      conditionType: 'match',
-      matchValue: 'Product/Services',
-      renderMin: null,
-      renderMax: null,
-    });
+        conditionType: 'match',
+        matchValue: 'Product/Services',
+        renderMin: null,
+        renderMax: null,
+      }
+    );
 
     await this.edgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout,
       whatWouldYouLikeToTalkAboutToCustomerSupport, {
-      conditionType: 'match',
-      matchValue: 'Customer Support',
-      renderMin: null,
-      renderMax: null,
-    });
+        conditionType: 'match',
+        matchValue: 'Customer Support',
+        renderMin: null,
+        renderMax: null,
+      }
+    );
 
     // Negative edges
     await this.edgeService.createEdge(rootQuestion, rootToWeAreSorryToHearThat,
@@ -789,11 +791,12 @@ class TemplateService {
 
     await this.edgeService.createEdge(rootToWeAreSorryToHearThat,
       weAreSorryToHearThatToCustomerSupport, {
-      conditionType: 'match',
-      matchValue: 'Customer Support',
-      renderMax: null,
-      renderMin: null,
-    });
+        conditionType: 'match',
+        matchValue: 'Customer Support',
+        renderMax: null,
+        renderMin: null,
+      }
+    );
   };
 
 
