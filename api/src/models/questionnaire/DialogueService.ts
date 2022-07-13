@@ -1091,7 +1091,9 @@ class DialogueService {
 
     // Get the top paths
     const isPositiveEntries = _.groupBy(textAndScoreEntries, (entry) => entry.y && entry.y > 50);
+    // @ts-ignore
     const topNegativePath = DialogueService.getTopNPaths(isPositiveEntries.false || [], 3, 'negative') || [];
+    // @ts-ignore
     const topPositivePath = DialogueService.getTopNPaths(isPositiveEntries.true || [], 3, 'positive') || [];
 
     // Get the most popular paths in general

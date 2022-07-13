@@ -5,6 +5,7 @@ import { useNavigator } from 'hooks/useNavigator';
 interface UseRouteModal {
   matchUrlKey: string;
   exitUrl: string;
+  exitCallback?: () => void;
 }
 
 type UseRouteModalOutput<T> = [
@@ -14,7 +15,7 @@ type UseRouteModalOutput<T> = [
   params: T,
 ];
 
-export function useRouteModal<RouteParams>({ matchUrlKey, exitUrl }: UseRouteModal): UseRouteModalOutput<RouteParams> {
+export function useRouteModal<RouteParams>({ matchUrlKey, exitUrl, exitCallback }: UseRouteModal): UseRouteModalOutput<RouteParams> {
   const { customerSlug, dialogueSlug } = useNavigator();
   const match = useRouteMatch<RouteParams>({
     path: matchUrlKey,
@@ -28,6 +29,7 @@ export function useRouteModal<RouteParams>({ matchUrlKey, exitUrl }: UseRouteMod
   };
 
   const close = () => {
+    if (exitCallback) return exitCallback();
     history.push(exitUrl);
   };
 

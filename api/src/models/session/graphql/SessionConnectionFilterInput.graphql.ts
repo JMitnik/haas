@@ -1,4 +1,4 @@
-import { enumType, unionType, inputObjectType, objectType } from '@nexus/schema';
+import { enumType, inputObjectType } from '@nexus/schema';
 
 export const SessionConnectionOrderByInput = inputObjectType({
   name: 'SessionConnectionOrderByInput',
@@ -14,7 +14,7 @@ export const SessionConnectionOrderType = enumType({
   name: 'SessionConnectionOrder',
   description: 'Fields to order SessionConnection by.',
 
-  members: ['createdAt'],
+  members: ['createdAt', 'dialogueId'],
 });
 
 export const SessionDeliveryTypeFilter = enumType({
@@ -40,8 +40,8 @@ export const SessionConnectionFilterInput = inputObjectType({
   definition(t) {
     // Pre-filter
     t.string('search', { required: false });
-    t.string('startDate', { required: false });
-    t.string('endDate', { required: false });
+    t.dateString('startDate', { required: false });
+    t.dateString('endDate', { required: false });
     t.field('deliveryType', { type: SessionDeliveryTypeFilter, required: false });
     t.field('scoreRange', { type: SessionScoreRangeFilter, required: false });
     t.string('campaignVariantId', { required: false });
@@ -52,5 +52,8 @@ export const SessionConnectionFilterInput = inputObjectType({
     // Paginate
     t.int('offset', { nullable: true });
     t.int('perPage', { required: false, default: 10 });
+
+    t.list.string('dialogueIds', { nullable: true });
+    t.boolean('withFollowUpAction', { nullable: true });
   },
 })

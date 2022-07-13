@@ -1,14 +1,14 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 
-import { SessionWithEntries, TopicCount } from '../session/SessionTypes';
+import { SessionWithEntries } from '../session/Session.types';
 import SessionService from '../session/SessionService';
 import { CustomerService as WorkspaceService } from '../customer/CustomerService';
-import { TopicFilterInput } from './Topic.types';
+import { TopicFilterInput, TopicByString } from './Topic.types';
 
 export class TopicService {
-  prisma: PrismaClient;
-  sessionService: SessionService;
-  workspaceService: WorkspaceService;
+  private prisma: PrismaClient;
+  private sessionService: SessionService;
+  private workspaceService: WorkspaceService;
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
@@ -16,7 +16,7 @@ export class TopicService {
     this.workspaceService = new WorkspaceService(prisma);
   }
 
-  buildSessionFilter(topicFilter?: TopicFilterInput): Prisma.SessionWhereInput {
+  public buildSessionFilter(topicFilter?: TopicFilterInput): Prisma.SessionWhereInput {
     let query: Prisma.SessionWhereInput = {};
 
     if (topicFilter?.topicStrings?.length) {
@@ -48,7 +48,7 @@ export class TopicService {
     startDate: Date,
     endDate: Date,
     topicFilter?: TopicFilterInput
-  ): Promise<Record<string, TopicCount>> {
+  ): Promise<TopicByString> {
     const dialogueIds = (
       await this.workspaceService.getDialogues(workspaceId, topicFilter?.dialogueStrings || undefined)
     ).map(dialogue => dialogue.id);
@@ -59,12 +59,18 @@ export class TopicService {
       startDate,
       endDate,
       this.buildSessionFilter(topicFilter),
-      { nodeEntries: { include: { choiceNodeEntry: true } } }
+      {
+        nodeEntries:
+        {
+          include:
+            { choiceNodeEntry: true, formNodeEntry: { include: { values: { include: { relatedField: true } } } } },
+        },
+      }
     ) as unknown as SessionWithEntries[];
 
     // Calculate all the candidate topic-counts.
-    const topicCounts = this.sessionService.countTopicsFromSessions(sessions);
+    const topicByStatistics = this.sessionService.extractTopics(sessions);
 
-    return topicCounts;
+    return topicByStatistics;
   }
 }

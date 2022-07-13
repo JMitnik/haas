@@ -37,9 +37,9 @@ class QuestionNodePrismaAdapter {
 
   /**
    * Finds a cache entry of a dialogue statistics summary based on id and date range
-   * @param dialogueId 
-   * @param startDateTime 
-   * @param endDateTime 
+   * @param dialogueId
+   * @param startDateTime
+   * @param endDateTime
    * @returns DialogueStatisticsSummaryCache | null
    */
   findQuestionStatisticsSummaryByQuestionId = async (dialogueId: string, startDateTime: Date, endDateTime: Date) => {

@@ -1,7 +1,7 @@
 import { extendType, inputObjectType, mutationField, objectType } from '@nexus/schema';
 import { UserInputError } from 'apollo-server-express';
 
-import { NodeEntryDataInput, NodeEntryInput, NodeEntryType } from '../../node-entry/NodeEntry';
+import { FormNodeEntryType, NodeEntryDataInput, NodeEntryInput, NodeEntryType } from '../../node-entry/NodeEntry';
 import { ConnectionInterface } from '../../general/Pagination';
 import SessionService from '../SessionService';
 
@@ -16,7 +16,6 @@ export const SessionType = objectType({
 
     t.string('browser', { resolve: (parent) => parent?.browser || '' });
 
-    // t.int('index');
     t.int('paths', {
       async resolve(parent, args, ctx) {
         const entryCount = await ctx.services.nodeEntryService.countNodeEntriesBySessionid(parent.id);
@@ -30,11 +29,16 @@ export const SessionType = objectType({
         if (parent.score) return parent.score;
         if (parent.mainScore) return parent.mainScore;
 
-
         const score = await SessionService.findSessionScore(parent.id) || 0.0;
 
         return score;
       },
+    });
+
+    t.field('dialogue', {
+      nullable: true,
+      type: 'Dialogue',
+      resolve: ({ dialogueId }, _, { services }) => services.dialogueService.getDialogueById(dialogueId),
     });
 
     t.int('totalTimeInSec', {
@@ -71,6 +75,18 @@ export const SessionType = objectType({
         return ctx.services.nodeEntryService.getNodeEntriesBySessionId(parent.id);
       },
     });
+
+    t.field('followUpAction', {
+      type: FormNodeEntryType,
+      nullable: true,
+      useParentResolve: true,
+      resolve: (parent, _, { services }) => {
+        // @ts-ignore
+        if (parent.nodeEntries) return services.sessionService.actionsFromNodeEntries(parent.nodeEntries);
+
+        return null;
+      },
+    })
   },
 });
 

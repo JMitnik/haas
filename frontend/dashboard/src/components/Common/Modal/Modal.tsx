@@ -33,7 +33,7 @@ const Overlay = styled(DialogPrimitive.DialogOverlay)`
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 10000;
+  z-index: 100000;
 `;
 
 export const Root = ({ children, open, onClose, minWidth = 600, ...props }: RootProps) => (

@@ -6,7 +6,7 @@ import { Button } from './Buttons';
 
 export type BoxShadowSize = 'sm' | 'md' | 'lg';
 
-export const ButtonCard = styled(Button)<{ isActive: boolean }>`
+export const ButtonCard = styled(Button) <{ isActive: boolean }>`
   ${({ theme, isActive }) => css`
     border-radius: ${theme.borderRadiuses.md};
     box-shadow: ${theme.boxShadows.md};
@@ -41,11 +41,51 @@ export const ButtonCard = styled(Button)<{ isActive: boolean }>`
   `}
 `;
 
-export const CardBody = styled(Div)`
-  ${({ theme }) => css`
-    padding: ${theme.gutter * 0.75}px;
+type Size = 'sm' | 'md' | 'lg';
+
+interface CardBodyProps {
+  _size?: Size;
+  isInModal?: boolean;
+}
+
+export const CardHeader = styled(Div) <CardBodyProps>`
+  ${({ theme, _size = 'md', isInModal }) => css`
     flex-grow: 1;
     position: relative;
+    background-color: ${theme.colors.neutral[300]};
+    border-radius: ${isInModal ? '0 0 0 0' : `${theme.borderRadiuses.lg}px ${theme.borderRadiuses.lg}px 0 0`} ;
+    border-bottom: 1px solid ${theme.colors.off[100]};
+
+    ${_size === 'sm' && css`
+      padding: ${theme.gutter * 0.5}px;
+    `}
+
+    ${_size === 'md' && css`
+      padding: ${theme.gutter * 0.75}px;
+    `}
+
+    ${_size === 'lg' && css`
+      padding: ${theme.gutter * 1.25}px;
+    `}
+  `}
+`;
+
+export const CardBody = styled(Div) <CardBodyProps>`
+  ${({ theme, _size = 'md' }) => css`
+    flex-grow: 1;
+    position: relative;
+
+    ${_size === 'sm' && css`
+      padding: ${theme.gutter * 0.5}px;
+    `}
+
+    ${_size === 'md' && css`
+      padding: ${theme.gutter * 0.75}px;
+    `}
+
+    ${_size === 'lg' && css`
+      padding: ${theme.gutter * 1.25}px;
+    `}
   `}
 `;
 
@@ -74,7 +114,7 @@ interface CardProps {
   hasBlur?: boolean;
 }
 
-export const Card = styled(Div)<CardProps>`
+export const Card = styled(Div) <CardProps>`
   ${({ theme, hasHover, boxShadow = 'md', bg = 'white', hasBlur = false }) => css`
     background: ${get(theme.colors, bg as string)};
     border-radius: ${theme.borderRadiuses.lg}px;

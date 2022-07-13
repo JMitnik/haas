@@ -1,6 +1,7 @@
 import { GREEN_LOWER_BOUND, ORANGE_LOWER_BOUND } from 'config/constants';
 import { Grid, Hex, createHexPrototype, rectangle } from 'honeycomb-grid';
-import { meanBy, orderBy, uniqBy } from 'lodash';
+import { isPresent } from 'ts-is-present';
+import { meanBy, orderBy, uniq, uniqBy } from 'lodash';
 
 import {
   Dialogue,
@@ -424,3 +425,24 @@ export const extractDialogueFragments = (historyQueue: HexagonState[]): string[]
 
   return fragments;
 };
+
+/**
+   * Traverses a HexagonNode and its groups to find all the dialogueIds
+   * @param data the root group HexagonNode
+   * @param filteredDialogueIds an array to store the traversed HexagonNode IDs
+   * @returns a list of dialogueIds part of the current group
+   */
+export const findDialoguesInGroup = (
+  data: HexagonNode[], filteredDialogueIds: string[] = [],
+): string[] => uniq(data.flatMap((node) => {
+  if (node?.type === HexagonNodeType.Dialogue) {
+    filteredDialogueIds.push(node.id);
+    return filteredDialogueIds;
+  }
+
+  if (node?.type === HexagonNodeType.Group) {
+    return findDialoguesInGroup(node.subGroups, filteredDialogueIds);
+  }
+
+  return undefined;
+}).filter(isPresent));
