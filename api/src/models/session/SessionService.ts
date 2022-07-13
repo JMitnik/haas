@@ -19,7 +19,7 @@ import Sentry from '../../config/sentry';
 import SessionPrismaAdapter from './SessionPrismaAdapter';
 import AutomationService from '../automations/AutomationService';
 import { CustomerService } from '../customer/CustomerService';
-import { logger } from 'config/logger';
+import { logger } from '../../config/logger';
 
 class SessionService {
   private sessionPrismaAdapter: SessionPrismaAdapter;
