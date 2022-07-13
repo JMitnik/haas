@@ -26,6 +26,8 @@ export const QuestionOptionType = objectType({
     t.int('id');
     t.string('value');
 
+    t.boolean('isTopic');
+
     // TODO: Make this required in prisma.
     t.string('questionId', {
       nullable: true,
@@ -439,6 +441,7 @@ export const OptionInputType = inputObjectType({
     t.string('publicValue', { nullable: true });
     t.string('overrideLeafId', { required: false });
     t.int('position', { required: true });
+    t.boolean('isTopic');
   },
 });
 

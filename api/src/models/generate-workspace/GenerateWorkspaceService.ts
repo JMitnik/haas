@@ -1,9 +1,9 @@
-import { Customer, Prisma, PrismaClient, Role, RoleTypeEnum } from '@prisma/client';
+import { Customer, PrismaClient, Role, RoleTypeEnum } from '@prisma/client';
 import { ApolloError } from 'apollo-server-express';
 
 import templates from '../templates';
 import TemplateService from '../templates/TemplateService';
-import { NexusGenEnums, NexusGenInputs } from '../../generated/nexus';
+import { NexusGenEnums } from '../../generated/nexus';
 import { parseCsv } from '../../utils/parseCsv';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
@@ -107,6 +107,7 @@ class GenerateWorkspaceService {
         customer: { id: workspace.id, create: false },
         isPrivate: false,
         postLeafText: template?.postLeafText,
+        language: template.language,
       };
 
       // Create initial dialogue
@@ -228,6 +229,7 @@ class GenerateWorkspaceService {
             header: template.postLeafText?.header,
             subHeader: template.postLeafText?.subHeader,
           },
+          language: template.language,
         };
 
         // Create initial dialogue
@@ -253,12 +255,67 @@ class GenerateWorkspaceService {
 
         const invitedUser = await this.userOfCustomerPrismaAdapter.upsertUserOfCustomer(
           workspace.id,
-          user.id,
-          user.id === userId ? adminRole?.id as string : userRole.id, // If user generating is upserted => give admin role
+          adminRole?.id as string,
+          userId as string
         );
 
-        void this.userService.sendInvitationMail(invitedUser);
-      };
+        // For every record generate dialogue, users + assign to dialogue
+        for (let i = 0; i < records.length; i++) {
+          const record = records[i];
+          const layers = Object.entries(record).filter((entry) => entry[0].includes('layer') && (entry[1] as string)?.length > 0);
+          const layersContent = layers.map((layer) => (layer[1] as string).replaceAll('-', ''));
+          const dialogueSlug = layersContent.join('-').replaceAll(/[^a-zA-Z0-9&]/g, '-').replaceAll(/[--]+/g, '-').toLowerCase();
+          const dialogueTitle = layersContent.join(' - ');
+
+          const userEmailEntry = Object.entries(record).find((entry) => entry[0] === 'limited_access_assignee_email?');
+          const userPhoneEntry = Object.entries(record).find((entry) => entry[0] === 'limited_access_assignee_phone?');
+          const hasEmailAssignee = !!userEmailEntry?.[1];
+          const emailAssignee = userEmailEntry?.[1] as string;
+          const phoneAssignee = userPhoneEntry?.[1] as string | undefined;
+          const userRole = workspace.roles.find((role) => role.type === RoleTypeEnum.USER);
+
+          const dialogueInput: CreateDialogueInput = {
+            slug: dialogueSlug,
+            title: dialogueTitle,
+            description: '',
+            customer: { id: workspace.id, create: false },
+            isPrivate: hasEmailAssignee,
+            postLeafText: {
+              header: template.postLeafText?.header,
+              subHeader: template.postLeafText?.subHeader,
+            },
+          };
+
+          // Create initial dialogue
+          const dialogue = await this.dialoguePrismaAdapter.createTemplate(dialogueInput);
+
+          if (!dialogue) throw new ApolloError('ERROR: No dialogue created! aborting...');
+          // Make the leafs
+          const leafs = await this.templateService.createTemplateLeafNodes(type as NexusGenEnums['DialogueTemplateType'], dialogue.id);
+
+          // Make nodes
+          await this.templateService.createTemplateNodes(dialogue.id, workspace.name, leafs, type as string);
+
+          // Check if user already exists
+          // If not create new user entry + userOfCustomer entry
+          // If exists => connect existing user when creating new userOfCustomer entry
+          if (!hasEmailAssignee || !emailAssignee || !userRole) continue;
+
+          const user = await this.userOfCustomerPrismaAdapter.addUserToPrivateDialogue(
+            emailAssignee,
+            dialogue.id,
+            phoneAssignee
+          );
+
+          const invitedUser = await this.userOfCustomerPrismaAdapter.upsertUserOfCustomer(
+            workspace.id,
+            user.id,
+            user.id === userId ? adminRole?.id as string : userRole.id, // If user generating is upserted => give admin role
+          );
+
+          void this.userService.sendInvitationMail(invitedUser);
+        };
+      }
 
       if (managerCsv) await this.addManagersFromCSV(managerCsv, workspace);
 

@@ -193,6 +193,7 @@ const QuestionEntryItem = ({ depth,
       value: option.overrideLeaf?.id,
       type: option.overrideLeaf?.type,
     },
+    isTopic: option.isTopic,
   })) || [];
 
   return (

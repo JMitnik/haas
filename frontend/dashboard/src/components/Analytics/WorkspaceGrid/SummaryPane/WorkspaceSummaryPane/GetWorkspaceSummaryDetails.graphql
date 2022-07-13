@@ -1,4 +1,4 @@
-query GetWorkspaceSummaryDetails($id: ID, 
+query GetWorkspaceSummaryDetails($id: ID,
 	$summaryInput: DialogueStatisticsSummaryFilterInput!,
 	$healthInput: HealthScoreInput!
 ) {
@@ -16,25 +16,6 @@ query GetWorkspaceSummaryDetails($id: ID,
 				basicStats {
 					average
 					responseCount
-				}
-			}
-			urgentPath(input: $summaryInput) {
-				id
-				path {
-					id
-					topicStrings
-				}
-				dialogue {
-					id
-          title
-				}
-				path {
-					id
-					topicStrings
-				}
-				basicStats {
-					responseCount
-					average
 				}
 			}
     }

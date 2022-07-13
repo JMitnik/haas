@@ -47,17 +47,29 @@ const IllustrationCardWrapper = styled.div`
 interface IllustrationCardProps {
   svg: any;
   text: string;
+  flatten?: boolean;
   children?: React.ReactNode;
   boxShadow?: BoxShadowSize;
 }
 
-export const IllustrationCard = ({ svg, text, children, boxShadow }: IllustrationCardProps) => {
+export const IllustrationCard = ({ svg, text, children, boxShadow, flatten }: IllustrationCardProps) => {
+  if (flatten) {
+    return (
+      <IllustrationCardWrapper>
+        {svg}
+        <Span>
+          <H4 color="off.500" pt={4} fontWeight={500} pb={2}>{text}</H4>
+          {children}
+        </Span>
+      </IllustrationCardWrapper>
+    )
+  }
   return (
     <Card boxShadow={boxShadow}>
       <IllustrationCardWrapper>
         {svg}
         <Span>
-          <H4 color="off.400" pt={4} fontWeight={500} pb={2}>{text}</H4>
+          <H4 color="off.500" pt={4} fontWeight={500} pb={2}>{text}</H4>
           {children}
         </Span>
       </IllustrationCardWrapper>

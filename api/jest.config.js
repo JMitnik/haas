@@ -6,7 +6,7 @@ module.exports = {
         "^.+\\.(t|j)sx?$": "@swc/jest",
       },
       testEnvironment: "node",
-      setupFilesAfterEnv: [],
+      setupFilesAfterEnv: ['<rootDir>/src/test/globalSetup.ts'],
       testPathIgnorePatterns: ["<rootDir>/node_modules/"],
       moduleFileExtensions: ["ts", "js", "node"],
       testMatch: [

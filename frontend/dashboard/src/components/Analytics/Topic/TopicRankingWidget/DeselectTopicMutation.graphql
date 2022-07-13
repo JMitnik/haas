@@ -1,0 +1,3 @@
+mutation deselectTopic ($input: DeselectTopicInput) {
+	deselectTopic(input: $input)
+}
