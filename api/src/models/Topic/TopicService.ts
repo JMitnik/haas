@@ -1,19 +1,19 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 
-import { SessionWithEntries, TopicCount } from '../session/SessionTypes';
+import { SessionWithEntries } from '../session/Session.types';
 import SessionService from '../session/SessionService';
 import { CustomerService as WorkspaceService } from '../customer/CustomerService';
-import { TopicFilterInput } from './Topic.types';
+import { TopicFilterInput, TopicByString } from './Topic.types';
 import { NexusGenInputs } from 'generated/nexus';
 import DialogueService from '../../models/questionnaire/DialogueService';
 import QuestionNodePrismaAdapter from '../../models/QuestionNode/QuestionNodePrismaAdapter';
 
 export class TopicService {
-  prisma: PrismaClient;
-  sessionService: SessionService;
-  workspaceService: WorkspaceService;
-  dialogueService: DialogueService;
-  questionNodePrismaAdapter: QuestionNodePrismaAdapter;
+  private prisma: PrismaClient;
+  private sessionService: SessionService;
+  private workspaceService: WorkspaceService;
+  private dialogueService: DialogueService;
+  private questionNodePrismaAdapter: QuestionNodePrismaAdapter;
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
@@ -25,8 +25,8 @@ export class TopicService {
 
   /**
    * Loop over all dialogues in a workspace and deselect the question options matching the topic name
-   * @param input 
-   * @returns boolean 
+   * @param input
+   * @returns boolean
    */
   deselectTopic = async (input: NexusGenInputs['DeselectTopicInput']) => {
     const dialoguesIds = await this.dialogueService.findDialogueIdsByCustomerId(input.workspaceId);
@@ -47,7 +47,7 @@ export class TopicService {
     return true;
   }
 
-  buildSessionFilter(topicFilter?: TopicFilterInput): Prisma.SessionWhereInput {
+  public buildSessionFilter(topicFilter?: TopicFilterInput): Prisma.SessionWhereInput {
     let query: Prisma.SessionWhereInput = {};
 
     if (topicFilter?.topicStrings?.length) {
@@ -79,7 +79,7 @@ export class TopicService {
     startDate: Date,
     endDate: Date,
     topicFilter?: TopicFilterInput
-  ): Promise<Record<string, TopicCount>> {
+  ): Promise<TopicByString> {
     const dialogueIds = (
       await this.workspaceService.getDialogues(workspaceId, topicFilter?.dialogueStrings || undefined)
     ).map(dialogue => dialogue.id);
@@ -94,6 +94,15 @@ export class TopicService {
         nodeEntries: {
           include: {
             choiceNodeEntry: true,
+            formNodeEntry: {
+              include: {
+                values: {
+                  include: {
+                    relatedField: true,
+                  },
+                },
+              },
+            },
             relatedNode: {
               select: {
                 options: {
@@ -110,8 +119,8 @@ export class TopicService {
     ) as unknown as SessionWithEntries[];
 
     // Calculate all the candidate topic-counts.
-    const topicCounts = this.sessionService.countTopicsFromSessions(sessions);
+    const topicByStatistics = this.sessionService.extractTopics(sessions);
 
-    return topicCounts;
+    return topicByStatistics;
   }
 }

@@ -1,15 +1,7 @@
 import * as UI from '@haas/ui';
 import { AnimatePresence, AnimateSharedLayout, motion } from 'framer-motion';
-import {
-  GradientLightgreenGreen,
-  GradientOrangeRed,
-  GradientPinkRed,
-  GradientSteelPurple,
-  LinearGradient,
-} from '@visx/gradient';
 import { Group } from '@visx/group';
-import { MapPin, Minus } from 'react-feather';
-import { PatternCircles } from '@visx/pattern';
+import { MapPin, Minus, Plus } from 'react-feather';
 import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { TooltipWithBounds, useTooltip } from '@visx/tooltip';
 import { localPoint } from '@visx/event';
@@ -28,13 +20,11 @@ import { TooltipBody } from './TooltipBody';
 interface HexagonGridProps {
   stateKey: string;
   nodes: HexagonNode[];
-  isAtRoot: boolean;
   onHexClick: (zoomHelper: ProvidedZoom<SVGElement>, node: HexagonNode) => void;
   width: number;
   height: number;
   zoom: ZoomProps;
   backgroundColor: string;
-  onGoBack: () => void;
   useBackgroundPattern: boolean;
   children?: React.ReactNode;
 }
@@ -78,8 +68,6 @@ export const HexagonGrid = ({
   zoom,
   backgroundColor,
   useBackgroundPattern = false,
-  isAtRoot = false,
-  onGoBack,
   children,
 }: HexagonGridProps) => {
   const { t } = useTranslation();
@@ -90,7 +78,8 @@ export const HexagonGrid = ({
     },
   });
 
-  const [openGoBackTooltip, setOpenGoBackTooltip] = useState(false);
+  const [openZoomOutTooltip, setOpenZoomOutTooltip] = useState(false);
+  const [openZoomInTooltip, setOpenZoomInTooltip] = useState(false);
   const [openCenterHexagonTooltip, setOpenCenterHexagonTooltip] = useState(false);
 
   const {
@@ -128,20 +117,11 @@ export const HexagonGrid = ({
         width={width}
         height={height}
         style={{
-          cursor: zoom.isDragging ? 'grabbing' : 'grab',
           touchAction: 'none',
           borderRadius: '10px',
           border: '1px solid #D6DCF2',
         }}
-        // @ts-ignore
-        ref={zoom.containerRef}
       >
-        <PatternCircles id="circles" height={6} width={6} stroke="black" strokeWidth={1} />
-        <GradientOrangeRed id="dots-orange" />
-        <GradientPinkRed id="dots-pink" />
-        <GradientSteelPurple id="dots-gray" />
-        <LinearGradient id="grays" from="#757F9A" to="#939bb1" />
-        <GradientLightgreenGreen id="dots-green" />
         <rect width={width} height={height} fill={backgroundColor} stroke={backgroundColor} />
 
         {useBackgroundPattern && (
@@ -166,26 +146,6 @@ export const HexagonGrid = ({
             />
           </>
         )}
-        <rect
-          width={width}
-          height={height}
-          rx={14}
-          fill="transparent"
-          onTouchStart={zoom.dragStart}
-          onTouchMove={zoom.dragMove}
-          onTouchEnd={zoom.dragEnd}
-          onMouseDown={zoom.dragStart}
-          onMouseMove={zoom.dragMove}
-          onMouseUp={zoom.dragEnd}
-          onMouseLeave={() => {
-            // @ts-ignore
-            if (zoom.isDragging) zoom.dragEnd();
-          }}
-          onDoubleClick={() => {
-            zoom.scale({ scaleX: 1.1, scaleY: 1.1 });
-          }}
-        />
-
         <motion.g
           initial={{ transform: 'matrix(1, 0, 0, 1, 0, 0', opacity: 0 }}
           style={{ transform: 'matrix(1, 0, 0, 1, 0, 0' }}
@@ -231,26 +191,44 @@ export const HexagonGrid = ({
 
       {children}
 
-      <UI.Div display="flex" flexDirection="column" position="absolute" right={24} top="40%">
-        <Tooltip.Root delayDuration={300} open={openGoBackTooltip} onOpenChange={setOpenGoBackTooltip}>
-          <Tooltip.Trigger>
-            <LS.ControlButton onClick={onGoBack} aria-disabled={isAtRoot}>
+      <UI.Div display="flex" flexDirection="column" position="absolute" right={24} bottom={24}>
+
+        <Tooltip.Root delayDuration={300} open={openZoomOutTooltip} onOpenChange={setOpenZoomOutTooltip}>
+          <Tooltip.Trigger asChild>
+            <LS.ControlButton onClick={() => zoom.scale({ scaleX: 0.8, scaleY: 0.8 })}>
               <UI.Icon>
                 <Minus />
               </UI.Icon>
             </LS.ControlButton>
           </Tooltip.Trigger>
-          <Tooltip.Content isOpen={openGoBackTooltip}>
+          <Tooltip.Content isOpen={openZoomOutTooltip}>
             <UI.Div position="relative">
               <UI.Card padding={1} backgroundColor="white">
-                <UI.Span color="off.600">{t('go_up_one_layer')}</UI.Span>
+                <UI.Span color="off.600">{t('zoom_out')}</UI.Span>
+              </UI.Card>
+            </UI.Div>
+          </Tooltip.Content>
+        </Tooltip.Root>
+
+        <Tooltip.Root delayDuration={300} open={openZoomInTooltip} onOpenChange={setOpenZoomInTooltip}>
+          <Tooltip.Trigger asChild>
+            <LS.ControlButton mt={2} onClick={() => zoom.scale({ scaleX: 1.2, scaleY: 1.2 })}>
+              <UI.Icon>
+                <Plus />
+              </UI.Icon>
+            </LS.ControlButton>
+          </Tooltip.Trigger>
+          <Tooltip.Content isOpen={openZoomInTooltip}>
+            <UI.Div position="relative">
+              <UI.Card padding={1} backgroundColor="white">
+                <UI.Span color="off.600">{t('zoom_in')}</UI.Span>
               </UI.Card>
             </UI.Div>
           </Tooltip.Content>
         </Tooltip.Root>
 
         <Tooltip.Root delayDuration={300} open={openCenterHexagonTooltip} onOpenChange={setOpenCenterHexagonTooltip}>
-          <Tooltip.Trigger>
+          <Tooltip.Trigger asChild>
             <LS.ControlButton onClick={() => zoom.reset()} mt={2}>
               <UI.Icon>
                 <MapPin />

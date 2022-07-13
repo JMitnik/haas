@@ -1,4 +1,11 @@
-import { NodeEntry, QuestionNode, SliderNodeEntry, ChoiceNodeEntry, RegistrationNodeEntry, TextboxNodeEntry, LinkNodeEntry, Prisma } from '@prisma/client';
+import {
+  NodeEntry,
+  SliderNodeEntry,
+  ChoiceNodeEntry,
+  Prisma,
+  FormNodeEntry,
+  FormNodeFieldEntryData,
+} from '@prisma/client';
 
 const question = Prisma.validator<Prisma.QuestionNodeArgs>()({
   include: {
@@ -7,7 +14,6 @@ const question = Prisma.validator<Prisma.QuestionNodeArgs>()({
 });
 
 export type NodeWithOptions = Prisma.QuestionNodeGetPayload<typeof question>;
-
 export interface NodeEntryWithTypes extends NodeEntry {
   session?: {
     id: String;
@@ -16,4 +22,7 @@ export interface NodeEntryWithTypes extends NodeEntry {
   relatedNode?: NodeWithOptions | null;
   sliderNodeEntry: SliderNodeEntry | null;
   choiceNodeEntry: ChoiceNodeEntry | null;
+  formNodeEntry: FormNodeEntry & {
+    values: FormNodeFieldEntryData[];
+  } | null;
 }

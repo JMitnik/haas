@@ -1,9 +1,0 @@
-{
-    "packages": [
-        "api",
-        "frontend/UI",
-        "frontend/dashboard"
-    ],
-    "version": "0.0.0",
-    "useWorkspaces": "true"
-  }

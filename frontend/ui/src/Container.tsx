@@ -36,8 +36,8 @@ export const Container = styled(Div)<ContainerProps>`
   ${({ theme }) => css`
     position: relative;
     margin: 0 auto;
-    width: ${theme.containerWidth}px;
-    max-width: 100%;
+    max-width: ${theme.containerWidth}px;
+    width: 100%;
 
     ${color}
     ${space}

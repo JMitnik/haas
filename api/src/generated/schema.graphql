@@ -517,6 +517,7 @@ type Customer {
   dialogueConnection(filter: DialogueConnectionFilterInput): DialogueConnection
   dialogues(filter: DialogueFilterInputType): [Dialogue!]
   id: ID!
+  issues(filter: IssueFilterInput): [Issue!]
   name: String!
   nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!] @deprecated(reason: "Deprecated, see statistics")
   nestedHealthScore(input: HealthScoreInput): HealthScore @deprecated(reason: "Deprectaed, see statistics")
@@ -524,6 +525,7 @@ type Customer {
   nestedMostPopular(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
   nestedMostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
   roles: [RoleType!]
+  sessionConnection(filter: SessionConnectionFilterInput): SessionConnection
   settings: CustomerSettings
   slug: String!
 
@@ -560,6 +562,28 @@ type CustomFieldType {
 
 """Date custom scalar type"""
 scalar Date
+
+"""
+A histogram contains a list of entries sorted typically by date, along with their frequency.
+"""
+type DateHistogram {
+  id: ID!
+  items: [DateHistogramItem!]!
+}
+
+"""A histogram item contains a date"""
+type DateHistogramItem {
+  date: Date!
+  frequency: Int!
+  id: ID!
+}
+
+"""
+
+    A date-string follows format "dd-MM-yyyy HH:mm", "dd-MM-yyyy" or ISO format, and is resolved to a relevant Date object.
+  
+"""
+scalar DateString
 
 input DeleteDialogueInputType {
   customerSlug: String
@@ -762,10 +786,6 @@ enum DialogueImpactScoreType {
   AVERAGE
 }
 
-input DialogueLinksInput {
-  workspaceId: String
-}
-
 type DialogueStatistics {
   history: [lineChartDataType!]
   mostPopularPath: topPathType
@@ -889,7 +909,7 @@ input FormNodeEntryInput {
 }
 
 type FormNodeEntryType {
-  id: Int!
+  id: Int
   values: [FormNodeEntryValueType!]!
 }
 
@@ -1035,6 +1055,37 @@ input InviteUserInput {
 type InviteUserOutput {
   didAlreadyExist: Boolean!
   didInvite: Boolean!
+}
+
+"""
+
+    An issue is a problem that has been identified.
+
+    Typically, an issue is a combination of a particulat topic and a specific dialogue.
+  
+"""
+type Issue {
+  """Number of actions required"""
+  actionRequiredCount: Int
+  basicStats: BasicStatistics!
+  createdAt: Date!
+  dialogue: Dialogue
+  dialogueId: String!
+  followUpAction: SessionActionType
+  history: DateHistogram!
+  id: ID!
+  rankScore: Float!
+  status: StatusType!
+  topic: String!
+  updatedAt: Date!
+}
+
+"""Filter input for Issues"""
+input IssueFilterInput {
+  dialogueStrings: [String!]
+  endDate: String
+  startDate: String
+  topicStrings: [String!]
 }
 
 type JobObjectType {
@@ -1214,6 +1265,7 @@ type Mutation {
   removePixelRange(input: RemovePixelRangeInput): AWSImageType
   requestInvite(input: RequestInviteInput): RequestInviteOutput!
   retryAutodeckJob(jobId: String): CreateWorkspaceJobType
+  sandbox(input: SandboxInput): String!
   setDialoguePrivacy(input: SetDialoguePrivacyInput): Dialogue
   singleUpload(file: Upload): ImageType!
   updateAutomation(input: CreateAutomationInput): AutomationModel!
@@ -1356,6 +1408,7 @@ type Path {
 
 input PathedSessionsInput {
   endDateTime: String
+  issueOnly: Boolean
   path: [String!]!
   refresh: Boolean = false
   startDateTime: String!
@@ -1398,6 +1451,12 @@ type PreviewDataType {
   websiteScreenshotUrl: String!
 }
 
+type PublicDialogueConnection implements ConnectionInterface {
+  dialogues: [PublicDialogueInfo!]!
+  pageInfo: PaginationPageInfo!
+  totalPages: Int
+}
+
 type PublicDialogueInfo {
   description: String
   slug: String!
@@ -1412,7 +1471,7 @@ type Query {
   customers: [Customer!]!
   delivery(deliveryId: String): DeliveryType
   dialogue(where: DialogueWhereUniqueInput): Dialogue
-  dialogueLinks(input: DialogueLinksInput): [PublicDialogueInfo!]
+  dialogueLinks(filter: DialogueConnectionFilterInput, workspaceId: String): PublicDialogueConnection
   dialogues(filter: DialogueFilterInputType): [Dialogue!]!
   edge(id: String): Edge
   getAdjustedLogo(input: AdjustedImageInput): AWSImageType
@@ -1617,13 +1676,21 @@ type RoleType {
   roleId: String
 }
 
+input SandboxInput {
+  name: String
+  onlyGet: Boolean
+  value: Int
+}
+
 type Session {
   browser: String!
   createdAt: Date!
   delivery: DeliveryType
   deliveryId: String
   device: String
+  dialogue: Dialogue
   dialogueId: String!
+  followUpAction: FormNodeEntryType
   id: ID!
   mainScore: Float!
   nodeEntries: [NodeEntry!]!
@@ -1631,6 +1698,11 @@ type Session {
   paths: Int!
   score: Float!
   totalTimeInSec: Int
+}
+
+"""Actions expected after session"""
+enum SessionActionType {
+  CONTACT
 }
 
 type SessionConnection implements ConnectionInterface {
@@ -1642,18 +1714,21 @@ type SessionConnection implements ConnectionInterface {
 input SessionConnectionFilterInput {
   campaignVariantId: String
   deliveryType: SessionDeliveryType
-  endDate: String
+  dialogueIds: [String!]
+  endDate: DateString
   offset: Int
   orderBy: SessionConnectionOrderByInput
   perPage: Int = 10
   scoreRange: SessionScoreRangeFilter
   search: String
-  startDate: String
+  startDate: DateString
+  withFollowUpAction: Boolean
 }
 
 """Fields to order SessionConnection by."""
 enum SessionConnectionOrder {
   createdAt
+  dialogueId
 }
 
 """Sorting of sessionConnection"""
@@ -1757,6 +1832,13 @@ type SliderNodeType {
 """Details regarding interaction with social node"""
 input SocialNodeEntryInput {
   visitedLink: String
+}
+
+"""A status is a label that indicates the current state of a process."""
+enum StatusType {
+  CLOSED
+  IN_PROGRESS
+  OPEN
 }
 
 enum SystemPermission {
@@ -2106,10 +2188,5 @@ type WorkspaceStatistics {
   Topics of a workspace ranked by either impact score or number of responses
   """
   rankedTopics(input: DialogueStatisticsSummaryFilterInput): [TopicType!]!
-
-  """
-  Returns potentially the most urgent path of the workspace (one at most)
-  """
-  urgentPath(input: DialogueStatisticsSummaryFilterInput): UrgentPath
   workspaceStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!]
 }

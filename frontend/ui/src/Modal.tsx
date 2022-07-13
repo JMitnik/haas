@@ -5,9 +5,13 @@ import { Div } from './Generics';
 
 export const ModalTitle = styled(Paragraph)``;
 
-export const ModalBody = styled(Div)`
-  ${({ theme }) => css`
-    padding: ${theme.gutter * 1.5}px;
+interface ModalBodyProps {
+  noPadding?: boolean;
+}
+
+export const ModalBody = styled(Div)<ModalBodyProps>`
+  ${({ theme, noPadding }) => css`
+    padding: ${noPadding ? 0 : `${theme.gutter * 1.5}px`};
   `}
 `;
 

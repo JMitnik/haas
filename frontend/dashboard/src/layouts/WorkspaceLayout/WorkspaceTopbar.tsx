@@ -11,16 +11,29 @@ import { TopbarHamburger } from './TopbarHamburger';
 import { WorkspaceNav } from './WorkspaceNav';
 import { WorkspaceSwitcher, WorkspaceSwitcherContainer } from './WorkspaceSwitcher';
 
-export const TopbarContainer = styled(UI.Div)`
-  ${({ theme }) => css`
+interface TopbarContainerProps {
+  maxHeight?: number;
+}
+
+export const TopbarContainer = styled(UI.Div)<TopbarContainerProps>`
+  ${({ theme, maxHeight = 60 }) => css`
     padding: 0;
     background: ${theme.colors.app.topbar};
     border-bottom: 1px solid ${theme.colors.gray[100]};
     width: 100%;
 
+    ${maxHeight && css`
+      max-height: ${maxHeight}px;
+    `}
+
     ${LogoContainer} {
       color: ${theme.colors.off[600]};
+
+      ${maxHeight && css`
+        max-height: ${maxHeight}px;
+      `}
     }
+
 
     ${LogoContainer} {
       color: ${theme.colors.off[500]};
@@ -143,6 +156,23 @@ export const TopbarContainer = styled(UI.Div)`
       }
     }
 
+    ${WorkspaceSwitcherContainer} {
+      p {
+        max-width: 175px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+
+      ${maxHeight && css`
+        max-height: ${maxHeight}px;
+        padding: 0 ${theme.gutter}px;
+        border-radius: ${theme.borderRadiuses.sm}px;
+        border-top: none;
+        border-right: none;
+      `}
+    }
+
     ${WorkspaceSwitcherContainer} ${UI.Icon} {
       margin-left: ${theme.gutter}px;
     }
@@ -158,7 +188,7 @@ const WorkspaceTopbar = ({ withNav }: WorkspaceTopbarProps) => {
 
   const { isSmall, isMedium } = useMediaDevice();
   return (
-    <TopbarContainer>
+    <TopbarContainer maxHeight={60}>
       <UI.Container>
         <UI.Flex justifyContent="space-between" alignItems="center" flexWrap="wrap">
           <UI.Div flexShrink={0}>
