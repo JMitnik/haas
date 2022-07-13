@@ -5,10 +5,10 @@ import {
   Edge,
   DialogueImpactScore,
 } from '@prisma/client';
+import { cloneDeep } from 'lodash';
 
 import { CreateDialogueInput, CreateQuestionsInput, UpsertDialogueStatisticsInput, UpsertDialogueTopicCacheInput } from './DialoguePrismaAdapterType';
-import { NexusGenInputs } from 'generated/nexus';
-import { cloneDeep } from 'lodash';
+import { NexusGenInputs } from '../../generated/nexus';
 import { DialogueConnectionFilterInput } from './Dialogue.types';
 
 
