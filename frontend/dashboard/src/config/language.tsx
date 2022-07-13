@@ -11,6 +11,10 @@ const language = {
     },
   },
   general: {
+    is_topic: {
+      en: 'Is a topic',
+      de: 'Ist ein Thema',
+    },
     dashboard_description: {
       en: 'See how your teams and people are doing.',
       de: 'See how your teams and people are doing.',

@@ -27,6 +27,7 @@ import { offsetPaginate } from '../general/PaginationHelpers';
 import config from '../../config/config';
 import { DialogueTemplateType } from '../QuestionNode/NodeServiceType';
 import TemplateService from '../templates/TemplateService';
+import { logger } from '../../config/logger';
 
 function getRandomIntFromInterval(min: number, max: number) { // min and max included
   return Math.floor(Math.random() * (max - min + 1) + min)
@@ -1090,7 +1091,7 @@ class DialogueService {
     }));
 
     // Get the top paths
-    const isPositiveEntries = _.groupBy(textAndScoreEntries, (entry) => entry.y && entry.y > 50);
+    const isPositiveEntries: any = _.groupBy(textAndScoreEntries, (entry) => entry.y && entry.y > 50);
     // @ts-ignore
     const topNegativePath = DialogueService.getTopNPaths(isPositiveEntries.false || [], 3, 'negative') || [];
     // @ts-ignore
@@ -1312,6 +1313,7 @@ class DialogueService {
     // Create edges
     const updatedTemplateEdges = templateDialogue?.edges.map((edge) => {
       const mappedConditions = edge.conditions.map((condition) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { id, edgeId, ...conditionData } = condition;
         const updateCondition = { ...conditionData };
         return updateCondition;
@@ -1353,8 +1355,7 @@ class DialogueService {
     };
 
     if (customers.length > 1) {
-      // TODO: Make this a logger or something
-      console.warn(`Multiple customers found with slug ${input.customerSlug}`);
+      logger.log(`Multiple customers found with slug ${input.customerSlug}`);
     };
 
     const customer = customers?.[0];

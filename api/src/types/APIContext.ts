@@ -23,10 +23,10 @@ import LinkService from '../models/link/LinkService';
 import { TopicService } from '../models/Topic/TopicService';
 import { RedisService } from '../models/general/cache/RedisService';
 import AutomationService from '../models/automations/AutomationService';
-import QuestionStatisticsService from 'models/QuestionNode/QuestionStatisticsService';
+import QuestionStatisticsService from '../models/QuestionNode/QuestionStatisticsService';
 import GenerateWorkspaceService from '../models/generate-workspace/GenerateWorkspaceService';
 import TemplateService from '../models/templates/TemplateService';
-import { IssueService } from 'models/Issue/IssueService';
+import { IssueService } from '../models/Issue/IssueService';
 
 export interface APIServiceContainer {
   issueService: IssueService;

@@ -1,5 +1,4 @@
 import { mutationField, inputObjectType } from '@nexus/schema';
-import { ConditionDialogueScopeInput } from 'models/automations';
 
 export const SandboxInput = inputObjectType({
   name: 'SandboxInput',

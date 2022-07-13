@@ -51,6 +51,7 @@ const QuestionFragment = gql`
         value
         publicValue
         position
+        isTopic
         overrideLeaf {
           id
           title

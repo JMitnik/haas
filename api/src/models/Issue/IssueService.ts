@@ -1,9 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import { orderBy } from 'lodash';
-
 import { isPresent } from 'ts-is-present';
-import { Nullable } from 'types/generic';
 
+import { Nullable } from '../../types/generic';
 import { convertDatesToHistogramItems } from '../Common/Analytics/Analytics.helpers';
 import { TopicByString, TopicFilterInput, TopicStatistics, TopicStatisticsByDialogueId } from '../Topic/Topic.types';
 import { TopicService } from '../Topic/TopicService';
