@@ -48,21 +48,23 @@ class GenerateWorkspaceService {
    * @returns 
    */
   resetWorkspaceData = async (workspaceId: string) => {
-    try {
-      // Find all sessions
-      const sessions = await this.sessionPrismaAdapter.findCustomerSessions(workspaceId);
-      const sessionIds = sessions.map((session) => session.id);
-      await this.sessionPrismaAdapter.deleteMany(sessionIds);
+    const workspace = await this.customerService.findWorkspaceById(workspaceId);
 
-      const dialogues = await this.dialogueService.findDialoguesByCustomerId(workspaceId);
-      for (const dialogue of dialogues) {
-        const template = this.templateService.findTemplate(dialogue.template as DialogueTemplateType);
-        await this.dialogueService.massGenerateFakeData(
-          dialogue.id, template, 1, true, 5, 70, 80
-        );
-      }
-    } catch (e) {
-      return false;
+    if (!workspace?.isDemo) {
+      throw new ApolloError('Workpace is not a demo workspace! Abort reset.');
+    };
+
+    // Find all sessions
+    const sessions = await this.sessionPrismaAdapter.findCustomerSessions(workspaceId);
+    const sessionIds = sessions.map((session) => session.id);
+    await this.sessionPrismaAdapter.deleteMany(sessionIds);
+
+    const dialogues = await this.dialogueService.findDialoguesByCustomerId(workspaceId);
+    for (const dialogue of dialogues) {
+      const template = this.templateService.findTemplate(dialogue.template as DialogueTemplateType);
+      await this.dialogueService.massGenerateFakeData(
+        dialogue.id, template, 1, true, 5, 70, 80
+      );
     }
 
     return true;
