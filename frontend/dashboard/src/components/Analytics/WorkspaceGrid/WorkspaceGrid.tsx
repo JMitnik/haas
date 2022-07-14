@@ -333,16 +333,16 @@ export const WorkspaceGrid = ({
   // Various stats fields
   const health = summary?.health;
 
-  const [resetWorkspaceData, { loading: resetLoading }] = useResetWorkspaceDataMutation({
-    variables: {
-      workspaceId: activeCustomer?.id as string,
-    },
-    refetchQueries: ['GetWorkspaceDialogueStatistics', 'GetWorkspaceLayoutDetails'],
-    onCompleted: () => {
-      resetWorkspaceGrid();
-      toast.success({ title: 'Workspace data successfully resetted' });
-    },
-  });
+  // const [resetWorkspaceData, { loading: resetLoading }] = useResetWorkspaceDataMutation({
+  //   variables: {
+  //     workspaceId: activeCustomer?.id as string,
+  //   },
+  //   refetchQueries: ['GetWorkspaceDialogueStatistics', 'GetWorkspaceLayoutDetails'],
+  //   onCompleted: () => {
+  //     resetWorkspaceGrid();
+  //     toast.success({ title: 'Workspace data successfully resetted' });
+  //   },
+  // });
 
   return (
     <LS.WorkspaceGridContainer backgroundColor={backgroundColor}>
@@ -370,7 +370,7 @@ export const WorkspaceGrid = ({
                   endDate={endDate}
                   onChange={setDateRange}
                 />
-                {data?.customer?.isDemo && canResetWorkspaceData && (
+                {/* {data?.customer?.isDemo && canResetWorkspaceData && (
                   <LS.ResetDataCard onClick={() => resetWorkspaceData()} ml={2}>
                     <UI.Flex alignItems="center">
                       <UI.Div mr={1}>
@@ -390,7 +390,7 @@ export const WorkspaceGrid = ({
                     </UI.Flex>
 
                   </LS.ResetDataCard>
-                )}
+                )} */}
 
               </UI.Flex>
             </UI.Div>
