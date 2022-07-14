@@ -7,6 +7,7 @@ import * as InteractionAPI from '../models/session/graphql';
 import * as NodeEntryAPI from '../models/node-entry/NodeEntry';
 import * as PaginationAPI from '../models/general/Pagination';
 import * as SandboxAPI from '../models/Common/Sandbox/graphql/SandboxMutation.graphql';
+import * as OrganizationAPI from '../models/Organization/graphql';
 import * as QuestionNodeAPI from '../models/QuestionNode';
 import * as DateAPI from '../models/Common/Date/graphql';
 import * as IssueAPI from '../models/Issue/graphql';
@@ -26,10 +27,9 @@ import * as RoleAPI from '../models/role';
 import tagNexus from '../models/tag/Tag';
 import triggerNexus from '../models/trigger/Trigger';
 import uploadNexus from '../models/link/graphql/UploadUpsellFileResolver';
-import * as organizationAPI from '../models/organization/graphql/index';
 
 const nexus = [
-  ...Array(organizationAPI),
+  ...Array(OrganizationAPI),
   ...Array(CommonAnalyticsAPI),
   ...Array(DateAPI),
   ...Array(CommonStatusAPI),

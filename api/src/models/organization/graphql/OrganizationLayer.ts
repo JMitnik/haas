@@ -1,4 +1,5 @@
 import { objectType } from '@nexus/schema';
+
 import { OrganizationLayerType } from './OrganizationLayerType';
 
 export const OrganizationLayer = objectType({

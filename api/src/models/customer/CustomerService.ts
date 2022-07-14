@@ -5,7 +5,7 @@ import cuid from 'cuid';
 import { addDays, subDays } from 'date-fns';
 import { isPresent } from 'ts-is-present';
 
-import { NexusGenEnums, NexusGenInputs } from '../../generated/nexus';
+import { NexusGenInputs } from '../../generated/nexus';
 import DialogueService from '../questionnaire/DialogueService';
 import NodeService from '../QuestionNode/NodeService';
 import defaultWorkspaceTemplate, { defaultMassSeedTemplate } from '../templates/defaultWorkspaceTemplate';
@@ -154,7 +154,7 @@ export class CustomerService {
           return previousValue;
         }
       }, {
-      prevData: [] as ({
+        prevData: [] as ({
         sessionId: string;
         dialogueId: string;
         mainScore: number;
@@ -171,7 +171,7 @@ export class CustomerService {
         }) | undefined;
         prev: boolean;
       })[],
-    });
+      });
 
     const prevDataGroupedOptions = groupBy(splittedSessions.prevData, (session) => {
       return `${session.dialogueId}_${session.entry?.choiceNodeEntry?.value}`;

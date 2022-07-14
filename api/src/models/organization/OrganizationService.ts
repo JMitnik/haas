@@ -2,68 +2,43 @@ import { PrismaClient } from '@prisma/client';
 import { maxBy } from 'lodash';
 
 import CustomerService from '../customer/CustomerService';
-import { NexusGenEnums } from '../../generated/nexus';
+import { makeLayer } from './Organization.helpers';
+import { OrganizationLayer, OrganizationLayerTypeEnum } from './Organization.types';
 
-enum OrganizationLayerType {
-  GROUP = 'GROUP',
-  DIALOGUE = 'DIALOGUE',
-  INTERACTION = 'INTERACTION',
-}
-
-interface OrganizationLayer { id: string; depth: number; type: NexusGenEnums['OrganizationLayerType'] }
-
-class OrganizationService {
-  customerService: CustomerService;
+export class OrganizationService {
+  private workspaceService: CustomerService;
 
   constructor(prismaClient: PrismaClient) {
-    this.customerService = new CustomerService(prismaClient);
+    this.workspaceService = new CustomerService(prismaClient);
   };
 
-  getOrganizationLayers = async (workspaceId: string) => {
-    // Every organization consits at least of a dialogue and interaction layer
-    const layers: OrganizationLayer[] = [
-      {
-        id: `${workspaceId}-0-${OrganizationLayerType.DIALOGUE}`,
-        depth: 0,
-        type: OrganizationLayerType.DIALOGUE,
-      },
-      {
-        id: `${workspaceId}-1-${OrganizationLayerType.INTERACTION}`,
-        depth: 1,
-        type: OrganizationLayerType.INTERACTION,
-      },
-    ];
-
-    const dialogues = await this.customerService.getDialogues(workspaceId);
-    const dialogueTitles = dialogues.map((dialogue) => {
-      return dialogue.title.split('-');
-    });
+  /**
+   * Gets all organization layers: this starts with GROUPS => DIALOGUE/TEAM => INTERACTION
+   * @param workspaceId
+   * @returns
+   */
+  public async getOrganizationLayers(workspaceId: string): Promise<OrganizationLayer[]> {
+    const dialogues = await this.workspaceService.getDialogues(workspaceId);
+    const dialogueTitles = dialogues.map((dialogue) => dialogue.title.split('-'));
 
     // Find the dialogue with the most amount of layers
-    const deepestLayers = maxBy(dialogueTitles, (splittedTitle) => splittedTitle.length) as string[];
+    const deepestLayers = maxBy(dialogueTitles,  (splittedTitle) => splittedTitle.length) as string[];
 
-    if (!deepestLayers.length) return layers;
+    // Every organization consists at least of a dialogue and interaction layer.
+    if (!deepestLayers.length) return [
+      makeLayer(workspaceId, 0, OrganizationLayerTypeEnum.DIALOGUE),
+      makeLayer(workspaceId, 1, OrganizationLayerTypeEnum.INTERACTION),
+    ];
 
-    // Substract with 1 as the last entry of the dialogue title is considered a dialogue and not a group
-    const groupLayers: OrganizationLayer[] = [...Array(deepestLayers.length - 1)].map(
-      () => ({
-        id: '-1',
-        depth: -1,
-        type: OrganizationLayerType.GROUP,
-      }));
+    const layers: OrganizationLayer[] = [
+      // Fill starting layers with groups
+      ...Array(deepestLayers.length - 1).map((depth) => makeLayer(workspaceId, depth, OrganizationLayerTypeEnum.GROUP)),
+      // Then add dialogue
+      makeLayer(workspaceId, deepestLayers.length, OrganizationLayerTypeEnum.DIALOGUE),
+      // Then add interaction
+      makeLayer(workspaceId, deepestLayers.length + 1, OrganizationLayerTypeEnum.GROUP),
+    ];
 
-    layers.unshift(...groupLayers);
-
-    const finalLayers: OrganizationLayer[] = layers.map((layer, index) => ({
-      id: `${workspaceId}-${index}-${layer.type}`,
-      depth: index,
-      type: layer.type,
-    }));
-
-    return finalLayers;
+    return layers;
   }
-
-
 };
-
-export default OrganizationService;

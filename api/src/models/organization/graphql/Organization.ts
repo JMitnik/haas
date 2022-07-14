@@ -1,15 +1,19 @@
 import { objectType } from '@nexus/schema';
 import { UserInputError } from 'apollo-server-express';
+
 import { OrganizationLayer } from './OrganizationLayer';
 
 export const Organization = objectType({
   name: 'Organization',
+  description: `
+    An Organization defines the underlying members structure of a workspace, corresponding to an org-chart.
+  `,
+
   definition(t) {
     t.id('id', {
-      resolve(parent, args, ctx, info) {
-        return `ORG-${info.variableValues.workspaceId}`
-      },
-    })
+      resolve: (parent, args, ctx, info) => `ORG-${info.variableValues.workspaceId}`,
+    });
+
     t.list.field('layers', {
       type: OrganizationLayer,
       nullable: true,
