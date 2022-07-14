@@ -36,6 +36,8 @@ export const CustomerType = objectType({
     t.string('slug');
     t.string('name');
 
+    t.boolean('isDemo');
+
     t.field('settings', {
       type: CustomerSettingsType,
       nullable: true,

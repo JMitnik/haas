@@ -1,5 +1,5 @@
 import * as UI from '@haas/ui';
-import { AlertTriangle, MessageCircle, User } from 'react-feather';
+import { AlertTriangle, Aperture, MessageCircle, User } from 'react-feather';
 import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { Zoom } from '@visx/zoom';
 import { sumBy } from 'lodash';
@@ -10,13 +10,18 @@ import useMeasure from 'react-use-measure';
 import * as Modal from 'components/Common/Modal';
 import { DateFormat, useDate } from 'hooks/useDate';
 import { DatePicker } from 'components/Common/DatePicker';
-import { DialogueImpactScoreType, useGetIssuesQuery, useGetWorkspaceSummaryDetailsQuery } from 'types/generated-types';
+import {
+  DialogueImpactScoreType,
+  useGetIssuesQuery,
+  useGetWorkspaceSummaryDetailsQuery,
+  useResetWorkspaceDataMutation,
+} from 'types/generated-types';
 import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModalCard';
 import { SimpleIssueTable } from 'components/Analytics/Issues/SimpleIssueTable';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useNavigator } from 'hooks/useNavigator';
+import { useToast } from 'hooks/useToast';
 
-import { endOfDay, startOfDay } from 'date-fns';
 import * as LS from './WorkspaceGrid.styles';
 import { BreadCrumb } from './BreadCrumb';
 import {
@@ -39,6 +44,8 @@ import {
   findDialoguesInGroup,
   reconstructHistoryStack,
 } from './WorkspaceGrid.helpers';
+import { endOfDay, startOfDay } from 'date-fns';
+import useAuth from 'hooks/useAuth';
 
 export interface DataLoadOptions {
   dialogueId?: string;
@@ -72,6 +79,8 @@ export const WorkspaceGrid = ({
   const { format } = useDate();
   const { goToWorkspaceFeedbackOverview } = useNavigator();
   const { activeCustomer } = useCustomer();
+  const { canResetWorkspaceData } = useAuth();
+  const toast = useToast();
   const initialRef = React.useRef<HTMLDivElement>();
   const { t } = useTranslation();
   // Local loading
@@ -324,6 +333,17 @@ export const WorkspaceGrid = ({
   // Various stats fields
   const health = summary?.health;
 
+  const [resetWorkspaceData, { loading: resetLoading }] = useResetWorkspaceDataMutation({
+    variables: {
+      workspaceId: activeCustomer?.id as string,
+    },
+    refetchQueries: ['GetWorkspaceDialogueStatistics', 'GetWorkspaceLayoutDetails'],
+    onCompleted: () => {
+      resetWorkspaceGrid();
+      toast.success({ title: 'Workspace data successfully resetted' });
+    },
+  });
+
   return (
     <LS.WorkspaceGridContainer backgroundColor={backgroundColor}>
       {isLoading && (
@@ -343,14 +363,36 @@ export const WorkspaceGrid = ({
 
             <UI.Div>
               <UI.Helper>Filters</UI.Helper>
-              <UI.Div mt={1}>
+              <UI.Flex mt={1}>
                 <DatePicker
                   type="range"
                   startDate={startDate}
                   endDate={endDate}
                   onChange={setDateRange}
                 />
-              </UI.Div>
+                {data?.customer?.isDemo && canResetWorkspaceData && (
+                  <LS.ResetDataCard onClick={() => resetWorkspaceData()} ml={2}>
+                    <UI.Flex alignItems="center">
+                      <UI.Div mr={1}>
+                        {resetLoading && (
+                          <UI.Loader size={18} />
+                        )}
+
+                        {!resetLoading && (
+                          <UI.Icon color="off.400">
+                            <Aperture width="18px" height="auto" />
+                          </UI.Icon>
+                        )}
+                      </UI.Div>
+                      <UI.Span>
+                        Reset Data
+                      </UI.Span>
+                    </UI.Flex>
+
+                  </LS.ResetDataCard>
+                )}
+
+              </UI.Flex>
             </UI.Div>
           </UI.Flex>
         </UI.Div>

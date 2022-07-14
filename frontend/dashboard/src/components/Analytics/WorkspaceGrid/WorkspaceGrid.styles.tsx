@@ -2,6 +2,23 @@ import * as UI from '@haas/ui';
 import { motion } from 'framer-motion';
 import styled, { css } from 'styled-components';
 
+export const ResetDataCard = styled(UI.Flex)`
+   ${({ theme }) => css`
+      cursor: pointer;
+      padding: 6px;
+      background-color: ${theme.colors.white};;
+      color: ${theme.colors.off[500]};
+      border: 1px solid ${theme.colors.neutral[400]};
+      border-radius: ${theme.borderRadiuses.md}px;
+      box-shadow: ${theme.boxShadows.md};
+
+      &:hover {
+        box-shadow: ${theme.boxShadows.lg};
+        transition: all ${theme.transitions.normal};
+      }
+   `}
+`;
+
 export const WorkspaceGridAdapterContainer = styled(UI.Div)``;
 
 export const WidgetHeader = styled(UI.Div)`

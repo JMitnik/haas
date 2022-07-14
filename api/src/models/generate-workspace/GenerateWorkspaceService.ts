@@ -63,7 +63,7 @@ class GenerateWorkspaceService {
     for (const dialogue of dialogues) {
       const template = this.templateService.findTemplate(dialogue.template as DialogueTemplateType);
       await this.dialogueService.massGenerateFakeData(
-        dialogue.id, template, 1, true, 5, 70, 80
+        dialogue.id, template, 1, true, 2, 70, 80
       );
     }
 
@@ -156,7 +156,7 @@ class GenerateWorkspaceService {
 
       // Generate data
       if (generateData) {
-        await this.dialogueService.massGenerateFakeData(dialogue.id, template, sessionsPerDay, true, 5, 70, 80);
+        await this.dialogueService.massGenerateFakeData(dialogue.id, template, sessionsPerDay, true, 2, 70, 80);
       }
     }
 
