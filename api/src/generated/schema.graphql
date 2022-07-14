@@ -458,6 +458,7 @@ input CreateTriggerInputType {
 
 """Creates a workspace"""
 input CreateWorkspaceInput {
+  isDemo: Boolean = false
   isSeed: Boolean = false
   logo: String
   logoOpacity: Int
@@ -1270,6 +1271,7 @@ type Mutation {
   register(input: RegisterInput): String
   removePixelRange(input: RemovePixelRangeInput): AWSImageType
   requestInvite(input: RequestInviteInput): RequestInviteOutput!
+  resetWorkspaceData(workspaceId: String): Boolean!
   retryAutodeckJob(jobId: String): CreateWorkspaceJobType
   sandbox(input: SandboxInput): String!
   setDialoguePrivacy(input: SetDialoguePrivacyInput): Dialogue

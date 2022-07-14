@@ -226,6 +226,7 @@ export interface NexusGenInputs {
     trigger?: NexusGenInputs['TriggerInputType'] | null; // TriggerInputType
   }
   CreateWorkspaceInput: { // input type
+    isDemo?: boolean | null; // Boolean
     isSeed?: boolean | null; // Boolean
     logo?: string | null; // String
     logoOpacity?: number | null; // Int
@@ -732,7 +733,7 @@ export interface NexusGenEnums {
   DialogueAspectType: "GENERAL_SCORE" | "LATEST_SCORE" | "NR_INTERACTIONS" | "NR_VISITORS"
   DialogueConnectionOrder: "createdAt"
   DialogueImpactScoreType: "AVERAGE"
-  DialogueTemplateType: "BUSINESS_ENG" | "BUSINESS_NL" | "DEFAULT" | "MASS_SEED" | "SPORT_ENG" | "SPORT_NL"
+  DialogueTemplateType: prisma.DialogueTemplateType
   FormNodeFieldTypeEnum: "email" | "longText" | "number" | "phoneNumber" | "shortText" | "url"
   JobProcessLocationType: prisma.JobProcessLocationType
   JobStatusType: prisma.JobStatusType
@@ -1957,6 +1958,7 @@ export interface NexusGenFieldTypes {
     register: string | null; // String
     removePixelRange: NexusGenRootTypes['AWSImageType'] | null; // AWSImageType
     requestInvite: NexusGenRootTypes['RequestInviteOutput']; // RequestInviteOutput!
+    resetWorkspaceData: boolean; // Boolean!
     retryAutodeckJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
     sandbox: string; // String!
     setDialoguePrivacy: NexusGenRootTypes['Dialogue'] | null; // Dialogue
@@ -2548,6 +2550,9 @@ export interface NexusGenArgTypes {
     }
     requestInvite: { // args
       input?: NexusGenInputs['RequestInviteInput'] | null; // RequestInviteInput
+    }
+    resetWorkspaceData: { // args
+      workspaceId?: string | null; // String
     }
     retryAutodeckJob: { // args
       jobId?: string | null; // String

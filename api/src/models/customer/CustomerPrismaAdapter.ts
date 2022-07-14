@@ -246,6 +246,7 @@ export class CustomerPrismaAdapter {
       data: {
         name: input.name,
         slug: input.slug,
+        isDemo: input.isDemo || undefined,
         tags: { create: template.tags },
         settings: {
           create: {
