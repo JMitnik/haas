@@ -1,4 +1,4 @@
-import { inputObjectType, objectType } from '@nexus/schema';
+import { inputObjectType, objectType } from 'nexus';
 import { TopicFilterInput } from '../../Topic/graphql';
 
 export const HealthScoreInput = inputObjectType({

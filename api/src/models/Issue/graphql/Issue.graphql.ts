@@ -1,4 +1,4 @@
-import { objectType } from '@nexus/schema';
+import { objectType } from 'nexus';
 
 import { StatusType } from '../../Common/Status/graphql';
 import { DateHistogram } from '../../Common/Analytics/graphql/DateHistogram.graphql';
@@ -23,7 +23,7 @@ export const Issue = objectType({
     t.string('topic');
 
     /** Each issue has an associated dialogue  */
-    t.string('dialogueId');
+    t.nonNull.string('dialogueId');
     t.field('dialogue', {
       type: Dialogue,
       nullable: true,

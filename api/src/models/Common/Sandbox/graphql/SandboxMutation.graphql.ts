@@ -1,4 +1,4 @@
-import { mutationField, inputObjectType } from '@nexus/schema';
+import { mutationField, inputObjectType } from 'nexus';
 
 export const SandboxInput = inputObjectType({
   name: 'SandboxInput',

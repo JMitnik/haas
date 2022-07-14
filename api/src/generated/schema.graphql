@@ -223,6 +223,15 @@ enum AutomationType {
   TRIGGER
 }
 
+"""Basic statistics for a general statistics"""
+type BasicStatistics {
+  """Average value of summarizable statistic"""
+  average: Float
+
+  """Number of responses"""
+  responseCount: Int
+}
+
 input CTALinkInputObjectType {
   backgroundColor: String
   buttonText: String
@@ -245,15 +254,6 @@ input CTAShareInputObjectType {
   title: String
   tooltip: String
   url: String
-}
-
-"""Basic statistics for a general statistics"""
-type BasicStatistics {
-  """Average value of summarizable statistic"""
-  average: Float!
-
-  """Number of responses"""
-  responseCount: Int!
 }
 
 """Campaign"""
@@ -521,19 +521,19 @@ type Customer {
   campaigns: [CampaignType]
   dialogue(where: DialogueWhereUniqueInput): Dialogue
   dialogueConnection(filter: DialogueConnectionFilterInput): DialogueConnection
-  dialogues(filter: DialogueFilterInputType): [Dialogue!]
-  id: ID!
-  issues(filter: IssueFilterInput): [Issue!]
-  name: String!
-  nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!] @deprecated(reason: "Deprecated, see statistics")
+  dialogues(filter: DialogueFilterInputType): [Dialogue]
+  id: ID
+  issues(filter: IssueFilterInput): [Issue]
+  name: String
+  nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel] @deprecated(reason: "Deprecated, see statistics")
   nestedHealthScore(input: HealthScoreInput): HealthScore @deprecated(reason: "Deprectaed, see statistics")
   nestedMostChanged(input: DialogueStatisticsSummaryFilterInput): MostChangedPath
   nestedMostPopular(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
   nestedMostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
-  roles: [RoleType!]
+  roles: [RoleType]
   sessionConnection(filter: SessionConnectionFilterInput): SessionConnection
   settings: CustomerSettings
-  slug: String!
+  slug: String
 
   """Workspace statistics"""
   statistics: WorkspaceStatistics
@@ -561,21 +561,21 @@ scalar Date
 A histogram contains a list of entries sorted typically by date, along with their frequency.
 """
 type DateHistogram {
-  id: ID!
-  items: [DateHistogramItem!]!
+  id: ID
+  items: [DateHistogramItem]
 }
 
 """A histogram item contains a date"""
 type DateHistogramItem {
-  date: Date!
-  frequency: Int!
-  id: ID!
+  date: Date
+  frequency: Int
+  id: ID
 }
 
 """
 
     A date-string follows format "dd-MM-yyyy HH:mm", "dd-MM-yyyy" or ISO format, and is resolved to a relevant Date object.
-
+  
 """
 scalar DateString
 
@@ -696,7 +696,7 @@ type Dialogue {
   customerId: String
   description: String!
   dialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): DialogueStatisticsSummaryModel
-  edges: [Edge!]!
+  edges: [Edge]
   healthScore(input: HealthScoreInput): HealthScore
   id: ID!
   isPrivate: Boolean
@@ -806,7 +806,7 @@ type DialogueStatisticsSummaryModel {
   impactScore: Float
   nrVotes: Int
   startDateTime: Date
-  title: String!
+  title: String
   updatedAt: Date
 }
 
@@ -904,7 +904,7 @@ input FormNodeEntryInput {
 
 type FormNodeEntryType {
   id: Int
-  values: [FormNodeEntryValueType!]!
+  values: [FormNodeEntryValueType]
 }
 
 type FormNodeEntryValueType {
@@ -1015,9 +1015,9 @@ input HandleUserStateInWorkspaceInput {
 }
 
 type HealthScore {
-  negativeResponseCount: Int!
-  nrVotes: Int!
-  score: Float!
+  negativeResponseCount: Int
+  nrVotes: Int
+  score: Float
 }
 
 input HealthScoreInput {
@@ -1056,22 +1056,22 @@ type InviteUserOutput {
     An issue is a problem that has been identified.
 
     Typically, an issue is a combination of a particulat topic and a specific dialogue.
-
+  
 """
 type Issue {
   """Number of actions required"""
   actionRequiredCount: Int
-  basicStats: BasicStatistics!
-  createdAt: Date!
+  basicStats: BasicStatistics
+  createdAt: Date
   dialogue: Dialogue
   dialogueId: String!
   followUpAction: SessionActionType
-  history: DateHistogram!
-  id: ID!
-  rankScore: Float!
-  status: StatusType!
-  topic: String!
-  updatedAt: Date!
+  history: DateHistogram
+  id: ID
+  rankScore: Float
+  status: StatusType
+  topic: String
+  updatedAt: Date
 }
 
 """Filter input for Issues"""
@@ -1081,6 +1081,11 @@ input IssueFilterInput {
   startDate: String
   topicStrings: [String!]
 }
+
+"""
+The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSONObject @specifiedBy(url: "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf")
 
 type JobObjectType {
   createWorkspaceJob: CreateWorkspaceJobType
@@ -1227,12 +1232,12 @@ type Mutation {
   deleteQuestion(input: DeleteNodeInputType): QuestionNode
   deleteTag(tagId: String): Tag
   deleteTrigger(customerSlug: String, id: String): TriggerType
-  deleteUser(input: DeleteUserInput): DeleteUserOutput!
+  deleteUser(input: DeleteUserInput): DeleteUserOutput
 
   """
-
+  
       Deselcting a topic implies that all question-options related to the topic string are disregarded as topic.
-
+    
   """
   deselectTopic(input: DeselectTopicInput): Boolean
   duplicateQuestion(questionId: String): QuestionNode
@@ -1242,7 +1247,7 @@ type Mutation {
   editWorkspace(input: EditWorkspaceInput): Customer
   generateAutodeck(input: GenerateAutodeckInput): CreateWorkspaceJobType
   generateWorkspaceFromCSV(input: GenerateWorkspaceCSVInputType): Customer
-  handleUserStateInWorkspace(input: HandleUserStateInWorkspaceInput): UserCustomer!
+  handleUserStateInWorkspace(input: HandleUserStateInWorkspaceInput): UserCustomer
 
   """Invite a user to a particular customer domain, given an email and role"""
   inviteUser(input: InviteUserInput): InviteUserOutput
@@ -1254,7 +1259,7 @@ type Mutation {
   removePixelRange(input: RemovePixelRangeInput): AWSImageType
   requestInvite(input: RequestInviteInput): RequestInviteOutput
   retryAutodeckJob(jobId: String): CreateWorkspaceJobType
-  sandbox(input: SandboxInput): String!
+  sandbox(input: SandboxInput): String
   setDialoguePrivacy(input: SetDialoguePrivacyInput): Dialogue
   singleUpload(file: Upload!): ImageType
   updateAutomation(input: CreateAutomationInput): AutomationModel
@@ -1391,14 +1396,21 @@ input PaginationWhereInput {
 
 """A path is the traversal of topics in a dialogue."""
 type Path {
-  id: ID!
-  topicStrings: [String!]!
+  id: ID
+  topicStrings: [String]
+}
+
+type PathTopic {
+  depth: Int
+  impactScore: Float
+  nrVotes: Int
+  topic: String
 }
 
 input PathedSessionsInput {
   endDateTime: String
   issueOnly: Boolean
-  path: [String!]!
+  path: [String!]
   refresh: Boolean = false
   startDateTime: String!
 }
@@ -1434,8 +1446,8 @@ type PreviewDataType {
 }
 
 type PublicDialogueConnection implements ConnectionInterface {
-  dialogues: [PublicDialogueInfo!]!
-  pageInfo: PaginationPageInfo!
+  dialogues: [PublicDialogueInfo]
+  pageInfo: PaginationPageInfo
   totalPages: Int
 }
 
@@ -1455,7 +1467,7 @@ type Query {
   delivery(deliveryId: String): DeliveryType
   dialogue(where: DialogueWhereUniqueInput): Dialogue
   dialogueLinks(filter: DialogueConnectionFilterInput, workspaceId: String): PublicDialogueConnection
-  dialogues(filter: DialogueFilterInputType): [Dialogue!]!
+  dialogues(filter: DialogueFilterInputType): [Dialogue]
   edge(id: String): Edge
   getAdjustedLogo(input: AdjustedImageInput): AWSImageType
   getAutodeckJobs(filter: PaginationWhereInput): AutodeckConnectionType
@@ -1546,8 +1558,8 @@ input QuestionNodeWhereUniqueInput {
 }
 
 type QuestionOption {
-  id: Int!
-  isTopic: Boolean!
+  id: Int
+  isTopic: Boolean
   overrideLeaf: QuestionNode
   position: Int
   publicValue: String
@@ -1671,7 +1683,7 @@ type Session {
   deliveryId: String
   device: String
   dialogue: Dialogue
-  dialogueId: String!
+  dialogueId: String
   followUpAction: FormNodeEntryType
   id: ID!
   mainScore: Float
@@ -1907,7 +1919,7 @@ type TopicNodeEntryValue {
 
 type TopicType {
   basicStats: BasicStatistics
-  impactScore: Float!
+  impactScore: Float
   name: String!
   nrVotes: Int
   subTopics: [TopicType]
@@ -2028,14 +2040,14 @@ input UploadSellImageInputType {
     1. Get all sessions of the workspace.
     2. Find sessions with a score below 4. If there is no such session, then no urgency is reported.
     3. Find the topic that has the most negative responses.
-
+  
 """
 type UrgentPath {
-  basicStats: BasicStatistics!
+  basicStats: BasicStatistics
   dialogue: Dialogue
   dialogueId: String!
-  id: ID!
-  path: Path!
+  id: ID
+  path: Path
 }
 
 type UserConnection implements ConnectionInterface {
@@ -2141,6 +2153,32 @@ type WorkspaceConditionScopeModel {
   updatedAt: Date
 }
 
+type WorkspaceStatistics {
+  """
+  Basic statistics of a workspace (e.g. number of responses, average general score, etc)
+  """
+  basicStats(input: DialogueStatisticsSummaryFilterInput): BasicStatistics
+
+  """Gets the health score of the workspace"""
+  health(input: HealthScoreInput): HealthScore
+  id: ID
+
+  """
+  
+          Get the path (sequence of topics) with the most changed impact score.
+        
+  """
+  mostChangedPath(input: DialogueStatisticsSummaryFilterInput): MostChangedPath
+  mostPopularPath(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
+  mostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
+
+  """
+  Topics of a workspace ranked by either impact score or number of responses
+  """
+  rankedTopics(input: DialogueStatisticsSummaryFilterInput): [TopicType]
+  workspaceStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel]
+}
+
 input createJobProcessLocationInput {
   name: String
   path: String
@@ -2157,30 +2195,4 @@ type topPathType {
   answer: String
   basicSentiment: String
   quantity: Int
-}
-
-type WorkspaceStatistics {
-  """
-  Basic statistics of a workspace (e.g. number of responses, average general score, etc)
-  """
-  basicStats(input: DialogueStatisticsSummaryFilterInput): BasicStatistics!
-
-  """Gets the health score of the workspace"""
-  health(input: HealthScoreInput): HealthScore!
-  id: ID!
-
-  """
-
-          Get the path (sequence of topics) with the most changed impact score.
-
-  """
-  mostChangedPath(input: DialogueStatisticsSummaryFilterInput): MostChangedPath!
-  mostPopularPath(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
-  mostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
-
-  """
-  Topics of a workspace ranked by either impact score or number of responses
-  """
-  rankedTopics(input: DialogueStatisticsSummaryFilterInput): [TopicType!]!
-  workspaceStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!]
 }

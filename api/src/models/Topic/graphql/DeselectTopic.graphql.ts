@@ -1,4 +1,4 @@
-import { inputObjectType, mutationField } from '@nexus/schema';
+import { inputObjectType, mutationField } from 'nexus';
 import { UserInputError } from 'apollo-server-express';
 
 export const DeselectTopicInput = inputObjectType({
