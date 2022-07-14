@@ -1,6 +1,5 @@
 import * as UI from '@haas/ui';
 import { ArrowDown, ArrowUp, PlusCircle, Trash } from 'react-feather';
-
 import { Controller, UseFormReturn, useFieldArray } from 'react-hook-form';
 import { useTranslation } from 'react-i18next/';
 import React from 'react';
@@ -103,7 +102,7 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                 <UI.Helper>{t('call_to_action')}</UI.Helper>
                 <UI.Helper>{t('is_topic')}</UI.Helper>
               </UI.Grid>
-              {choicesForm.fields.map((choice, index) => (
+              {choicesForm.fields.map((choice: any, index) => (
                 <UI.Grid
                   key={choice.fieldIndex}
                   p={2}
@@ -214,7 +213,7 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                       control={form.control}
                       name={`optionsFull[${index}].isTopic`}
                       defaultValue={choice.isTopic}
-                      render={({ onChange, value }) => (
+                      render={({ field: { onChange, value } }) => (
                         <UI.Checkbox
                           size="lg"
                           isChecked={value}

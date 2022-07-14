@@ -42,7 +42,7 @@ import {
   UpdateAutomationInput,
 } from './AutomationTypes'
 import { AutomationActionService } from './AutomationActionService';
-import { GenerateReportPayload } from 'models/users/UserServiceTypes';
+import { GenerateReportPayload } from '../../models/users/UserServiceTypes';
 import CustomerService from '../../models/customer/CustomerService';
 
 class AutomationService {
