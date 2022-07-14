@@ -4,6 +4,7 @@ import { ApolloError, UserInputError } from 'apollo-server-express';
 import { arg, extendType, inputObjectType, mutationField, nonNull, objectType, scalarType } from 'nexus';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
 
+import { WorkspaceStatistics } from './WorkspaceStatistics';
 import { CustomerSettingsType } from '../../settings/CustomerSettings';
 import { DialogueFilterInputType, DialogueType, DialogueWhereUniqueInput } from '../../questionnaire/Dialogue';
 import { UserConnection } from '../../users/graphql/User';
@@ -15,6 +16,10 @@ import { AutomationConnection, AutomationConnectionFilterInput } from '../../aut
 import { isValidDateTime } from '../../../utils/isValidDate';
 import { DialogueStatisticsSummaryFilterInput, DialogueStatisticsSummaryModel, MostTrendingTopic } from '../../questionnaire';
 import { DialogueConnection, DialogueConnectionFilterInput } from '../../questionnaire';
+import { HealthScore, HealthScoreInput } from './HealthScore';
+import { Issue, IssueFilterInput } from '../../Issue/graphql';
+import { IssueValidator } from '../../Issue/IssueValidator';
+import { SessionConnectionFilterInput, SessionConnection } from '../../../models/session/graphql';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -40,6 +45,52 @@ export const CustomerType = objectType({
         return customerSettings;
       },
     });
+
+    t.field('sessionConnection', {
+      type: SessionConnection,
+      args: { filter: SessionConnectionFilterInput },
+      nullable: true,
+
+      async resolve(parent, args, ctx) {
+        if (!parent.id) return null;
+
+        const sessionConnection = await ctx.services.sessionService.getWorkspaceSessionConnection(
+          parent.id,
+          args.filter
+        );
+
+        return sessionConnection;
+      },
+    });
+
+    /**
+     * Workspace-statistics
+     * - Note: These statistics share the same ID as the Workspace / Customer.
+     */
+    t.field('statistics', {
+      type: WorkspaceStatistics,
+      nullable: true,
+      description: 'Workspace statistics',
+
+      resolve: async (parent) => {
+        return { id: parent.id }
+      },
+    });
+
+    /**
+     * Issues
+     */
+    t.list.field('issues', {
+      type: Issue,
+      nullable: true,
+      args: { filter: IssueFilterInput },
+
+      resolve: async (parent, args, { services }) => {
+        const filter = IssueValidator.resolveFilter(args.filter);
+        return await services.issueService.getProblemDialoguesByWorkspace(parent.id, filter);
+      },
+    });
+
 
     t.field('dialogueConnection', {
       type: DialogueConnection,
@@ -85,6 +136,37 @@ export const CustomerType = objectType({
       type: AutomationModel,
       async resolve(parent, args, ctx) {
         return ctx.services.automationService.findAutomationsByWorkspace(parent.id);
+      },
+    });
+
+    t.field('nestedHealthScore', {
+      nullable: true,
+      deprecation: 'Deprectaed, see statistics',
+      type: HealthScore,
+      args: {
+        input: HealthScoreInput,
+      },
+      async resolve(parent, args, ctx) {
+        if (!args.input) throw new UserInputError('Not input object!');
+        const { startDateTime, endDateTime, threshold } = args.input;
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (startDateTime) {
+          utcStartDateTime = isValidDateTime(startDateTime, 'START_DATE') as Date;
+        }
+
+        if (endDateTime) {
+          utcEndDateTime = isValidDateTime(endDateTime, 'END_DATE');
+        }
+
+        return ctx.services.dialogueStatisticsService.findWorkspaceHealthScore(
+          parent.id,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          undefined,
+          threshold || undefined,
+        );
       },
     });
 
@@ -189,6 +271,7 @@ export const CustomerType = objectType({
 
     t.field('nestedDialogueStatisticsSummary', {
       type: DialogueStatisticsSummaryModel,
+      deprecation: 'Deprecated, see statistics',
       list: true,
       args: {
         input: DialogueStatisticsSummaryFilterInput,
@@ -198,27 +281,7 @@ export const CustomerType = objectType({
       // useQueryCounter: true,
       useTimeResolve: true,
       async resolve(parent, args, ctx) {
-        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
-        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
-
-        let utcStartDateTime: Date | undefined;
-        let utcEndDateTime: Date | undefined;
-
-        if (args.input?.startDateTime) {
-          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE');
-        }
-
-        if (args.input?.endDateTime) {
-          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
-        }
-
-        return ctx.services.customerService.findNestedDialogueStatisticsSummary(
-          parent.id,
-          args.input.impactType,
-          utcStartDateTime as Date,
-          utcEndDateTime,
-          args.input.refresh || false,
-        )
+        return null;
       },
     });
 
@@ -400,12 +463,10 @@ export const WorkspaceMutations = extendType({
         const stream = new Promise<UploadApiResponse>((resolve, reject) => {
           const cld_upload_stream = cloudinary.v2.uploader.upload_stream({
             folder: 'company_logos',
-          },
-            (error, result: UploadApiResponse | undefined) => {
-              if (result) return resolve(result);
-
-              return reject(error);
-            });
+          }, (error, result: UploadApiResponse | undefined) => {
+            if (result) return resolve(result);
+            return reject(error);
+          });
 
           return createReadStream().pipe(cld_upload_stream);
         });

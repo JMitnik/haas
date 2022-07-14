@@ -51,6 +51,26 @@ const language = {
       de: 'Danke für das Abstimmen',
       nl: 'Bedankt voor het stemmen',
     },
+    illegal_back_title: {
+      en: 'Try again?',
+      de: 'Erneut versuchen?',
+      nl: 'Nog een keer?',
+    },
+    illegal_back_description: {
+      en: 'It seems that you tried to go back after our last question.\nWe want to ensure that you do not fill in your answers twice.',
+      de: 'Es scheint, als hätten Sie versucht, nach unserer letzten Frage zurückzugehen.\nWir möchten sicherstellen, dass Sie Ihre Antworten nicht zweimal ausfüllen.',
+      nl: 'Het lijkt erop dat je probeerdere terug te gaan na onze laatste vraag.\nWe willen zeker zijn dat je niet twee keer hetzelfde anstwoord geeft.',
+    },
+    illegal_back_go_back: {
+      en: 'Back to the last question',
+      de: 'Zurück zur letzten Frage',
+      nl: 'Terug naar de laatste vraag',
+    },
+    illegal_back_restart: {
+      en: 'Restart from the beginning',
+      de: 'Neustart von Anfang an',
+      nl: 'Opnieuw beginnen',
+    },
   },
 };
 

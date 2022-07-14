@@ -1,14 +1,13 @@
+import * as UI from '@haas/ui';
 import styled, { css } from 'styled-components';
 
-import { Card, Div, Flex, H4, Icon, Span } from '@haas/ui';
-
-export const QuestionEntryHeader = styled(H4)`
+export const QuestionEntryHeader = styled(UI.H4)`
 ${({ theme }) => css`
   background-color: ${theme.colors.default.light};
   cursor: pointer;
 `}`;
 
-export const ConditionContainer = styled(Flex) <{ activeCTA: string | null, id: string }>`
+export const ConditionContainer = styled(UI.Flex) <{ activeCTA: string | null, id: string }>`
   ${({ activeCTA, id, theme }) => css`
     color: ${theme.colors.default.darkest};
     background: ${theme.colors.white};
@@ -38,7 +37,7 @@ export const ConditionContainer = styled(Flex) <{ activeCTA: string | null, id: 
   `}
 `;
 
-export const OverflowSpan = styled(Span)`
+export const OverflowSpan = styled(UI.Span)`
   ${({ theme }) => css`
     color: ${theme.colors.default.darkest};
     font-size: 1.2em;
@@ -48,8 +47,8 @@ export const OverflowSpan = styled(Span)`
   `}
 `;
 
-export const AddQuestionContainer = styled(Flex)`
-   ${({ theme }) => css`
+export const AddQuestionContainer = styled(UI.Flex)`
+  ${({ theme }) => css`
     flex-direction: row;
     align-self: center;
     cursor: pointer;
@@ -70,10 +69,10 @@ export const AddQuestionContainer = styled(Flex)`
       background-color: ${theme.colors.white};
       box-shadow: 0 1px 3px 1px rgba(0,0,0,0.1);
     }
- `}
+  `}
 `;
 
-export const QuestionEntryViewContainer = styled(Card) <{ activeCTA: string | null, id: string }>`
+export const QuestionEntryViewContainer = styled(UI.Card) <{ activeCTA: string | null, id: string }>`
   ${({ id, activeCTA, theme }) => css`
     position: relative;
     flex-direction: row;
@@ -100,7 +99,7 @@ export const QuestionEntryViewContainer = styled(Card) <{ activeCTA: string | nu
  `}
 `;
 
-export const AddChildContainer = styled(Flex) <{ isDisabled?: Boolean }>`
+export const AddChildContainer = styled(UI.Flex) <{ isDisabled?: Boolean }>`
   ${({ theme, isDisabled }) => css`
     position: absolute;
     flex-direction: row;
@@ -122,7 +121,7 @@ export const AddChildContainer = styled(Flex) <{ isDisabled?: Boolean }>`
  `}
 `;
 
-export const LinkContainer = styled(Flex) <{ hasCTA?: Boolean }>`
+export const LinkContainer = styled(UI.Flex) <{ hasCTA?: Boolean }>`
   ${({ theme, hasCTA }) => css`
     flex-direction: column;
     justify-content: center;
@@ -146,7 +145,7 @@ export const LinkContainer = styled(Flex) <{ hasCTA?: Boolean }>`
  `}
 `;
 
-export const ConditionSpan = styled(Span)`
+export const ConditionSpan = styled(UI.Span)`
    ${({ theme }) => css`
     position: relative;
     overflow: hidden;
@@ -162,13 +161,13 @@ export const ConditionSpan = styled(Span)`
  `}
 `;
 
-export const TypeSpan = styled(Span)`
+export const TypeSpan = styled(UI.Span)`
   ${({ theme }) => css`
     color: ${theme.colors.default.darkest};
  `}
 `;
 
-export const DepthSpan = styled(Span)`
+export const DepthSpan = styled(UI.Span)`
   ${({ theme }) => css`
     margin-left: 5px;
     color: ${theme.colors.default.darkest};
@@ -176,7 +175,7 @@ export const DepthSpan = styled(Span)`
   `}
 `;
 
-export const QuestionEntryContainer = styled(Flex)`
+export const QuestionEntryContainer = styled(UI.Flex)`
  ${({ theme }) => css`
     position: relative;
     flex-direction: column;
@@ -184,7 +183,7 @@ export const QuestionEntryContainer = styled(Flex)`
  `}
 `;
 
-export const AddChildIconContainer = styled(Div)`
+export const AddChildIconContainer = styled(UI.Div)`
   ${({ theme }) => css`
     opacity: 0.9;
     cursor: pointer;
@@ -223,7 +222,7 @@ export const QuestionNodeProblem = styled.div`
     background: ${theme.colors.yellow[200]};
     color: ${theme.colors.yellow[500]};
 
-    > ${Icon} {
+    > ${UI.Icon} {
       width: 24px;
       height: 24px;
       padding: 4px;

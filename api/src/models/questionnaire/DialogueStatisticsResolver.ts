@@ -1,4 +1,6 @@
 import { inputObjectType, objectType } from 'nexus';
+
+import { TopicFilterInput } from '../Topic/graphql/TopicFilterInput';
 import { SessionType } from '../session/graphql';
 import { DialogueImpactScoreType } from './DialogueStatisticsSummary';
 
@@ -12,6 +14,8 @@ export const DialogueStatisticsSummaryFilterInput = inputObjectType({
       type: DialogueImpactScoreType,
       required: true,
     });
+
+    t.field('topicsFilter', { type: TopicFilterInput, required: false });
     t.int('cutoff');
   },
 })
@@ -22,10 +26,16 @@ export const TopicType = objectType({
     t.nonNull.string('name');
     t.float('impactScore');
     t.int('nrVotes');
+
     t.field('subTopics', {
       list: true,
       nullable: true,
       type: TopicType,
+    });
+
+    t.field('basicStats', {
+      type: 'BasicStatistics',
+      nullable: true,
     });
   },
 });
@@ -64,6 +74,7 @@ export const PathedSessionsInput = inputObjectType({
     t.list.string('path', { required: true });
     t.string('startDateTime', { required: true });
     t.string('endDateTime');
+    t.boolean('issueOnly');
     t.boolean('refresh', { default: false });
   },
 });

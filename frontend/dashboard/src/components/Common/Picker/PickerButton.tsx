@@ -1,6 +1,5 @@
 import * as UI from '@haas/ui';
-import { useDisclosure } from '@chakra-ui/core';
-import React from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import * as Popover from 'components/Common/Popover';
@@ -39,22 +38,22 @@ interface PickerButtonProps {
   children?: (onClose: () => void) => React.ReactNode;
   label: string;
   icon?: React.ReactNode;
-  arrowBg?: string;
 }
 
 /**
  * PickerButton that triggers a Popover.
  */
-export const PickerButton = ({ children, label, icon, arrowBg = 'white' }: PickerButtonProps) => {
-  const { onOpen, onClose, isOpen } = useDisclosure();
+export const PickerButton = ({ children, label, icon }: PickerButtonProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleClose = () => setIsOpen(false);
 
   return (
-    <Popover.Base
-      isOpen={isOpen}
-      onOpen={onOpen}
-      onClose={onClose}
+    <Popover.Root
+      open={isOpen}
+      onOpenChange={setIsOpen}
     >
-      <Popover.Trigger>
+      <Popover.Trigger asChild>
         <PickerButtonContainer as="button">
           {icon && (
             <UI.Icon>
@@ -66,9 +65,11 @@ export const PickerButton = ({ children, label, icon, arrowBg = 'white' }: Picke
           </UI.Span>
         </PickerButtonContainer>
       </Popover.Trigger>
-      <Popover.Body hasClose arrowBg={arrowBg} hasArrow padding={0} maxWidth={700}>
-        {children?.(onClose)}
-      </Popover.Body>
-    </Popover.Base>
+      <Popover.Content isOpen={isOpen}>
+        <UI.Card maxWidth={700}>
+          {children?.(handleClose)}
+        </UI.Card>
+      </Popover.Content>
+    </Popover.Root>
   );
 };

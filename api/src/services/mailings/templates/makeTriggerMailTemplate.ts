@@ -1,7 +1,7 @@
 import Color from 'color';
 import mjml2html from 'mjml';
 
-import { SessionWithEntries } from '../../../models/session/SessionTypes';
+import { SessionWithEntries } from '../../../models/session/Session.types';
 import NodeEntryService from '../../../models/node-entry/NodeEntryService';
 
 const makeTriggerMailTemplate = (recipientName: string, userSession: SessionWithEntries, bgColor: string = '#0059f8') => {

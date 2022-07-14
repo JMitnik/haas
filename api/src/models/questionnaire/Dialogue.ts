@@ -1,4 +1,3 @@
-
 import { UserInputError } from 'apollo-server-express';
 import { subDays } from 'date-fns';
 import { enumType, extendType, inputObjectType, objectType } from 'nexus';
@@ -7,17 +6,18 @@ import { DialogueStatistics } from './graphql/DialogueStatistics';
 import { CustomerType } from '../customer/graphql/Customer';
 import { EdgeType } from '../edge/Edge';
 import { QuestionNodeType } from '../QuestionNode/QuestionNode';
-import { SessionConnection, SessionType } from '../session/graphql/Session';
+import { SessionConnection, SessionType } from '../session/graphql/Session.graphql';
 import { TagType, TagsInputType } from '../tag/Tag';
 import DialogueService from './DialogueService';
 import SessionService from '../session/SessionService';
 import formatDate from '../../utils/formatDate';
 import { isADate, isValidDateTime } from '../../utils/isValidDate';
-import { CopyDialogueInputType } from './DialogueTypes';
+import { CopyDialogueInputType } from './Dialogue.types';
 import { SessionConnectionFilterInput } from '../session/graphql';
 import { DialogueStatisticsSummaryModel } from './DialogueStatisticsSummary';
 import { UserType } from '../users/graphql/User';
 import { PathedSessionsType, PathedSessionsInput, TopicType, TopicInputType, MostPopularPath, DialogueStatisticsSummaryFilterInput, MostChangedPath, MostTrendingTopic } from './DialogueStatisticsResolver';
+import { HealthScore, HealthScoreInput } from '../customer/graphql/HealthScore';
 
 export const TEXT_NODES = [
   'TEXTBOX',
@@ -83,6 +83,35 @@ export const DialogueType = objectType({
       },
     });
 
+    t.field('healthScore', {
+      nullable: true,
+      type: HealthScore,
+      args: {
+        input: HealthScoreInput,
+      },
+      async resolve(parent, args, ctx) {
+        if (!args.input) throw new UserInputError('Not input object!');
+        const { startDateTime, endDateTime, threshold } = args.input;
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (startDateTime) {
+          utcStartDateTime = isValidDateTime(startDateTime, 'START_DATE') as Date;
+        }
+
+        if (endDateTime) {
+          utcEndDateTime = isValidDateTime(endDateTime, 'END_DATE');
+        }
+
+        return ctx.services.dialogueStatisticsService.findDialogueHealthScore(
+          parent.id,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          threshold || undefined,
+        );
+      },
+    });
+
     t.field('pathedSessionsConnection', {
       type: PathedSessionsType,
       nullable: true,
@@ -115,6 +144,7 @@ export const DialogueType = objectType({
           utcStartDateTime as Date,
           utcEndDateTime,
           args.input.refresh || false,
+          args.input.issueOnly || false,
         );
 
         return (pathedSessions || null) as any;
@@ -369,14 +399,13 @@ export const DialogueType = objectType({
 
       async resolve(parent, args, ctx) {
         if (!parent.id) return null;
+
         const sessionConnection = await ctx.services.sessionService.getSessionConnection(
           parent.id,
           args.filter
         );
 
-        if (!sessionConnection) return null;
-
-        return sessionConnection;
+        return sessionConnection || null;
       },
     });
 

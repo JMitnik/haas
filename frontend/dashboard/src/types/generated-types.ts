@@ -14,6 +14,14 @@ export type Scalars = {
   Float: number;
   /** Date custom scalar type */
   Date: any;
+  /**
+   *
+   *     A date-string follows format "dd-MM-yyyy HH:mm", "dd-MM-yyyy" or ISO format, and is resolved to a relevant Date object.
+   *
+   */
+  DateString: any;
+  /** The `Upload` scalar type represents a file upload. */
+  Upload: any;
   /** The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSONObject: any;
   /** The `Upload` scalar type represents a file upload. */
@@ -274,6 +282,15 @@ export type CtaShareInputObjectType = {
   tooltip?: Maybe<Scalars['String']>;
   title?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['String']>;
+};
+
+/** Basic statistics for a general statistics */
+export type BasicStatistics = {
+  __typename?: 'BasicStatistics';
+  /** Number of responses */
+  responseCount: Scalars['Int'];
+  /** Average value of summarizable statistic */
+  average: Scalars['Float'];
 };
 
 /** Campaign */
@@ -553,14 +570,21 @@ export type Customer = {
   slug?: Maybe<Scalars['String']>;
   name?: Maybe<Scalars['String']>;
   settings?: Maybe<CustomerSettings>;
+  sessionConnection?: Maybe<SessionConnection>;
+  /** Workspace statistics */
+  statistics?: Maybe<WorkspaceStatistics>;
+  issues?: Maybe<Array<Issue>>;
   dialogueConnection?: Maybe<DialogueConnection>;
   automationConnection?: Maybe<AutomationConnection>;
   usersConnection?: Maybe<UserConnection>;
-  automations?: Maybe<Array<Maybe<AutomationModel>>>;
+  automations?: Maybe<Array<AutomationModel>>;
+  /** @deprecated Deprectaed, see statistics */
+  nestedHealthScore?: Maybe<HealthScore>;
   nestedMostPopular?: Maybe<MostPopularPath>;
   nestedMostChanged?: Maybe<MostChangedPath>;
   nestedMostTrendingTopic?: Maybe<MostTrendingTopic>;
-  nestedDialogueStatisticsSummary?: Maybe<Array<Maybe<DialogueStatisticsSummaryModel>>>;
+  /** @deprecated Deprecated, see statistics */
+  nestedDialogueStatisticsSummary?: Maybe<Array<DialogueStatisticsSummaryModel>>;
   dialogue?: Maybe<Dialogue>;
   dialogues?: Maybe<Array<Maybe<Dialogue>>>;
   users?: Maybe<Array<Maybe<UserType>>>;
@@ -568,6 +592,16 @@ export type Customer = {
   roles?: Maybe<Array<Maybe<RoleType>>>;
   campaign?: Maybe<CampaignType>;
   userCustomer?: Maybe<UserCustomer>;
+};
+
+
+export type CustomerSessionConnectionArgs = {
+  filter?: Maybe<SessionConnectionFilterInput>;
+};
+
+
+export type CustomerIssuesArgs = {
+  filter?: Maybe<IssueFilterInput>;
 };
 
 
@@ -584,6 +618,11 @@ export type CustomerAutomationConnectionArgs = {
 export type CustomerUsersConnectionArgs = {
   customerSlug?: Maybe<Scalars['String']>;
   filter?: Maybe<UserConnectionFilterInput>;
+};
+
+
+export type CustomerNestedHealthScoreArgs = {
+  input?: Maybe<HealthScoreInput>;
 };
 
 
@@ -637,6 +676,22 @@ export type CustomerSettings = {
 
 export type CustomerWhereUniqueInput = {
   id: Scalars['ID'];
+};
+
+
+/** A histogram contains a list of entries sorted typically by date, along with their frequency. */
+export type DateHistogram = {
+  __typename?: 'DateHistogram';
+  id: Scalars['ID'];
+  items: Array<DateHistogramItem>;
+};
+
+/** A histogram item contains a date */
+export type DateHistogramItem = {
+  __typename?: 'DateHistogramItem';
+  id: Scalars['ID'];
+  date: Scalars['Date'];
+  frequency: Scalars['Int'];
 };
 
 
@@ -747,6 +802,12 @@ export type DeprecatedPaginationPageInfo = {
   pageIndex?: Maybe<Scalars['Int']>;
 };
 
+/** Deselects all question options as topic within workspace */
+export type DeselectTopicInput = {
+  workspaceId: Scalars['ID'];
+  topic: Scalars['String'];
+};
+
 export type Dialogue = {
   __typename?: 'Dialogue';
   id: Scalars['ID'];
@@ -762,6 +823,7 @@ export type Dialogue = {
   updatedAt?: Maybe<Scalars['String']>;
   assignees?: Maybe<Array<Maybe<UserType>>>;
   postLeafNode?: Maybe<DialogueFinisherObjectType>;
+  healthScore?: Maybe<HealthScore>;
   pathedSessionsConnection?: Maybe<PathedSessionsType>;
   topic?: Maybe<TopicType>;
   mostPopularPath?: Maybe<MostPopularPath>;
@@ -780,6 +842,11 @@ export type Dialogue = {
   questions?: Maybe<Array<Maybe<QuestionNode>>>;
   leafs?: Maybe<Array<Maybe<QuestionNode>>>;
   campaignVariants?: Maybe<Array<Maybe<CampaignVariantType>>>;
+};
+
+
+export type DialogueHealthScoreArgs = {
+  input?: Maybe<HealthScoreInput>;
 };
 
 
@@ -898,10 +965,6 @@ export enum DialogueImpactScoreType {
   Average = 'AVERAGE'
 }
 
-export type DialogueLinksInput = {
-  workspaceId?: Maybe<Scalars['String']>;
-};
-
 export type DialogueStatistics = {
   __typename?: 'DialogueStatistics';
   nrInteractions?: Maybe<Scalars['Int']>;
@@ -916,6 +979,7 @@ export type DialogueStatisticsSummaryFilterInput = {
   endDateTime?: Maybe<Scalars['String']>;
   refresh?: Maybe<Scalars['Boolean']>;
   impactType: DialogueImpactScoreType;
+  topicsFilter?: Maybe<TopicFilterInput>;
   cutoff?: Maybe<Scalars['Int']>;
 };
 
@@ -929,6 +993,7 @@ export type DialogueStatisticsSummaryModel = {
   endDateTime?: Maybe<Scalars['Date']>;
   nrVotes?: Maybe<Scalars['Int']>;
   impactScore?: Maybe<Scalars['Float']>;
+  title: Scalars['String'];
   dialogue?: Maybe<Dialogue>;
 };
 
@@ -1031,7 +1096,7 @@ export type FormNodeEntryInput = {
 export type FormNodeEntryType = {
   __typename?: 'FormNodeEntryType';
   id?: Maybe<Scalars['Int']>;
-  values?: Maybe<Array<Maybe<FormNodeEntryValueType>>>;
+  values: Array<FormNodeEntryValueType>;
 };
 
 export type FormNodeEntryValueType = {
@@ -1120,8 +1185,10 @@ export type GenerateAutodeckInput = {
 export type GenerateWorkspaceCsvInputType = {
   workspaceSlug: Scalars['String'];
   workspaceTitle: Scalars['String'];
-  uploadedCsv: Scalars['Upload'];
-  type?: Maybe<DialogueTemplateType>;
+  uploadedCsv?: Maybe<Scalars['Upload']>;
+  managerCsv?: Maybe<Scalars['Upload']>;
+  type?: Scalars['String'];
+  generateDemoData?: Maybe<Scalars['Boolean']>;
 };
 
 export type GetAutomationInput = {
@@ -1140,6 +1207,20 @@ export type HandleUserStateInWorkspaceInput = {
   userId?: Maybe<Scalars['String']>;
   workspaceId?: Maybe<Scalars['String']>;
   isActive?: Maybe<Scalars['Boolean']>;
+};
+
+export type HealthScore = {
+  __typename?: 'HealthScore';
+  score: Scalars['Float'];
+  negativeResponseCount: Scalars['Int'];
+  nrVotes: Scalars['Int'];
+};
+
+export type HealthScoreInput = {
+  threshold?: Maybe<Scalars['Float']>;
+  startDateTime: Scalars['String'];
+  endDateTime?: Maybe<Scalars['String']>;
+  topicFilter?: Maybe<TopicFilterInput>;
 };
 
 export type ImageType = {
@@ -1169,6 +1250,35 @@ export type InviteUserOutput = {
   didAlreadyExist?: Maybe<Scalars['Boolean']>;
 };
 
+/**
+ * An issue is a problem that has been identified.
+ *
+ * Typically, an issue is a combination of a particulat topic and a specific dialogue.
+ */
+export type Issue = {
+  __typename?: 'Issue';
+  id: Scalars['ID'];
+  rankScore: Scalars['Float'];
+  topic: Scalars['String'];
+  dialogueId: Scalars['String'];
+  dialogue?: Maybe<Dialogue>;
+  history: DateHistogram;
+  basicStats: BasicStatistics;
+  status: StatusType;
+  followUpAction?: Maybe<SessionActionType>;
+  /** Number of actions required */
+  actionRequiredCount?: Maybe<Scalars['Int']>;
+  createdAt: Scalars['Date'];
+  updatedAt: Scalars['Date'];
+};
+
+/** Filter input for Issues */
+export type IssueFilterInput = {
+  startDate?: Maybe<Scalars['String']>;
+  endDate?: Maybe<Scalars['String']>;
+  dialogueStrings?: Maybe<Array<Scalars['String']>>;
+  topicStrings?: Maybe<Array<Scalars['String']>>;
+};
 
 export type JobObjectType = {
   __typename?: 'JobObjectType';
@@ -1295,7 +1405,7 @@ export type MostTrendingTopic = {
 export type Mutation = {
   __typename?: 'Mutation';
   generateWorkspaceFromCSV?: Maybe<Customer>;
-  createJobProcessLocation?: Maybe<JobProcessLocation>;
+  createJobProcessLocation: JobProcessLocation;
   generateAutodeck?: Maybe<CreateWorkspaceJobType>;
   retryAutodeckJob?: Maybe<CreateWorkspaceJobType>;
   confirmCreateWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
@@ -1317,11 +1427,12 @@ export type Mutation = {
   createTrigger?: Maybe<TriggerType>;
   createPermission?: Maybe<PermssionType>;
   updatePermissions?: Maybe<RoleType>;
-  createRole?: Maybe<RoleType>;
-  updateRoles?: Maybe<RoleType>;
-  singleUpload?: Maybe<ImageType>;
-  createWorkspace?: Maybe<Customer>;
-  editWorkspace?: Maybe<Customer>;
+  createRole: RoleType;
+  updateRoles: RoleType;
+  singleUpload: ImageType;
+  createWorkspace: Customer;
+  editWorkspace: Customer;
+  deselectTopic?: Maybe<Scalars['Boolean']>;
   massSeed?: Maybe<Customer>;
   deleteCustomer?: Maybe<Customer>;
   handleUserStateInWorkspace?: Maybe<UserCustomer>;
@@ -1505,6 +1616,11 @@ export type MutationCreateWorkspaceArgs = {
 
 export type MutationEditWorkspaceArgs = {
   input?: Maybe<EditWorkspaceInput>;
+};
+
+
+export type MutationDeselectTopicArgs = {
+  input?: Maybe<DeselectTopicInput>;
 };
 
 
@@ -1705,6 +1821,7 @@ export type OptionInputType = {
   publicValue?: Maybe<Scalars['String']>;
   overrideLeafId?: Maybe<Scalars['String']>;
   position: Scalars['Int'];
+  isTopic?: Maybe<Scalars['Boolean']>;
 };
 
 export type OptionsInputType = {
@@ -1776,10 +1893,18 @@ export type PathTopic = {
   impactScore?: Maybe<Scalars['Float']>;
 };
 
+/** A path is the traversal of topics in a dialogue. */
+export type Path = {
+  __typename?: 'Path';
+  id: Scalars['ID'];
+  topicStrings: Array<Scalars['String']>;
+};
+
 export type PathedSessionsInput = {
   path?: Maybe<Array<Scalars['String']>>;
   startDateTime: Scalars['String'];
   endDateTime?: Maybe<Scalars['String']>;
+  issueOnly?: Maybe<Scalars['Boolean']>;
   refresh?: Maybe<Scalars['Boolean']>;
 };
 
@@ -1816,6 +1941,13 @@ export type PreviewDataType = {
   websiteScreenshotUrl?: Maybe<Scalars['String']>;
 };
 
+export type PublicDialogueConnection = ConnectionInterface & {
+  __typename?: 'PublicDialogueConnection';
+  totalPages?: Maybe<Scalars['Int']>;
+  pageInfo: PaginationPageInfo;
+  dialogues: Array<PublicDialogueInfo>;
+};
+
 export type PublicDialogueInfo = {
   __typename?: 'PublicDialogueInfo';
   title?: Maybe<Scalars['String']>;
@@ -1847,10 +1979,10 @@ export type Query = {
   users?: Maybe<Array<Maybe<UserType>>>;
   user?: Maybe<UserType>;
   dialogue?: Maybe<Dialogue>;
-  dialogues?: Maybe<Array<Maybe<Dialogue>>>;
-  dialogueLinks?: Maybe<Array<Maybe<PublicDialogueInfo>>>;
-  refreshAccessToken?: Maybe<RefreshAccessTokenOutput>;
-  sessions?: Maybe<Array<Maybe<Session>>>;
+  dialogues: Array<Dialogue>;
+  dialogueLinks?: Maybe<PublicDialogueConnection>;
+  refreshAccessToken: RefreshAccessTokenOutput;
+  sessions: Array<Session>;
   /** A session is one entire user-interaction */
   session?: Maybe<Session>;
   question?: Maybe<QuestionNode>;
@@ -1961,7 +2093,8 @@ export type QueryDialoguesArgs = {
 
 
 export type QueryDialogueLinksArgs = {
-  input?: Maybe<DialogueLinksInput>;
+  workspaceId?: Maybe<Scalars['String']>;
+  filter?: Maybe<DialogueConnectionFilterInput>;
 };
 
 
@@ -2062,8 +2195,9 @@ export type QuestionNodeWhereUniqueInput = {
 
 export type QuestionOption = {
   __typename?: 'QuestionOption';
-  id?: Maybe<Scalars['Int']>;
-  value?: Maybe<Scalars['String']>;
+  id: Scalars['Int'];
+  value: Scalars['String'];
+  isTopic: Scalars['Boolean'];
   questionId?: Maybe<Scalars['String']>;
   publicValue?: Maybe<Scalars['String']>;
   overrideLeaf?: Maybe<QuestionNode>;
@@ -2181,19 +2315,26 @@ export type RoleType = {
 export type Session = {
   __typename?: 'Session';
   id: Scalars['ID'];
-  createdAt?: Maybe<Scalars['Date']>;
-  dialogueId?: Maybe<Scalars['String']>;
-  mainScore?: Maybe<Scalars['Float']>;
-  browser?: Maybe<Scalars['String']>;
-  paths?: Maybe<Scalars['Int']>;
-  score?: Maybe<Scalars['Float']>;
+  createdAt: Scalars['Date'];
+  dialogueId: Scalars['String'];
+  mainScore: Scalars['Float'];
+  browser: Scalars['String'];
+  paths: Scalars['Int'];
+  score: Scalars['Float'];
+  dialogue?: Maybe<Dialogue>;
   totalTimeInSec?: Maybe<Scalars['Int']>;
   originUrl?: Maybe<Scalars['String']>;
   device?: Maybe<Scalars['String']>;
   deliveryId?: Maybe<Scalars['String']>;
   delivery?: Maybe<DeliveryType>;
-  nodeEntries?: Maybe<Array<Maybe<NodeEntry>>>;
+  nodeEntries: Array<NodeEntry>;
+  followUpAction?: Maybe<FormNodeEntryType>;
 };
+
+/** Actions expected after session */
+export enum SessionActionType {
+  Contact = 'CONTACT'
+}
 
 export type SessionConnection = ConnectionInterface & {
   __typename?: 'SessionConnection';
@@ -2204,19 +2345,22 @@ export type SessionConnection = ConnectionInterface & {
 
 export type SessionConnectionFilterInput = {
   search?: Maybe<Scalars['String']>;
-  startDate?: Maybe<Scalars['String']>;
-  endDate?: Maybe<Scalars['String']>;
+  startDate?: Maybe<Scalars['DateString']>;
+  endDate?: Maybe<Scalars['DateString']>;
   deliveryType?: Maybe<SessionDeliveryType>;
   scoreRange?: Maybe<SessionScoreRangeFilter>;
   campaignVariantId?: Maybe<Scalars['String']>;
   orderBy?: Maybe<SessionConnectionOrderByInput>;
   offset?: Maybe<Scalars['Int']>;
   perPage?: Maybe<Scalars['Int']>;
+  dialogueIds?: Maybe<Array<Scalars['String']>>;
+  withFollowUpAction?: Maybe<Scalars['Boolean']>;
 };
 
 /** Fields to order SessionConnection by. */
 export enum SessionConnectionOrder {
-  CreatedAt = 'createdAt'
+  CreatedAt = 'createdAt',
+  DialogueId = 'dialogueId'
 }
 
 /** Sorting of sessionConnection */
@@ -2326,6 +2470,13 @@ export type SocialNodeEntryInput = {
   visitedLink?: Maybe<Scalars['String']>;
 };
 
+/** A status is a label that indicates the current state of a process. */
+export enum StatusType {
+  Open = 'OPEN',
+  InProgress = 'IN_PROGRESS',
+  Closed = 'CLOSED'
+}
+
 export enum SystemPermission {
   CanAccessAdminPanel = 'CAN_ACCESS_ADMIN_PANEL',
   CanGenerateWorkspaceFromCsv = 'CAN_GENERATE_WORKSPACE_FROM_CSV',
@@ -2387,6 +2538,13 @@ export type TopicDelta = {
   group?: Maybe<Scalars['String']>;
 };
 
+/** Generic filter object for filtering topics */
+export type TopicFilterInput = {
+  topicStrings?: Maybe<Array<Scalars['String']>>;
+  relatedSessionScoreLowerThreshold?: Maybe<Scalars['Float']>;
+  dialogueStrings?: Maybe<Array<Scalars['String']>>;
+};
+
 export type TopicInputType = {
   isRoot?: Maybe<Scalars['Boolean']>;
   value: Scalars['String'];
@@ -2407,9 +2565,17 @@ export type TopicNodeEntryValue = {
 export type TopicType = {
   __typename?: 'TopicType';
   name: Scalars['String'];
-  impactScore?: Maybe<Scalars['Float']>;
-  nrVotes?: Maybe<Scalars['Int']>;
-  subTopics?: Maybe<Array<Maybe<TopicType>>>;
+  impactScore: Scalars['Float'];
+  nrVotes: Scalars['Int'];
+  subTopics?: Maybe<Array<TopicType>>;
+  basicStats?: Maybe<BasicStatistics>;
+};
+
+export type TopPathType = {
+  __typename?: 'topPathType';
+  answer?: Maybe<Scalars['String']>;
+  quantity?: Maybe<Scalars['Int']>;
+  basicSentiment?: Maybe<Scalars['String']>;
 };
 
 export enum TriggerConditionEnum {
@@ -2520,6 +2686,21 @@ export enum UploadImageEnumType {
 export type UploadSellImageInputType = {
   file?: Maybe<Scalars['Upload']>;
   workspaceId?: Maybe<Scalars['String']>;
+};
+
+/**
+ * An urgent path is a path which was considered urgent. It currently follows a simple heuristic:
+ * 1. Get all sessions of the workspace.
+ * 2. Find sessions with a score below 4. If there is no such session, then no urgency is reported.
+ * 3. Find the topic that has the most negative responses.
+ */
+export type UrgentPath = {
+  __typename?: 'UrgentPath';
+  id: Scalars['ID'];
+  path: Path;
+  dialogueId: Scalars['String'];
+  dialogue?: Maybe<Dialogue>;
+  basicStats: BasicStatistics;
 };
 
 export type UserConnection = ConnectionInterface & {
@@ -2635,25 +2816,66 @@ export type WorkspaceConditionScopeModel = {
   aggregate?: Maybe<ConditionPropertyAggregate>;
 };
 
-export type CreateJobProcessLocationInput = {
-  name?: Maybe<Scalars['String']>;
-  path?: Maybe<Scalars['String']>;
-  type?: Maybe<JobProcessLocationType>;
+export type WorkspaceStatistics = {
+  __typename?: 'WorkspaceStatistics';
+  id: Scalars['ID'];
+  workspaceStatisticsSummary?: Maybe<Array<DialogueStatisticsSummaryModel>>;
+  /** Basic statistics of a workspace (e.g. number of responses, average general score, etc) */
+  basicStats: BasicStatistics;
+  /** Topics of a workspace ranked by either impact score or number of responses */
+  rankedTopics: Array<TopicType>;
+  /** Gets the health score of the workspace */
+  health: HealthScore;
+  /** Get the path (sequence of topics) with the most changed impact score. */
+  mostChangedPath: MostChangedPath;
+  mostTrendingTopic?: Maybe<MostTrendingTopic>;
+  mostPopularPath?: Maybe<MostPopularPath>;
 };
 
-export type LineChartDataType = {
-  __typename?: 'lineChartDataType';
-  x?: Maybe<Scalars['String']>;
-  y?: Maybe<Scalars['Int']>;
-  entryId?: Maybe<Scalars['String']>;
+
+export type WorkspaceStatisticsWorkspaceStatisticsSummaryArgs = {
+  input?: Maybe<DialogueStatisticsSummaryFilterInput>;
 };
 
-export type TopPathType = {
-  __typename?: 'topPathType';
-  answer?: Maybe<Scalars['String']>;
-  quantity?: Maybe<Scalars['Int']>;
-  basicSentiment?: Maybe<Scalars['String']>;
+
+export type WorkspaceStatisticsBasicStatsArgs = {
+  input?: Maybe<DialogueStatisticsSummaryFilterInput>;
 };
+
+
+export type WorkspaceStatisticsRankedTopicsArgs = {
+  input?: Maybe<DialogueStatisticsSummaryFilterInput>;
+};
+
+
+export type WorkspaceStatisticsHealthArgs = {
+  input?: Maybe<HealthScoreInput>;
+};
+
+
+export type WorkspaceStatisticsMostChangedPathArgs = {
+  input?: Maybe<DialogueStatisticsSummaryFilterInput>;
+};
+
+
+export type WorkspaceStatisticsMostTrendingTopicArgs = {
+  input?: Maybe<DialogueStatisticsSummaryFilterInput>;
+};
+
+
+export type WorkspaceStatisticsMostPopularPathArgs = {
+  input?: Maybe<DialogueStatisticsSummaryFilterInput>;
+};
+
+export type DeselectTopicMutationVariables = Exact<{
+  input?: Maybe<DeselectTopicInput>;
+}>;
+
+
+export type DeselectTopicMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'deselectTopic'>
+);
 
 export type GetDialogueTopicsQueryVariables = Exact<{
   dialogueId: Scalars['ID'];
@@ -2674,6 +2896,38 @@ export type GetDialogueTopicsQuery = (
         & Pick<TopicType, 'name' | 'impactScore' | 'nrVotes'>
       )>>> }
     )> }
+  )> }
+);
+
+export type GetIssuesQueryVariables = Exact<{
+  workspaceId: Scalars['ID'];
+  filter?: Maybe<IssueFilterInput>;
+}>;
+
+
+export type GetIssuesQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { issues?: Maybe<Array<(
+      { __typename?: 'Issue' }
+      & Pick<Issue, 'id' | 'topic' | 'rankScore' | 'followUpAction' | 'actionRequiredCount'>
+      & { dialogue?: Maybe<(
+        { __typename?: 'Dialogue' }
+        & Pick<Dialogue, 'id' | 'title'>
+      )>, basicStats: (
+        { __typename?: 'BasicStatistics' }
+        & Pick<BasicStatistics, 'responseCount' | 'average'>
+      ), history: (
+        { __typename?: 'DateHistogram' }
+        & Pick<DateHistogram, 'id'>
+        & { items: Array<(
+          { __typename?: 'DateHistogramItem' }
+          & Pick<DateHistogramItem, 'id' | 'date' | 'frequency'>
+        )> }
+      ) }
+    )>> }
   )> }
 );
 
@@ -2710,14 +2964,47 @@ export type GetWorkspaceDialogueStatisticsQuery = (
   { __typename?: 'Query' }
   & { customer?: Maybe<(
     { __typename?: 'Customer' }
-    & { dialogues?: Maybe<Array<Maybe<(
-      { __typename?: 'Dialogue' }
-      & Pick<Dialogue, 'id' | 'title'>
-      & { dialogueStatisticsSummary?: Maybe<(
+    & { statistics?: Maybe<(
+      { __typename?: 'WorkspaceStatistics' }
+      & { workspaceStatisticsSummary?: Maybe<Array<(
         { __typename?: 'DialogueStatisticsSummaryModel' }
-        & Pick<DialogueStatisticsSummaryModel, 'id' | 'dialogueId' | 'impactScore' | 'nrVotes' | 'updatedAt'>
+        & Pick<DialogueStatisticsSummaryModel, 'id' | 'nrVotes' | 'impactScore' | 'updatedAt' | 'title'>
+        & { dialogue?: Maybe<(
+          { __typename?: 'Dialogue' }
+          & Pick<Dialogue, 'title' | 'id'>
+        )> }
+      )>> }
+    )> }
+  )> }
+);
+
+export type GetWorkspaceSummaryDetailsQueryVariables = Exact<{
+  id?: Maybe<Scalars['ID']>;
+  summaryInput: DialogueStatisticsSummaryFilterInput;
+  healthInput: HealthScoreInput;
+}>;
+
+
+export type GetWorkspaceSummaryDetailsQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { statistics?: Maybe<(
+      { __typename?: 'WorkspaceStatistics' }
+      & Pick<WorkspaceStatistics, 'id'>
+      & { health: (
+        { __typename?: 'HealthScore' }
+        & Pick<HealthScore, 'nrVotes' | 'negativeResponseCount' | 'score'>
+      ), rankedTopics: Array<(
+        { __typename?: 'TopicType' }
+        & Pick<TopicType, 'name'>
+        & { basicStats?: Maybe<(
+          { __typename?: 'BasicStatistics' }
+          & Pick<BasicStatistics, 'average' | 'responseCount'>
+        )> }
       )> }
-    )>>> }
+    )> }
   )> }
 );
 
@@ -2765,13 +3052,44 @@ export type NodeEntryFragmentFragment = (
 
 export type SessionFragmentFragment = (
   { __typename?: 'Session' }
-  & Pick<Session, 'id' | 'createdAt' | 'score' | 'originUrl' | 'totalTimeInSec' | 'device'>
-  & { nodeEntries?: Maybe<Array<Maybe<(
+  & Pick<Session, 'id' | 'createdAt' | 'score' | 'originUrl' | 'totalTimeInSec' | 'device' | 'dialogueId'>
+  & { nodeEntries: Array<(
     { __typename?: 'NodeEntry' }
     & NodeEntryFragmentFragment
   )>>>, delivery?: Maybe<(
     { __typename?: 'DeliveryType' }
     & DeliveryFragmentFragment
+  )>, dialogue?: Maybe<(
+    { __typename?: 'Dialogue' }
+    & Pick<Dialogue, 'id' | 'title' | 'slug'>
+  )>, followUpAction?: Maybe<(
+    { __typename?: 'FormNodeEntryType' }
+    & { values: Array<(
+      { __typename?: 'FormNodeEntryValueType' }
+      & Pick<FormNodeEntryValueType, 'shortText'>
+    )> }
+  )> }
+);
+
+export type GetWorkspaceLayoutDetailsQueryVariables = Exact<{
+  workspaceId: Scalars['ID'];
+  healthInput: HealthScoreInput;
+}>;
+
+
+export type GetWorkspaceLayoutDetailsQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { statistics?: Maybe<(
+      { __typename?: 'WorkspaceStatistics' }
+      & Pick<WorkspaceStatistics, 'id'>
+      & { health: (
+        { __typename?: 'HealthScore' }
+        & Pick<HealthScore, 'nrVotes' | 'negativeResponseCount' | 'score'>
+      ) }
+    )> }
   )> }
 );
 
@@ -2864,19 +3182,6 @@ export type UploadUpsellImageMutation = (
     { __typename?: 'ImageType' }
     & Pick<ImageType, 'url'>
   )> }
-);
-
-export type GetWorkspaceAdminsQueryVariables = Exact<{
-  customerSlug: Scalars['String'];
-}>;
-
-
-export type GetWorkspaceAdminsQuery = (
-  { __typename?: 'Query' }
-  & { users?: Maybe<Array<Maybe<(
-    { __typename?: 'UserType' }
-    & Pick<UserType, 'id' | 'firstName' | 'lastName' | 'globalPermissions'>
-  )>>> }
 );
 
 export type ConfirmWorkspaceJobMutationVariables = Exact<{
@@ -3174,19 +3479,6 @@ export type GetWorkspaceDialoguesQuery = (
   )> }
 );
 
-export type GenerateWorkspaceFromCsvMutationVariables = Exact<{
-  input?: Maybe<GenerateWorkspaceCsvInputType>;
-}>;
-
-
-export type GenerateWorkspaceFromCsvMutation = (
-  { __typename?: 'Mutation' }
-  & { generateWorkspaceFromCSV?: Maybe<(
-    { __typename?: 'Customer' }
-    & Pick<Customer, 'id' | 'slug'>
-  )> }
-);
-
 export type DuplicateQuestionMutationVariables = Exact<{
   questionId?: Maybe<Scalars['String']>;
 }>;
@@ -3201,16 +3493,37 @@ export type DuplicateQuestionMutation = (
 );
 
 export type GetDialogueLinksQueryVariables = Exact<{
-  input?: Maybe<DialogueLinksInput>;
+  workspaceId?: Maybe<Scalars['String']>;
+  filter?: Maybe<DialogueConnectionFilterInput>;
 }>;
 
 
 export type GetDialogueLinksQuery = (
   { __typename?: 'Query' }
-  & { dialogueLinks?: Maybe<Array<Maybe<(
-    { __typename?: 'PublicDialogueInfo' }
-    & Pick<PublicDialogueInfo, 'title' | 'slug' | 'description' | 'url'>
-  )>>> }
+  & { dialogueLinks?: Maybe<(
+    { __typename?: 'PublicDialogueConnection' }
+    & Pick<PublicDialogueConnection, 'totalPages'>
+    & { dialogues: Array<(
+      { __typename?: 'PublicDialogueInfo' }
+      & Pick<PublicDialogueInfo, 'title' | 'slug' | 'description' | 'url'>
+    )>, pageInfo: (
+      { __typename?: 'PaginationPageInfo' }
+      & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'prevPageOffset' | 'nextPageOffset' | 'pageIndex'>
+    ) }
+  )> }
+);
+
+export type DeleteDialogueMutationVariables = Exact<{
+  input?: Maybe<DeleteDialogueInputType>;
+}>;
+
+
+export type DeleteDialogueMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteDialogue: (
+    { __typename?: 'Dialogue' }
+    & Pick<Dialogue, 'id' | 'slug'>
+  ) }
 );
 
 export type DialogueConnectionQueryVariables = Exact<{
@@ -3335,6 +3648,44 @@ export type GetInteractionQuery = (
       & DeliveryFragmentFragment
     )> }
     & SessionFragmentFragment
+  )> }
+);
+
+export type GetWorkspaceSessionsQueryVariables = Exact<{
+  id?: Maybe<Scalars['ID']>;
+  filter?: Maybe<SessionConnectionFilterInput>;
+}>;
+
+
+export type GetWorkspaceSessionsQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { sessionConnection?: Maybe<(
+      { __typename?: 'SessionConnection' }
+      & Pick<SessionConnection, 'totalPages'>
+      & { sessions: Array<(
+        { __typename?: 'Session' }
+        & SessionFragmentFragment
+      )>, pageInfo: (
+        { __typename?: 'PaginationPageInfo' }
+        & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'nextPageOffset' | 'prevPageOffset' | 'pageIndex'>
+      ) }
+    )> }
+  )> }
+);
+
+export type GenerateWorkspaceFromCsvMutationVariables = Exact<{
+  input?: Maybe<GenerateWorkspaceCsvInputType>;
+}>;
+
+
+export type GenerateWorkspaceFromCsvMutation = (
+  { __typename?: 'Mutation' }
+  & { generateWorkspaceFromCSV?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id' | 'slug'>
   )> }
 );
 
@@ -3622,15 +3973,57 @@ export const SessionFragmentFragmentDoc = gql`
   originUrl
   totalTimeInSec
   device
+  dialogueId
   nodeEntries {
     ...NodeEntryFragment
   }
   delivery {
     ...DeliveryFragment
   }
+  dialogue {
+    id
+    title
+    slug
+  }
+  followUpAction {
+    values {
+      shortText
+    }
+  }
 }
     ${NodeEntryFragmentFragmentDoc}
 ${DeliveryFragmentFragmentDoc}`;
+export const DeselectTopicDocument = gql`
+    mutation deselectTopic($input: DeselectTopicInput) {
+  deselectTopic(input: $input)
+}
+    `;
+export type DeselectTopicMutationFn = Apollo.MutationFunction<DeselectTopicMutation, DeselectTopicMutationVariables>;
+
+/**
+ * __useDeselectTopicMutation__
+ *
+ * To run a mutation, you first call `useDeselectTopicMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeselectTopicMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deselectTopicMutation, { data, loading, error }] = useDeselectTopicMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDeselectTopicMutation(baseOptions?: Apollo.MutationHookOptions<DeselectTopicMutation, DeselectTopicMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeselectTopicMutation, DeselectTopicMutationVariables>(DeselectTopicDocument, options);
+      }
+export type DeselectTopicMutationHookResult = ReturnType<typeof useDeselectTopicMutation>;
+export type DeselectTopicMutationResult = Apollo.MutationResult<DeselectTopicMutation>;
+export type DeselectTopicMutationOptions = Apollo.BaseMutationOptions<DeselectTopicMutation, DeselectTopicMutationVariables>;
 export const GetDialogueTopicsDocument = gql`
     query GetDialogueTopics($dialogueId: ID!, $input: TopicInputType!) {
   dialogue(where: {id: $dialogueId}) {
@@ -3679,6 +4072,68 @@ export type GetDialogueTopicsLazyQueryHookResult = ReturnType<typeof useGetDialo
 export type GetDialogueTopicsQueryResult = Apollo.QueryResult<GetDialogueTopicsQuery, GetDialogueTopicsQueryVariables>;
 export function refetchGetDialogueTopicsQuery(variables?: GetDialogueTopicsQueryVariables) {
       return { query: GetDialogueTopicsDocument, variables: variables }
+    }
+export const GetIssuesDocument = gql`
+    query GetIssues($workspaceId: ID!, $filter: IssueFilterInput) {
+  customer(id: $workspaceId) {
+    id
+    issues(filter: $filter) {
+      id
+      topic
+      rankScore
+      followUpAction
+      actionRequiredCount
+      dialogue {
+        id
+        title
+      }
+      basicStats {
+        responseCount
+        average
+      }
+      history {
+        id
+        items {
+          id
+          date
+          frequency
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetIssuesQuery__
+ *
+ * To run a query within a React component, call `useGetIssuesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetIssuesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetIssuesQuery({
+ *   variables: {
+ *      workspaceId: // value for 'workspaceId'
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useGetIssuesQuery(baseOptions: Apollo.QueryHookOptions<GetIssuesQuery, GetIssuesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetIssuesQuery, GetIssuesQueryVariables>(GetIssuesDocument, options);
+      }
+export function useGetIssuesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetIssuesQuery, GetIssuesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetIssuesQuery, GetIssuesQueryVariables>(GetIssuesDocument, options);
+        }
+export type GetIssuesQueryHookResult = ReturnType<typeof useGetIssuesQuery>;
+export type GetIssuesLazyQueryHookResult = ReturnType<typeof useGetIssuesLazyQuery>;
+export type GetIssuesQueryResult = Apollo.QueryResult<GetIssuesQuery, GetIssuesQueryVariables>;
+export function refetchGetIssuesQuery(variables?: GetIssuesQueryVariables) {
+      return { query: GetIssuesDocument, variables: variables }
     }
 export const GetSessionPathsDocument = gql`
     query GetSessionPaths($dialogueId: ID!, $input: PathedSessionsInput!) {
@@ -3734,17 +4189,17 @@ export function refetchGetSessionPathsQuery(variables?: GetSessionPathsQueryVari
 export const GetWorkspaceDialogueStatisticsDocument = gql`
     query GetWorkspaceDialogueStatistics($workspaceId: ID!, $startDateTime: String!, $endDateTime: String!) {
   customer(id: $workspaceId) {
-    dialogues {
-      id
-      title
-      dialogueStatisticsSummary(
-        input: {startDateTime: $startDateTime, endDateTime: $endDateTime, impactType: AVERAGE}
-      ) {
+    statistics {
+      workspaceStatisticsSummary(input: {startDateTime: $startDateTime, endDateTime: $endDateTime, impactType: AVERAGE, refresh: true}) {
         id
-        dialogueId
-        impactScore
         nrVotes
+        impactScore
         updatedAt
+        title
+        dialogue {
+          title
+          id
+        }
       }
     }
   }
@@ -3782,6 +4237,108 @@ export type GetWorkspaceDialogueStatisticsLazyQueryHookResult = ReturnType<typeo
 export type GetWorkspaceDialogueStatisticsQueryResult = Apollo.QueryResult<GetWorkspaceDialogueStatisticsQuery, GetWorkspaceDialogueStatisticsQueryVariables>;
 export function refetchGetWorkspaceDialogueStatisticsQuery(variables?: GetWorkspaceDialogueStatisticsQueryVariables) {
       return { query: GetWorkspaceDialogueStatisticsDocument, variables: variables }
+    }
+export const GetWorkspaceSummaryDetailsDocument = gql`
+    query GetWorkspaceSummaryDetails($id: ID, $summaryInput: DialogueStatisticsSummaryFilterInput!, $healthInput: HealthScoreInput!) {
+  customer(id: $id) {
+    id
+    statistics {
+      id
+      health(input: $healthInput) {
+        nrVotes
+        negativeResponseCount
+        score
+      }
+      rankedTopics(input: $summaryInput) {
+        name
+        basicStats {
+          average
+          responseCount
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetWorkspaceSummaryDetailsQuery__
+ *
+ * To run a query within a React component, call `useGetWorkspaceSummaryDetailsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetWorkspaceSummaryDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetWorkspaceSummaryDetailsQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      summaryInput: // value for 'summaryInput'
+ *      healthInput: // value for 'healthInput'
+ *   },
+ * });
+ */
+export function useGetWorkspaceSummaryDetailsQuery(baseOptions: Apollo.QueryHookOptions<GetWorkspaceSummaryDetailsQuery, GetWorkspaceSummaryDetailsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetWorkspaceSummaryDetailsQuery, GetWorkspaceSummaryDetailsQueryVariables>(GetWorkspaceSummaryDetailsDocument, options);
+      }
+export function useGetWorkspaceSummaryDetailsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceSummaryDetailsQuery, GetWorkspaceSummaryDetailsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetWorkspaceSummaryDetailsQuery, GetWorkspaceSummaryDetailsQueryVariables>(GetWorkspaceSummaryDetailsDocument, options);
+        }
+export type GetWorkspaceSummaryDetailsQueryHookResult = ReturnType<typeof useGetWorkspaceSummaryDetailsQuery>;
+export type GetWorkspaceSummaryDetailsLazyQueryHookResult = ReturnType<typeof useGetWorkspaceSummaryDetailsLazyQuery>;
+export type GetWorkspaceSummaryDetailsQueryResult = Apollo.QueryResult<GetWorkspaceSummaryDetailsQuery, GetWorkspaceSummaryDetailsQueryVariables>;
+export function refetchGetWorkspaceSummaryDetailsQuery(variables?: GetWorkspaceSummaryDetailsQueryVariables) {
+      return { query: GetWorkspaceSummaryDetailsDocument, variables: variables }
+    }
+export const GetWorkspaceLayoutDetailsDocument = gql`
+    query GetWorkspaceLayoutDetails($workspaceId: ID!, $healthInput: HealthScoreInput!) {
+  customer(id: $workspaceId) {
+    id
+    statistics {
+      id
+      health(input: $healthInput) {
+        nrVotes
+        negativeResponseCount
+        score
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetWorkspaceLayoutDetailsQuery__
+ *
+ * To run a query within a React component, call `useGetWorkspaceLayoutDetailsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetWorkspaceLayoutDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetWorkspaceLayoutDetailsQuery({
+ *   variables: {
+ *      workspaceId: // value for 'workspaceId'
+ *      healthInput: // value for 'healthInput'
+ *   },
+ * });
+ */
+export function useGetWorkspaceLayoutDetailsQuery(baseOptions: Apollo.QueryHookOptions<GetWorkspaceLayoutDetailsQuery, GetWorkspaceLayoutDetailsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetWorkspaceLayoutDetailsQuery, GetWorkspaceLayoutDetailsQueryVariables>(GetWorkspaceLayoutDetailsDocument, options);
+      }
+export function useGetWorkspaceLayoutDetailsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceLayoutDetailsQuery, GetWorkspaceLayoutDetailsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetWorkspaceLayoutDetailsQuery, GetWorkspaceLayoutDetailsQueryVariables>(GetWorkspaceLayoutDetailsDocument, options);
+        }
+export type GetWorkspaceLayoutDetailsQueryHookResult = ReturnType<typeof useGetWorkspaceLayoutDetailsQuery>;
+export type GetWorkspaceLayoutDetailsLazyQueryHookResult = ReturnType<typeof useGetWorkspaceLayoutDetailsLazyQuery>;
+export type GetWorkspaceLayoutDetailsQueryResult = Apollo.QueryResult<GetWorkspaceLayoutDetailsQuery, GetWorkspaceLayoutDetailsQueryVariables>;
+export function refetchGetWorkspaceLayoutDetailsQuery(variables?: GetWorkspaceLayoutDetailsQueryVariables) {
+      return { query: GetWorkspaceLayoutDetailsDocument, variables: variables }
     }
 export const CreateCtaDocument = gql`
     mutation createCTA($input: CreateCTAInputType) {
@@ -3977,47 +4534,6 @@ export function useUploadUpsellImageMutation(baseOptions?: Apollo.MutationHookOp
 export type UploadUpsellImageMutationHookResult = ReturnType<typeof useUploadUpsellImageMutation>;
 export type UploadUpsellImageMutationResult = Apollo.MutationResult<UploadUpsellImageMutation>;
 export type UploadUpsellImageMutationOptions = Apollo.BaseMutationOptions<UploadUpsellImageMutation, UploadUpsellImageMutationVariables>;
-export const GetWorkspaceAdminsDocument = gql`
-    query GetWorkspaceAdmins($customerSlug: String!) {
-  users(customerSlug: $customerSlug) {
-    id
-    firstName
-    lastName
-    globalPermissions
-  }
-}
-    `;
-
-/**
- * __useGetWorkspaceAdminsQuery__
- *
- * To run a query within a React component, call `useGetWorkspaceAdminsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetWorkspaceAdminsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetWorkspaceAdminsQuery({
- *   variables: {
- *      customerSlug: // value for 'customerSlug'
- *   },
- * });
- */
-export function useGetWorkspaceAdminsQuery(baseOptions: Apollo.QueryHookOptions<GetWorkspaceAdminsQuery, GetWorkspaceAdminsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetWorkspaceAdminsQuery, GetWorkspaceAdminsQueryVariables>(GetWorkspaceAdminsDocument, options);
-      }
-export function useGetWorkspaceAdminsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceAdminsQuery, GetWorkspaceAdminsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetWorkspaceAdminsQuery, GetWorkspaceAdminsQueryVariables>(GetWorkspaceAdminsDocument, options);
-        }
-export type GetWorkspaceAdminsQueryHookResult = ReturnType<typeof useGetWorkspaceAdminsQuery>;
-export type GetWorkspaceAdminsLazyQueryHookResult = ReturnType<typeof useGetWorkspaceAdminsLazyQuery>;
-export type GetWorkspaceAdminsQueryResult = Apollo.QueryResult<GetWorkspaceAdminsQuery, GetWorkspaceAdminsQueryVariables>;
-export function refetchGetWorkspaceAdminsQuery(variables?: GetWorkspaceAdminsQueryVariables) {
-      return { query: GetWorkspaceAdminsDocument, variables: variables }
-    }
 export const ConfirmWorkspaceJobDocument = gql`
     mutation confirmWorkspaceJob($input: GenerateAutodeckInput) {
   confirmCreateWorkspaceJob(input: $input) {
@@ -4731,40 +5247,6 @@ export type GetWorkspaceDialoguesQueryResult = Apollo.QueryResult<GetWorkspaceDi
 export function refetchGetWorkspaceDialoguesQuery(variables?: GetWorkspaceDialoguesQueryVariables) {
       return { query: GetWorkspaceDialoguesDocument, variables: variables }
     }
-export const GenerateWorkspaceFromCsvDocument = gql`
-    mutation GenerateWorkspaceFromCSV($input: GenerateWorkspaceCSVInputType) {
-  generateWorkspaceFromCSV(input: $input) {
-    id
-    slug
-  }
-}
-    `;
-export type GenerateWorkspaceFromCsvMutationFn = Apollo.MutationFunction<GenerateWorkspaceFromCsvMutation, GenerateWorkspaceFromCsvMutationVariables>;
-
-/**
- * __useGenerateWorkspaceFromCsvMutation__
- *
- * To run a mutation, you first call `useGenerateWorkspaceFromCsvMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useGenerateWorkspaceFromCsvMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [generateWorkspaceFromCsvMutation, { data, loading, error }] = useGenerateWorkspaceFromCsvMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useGenerateWorkspaceFromCsvMutation(baseOptions?: Apollo.MutationHookOptions<GenerateWorkspaceFromCsvMutation, GenerateWorkspaceFromCsvMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<GenerateWorkspaceFromCsvMutation, GenerateWorkspaceFromCsvMutationVariables>(GenerateWorkspaceFromCsvDocument, options);
-      }
-export type GenerateWorkspaceFromCsvMutationHookResult = ReturnType<typeof useGenerateWorkspaceFromCsvMutation>;
-export type GenerateWorkspaceFromCsvMutationResult = Apollo.MutationResult<GenerateWorkspaceFromCsvMutation>;
-export type GenerateWorkspaceFromCsvMutationOptions = Apollo.BaseMutationOptions<GenerateWorkspaceFromCsvMutation, GenerateWorkspaceFromCsvMutationVariables>;
 export const DuplicateQuestionDocument = gql`
     mutation duplicateQuestion($questionId: String) {
   duplicateQuestion(questionId: $questionId) {
@@ -4799,12 +5281,22 @@ export type DuplicateQuestionMutationHookResult = ReturnType<typeof useDuplicate
 export type DuplicateQuestionMutationResult = Apollo.MutationResult<DuplicateQuestionMutation>;
 export type DuplicateQuestionMutationOptions = Apollo.BaseMutationOptions<DuplicateQuestionMutation, DuplicateQuestionMutationVariables>;
 export const GetDialogueLinksDocument = gql`
-    query GetDialogueLinks($input: DialogueLinksInput) {
-  dialogueLinks(input: $input) {
-    title
-    slug
-    description
-    url
+    query GetDialogueLinks($workspaceId: String, $filter: DialogueConnectionFilterInput) {
+  dialogueLinks(workspaceId: $workspaceId, filter: $filter) {
+    dialogues {
+      title
+      slug
+      description
+      url
+    }
+    totalPages
+    pageInfo {
+      hasPrevPage
+      hasNextPage
+      prevPageOffset
+      nextPageOffset
+      pageIndex
+    }
   }
 }
     `;
@@ -4821,7 +5313,8 @@ export const GetDialogueLinksDocument = gql`
  * @example
  * const { data, loading, error } = useGetDialogueLinksQuery({
  *   variables: {
- *      input: // value for 'input'
+ *      workspaceId: // value for 'workspaceId'
+ *      filter: // value for 'filter'
  *   },
  * });
  */
@@ -4839,6 +5332,40 @@ export type GetDialogueLinksQueryResult = Apollo.QueryResult<GetDialogueLinksQue
 export function refetchGetDialogueLinksQuery(variables?: GetDialogueLinksQueryVariables) {
       return { query: GetDialogueLinksDocument, variables: variables }
     }
+export const DeleteDialogueDocument = gql`
+    mutation deleteDialogue($input: DeleteDialogueInputType) {
+  deleteDialogue(input: $input) {
+    id
+    slug
+  }
+}
+    `;
+export type DeleteDialogueMutationFn = Apollo.MutationFunction<DeleteDialogueMutation, DeleteDialogueMutationVariables>;
+
+/**
+ * __useDeleteDialogueMutation__
+ *
+ * To run a mutation, you first call `useDeleteDialogueMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteDialogueMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteDialogueMutation, { data, loading, error }] = useDeleteDialogueMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDeleteDialogueMutation(baseOptions?: Apollo.MutationHookOptions<DeleteDialogueMutation, DeleteDialogueMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteDialogueMutation, DeleteDialogueMutationVariables>(DeleteDialogueDocument, options);
+      }
+export type DeleteDialogueMutationHookResult = ReturnType<typeof useDeleteDialogueMutation>;
+export type DeleteDialogueMutationResult = Apollo.MutationResult<DeleteDialogueMutation>;
+export type DeleteDialogueMutationOptions = Apollo.BaseMutationOptions<DeleteDialogueMutation, DeleteDialogueMutationVariables>;
 export const DialogueConnectionDocument = gql`
     query dialogueConnection($customerSlug: String, $filter: DialogueConnectionFilterInput) {
   customer(slug: $customerSlug) {
@@ -5084,6 +5611,92 @@ export type GetInteractionQueryResult = Apollo.QueryResult<GetInteractionQuery, 
 export function refetchGetInteractionQuery(variables?: GetInteractionQueryVariables) {
       return { query: GetInteractionDocument, variables: variables }
     }
+export const GetWorkspaceSessionsDocument = gql`
+    query GetWorkspaceSessions($id: ID, $filter: SessionConnectionFilterInput) {
+  customer(id: $id) {
+    id
+    sessionConnection(filter: $filter) {
+      sessions {
+        ...SessionFragment
+      }
+      totalPages
+      pageInfo {
+        hasPrevPage
+        hasNextPage
+        nextPageOffset
+        prevPageOffset
+        pageIndex
+      }
+    }
+  }
+}
+    ${SessionFragmentFragmentDoc}`;
+
+/**
+ * __useGetWorkspaceSessionsQuery__
+ *
+ * To run a query within a React component, call `useGetWorkspaceSessionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetWorkspaceSessionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetWorkspaceSessionsQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useGetWorkspaceSessionsQuery(baseOptions?: Apollo.QueryHookOptions<GetWorkspaceSessionsQuery, GetWorkspaceSessionsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetWorkspaceSessionsQuery, GetWorkspaceSessionsQueryVariables>(GetWorkspaceSessionsDocument, options);
+      }
+export function useGetWorkspaceSessionsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceSessionsQuery, GetWorkspaceSessionsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetWorkspaceSessionsQuery, GetWorkspaceSessionsQueryVariables>(GetWorkspaceSessionsDocument, options);
+        }
+export type GetWorkspaceSessionsQueryHookResult = ReturnType<typeof useGetWorkspaceSessionsQuery>;
+export type GetWorkspaceSessionsLazyQueryHookResult = ReturnType<typeof useGetWorkspaceSessionsLazyQuery>;
+export type GetWorkspaceSessionsQueryResult = Apollo.QueryResult<GetWorkspaceSessionsQuery, GetWorkspaceSessionsQueryVariables>;
+export function refetchGetWorkspaceSessionsQuery(variables?: GetWorkspaceSessionsQueryVariables) {
+      return { query: GetWorkspaceSessionsDocument, variables: variables }
+    }
+export const GenerateWorkspaceFromCsvDocument = gql`
+    mutation GenerateWorkspaceFromCSV($input: GenerateWorkspaceCSVInputType) {
+  generateWorkspaceFromCSV(input: $input) {
+    id
+    slug
+  }
+}
+    `;
+export type GenerateWorkspaceFromCsvMutationFn = Apollo.MutationFunction<GenerateWorkspaceFromCsvMutation, GenerateWorkspaceFromCsvMutationVariables>;
+
+/**
+ * __useGenerateWorkspaceFromCsvMutation__
+ *
+ * To run a mutation, you first call `useGenerateWorkspaceFromCsvMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useGenerateWorkspaceFromCsvMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [generateWorkspaceFromCsvMutation, { data, loading, error }] = useGenerateWorkspaceFromCsvMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useGenerateWorkspaceFromCsvMutation(baseOptions?: Apollo.MutationHookOptions<GenerateWorkspaceFromCsvMutation, GenerateWorkspaceFromCsvMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<GenerateWorkspaceFromCsvMutation, GenerateWorkspaceFromCsvMutationVariables>(GenerateWorkspaceFromCsvDocument, options);
+      }
+export type GenerateWorkspaceFromCsvMutationHookResult = ReturnType<typeof useGenerateWorkspaceFromCsvMutation>;
+export type GenerateWorkspaceFromCsvMutationResult = Apollo.MutationResult<GenerateWorkspaceFromCsvMutation>;
+export type GenerateWorkspaceFromCsvMutationOptions = Apollo.BaseMutationOptions<GenerateWorkspaceFromCsvMutation, GenerateWorkspaceFromCsvMutationVariables>;
 export const GetInteractionsQueryDocument = gql`
     query GetInteractionsQuery($customerSlug: String, $dialogueSlug: String, $sessionsFilter: SessionConnectionFilterInput) {
   customer(slug: $customerSlug) {
@@ -5542,6 +6155,12 @@ export function useUpdatePermissionsMutation(baseOptions?: Apollo.MutationHookOp
 export type UpdatePermissionsMutationHookResult = ReturnType<typeof useUpdatePermissionsMutation>;
 export type UpdatePermissionsMutationResult = Apollo.MutationResult<UpdatePermissionsMutation>;
 export type UpdatePermissionsMutationOptions = Apollo.BaseMutationOptions<UpdatePermissionsMutation, UpdatePermissionsMutationVariables>;
+export namespace DeselectTopic {
+  export type Variables = DeselectTopicMutationVariables;
+  export type Mutation = DeselectTopicMutation;
+  export const Document = DeselectTopicDocument;
+}
+
 export namespace GetDialogueTopics {
   export type Variables = GetDialogueTopicsQueryVariables;
   export type Query = GetDialogueTopicsQuery;
@@ -5549,6 +6168,18 @@ export namespace GetDialogueTopics {
   export type Topic = (NonNullable<(NonNullable<GetDialogueTopicsQuery['dialogue']>)['topic']>);
   export type SubTopics = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueTopicsQuery['dialogue']>)['topic']>)['subTopics']>)[number]>;
   export const Document = GetDialogueTopicsDocument;
+}
+
+export namespace GetIssues {
+  export type Variables = GetIssuesQueryVariables;
+  export type Query = GetIssuesQuery;
+  export type Customer = (NonNullable<GetIssuesQuery['customer']>);
+  export type Issues = NonNullable<(NonNullable<(NonNullable<GetIssuesQuery['customer']>)['issues']>)[number]>;
+  export type Dialogue = (NonNullable<NonNullable<(NonNullable<(NonNullable<GetIssuesQuery['customer']>)['issues']>)[number]>['dialogue']>);
+  export type BasicStats = (NonNullable<NonNullable<(NonNullable<(NonNullable<GetIssuesQuery['customer']>)['issues']>)[number]>['basicStats']>);
+  export type History = (NonNullable<NonNullable<(NonNullable<(NonNullable<GetIssuesQuery['customer']>)['issues']>)[number]>['history']>);
+  export type Items = NonNullable<(NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<GetIssuesQuery['customer']>)['issues']>)[number]>['history']>)['items']>)[number]>;
+  export const Document = GetIssuesDocument;
 }
 
 export namespace GetSessionPaths {
@@ -5564,9 +6195,21 @@ export namespace GetWorkspaceDialogueStatistics {
   export type Variables = GetWorkspaceDialogueStatisticsQueryVariables;
   export type Query = GetWorkspaceDialogueStatisticsQuery;
   export type Customer = (NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>);
-  export type Dialogues = NonNullable<(NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['dialogues']>)[number]>;
-  export type DialogueStatisticsSummary = (NonNullable<NonNullable<(NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['dialogues']>)[number]>['dialogueStatisticsSummary']>);
+  export type Statistics = (NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['statistics']>);
+  export type WorkspaceStatisticsSummary = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['statistics']>)['workspaceStatisticsSummary']>)[number]>;
+  export type Dialogue = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['statistics']>)['workspaceStatisticsSummary']>)[number]>['dialogue']>);
   export const Document = GetWorkspaceDialogueStatisticsDocument;
+}
+
+export namespace GetWorkspaceSummaryDetails {
+  export type Variables = GetWorkspaceSummaryDetailsQueryVariables;
+  export type Query = GetWorkspaceSummaryDetailsQuery;
+  export type Customer = (NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>);
+  export type Statistics = (NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>);
+  export type Health = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['health']>);
+  export type RankedTopics = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['rankedTopics']>)[number]>;
+  export type BasicStats = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceSummaryDetailsQuery['customer']>)['statistics']>)['rankedTopics']>)[number]>['basicStats']>);
+  export const Document = GetWorkspaceSummaryDetailsDocument;
 }
 
 export namespace DeliveryEventFragment {
@@ -5592,6 +6235,18 @@ export namespace SessionFragment {
   export type Fragment = SessionFragmentFragment;
   export type NodeEntries = NonNullable<(NonNullable<SessionFragmentFragment['nodeEntries']>)[number]>;
   export type Delivery = (NonNullable<SessionFragmentFragment['delivery']>);
+  export type Dialogue = (NonNullable<SessionFragmentFragment['dialogue']>);
+  export type FollowUpAction = (NonNullable<SessionFragmentFragment['followUpAction']>);
+  export type Values = NonNullable<(NonNullable<(NonNullable<SessionFragmentFragment['followUpAction']>)['values']>)[number]>;
+}
+
+export namespace GetWorkspaceLayoutDetails {
+  export type Variables = GetWorkspaceLayoutDetailsQueryVariables;
+  export type Query = GetWorkspaceLayoutDetailsQuery;
+  export type Customer = (NonNullable<GetWorkspaceLayoutDetailsQuery['customer']>);
+  export type Statistics = (NonNullable<(NonNullable<GetWorkspaceLayoutDetailsQuery['customer']>)['statistics']>);
+  export type Health = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceLayoutDetailsQuery['customer']>)['statistics']>)['health']>);
+  export const Document = GetWorkspaceLayoutDetailsDocument;
 }
 
 export namespace CreateCta {
@@ -5632,13 +6287,6 @@ export namespace UploadUpsellImage {
   export type Mutation = UploadUpsellImageMutation;
   export type UploadUpsellImage = (NonNullable<UploadUpsellImageMutation['uploadUpsellImage']>);
   export const Document = UploadUpsellImageDocument;
-}
-
-export namespace GetWorkspaceAdmins {
-  export type Variables = GetWorkspaceAdminsQueryVariables;
-  export type Query = GetWorkspaceAdminsQuery;
-  export type Users = NonNullable<(NonNullable<GetWorkspaceAdminsQuery['users']>)[number]>;
-  export const Document = GetWorkspaceAdminsDocument;
 }
 
 export namespace ConfirmWorkspaceJob {
@@ -5776,13 +6424,6 @@ export namespace GetWorkspaceDialogues {
   export const Document = GetWorkspaceDialoguesDocument;
 }
 
-export namespace GenerateWorkspaceFromCsv {
-  export type Variables = GenerateWorkspaceFromCsvMutationVariables;
-  export type Mutation = GenerateWorkspaceFromCsvMutation;
-  export type GenerateWorkspaceFromCsv = (NonNullable<GenerateWorkspaceFromCsvMutation['generateWorkspaceFromCSV']>);
-  export const Document = GenerateWorkspaceFromCsvDocument;
-}
-
 export namespace DuplicateQuestion {
   export type Variables = DuplicateQuestionMutationVariables;
   export type Mutation = DuplicateQuestionMutation;
@@ -5793,8 +6434,17 @@ export namespace DuplicateQuestion {
 export namespace GetDialogueLinks {
   export type Variables = GetDialogueLinksQueryVariables;
   export type Query = GetDialogueLinksQuery;
-  export type DialogueLinks = NonNullable<(NonNullable<GetDialogueLinksQuery['dialogueLinks']>)[number]>;
+  export type DialogueLinks = (NonNullable<GetDialogueLinksQuery['dialogueLinks']>);
+  export type Dialogues = NonNullable<(NonNullable<(NonNullable<GetDialogueLinksQuery['dialogueLinks']>)['dialogues']>)[number]>;
+  export type PageInfo = (NonNullable<(NonNullable<GetDialogueLinksQuery['dialogueLinks']>)['pageInfo']>);
   export const Document = GetDialogueLinksDocument;
+}
+
+export namespace DeleteDialogue {
+  export type Variables = DeleteDialogueMutationVariables;
+  export type Mutation = DeleteDialogueMutation;
+  export type DeleteDialogue = (NonNullable<DeleteDialogueMutation['deleteDialogue']>);
+  export const Document = DeleteDialogueDocument;
 }
 
 export namespace DialogueConnection {
@@ -5842,6 +6492,23 @@ export namespace GetInteraction {
   export type Campaign = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetInteractionQuery['session']>)['delivery']>)['campaignVariant']>)['campaign']>);
   export type Events = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetInteractionQuery['session']>)['delivery']>)['events']>)[number]>;
   export const Document = GetInteractionDocument;
+}
+
+export namespace GetWorkspaceSessions {
+  export type Variables = GetWorkspaceSessionsQueryVariables;
+  export type Query = GetWorkspaceSessionsQuery;
+  export type Customer = (NonNullable<GetWorkspaceSessionsQuery['customer']>);
+  export type SessionConnection = (NonNullable<(NonNullable<GetWorkspaceSessionsQuery['customer']>)['sessionConnection']>);
+  export type Sessions = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceSessionsQuery['customer']>)['sessionConnection']>)['sessions']>)[number]>;
+  export type PageInfo = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceSessionsQuery['customer']>)['sessionConnection']>)['pageInfo']>);
+  export const Document = GetWorkspaceSessionsDocument;
+}
+
+export namespace GenerateWorkspaceFromCsv {
+  export type Variables = GenerateWorkspaceFromCsvMutationVariables;
+  export type Mutation = GenerateWorkspaceFromCsvMutation;
+  export type GenerateWorkspaceFromCsv = (NonNullable<GenerateWorkspaceFromCsvMutation['generateWorkspaceFromCSV']>);
+  export const Document = GenerateWorkspaceFromCsvDocument;
 }
 
 export namespace GetInteractionsQuery {

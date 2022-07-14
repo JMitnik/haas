@@ -5,6 +5,7 @@ import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
+import { Loader } from 'components/Common/Loader/Loader';
 import { SystemPermission, useFindRoleByIdQuery, useUpdatePermissionsMutation } from 'types/generated-types';
 
 interface RoleUserModalCardProps {
@@ -126,9 +127,9 @@ const RoleUserModalCard = ({ id, userId, onClose }: RoleUserModalCardProps) => {
 
   const role = data?.role;
 
-  if (loading) {
-    return <UI.Loader />;
-  }
+  // if (loading) {
+  //   return <UI.Loader />;
+  // }
 
   const permissions: PermissionsType[] = role?.allPermissions?.map((permission) => ({
     isActive: role?.permissions?.includes(permission) || false,
@@ -136,7 +137,7 @@ const RoleUserModalCard = ({ id, userId, onClose }: RoleUserModalCardProps) => {
   })) || [];
 
   return (
-    <UI.ModalCard maxWidth={1200} breakout onClose={onClose}>
+    <>
       <UI.ModalHead>
         <UI.ModalTitle>
           {t('role_permissions')}
@@ -150,15 +151,21 @@ const RoleUserModalCard = ({ id, userId, onClose }: RoleUserModalCardProps) => {
         {error && (
           <UI.ErrorPane header="Server Error" text={error.message} />
         )}
-        <RoleUserForm
-          permissionsState={permissions}
-          allPermissions={role?.allPermissions?.filter(isPresent)}
-          permissionsArray={role?.permissions?.filter(isPresent) || []}
-          roleId={id}
-          onClose={onClose}
-        />
+        {loading && (
+          <Loader testId="haas-runner" />
+        )}
+
+        {!loading && (
+          <RoleUserForm
+            permissionsState={permissions}
+            allPermissions={role?.allPermissions?.filter(isPresent)}
+            permissionsArray={role?.permissions?.filter(isPresent) || []}
+            roleId={id}
+            onClose={onClose}
+          />
+        )}
       </UI.ModalBody>
-    </UI.ModalCard>
+    </>
   );
 };
 

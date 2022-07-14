@@ -129,7 +129,7 @@ const InviteUserForm = ({ onClose, onRefetch }: InviteUserFormProps) => {
   };
 
   return (
-    <UI.Div py={2} px={4}>
+    <UI.Div>
       <UI.FormSectionHelper mb={1}>
         {t('invite_user_description')}
       </UI.FormSectionHelper>

@@ -1,5 +1,5 @@
 import { ProvidedZoom } from '@visx/zoom/lib/types';
-import React, { useState } from 'react';
+import React from 'react';
 
 import { HexagonNode } from './WorkspaceGrid.types';
 import { getHexagonSVGFill } from './WorkspaceGrid.helpers';
@@ -9,9 +9,11 @@ interface HexagonItemProps {
   zoomHelper: ProvidedZoom<SVGElement>;
   points: string;
   score: number;
+  strokeWidth: number;
   onZoom: (zoomHelper: ProvidedZoom<SVGElement>, node: HexagonNode) => void;
   onMouseOver: (event: React.MouseEvent<SVGPolygonElement, MouseEvent>, node: HexagonNode) => void;
   onMouseExit?: () => void;
+  id?: string;
 }
 
 export const HexagonItem = ({
@@ -22,16 +24,20 @@ export const HexagonItem = ({
   onZoom,
   onMouseOver,
   onMouseExit,
+  strokeWidth,
 }: HexagonItemProps) => {
   const initialFill = getHexagonSVGFill(score);
-  const [fill] = useState(initialFill);
 
   return (
     <g>
       <g fill="blue">
         <polygon
+          aria-label={node.id}
+          role="button"
+          strokeWidth={strokeWidth}
           points={points}
-          fill={fill}
+          stroke="white"
+          fill={initialFill}
           onMouseOver={(event) => {
             onMouseOver?.(event, node);
           }}

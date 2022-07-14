@@ -34,9 +34,10 @@ interface CustomerContextProps {
 interface CustomerProviderProps {
   children: React.ReactNode;
   workspaceOverrideSlug?: string;
+  __test__?: boolean;
 }
 
-const CustomerProvider = ({ children, workspaceOverrideSlug }: CustomerProviderProps) => {
+const CustomerProvider = ({ children, workspaceOverrideSlug, __test__ = false }: CustomerProviderProps) => {
   const { user } = useUser();
   const history = useHistory();
   const { customerSlug } = useParams<{ customerSlug: string }>();
@@ -64,7 +65,7 @@ const CustomerProvider = ({ children, workspaceOverrideSlug }: CustomerProviderP
   }, [activeCustomer]);
 
   const { loading: isLoading } = useGetCustomerOfUserQuery({
-    skip: !workspaceSlug,
+    skip: !workspaceSlug || __test__,
     fetchPolicy: 'cache-and-network',
     variables: {
       input: {
@@ -92,6 +93,7 @@ const CustomerProvider = ({ children, workspaceOverrideSlug }: CustomerProviderP
         ...customer,
         user: newUser as any,
         userRole: role,
+        statistics: null,
       });
     },
   });

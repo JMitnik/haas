@@ -33,15 +33,16 @@ const DialogueBuilderView = ({ nodes, selectLeafs, ctaNodes, root }: DialogueBui
       value: option.overrideLeaf?.id,
       type: option.overrideLeaf?.type,
     },
+    isTopic: option.isTopic,
   })) || [];
 
   return (
     <>
       <UI.ViewHead>
-        <UI.ViewTitle>
+        <UI.DeprecatedViewTitle>
           <UI.Icon as={Zap} mr={1} />
           {t('views:builder_view')}
-        </UI.ViewTitle>
+        </UI.DeprecatedViewTitle>
       </UI.ViewHead>
 
       <UI.ViewBody>

@@ -2,20 +2,11 @@ import * as UI from '@haas/ui';
 import { motion } from 'framer-motion';
 import styled, { css } from 'styled-components';
 
-export const WorkspaceGridAdapterContainer = styled(UI.Div)`
-  ${({ theme }) => css`
-    background: white;
-    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
-    /* padding: ${theme.gutter * 1.5}px; */
-    border-radius: 8px;
-    border: 1px solid #f7f6f6;
-  `}
-`;
+export const WorkspaceGridAdapterContainer = styled(UI.Div)``;
 
 export const WidgetHeader = styled(UI.Div)`
   ${({ theme }) => css`
     border-bottom: 1px solid ${theme.colors.gray[100]};
-    /* padding-bottom: ${theme.gutter / 2}px; */
     padding: 24px;
 
     ${UI.H4} {
@@ -45,14 +36,27 @@ interface WorkspaceGridContainerProps {
   backgroundColor: string;
 }
 
-export const WorkspaceGridContainer = styled(UI.Div)<WorkspaceGridContainerProps>`
+export const WorkspaceGridContainer = styled(UI.Div) <WorkspaceGridContainerProps>`
   ${({ theme, backgroundColor }) => css`
-    /* border-bottom: 1px solid ${theme.colors.gray[200]}; */
     background: ${backgroundColor};
     position: relative;
-    svg polygon:hover {
-      stroke: red;
+    height: 100%;
+    min-height: 100vh;
+
+    #items {
+      opacity: 1;
+      transition: all ${theme.transitions.normal};
+    }
+
+    #items:hover polygon {
+      opacity: 0.4;
       cursor: pointer;
+      transition: all ${theme.transitions.normal};
+    }
+
+    #items polygon:hover {
+      opacity: 1;
+      transition: all ${theme.transitions.normal};
     }
   `}
 `;
@@ -94,7 +98,7 @@ export const WorkspaceGridPaneContainer = styled(UI.Div)`
   ${({ theme }) => css`
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.075), 0 2px 8px rgba(0, 0, 0, 0.06);
     background: white;
-    border-radius: 12px;
+    border-radius: 20px;
 
     > * {
       padding: 36px;
@@ -212,24 +216,31 @@ export const MetadataLabel = styled(UI.Span)`
 
 export const TooltipContainer = styled(UI.Div)`
   ${({ theme }) => css`
-    min-width: 300px;
+    min-width: 200px;
     background: ${theme.colors.white};
-    border-radius: 5px 20px 20px 20px !important;
+    border-radius: ${theme.borderRadiuses.md}px !important;
+
+    ${UI.Icon} {
+      svg {
+        max-width: 100%;
+        max-height: 100%;
+      }
+    }
   `}
 `;
 
 export const TooltipHeader = styled(UI.Div)`
   ${({ theme }) => css`
     padding: 12px 16px;
-    background: ${theme.colors.gray[200]};
-    border-radius: 5px 20px 0 0 !important;
-    color: ${theme.colors.gray[600]};
+    background: ${theme.colors.neutral[200]};
+    border-radius: ${theme.borderRadiuses.md}px ${theme.borderRadiuses.md}px 0 0;
+    color: ${theme.colors.off[600]};
     font-weight: 600;
     border-bottom: 1px solid ${theme.colors.gray[200]};
 
     ${UI.Helper} {
       font-size: 0.7rem !important;
-      color: ${theme.colors.gray[400]};
+      color: ${theme.colors.off[300]};
     }
   `}
 `;
@@ -237,4 +248,68 @@ export const TooltipHeader = styled(UI.Div)`
 export const TooltipBody = styled(UI.Div)`
   padding: 12px 16px;
   margin-bottom: 6px;
+`;
+
+export const Tooltip = motion.custom(styled.div`
+  ${({ theme }) => css`
+    box-shadow: ${theme.boxShadows.md} !important;
+
+    > * {
+      padding: 0 !important;
+      border-radius: 20px !important;
+    }
+  `}
+`);
+
+export const ControlBody = styled(UI.Span)`
+  display: block;
+  padding: 8px;
+`;
+
+export const ControlContainer = styled(UI.Span)`
+  ${({ theme }) => css`
+    display: block;
+    background-color: ${theme.colors.white} !important;
+    box-shadow: ${theme.boxShadows.md};
+    border-radius: ${theme.borderRadiuses.md}px;
+    color: ${theme.colors.main[500]} !important;
+    transition: all ${theme.transitions.normal};
+
+    &[aria-disabled='true'] {
+      opacity: 0.5;
+      background: ${theme.colors.off[200]} !important;
+      box-shadow: ${theme.boxShadows.md} !important;
+    }
+
+    ${UI.Icon} svg {
+      width: 21px !important;
+    }
+  `}
+`;
+
+export const ControlButton = styled(UI.Button)`
+  ${({ theme }) => css`
+    background-color: ${theme.colors.white} !important;
+    box-shadow: ${theme.boxShadows.md};
+    border-radius: ${theme.borderRadiuses.md}px;
+    color: ${theme.colors.main[500]} !important;
+    width: 30px;
+    height: 30px;
+    transition: all ${theme.transitions.normal};
+
+    &[aria-disabled='true'] {
+      opacity: 0.5;
+      background: ${theme.colors.off[200]} !important;
+      box-shadow: ${theme.boxShadows.md} !important;
+    }
+
+    &:hover {
+      box-shadow: ${theme.boxShadows.lg};
+      transition: all ${theme.transitions.normal};
+    }
+
+    ${UI.Icon} svg {
+      width: 21px !important;
+    }
+  `}
 `;

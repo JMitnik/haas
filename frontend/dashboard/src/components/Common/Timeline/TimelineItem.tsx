@@ -32,7 +32,7 @@ export const TimelineItemContainer = styled(UI.Grid) <TimelineItemContainerProps
     background-color: var(--timeline-color);
   }
 
-  >:first-child {
+  >:first-of-type {
     position: relative;
   }
 `;

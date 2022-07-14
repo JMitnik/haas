@@ -1,8 +1,8 @@
 import styled, { css } from 'styled-components';
 import React from 'react';
 import { Skeleton as ChakraSkeleton } from '@chakra-ui/core';
-import { Text } from './Type';
-import Card from './Cards';
+import { H4, Text } from './Type';
+import { BoxShadowSize, Card } from './Cards';
 import { Span } from './Span';
 import { CloseIcon } from './assets/icon-close';
 import { Div } from './Generics';
@@ -13,7 +13,7 @@ import { Flex } from './Container';
 const IllustrationCardWrapper = styled.div`
   ${({ theme }) => css`
     ${Span} {
-      color: ${theme.colors.gray['500']};
+      color: ${theme.colors.gray['800']};
       bottom: ${theme.gutter}px;
       font-weight: 200;
       font-size: 1.3rem;
@@ -22,6 +22,11 @@ const IllustrationCardWrapper = styled.div`
       display: block;
       max-width: 80%;
       margin: 0 auto;
+    }
+
+    ${Text} {
+      color: ${theme.colors.off['500']};
+      font-weight: 300;
     }
 
     > svg {
@@ -39,13 +44,32 @@ const IllustrationCardWrapper = styled.div`
   `}
 `;
 
-export const IllustrationCard = ({ svg, text, children, isFlat }: { svg: any, text: string, children?: React.ReactNode, isFlat?: boolean; }) => {
-  return (
-    <Card noHover isFlat={isFlat}>
+interface IllustrationCardProps {
+  svg: any;
+  text: string;
+  flatten?: boolean;
+  children?: React.ReactNode;
+  boxShadow?: BoxShadowSize;
+}
+
+export const IllustrationCard = ({ svg, text, children, boxShadow, flatten }: IllustrationCardProps) => {
+  if (flatten) {
+    return (
       <IllustrationCardWrapper>
         {svg}
         <Span>
-          <Text pb={2}>{text}</Text>
+          <H4 color="off.500" pt={4} fontWeight={500} pb={2}>{text}</H4>
+          {children}
+        </Span>
+      </IllustrationCardWrapper>
+    )
+  }
+  return (
+    <Card boxShadow={boxShadow}>
+      <IllustrationCardWrapper>
+        {svg}
+        <Span>
+          <H4 color="off.500" pt={4} fontWeight={500} pb={2}>{text}</H4>
           {children}
         </Span>
       </IllustrationCardWrapper>
@@ -176,7 +200,7 @@ export const Separator = styled(Div)`
 interface PaddedBodyProps {
   fraction?: number;
 }
-export const PaddedBody = styled(Div)<PaddedBodyProps>`
+export const PaddedBody = styled(Div) <PaddedBodyProps>`
   ${({ theme, fraction = 1 }) => css`
     padding: ${theme.gutter * fraction}px;
   `}

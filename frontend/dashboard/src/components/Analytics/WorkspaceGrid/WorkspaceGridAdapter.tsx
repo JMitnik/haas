@@ -1,24 +1,18 @@
-import * as UI from '@haas/ui';
-import { format, sub } from 'date-fns';
-import { isPresent } from 'ts-is-present';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
+import { DateFormat, useDate } from 'hooks/useDate';
+import { useCustomer } from 'providers/CustomerProvider';
 import {
-  DialogueImpactScoreType,
-  useGetDialogueTopicsQuery,
   useGetSessionPathsQuery,
   useGetWorkspaceDialogueStatisticsQuery,
 } from 'types/generated-types';
-import { ReactComponent as HoneyComb } from 'assets/icons/honeycomb.svg';
-import { useCustomer } from 'providers/CustomerProvider';
 
 import * as LS from './WorkspaceGrid.styles';
 import { DataLoadOptions, WorkspaceGrid } from './WorkspaceGrid';
-import { HexagonNode, HexagonNodeType, HexagonViewMode } from './WorkspaceGrid.types';
-import { SingleHexagon } from './SingleHexagon';
-import { groupsFromDialogues } from './WorkspaceGrid.helpers';
+import { Dialogue, HexagonNode, HexagonNodeType, HexagonViewMode } from './WorkspaceGrid.types';
+import { groupsFromDialogues, mapNodeTypeToViewType } from './WorkspaceGrid.helpers';
 
-interface WorkspaceGridAdapterProps {
+export interface WorkspaceGridAdapterProps {
   height: number;
   width: number;
   backgroundColor: string;
@@ -34,117 +28,88 @@ export const WorkspaceGridAdapter = ({
   width,
   backgroundColor,
 }: WorkspaceGridAdapterProps) => {
+  const { getOneWeekAgo, format, getEndOfToday, getTomorrow } = useDate();
+  const [dateRange, setDateRange] = useState<[Date, Date]>(() => {
+    const startDate = getOneWeekAgo();
+    const endDate = getEndOfToday();
+
+    return [startDate, endDate];
+  });
+
+  const [selectedStartDate, selectedEndDate] = dateRange;
+  const [dialogues, setDialogues] = useState<Dialogue[]>([]);
+
   const { activeCustomer } = useCustomer();
 
-  const { data } = useGetWorkspaceDialogueStatisticsQuery({
+  const { loading: workspaceLoading } = useGetWorkspaceDialogueStatisticsQuery({
     variables: {
-      startDateTime: format(sub(new Date(), { weeks: 1 }), 'dd-MM-yyyy'),
-      endDateTime: format(new Date(), 'dd-MM-yyyy'),
+      startDateTime: format(selectedStartDate, DateFormat.DayFormat),
+      endDateTime: format(selectedEndDate, DateFormat.DayFormat),
       workspaceId: activeCustomer?.id || '',
     },
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'no-cache',
+    skip: !(!!selectedStartDate && !!selectedEndDate),
+    onCompleted: (data) => {
+      setDialogues(data.customer?.statistics?.workspaceStatisticsSummary || []);
+    },
   });
 
-  const { refetch: fetchGetDialogues } = useGetDialogueTopicsQuery({
-    skip: true,
-  });
+  const { refetch: fetchGetSessions } = useGetSessionPathsQuery({ skip: true });
 
-  const { refetch: fetchGetSessions } = useGetSessionPathsQuery({
-    skip: true,
-  });
-
-  const dialogues = data?.customer?.dialogues || [];
-
+  /**
+   * Fetches the various loading data requirements for the underlying WorkspaceGrid.
+   *
+   * Returns a Tuple consisting of Nodes and a View Mode
+   */
   const handleLoadData = async (options: DataLoadOptions): Promise<[HexagonNode[], HexagonViewMode]> => {
+    // Checkpoint one: If we clicked a group, return its subgroups (Groups or Dialogues)
     if (options.clickedGroup) {
-      return [options.clickedGroup.subGroups, HexagonViewMode.Group];
+      const subGroupType = options.clickedGroup.subGroups[0].type;
+      return [options.clickedGroup.subGroups, mapNodeTypeToViewType(subGroupType)];
     }
-    const { data: loadedData } = await fetchGetDialogues({
-      dialogueId: options.dialogueId,
-      input: {
-        value: options.topic || '',
-        isRoot: !options.topic,
-        startDateTime: format(sub(new Date(), { weeks: 1 }), 'dd-MM-yyyy'),
-        endDateTime: format(new Date(), 'dd-MM-yyyy'),
-        impactScoreType: DialogueImpactScoreType.Average,
-      },
-    });
 
-    const nodes: HexagonNode[] = loadedData?.dialogue?.topic?.subTopics?.filter(isPresent).map((topic) => ({
-      id: topic.name,
-      type: HexagonNodeType.Topic,
-      score: topic.impactScore!,
-      topic,
-    })) || [];
-
-    if (nodes.length) return [nodes, HexagonViewMode.Topic];
-
+    // Checkpoint three: Fetch all sessions for the current selected topics
     const { data: sessionData } = await fetchGetSessions({
       input: {
-        startDateTime: format(sub(new Date(), { weeks: 1 }), 'dd-MM-yyyy'),
-        endDateTime: format(new Date(), 'dd-MM-yyyy'),
+        startDateTime: format(selectedStartDate, DateFormat.DayFormat),
+        endDateTime: format(selectedEndDate, DateFormat.DayFormat),
         path: options.topics || [],
-        refresh: false,
+        refresh: true,
+        issueOnly: options.issueOnly,
       },
       dialogueId: options.dialogueId,
     });
 
-    const fetchNodes: HexagonNode[] = sessionData.dialogue?.pathedSessionsConnection?.pathedSessions?.filter(isPresent)
-      .map(
-        (session) => ({
-          id: session.id,
-          type: HexagonNodeType.Session,
-          score: session.score!,
-          session,
-        }),
-      ) || [];
+    const fetchNodes: HexagonNode[] = sessionData.dialogue?.pathedSessionsConnection?.pathedSessions?.map(
+      (session) => ({
+        id: session.id,
+        label: session.id,
+        type: HexagonNodeType.Session,
+        score: session.score,
+        session,
+      }),
+    ) || [];
 
     if (fetchNodes.length) return [fetchNodes, HexagonViewMode.Session];
 
+    // Final checkpoint: Return a "Final" state
     return [[], HexagonViewMode.Final];
   };
 
-  const initialViewMode = HexagonViewMode.Dialogue;
+  const initialData = useMemo(() => groupsFromDialogues(dialogues), [dialogues]);
+  const initialViewMode = HexagonViewMode.Workspace;
 
-  const initialData = useMemo(() => groupsFromDialogues(dialogues.filter(isPresent)), [dialogues]);
-
-  // Add spinner
+  // TODO: Add spinner
   if (!dialogues.length) return null;
+
+  const isServerLoading = workspaceLoading;
 
   return (
     <LS.WorkspaceGridAdapterContainer>
-      <LS.WidgetHeader>
-        <UI.Flex>
-          <UI.Div>
-            <UI.Div
-              px={1}
-              py={1}
-              border="1px solid"
-              borderColor="cyan.300"
-              backgroundColor="cyan.100"
-              style={{ borderRadius: '10px' }}
-              mr={3}
-            >
-              <UI.Icon width={30} height={30} color="cyan.400">
-                <HoneyComb fill="currentColor" />
-              </UI.Icon>
-            </UI.Div>
-          </UI.Div>
-          <UI.Div>
-            <UI.H4 mb={1}>Team overview</UI.H4>
-            <UI.Div display="flex" alignItems="center">
-              Discover and detect patterns in your teams. Red hexagons
-              {' '}
-              <UI.Span ml={1} mr={1}>
-                <SingleHexagon fill="red" />
-              </UI.Span>
-              {' '}
-              indicate trouble.
-            </UI.Div>
-          </UI.Div>
-        </UI.Flex>
-      </LS.WidgetHeader>
       <WorkspaceGrid
+        isServerLoading={isServerLoading}
+        dateRange={dateRange}
+        setDateRange={setDateRange}
         backgroundColor={backgroundColor}
         initialViewMode={initialViewMode}
         initialData={initialData}

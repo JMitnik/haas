@@ -1,12 +1,9 @@
-import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
 import { clearDatabase, prepDefaultCreateData } from './testUtils';
 import AuthService from '../../auth/AuthService';
 import { constructValidCreateAutomationInputData } from './testData';
 
-jest.setTimeout(30000);
-
-import { prisma } from 'test/setup/singletonDeps';
+import { prisma } from '../../../test/setup/singletonDeps';
 const ctx = makeTestContext(prisma);
 
 
@@ -35,12 +32,12 @@ it('creates automation', async () => {
       }
     }
   `,
-    {
-      input: input,
-    },
-    {
-      'Authorization': `Bearer ${token}`,
-    }
+  {
+    input: input,
+  },
+  {
+    'Authorization': `Bearer ${token}`,
+  }
   ).then((data) => data?.createAutomation);
 
   expect(res).toMatchObject({
@@ -67,16 +64,80 @@ it('unable to create automation when no workspace id is provided', async () => {
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
     if (error instanceof Error) {
       expect(error.message).toContain('Not Authorised!');
+    }
+  }
+});
+
+it('unable to create automation when no automation label is provided', async () => {
+  const { user, workspace, dialogue, question } = await prepDefaultCreateData(prisma);
+
+  // Generate token for API access
+  const token = AuthService.createUserToken(user.id, 22);
+  const input = constructValidCreateAutomationInputData(workspace, dialogue, question);
+  input.label = null;
+
+  try {
+    await ctx.client.request(`
+      mutation createAutomation($input: CreateAutomationInput) {
+        createAutomation(input: $input) {
+          id
+          label
+          type
+        }
+      }
+    `,
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
+    );
+  } catch (error) {
+    if (error instanceof Error) {
+      expect(error.message).toContain('No label provided');
+    } else { throw new Error(); }
+  }
+});
+
+it('unable to create automation when no automation type is provided', async () => {
+  const { user, workspace, dialogue, question } = await prepDefaultCreateData(prisma);
+
+  // Generate token for API access
+  const token = AuthService.createUserToken(user.id, 22);
+  const input = constructValidCreateAutomationInputData(workspace, dialogue, question);
+  input.automationType = null;
+
+  try {
+    await ctx.client.request(`
+      mutation createAutomation($input: CreateAutomationInput) {
+        createAutomation(input: $input) {
+          id
+          label
+          type
+        }
+      }
+    `,
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
+    );
+  } catch (error) {
+    if (error instanceof Error) {
+      expect(error.message).toContain('No automation type');
     } else { throw new Error(); }
   }
 });
@@ -99,12 +160,12 @@ it('unable to create automation when no actions are provided', async () => {
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
     if (error instanceof Error) {
@@ -119,7 +180,7 @@ it('unable to create automation when no action type is provided for an action', 
   // Generate token for API access
   const token = AuthService.createUserToken(user.id, 22);
   const input = constructValidCreateAutomationInputData(workspace, dialogue, question);
-  (input.actions?.[0] as any).type = null;
+  (input.actions as any)[0].type = null;
 
   try {
     await ctx.client.request(`
@@ -131,12 +192,12 @@ it('unable to create automation when no action type is provided for an action', 
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
     if (error instanceof Error) {
@@ -163,12 +224,12 @@ it('unable to create automation when no event type is provided for a condition',
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
     if (error instanceof Error) {
@@ -195,12 +256,12 @@ it('unable to create automation when no event type is provided for a condition',
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
     if (error instanceof Error) {
@@ -228,12 +289,12 @@ it('unable to create automation when no targets are provided for a SEND_SMS acti
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
     if (error instanceof Error) {
@@ -266,12 +327,12 @@ it('unable to create automations unauthorized', async () => {
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
     if (error instanceof Error) {

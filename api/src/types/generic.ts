@@ -8,17 +8,22 @@ export interface OrderByProps {
 }
 
 export interface PaginationProps {
-  pageIndex?: Nullable<number>,
-  offset?: Nullable<number>,
-  limit?: Nullable<number>,
-  orderBy?: Nullable<Array<NexusGenInputs['PaginationSortInput']>>,
-  startDate?: Nullable<Date>,
-  endDate?: Nullable<Date>,
-  searchTerm?: Nullable<string>
+  pageIndex?: Nullable<number>;
+  offset?: Nullable<number>;
+  limit?: Nullable<number>;
+  orderBy?: Nullable<Array<NexusGenInputs['PaginationSortInput']>>;
+  startDate?: Nullable<Date>;
+  endDate?: Nullable<Date>;
+  searchTerm?: Nullable<string>;
 }
 
 export type Nullable<T> = T | null | undefined;
 
 export function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
   return value !== null && value !== undefined;
+}
+
+export interface DateRangeFilter {
+  startDate: Date;
+  endDate: Date;
 }

@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
+import * as Modal from 'components/Common/Modal';
 import {
   CreateWorkspaceJobType,
   JobStatusType,
@@ -126,7 +127,7 @@ export const AutodeckOverview = () => {
             <BackButtonContainer onClick={() => history.goBack()}>
               <ArrowLeft />
             </BackButtonContainer>
-            <UI.ViewTitle>Autodeck overview</UI.ViewTitle>
+            <UI.DeprecatedViewTitle>Autodeck overview</UI.DeprecatedViewTitle>
             <UI.Button
               leftIcon={Plus}
               onClick={() => setIsOpenImportModal(true)}
@@ -140,7 +141,7 @@ export const AutodeckOverview = () => {
         </UI.Stack>
       </UI.ViewHead>
       <UI.ViewContainer>
-        <UI.Card noHover>
+        <UI.Card>
           <UI.Div p={2}>
             <UI.Table width="100%">
               <UI.TableHeading>
@@ -229,8 +230,8 @@ export const AutodeckOverview = () => {
           )}
         </UI.Card>
 
-        <UI.Modal isOpen={isOpenDetailModel} onClose={() => setActiveJob(null)}>
-          <UI.Card bg="white" width={600} noHover>
+        <Modal.Root open={isOpenDetailModel} onClose={() => setActiveJob(null)}>
+          <UI.Card bg="white" width={600}>
             <UI.CardBody>
               <UI.FormSectionHeader>{t('details')}</UI.FormSectionHeader>
               <UI.Stack mb={4}>
@@ -272,7 +273,11 @@ export const AutodeckOverview = () => {
                       >
                         {activeJob?.resourcesUrl
                           ? (
-                            <a style={{ color: 'white', textDecoration: 'none' }} href={activeJob?.resourcesUrl} download>
+                            <a
+                              style={{ color: 'white', textDecoration: 'none' }}
+                              href={activeJob?.resourcesUrl}
+                              download
+                            >
                               {t('autodeck:download_result')}
                             </a>
                           )
@@ -301,16 +306,16 @@ export const AutodeckOverview = () => {
               </UI.Stack>
             </UI.CardBody>
           </UI.Card>
-        </UI.Modal>
+        </Modal.Root>
 
-        <UI.Modal
-          isOpen={isOpenImportModal}
+        <Modal.Root
+          open={isOpenImportModal}
           onClose={() => {
             setIsOpenImportModal(false);
             setActiveJob(null);
           }}
         >
-          <UI.Card bg="white" noHover overflowY="scroll" height={800} width={1200}>
+          <UI.Card bg="white" overflowY="scroll" height={800} width={1200}>
             <UI.CardBody>
               <AutodeckForm
                 job={activeJob}
@@ -323,7 +328,7 @@ export const AutodeckOverview = () => {
               />
             </UI.CardBody>
           </UI.Card>
-        </UI.Modal>
+        </Modal.Root>
       </UI.ViewContainer>
     </>
   );

@@ -74,7 +74,9 @@ export const SubtlePageSubHeading = styled(Text)`
   `}
 `;
 
-export const Paragraph = styled(GenericType).attrs({ as: 'p' })``;
+export const Paragraph = styled(GenericType).attrs({ as: 'p' })`
+  font-size: 1rem;
+`;
 
 export const H1 = styled(GenericType).attrs({ as: 'h1' })`
   ${({ theme }) => css`
@@ -83,7 +85,8 @@ export const H1 = styled(GenericType).attrs({ as: 'h1' })`
 `;
 
 export const H2 = styled(GenericType).attrs({ as: 'h2' })`
-  ${({ theme }) => css`
+  ${({ theme, fontWeight = 800 }) => css`
+    font-weight: ${fontWeight?.toString() || 800};
     font-size: ${theme.fontSizes[4]}px;
   `}
 `;
@@ -95,14 +98,17 @@ export const PageHeading = styled(H2).attrs({ 'data-cy': 'PageHeading', role: 'h
 `;
 
 export const H3 = styled(GenericType).attrs({ as: 'h3' })`
-  ${({ theme }) => css`
+  ${({ theme, fontWeight }) => css`
     font-size: ${theme.fontSizes[3]}px;
+    font-weight: ${fontWeight?.toString() || 800};
+    letter-spacing: 0.014em;
   `}
 `;
 
 export const H4 = styled(GenericType).attrs({ as: 'h4' })`
-  ${({ theme }) => css`
+  ${({ theme, fontWeight }) => css`
     font-size: ${theme.fontSizes[2]}px;
+    font-weight: ${fontWeight?.toString() || 800};
   `}
 `;
 
@@ -122,8 +128,7 @@ export const Muted = styled(GenericType).attrs({ as: 'p' })`
 
 export const Strong = styled(GenericType).attrs({ as: 'p' })`
   ${({ theme }) => css`
+    display: inline;
     font-weight: 700;
-    font-size: 0.9rem;
-    color: ${theme.colors.gray['600']};
   `}
 `;

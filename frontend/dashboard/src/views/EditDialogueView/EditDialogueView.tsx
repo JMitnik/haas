@@ -4,8 +4,8 @@ import { Activity, Minus, Plus, Type } from 'react-feather';
 import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, Stack } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
 import {
-  Div, Flex, Form, FormContainer, FormControl, FormLabel, FormSection,
-  H3, Hr, Input, InputGrid, InputHelper, Muted, RadioButton, Textarea, ViewTitle,
+  DeprecatedViewTitle, Div, Flex, Form, FormContainer, FormControl, FormLabel,
+  FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, RadioButton, Textarea,
 } from '@haas/ui';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { motion } from 'framer-motion';
@@ -190,9 +190,9 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
   return (
     <>
       <UI.ViewHead>
-        <UI.ViewTitle>
+        <UI.DeprecatedViewTitle>
           {t('views:edit_dialogue_view')}
-        </UI.ViewTitle>
+        </UI.DeprecatedViewTitle>
       </UI.ViewHead>
       <UI.ViewBody>
 
@@ -315,7 +315,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
                       <UI.Input
                         name="postLeafSubheading"
                         leftEl={<Type />}
-                        placeholder="We will strive towards making you happier."
+                        placeholder="We strive to make you happier."
                         ref={form.register()}
                       />
                       <FormErrorMessage>{form.errors.postLeafSubheading?.message}</FormErrorMessage>

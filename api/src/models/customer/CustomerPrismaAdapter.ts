@@ -1,4 +1,5 @@
-import { PrismaClient, Dialogue, Customer, Tag, CustomerSettings, ColourSettings, FontSettings, DialogueImpactScore } from '@prisma/client';
+import { Prisma, PrismaClient, Dialogue, Customer, Tag, CustomerSettings, ColourSettings, FontSettings } from '@prisma/client';
+import WorkspaceTemplate, { DemoWorkspaceTemplate } from '..//templates/TemplateTypes';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import defaultWorkspaceTemplate from '../templates/defaultWorkspaceTemplate';
@@ -12,8 +13,23 @@ export class CustomerPrismaAdapter {
   }
 
   /**
+   * Fetches all dialogues
+   */
+  async getDialogues(workspaceId: string, dialogueFragments?: string[]) {
+    let query: Prisma.DialogueWhereInput = { customerId: workspaceId };
+
+    if (dialogueFragments?.length) {
+      query.title = { contains: dialogueFragments.join(' - ') };
+    }
+
+    return this.prisma.dialogue.findMany({
+      where: query,
+    });
+  }
+
+  /**
    * Find all the private dialogues within a workspace
-   * @param workspaceId 
+   * @param workspaceId
    * @returns a list of private dialogues
    */
   findPrivateDialoguesOfWorkspace = async (workspaceId?: string, workspaceSlug?: string) => {
@@ -225,24 +241,24 @@ export class CustomerPrismaAdapter {
     return customerWithDialogue?.dialogues?.[0];
   }
 
-  async createWorkspace(input: NexusGenInputs['CreateWorkspaceInput']) {
+  async createWorkspace(input: NexusGenInputs['CreateWorkspaceInput'], template: WorkspaceTemplate | DemoWorkspaceTemplate = defaultWorkspaceTemplate) {
     return this.prisma.customer.create({
       data: {
         name: input.name,
         slug: input.slug,
-        tags: { create: defaultWorkspaceTemplate.tags },
+        tags: { create: template.tags },
         settings: {
           create: {
             logoUrl: input.logo || '',
             logoOpacity: input.logoOpacity || 30,
             colourSettings: {
               create: {
-                primary: input.primaryColour || defaultWorkspaceTemplate.primaryColor,
+                primary: input.primaryColour || template.primaryColor,
               },
             },
           },
         },
-        roles: { create: defaultWorkspaceTemplate.roles },
+        roles: { create: template.roles },
         dialogues: { create: [] },
       },
       include: {

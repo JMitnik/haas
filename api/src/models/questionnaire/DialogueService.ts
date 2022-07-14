@@ -9,8 +9,8 @@ import NodeService from '../QuestionNode/NodeService';
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import {
   HistoryDataProps, HistoryDataWithEntry, IdMapProps,
-  PathFrequency, QuestionProps, StatisticsProps, CopyDialogueInputType, TopicSession,
-} from './DialogueTypes';
+  PathFrequency, QuestionProps, StatisticsProps, CopyDialogueInputType, TopicSession, DialogueConnectionFilterInput,
+} from './Dialogue.types';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import SessionService from '../session/SessionService';
 import { MassSeedTemplate } from '../templates/defaultWorkspaceTemplate';
@@ -27,8 +27,11 @@ import { offsetPaginate } from '../general/PaginationHelpers';
 import config from '../../config/config';
 import { DialogueTemplateType } from '../QuestionNode/NodeServiceType';
 import TemplateService from '../templates/TemplateService';
+import { logger } from '../../config/logger';
 
-
+function getRandomIntFromInterval(min: number, max: number) { // min and max included
+  return Math.floor(Math.random() * (max - min + 1) + min)
+}
 function getRandomInt(max: number) {
   return Math.floor(Math.random() * Math.floor(max));
 }
@@ -57,30 +60,46 @@ class DialogueService {
   }
 
   /**
-   * Finds all dialogues of a workspace but strips them off all sensitive information
-   * @param workspaceId 
+   * Finds all dialogues of a worksp
+   * ace but strips them off all sensitive information
+   * @param workspaceId
    * @returns a list of dialogues including a url to their client version
    */
-  findDialogueUrlsByWorkspaceId = async (workspaceId: string) => {
-    const strippedDialogues = await this.dialoguePrismaAdapter.findDialogueUrlsByWorkspaceId(workspaceId);
+  public async findDialogueUrlsByWorkspaceId(
+    workspaceId: string,
+    filter?: DialogueConnectionFilterInput | null,
+  ) {
+    const offset = filter?.offset ?? 0;
+    const perPage = filter?.perPage ?? 12;
+
+    const strippedDialogues = await this.dialoguePrismaAdapter.findDialogueUrlsByWorkspaceId(workspaceId, filter);
     const mappedStrippedDialogues = strippedDialogues.map((dialogue) => ({
       slug: dialogue.slug,
       title: dialogue.title,
       description: dialogue.description,
       url: config.env === 'local' ? `http://localhost:3000/${dialogue.customer.slug}/${dialogue.slug}` : `https://client.haas.live/${dialogue.customer.slug}/${dialogue.slug}`,
     }));
-    return mappedStrippedDialogues;
+
+    const totalDialogues = await this.dialoguePrismaAdapter.countDialogueLinks(workspaceId, filter);
+
+    const { totalPages, ...pageInfo } = offsetPaginate(totalDialogues, offset, perPage);
+
+    return {
+      dialogues: mappedStrippedDialogues,
+      totalPages,
+      pageInfo,
+    };
   }
 
   /**
    * Finds the most popular traversed path between two dates for a dialogue
-   * @param dialogueId 
-   * @param dialogueTitle 
-   * @param impactScoreType 
-   * @param startDateTime 
-   * @param endDateTime 
-   * @param refresh 
-   * @returns 
+   * @param dialogueId
+   * @param dialogueTitle
+   * @param impactScoreType
+   * @param startDateTime
+   * @param endDateTime
+   * @param refresh
+   * @returns
    */
   findMostPopularPath = async (
     dialogueId: string,
@@ -105,7 +124,7 @@ class DialogueService {
 
   /**
    * Recursively find the most iterated path taken within a list of sessions
-   * @param sessions 
+   * @param sessions
    * @param path a list of path entries containing info on the topic, frequency and impactScore
    * @param depth the depth of node entries which should be looked at
    * @returns a list of path entries containing info on the topic, frequency and impactScore
@@ -171,13 +190,13 @@ class DialogueService {
 
   /**
    * Finds the percentage change of the frequency of a path topic between two dates
-   * @param dialogueId 
-   * @param dialogueTitle 
-   * @param impactScoreType 
-   * @param startDateTime 
-   * @param endDateTime 
-   * @param refresh 
-   * @returns 
+   * @param dialogueId
+   * @param dialogueTitle
+   * @param impactScoreType
+   * @param startDateTime
+   * @param endDateTime
+   * @param refresh
+   * @returns
    */
   findMostChangedPath = async (
     dialogueId: string,
@@ -245,11 +264,11 @@ class DialogueService {
 
   /**
    * Finds the deepest entries of a list of sessions and groups them per topic
-   * @param dialogueId 
-   * @param startDateTime 
-   * @param endDateTime 
-   * @param isPrev 
-   * @returns 
+   * @param dialogueId
+   * @param startDateTime
+   * @param endDateTime
+   * @param isPrev
+   * @returns
    */
   findGroupedDeepestEntrySessions = async (
     dialogueId: string,
@@ -277,13 +296,13 @@ class DialogueService {
 
   /**
    * Finds the most trending topic for a dialogue
-   * @param dialogueId 
-   * @param dialogueTitle 
-   * @param impactScoreType 
-   * @param startDateTime 
-   * @param endDateTime 
-   * @param refresh 
-   * @returns 
+   * @param dialogueId
+   * @param dialogueTitle
+   * @param impactScoreType
+   * @param startDateTime
+   * @param endDateTime
+   * @param refresh
+   * @returns
    */
   findMostTrendingTopic = async (
     dialogueId: string,
@@ -406,9 +425,9 @@ class DialogueService {
 
   /**
    * Merges new scores with existing sub topics
-   * @param scores 
-   * @param subTopics 
-   * @returns updated sub topic 
+   * @param scores
+   * @param subTopics
+   * @returns updated sub topic
    */
   mergeScoresWithTopicIds = (
     scores: {
@@ -424,12 +443,12 @@ class DialogueService {
 
   /**
    * Checks whether cache needs to be updated
-   * @param dialogueId 
-   * @param impactScoreType 
-   * @param startDateTime 
-   * @param endDateTime 
-   * @param refresh 
-   * @param topic 
+   * @param dialogueId
+   * @param impactScoreType
+   * @param startDateTime
+   * @param endDateTime
+   * @param refresh
+   * @param topic
    * @returns the cached if exists, and a boolean whether a refresh should happen
    */
   checkRefreshDialogueTopicCache = async (
@@ -469,9 +488,9 @@ class DialogueService {
 
   /**
    * Finds all unique sub topics of the root question and calculate their impact scores
-   * @param dialogueId 
-   * @param startDateTime 
-   * @param endDateTime 
+   * @param dialogueId
+   * @param startDateTime
+   * @param endDateTime
    * @returns an impact score for every sub topic
    */
   findSubTopicsOfRoot = async (
@@ -544,10 +563,10 @@ class DialogueService {
 
   /**
    * Finds all unique sub topics of a topic and calculate their impact scores
-   * @param dialogueId 
-   * @param topic 
-   * @param startDateTime 
-   * @param endDateTime 
+   * @param dialogueId
+   * @param topic
+   * @param startDateTime
+   * @param endDateTime
    * @returns an impact score for every sub topic
    */
   findSubTopicsByTopic = async (
@@ -777,6 +796,10 @@ class DialogueService {
     return updateDialogueArgs;
   };
 
+  createPostLeafNode = async (dialogueId: string, postLeafNodeContent: { header: string; subHeader: string }) => {
+    return this.dialoguePrismaAdapter.createPostLeafNode(dialogueId, postLeafNodeContent);
+  }
+
   static updatePostLeafNode(
     dbPostLeaf: PostLeafNode | null | undefined,
     heading: string | null | undefined,
@@ -895,11 +918,14 @@ class DialogueService {
     dialogueId: string,
     template: MassSeedTemplate,
     maxSessions: number = 30,
-    isStrict: boolean = false
+    isStrict: boolean = false,
+    nrDays: number = 30,
+    minSliderValue: number = 1,
+    maxSliderValue: number = 100,
   ) => {
     const currentDate = new Date();
 
-    const nrDaysBack = Array.from(Array(30)).map((empty, index) => index + 1);
+    const nrDaysBack = Array.from(Array(nrDays)).map((empty, index) => index + 1);
     const datesBackInTime = nrDaysBack.map((daysBackCount, index) => subDays(currentDate, index));
     const dialogueWithNodes = await this.dialoguePrismaAdapter.getDialogueWithNodesAndEdges(dialogueId);
     await this.dialoguePrismaAdapter.setGeneratedWithGenData(dialogueId, true);
@@ -916,7 +942,7 @@ class DialogueService {
         const sessionCount = isStrict ? maxSessions : Math.ceil(Math.random() * maxSessions + 1);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         for (var k = 0, z = sessionCount; k < z; k++) {
-          const simulatedRootVote: number = getRandomInt(100);
+          const simulatedRootVote: number = getRandomIntFromInterval(minSliderValue, maxSliderValue);
 
           const simulatedChoice = Object.keys(template.topics)[
             Math.floor(Math.random() * Object.keys(template.topics).length)
@@ -928,8 +954,8 @@ class DialogueService {
           const simulatedSubChoice = sample(subChoices) as string;
 
           const simulatedChoiceEdge = edgesOfRootNode?.find((edge) => edge.conditions.every((condition) => {
-            if ((!condition.renderMin && !(condition.renderMin === 0)) || !condition.renderMax) return false;
-            const isValid = condition?.renderMin < simulatedRootVote && condition?.renderMax > simulatedRootVote;
+            if ((!condition.renderMin && typeof condition.renderMin !== 'number') || !condition.renderMax) return false;
+            const isValid = simulatedRootVote >= condition?.renderMin && simulatedRootVote <= condition?.renderMax;
             return isValid;
           }));
 
@@ -980,7 +1006,10 @@ class DialogueService {
     }
   };
 
-  generateFakeData = async (dialogueId: string, template: WorkspaceTemplate) => {
+  generateFakeData = async (
+    dialogueId: string,
+    template: WorkspaceTemplate
+  ) => {
     const currentDate = new Date();
     const nrDaysBack = Array.from(Array(30)).map((empty, index) => index + 1);
     const datesBackInTime = nrDaysBack.map((amtDaysBack) => subDays(currentDate, amtDaysBack));
@@ -999,7 +1028,10 @@ class DialogueService {
     await Promise.all(datesBackInTime.map(async (backDate) => {
       const simulatedRootVote: number = getRandomInt(100);
 
-      const simulatedChoice = template.topics[Math.floor(Math.random() * template.topics.length)];
+      const simulatedChoice = Object.keys(template.topics)[
+        Math.floor(Math.random() * Object.keys(template.topics).length)
+      ].toString();
+
       const simulatedChoiceEdge = edgesOfRootNode?.find((edge) => edge.conditions.every((condition) => {
         if ((!condition.renderMin && !(condition.renderMin === 0)) || !condition.renderMax) return false;
         const isValid = condition?.renderMin < simulatedRootVote && condition?.renderMax > simulatedRootVote;
@@ -1059,8 +1091,10 @@ class DialogueService {
     }));
 
     // Get the top paths
-    const isPositiveEntries = _.groupBy(textAndScoreEntries, (entry) => entry.y && entry.y > 50);
+    const isPositiveEntries: any = _.groupBy(textAndScoreEntries, (entry) => entry.y && entry.y > 50);
+    // @ts-ignore
     const topNegativePath = DialogueService.getTopNPaths(isPositiveEntries.false || [], 3, 'negative') || [];
+    // @ts-ignore
     const topPositivePath = DialogueService.getTopNPaths(isPositiveEntries.true || [], 3, 'positive') || [];
 
     // Get the most popular paths in general
@@ -1279,6 +1313,7 @@ class DialogueService {
     // Create edges
     const updatedTemplateEdges = templateDialogue?.edges.map((edge) => {
       const mappedConditions = edge.conditions.map((condition) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { id, edgeId, ...conditionData } = condition;
         const updateCondition = { ...conditionData };
         return updateCondition;
@@ -1320,8 +1355,7 @@ class DialogueService {
     };
 
     if (customers.length > 1) {
-      // TODO: Make this a logger or something
-      console.warn(`Multiple customers found with slug ${input.customerSlug}`);
+      logger.log(`Multiple customers found with slug ${input.customerSlug}`);
     };
 
     const customer = customers?.[0];

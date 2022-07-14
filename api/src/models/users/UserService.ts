@@ -1,4 +1,4 @@
-import { UserOfCustomer, PrismaClient, Customer, Prisma, User } from '@prisma/client';
+import { UserOfCustomer, PrismaClient, Customer, Prisma, User, CustomerSettings } from '@prisma/client';
 import { UserInputError } from 'apollo-server';
 import _ from 'lodash';
 
@@ -12,19 +12,57 @@ import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import UserOfCustomerPrismaAdapter from './UserOfCustomerPrismaAdapter';
 import { DeletedUserOutput, UserWithWorkspaces } from './UserServiceTypes';
 import { offsetPaginate } from '../general/PaginationHelpers';
+import DialogueService from '../../models/questionnaire/DialogueService';
+import CustomerService from '../../models/customer/CustomerService';
 
 class UserService {
   prisma: PrismaClient;
   userPrismaAdapter: UserPrismaAdapter;
   customerPrismaAdapter: CustomerPrismaAdapter;
   userOfCustomerPrismaAdapter: UserOfCustomerPrismaAdapter;
+  customerService: CustomerService;
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
     this.userPrismaAdapter = new UserPrismaAdapter(prismaClient);
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
     this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
+    this.customerService = new CustomerService(prismaClient);
   };
+
+  /**
+   * Creates a "root" user without any workspace associated.
+   */
+  public async createUser(email: string, firstName: string, lastName: string, isSuperAdmin: boolean) {
+    return this.userPrismaAdapter.upsertUserByEmail({
+      email,
+      firstName,
+      lastName,
+      globalPermissions: {
+        set: isSuperAdmin ? ['CAN_ACCESS_ADMIN_PANEL'] : [],
+      },
+    })
+  }
+
+  /**
+   * Finds all private dialogues of a workspace and connects them to a user
+   * @param userId
+   * @param workspaceId
+   */
+  connectPrivateDialoguesToUser = async (userId: string, workspaceId: string) => {
+    const customerWithDialogues = await this.customerService.findPrivateDialoguesOfWorkspace(workspaceId);
+    const privateDialogueIds = customerWithDialogues?.dialogues.map((dialogue) => ({ id: dialogue.id })) || [];
+    await this.userOfCustomerPrismaAdapter.connectPrivateDialoguesToUser(userId, privateDialogueIds);
+  }
+
+  /**
+   * Upserts a user by checking if the email already exists or not
+   * @param input
+   * @returns
+   */
+  upsertUserByEmail = async (input: Prisma.UserCreateInput) => {
+    return this.userPrismaAdapter.upsertUserByEmail(input);
+  }
 
   /**
    * Finds the private dialogues of a user as well as all private dialogues within a workspace
@@ -214,10 +252,44 @@ class UserService {
   }
 
   /**
+   * Send an invitation email to a user of a customer
+   * @param invitedUser
+   */
+  sendInvitationMail = async (
+    invitedUser: UserOfCustomer & {
+      customer: {
+        id: string;
+        name: string;
+        settings: {
+          colourSettings: {
+            primary: string;
+          } | null;
+        } | null;
+      };
+      user: User;
+    }) => {
+    const inviteLoginToken = AuthService.createUserToken(invitedUser.userId);
+    await this.userPrismaAdapter.setLoginToken(invitedUser.userId, inviteLoginToken);
+
+    const emailBody = makeInviteTemplate({
+      customerName: invitedUser.customer.name,
+      recipientMail: invitedUser.user.email,
+      token: inviteLoginToken,
+      bgColor: invitedUser.customer.settings?.colourSettings?.primary,
+    });
+
+    mailService.send({
+      recipient: invitedUser.user.email,
+      subject: `HAAS: You have been invited to ${invitedUser.customer.name}`,
+      body: emailBody,
+    });
+  }
+
+  /**
    * Invites a new user to a current customer, and mails them with a login-token.
    */
   async inviteNewUserToCustomer(email: string, customerId: string, roleId: string) {
-    const createdUser = await this.userPrismaAdapter.createNewUser(customerId, roleId, email)
+    const createdUser = await this.userPrismaAdapter.createWorkspaceUser(customerId, roleId, email)
 
     const inviteLoginToken = AuthService.createUserToken(createdUser.id);
 

@@ -3,6 +3,7 @@ import {
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import { sortBy } from 'lodash';
+import { addDays, differenceInHours } from 'date-fns';
 
 import { offsetPaginate } from '../general/PaginationHelpers';
 import { TEXT_NODES } from '../questionnaire/Dialogue';
@@ -10,32 +11,124 @@ import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';
 import { Nullable, PaginationProps } from '../../types/generic';
-import { SessionWithEntries } from './SessionTypes';
+import { FollowUpAction, SessionActionType, SessionConnection, SessionConnectionFilterInput, SessionWithEntries } from './Session.types';
+import { TopicByString, TopicStatistics, TopicStatisticsByDialogueId } from '../Topic/Topic.types';
 import TriggerService from '../trigger/TriggerService';
 import prisma from '../../config/prisma';
 import Sentry from '../../config/sentry';
 import SessionPrismaAdapter from './SessionPrismaAdapter';
 import AutomationService from '../automations/AutomationService';
-import { addDays, differenceInHours } from 'date-fns';
+import { CustomerService } from '../customer/CustomerService';
+import { logger } from '../../config/logger';
 
 class SessionService {
-  sessionPrismaAdapter: SessionPrismaAdapter;
-  triggerService: TriggerService;
-  automationService: AutomationService;
+  private sessionPrismaAdapter: SessionPrismaAdapter;
+  private triggerService: TriggerService;
+  private automationService: AutomationService;
+  private workspaceService: CustomerService;
 
   constructor(prismaClient: PrismaClient) {
     this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
     this.triggerService = new TriggerService(prismaClient);
     this.automationService = new AutomationService(prismaClient);
+    this.workspaceService = new CustomerService(prismaClient);
   };
 
   /**
+   * Given a list of sessions with node-entries, return an object which maps negative dialogue interactions to their "frequency".
+   *
+   * Note: this can be applied both within a workspace as well as outside.
+   *
+   * Precondition: Sessions are sorted by createdAt.
+   */
+  public extractNegativeScoresByDialogue(sessions: SessionWithEntries[]): TopicStatisticsByDialogueId {
+    const negativeDialogueScoresExtracted = sessions.reduce((acc, session) => {
+      // Only add negative sessions
+      if (session.mainScore < 55) {
+        // Check if topic exists in acc.
+        // If not, create a unique entry for ${dialogueId}
+        if (!acc?.hasOwnProperty(session.dialogueId)) {
+          acc[session.dialogueId] = this.makeTopicStatistics('', [], session);
+          return acc;
+        }
+        // Else, add negative interaction info to the dialogue.
+        acc[session.dialogueId] = {
+          dates: [...acc[session.dialogueId].dates, session.createdAt],
+          dialogueIds: [],
+          count: acc[session.dialogueId].count + 1,
+          score: acc[session.dialogueId].score + session.mainScore,
+          relatedTopics: [],
+          topic: '',
+          followUpActions: [...acc[session.dialogueId].followUpActions, this.getActionFromSession(session)],
+        };
+      }
+      return acc;
+    }, {} as TopicStatisticsByDialogueId);
+
+    return negativeDialogueScoresExtracted;
+  }
+
+  /**
+   * Given a list of sessions with node-entries, return an object which maps topics to their "frequency".
+   *
+   * Note: this can be applied both within a workspace as well as outside.
+   *
+   * Precondition: Sessions are sorted by createdAt.
+   */
+  public extractTopics(sessions: SessionWithEntries[]): TopicByString {
+    const topicsByString = sessions.reduce((acc, session) => {
+      const topics = session.nodeEntries.map(nodeEntry => nodeEntry.choiceNodeEntry?.value).filter(isPresent);
+
+      topics.forEach((topic) => {
+        // Check if topic exists in acc.
+        // If not, create a unique entry for ${dialogueId}
+        if (!acc.hasOwnProperty(topic)) {
+          acc[topic] = {
+            [session.dialogueId]: this.makeTopicStatistics(topic, topics, session),
+          }
+
+          return;
+        }
+
+        // Check if topic also check if it exists for this dialogue
+        // If not, create a unique entry for dialogue
+        if (!acc[topic].hasOwnProperty(session.dialogueId)) {
+          acc[topic][session.dialogueId] = this.makeTopicStatistics(topic, topics, session);
+          return;
+        }
+
+        // Else, add it to the dialogue-topic combination.
+        acc[topic][session.dialogueId] = {
+          dates: [...acc[topic][session.dialogueId].dates, session.createdAt],
+          dialogueIds: [...acc[topic][session.dialogueId].dialogueIds, session.dialogueId],
+          count: acc[topic][session.dialogueId].count + 1,
+          score: acc[topic][session.dialogueId].score + session.mainScore,
+          relatedTopics: [...acc[topic][session.dialogueId].relatedTopics, ...topics],
+          topic: topic,
+          followUpActions: [...acc[topic][session.dialogueId].followUpActions, this.getActionFromSession(session)],
+        }
+      });
+
+      return acc;
+    }, {} as TopicByString);
+
+    // Normalize the topic counts (by averaging the cumulative `score`)
+    Object.entries(topicsByString).forEach(([topic]) => {
+      Object.entries(topicsByString[topic]).forEach(([dialogueId, topicStatistics]) => {
+        topicsByString[topic][dialogueId].score = topicStatistics.score / topicStatistics.count;
+      });
+    });
+
+    return topicsByString;
+  }
+
+  /**
    * Finds all sessions where all pathEntry answers exist in the session's node entries
-   * @param dialogueId 
-   * @param path 
-   * @param startDateTime 
-   * @param endDateTime 
-   * @returns 
+   * @param dialogueId
+   * @param path
+   * @param startDateTime
+   * @param endDateTime
+   * @returns
    */
   findPathMatchedSessions = async (
     dialogueId: string,
@@ -43,6 +136,7 @@ class SessionService {
     startDateTime: Date,
     endDateTime?: Date,
     refresh: boolean = false,
+    issueOnly: boolean = false,
   ) => {
     const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
 
@@ -70,12 +164,17 @@ class SessionService {
       },
     })) : [];
 
-    const pathedSessions = await this.sessionPrismaAdapter.findPathMatchedSessions(
+    let pathedSessions = await this.sessionPrismaAdapter.findPathMatchedSessions(
       pathEntries,
       startDateTime,
       endDateTimeSet,
       dialogueId
     );
+
+    // TODO: Make this a more formal calculation
+    if (issueOnly) {
+      pathedSessions = pathedSessions.filter(session => session.mainScore < 55);
+    }
 
     // Create a pathed session cache object
     void this.sessionPrismaAdapter.upsertPathedSessionCache(
@@ -105,12 +204,18 @@ class SessionService {
     return this.sessionPrismaAdapter.findNodeEntriesBySessionIds(sessionIds, depth);
   }
 
+  /**
+   * Gets all sessions for all dialogues, between certain dates
+   */
   findSessionsForDialogues = async (
     dialogueIds: string[],
     startDateTime: Date,
     endDateTime: Date,
+    where?: Prisma.SessionWhereInput,
+    include?: Prisma.SessionInclude
   ) => {
     return this.sessionPrismaAdapter.prisma.session.findMany({
+      include: include ? { ...include } : undefined,
       where: {
         dialogueId: {
           in: dialogueIds,
@@ -119,8 +224,9 @@ class SessionService {
           gte: startDateTime,
           lte: endDateTime,
         },
+        ...where,
       },
-    })
+    });
   }
 
   /**
@@ -143,6 +249,16 @@ class SessionService {
       endDateTime,
       performanceThreshold
     );
+  }
+
+  /**
+   * Get actions from from noed entries
+   */
+  public actionsFromNodeEntries(nodeEntries: NodeEntryWithTypes[]): FollowUpAction | null {
+    const nodeEntry = nodeEntries.find((nodeEntry) => nodeEntry.formNodeEntry);
+
+    // @ts-ignore
+    return nodeEntry?.formNodeEntry || null;
   }
 
   /**
@@ -200,13 +316,13 @@ class SessionService {
     try {
       await this.triggerService.tryTriggers(session);
     } catch (error) {
-      console.log('Something went wrong while handling sms triggers: ', error);
+      logger.error('Something went wrong while handling sms triggers', error);
     };
 
     try {
       await this.automationService.handleTriggerAutomations(dialogueId);
     } catch (error) {
-      console.log('Something went wrong checking automation triggers: ', error);
+      logger.error('Something went wrong checking automation triggers', error);
     }
 
     return session;
@@ -419,9 +535,47 @@ class SessionService {
     return sorted;
   }
 
+  /**
+   * Finds a subset of workspace-wide sessions based on a filter.
+   * @param workspaceId
+   * @param filter
+   * @returns a list of sessions
+   */
+  getWorkspaceSessionConnection = async (
+    workspaceId: string,
+    filter?: SessionConnectionFilterInput | null
+  ): Promise<SessionConnection | null> => {
+    const offset = filter?.offset ?? 0;
+    const perPage = filter?.perPage ?? 5;
+    let dialogueIds = filter?.dialogueIds;
+
+    if (!dialogueIds?.length) {
+      const dialogues = await this.workspaceService.getDialogues(workspaceId);
+      dialogueIds = dialogues.map((dialogue) => dialogue.id);
+    }
+
+    const sessions = await this.sessionPrismaAdapter.findWorkspaceSessions(dialogueIds, filter);
+
+    const sessionWithFollowUpAction = sessions.map((session) => ({
+      ...session,
+      followUpAction: this.actionsFromNodeEntries(session.nodeEntries as NodeEntryWithTypes[]),
+    }));
+
+    const totalSessions = await this.sessionPrismaAdapter.countWorkspaceSessions(dialogueIds, filter);
+
+    const { totalPages, ...pageInfo } = offsetPaginate(totalSessions, offset, perPage);
+
+    return {
+      sessions: sessionWithFollowUpAction,
+      totalPages,
+      pageInfo,
+    };
+  };
+
+
   getSessionConnection = async (
     dialogueId: string,
-    filter?: NexusGenInputs['SessionConnectionFilterInput'] | null
+    filter?: SessionConnectionFilterInput | null
   ): Promise<NexusGenFieldTypes['SessionConnection'] | null> => {
     const offset = filter?.offset ?? 0;
     const perPage = filter?.perPage ?? 5;
@@ -453,6 +607,13 @@ class SessionService {
         nodeEntries: {
           include: {
             choiceNodeEntry: true,
+            formNodeEntry: {
+              include: {
+                values: {
+                  include: { relatedField: true },
+                },
+              },
+            },
             linkNodeEntry: true,
             registrationNodeEntry: true,
             sliderNodeEntry: true,
@@ -488,6 +649,44 @@ class SessionService {
 
     return dateRange;
   };
+
+  /**
+   * Get the action a Session requires.
+   * @param session Session with node-entries
+   * @returns Which type the session alludes to
+   */
+  private getActionFromSession(session: SessionWithEntries): SessionActionType | null {
+    const contactAction = session.nodeEntries.find((nodeEntry) => (
+      nodeEntry.formNodeEntry?.values.find((val) => !!val.email || !!val.phoneNumber || !!val.shortText)
+    ));
+
+    if (contactAction) return 'CONTACT';
+
+    return null;
+  }
+
+  /**
+   * Converts a session with topic-string to TopicStatistics
+   * @param topicName
+   * @param relatedTopics
+   * @param session
+   * @returns
+   */
+  private makeTopicStatistics(
+    topicName: string,
+    relatedTopics: string[],
+    session: SessionWithEntries
+  ): TopicStatistics {
+    return {
+      count: 1,
+      dates: [session.createdAt],
+      dialogueIds: [],
+      relatedTopics: relatedTopics,
+      score: session.mainScore,
+      topic: topicName,
+      followUpActions: [this.getActionFromSession(session)],
+    };
+  }
 };
 
 export default SessionService;

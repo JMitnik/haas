@@ -11,7 +11,6 @@ import SimpleMDE from 'react-simplemde-editor';
 import {
   Checkbox as ChakraCheckbox,
   CheckboxProps as ChakraCheckboxProps,
-  ButtonProps as ChakraButtonProps,
   Button,
   FormControl as ChakraFormControl,
   FormLabel as ChakraFormLabel,
@@ -126,7 +125,7 @@ export const InputLabel = styled.label`
 `;
 
 export const FormLabel = forwardRef((props: FormLabelProps, ref) => (
-  <ChakraFormLabel fontSize="0.9rem" color="gray.600" fontWeight="600" {...props} ref={ref} />
+  <ChakraFormLabel fontSize="0.95rem" color="off.500" fontWeight="600" {...props} ref={ref} />
 ));
 
 interface InputProps extends ChakraInputProps {
@@ -182,7 +181,7 @@ export const Input = forwardRef(({ id, ...props }: InputProps, ref: Ref<HTMLInpu
       roundedTopRight={props.rightAddOn ? '0' : 'auto'}
       id={id}
       {...props}
-      fontSize="0.8rem"
+      fontSize="0.9rem"
       ref={ref}
     />
   </InputGroup>
@@ -585,7 +584,7 @@ export const CardForm = styled(Div) <CardFormProps>`
     css`
       display: flex;
 
-      > *:first-child {
+      > *:first-of-type {
         border-right: 1px solid ${theme.colors.gray[200]};
       }
     `}

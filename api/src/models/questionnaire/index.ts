@@ -3,5 +3,7 @@ export * from './graphql/DialogueConnection';
 export * from './Dialogue';
 export * from './DialogueStatisticsSummary';
 export * from './SetDialoguePrivacyResolver';
-export * from './DialogueLinksResolver';
+export * from './graphql/PublicDialogue.graphql';
+export * from './graphql/DialogueLinks.graphql';
 export * from './DialogueStatisticsResolver';
+export * from './graphql/Path';

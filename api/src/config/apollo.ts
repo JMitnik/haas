@@ -57,6 +57,7 @@ export const makeApollo = async (prisma: PrismaClient) => {
     cors: true,
     logging: true,
     maskedErrors: false,
+    // uploads: false,
     schema: applyMiddleware(schema, authShield),
     context: async (ctx: any): Promise<APIContext> => ({
       ...ctx,

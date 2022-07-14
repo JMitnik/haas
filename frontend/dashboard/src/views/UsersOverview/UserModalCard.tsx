@@ -42,12 +42,12 @@ export const UserModalCard = ({ id, onClose }: UserModalCardProps) => {
 
   const { user } = userOfCustomer;
 
-  const fullName = `${userOfCustomer?.user?.firstName} ${userOfCustomer?.user?.lastName}`;
+  const userName = user?.firstName ? `${user?.firstName} ${user?.lastName}` : user?.email;
 
   return (
-    <UI.ModalCard maxWidth={1200} onClose={onClose} breakout>
+    <>
       <UI.ModalHead>
-        <UI.ModalTitle mb={2}>{fullName}</UI.ModalTitle>
+        <UI.ModalTitle mb={2}>{userName}</UI.ModalTitle>
 
         <UI.Stack>
           <UI.Grid gridTemplateColumns="auto 1fr" gridColumnGap={4} gridRowGap={2}>
@@ -112,6 +112,6 @@ export const UserModalCard = ({ id, onClose }: UserModalCardProps) => {
           />
         </UI.ModalBody>
       )}
-    </UI.ModalCard>
+    </>
   );
 };

@@ -9,8 +9,10 @@ import { graphqlUploadExpress } from 'graphql-upload';
 import DeliveryWebhookRoute from '../routes/webhooks/DeliveryWebhookRoute';
 import { makeApollo } from './apollo';
 import config from './config';
+import { logger } from './logger';
 
 export const makeServer = async (port: number, prismaClient: PrismaClient) => {
+  logger.logLifeCycle('Starting application');
   const app = express();
 
   const corsOptions: CorsOptions = {
@@ -41,7 +43,6 @@ export const makeServer = async (port: number, prismaClient: PrismaClient) => {
   // Add /graphql and graphqlUploadExpress
   const apollo = await makeApollo(prismaClient);
   app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }));
-
   app.use('/graphql', apollo)
 
   if (config.useSSL) {
@@ -56,10 +57,7 @@ export const makeServer = async (port: number, prismaClient: PrismaClient) => {
   }
 
   const serverInstance = app.listen(port);
-
-  if (process.env.NODE_ENV !== 'test') {
-    console.log('🏁\tStarted the server!');
-  }
+  logger.logLifeCycle('Started the server!');
 
   return serverInstance;
 };

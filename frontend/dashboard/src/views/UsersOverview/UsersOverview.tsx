@@ -1,14 +1,14 @@
 import * as UI from '@haas/ui';
-import { AnimatePresence, motion } from 'framer-motion';
 import { BooleanParam, DateTimeParam, NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
 import { Calendar, Filter, Search, User } from 'react-feather';
-import { Route, Switch, useHistory, useLocation } from 'react-router';
 import { endOfDay, startOfDay } from 'date-fns';
+import { useHistory } from 'react-router-dom';
 import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
 import * as Menu from 'components/Common/Menu';
+import * as Modal from 'components/Common/Modal';
 import * as Table from 'components/Common/Table';
 import { Avatar } from 'components/Common/Avatar';
 import { FormatTimestamp } from 'components/Common/DateAndTime';
@@ -23,12 +23,13 @@ import {
 import { PickerButton } from 'components/Common/Picker/PickerButton';
 import { ROUTES, useNavigator } from 'hooks/useNavigator';
 import { TabbedMenu } from 'components/Common/TabMenu';
-import { ReactComponent as UsersIcon } from 'assets/icons/icon-user-group.svg';
+import { View } from 'layouts/View';
 import { formatSimpleDate } from 'utils/dateUtils';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useMenu } from 'components/Common/Menu/useMenu';
-import SearchBar from 'components/SearchBar/SearchBar';
-import Searchbar from 'components/SearchBar';
+import { useRouteModal } from 'components/Common/Modal';
+import SearchBar from 'components/Common/SearchBar/SearchBar';
+import Searchbar from 'components/Common/SearchBar';
 import useAuth from 'hooks/useAuth';
 
 import { UserModalCard } from './UserModalCard';
@@ -65,6 +66,11 @@ const UserAvatarCell = ({ firstName }: { firstName?: string | null }) => {
   );
 };
 
+interface RoleModalRouteParams {
+  userId: string;
+  roleId: string;
+}
+
 interface ContextualMenuProps {
   userId: string;
 }
@@ -72,9 +78,8 @@ interface ContextualMenuProps {
 const UsersOverview = () => {
   const { canAccessAdmin, canEditUsers, canDeleteUsers } = useAuth();
   const { activeCustomer } = useCustomer();
-  const { customerSlug, goToUserView, goToUsersOverview, goToRoleUserView, userOverviewMatch } = useNavigator();
+  const { customerSlug } = useNavigator();
   const { t } = useTranslation();
-  const location = useLocation();
   const history = useHistory();
   const toast = useToast();
 
@@ -148,8 +153,6 @@ const UsersOverview = () => {
       });
     },
   });
-
-  // console.log({called, loading })
 
   const handleDeleteUser = (userId: string) => {
     deleteUser({
@@ -236,31 +239,51 @@ const UsersOverview = () => {
 
   const pageCount = activePaginatedUsersResult?.customer?.usersConnection?.totalPages || 0;
 
+  const [openRoleModal, closeRoleModal, isRoleModalOpen, roleParams] = useRouteModal<RoleModalRouteParams>({
+    matchUrlKey: ROUTES.ROLE_USER_VIEW,
+    exitUrl: `/dashboard/b/${customerSlug}/users`,
+  });
+
+  const [openUserModal, closeUserModal, isUserModalOpen, userParams] = useRouteModal<{ userId: string }>({
+    matchUrlKey: ROUTES.USER_VIEW,
+    exitUrl: `/dashboard/b/${customerSlug}/users`,
+  });
+
   return (
-    <>
+    <View documentTitle="haas | Users">
       <UI.ViewHead>
         <UI.Flex width="100%" justifyContent="space-between">
-          <UI.Flex alignItems="center">
-            <UI.ViewTitle leftIcon={<UsersIcon fill="currentColor" />}>{t('views:users_overview')}</UI.ViewTitle>
-            <InviteUserButton>
-              {(onClose) => (
-                <InviteUserForm onRefetch={refetch} onClose={onClose} />
-              )}
-            </InviteUserButton>
+          <UI.Flex alignItems="flex-end">
+            <UI.Div>
+              <UI.ViewTitle>{t('views:users_overview')}</UI.ViewTitle>
+              <UI.ViewSubTitle>
+                {t('users_subtitle')}
+              </UI.ViewSubTitle>
+            </UI.Div>
+
+            <UI.Div ml={8}>
+              <InviteUserButton>
+                {(onClose) => (
+                  <InviteUserForm onRefetch={refetch} onClose={onClose} />
+                )}
+              </InviteUserButton>
+            </UI.Div>
           </UI.Flex>
 
-          <SearchBar
-            activeSearchTerm={filter.search}
-            onSearchTermChange={handleSearchTermChange}
-          />
+          <UI.Div>
+            <SearchBar
+              search={filter.search}
+              onSearchChange={handleSearchTermChange}
+            />
+          </UI.Div>
+
         </UI.Flex>
       </UI.ViewHead>
 
       <UI.ViewBody>
         <UI.Div>
           <UI.Flex mb={2} justifyContent="space-between">
-
-            <PickerButton arrowBg="gray.50" label={t('filter_users')} icon={(<Filter />)}>
+            <PickerButton label={t('filter_users')} icon={(<Filter />)}>
               {() => (
                 <TabbedMenu
                   menuHeader={t('filter_users')}
@@ -275,8 +298,8 @@ const UsersOverview = () => {
                       {t('filter_by_search')}
                     </UI.RadioHeader>
                     <Searchbar
-                      activeSearchTerm={filter.search}
-                      onSearchTermChange={handleSearchChange}
+                      search={filter.search}
+                      onSearchChange={handleSearchChange}
                     />
                   </UI.Div>
 
@@ -301,8 +324,8 @@ const UsersOverview = () => {
                           {t('filter_by_recipient_first_name')}
                         </UI.RadioHeader>
                         <Searchbar
-                          activeSearchTerm={filter.firstName}
-                          onSearchTermChange={handleRecipientFirstName}
+                          search={filter.firstName}
+                          onSearchChange={handleRecipientFirstName}
                         />
                       </UI.Div>
                       <UI.Div>
@@ -310,8 +333,8 @@ const UsersOverview = () => {
                           {t('filter_by_recipient_last_name')}
                         </UI.RadioHeader>
                         <Searchbar
-                          activeSearchTerm={filter.lastName}
-                          onSearchTermChange={handleRecipientLastName}
+                          search={filter.lastName}
+                          onSearchChange={handleRecipientLastName}
                         />
                       </UI.Div>
                       <UI.Div>
@@ -319,8 +342,8 @@ const UsersOverview = () => {
                           {t('filter_by_recipient_email')}
                         </UI.RadioHeader>
                         <Searchbar
-                          activeSearchTerm={filter.email}
-                          onSearchTermChange={handleRecipientEmail}
+                          search={filter.email}
+                          onSearchChange={handleRecipientEmail}
                         />
                       </UI.Div>
                       <UI.Div>
@@ -328,8 +351,8 @@ const UsersOverview = () => {
                           {t('filter_by_role_name')}
                         </UI.RadioHeader>
                         <Searchbar
-                          activeSearchTerm={filter.role}
-                          onSearchTermChange={handleRole}
+                          search={filter.role}
+                          onSearchChange={handleRole}
                         />
                       </UI.Div>
                     </UI.Stack>
@@ -472,7 +495,7 @@ const UsersOverview = () => {
             <Table.Row
               onContextMenu={(e) => openMenu(e, { userId: user.userId! })}
               isDisabled={!user.isActive}
-              onClick={() => goToUserView(user.id!)}
+              onClick={() => openUserModal({ userId: user.userId })}
               isLoading={isLoading}
               key={user.id}
               gridTemplateColumns={columns}
@@ -496,7 +519,11 @@ const UsersOverview = () => {
               <Table.Cell>
 
                 <Table.InnerCell isDisabled={!canAccessAdmin && !canEditUsers}>
-                  <UI.Div onClick={() => goToRoleUserView(user.id!, user.role!.id!)}>
+                  <UI.Div onClick={(e) => {
+                    e.stopPropagation();
+                    openRoleModal({ roleId: user.role.id, userId: user.id });
+                  }}
+                  >
                     <UI.Helper>
                       {user?.role?.name}
                     </UI.Helper>
@@ -544,62 +571,25 @@ const UsersOverview = () => {
             setPageIndex={(page) => setFilter((newFilter) => ({ ...newFilter, pageIndex: page - 1 }))}
           />
         </UI.Flex>
-        {!userOverviewMatch?.isExact && (
-          <AnimatePresence>
-            <Switch
-              location={location}
-              key={location.pathname}
-            >
-              <Route
-                path={ROUTES.ROLE_USER_VIEW}
-              >
-                {({ match }) => (
-                  <motion.div
-                    key={location.pathname}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                  >
-                    <UI.Modal isOpen onClose={() => goToUsersOverview()}>
-                      <RoleUserModalCard
-                        onClose={() => goToUsersOverview()}
-                        // @ts-ignore
-                        id={match?.params?.roleId}
-                        // @ts-ignore
-                        userId={match?.params?.userId}
-                      />
-                    </UI.Modal>
-                  </motion.div>
-                )}
-              </Route>
-
-              <Route
-                path={ROUTES.USER_VIEW}
-              >
-                {({ match }) => (
-                  <motion.div
-                    key={location.pathname}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                  >
-                    <UI.Modal isOpen onClose={() => goToUsersOverview()}>
-                      <UserModalCard
-                        onClose={() => goToUsersOverview()}
-                        // @ts-ignore
-                        id={match?.params?.userId}
-                      />
-                    </UI.Modal>
-                  </motion.div>
-                )}
-              </Route>
-
-            </Switch>
-          </AnimatePresence>
-        )}
-
+        <Modal.Root open={isRoleModalOpen} onClose={closeRoleModal}>
+          {roleParams && (
+            <RoleUserModalCard
+              onClose={closeRoleModal}
+              id={roleParams.roleId}
+              userId={roleParams?.userId}
+            />
+          )}
+        </Modal.Root>
+        <Modal.Root open={isUserModalOpen} onClose={closeUserModal}>
+          {userParams && (
+            <UserModalCard
+              onClose={() => closeUserModal()}
+              id={userParams.userId}
+            />
+          )}
+        </Modal.Root>
       </UI.ViewBody>
-    </>
+    </View>
   );
 };
 

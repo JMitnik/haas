@@ -17,8 +17,23 @@ class UserPrismaAdapter {
   }
 
   /**
+   * Upserts a user by checking if the email already exists or not
+   * @param input
+   * @returns
+   */
+  upsertUserByEmail = async (input: Prisma.UserCreateInput) => {
+    return this.prisma.user.upsert({
+      where: {
+        email: input.email,
+      },
+      create: { ...input, id: input.id },
+      update: { ...input, id: input.id },
+    })
+  }
+
+  /**
    * Finds the private dialogues assigned to an user
-   * @param userId 
+   * @param userId
    */
   findPrivateDialogueOfUser = async (userId: string) => {
     const user = await this.prisma.user.findUnique({
@@ -35,10 +50,10 @@ class UserPrismaAdapter {
 
   /**
    * Upserts a user and assignes it to a private dialogue
-   * @param emailAddress 
-   * @param dialogueId 
-   * @param phoneNumber 
-   * @returns 
+   * @param emailAddress
+   * @param dialogueId
+   * @param phoneNumber
+   * @returns
   */
   addUserToPrivateDialogue = (emailAddress: string, dialogueId: string, phoneNumber?: string) => {
     return this.prisma.user.upsert({
@@ -65,10 +80,10 @@ class UserPrismaAdapter {
   }
 
   /**
-   * Adjusts the dialogue privacy settings of a user based on the input. The input consits one list of dialogue ids 
-   * which should be disconnected and another which should be connected to the user 
-   * @param input 
-   * @returns 
+   * Adjusts the dialogue privacy settings of a user based on the input. The input consits one list of dialogue ids
+   * which should be disconnected and another which should be connected to the user
+   * @param input
+   * @returns
    */
   updateUserPrivateDialogues = async (input: NexusGenInputs['AssignUserToDialoguesInput']) => {
     const user = await this.prisma.user.findUnique({
@@ -342,7 +357,7 @@ class UserPrismaAdapter {
     });
   };
 
-  async createNewUser(customerId: string, roleId: string, email: string) {
+  async createWorkspaceUser(customerId: string, roleId: string, email: string) {
     return this.prisma.user.create({
       data: {
         email,
@@ -417,7 +432,7 @@ class UserPrismaAdapter {
   };
 
   async findUserWithinWorkspace(email: string, workspaceId: string) {
-    return this.prisma.user.findFirst({
+    return this.prisma.user.findUnique({
       where: { email },
       include: {
         customers: {

@@ -1,4 +1,5 @@
 import { Prisma, Link, NodeType, QuestionCondition, QuestionNode, PrismaClient, Edge, QuestionOption, VideoEmbeddedNode } from '@prisma/client';
+import { isPresent } from 'ts-is-present';
 import cuid from 'cuid';
 
 import { NexusGenInputs } from '../../generated/nexus';
@@ -9,8 +10,7 @@ import { findDifference } from '../../utils/findDifference';
 import EdgePrismaAdapter, { CreateEdgeInput } from '../edge/EdgePrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import { CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType';
-import { UpdateQuestionInput } from './QuestionNodePrismaAdapterType';
-import { isPresent } from 'ts-is-present';
+import { CreateSliderNodeInput, UpdateQuestionInput } from './QuestionNodePrismaAdapterType';
 
 export interface IdMapProps {
   [details: string]: string;
@@ -30,6 +30,15 @@ export class NodeService {
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
     this.prisma = prismaClient;
   }
+
+  /**
+   * Creates a slider node and connects it to a question
+   * @param data
+   * @returns
+   */
+  createSliderNode = async (data: CreateSliderNodeInput) => {
+    return this.questionNodePrismaAdapter.createSliderNode(data);
+  };
 
   /**
    * Finds the slider node of a dialogue
@@ -285,6 +294,7 @@ export class NodeService {
         value: rest.value,
         publicValue: rest.publicValue,
         overrideLeafId: overrideLeafId || undefined,
+        isTopic: rest.isTopic,
       };
     });
 
@@ -459,10 +469,7 @@ export class NodeService {
     overrideLeafId: string = '',
     isLeaf: boolean = false
   ) => {
-    const qOptions = options.length > 0 ? [
-      ...options,
-    ] : [];
-
+    const qOptions = options.length > 0 ? options : [];
     const params: CreateQuestionInput =
     {
       isRoot,
@@ -803,6 +810,7 @@ export class NodeService {
       await this.questionNodePrismaAdapter.deleteQuestionOptions(removeQuestionOptionsIds);
     }
   };
+
 }
 
 export default NodeService;

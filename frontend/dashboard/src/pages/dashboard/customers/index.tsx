@@ -1,11 +1,11 @@
+import { Redirect } from 'react-router';
 import { useErrorHandler } from 'react-error-boundary';
 import { useQuery } from '@apollo/client';
 import React from 'react';
 
 import { getCustomers as CustomerData } from 'queries/__generated__/getCustomers';
-import { Redirect } from 'react-router';
+import { WorkspaceOverview } from 'views/WorkspaceOverview';
 import { useUser } from 'providers/UserProvider';
-import CustomerOverview from 'views/CustomerOverview';
 import getCustomersOfUser from 'queries/getCustomersOfUser';
 import useAuth from 'hooks/useAuth';
 
@@ -31,7 +31,7 @@ const CustomersPage = () => {
     return <Redirect to={`/dashboard/b/${redirectSlug}`} />;
   }
 
-  return <CustomerOverview isLoading={loading} customers={customers} />;
+  return <WorkspaceOverview isLoading={loading} customers={customers} />;
 };
 
 export default CustomersPage;

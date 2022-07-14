@@ -37,7 +37,7 @@ export const CreateCallToActionModalCard = ({ onClose, onSuccess }: NewCTAModalC
   const { t } = useTranslation();
 
   return (
-    <UI.ModalCard breakout maxWidth={1200} onClose={onClose}>
+    <>
       <UI.ModalHead>
         <UI.ModalTitle>
           {t('create_new_cta')}
@@ -57,6 +57,6 @@ export const CreateCallToActionModalCard = ({ onClose, onSuccess }: NewCTAModalC
           form={{}}
         />
       </UI.ModalBody>
-    </UI.ModalCard>
+    </>
   );
 };

@@ -1,24 +1,24 @@
 import * as UI from '@haas/ui';
-import { AnimatePresence, AnimateSharedLayout, motion } from 'framer-motion';
-import { ChevronRight } from 'react-feather';
-import { GradientLightgreenGreen, GradientPinkRed, GradientSteelPurple } from '@visx/gradient';
-import { Grid, Hex, createHexPrototype, rectangle } from 'honeycomb-grid';
-import { Group } from '@visx/group';
-import { ParentSizeModern } from '@visx/responsive';
-import { PatternCircles } from '@visx/pattern';
+import { AlertTriangle, MessageCircle, User } from 'react-feather';
 import { ProvidedZoom } from '@visx/zoom/lib/types';
-import { TooltipWithBounds, useTooltip } from '@visx/tooltip';
 import { Zoom } from '@visx/zoom';
-import { localPoint } from '@visx/event';
-import { useModal } from 'react-modal-hook';
-import React, { useEffect, useMemo, useState } from 'react';
-import styled from 'styled-components';
+import { sumBy } from 'lodash';
+import { useTranslation } from 'react-i18next';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import useMeasure from 'react-use-measure';
 
+import * as Modal from 'components/Common/Modal';
+import { DateFormat, useDate } from 'hooks/useDate';
+import { DatePicker } from 'components/Common/DatePicker';
+import { DialogueImpactScoreType, useGetIssuesQuery, useGetWorkspaceSummaryDetailsQuery } from 'types/generated-types';
 import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModalCard';
-import { Loader } from 'components/Common/Loader/Loader';
-import { useFormatter } from 'hooks/useFormatter';
+import { SimpleIssueTable } from 'components/Analytics/Issues/SimpleIssueTable';
+import { useCustomer } from 'providers/CustomerProvider';
+import { useNavigator } from 'hooks/useNavigator';
 
+import { endOfDay, startOfDay } from 'date-fns';
 import * as LS from './WorkspaceGrid.styles';
+import { BreadCrumb } from './BreadCrumb';
 import {
   HexagonDialogueNode,
   HexagonGroupNode,
@@ -27,22 +27,24 @@ import {
   HexagonState,
   HexagonTopicNode,
   HexagonViewMode,
+  HexagonWorkspaceNode,
+  Issue,
 } from './WorkspaceGrid.types';
-import { HexagonItem } from './HexagonItem';
-import { TooltipBody } from './TooltipBody';
-import { WorkspaceGridPane } from './WorkspaceGridPane';
-
-const Tooltip = motion.custom(styled.div`
-  > * {
-    padding: 0 !important;
-    border-radius: 20px !important;
-  }
-`);
+import { HexagonGrid } from './HexagonGrid';
+import { IssuesModal } from './IssuesModal';
+import { Statistic } from './Statistic';
+import {
+  createGrid,
+  extractDialogueFragments,
+  findDialoguesInGroup,
+  reconstructHistoryStack,
+} from './WorkspaceGrid.helpers';
 
 export interface DataLoadOptions {
   dialogueId?: string;
   topic?: string;
   topics?: string[];
+  issueOnly?: boolean;
   clickedGroup?: HexagonGroupNode;
 }
 
@@ -51,177 +53,120 @@ export interface WorkspaceGridProps {
   width: number;
   height: number;
   backgroundColor: string;
+  dateRange: [Date, Date];
+  setDateRange: (dateRange: [Date, Date]) => void;
   isLoading?: boolean;
+  isServerLoading?: boolean;
   initialViewMode?: HexagonViewMode;
   onLoadData?: (options: DataLoadOptions) => Promise<[HexagonNode[], HexagonViewMode]>;
 }
-
-const createGrid = (nrItems: number, windowHeight: number, windowWidth: number) => {
-  const gridItems: any[] = [];
-  const squareRoot = Math.sqrt(nrItems);
-  const ratioWindow = windowWidth / windowHeight;
-  const itemsPerRow = Math.ceil(squareRoot * ratioWindow) || 1;
-  const itemsPerColumn = Math.ceil(squareRoot) || 1;
-  const dimensions = Math.floor((windowWidth / itemsPerRow) / 2);
-
-  const hexPrototype = createHexPrototype({
-    dimensions,
-    offset: 1,
-  });
-
-  new Grid(hexPrototype, rectangle({ start: [0, 0], width: itemsPerRow, height: itemsPerColumn }))
-    .each((hex: Hex) => {
-      const corners = hex.corners.map(({ x, y }) => `${x},${y}`);
-      gridItems.push(corners.join(' '));
-    }).run();
-
-  return gridItems;
-};
-
-const getLabelFill = (score?: number) => {
-  if (!score) return '#4b1c54';
-  if (score >= 40) return '#34aea3';
-  return '#fb5a66';
-};
-
-const getLabelColor = (score?: number) => {
-  if (!score) return '#f9ecff';
-  if (score >= 40) return '#deffde';
-  return 'white';
-};
 
 export const WorkspaceGrid = ({
   initialData,
   backgroundColor,
   onLoadData,
-  initialViewMode = HexagonViewMode.Group,
+  dateRange: [startDate, endDate],
+  setDateRange,
+  initialViewMode = HexagonViewMode.Workspace,
 }: WorkspaceGridProps) => {
-  const zoomHelper = React.useRef<ProvidedZoom<SVGElement> | null>(null);
+  const { format } = useDate();
+  const { goToWorkspaceFeedbackOverview } = useNavigator();
+  const { activeCustomer } = useCustomer();
   const initialRef = React.useRef<HTMLDivElement>();
-  const [stateHistoryStack, setStateHistoryStack] = React.useState<HexagonState[]>([]);
+  const { t } = useTranslation();
+  // Local loading
   const [isLoading, setIsLoading] = useState(false);
+  const [issuesModalIsOpen, setIssuesModalIsOpen] = useState(false);
+
+  // Session-id if currently being tracked.
+  const [sessionId, setSessionId] = useState<string | undefined>(undefined);
+
+  const [ref, bounds] = useMeasure();
+  const width = bounds.width || 600;
+  const height = Math.max(bounds.height, 500);
+
+  /**
+   * The current state describes that state of the workspace grid component, including the node
+   * that was clicked just now, the candidate child nodes that can be clicked next, and a general global "state" what
+   * type of view is currently being shown.
+   */
   const [currentState, setCurrentState] = React.useState<HexagonState>({
-    currentNode: undefined,
+    currentNode: {
+      id: activeCustomer?.id,
+      label: activeCustomer?.name,
+      score: 0,
+      type: HexagonNodeType.Workspace,
+    } as HexagonWorkspaceNode,
     childNodes: initialData,
     viewMode: initialViewMode,
   });
-  const { formatScore } = useFormatter();
-  const [sessionId, setSessionId] = useState<string | undefined>(undefined);
 
+  /**
+   * The history stack tracks previous states of the workspace grid component. Utilized for things like the layers,
+   * breadcrumb navigations, and such.
+   *
+   * Can be read as queue by reversing the stack, via `historyQueue`.
+   * The `previousLabels` are the queue labels.
+   */
+  const [stateHistoryStack, setStateHistoryStack] = React.useState<HexagonState[]>([]);
+  const historyQueue = [...stateHistoryStack].reverse();
+  /**
+   * If the last selected node was a dialogue, then the activeDialogue will point to that dialogue.
+   */
   const activeDialogue = useMemo(() => {
     const activeNode = stateHistoryStack.find((state) => state.selectedNode?.type === HexagonNodeType.Dialogue);
     return (activeNode?.selectedNode as HexagonDialogueNode)?.dialogue || undefined;
   }, [currentState]);
 
-  const {
-    tooltipData,
-    tooltipLeft,
-    tooltipTop,
-    tooltipOpen,
-    showTooltip,
-    hideTooltip,
-  } = useTooltip<HexagonNode>();
-
-  const handleMouseOverHex = (event: React.MouseEvent<SVGPolygonElement, MouseEvent>, node: HexagonNode) => {
-    const point = localPoint(event);
-
-    if (!point) return;
-
-    const { x, y } = point;
-    showTooltip({
-      tooltipData: node,
-      tooltipLeft: x,
-      tooltipTop: y,
+  /**
+   * Resets the entire grid state to the beginning.
+   * Used when one of the following changes:
+   * - Initial data (think of filters)
+   * - The workspace changes.
+   */
+  const resetWorkspaceGrid = useCallback(() => {
+    setCurrentState({
+      currentNode: {
+        id: activeCustomer?.id,
+        label: activeCustomer?.name,
+        score: 0,
+        type: HexagonNodeType.Workspace,
+      } as HexagonWorkspaceNode,
+      childNodes: initialData,
+      viewMode: initialViewMode,
     });
-  };
-
-  const [openInteractionModal, closeInteractionModal] = useModal(() => (
-    <UI.Modal isOpen onClose={() => setSessionId(undefined)}>
-      <InteractionModalCard
-        sessionId={sessionId || ''}
-        onClose={() => setSessionId(undefined)}
-      />
-    </UI.Modal>
-  ), [sessionId, setSessionId]);
+    setStateHistoryStack([]);
+  }, [activeCustomer, initialData, initialViewMode, setStateHistoryStack]);
 
   useEffect(() => {
-    if (sessionId) {
-      openInteractionModal();
-    } else {
-      closeInteractionModal();
-    }
-  }, [sessionId]);
+    resetWorkspaceGrid();
+  }, [resetWorkspaceGrid, startDate, endDate]);
 
-  const handleMouseOutHex = () => hideTooltip();
-
-  const handleZoominLevel = async (currentZoomHelper: ProvidedZoom<SVGElement>, clickedNode: HexagonNode) => {
-    hideTooltip();
-
-    if (currentState.viewMode === HexagonViewMode.Final) return;
-
-    if (currentState.viewMode === HexagonViewMode.Session && clickedNode.type === HexagonNodeType.Session) {
-      setSessionId(clickedNode.session.id || undefined);
-      return;
-    }
-
-    // Empty canvas and unset soom
-    // currentZoomHelper.reset();
-    const newStateHistory = [{
-      currentNode: currentState.currentNode,
-      childNodes: currentState.childNodes,
-      selectedNode: clickedNode,
-      viewMode: currentState.viewMode,
-    }, ...stateHistoryStack];
-    setStateHistoryStack(newStateHistory);
-
-    const topics = newStateHistory
-      .filter((state) => state.selectedNode?.type === HexagonNodeType.Topic)
-      .map((state) => (state.selectedNode as HexagonTopicNode)?.topic);
-
-    if (!onLoadData) return;
-
-    if (clickedNode.type === HexagonNodeType.Group) {
-      const [newNodes, hexagonViewMode] = await onLoadData({
-        clickedGroup: clickedNode.type === HexagonNodeType.Group ? clickedNode : undefined,
-      }).finally(() => setIsLoading(false));
-
-      setCurrentState({ currentNode: clickedNode, childNodes: newNodes, viewMode: hexagonViewMode });
-      return;
-    }
-
-    const dialogueId = clickedNode.type === HexagonNodeType.Dialogue ? clickedNode.id : activeDialogue?.id;
-    if (!dialogueId || !onLoadData) return;
-    setIsLoading(true);
-
-    const [newNodes, hexagonViewMode] = await onLoadData({
-      dialogueId,
-      topic: clickedNode.type === HexagonNodeType.Topic ? clickedNode.topic.name || undefined : '',
-      topics: topics.map((topic) => topic.name),
-    }).finally(() => setIsLoading(false));
-
-    setCurrentState({ currentNode: clickedNode, childNodes: newNodes, viewMode: hexagonViewMode });
-  };
-
-  useEffect(() => {
-    hideTooltip();
-  }, [currentState.currentNode?.id, hideTooltip]);
-
+  /**
+   * Generates an array of Hexagon SVG coordinates according to the desired shape.
+   *
+   * The entries in the array correspond to `currentState.childNodes`, and can be accessed by the indices.
+   */
   const gridItems = useMemo(() => (
     createGrid(
       currentState?.childNodes?.length || 0,
       initialRef.current?.clientHeight || 495,
       initialRef.current?.clientWidth || 495,
     )
-  ), [currentState.childNodes]);
+  ), [initialData, currentState.childNodes]);
 
+  /**
+   * Adds the generated SVG coordinates to the hexagon nodes.
+   */
   const hexagonNodes = currentState.childNodes?.map((node, index) => ({
     ...node,
-    points: gridItems[index],
+    id: node.id,
+    points: gridItems.points[index],
   })) || [];
 
-  // ReversedHistory: Session => Dialogue => Group
-  const historyQueue = [...stateHistoryStack].reverse();
-
+  /**
+   * Method for traversing the `historyStack` backwards by using an index to jump to the appropriate position.
+   */
   const popToIndex = (index: number) => {
     if (index === historyQueue.length) return;
 
@@ -244,222 +189,291 @@ export const WorkspaceGrid = ({
     }
   };
 
+  /**
+   * Method for traversing the `historyStack` forwards until a particular dialogue.
+   * - Useful for skipping groups.
+   * - Allows for additional filtering, by only retrieving sessions mentioning certain `topics`.
+   */
+  const jumpToDialogue = async (dialogueId: string, topics?: string[], issueOnly: boolean = false) => {
+    if (!onLoadData) return;
+
+    const [sessions, viewMode] = await onLoadData({
+      dialogueId,
+      topics,
+      issueOnly,
+    });
+
+    const reconstructedHistoryStack = reconstructHistoryStack(dialogueId, initialData);
+    setStateHistoryStack(reconstructedHistoryStack);
+
+    setCurrentState({ currentNode: reconstructedHistoryStack[0].selectedNode, childNodes: sessions, viewMode });
+  };
+
+  /**
+   * Method for when a user clicks on a node. This will typically zoom in on the hexagon node (drill-down).
+   */
+  const handleHexClick = async (currentZoomHelper: ProvidedZoom<SVGElement>, clickedNode: HexagonNode) => {
+    // PHASE 1: Prevent termination states from being clicked.
+
+    // If we somehow trigger this while being in the termination state (Final), ignore the click.
+    // NOTE: This should generally never happen, but it's here just in case.
+    if (currentState.viewMode === HexagonViewMode.Final) return;
+
+    // If we are at the other termination state (Session), and the node clicked was a session, set it to be active.
+    // This will trigger the modal.
+    if (currentState.viewMode === HexagonViewMode.Session && clickedNode.type === HexagonNodeType.Session) {
+      setSessionId(clickedNode.session.id || undefined);
+      return;
+    }
+
+    // PHASE 2: Update History Stack
+
+    // Update the history with the last state.
+    const newStateHistory = [{
+      currentNode: currentState.currentNode,
+      childNodes: currentState.childNodes,
+      selectedNode: clickedNode,
+      viewMode: currentState.viewMode,
+    }, ...stateHistoryStack];
+    setStateHistoryStack(newStateHistory);
+
+    if (!onLoadData) return;
+
+    // PHASE 3: Fetch the children
+
+    // If we clicked on group, load the groups children (other groups / dialogues), and set that state.
+    if (clickedNode.type === HexagonNodeType.Group) {
+      const [newNodes, hexagonViewMode] = await onLoadData({
+        clickedGroup: clickedNode.type === HexagonNodeType.Group ? clickedNode : undefined,
+      }).finally(() => setIsLoading(false));
+
+      setCurrentState({ currentNode: clickedNode, childNodes: newNodes, viewMode: hexagonViewMode });
+      return;
+    }
+
+    // If we clicked on a dialogue, load the underlying topics or sessions.
+    const dialogueId = clickedNode.type === HexagonNodeType.Dialogue ? clickedNode.id : activeDialogue?.id;
+    if (!dialogueId) return;
+    setIsLoading(true);
+
+    const topics = newStateHistory
+      .filter((state) => state.selectedNode?.type === HexagonNodeType.Topic)
+      .map((state) => (state.selectedNode as HexagonTopicNode)?.topic);
+
+    const [newNodes, hexagonViewMode] = await onLoadData({
+      dialogueId,
+      topic: clickedNode.type === HexagonNodeType.Topic ? clickedNode.topic.name || undefined : '',
+      topics: topics.map((topic) => topic.name),
+    }).finally(() => setIsLoading(false));
+
+    setCurrentState({ currentNode: clickedNode, childNodes: newNodes, viewMode: hexagonViewMode });
+  };
+
+  const handleIssueClick = (issue: Issue) => {
+    if (issue.dialogue?.id) {
+      jumpToDialogue(issue.dialogue.id, undefined, true);
+    }
+  };
+
+  const visitedDialogueFragments = useMemo(() => extractDialogueFragments(historyQueue), [historyQueue]);
+
+  const { data } = useGetWorkspaceSummaryDetailsQuery({
+    fetchPolicy: 'no-cache',
+    variables: {
+      id: activeCustomer?.id,
+      healthInput: {
+        startDateTime: format(startOfDay(startDate), DateFormat.DayTimeFormat),
+        endDateTime: format(endOfDay(endDate), DateFormat.DayTimeFormat),
+        topicFilter: {
+          dialogueStrings: visitedDialogueFragments,
+        },
+      },
+      summaryInput: {
+        impactType: DialogueImpactScoreType.Average,
+        startDateTime: format(startOfDay(startDate), DateFormat.DayTimeFormat),
+        endDateTime: format(endOfDay(endDate), DateFormat.DayTimeFormat),
+        topicsFilter: {
+          dialogueStrings: visitedDialogueFragments,
+        },
+        refresh: true,
+      },
+    },
+  });
+
+  const summary = data?.customer?.statistics;
+
+  const { data: issuesData, loading: issuesLoading } = useGetIssuesQuery({
+    fetchPolicy: 'no-cache',
+    variables: {
+      workspaceId: activeCustomer?.id || '',
+      filter: {
+        startDate: format(startOfDay(startDate), DateFormat.DayTimeFormat),
+        endDate: format(endOfDay(endDate), DateFormat.DayTimeFormat),
+        dialogueStrings: visitedDialogueFragments,
+      },
+    },
+  });
+
+  const issues = issuesData?.customer?.issues || [];
+  const issueStats = issues.reduce((acc, issue) => {
+    acc.problems += issue.basicStats.responseCount;
+    acc.actionsRequested += issue.actionRequiredCount || 0;
+    return acc;
+  }, { problems: 0, actionsRequested: 0 });
+
+  // Various stats fields
+  const health = summary?.health;
+
   return (
     <LS.WorkspaceGridContainer backgroundColor={backgroundColor}>
-      <AnimatePresence />
       {isLoading && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          exit={{ opacity: 0 }}
-          style={{
-            position: 'absolute',
-            top: '0',
-            left: '0',
-            right: '0',
-            bottom: '0',
-            zIndex: 1000,
-          }}
-        >
-          <UI.Div style={{ position: 'absolute', bottom: '0' }}>
-            <Loader testId="load" />
-          </UI.Div>
-        </motion.div>
+        <UI.Loader />
       )}
-      <UI.Grid gridTemplateColumns="2fr 1fr" gridGap="0">
-        <UI.Div borderRadius={10} height="60vh" position="relative">
-          {stateHistoryStack.length > 0 && (
-            <LS.BreadCrumbContainer
-              display="inline-block"
-              my={1}
-              border="1px solid"
-              borderColor="gray.100"
-              borderRadius={12}
-              pl={2}
-              pr={2}
-              py={1}
+      <UI.Container px={4} pt={4}>
+        <UI.Div pb={4} position="relative" zIndex={10000}>
+          <UI.Flex alignItems="center" justifyContent="space-between">
+            <UI.Div>
+              <UI.H4 fontSize="1.1rem" color="off.500">
+                {t('overview')}
+              </UI.H4>
+              <UI.Span color="off.400" fontWeight={500}>
+                {t('workspace_overview_description')}
+              </UI.Span>
+            </UI.Div>
+
+            <UI.Div>
+              <UI.Helper>Filters</UI.Helper>
+              <UI.Div mt={1}>
+                <DatePicker
+                  type="range"
+                  startDate={startDate}
+                  endDate={endDate}
+                  onChange={setDateRange}
+                />
+              </UI.Div>
+            </UI.Div>
+          </UI.Flex>
+        </UI.Div>
+        <UI.Hr />
+        <UI.Grid gridTemplateColumns={['1fr', '1fr', '1fr', '1fr', '2fr 1fr']}>
+          <UI.Div>
+            <>
+              <UI.Grid gridTemplateColumns="1fr 1fr 1fr">
+                <Statistic
+                  icon={<User height={40} width={40} />}
+                  themeBg="green.500"
+                  themeColor="white"
+                  name="Responses"
+                  value={health?.nrVotes || 0}
+                  isFilterEnabled={historyQueue.length > 0}
+                  onNavigate={() => goToWorkspaceFeedbackOverview(
+                    findDialoguesInGroup([currentState.currentNode as HexagonNode]),
+                    format(startOfDay(startDate), DateFormat.DayTimeFormat),
+                    format(endOfDay(endDate), DateFormat.DayTimeFormat),
+                  )}
+                />
+                <Statistic
+                  icon={<AlertTriangle height={40} width={40} />}
+                  themeBg="red.500"
+                  themeColor="white"
+                  name="Problems"
+                  value={issueStats.problems}
+                  isFilterEnabled={historyQueue.length > 0}
+                  onNavigate={() => goToWorkspaceFeedbackOverview(
+                    findDialoguesInGroup([currentState.currentNode as HexagonNode]),
+                    format(startOfDay(startDate), DateFormat.DayTimeFormat),
+                    format(endOfDay(endDate), DateFormat.DayTimeFormat),
+                    55,
+                  )}
+                />
+                <Statistic
+                  icon={<MessageCircle height={40} width={40} />}
+                  themeBg="main.500"
+                  themeColor="white"
+                  name="Action Requests"
+                  value={
+                    issueStats.actionsRequested
+                    // sumBy(issues.filter((issue) => issue.followUpAction), ((issue) => issue.basicStats.responseCount))
+                  }
+                  isFilterEnabled={historyQueue.length > 0}
+                  onNavigate={() => goToWorkspaceFeedbackOverview(
+                    findDialoguesInGroup([currentState.currentNode as HexagonNode]),
+                    format(startOfDay(startDate), DateFormat.DayTimeFormat),
+                    format(endOfDay(endDate), DateFormat.DayTimeFormat),
+                    undefined,
+                    true,
+                  )}
+                />
+              </UI.Grid>
+              <UI.Div mt={4}>
+                <SimpleIssueTable
+                  inPreview
+                  onResetFilter={() => popToIndex(0)}
+                  isFilterEnabled={historyQueue.length > 0}
+                  issues={issues}
+                  onIssueClick={handleIssueClick}
+                  isLoading={issuesLoading}
+                  onOpenIssueModal={() => setIssuesModalIsOpen(true)}
+                />
+              </UI.Div>
+            </>
+
+          </UI.Div>
+          <UI.Div width="100%" ref={ref}>
+            <Zoom<SVGElement>
+              width={width}
+              height={height}
+              scaleYMax={1.5}
+              scaleYMin={0.5}
             >
-              <UI.Stack alignItems="center" isInline>
-                <UI.Flex alignItems="center">
-                  <UI.Label
-                    color="black"
-                    bg="white"
-                    onClick={() => { popToIndex(0); }}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <UI.Span ml={1}>
-                      Home
-                    </UI.Span>
-                  </UI.Label>
-                  {historyQueue.map((state, index) => (
-                    <React.Fragment key={index}>
-                      <UI.Icon
-                        bg="gray.200"
-                        color="gray.500"
-                        width="1.2rem"
-                        height="1.2rem"
-                        fontSize="0.9rem"
-                        mx={1}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          borderRadius: '100%',
-                        }}
-                      >
-                        <ChevronRight />
-                      </UI.Icon>
-                      <UI.Flex>
-                        <UI.Label
-                          color={getLabelColor(state?.selectedNode?.score || 0)}
-                          bg={getLabelFill(state?.selectedNode?.score)}
-                          key={index}
-                          onClick={() => { popToIndex(index + 1); }}
-                          style={{ cursor: 'pointer' }}
-                        >
-                          <UI.Span>
-                            {formatScore(state.selectedNode?.score)}
-                          </UI.Span>
-                          {' '}
-                          {/* <SingleHexagon fill={getHexagonFill(state.selectedNode?.score)} /> */}
-                          <UI.Span ml={1}>
-                            {state.selectedNode?.type === HexagonNodeType.Group && (
-                              <>
-                                {state.selectedNode.label}
-                              </>
-                            )}
-                            {state.selectedNode?.type === HexagonNodeType.Dialogue && (
-                              <>
-                                {state.selectedNode.label}
-                              </>
-                            )}
-                            {state.selectedNode?.type === HexagonNodeType.Topic && (
-                              <>
-                                {state.selectedNode.topic.name}
-                              </>
-                            )}
-                            {state.selectedNode?.type === HexagonNodeType.Session && (
-                              <>
-                                {state.selectedNode.session.id}
-                              </>
-                            )}
-                          </UI.Span>
-                        </UI.Label>
-                      </UI.Flex>
-                    </React.Fragment>
-                  ))}
-                </UI.Flex>
-              </UI.Stack>
-            </LS.BreadCrumbContainer>
-          )}
-          <ParentSizeModern>
-            {({ width, height }) => (
-              <Zoom<SVGElement>
-                width={width}
-                height={height}
-              >
-                {(zoom) => {
-                  zoomHelper.current = zoom;
-                  return (
-                    <UI.Div>
-                      <svg
-                        width={width}
-                        height={height}
-                        style={{ cursor: zoom.isDragging ? 'grabbing' : 'grab', touchAction: 'none' }}
-                        // @ts-ignore
-                        ref={zoom.containerRef}
-                      >
-                        <PatternCircles id="circles" height={6} width={6} stroke="black" strokeWidth={1} />
-                        <GradientPinkRed id="dots-pink" />
-                        <GradientSteelPurple id="dots-gray" />
-                        <GradientLightgreenGreen id="dots-green" />
-                        <rect width={width} height={height} fill="#f7f7f7" stroke={backgroundColor} />
-                        <rect
-                          width={width}
-                          height={height}
-                          rx={14}
-                          fill="transparent"
-                          onTouchStart={zoom.dragStart}
-                          onTouchMove={zoom.dragMove}
-                          onTouchEnd={zoom.dragEnd}
-                          onMouseDown={zoom.dragStart}
-                          onMouseMove={zoom.dragMove}
-                          onMouseUp={zoom.dragEnd}
-                          onMouseLeave={() => {
-                            if (zoom.isDragging) zoom.dragEnd();
-                          }}
-                          onDoubleClick={() => {
-                            zoom.scale({ scaleX: 1.1, scaleY: 1.1 });
-                          }}
-                        />
-                        <motion.g
-                          initial={{ transform: 'matrix(1, 0, 0, 1, 0, 0', opacity: 0 }}
-                          style={{ transform: 'matrix(1, 0, 0, 1, 0, 0' }}
-                          animate={{ transform: zoom.toString(), opacity: 1 }}
-                        >
-                          <Group top={200} left={200}>
-                            <AnimatePresence>
-                              <motion.g
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                initial={{ opacity: 0 }}
-                                key={currentState.currentNode?.id}
-                              >
-                                {hexagonNodes.map((node) => (
-                                  <HexagonItem
-                                    key={node.id}
-                                    node={node}
-                                    points={node.points}
-                                    onMouseOver={handleMouseOverHex}
-                                    onMouseExit={handleMouseOutHex}
-                                    score={node.score}
-                                    zoomHelper={zoom}
-                                    onZoom={handleZoominLevel}
-                                  />
-                                ))}
-                              </motion.g>
-                            </AnimatePresence>
+              {(zoom) => (
+                <HexagonGrid
+                  key={`${startDate.toISOString()} - ${endDate.toISOString()}`}
+                  width={width}
+                  height={height}
+                  backgroundColor="#ebf0ff"
+                  nodes={hexagonNodes}
+                  onHexClick={handleHexClick}
+                  stateKey={currentState.currentNode?.id || ''}
+                  zoom={zoom}
+                  useBackgroundPattern
+                >
+                  <UI.Div position="absolute" left={12} top={12}>
+                    <BreadCrumb
+                      maxWidth={width * 0.8}
+                      viewMode={currentState.viewMode}
+                      historyQueue={historyQueue}
+                      onJumpToIndex={popToIndex}
+                    />
+                  </UI.Div>
+                </HexagonGrid>
+              )}
+            </Zoom>
+          </UI.Div>
+        </UI.Grid>
+      </UI.Container>
 
-                          </Group>
-                        </motion.g>
-                      </svg>
+      <UI.Div pt={4}>
+        <UI.Hr />
+      </UI.Div>
 
-                      <AnimateSharedLayout>
-                        <AnimatePresence>
-                          {tooltipOpen && (
-                            <Tooltip
-                              animate={{ opacity: 1 }}
-                              exit={{ opacity: 0 }}
-                              initial={{ opacity: 0 }}
-                              layoutId="tooltip"
-                            >
-                              <TooltipWithBounds
-                                key={Math.random()}
-                                top={tooltipTop}
-                                left={tooltipLeft}
-                              >
-                                {tooltipData && (
-                                  <TooltipBody node={tooltipData} />
-                                )}
-                              </TooltipWithBounds>
-                            </Tooltip>
-                          )}
-                        </AnimatePresence>
-                      </AnimateSharedLayout>
+      <Modal.Root open={!!sessionId} onClose={() => setSessionId(undefined)}>
+        <InteractionModalCard
+          sessionId={sessionId || ''}
+        />
+      </Modal.Root>
 
-                    </UI.Div>
-                  );
-                }}
-              </Zoom>
-            )}
-          </ParentSizeModern>
-        </UI.Div>
-
-        <UI.Div px={2} mt={2}>
-          <WorkspaceGridPane currentState={currentState} />
-        </UI.Div>
-      </UI.Grid>
+      <Modal.Root open={issuesModalIsOpen} onClose={() => setIssuesModalIsOpen(false)}>
+        <IssuesModal
+          onResetFilters={() => popToIndex(0)}
+          issues={issues}
+          onIssueClick={(issue) => {
+            handleIssueClick(issue);
+            setIssuesModalIsOpen(false);
+          }}
+          isFiltersEnabled={historyQueue.length > 0}
+        />
+      </Modal.Root>
     </LS.WorkspaceGridContainer>
   );
 };

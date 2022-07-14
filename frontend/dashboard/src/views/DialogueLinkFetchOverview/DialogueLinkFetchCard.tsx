@@ -1,51 +1,84 @@
 import * as UI from '@haas/ui';
 import {
-  useClipboard, useToast,
+  useClipboard,
 } from '@chakra-ui/core';
-import React, { useRef } from 'react';
+import { useToast } from 'hooks/useToast';
+import { useTranslation } from 'react-i18next';
+import React from 'react';
+import styled, { css } from 'styled-components';
 
-const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: boolean }) => {
-  const ref = useRef(null);
+import { PublicDialogueInfo } from 'types/generated-types';
+
+import { stripPrefixFromUrl } from './DialogueLinkFetchCard.helpers';
+
+interface DialogueCardContainerProps {
+  loading: boolean;
+}
+
+const DialogueCardContainer = styled(UI.Div)<DialogueCardContainerProps>`
+  ${({ theme, loading }) => css`
+    background: white;
+    box-shadow: ${theme.boxShadows.md};
+    border-radius: ${theme.borderRadiuses.md}px;
+    transition: all ${theme.transitions.normal};
+
+    ${loading && css`
+      opacity: 0.6;
+      pointer-events: none;
+      transition: all ${theme.transitions.normal};
+    `}
+
+    &:hover {
+      box-shadow: ${theme.boxShadows.lg};
+      cursor: pointer;
+      transition: all ${theme.transitions.normal};
+    }
+  `}
+`;
+
+interface DialogueCardProps {
+  dialogue: PublicDialogueInfo;
+  loading: boolean;
+}
+
+const DialogueCard = ({ dialogue, loading }: DialogueCardProps) => {
   const toast = useToast();
-  const { onCopy } = useClipboard(dialogue.url);
+  const { onCopy, hasCopied } = useClipboard(dialogue.url);
+  const { t } = useTranslation();
 
   const handleCardClick = () => {
     onCopy?.();
-    toast({
-      title: 'Dialogue url copied',
-      description: 'Copied the url of the selected dialogue',
-      status: 'success',
-      position: 'bottom-right',
-      duration: 3000,
-    });
+    toast.success({ title: 'Dialogue url copied', description: 'Copied the url of the selected dialogue' });
   };
 
+  const urlBase = stripPrefixFromUrl(dialogue.url);
+
   return (
-    <UI.Card
-      ref={ref}
+    <DialogueCardContainer
       data-cy="DialogueCard"
       bg="white"
-      useFlex
-      flexDirection="column"
+      loading={loading}
       onClick={() => handleCardClick()}
     >
-      <UI.CardBody flex="100%">
+      <UI.CardBody height="100%">
         <UI.ColumnFlex justifyContent="space-between" height="100%">
           <UI.Div>
-            <UI.Flex justifyContent="space-between" alignItems="center">
-              <UI.Text fontSize={isCompact ? '1.1rem' : '1.4rem'} color="app.onWhite" mb={2} fontWeight={500}>
-                {dialogue.title}
-              </UI.Text>
-            </UI.Flex>
-            <UI.Paragraph fontSize="0.8rem" color="app.mutedOnWhite" fontWeight="100">
-              <UI.ExtLink to={dialogue.url}>
-                {dialogue.url}
-              </UI.ExtLink>
-            </UI.Paragraph>
+            <UI.H4 color="off.600" fontWeight="700">
+              {dialogue.title}
+            </UI.H4>
+            <UI.ExtLink to={dialogue.url} color="off.300">
+              {urlBase}
+            </UI.ExtLink>
+          </UI.Div>
+
+          <UI.Div>
+            <UI.Button size="sm" variant="outline">
+              {hasCopied ? t('copied') : t('copy_link')}
+            </UI.Button>
           </UI.Div>
         </UI.ColumnFlex>
       </UI.CardBody>
-    </UI.Card>
+    </DialogueCardContainer>
   );
 };
 

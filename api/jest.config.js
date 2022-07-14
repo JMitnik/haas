@@ -1,15 +1,20 @@
 module.exports = {
-  clearMocks: true,
-  roots: ['src'],
-  modulePaths: ["node_modules", "<rootDir>/src"],
-  preset: 'ts-jest',
-  testEnvironment: './src/test/setup/environment.ts',
-  testMatch: [
-    '**/__tests__/**/*.test.+(ts|tsx|js)',
-    '**/?(*.)+(spec|test).+(ts|tsx|js)',
+  testTimeout: 30000,
+  projects: [
+    {
+      transform: {
+        "^.+\\.(t|j)sx?$": "@swc/jest",
+      },
+      testEnvironment: "node",
+      setupFilesAfterEnv: ['<rootDir>/src/test/globalSetup.ts'],
+      testPathIgnorePatterns: ["<rootDir>/node_modules/"],
+      moduleFileExtensions: ["ts", "js", "node"],
+      testMatch: [
+        '**/__tests__/**/*.test.+(ts|tsx|js)',
+        '**/?(*.)+(spec|test).+(ts|tsx|js)',
+      ],
+      roots: ['<rootDir>/src'],
+    },
+    // ...
   ],
-  transform: {
-    '^.+\\.(ts|tsx)$': 'ts-jest',
-  },
-  setupFilesAfterEnv: ['./src/test/setup/testSetup.ts'],
-};
+}
