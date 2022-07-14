@@ -4,9 +4,13 @@ import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import {
   Bell,
+  Check,
+  ChevronDown,
+  ChevronUp,
   Clock, Copy, MessageSquare, MoreVertical, PlusCircle, RefreshCcw, Trash2, Type,
 } from 'react-feather';
 import { Button, ButtonGroup } from '@chakra-ui/core';
+import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons';
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
 import {
   Div, Form, FormControl, FormLabel,
@@ -22,6 +26,7 @@ import Select from 'react-select';
 import * as Menu from 'components/Common/Menu';
 import * as Modal from 'components/Common/Modal';
 import * as RadioGroup from 'components/Common/RadioGroup';
+import * as RadixSelect from 'components/Common/Select';
 import {
   AutomationActionType,
   AutomationConditionBuilderType,
@@ -59,6 +64,8 @@ import { ConditionCell } from './ConditionCell';
 import { ConditionEntry } from './CreateConditionModalCardTypes';
 import { CreateConditionModalCard } from './CreateConditionModalCard';
 import { CronScheduleHeader, ModalState, ModalType, OPERATORS } from './AutomationTypes';
+import { DayPicker } from './DayPicker';
+import { TimePicker } from './TimePicker';
 import { zonedTimeToUtc } from 'date-fns-tz';
 import useCronSchedule from './useCronSchedule';
 
@@ -969,6 +976,14 @@ const AutomationForm = ({
                   </UI.Grid>
 
                 )}
+
+                <UI.Div>
+                  <TimePicker />
+                </UI.Div>
+
+                <UI.Div>
+                  <DayPicker />
+                </UI.Div>
 
                 <UI.Div
                   p={2}
