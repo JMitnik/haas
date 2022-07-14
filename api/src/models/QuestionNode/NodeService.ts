@@ -294,6 +294,7 @@ export class NodeService {
         value: rest.value,
         publicValue: rest.publicValue,
         overrideLeafId: overrideLeafId || undefined,
+        isTopic: rest.isTopic,
       };
     });
 
@@ -468,10 +469,7 @@ export class NodeService {
     overrideLeafId: string = '',
     isLeaf: boolean = false
   ) => {
-    const qOptions = options.length > 0 ? [
-      ...options,
-    ] : [];
-
+    const qOptions = options.length > 0 ? options : [];
     const params: CreateQuestionInput =
     {
       isRoot,

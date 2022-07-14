@@ -67,12 +67,11 @@ const WorkspaceCard = ({ customer }: { customer: any }) => {
 
   return (
     <UI.Card
-      useFlex
       height="100%"
       flexDirection="column"
-      backgroundColor={primaryColor.hex()}
       onClick={() => setCustomerSlug(customer.slug)}
-      style={{ borderColor: 'transparent', borderRadius: 20 }}
+      style={{ borderColor: 'transparent', borderRadius: 20, backgroundColor: primaryColor.hex() }}
+      hasHover
       data-cy="CustomerCard"
       data-testid="CustomerCard"
     >

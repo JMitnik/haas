@@ -11,9 +11,9 @@ const ContentContainer = styled(RadixPopover.Content)`
   width: 100%;
 `;
 
-export const {Root} = RadixPopover;
+export const { Root } = RadixPopover;
 
-export const {Trigger} = RadixPopover;
+export const { Trigger } = RadixPopover;
 
 interface ContentProps {
   isOpen: boolean;

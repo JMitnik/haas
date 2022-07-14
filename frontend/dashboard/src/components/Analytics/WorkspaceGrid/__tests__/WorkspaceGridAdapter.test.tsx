@@ -1,6 +1,5 @@
-import React from 'react';
-
 import { render, screen } from 'test';
+import React from 'react';
 
 import { WorkspaceGridAdapter } from '../WorkspaceGridAdapter';
 import { mockGetWorkspaceDialogueStatistics, mockQueryDialogueConnection } from './helpers';
@@ -13,6 +12,4 @@ test('render layers', async () => {
   mockGetWorkspaceDialogueStatistics((res) => ({ ...res }));
   mockQueryDialogueConnection((res) => ({ ...res }));
   renderComponent();
-
-  expect(await screen.findByText('Layers')).toBeInTheDocument();
 });

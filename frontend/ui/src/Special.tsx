@@ -2,7 +2,7 @@ import styled, { css } from 'styled-components';
 import React from 'react';
 import { Skeleton as ChakraSkeleton } from '@chakra-ui/core';
 import { H4, Text } from './Type';
-import Card, { BoxShadowSize, NewCard } from './Cards';
+import { BoxShadowSize, Card } from './Cards';
 import { Span } from './Span';
 import { CloseIcon } from './assets/icon-close';
 import { Div } from './Generics';
@@ -47,21 +47,33 @@ const IllustrationCardWrapper = styled.div`
 interface IllustrationCardProps {
   svg: any;
   text: string;
+  flatten?: boolean;
   children?: React.ReactNode;
   boxShadow?: BoxShadowSize;
 }
 
-export const IllustrationCard = ({ svg, text, children, boxShadow }: IllustrationCardProps) => {
-  return (
-    <NewCard boxShadow={boxShadow}>
+export const IllustrationCard = ({ svg, text, children, boxShadow, flatten }: IllustrationCardProps) => {
+  if (flatten) {
+    return (
       <IllustrationCardWrapper>
         {svg}
         <Span>
-          <H4 color="off.400" pt={4} fontWeight={500} pb={2}>{text}</H4>
+          <H4 color="off.500" pt={4} fontWeight={500} pb={2}>{text}</H4>
           {children}
         </Span>
       </IllustrationCardWrapper>
-    </NewCard>
+    )
+  }
+  return (
+    <Card boxShadow={boxShadow}>
+      <IllustrationCardWrapper>
+        {svg}
+        <Span>
+          <H4 color="off.500" pt={4} fontWeight={500} pb={2}>{text}</H4>
+          {children}
+        </Span>
+      </IllustrationCardWrapper>
+    </Card>
   );
 };
 

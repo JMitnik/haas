@@ -4,6 +4,7 @@ fragment QuestionFragment on QuestionNode {
   isRoot
   isLeaf
   type
+  extraContent
   children {
     ...EdgeFragment
     parentNode {
@@ -17,6 +18,50 @@ fragment QuestionFragment on QuestionNode {
     id
     title
     type
+  }
+  share {
+    id
+    title
+    url
+    tooltip
+  }
+  form {
+    id
+    helperText
+    fields {
+      id
+      label
+      type
+      placeholder
+      isRequired
+      position
+    }
+  }
+  links {
+    url
+    type
+    title
+    iconUrl
+    backgroundColor
+    buttonText
+    header
+    subHeader
+    imageUrl
+  }
+  sliderNode {
+    id
+    happyText
+    unhappyText
+    markers {
+      id
+      label
+      subLabel
+      range {
+        id
+        start
+        end
+      }
+    }
   }
   options {
     id

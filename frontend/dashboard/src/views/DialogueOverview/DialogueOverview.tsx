@@ -91,7 +91,7 @@ const DialogueOverview = () => {
                       </UI.Button>
                     </Popover.Trigger>
                     <Popover.Content isOpen={openShare}>
-                      <UI.NewCard minWidth={500}>
+                      <UI.Card minWidth={500}>
                         <UI.CardBody>
                           <UI.Div mb={2}>
                             <UI.H4 color="off.500">
@@ -119,7 +119,7 @@ const DialogueOverview = () => {
                             </UI.Div>
                           </UI.Div>
                         </UI.CardBody>
-                      </UI.NewCard>
+                      </UI.Card>
                     </Popover.Content>
                   </Popover.Root>
 

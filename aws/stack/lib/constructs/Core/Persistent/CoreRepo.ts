@@ -1,4 +1,5 @@
 import { aws_ecr as ecr, aws_ecs_patterns as aws_ecs_patterns } from "aws-cdk-lib";
+import { IRepository } from "aws-cdk-lib/aws-ecr";
 import { Construct } from 'constructs';
 
 interface CoreRepoProps {
@@ -6,14 +7,12 @@ interface CoreRepoProps {
 }
 
 export class CoreRepo extends Construct {
-  repo: ecr.Repository;
+  repo: IRepository;
 
   constructor(scope: Construct, id: string, props: CoreRepoProps) {
     super(scope, id);
-
-    const repo = new ecr.Repository(this, 'CORE_REPO', {
-      repositoryName: props.repoName,
-    });
+    // TODO: Repo now has to be created before-hand.
+    const repo = ecr.Repository.fromRepositoryName(this, 'CORE_REPO', props.repoName);
 
     this.repo = repo;
   }

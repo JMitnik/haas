@@ -12,8 +12,29 @@ class QuestionNodePrismaAdapter {
     this.prisma = prismaClient;
   }
 
+  /**
+   * Finds all topic question options within a list of dialogues matching a string
+   * @param dialogueIds
+   * @param topic
+   * @returns
+   */
+  public async findQuestionOptionsBySelectedTopic (dialogueIds: string[], topic: string) {
+    const questionOptions = await this.prisma.questionOption.findMany({
+      where: {
+        value: topic,
+        isTopic: true,
+        QuestionNode: {
+          questionDialogueId: {
+            in: dialogueIds,
+          },
+        },
+      },
+    });
 
-  findSliderNodeByDialogueId = async (dialogueId: string) => {
+    return questionOptions
+  }
+
+  public async findSliderNodeByDialogueId (dialogueId: string) {
     return this.prisma.questionNode.findFirst({
       where: {
         questionDialogueId: dialogueId,
@@ -37,9 +58,9 @@ class QuestionNodePrismaAdapter {
 
   /**
    * Finds a cache entry of a dialogue statistics summary based on id and date range
-   * @param dialogueId 
-   * @param startDateTime 
-   * @param endDateTime 
+   * @param dialogueId
+   * @param startDateTime
+   * @param endDateTime
    * @returns DialogueStatisticsSummaryCache | null
    */
   findQuestionStatisticsSummaryByQuestionId = async (dialogueId: string, startDateTime: Date, endDateTime: Date) => {
@@ -363,6 +384,7 @@ class QuestionNodePrismaAdapter {
         publicValue: option.publicValue,
         overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : undefined,
         position: option.position,
+        isTopic: option.isTopic,
       }
       const updatedQOption = await this.upsertQuestionOption(optionId, optionUpsertInput, optionUpsertInput);
 
@@ -440,12 +462,13 @@ class QuestionNodePrismaAdapter {
           create: question.links,
         } : undefined,
         options: question.options?.length ? {
-          create: question.options.map(({ value, overrideLeafId, publicValue, position }) => {
+          create: question.options.map(({ value, overrideLeafId, publicValue, position, isTopic }) => {
             return {
               value,
               publicValue,
               position,
               overrideLeaf: overrideLeafId ? { connect: { id: overrideLeafId } } : undefined,
+              isTopic,
             }
           }),
         } : undefined,

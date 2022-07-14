@@ -1,10 +1,19 @@
 import * as UI from '@haas/ui';
+import { EyeOff } from 'react-feather';
 import { motion } from 'framer-motion';
 import React from 'react';
 import theme from 'config/theme';
 import useMeasure from 'react-use-measure';
 
-import { GetWorkspaceSummaryDetails } from 'types/generated-types';
+import {
+  GetWorkspaceSummaryDetails,
+  useDeselectTopicMutation,
+} from 'types/generated-types';
+import { useCustomer } from 'providers/CustomerProvider';
+import { useToast } from 'hooks/useToast';
+
+import { ClickableSvg, Item } from './TopicRankingWidgetStyles';
+import { ShowMoreButton } from './SVGShowMoreButton';
 
 interface TopicRankingWidgetProps {
   totalResponseCount: number;
@@ -13,19 +22,43 @@ interface TopicRankingWidgetProps {
 
 export const TopicRankingWidget = ({ topics, totalResponseCount }: TopicRankingWidgetProps) => {
   const [ref, bounds] = useMeasure();
+  const { activeCustomer } = useCustomer();
+  const toast = useToast();
 
   const barHeight = 25;
   const margin = 4;
 
+  const [deselectTopic] = useDeselectTopicMutation({
+    refetchQueries: ['GetWorkspaceSummaryDetails'],
+    onCompleted: () => {
+      toast.success({
+        title: 'Option hidden',
+        description: 'Succesfully hid option from topics',
+      });
+    },
+  });
+
+  const handleDeselectTopic = (topic: string, onClosePopoverCallback: () => void) => {
+    deselectTopic({
+      variables: {
+        input: {
+          topic,
+          workspaceId: activeCustomer?.id as string,
+        },
+      },
+    });
+    onClosePopoverCallback();
+  };
+
   return (
-    <UI.NewCard>
+    <UI.Card>
       <UI.CardBodyLarge>
         <UI.Helper>
           Top topics
         </UI.Helper>
 
         <UI.Div ref={ref} mt={2}>
-          <svg width={bounds.width} height={160}>
+          <ClickableSvg width={bounds.width} height={160}>
             {topics.map((topic, index) => (
               <React.Fragment key={index}>
                 <motion.rect
@@ -65,7 +98,7 @@ export const TopicRankingWidget = ({ topics, totalResponseCount }: TopicRankingW
                   y={barHeight / 3.5 + index * (barHeight / 2 + margin)}
                   height={barHeight / 1.5}
                   dominantBaseline="middle"
-                  x={bounds.width - 180}
+                  x={bounds.width - 190}
                   initial={{
                     opacity: 0,
                   }}
@@ -76,12 +109,25 @@ export const TopicRankingWidget = ({ topics, totalResponseCount }: TopicRankingW
                 >
                   {topic.basicStats?.responseCount}
                 </motion.text>
+                <ShowMoreButton bounds={bounds} index={index} margin={margin}>
+                  {(handleClose) => (
+                    <UI.Card style={{ borderRadius: '10px' }} padding="0.5em" minWidth={200}>
+                      <Item onClick={() => handleDeselectTopic(topic.name, handleClose)}>
+                        <UI.Icon>
+                          <EyeOff />
+                        </UI.Icon>
+                        Hide topic
+                      </Item>
+                    </UI.Card>
+                  )}
+
+                </ShowMoreButton>
 
               </React.Fragment>
             ))}
-          </svg>
+          </ClickableSvg>
         </UI.Div>
       </UI.CardBodyLarge>
-    </UI.NewCard>
+    </UI.Card>
   );
 };

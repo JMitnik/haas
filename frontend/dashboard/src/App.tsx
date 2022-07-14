@@ -8,6 +8,7 @@ import { CampaignView } from 'views/CampaignView/CampaignView';
 import { DashboardView } from 'views/DashboardView';
 import { DialogueLinkFetchOverview } from 'views/DialogueLinkFetchOverview';
 import { DialogueProvider } from 'providers/DialogueProvider';
+import { FeedbackOverview } from 'views/FeedbackView/index';
 import { FirstTimeView } from 'views/FirstTimeView';
 import { GenerateWorkspaceView } from 'views/GenerateWorkspaceView';
 import { InteractionsOverview } from 'views/InteractionsOverview';
@@ -23,7 +24,6 @@ import ActionsPage from 'pages/dashboard/actions';
 import AddCustomerPage from 'pages/dashboard/customers/add';
 import AddDialogueView from 'views/AddDialogueView';
 import AddTriggerView from 'views/TriggerOverview/AddTriggerView';
-import AdminOverview from 'views/AdminOverview/AdminOverview';
 import AnalyticsPage from 'pages/dashboard/analytics';
 import AutodeckOverview from 'views/AutodeckOverview/AutodeckOverview';
 import CampaignsView from 'views/CampaignsView/CampaignsView';
@@ -165,6 +165,11 @@ const CustomerRoutes = () => (
                     />
 
                     <GuardedRoute
+                      path="/dashboard/b/:customerSlug/dashboard/feedback"
+                      render={() => <FeedbackOverview />}
+                    />
+
+                    <GuardedRoute
                       path="/dashboard/b/:customerSlug/dashboard"
                       render={() => <DashboardView />}
                     />
@@ -282,12 +287,6 @@ const AppRoutes = () => (
         allowedPermission={SystemPermission.CanAccessAdminPanel}
         path={ROUTES.AUTODECK_OVERVIEW}
         render={() => <AutodeckOverview />}
-      />
-
-      <GuardedRoute
-        allowedPermission={SystemPermission.CanAccessAdminPanel}
-        path={ROUTES.ADMIN_OVERVIEW}
-        render={() => <AdminOverview />}
       />
 
       <GuardedRoute

@@ -5,14 +5,13 @@ import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
+import * as RadioGroup from 'components/Common/RadioGroup';
 import { DialogueTemplateType, refetchMeQuery, useGenerateWorkspaceFromCsvMutation } from 'types/generated-types';
 import { View } from 'layouts/View';
 import { useLogger } from 'hooks/useLogger';
 import { useToast } from 'hooks/useToast';
 import FileDropInput from 'components/FileDropInput';
 import intToBool from 'utils/intToBool';
-
-import * as LS from './GenerateWorkspaceView.styles';
 
 const schema = yup.object({
   workspaceTitle: yup.string().required(),
@@ -71,6 +70,7 @@ export const GenerateWorkspaceView = () => {
       });
     },
     onError: (error) => {
+      console.log('ERROR: ', error);
       logger.logError(error, {
         tags: { section: 'campaign' },
       });
@@ -84,7 +84,13 @@ export const GenerateWorkspaceView = () => {
     defaultValue: 0,
   });
 
-  console.log({ usesGeneratedData });
+  const handleManagerCancel = () => {
+    setActiveManagerCSV(null);
+  };
+
+  const handleGroupsCancel = () => {
+    setActiveCSV(null);
+  };
 
   const handleManagerDrop = (files: File[]) => {
     if (!files.length) return;
@@ -157,34 +163,29 @@ export const GenerateWorkspaceView = () => {
                 name="dialogueType"
                 control={form.control}
                 render={({ value, onChange, onBlur }) => (
-                  <LS.RadioGroupRoot
+                  <RadioGroup.Root
                     defaultValue={value}
                     onValueChange={onChange}
                     onBlur={onBlur}
                     variant="spaced"
                   >
                     {DIALOGUE_TYPE_OPTIONS.map((option) => (
-                      <LS.RadioGroupBox
-                        htmlFor={option.value}
-                        key={option.value}
+                      <RadioGroup.Item
                         isActive={value === option.value}
+                        value={option.value}
+                        key={option.value}
                         contentVariant="twoLine"
                         variant="boxed"
                       >
-                        <LS.RadioGroupItem id={option.value} key={option.value} value={option.value}>
-                          <LS.RadioGroupIndicator />
-                        </LS.RadioGroupItem>
-                        <UI.Div>
-                          <LS.RadioGroupLabel>
-                            {option.label}
-                          </LS.RadioGroupLabel>
-                          <LS.RadioGroupSubtitle>
-                            {option.description}
-                          </LS.RadioGroupSubtitle>
-                        </UI.Div>
-                      </LS.RadioGroupBox>
+                        <RadioGroup.Label>
+                          {option.label}
+                        </RadioGroup.Label>
+                        <RadioGroup.Subtitle>
+                          {option.description}
+                        </RadioGroup.Subtitle>
+                      </RadioGroup.Item>
                     ))}
-                  </LS.RadioGroupRoot>
+                  </RadioGroup.Root>
                 )}
               />
             </UI.FormControl>
@@ -222,6 +223,7 @@ export const GenerateWorkspaceView = () => {
               <FileDropInput
                 isDisabled={!!usesGeneratedData}
                 onDrop={handleManagerDrop}
+                onCancel={handleManagerCancel}
               />
             </UI.FormControl>
 
@@ -231,6 +233,7 @@ export const GenerateWorkspaceView = () => {
               <FileDropInput
                 isDisabled={!!usesGeneratedData}
                 onDrop={handleDrop}
+                onCancel={handleGroupsCancel}
               />
             </UI.FormControl>
           </UI.InputGrid>

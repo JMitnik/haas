@@ -1,7 +1,10 @@
 import { PrismaClient, Prisma } from '@prisma/client'
 
+import { redis } from './redis';
+import { RedisService } from '../models/general/cache/RedisService';
 import { mailService } from '../services/mailings/MailService'
 import { LoginService } from '../models/auth/LoginService'
+import { IssueService } from '../models/Issue/IssueService';
 import UserService from '../models/users/UserService'
 import { APIServiceContainer } from '../types/APIContext'
 import CustomerService from '../models/customer/CustomerService'
@@ -52,10 +55,13 @@ export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOption
   const generateWorkspaceService = new GenerateWorkspaceService(prisma);
   const templateService = new TemplateService(prisma);
   const topicService = new TopicService(prisma);
+  const issueService = new IssueService(prisma);
+  const redisService = new RedisService(redis);
   const organizationService = new OrganizationService(prisma);
 
   return {
     organizationService,
+    redisService,
     templateService,
     generateWorkspaceService,
     questionStatisticsService,
@@ -79,5 +85,6 @@ export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOption
     campaignService,
     linkService,
     topicService,
+    issueService,
   }
 }

@@ -1,14 +1,14 @@
-import { Div } from '@haas/ui';
+import * as UI from '@haas/ui';
 import styled from 'styled-components';
 
-const ModuleContainer = styled(Div)`
-    background: #f7f9fe;
-    border-radius: 12px;
-    overflow: hidden;
+const ModuleContainer = styled(UI.Div)`
+  ol {
+      padding: 12px 24px;
+  }
 
-    ol {
-        padding: 12px 24px;
-    }
+  ${UI.CardBody} {
+    overflow: hidden;
+  }
 `;
 
 export default ModuleContainer;

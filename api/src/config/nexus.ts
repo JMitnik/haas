@@ -6,7 +6,12 @@ import * as DebugAPI from '../models/debug/Debug';
 import * as InteractionAPI from '../models/session/graphql';
 import * as NodeEntryAPI from '../models/node-entry/NodeEntry';
 import * as PaginationAPI from '../models/general/Pagination';
+import * as SandboxAPI from '../models/Common/Sandbox/graphql/SandboxMutation.graphql';
 import * as QuestionNodeAPI from '../models/QuestionNode';
+import * as DateAPI from '../models/Common/Date/graphql';
+import * as IssueAPI from '../models/Issue/graphql';
+import * as CommonAnalyticsAPI from '../models/Common/Analytics/graphql';
+import * as CommonStatusAPI from '../models/Common/Status/graphql';
 import * as UserAPI from '../models/users/graphql';
 import * as WorkspaceAPI from '../models/customer';
 import * as GenerateWorkspaceAPI from '../models/generate-workspace';
@@ -25,11 +30,16 @@ import * as organizationAPI from '../models/organization/graphql/index';
 
 const nexus = [
   ...Array(organizationAPI),
+  ...Array(CommonAnalyticsAPI),
+  ...Array(DateAPI),
+  ...Array(CommonStatusAPI),
+  ...Array(SandboxAPI),
   ...Array(GenerateWorkspaceAPI),
   ...Array(AutodeckAPI),
   ...linkNexus,
   ...tagNexus,
   ...Array(TopicAPI),
+  ...Array(IssueAPI),
   ...Array(AutomationAPI),
   ...Array(CampaignAPI),
   ...triggerNexus,

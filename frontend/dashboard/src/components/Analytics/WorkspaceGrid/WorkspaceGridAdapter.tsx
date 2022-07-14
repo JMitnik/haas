@@ -28,10 +28,10 @@ export const WorkspaceGridAdapter = ({
   width,
   backgroundColor,
 }: WorkspaceGridAdapterProps) => {
-  const { getStartOfWeek, format } = useDate();
+  const { getOneWeekAgo, format, getEndOfToday, getTomorrow } = useDate();
   const [dateRange, setDateRange] = useState<[Date, Date]>(() => {
-    const startDate = getStartOfWeek();
-    const endDate = new Date();
+    const startDate = getOneWeekAgo();
+    const endDate = getEndOfToday();
 
     return [startDate, endDate];
   });
@@ -50,7 +50,7 @@ export const WorkspaceGridAdapter = ({
     fetchPolicy: 'no-cache',
     skip: !(!!selectedStartDate && !!selectedEndDate),
     onCompleted: (data) => {
-      setDialogues(data.customer?.dialogues || []);
+      setDialogues(data.customer?.statistics?.workspaceStatisticsSummary || []);
     },
   });
 
@@ -75,6 +75,7 @@ export const WorkspaceGridAdapter = ({
         endDateTime: format(selectedEndDate, DateFormat.DayFormat),
         path: options.topics || [],
         refresh: true,
+        issueOnly: options.issueOnly,
       },
       dialogueId: options.dialogueId,
     });

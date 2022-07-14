@@ -429,10 +429,7 @@ class AutomationService {
    */
   handleTriggerAutomations = async (dialogueId: string) => {
     const candidateAutomations = await this.getCandidateTriggers(dialogueId);
-    if (!candidateAutomations) {
-      console.log('No potential trigger automations found. abort');
-      return;
-    }
+    if (!candidateAutomations) return;
 
     const triggeredAutomations = await Promise.all(candidateAutomations.map(async (automationTrigger) => {
       const { trigger, workspaceSlug, dialogueSlug } = automationTrigger;

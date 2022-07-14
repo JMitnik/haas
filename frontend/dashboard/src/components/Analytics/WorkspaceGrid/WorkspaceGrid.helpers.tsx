@@ -1,6 +1,7 @@
 import { GREEN_LOWER_BOUND, ORANGE_LOWER_BOUND } from 'config/constants';
 import { Grid, Hex, createHexPrototype, rectangle } from 'honeycomb-grid';
-import { meanBy, orderBy, uniqBy } from 'lodash';
+import { isPresent } from 'ts-is-present';
+import { meanBy, orderBy, uniq, uniqBy } from 'lodash';
 
 import {
   Dialogue,
@@ -93,14 +94,14 @@ const filterDialogues = (groupFragments: string, dialogues: Dialogue[]): Dialogu
  */
 export const calcGroupStatistics = (dialogues: Dialogue[]): HexagonGroupNodeStatics => {
   const voteCount = dialogues.reduce<number>((acc, dialogue) => (
-    acc + (dialogue.dialogueStatisticsSummary?.nrVotes ?? 0)
+    acc + (dialogue?.nrVotes ?? 0)
   ), 0);
 
-  const filteredDialogues = dialogues.filter((dialogue) => dialogue.dialogueStatisticsSummary?.impactScore
-    && dialogue.dialogueStatisticsSummary?.impactScore > 0);
+  const filteredDialogues = dialogues.filter((dialogue) => dialogue?.impactScore
+    && dialogue?.impactScore > 0);
 
   const average = voteCount > 0
-    ? meanBy(filteredDialogues, (dialogue) => dialogue.dialogueStatisticsSummary?.impactScore)
+    ? meanBy(filteredDialogues, (dialogue) => dialogue?.impactScore)
     : 0;
 
   return {
@@ -132,7 +133,7 @@ export const recursiveBuildGroup = (
       type: HexagonNodeType.Dialogue,
       dialogue: relevantDialogue,
       label: groupName,
-      score: relevantDialogue.dialogueStatisticsSummary?.impactScore || 0,
+      score: relevantDialogue.impactScore || 0,
       points: undefined,
     } as HexagonDialogueNode;
   }
@@ -157,10 +158,10 @@ export const recursiveBuildGroup = (
 };
 
 export const dialogueToNode = (dialogue: Dialogue): HexagonNode => ({
-  id: dialogue.id,
+  id: dialogue?.id as string,
   type: HexagonNodeType.Dialogue,
   label: dialogue.title,
-  score: dialogue.dialogueStatisticsSummary?.impactScore ?? 0,
+  score: dialogue?.impactScore ?? 0,
   dialogue,
 });
 
@@ -198,7 +199,7 @@ export const orderNodesByVoteCount = (nodes: HexagonNode[]): HexagonNode[] => or
   if (typeof node !== 'object') return 0;
 
   if (node.type === HexagonNodeType.Dialogue) {
-    return node.dialogue.dialogueStatisticsSummary?.nrVotes;
+    return node.dialogue?.nrVotes;
   }
 
   if (node.type === HexagonNodeType.Topic) {
@@ -216,7 +217,7 @@ export const orderNodesByScore = (nodes: HexagonNode[]): HexagonNode[] => orderB
   if (typeof node !== 'object') return 0;
 
   if (node.type === HexagonNodeType.Dialogue) {
-    return node.dialogue.dialogueStatisticsSummary?.impactScore;
+    return node.dialogue?.impactScore;
   }
 
   if (node.type === HexagonNodeType.Topic) {
@@ -424,3 +425,24 @@ export const extractDialogueFragments = (historyQueue: HexagonState[]): string[]
 
   return fragments;
 };
+
+/**
+   * Traverses a HexagonNode and its groups to find all the dialogueIds
+   * @param data the root group HexagonNode
+   * @param filteredDialogueIds an array to store the traversed HexagonNode IDs
+   * @returns a list of dialogueIds part of the current group
+   */
+export const findDialoguesInGroup = (
+  data: HexagonNode[], filteredDialogueIds: string[] = [],
+): string[] => uniq(data.flatMap((node) => {
+  if (node?.type === HexagonNodeType.Dialogue) {
+    filteredDialogueIds.push(node.id);
+    return filteredDialogueIds;
+  }
+
+  if (node?.type === HexagonNodeType.Group) {
+    return findDialoguesInGroup(node.subGroups, filteredDialogueIds);
+  }
+
+  return undefined;
+}).filter(isPresent));

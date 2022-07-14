@@ -1,4 +1,4 @@
-import { DialogueImpactScore, FormNodeFieldType, LinkTypeEnum, NodeType, Prisma } from '@prisma/client';
+import { DialogueImpactScore, FormNodeFieldType, LanguageEnum, LinkTypeEnum, NodeType, Prisma } from '@prisma/client';
 
 export interface UpsertDialogueTopicCacheInput {
   id?: string;
@@ -34,6 +34,11 @@ export interface CreateDialogueInput {
   isWithoutGenData?: boolean;
   endScreenText?: string | null;
   wasGeneratedWithGenData?: boolean;
+  language?: LanguageEnum;
+  postLeafText?: {
+    header?: string;
+    subHeader?: string;
+  };
   customer?: { id?: string; name?: string; slug?: string; create: boolean };
 }
 
@@ -51,6 +56,7 @@ export interface CreateQuestionInput {
     value: string;
     position: number | null;
     overrideLeafId?: string;
+    isTopic?: boolean;
   }[];
   links?: Array<{
     title: string | null;
@@ -67,6 +73,11 @@ export interface CreateQuestionInput {
       isRequired: boolean;
       position: number;
     }>;
+  };
+  share?: {
+    url: string;
+    tooltip: string;
+    title: string;
   };
   sliderNode?: {
     markers: Array<{

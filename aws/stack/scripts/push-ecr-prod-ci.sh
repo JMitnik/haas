@@ -5,7 +5,7 @@ REGION="eu-central-1"
 LOCAL_REPO_NAME="haas"
 LOCAL_TAG="local-ecr"
 
-REMOTE_REPO_NAME="haas_core_repo"
+REMOTE_REPO_NAME="haas_core_repo_prod"
 REMOTE_REPO_TAG="latest"
 
 # Region is a variable

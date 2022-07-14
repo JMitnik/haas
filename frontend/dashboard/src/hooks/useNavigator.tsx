@@ -1,4 +1,5 @@
 import { generatePath, useHistory, useLocation, useParams, useRouteMatch } from 'react-router';
+import { useMemo } from 'react';
 
 export const ROUTES = {
   GENERATE_WORKSPACE_VIEW: '/dashboard/b/generate-workspace',
@@ -6,7 +7,10 @@ export const ROUTES = {
   DIALOGUES_VIEW: '/dashboard/b/:customerSlug/d',
   DIALOGUE_ROOT: '/dashboard/b/:customerSlug/d/:dialogueSlug',
   INTERACTIONS_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/interactions',
+  DASHBOARD_VIEW: '/dashboard/b/:customerSlug/dashboard',
   INTERACTION_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/interactions/:interactionId',
+  WORKSPACE_INTERACTIONS_VIEW: '/dashboard/b/:customerSlug/dashboard/feedback',
+  WORKSPACE_INTERACTION_VIEW: '/dashboard/b/:customerSlug/dashboard/feedback/:interactionId',
   CAMPAIGNS_VIEW: '/dashboard/b/:customerSlug/campaigns',
   CAMPAIGN_VIEW: '/dashboard/b/:customerSlug/campaign/:campaignId',
   DELIVERY_VIEW: '/dashboard/b/:customerSlug/campaign/:campaignId/:deliveryId',
@@ -30,16 +34,30 @@ interface DashboardParams {
 
 export const useNavigator = () => {
   const { customerSlug, dialogueSlug, campaignId } = useParams<DashboardParams>();
-  const dialogueMatch = useRouteMatch<{ dialogueSlug: string }>({
-    path: ROUTES.DIALOGUE_ROOT,
-  });
 
-  const userOverviewMatch = useRouteMatch<{ dialogueSlug: string }>({
-    path: ROUTES.USERS_OVERVIEW,
-  });
+  const dashboardScopeMatch = useRouteMatch<{ customerSlug: string }>({ path: ROUTES.DASHBOARD_VIEW });
+  const dialogueMatch = useRouteMatch<{ dialogueSlug: string }>({ path: ROUTES.DIALOGUE_ROOT });
+  const userOverviewMatch = useRouteMatch<{ dialogueSlug: string }>({ path: ROUTES.USERS_OVERVIEW });
+  const dialoguesMatch = useRouteMatch({ path: ROUTES.DIALOGUES_VIEW });
+  const campaignsMatch = useRouteMatch({ path: ROUTES.CAMPAIGNS_VIEW });
 
   const history = useHistory();
   const location = useLocation();
+
+  const goToWorkspaceFeedbackOverview = (
+    dialogueIds: string[], startDate: string, endDate: string, maxScore?: number, withFollowUpAction?: boolean,
+  ) => {
+    const path = generatePath(ROUTES.WORKSPACE_INTERACTIONS_VIEW, {
+      customerSlug,
+    });
+
+    const dialogueQueryParams = dialogueIds.length > 1 ? dialogueIds.join('&dialogueIds=') : `${dialogueIds?.[0] || ''}`;
+    let targetPath = `${path}?startDate=${startDate}&endDate=${endDate}&dialogueIds=${dialogueQueryParams}`;
+    if (maxScore) targetPath = `${targetPath}&maxScore=${maxScore}`;
+    if (withFollowUpAction) targetPath = `${targetPath}&withFollowUpAction=1`;
+
+    history.push(targetPath + location.search);
+  };
 
   const goToDialogueBuilderOverview = () => {
     const path = generatePath(ROUTES.DIALOGUE_BUILDER_OVERVIEW, {
@@ -144,15 +162,20 @@ export const useNavigator = () => {
   const getDialoguesPath = () => generatePath(ROUTES.DIALOGUES_VIEW, { customerSlug });
   const getAlertsPath = () => generatePath(ROUTES.ALERTS_OVERVIEW, { customerSlug });
 
-  const dialoguesMatch = useRouteMatch({
-    path: ROUTES.DIALOGUES_VIEW,
-  });
+  const dashboardPath = useMemo(() => customerSlug && generatePath(
+    ROUTES.DASHBOARD_VIEW, { customerSlug },
+  ), [customerSlug]);
+  const workspaceInteractionsPath = useMemo(() => customerSlug && generatePath(
+    ROUTES.WORKSPACE_INTERACTIONS_VIEW, { customerSlug },
+  ), [customerSlug]);
 
-  const campaignsMatch = useRouteMatch({
-    path: ROUTES.CAMPAIGNS_VIEW,
-  });
+  const goTo = (path: string) => history.push(path);
 
   return {
+    goTo,
+    dashboardPath,
+    workspaceInteractionsPath,
+    goToWorkspaceFeedbackOverview,
     goToGenerateWorkspaceOverview,
     goToNewOptionsCTAView,
     goToDialogueBuilderOverview,
@@ -169,6 +192,7 @@ export const useNavigator = () => {
     getAlertsPath,
     dialoguesMatch,
     dialogueMatch,
+    dashboardScopeMatch,
     customerSlug,
     dialogueSlug,
     campaignId,

@@ -1,9 +1,9 @@
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import * as UI from '@haas/ui';
 import { AnimatePresence, motion } from 'framer-motion';
+import React from 'react';
 
 import { slideUpFadeMotion } from 'components/animation/config';
-import React from 'react';
 import styled from 'styled-components';
 
 interface RootProps extends DialogPrimitive.DialogContentProps {
@@ -33,7 +33,7 @@ const Overlay = styled(DialogPrimitive.DialogOverlay)`
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 10000;
+  z-index: 100000;
 `;
 
 export const Root = ({ children, open, onClose, minWidth = 600, ...props }: RootProps) => (
@@ -70,9 +70,9 @@ export const Root = ({ children, open, onClose, minWidth = 600, ...props }: Root
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.3, ease: [0, 0, 0.2, 1] }}
                 >
-                  <UI.NewCard minWidth={minWidth} minHeight={300}>
+                  <UI.Card minWidth={minWidth} minHeight={300}>
                     {children}
-                  </UI.NewCard>
+                  </UI.Card>
                 </motion.div>
               </ContentContainer>
             </motion.div>

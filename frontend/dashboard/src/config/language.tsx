@@ -11,6 +11,62 @@ const language = {
     },
   },
   general: {
+    is_topic: {
+      en: 'Is a topic',
+      de: 'Ist ein Thema',
+    },
+    dashboard_description: {
+      en: 'See how your teams and people are doing.',
+      de: 'See how your teams and people are doing.',
+    },
+    workspace_overview_description: {
+      en: 'Use the table to get to pressing issues immediately, or navigate your organisation manually via the hexagon grid.',
+      de: 'Understand your teams and people by drilling down.',
+    },
+    dashboard_no_issues: {
+      en: 'Good news! No negative teams can be found in this date-range and filter level.',
+      de: 'Good news! No negative teams can be found in this date-range and filter level.',
+    },
+    dashboard_no_data_with_filter: {
+      en: 'Currently there is no data available on this date-range and filter level.',
+      de: 'Currently there is no data available on this date-range and filter level.',
+    },
+    zoom_in: {
+      en: 'Zoom in',
+      de: 'Zoom in',
+    },
+    zoom_out: {
+      en: 'Zoom out',
+      de: 'Zoom out',
+    },
+    teams_with_problems: {
+      en: 'Teams with problems',
+      de: 'Mannschaften mit Problemen',
+    },
+    issues: {
+      en: 'Issues',
+      de: 'Issues',
+    },
+    happy_people: {
+      en: 'Happy people',
+      de: 'Glückliche Leute',
+    },
+    unhappy_people: {
+      en: 'Unhappy people',
+      de: 'Unglückliche Menschen',
+    },
+    happiness_score: {
+      en: 'Happiness score',
+      de: 'Glückspunktzahl',
+    },
+    center_hexagons: {
+      en: 'Center the hexagons',
+      de: 'Zentrieren Sie die Sechsecke',
+    },
+    go_up_one_layer: {
+      en: 'Go up one layer',
+      de: 'Gehen Sie eine Ebene nach oben',
+    },
     individuals: {
       en: 'Individuals',
       de: 'Individuals',
@@ -326,6 +382,10 @@ const language = {
     filter_by_search: {
       en: 'Filter by search',
       de: 'Nach Suche filtern',
+    },
+    filter_by_score: {
+      en: 'Filter by score',
+      de: 'Nach Punktzahl filtern',
     },
     filter_by_date: {
       en: 'Filter by date',
@@ -1159,6 +1219,10 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       en: 'Maximum value',
       de: 'Maximalwert',
     },
+    score: {
+      en: 'Score',
+      de: 'Punktzahl',
+    },
     search: {
       en: 'Search',
       de: 'Suche',
@@ -1271,10 +1335,6 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     teams_subtitle: {
       en: 'Create, edit and manage your teams',
       de: 'Erstellen, bearbeiten und verwalten von Dialogen',
-    },
-    score: {
-      en: 'Score',
-      de: 'Ergebnis',
     },
     export_to_csv: {
       en: 'CSV export',
@@ -1715,9 +1775,13 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   views: {
+    feedback: {
+      en: 'Feedback',
+      de: 'Feedback',
+    },
     dashboard: {
-      en: 'Overview',
-      de: 'Overview',
+      en: 'Dashboard',
+      de: 'Dashboard',
     },
     configurations: {
       en: 'Configurations',

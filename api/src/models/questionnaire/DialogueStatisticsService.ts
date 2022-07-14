@@ -13,7 +13,7 @@ import DialogueService from './DialogueService';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import { TopicService } from '../Topic/TopicService';
 import { TopicFilterInput } from '../Topic/Topic.types';
-import { Topic } from './DialogueTypes';
+import { Topic } from './Dialogue.types';
 import { toUTC } from '../../utils/dateUtils';
 
 const THRESHOLD = 40;
@@ -46,46 +46,6 @@ class DialogueStatisticsService {
 
   buildCacheKey(dialogueId: string, type: DialogueImpactScore, startDateTime: Date, endDateTime?: Date): string {
     return `${dialogueId}_${type}_${startDateTime.getTime()}_${endDateTime?.getTime() ?? 0}`;
-  }
-
-  /**
-   * Calculate potentially an urgent path for the workspace.
-   */
-  async calculateUrgentPath(
-    workspaceId: string,
-    startDate: Date,
-    endDate: Date,
-    topicFilter: TopicFilterInput = {},
-  ): Promise<UrgentPath | null> {
-    // An urgent path is a path which was considered urgent. This can be either one of the following:
-    // TODO: 1. A particular subject was triggered which was marked as "important" (this takes precedence)
-
-    const topicCounts = await this.topicService.countWorkspaceTopics(workspaceId, startDate, endDate, {
-      ...topicFilter,
-      relatedSessionScoreLowerThreshold: THRESHOLD,
-    });
-
-    // This is where the decision is made "what" is considered most urgent to report on.
-    const urgentTopic = maxBy(Object.values(topicCounts), 'count');
-
-    if (!urgentTopic) return null;
-
-    return {
-      id: `URGENT_PATH_${workspaceId}`,
-      path: {
-        id: `PATH_URGENT_PATH_${workspaceId}`,
-        topicStrings: urgentTopic.relatedTopics,
-      },
-      // This is resolved separately.
-      dialogue: null,
-      // TODO: Accept multiple dialogues as output, we only return the "first" one right now.
-      dialogueId: urgentTopic.dialogueIds[0],
-      // Basic stats
-      basicStats: {
-        average: urgentTopic.score,
-        responseCount: urgentTopic.count,
-      },
-    }
   }
 
   findDialogueHealthScore = async (
@@ -190,6 +150,24 @@ class DialogueStatisticsService {
    * @param sessions a list of sessions
    * @returns an impact score or null if no sessions/type are provided
    */
+  calculateImpactScoreBySessions = (type: DialogueImpactScore, sessions: Session[]) => {
+    switch (type) {
+      case DialogueImpactScore.AVERAGE:
+        const sliderValues = sessions.map((session) => session.mainScore).filter(isPresent);
+        const average = mean(sliderValues);
+        return average;
+
+      default:
+        return null;
+    }
+  }
+
+  /**
+   * Calculates impact score of a list of sessions
+   * @param type an impact score type
+   * @param sessions a list of sessions
+   * @returns an impact score or null if no sessions/type are provided
+   */
   calculateImpactScore = async (type: DialogueImpactScore, sessions: Session[]) => {
     switch (type) {
       case DialogueImpactScore.AVERAGE:
@@ -271,26 +249,89 @@ class DialogueStatisticsService {
     topicFilter?: TopicFilterInput,
     cutoff = 5
   ): Promise<Topic[]> {
-    const topicCounts = await this.topicService.countWorkspaceTopics(
-      workspaceId,
-      startDate,
-      endDate,
-      topicFilter,
+    // TODO: FIX
+    // const topicCounts = await this.topicService.countWorkspaceTopics(
+    //   workspaceId,
+    //   startDate,
+    //   endDate,
+    //   topicFilter,
+    // );
+
+    // const test = Object.values(topicCounts).map((topicCount) => {
+    //   return Object.values(topicCount);
+    // }).flat();
+
+    // // Rank topics (without using index, not efficient)
+    // const rankedTopics: Topic[] = orderBy(Object.values(topicCounts), 'count', 'desc').map(topicCount => ({
+    //   name: topicCount.topic,
+    //   impactScore: topicCount.score,
+    //   nrVotes: topicCount.count,
+    //   subTopics: [],
+    //   basicStats: {
+    //     average: topicCount.score,
+    //     responseCount: topicCount.count,
+    //   },
+    // })).slice(0, cutoff);
+
+    // return rankedTopics;
+    return [];
+  }
+
+  /**
+   * Generates a statistics summary of all dialogues within a workspace
+   * @param customerId
+   * @param impactScoreType
+   * @param startDateTime
+   * @param endDateTime
+   * @returns
+   */
+  findWorkspaceStatisticsSummary = async (
+    customerId: string,
+    impactScoreType: DialogueImpactScore,
+    startDateTime: Date,
+    endDateTime?: Date,
+  ) => {
+    const dialogues = await this.dialogueService.findDialoguesByCustomerId(customerId);
+    const dialogueIds = dialogues.map((dialogue) => dialogue.id);
+    const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
+
+    const sessions = await this.sessionService.findSessionsForDialogues(
+      dialogueIds,
+      startDateTime as Date,
+      endDateTimeSet,
     );
 
-    // Rank topics (without using index, not efficient)
-    const rankedTopics: Topic[] = orderBy(Object.values(topicCounts), 'count', 'desc').map(topicCount => ({
-      name: topicCount.topic,
-      impactScore: topicCount.score,
-      nrVotes: topicCount.count,
-      subTopics: [],
-      basicStats: {
-        average: topicCount.score,
-        responseCount: topicCount.count,
-      },
-    })).slice(0, cutoff);
+    // Group node entries by their dialogue ids so we can calculate impact score
+    const sessionContext = groupBy(sessions, (session) => session?.dialogueId);
 
-    return rankedTopics;
+    // If no node entries/sessions exist for a dialogue return empty list so cache entry can still get created
+    dialogueIds.forEach((dialogueId) => {
+      if (!sessionContext[dialogueId]) {
+        sessionContext[dialogueId] = [];
+      }
+    });
+
+    const summaries = Object.entries(sessionContext).map((context) => {
+      const dialogueId = context[0];
+      const sessions = context[1];
+      const impactScore = this.calculateImpactScoreBySessions(
+        impactScoreType,
+        sessions
+      );
+
+      const data = {
+        id: dialogueId,
+        dialogueId,
+        updatedAt: toUTC(new Date(Date.now())),
+        impactScore: impactScore || 0,
+        nrVotes: sessions.length || 0,
+        dialogue: dialogues.find((dialogue) => dialogue.id === dialogueId) || null,
+      }
+
+      return data;
+    });
+
+    return summaries;
   }
 
   /**

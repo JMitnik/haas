@@ -5,6 +5,7 @@ import { useFormatter } from 'hooks/useFormatter';
 
 import { ProgressCircle } from '../../WorkspaceGrid/SummaryPane/ProgressCircle';
 import { getColorScoreBrandVariable, getHexagonSVGFill } from '../../WorkspaceGrid/WorkspaceGrid.helpers';
+import { useTranslation } from 'react-i18next';
 
 interface HealthCardProps {
   score: number;
@@ -19,9 +20,10 @@ export const HealthCard = ({
   negativeResponseCount,
   isPreview,
 }: HealthCardProps) => {
+  const { t } = useTranslation();
   const { formatFractionToPercentage } = useFormatter();
   return (
-    <UI.NewCard boxShadow="md" hasBlur maxWidth={250}>
+    <UI.Card boxShadow="md" hasBlur maxWidth={250}>
       <UI.CardBodyLarge>
         <UI.Flex justifyContent="center">
           <ProgressCircle
@@ -46,7 +48,7 @@ export const HealthCard = ({
             fontWeight={500}
             fontSize="1.3rem"
           >
-            Happiness score
+            {t('happiness_score')}
           </UI.Helper>
         </UI.Div>
 
@@ -54,7 +56,7 @@ export const HealthCard = ({
           <UI.Div>
             <UI.Flex mt={2} justifyContent="space-between">
               <UI.Span color="green.500" fontWeight={600}>
-                Happy people
+                {t('happy_people')}
               </UI.Span>
               <UI.Span color="off.500">
                 {positiveResponseCount}
@@ -63,7 +65,7 @@ export const HealthCard = ({
 
             <UI.Flex mt={1} justifyContent="space-between">
               <UI.Span color="red.500" fontWeight={600}>
-                Sad people
+                {t('unhappy_people')}
               </UI.Span>
               <UI.Span color="off.500">
                 {negativeResponseCount}
@@ -72,6 +74,6 @@ export const HealthCard = ({
           </UI.Div>
         )}
       </UI.CardBodyLarge>
-    </UI.NewCard>
+    </UI.Card>
   );
 };

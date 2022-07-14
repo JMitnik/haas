@@ -166,7 +166,7 @@ const ShareDialogue = ({ dialogueName, shareUrl }: ShareDialogueDropdownProps) =
   const { t } = useTranslation();
 
   return (
-    <UI.NewCard maxWidth={500}>
+    <UI.Card maxWidth={500}>
       <UI.CardBody>
         <UI.Div mb={4}>
           <UI.Text fontWeight={600} fontSize="1.3rem" color="gray.700">{t('dialogue:share_qr')}</UI.Text>
@@ -215,7 +215,7 @@ const ShareDialogue = ({ dialogueName, shareUrl }: ShareDialogueDropdownProps) =
           </UI.Flex>
         </UI.Div>
       </UI.CardBody>
-    </UI.NewCard>
+    </UI.Card>
   );
 };
 
@@ -271,8 +271,6 @@ const DialogueView = () => {
     dialogue?.thisWeekAverageScore || 0,
     dialogue?.previousScore || 0,
   );
-
-  console.log(dialogue?.sessions);
 
   const makeSearchUrl = () => {
     if (!dialogue?.statistics?.mostPopularPath?.answer) return '';
@@ -358,7 +356,6 @@ const DialogueView = () => {
               </UI.Skeleton>
 
               <UI.Skeleton {...fetchStatus}>
-
                 <SummaryModule
                   heading={t('dialogue:average_score')}
                   renderIcon={Award}

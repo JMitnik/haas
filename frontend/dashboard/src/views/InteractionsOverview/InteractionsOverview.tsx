@@ -38,7 +38,7 @@ import { useMenu } from 'components/Common/Menu/useMenu';
 import { useRouteModal } from 'components/Common/Modal';
 import SearchBar from 'components/Common/SearchBar/SearchBar';
 
-import { InteractionModalCard } from './InteractionModalCard';
+import { InteractionModalCard } from '../FeedbackView/InteractionModalCard';
 
 const undefinedToNull = (value: any) => {
   if (value === undefined) {
@@ -85,116 +85,63 @@ interface DistributionInnerCellProps {
   session: SessionFragmentFragment;
 }
 
-const DistributionInnerCell = ({ session }: DistributionInnerCellProps) => {
-  const { goToCampaignView } = useNavigator();
-
-  return (
-
-    <UI.Div>
-      {session.delivery ? (
-        <Table.InnerCell
-          header="Origin"
-          renderBody={() => (
-            <>
-              <UI.Stack spacing={1}>
-                <UI.Stack isInline>
-                  <UI.Text>Url:</UI.Text>
-                  <UI.Muted>
-                    <UI.Span fontSize="0.7rem">
-                      {session.originUrl}
-                    </UI.Span>
-                  </UI.Muted>
-                </UI.Stack>
-                <UI.Div>
-                  <UI.Stack isInline>
-                    <UI.Text>Campaign:</UI.Text>
-                    <UI.Div>
-                      <UI.Muted>
-                        <UI.Span fontSize="0.7rem">
-                          {session.delivery?.campaignVariant?.campaign?.label}
-                        </UI.Span>
-                      </UI.Muted>
-                      {!!session.delivery?.campaignVariant?.campaign?.id && (
-                        <UI.Button
-                          size="xs"
-                          onClick={
-                            () => goToCampaignView(session.delivery?.campaignVariant?.campaign?.id || '')
-                          }
-                        >
-                          View campaign
-                        </UI.Button>
-                      )}
-                    </UI.Div>
-                  </UI.Stack>
-                </UI.Div>
-                <UI.Stack isInline alignItems="center">
-                  <UI.Text>Campaign variant:</UI.Text>
-                  <UI.Muted>
-                    <UI.Span fontSize="0.7rem">
-                      {session.delivery?.campaignVariant?.label}
-                      {' - '}
-                      {session.delivery?.campaignVariant?.type}
-                    </UI.Span>
-                  </UI.Muted>
-                </UI.Stack>
-              </UI.Stack>
-            </>
-          )}
-        >
-          <UI.Flex>
-            <UI.Div>
-              {session.delivery.campaignVariant?.type === CampaignVariantEnum.Email ? (
-                <Circle flexShrink={0} brand="blue" mr={2}>
-                  <UI.Icon>
-                    <Smartphone />
-                  </UI.Icon>
-                </Circle>
-              ) : (
-                <Circle flexShrink={0} brand="blue" mr={2}>
-                  <UI.Icon>
-                    <Mail />
-                  </UI.Icon>
-                </Circle>
-              )}
-            </UI.Div>
-            <UI.Div>
-              <UI.Helper color="blue.500">
-                Campaign:
-                {' '}
-                {session.delivery.campaignVariant?.campaign?.label}
-              </UI.Helper>
-              <UI.Flex>
+const DistributionInnerCell = ({ session }: DistributionInnerCellProps) => (
+  <UI.Div>
+    {session.delivery ? (
+      <Table.InnerCell>
+        <UI.Flex>
+          <UI.Div>
+            {session.delivery.campaignVariant?.type === CampaignVariantEnum.Email ? (
+              <Circle flexShrink={0} brand="blue" mr={2}>
+                <UI.Icon>
+                  <Smartphone />
+                </UI.Icon>
+              </Circle>
+            ) : (
+              <Circle flexShrink={0} brand="blue" mr={2}>
+                <UI.Icon>
+                  <Mail />
+                </UI.Icon>
+              </Circle>
+            )}
+          </UI.Div>
+          <UI.Div>
+            <UI.Helper color="blue.500">
+              Campaign:
+              {' '}
+              {session.delivery.campaignVariant?.campaign?.label}
+            </UI.Helper>
+            <UI.Flex>
+              <UI.Muted>
+                {session.originUrl}
+              </UI.Muted>
+            </UI.Flex>
+          </UI.Div>
+        </UI.Flex>
+      </Table.InnerCell>
+    ) : (
+      <UI.Div>
+        <Table.InnerCell>
+          <UI.Div>
+            <UI.Flex>
+              <Circle flexShrink={0} brand="gray" mr={2}>
+                <UI.Icon>
+                  <Link2 />
+                </UI.Icon>
+              </Circle>
+              <UI.Div>
+                <UI.Helper color="gray.500">Link click</UI.Helper>
                 <UI.Muted>
                   {session.originUrl}
                 </UI.Muted>
-              </UI.Flex>
-            </UI.Div>
-          </UI.Flex>
+              </UI.Div>
+            </UI.Flex>
+          </UI.Div>
         </Table.InnerCell>
-      ) : (
-        <>
-          <Table.InnerCell>
-            <UI.Div>
-              <UI.Flex>
-                <Circle flexShrink={0} brand="gray" mr={2}>
-                  <UI.Icon>
-                    <Link2 />
-                  </UI.Icon>
-                </Circle>
-                <UI.Div>
-                  <UI.Helper color="gray.500">Link click</UI.Helper>
-                  <UI.Muted>
-                    {session.originUrl}
-                  </UI.Muted>
-                </UI.Div>
-              </UI.Flex>
-            </UI.Div>
-          </Table.InnerCell>
-        </>
-      )}
-    </UI.Div>
-  );
-};
+      </UI.Div>
+    )}
+  </UI.Div>
+);
 
 interface CampaignVariant {
   id: string;
@@ -341,7 +288,7 @@ export const InteractionsOverview = () => {
       <UI.ViewBody>
         <UI.Flex mb={2} justifyContent="flex-start">
           <UI.Stack isInline spacing={2} alignItems="center">
-            <PickerButton arrowBg="gray.50" label={t('add_filter')} icon={<Plus />}>
+            <PickerButton label={t('add_filter')} icon={<Plus />}>
               {() => (
                 <TabbedMenu
                   menuHeader={t('add_filter')}

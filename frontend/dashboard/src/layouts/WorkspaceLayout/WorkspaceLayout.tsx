@@ -9,6 +9,7 @@ import { useCustomer } from 'providers/CustomerProvider';
 import useMediaDevice from 'hooks/useMediaDevice';
 
 import * as LS from './WorkpaceLayout.styles';
+import { TopSubNavBar } from './TopSubNavBar';
 import { TopbarContainer, WorkspaceTopbar } from './WorkspaceTopbar';
 import NotAuthorizedView from '../NotAuthorizedView';
 
@@ -47,8 +48,15 @@ const WorkspaceLayout = ({ children }: WorskpaceLayoutProps) => {
             <Loader testId="runner" />
           </UI.Div>
         )}
-        <UI.Div position="relative" zIndex={100000}>
+        <UI.Div
+          style={{
+            boxShadow: '2px 2px 2px rgba(0, 0, 0, 0.03)',
+          }}
+          position="relative"
+          zIndex={100000}
+        >
           <WorkspaceTopbar withNav />
+          <TopSubNavBar />
         </UI.Div>
         <WorkspaceLayoutContainer isMobile={device.isSmall}>
           <LS.DashboardViewContainer>
