@@ -337,6 +337,7 @@ model QuestionOption {
   questionId     String?
   questionNodeId String?
   position       Int?
+  isTopic        Boolean       @default(true)
   overrideLeaf   QuestionNode? @relation("ChoiceCTANode", fields: [overrideLeafId], references: [id])
   question       QuestionNode? @relation("QuestionNodeOptions", fields: [questionId], references: [id])
   QuestionNode   QuestionNode? @relation(fields: [questionNodeId], references: [id])

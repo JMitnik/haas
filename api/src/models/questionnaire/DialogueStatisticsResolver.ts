@@ -73,6 +73,7 @@ export const PathedSessionsInput = inputObjectType({
     t.list.string('path', { required: true });
     t.string('startDateTime', { required: true });
     t.string('endDateTime');
+    t.boolean('issueOnly');
     t.boolean('refresh', { default: false });
   },
 });

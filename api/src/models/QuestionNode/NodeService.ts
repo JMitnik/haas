@@ -319,6 +319,7 @@ export class NodeService {
         value: rest.value,
         publicValue: rest.publicValue,
         overrideLeafId: overrideLeafId || undefined,
+        isTopic: rest.isTopic,
       };
     });
 

@@ -15,6 +15,7 @@ import { Construct } from 'constructs';
 import { IRepository } from "aws-cdk-lib/aws-ecr";
 
 import { APIOptions } from '../../../stacks/Core/CoreVariables';
+import { CoreRedis } from './CoreRedis';
 
 interface CoreApiProps {
   vpc: ec2.Vpc;
@@ -25,6 +26,7 @@ interface CoreApiProps {
   databaseCredentialSecretName: string;
   jwtSecretName: string;
 
+  redis: CoreRedis;
   db: rds.DatabaseInstance;
   dbSecurityGroup: ec2.SecurityGroup;
   apiOptions: APIOptions;
@@ -103,6 +105,7 @@ export class CoreAPI extends Construct {
           DASHBOARD_URL: props.apiOptions.dashboardUrl,
           CLOUDINARY_URL: 'cloudinary://934926832132984:uwtZjMqTGKgJL-nFzS2gsG_pnUE@haas-storage',
           MAIL_SENDER: props.apiOptions.mailSenderMail,
+          REDIS_URL: props.redis.cluster.attrRedisEndpointAddress,
           ENVIRONMENT: props.apiOptions.environment,
           EVENT_BRIDGE_RUN_ALL_LAMBDAS_ROLE_ARN: runAllLambdasEventBridgeRoleArn.stringValue,
           GENERATE_REPORT_LAMBDA_ARN: generateReportLambdaArn.stringValue,
@@ -120,20 +123,28 @@ export class CoreAPI extends Construct {
     this.service = apiService.service;
     this.grantDatabasePermission(props.db);
     this.grantIAMPermissions();
+    this.grantRedisPermission(props.redis);
   }
 
   /**
    * Grants all necessary permissions to access database.
    */
-  grantDatabasePermission(db: rds.DatabaseInstance) {
+  private grantDatabasePermission(db: rds.DatabaseInstance) {
     this.service.connections.allowTo(db, ec2.Port.tcp(5432), 'RDS Connection');
+  }
+
+  /**
+   * Grants all permissions to access redis
+   */
+  private grantRedisPermission(redis: CoreRedis) {
+    this.service.connections.allowTo(redis.redisSecurityGroup, ec2.Port.tcp(6379), 'Allow redis connection');
   }
 
   /**
    * Grants all necessary AWS IAM Permissions (for managed AWS services)
    * - Allows the API to send Emails using SES
    */
-  grantIAMPermissions() {
+  private grantIAMPermissions() {
     if (!this.service.taskDefinition.executionRole) return;
 
     // Grant permissions to send Emails usins SES

@@ -47,7 +47,7 @@ const PositivePathsModule = ({ positivePaths }: { positivePaths: any }) => {
         <UI.CardBody display="flex" flexDirection="column">
           <UI.Text fontSize="1.3rem" color="teal.200">{t('dialogue:top_positive_paths')}</UI.Text>
           <UI.Flex marginTop="10px" flexGrow={1} flexDirection="column">
-            {positivePaths.length > 0 && (
+            {positivePaths?.length > 0 && (
               <PostivePathsModuleList>
                 {positivePaths.map(({ answer, quantity }: { answer: string, quantity: number }) => (
                   <li key={`${answer}-${quantity}`}>
@@ -59,7 +59,7 @@ const PositivePathsModule = ({ positivePaths }: { positivePaths: any }) => {
 
           </UI.Flex>
         </UI.CardBody>
-        {!positivePaths.length && (
+        {!positivePaths?.length && (
           <FallbackContainer>
             <UI.Text
               fontWeight="600"

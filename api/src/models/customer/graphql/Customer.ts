@@ -17,6 +17,9 @@ import { isValidDateTime } from '../../../utils/isValidDate';
 import { DialogueStatisticsSummaryFilterInput, DialogueStatisticsSummaryModel, MostTrendingTopic } from '../../questionnaire';
 import { DialogueConnection, DialogueConnectionFilterInput } from '../../questionnaire';
 import { HealthScore, HealthScoreInput } from './HealthScore';
+import { Issue, IssueFilterInput } from '../../Issue/graphql';
+import { IssueValidator } from '../../Issue/IssueValidator';
+import { SessionConnectionFilterInput, SessionConnection } from '../../../models/session/graphql';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -43,6 +46,23 @@ export const CustomerType = objectType({
       },
     });
 
+    t.field('sessionConnection', {
+      type: SessionConnection,
+      args: { filter: SessionConnectionFilterInput },
+      nullable: true,
+
+      async resolve(parent, args, ctx) {
+        if (!parent.id) return null;
+
+        const sessionConnection = await ctx.services.sessionService.getWorkspaceSessionConnection(
+          parent.id,
+          args.filter
+        );
+
+        return sessionConnection;
+      },
+    });
+
     /**
      * Workspace-statistics
      * - Note: These statistics share the same ID as the Workspace / Customer.
@@ -55,7 +75,21 @@ export const CustomerType = objectType({
       resolve: async (parent) => {
         return { id: parent.id }
       },
-    })
+    });
+
+    /**
+     * Issues
+     */
+    t.list.field('issues', {
+      type: Issue,
+      nullable: true,
+      args: { filter: IssueFilterInput },
+
+      resolve: async (parent, args, { services }) => {
+        const filter = IssueValidator.resolveFilter(args.filter);
+        return await services.issueService.getProblemDialoguesByWorkspace(parent.id, filter);
+      },
+    });
 
 
     t.field('dialogueConnection', {
@@ -453,12 +487,10 @@ export const WorkspaceMutations = Upload && extendType({
         const stream = new Promise<UploadApiResponse>((resolve, reject) => {
           const cld_upload_stream = cloudinary.v2.uploader.upload_stream({
             folder: 'company_logos',
-          },
-            (error, result: UploadApiResponse | undefined) => {
-              if (result) return resolve(result);
-
-              return reject(error);
-            });
+          }, (error, result: UploadApiResponse | undefined) => {
+            if (result) return resolve(result);
+            return reject(error);
+          });
 
           return createReadStream().pipe(cld_upload_stream);
         });

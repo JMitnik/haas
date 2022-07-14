@@ -93,6 +93,7 @@ const QuestionSection = ({
       value: option.overrideLeaf?.id,
       type: option.overrideLeaf?.type,
     },
+    isTopic: option.isTopic,
   })) || [];
 
   const getConditionOfParentQuestion = (childNodeId: string) => {

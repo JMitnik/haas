@@ -12,7 +12,7 @@ import _ from 'lodash';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
-import { SessionWithEntries } from '../session/SessionTypes';
+import { SessionWithEntries } from '../session/Session.types';
 import { mailService } from '../../services/mailings/MailService';
 import { smsService } from '../../services/sms/SmsService';
 import NodeEntryService from '../node-entry/NodeEntryService';
@@ -179,7 +179,7 @@ class TriggerService {
   static sendSmsTrigger(
     trigger: TriggerWithSendData,
     recipient: User, session: SessionWithEntries,
-    values: Array<{ value: string | number | undefined, type: string }>,
+    values: Array<{ value: string | number | undefined; type: string }>,
   ) {
     if (!recipient.phone) return;
 

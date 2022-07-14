@@ -59,6 +59,7 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
     choicesForm.append({
       value: '',
       overrideLeaf: null,
+      isTopic: true,
     });
   };
 
@@ -91,7 +92,7 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
         >
           {choicesForm.fields.length ? (
             <>
-              <UI.Grid gridTemplateColumns="2fr 2fr 1fr">
+              <UI.Grid gridTemplateColumns="2fr 2fr 1fr 1fr">
                 <UI.FormControl isRequired>
                   <UI.FormLabel display="flex">
                     <UI.Helper>
@@ -100,13 +101,14 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                   </UI.FormLabel>
                 </UI.FormControl>
                 <UI.Helper>{t('call_to_action')}</UI.Helper>
+                <UI.Helper>{t('is_topic')}</UI.Helper>
               </UI.Grid>
               {choicesForm.fields.map((choice, index) => (
                 <UI.Grid
                   key={choice.fieldIndex}
                   p={2}
                   borderBottom="1px solid #edf2f7"
-                  gridTemplateColumns="2fr 2fr 1fr"
+                  gridTemplateColumns="2fr 2fr 1fr 1fr"
                 >
                   <UI.Div
                     display="flex"
@@ -207,6 +209,21 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                       )}
                     />
                   </UI.Div>
+                  <UI.Flex justifyContent="center">
+                    <Controller
+                      control={form.control}
+                      name={`optionsFull[${index}].isTopic`}
+                      defaultValue={choice.isTopic}
+                      render={({ onChange, value }) => (
+                        <UI.Checkbox
+                          size="lg"
+                          isChecked={value}
+                          onChange={() => onChange(!value)}
+                          variantColor="main"
+                        />
+                      )}
+                    />
+                  </UI.Flex>
                   <UI.Stack alignItems="center" isInline spacing={2}>
                     <UI.Stack spacing={2}>
                       <UI.Button

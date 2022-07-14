@@ -272,8 +272,6 @@ const DialogueView = () => {
     dialogue?.previousScore || 0,
   );
 
-  console.log(dialogue?.sessions);
-
   const makeSearchUrl = () => {
     if (!dialogue?.statistics?.mostPopularPath?.answer) return '';
 
