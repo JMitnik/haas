@@ -1,6 +1,7 @@
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 import { PrismaClient } from '@prisma/client';
 
+import { OrganizationService } from '../models/Organization/OrganizationService';
 import { ContextSessionType } from '../models/auth/ContextSessionType';
 import UserService from '../models/users/UserService';
 import CustomerService from '../models/customer/CustomerService';
@@ -29,6 +30,7 @@ import TemplateService from '../models/templates/TemplateService';
 import { IssueService } from '../models/Issue/IssueService';
 
 export interface APIServiceContainer {
+  organizationService: OrganizationService;
   issueService: IssueService;
   templateService: TemplateService;
   generateWorkspaceService: GenerateWorkspaceService;

@@ -560,6 +560,7 @@ export type Customer = {
   id: Scalars['ID'];
   slug: Scalars['String'];
   name: Scalars['String'];
+  organization?: Maybe<Organization>;
   settings?: Maybe<CustomerSettings>;
   sessionConnection?: Maybe<SessionConnection>;
   /** Workspace statistics */
@@ -1416,6 +1417,7 @@ export type MostTrendingTopic = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  sandbox: Scalars['String'];
   generateWorkspaceFromCSV?: Maybe<Customer>;
   createJobProcessLocation: JobProcessLocation;
   generateAutodeck?: Maybe<CreateWorkspaceJobType>;
@@ -1428,6 +1430,8 @@ export type Mutation = {
   assignTags: Dialogue;
   createTag: Tag;
   deleteTag: Tag;
+  /** Deselcting a topic implies that all question-options related to the topic string are disregarded as topic. */
+  deselectTopic?: Maybe<Scalars['Boolean']>;
   /** Creates a new automation. */
   createAutomation: AutomationModel;
   updateAutomation: AutomationModel;
@@ -1444,7 +1448,6 @@ export type Mutation = {
   singleUpload: ImageType;
   createWorkspace: Customer;
   editWorkspace: Customer;
-  deselectTopic?: Maybe<Scalars['Boolean']>;
   massSeed?: Maybe<Customer>;
   deleteCustomer?: Maybe<Customer>;
   handleUserStateInWorkspace: UserCustomer;
@@ -1477,6 +1480,11 @@ export type Mutation = {
   createCTA: QuestionNode;
   updateCTA: QuestionNode;
   updateQuestion: QuestionNode;
+};
+
+
+export type MutationSandboxArgs = {
+  input?: Maybe<SandboxInput>;
 };
 
 
@@ -1547,6 +1555,11 @@ export type MutationCreateTagArgs = {
 
 export type MutationDeleteTagArgs = {
   tagId?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationDeselectTopicArgs = {
+  input?: Maybe<DeselectTopicInput>;
 };
 
 
@@ -1628,11 +1641,6 @@ export type MutationCreateWorkspaceArgs = {
 
 export type MutationEditWorkspaceArgs = {
   input?: Maybe<EditWorkspaceInput>;
-};
-
-
-export type MutationDeselectTopicArgs = {
-  input?: Maybe<DeselectTopicInput>;
 };
 
 
@@ -1839,6 +1847,27 @@ export type OptionInputType = {
 export type OptionsInputType = {
   options?: Maybe<Array<OptionInputType>>;
 };
+
+export type Organization = {
+  __typename?: 'Organization';
+  id: Scalars['ID'];
+  layers?: Maybe<Array<OrganizationLayer>>;
+};
+
+/** A layer of an organization */
+export type OrganizationLayer = {
+  __typename?: 'OrganizationLayer';
+  id: Scalars['ID'];
+  depth: Scalars['Int'];
+  type: OrganizationLayerType;
+};
+
+/** Type of an organizational layer */
+export enum OrganizationLayerType {
+  Group = 'GROUP',
+  Dialogue = 'DIALOGUE',
+  Interaction = 'INTERACTION'
+}
 
 /** Information with regards to current page. */
 export type PaginationPageInfo = {
@@ -2322,6 +2351,12 @@ export type RoleType = {
   nrPermissions?: Maybe<Scalars['Int']>;
   allPermissions: Array<SystemPermission>;
   permissions?: Maybe<Array<SystemPermission>>;
+};
+
+export type SandboxInput = {
+  name?: Maybe<Scalars['String']>;
+  onlyGet?: Maybe<Scalars['Boolean']>;
+  value?: Maybe<Scalars['Int']>;
 };
 
 export type Session = {
@@ -2976,7 +3011,14 @@ export type GetWorkspaceDialogueStatisticsQuery = (
   { __typename?: 'Query' }
   & { customer?: Maybe<(
     { __typename?: 'Customer' }
-    & { statistics?: Maybe<(
+    & { organization?: Maybe<(
+      { __typename?: 'Organization' }
+      & Pick<Organization, 'id'>
+      & { layers?: Maybe<Array<(
+        { __typename?: 'OrganizationLayer' }
+        & Pick<OrganizationLayer, 'id' | 'depth' | 'type'>
+      )>> }
+    )>, statistics?: Maybe<(
       { __typename?: 'WorkspaceStatistics' }
       & { workspaceStatisticsSummary?: Maybe<Array<(
         { __typename?: 'DialogueStatisticsSummaryModel' }
@@ -4201,6 +4243,14 @@ export function refetchGetSessionPathsQuery(variables?: GetSessionPathsQueryVari
 export const GetWorkspaceDialogueStatisticsDocument = gql`
     query GetWorkspaceDialogueStatistics($workspaceId: ID!, $startDateTime: String!, $endDateTime: String!) {
   customer(id: $workspaceId) {
+    organization {
+      id
+      layers {
+        id
+        depth
+        type
+      }
+    }
     statistics {
       workspaceStatisticsSummary(input: {startDateTime: $startDateTime, endDateTime: $endDateTime, impactType: AVERAGE, refresh: true}) {
         id
@@ -6202,6 +6252,8 @@ export namespace GetWorkspaceDialogueStatistics {
   export type Variables = GetWorkspaceDialogueStatisticsQueryVariables;
   export type Query = GetWorkspaceDialogueStatisticsQuery;
   export type Customer = (NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>);
+  export type Organization = (NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['organization']>);
+  export type Layers = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['organization']>)['layers']>)[number]>;
   export type Statistics = (NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['statistics']>);
   export type WorkspaceStatisticsSummary = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['statistics']>)['workspaceStatisticsSummary']>)[number]>;
   export type Dialogue = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['statistics']>)['workspaceStatisticsSummary']>)[number]>['dialogue']>);
