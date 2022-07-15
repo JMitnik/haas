@@ -2,6 +2,7 @@ import * as UI from '@haas/ui';
 import { AlertTriangle, Aperture, MessageCircle, User } from 'react-feather';
 import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { Zoom } from '@visx/zoom';
+import { endOfDay, startOfDay } from 'date-fns';
 import { sumBy } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -21,8 +22,8 @@ import { SimpleIssueTable } from 'components/Analytics/Issues/SimpleIssueTable';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useNavigator } from 'hooks/useNavigator';
 import { useToast } from 'hooks/useToast';
+import useAuth from 'hooks/useAuth';
 
-import { endOfDay, startOfDay } from 'date-fns';
 import * as LS from './WorkspaceGrid.styles';
 import { BreadCrumb } from './BreadCrumb';
 import {
@@ -45,7 +46,6 @@ import {
   findDialoguesInGroup,
   reconstructHistoryStack,
 } from './WorkspaceGrid.helpers';
-import useAuth from 'hooks/useAuth';
 
 export interface DataLoadOptions {
   dialogueId?: string;
