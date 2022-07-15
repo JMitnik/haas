@@ -7,13 +7,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import * as RadixSelect from 'components/Common/Select';
-import { Avatar } from 'components/Common/Avatar';
-import { ReactComponent as SwitchIcon } from 'assets/icons/icon-switch.svg';
 import { slideUpFadeMotion } from 'components/animation/config';
-import { useCustomer } from 'providers/CustomerProvider';
-import { useUser } from 'providers/UserProvider';
 import SearchBar from 'components/Common/SearchBar';
-import Searchbar from 'components/Common/SearchBar';
 
 export const WorkspaceSwitcherContainer = styled(UI.Div)`
   ${({ theme }) => css`
@@ -44,21 +39,22 @@ const Content = styled(Popover.Content)`
   width: 100%;
 `;
 
-interface TimePickerProps {
-  onClose: () => void;
-}
-
 const times = [
-  { label: '7:00AM', value: '7 0' },
-  { label: '7:15AM', value: '7 15' },
-  { label: '7:30AM', value: '7 30' },
-  { label: '7:45AM', value: '7 45' },
-  { label: '8:00AM', value: '8 0' },
-  { label: '8:15AM', value: '8 15' },
-  { label: '1:00PM', value: '13 0' }
+  { label: '7:00AM', value: '0 7' },
+  { label: '7:15AM', value: '15 7' },
+  { label: '7:30AM', value: '30 7' },
+  { label: '7:45AM', value: '45 7' },
+  { label: '8:00AM', value: '0 8' },
+  { label: '8:15AM', value: '15 8' },
+  { label: '1:00PM', value: '30 8' },
 ];
 
-export const WorkspaceSwitchContent = ({ onClose }: TimePickerProps) => {
+interface TimePickerSelectProps {
+  onChange: (e: string) => void;
+  value?: string;
+}
+
+export const TimePickerContent = ({ onChange, value }: TimePickerSelectProps) => {
   const [search, setSearch] = useState('');
   console.log('Search: ', search);
   const [filteredItems, setFilteredItems] = useState(times);
@@ -68,11 +64,11 @@ export const WorkspaceSwitchContent = ({ onClose }: TimePickerProps) => {
       if (!search) setFilteredItems(times);
 
       setFilteredItems(times.filter((time) => time.label.includes(search)));
-    }, [search]
+    }, [search],
   );
   return (
     <UI.Div>
-      <RadixSelect.Root defaultValue="8 0">
+      <RadixSelect.Root value={value} onValueChange={onChange} defaultValue="8 0">
         <RadixSelect.SelectTrigger aria-label="Food">
           <RadixSelect.SelectValue />
           <RadixSelect.SelectIcon>
@@ -113,6 +109,8 @@ export const TimePicker = () => {
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = useState('');
 
+  const onChange = (e: string) => e;
+
   console.log('Search: ', search);
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
@@ -134,7 +132,7 @@ export const TimePicker = () => {
             style={{ minWidth: '320px', zIndex: 10000 }}
           >
             <motion.div>
-              <WorkspaceSwitchContent onClose={() => setOpen(false)} />
+              <TimePickerContent onChange={onChange} />
             </motion.div>
           </Content>
         ) : null}

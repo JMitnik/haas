@@ -65,7 +65,7 @@ import { ConditionEntry } from './CreateConditionModalCardTypes';
 import { CreateConditionModalCard } from './CreateConditionModalCard';
 import { CronScheduleHeader, ModalState, ModalType, OPERATORS } from './AutomationTypes';
 import { DayPicker } from './DayPicker';
-import { TimePicker } from './TimePicker';
+import { TimePicker, TimePickerContent } from './TimePicker';
 import { zonedTimeToUtc } from 'date-fns-tz';
 import useCronSchedule from './useCronSchedule';
 
@@ -200,6 +200,14 @@ const schema = yup.object({
     dayOfMonth: yup.string(),
     month: yup.string(),
     dayOfWeek: yup.string(),
+    frequency: yup.string(),
+    time: yup.string(),
+    dayRange: yup.array().required().of(
+      yup.object().required().shape({
+        label: yup.string().required(),
+        index: yup.number().required(),
+      }),
+    ),
   }).when('automationType', {
     is: (autoType) => autoType === AutomationType.Scheduled,
     then: yup.object().shape({
@@ -262,23 +270,58 @@ const SCHEDULE_TYPE_OPTIONS = [
   },
 ];
 
+enum CustomRecurringType {
+  YEARLY = '1 JAN *',
+  MONTHLY = '1 * *',
+  WEEKLY = '* * MON',
+  DAILY = '* *',
+}
+
 const getCronByScheduleType = (scheduleType: RecurringPeriodType) => {
   switch (scheduleType) {
     case RecurringPeriodType.EndOfDay:
       return {
-        minutes: '0', hours: '18', dayOfMonth: '*', month: '*', dayOfWeek: 'MON-FRI',
+        time: '0 18',
+        dayRange: [{ label: 'MON', index: 1 }, { label: 'FRI', index: 4 }],
+        frequency: CustomRecurringType.DAILY,
+        minutes: '0',
+        hours: '18',
+        dayOfMonth: '*',
+        month: '*',
+        dayOfWeek: 'MON-FRI',
       };
     case RecurringPeriodType.EndOfWeek:
       return {
-        minutes: '0', hours: '18', dayOfMonth: '*', month: '*', dayOfWeek: 'FRI',
+        time: '0 0',
+        dayRange: [],
+        frequency: CustomRecurringType.WEEKLY,
+        minutes: '0',
+        hours: '18',
+        dayOfMonth: '*',
+        month: '*',
+        dayOfWeek: 'FRI',
       };
     case RecurringPeriodType.StartOfDay:
       return {
-        minutes: '0', hours: '9', dayOfMonth: '*', month: '*', dayOfWeek: 'MON-FRI',
+        time: '0 9',
+        dayRange: [{ label: 'MON', index: 1 }, { label: 'FRI', index: 4 }],
+        frequency: CustomRecurringType.DAILY,
+        minutes: '0',
+        hours: '9',
+        dayOfMonth: '*',
+        month: '*',
+        dayOfWeek: 'MON-FRI',
       };
     case RecurringPeriodType.StartOfWeek:
       return {
-        minutes: '0', hours: '9', dayOfMonth: '*', month: '*', dayOfWeek: 'MON',
+        time: '0 0',
+        dayRange: [],
+        frequency: CustomRecurringType.WEEKLY,
+        minutes: '0',
+        hours: '9',
+        dayOfMonth: '*',
+        month: '*',
+        dayOfWeek: 'MON',
       };
     default:
       return null;
@@ -455,7 +498,10 @@ const AutomationForm = ({
     control: form.control,
   });
 
-  const cronners = useCronSchedule(`${watchSchedule?.minutes} ${watchSchedule?.hours} ${watchSchedule?.dayOfMonth} ${watchSchedule?.month} ${watchSchedule?.dayOfWeek}`);
+  console.log('Watch schedule: ', watchSchedule);
+
+  // const cronners = useCronSchedule(`${watchSchedule?.minutes} ${watchSchedule?.hours} ${watchSchedule?.dayOfMonth} ${watchSchedule?.month} ${watchSchedule?.dayOfWeek}`);
+  const cronners = useCronSchedule(`${watchSchedule?.time || ''} ${watchSchedule?.frequency || ''} ${watchSchedule?.frequency === '* *' ? watchSchedule?.dayRange?.map((day) => day.label).join('-') : ''}`);
 
   const onSubmit = (formData: FormDataProps) => {
     // TODO: Create a field for event type
@@ -884,6 +930,9 @@ const AutomationForm = ({
                           if (data) {
                             form.setValue('schedule', {
                               ...data,
+                              // frequency: watchSchedule?.frequency,
+                              // time: watchSchedule?.time,
+                              // dayRange: watchSchedule?.dayRange as any,
                               activeDialogue: watchSchedule?.activeDialogue as any,
                               type: watchSchedule?.type as RecurringPeriodType,
                             });
@@ -919,6 +968,93 @@ const AutomationForm = ({
                     border="1px solid #edf2f7"
                     backgroundColor={DEPTH_BACKGROUND_COLORS[0]}
                   >
+                    <UI.FormControl>
+                      <UI.FormLabel htmlFor="automationType">{t('automation:type')}</UI.FormLabel>
+                      <InputHelper>{t('automation:type_helper')}</InputHelper>
+                      <Controller
+                        name="schedule.frequency"
+                        control={form.control}
+                        // defaultValue={automation?.schedule?.type as RecurringPeriodType}
+                        render={({ field: { value, onChange, onBlur } }) => (
+                          <UI.Div>
+                            <RadixSelect.Root value={value} onValueChange={onChange} defaultValue="* * MON">
+                              <RadixSelect.SelectTrigger aria-label="Food">
+                                <RadixSelect.SelectValue />
+                                <RadixSelect.SelectIcon>
+                                  <ChevronDownIcon />
+                                </RadixSelect.SelectIcon>
+                              </RadixSelect.SelectTrigger>
+                              <RadixSelect.SelectContent>
+                                <RadixSelect.SelectScrollUpButton>
+                                  <ChevronUpIcon />
+                                </RadixSelect.SelectScrollUpButton>
+                                <RadixSelect.SelectViewport>
+                                  <RadixSelect.SelectGroup>
+
+                                    <RadixSelect.SelectItem value={CustomRecurringType.YEARLY}>
+                                      <RadixSelect.SelectItemText>Every Year</RadixSelect.SelectItemText>
+                                      <RadixSelect.SelectItemIndicator>
+                                        <CheckIcon />
+                                      </RadixSelect.SelectItemIndicator>
+                                    </RadixSelect.SelectItem>
+
+                                    <RadixSelect.SelectItem value={CustomRecurringType.MONTHLY}>
+                                      <RadixSelect.SelectItemText>Every Month</RadixSelect.SelectItemText>
+                                      <RadixSelect.SelectItemIndicator>
+                                        <CheckIcon />
+                                      </RadixSelect.SelectItemIndicator>
+                                    </RadixSelect.SelectItem>
+
+                                    <RadixSelect.SelectItem value={CustomRecurringType.WEEKLY}>
+                                      <RadixSelect.SelectItemText>Every Week</RadixSelect.SelectItemText>
+                                      <RadixSelect.SelectItemIndicator>
+                                        <CheckIcon />
+                                      </RadixSelect.SelectItemIndicator>
+                                    </RadixSelect.SelectItem>
+
+                                    <RadixSelect.SelectItem value={CustomRecurringType.DAILY}>
+                                      <RadixSelect.SelectItemText>Every Day</RadixSelect.SelectItemText>
+                                      <RadixSelect.SelectItemIndicator>
+                                        <CheckIcon />
+                                      </RadixSelect.SelectItemIndicator>
+                                    </RadixSelect.SelectItem>
+
+                                  </RadixSelect.SelectGroup>
+                                </RadixSelect.SelectViewport>
+                                <RadixSelect.SelectScrollDownButton>
+                                  <ChevronDownIcon />
+                                </RadixSelect.SelectScrollDownButton>
+                              </RadixSelect.SelectContent>
+                            </RadixSelect.Root>
+                          </UI.Div>
+                        )}
+                      />
+                    </UI.FormControl>
+                    <UI.FormControl>
+                      <UI.FormLabel htmlFor="automationType">{t('automation:type')}</UI.FormLabel>
+                      <InputHelper>{t('automation:type_helper')}</InputHelper>
+                      <Controller
+                        name="schedule.time"
+                        control={form.control}
+                        // defaultValue={automation?.schedule?.type as RecurringPeriodType}
+                        render={({ field: { value, onChange, onBlur } }) => (
+                          <TimePickerContent value={value} onChange={onChange} />
+                        )}
+                      />
+                    </UI.FormControl>
+                    <UI.FormControl>
+                      <UI.FormLabel htmlFor="automationType">{t('automation:type')}</UI.FormLabel>
+                      <InputHelper>{t('automation:type_helper')}</InputHelper>
+                      <Controller
+                        name="schedule.dayRange"
+                        control={form.control}
+                        defaultValue={[{ label: 'SUN', index: 0 }, { label: 'SAT', index: 6 }]}
+                        // defaultValue={automation?.schedule?.type as RecurringPeriodType}
+                        render={({ field: { value, onChange } }) => (
+                          <DayPicker value={value} onChange={onChange} />
+                        )}
+                      />
+                    </UI.FormControl>
                     <FormControl isRequired isInvalid={!!form.formState.errors.schedule?.minutes}>
                       <FormLabel htmlFor="minutes">{t('minutes')}</FormLabel>
                       <InputHelper>{t('minutes_helper')}</InputHelper>
@@ -981,9 +1117,9 @@ const AutomationForm = ({
                   <TimePicker />
                 </UI.Div>
 
-                <UI.Div>
+                {/* <UI.Div>
                   <DayPicker />
-                </UI.Div>
+                </UI.Div> */}
 
                 <UI.Div
                   p={2}

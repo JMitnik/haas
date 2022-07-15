@@ -67,7 +67,7 @@ const days: { index: number, label: Day }[] = [
   },
   {
     index: 4,
-    label: 'THU'
+    label: 'THU',
   },
   {
     index: 5,
@@ -75,8 +75,8 @@ const days: { index: number, label: Day }[] = [
   },
   {
     index: 6,
-    label: 'SAT'
-  }
+    label: 'SAT',
+  },
 ];
 
 const DaySelector = styled(UI.Div) <{ isSelected?: boolean, isWithinRange?: boolean }>`
@@ -97,18 +97,33 @@ ${({ isSelected, isWithinRange, theme }) => css`
     background-color: ${isSelected ? theme.colors.main['500'] : 'auto'};
     color: white;
   `}
+
+  ${!isSelected && css`
+    :hover {
+      background-color: ${theme.colors.main['50']};
+    }
+  `}
 `}
 `;
 
-interface DayPickerProps {
-  onClose: () => void;
-  onChange: (dayRange: { label: Day, index: number }[]) => void;
-  // onSetDates
+enum DayMap {
+  MON = 'Monday',
+  TUE = 'Tuesday',
+  WED = 'Wednesday',
+  THU = 'Thursday',
+  FRI = 'Friday',
+  SAT = 'Saturday',
+  SUN = 'Sunday',
 }
 
-export const WorkspaceSwitchContent = ({ onClose, onChange }: DayPickerProps) => {
+interface DayPickerProps {
+  onChange: (dayRange: { label: Day, index: number }[]) => void;
+  value?: { label: Day, index: number }[];
+}
+
+export const DayPickerContent = ({ value, onChange }: DayPickerProps) => {
   const [isSelected, setIsSelected] = useState(false);
-  const [selected, setSelected] = useState<{ label: Day, index: number }[]>([]);
+  const [selected, setSelected] = useState<{ label: Day, index: number }[]>(value || []);
 
   const handleDateSelection = (entry: { label: Day, index: number }) => {
     if (!isSelected) {
@@ -140,17 +155,15 @@ export const WorkspaceSwitchContent = ({ onClose, onChange }: DayPickerProps) =>
     onChange(selected);
   }, [selected]);
 
-  console.log('Selected: ', selected);
-
   return (
     <UI.Card>
-      <UI.Grid padding="1em" gridTemplateColumns="repeat(7, 1fr)">
+      <UI.Grid padding="0.5em" gridTemplateColumns="repeat(7, 1fr)">
         {days.map((day) => {
           const isWithinRange = isWithinSelectedDates(day.index);
 
           return (
             <DaySelector
-              isSelected={!!selected.find((selected) => day.label === selected.label)}
+              isSelected={!!value?.find((dayEntry) => day.label === dayEntry.label)}
               isWithinRange={isWithinRange}
               onClick={() => handleDateSelection(day)}
             >
@@ -164,15 +177,24 @@ export const WorkspaceSwitchContent = ({ onClose, onChange }: DayPickerProps) =>
   );
 };
 
-export const DayPicker = () => {
-  const [open, setOpen] = React.useState(false);
-  const [search, setSearch] = useState('');
+interface DayPickerSelectProps {
+  onChange: (dayRange: { label: Day, index: number }[]) => void;
+  value: { label: string, index: number }[];
+}
 
-  console.log('Search: ', search);
+const findDayName = (input: { label: Day, index: number }) => DayMap[input.label];
+
+export const DayPicker = ({ onChange, value }: DayPickerSelectProps) => {
+  const [open, setOpen] = React.useState(false);
+
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger style={{ width: '100%', zIndex: 1000 }}>
-        <UI.Input value={search} />
+        <UI.Input
+          color="main.500"
+          style={{ cursor: 'pointer' }}
+          value={value?.map((day) => findDayName(day as any)).join('-')}
+        />
       </Popover.Trigger>
 
       <AnimatePresence>
@@ -189,9 +211,9 @@ export const DayPicker = () => {
             style={{ minWidth: '320px', zIndex: 10000 }}
           >
             <motion.div>
-              <WorkspaceSwitchContent
-                onChange={(dayRange) => setSearch(dayRange.map((day) => day.label).join('-'))}
-                onClose={() => setOpen(false)}
+              <DayPickerContent
+                value={value as any}
+                onChange={(dayRange) => onChange(dayRange)}
               />
             </motion.div>
           </Content>

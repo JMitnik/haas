@@ -11,7 +11,7 @@ ${({ theme }) => css`
   cursor: pointer;
   border-radius: 4px;
   padding: 0 15px;
-  font-size: 13px;
+  font-size: 0.9rem;
   line-height: 1;
   height: 35px;
   gap: 5px;
@@ -51,10 +51,9 @@ export const SelectItem = styled(Select.Item)`
   align-items: center;
   cursor: pointer;
   
-  font-size: 13px,
-  line-height: 1,
-  color: ${theme.colors.main['500']},
-  border-radius: 3px,
+  font-size: 0.9rem;
+  line-height: 1;
+  border-radius: 3px;
   height: 25px;
   padding: 0 35px 0 25px;
   
@@ -74,7 +73,7 @@ export const SelectItem = styled(Select.Item)`
 export const SelectLabel = styled(Select.Label)`
   ${({ theme }) => css`
   padding: 0 25px;
-  font-size: 12px,
+  font-size: 0.9rem;
   line-height: 25px;
   color: ${theme.colors.main['700']};
   `}
