@@ -8,6 +8,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import useMeasure from 'react-use-measure';
 
 import * as Modal from 'components/Common/Modal';
+import { ControlButton } from 'components/Common/Button';
 import { DateFormat, useDate } from 'hooks/useDate';
 import { DatePicker } from 'components/Common/DatePicker';
 import {
@@ -370,7 +371,7 @@ export const WorkspaceGrid = ({
                   onChange={setDateRange}
                 />
                 {data?.customer?.isDemo && canResetWorkspaceData && (
-                  <LS.ResetDataCard onClick={() => resetWorkspaceData()} ml={2}>
+                  <ControlButton onClick={() => resetWorkspaceData()} ml={2}>
                     <UI.Flex alignItems="center">
                       <UI.Div mr={1}>
                         {resetLoading && (
@@ -378,17 +379,17 @@ export const WorkspaceGrid = ({
                         )}
 
                         {!resetLoading && (
-                          <UI.Icon color="off.400">
+                          <UI.Icon>
                             <Aperture width="18px" height="auto" />
                           </UI.Icon>
                         )}
                       </UI.Div>
                       <UI.Span>
-                        Reset Data
+                        {t('reset_data')}
                       </UI.Span>
                     </UI.Flex>
 
-                  </LS.ResetDataCard>
+                  </ControlButton>
                 )}
               </UI.Flex>
             </UI.Div>
