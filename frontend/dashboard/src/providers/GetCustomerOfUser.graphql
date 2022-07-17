@@ -2,6 +2,7 @@ query getCustomerOfUser($input: UserOfCustomerInput) {
     UserOfCustomer(input: $input) {
       customer {
         id
+        isDemo
         name
         slug
         settings {

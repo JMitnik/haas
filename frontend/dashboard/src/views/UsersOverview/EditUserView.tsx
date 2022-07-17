@@ -238,7 +238,6 @@ const EditUserForm = ({ userCustomer }: { userCustomer: any }) => {
 };
 
 const EditUserView = () => {
-  console.log('Test');
   const { activeCustomer } = useCustomer();
   const { userId } = useParams<{ userId: string }>();
 

@@ -38,6 +38,7 @@ export const CustomerType = objectType({
     t.string('slug');
     t.string('name');
 
+    t.boolean('isDemo');
     t.field('organization', {
       type: Organization,
       nullable: true,
@@ -454,6 +455,7 @@ const CreateWorkspaceInput = inputObjectType({
     // Creation specific data
     t.boolean('isSeed', { default: false, required: false });
     t.boolean('willGenerateFakeData', { default: false });
+    t.boolean('isDemo', { default: false });
   },
 });
 
