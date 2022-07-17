@@ -3,7 +3,6 @@ import { AlertTriangle, Aperture, MessageCircle, User } from 'react-feather';
 import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { Zoom } from '@visx/zoom';
 import { endOfDay, startOfDay } from 'date-fns';
-import { sumBy } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import useMeasure from 'react-use-measure';
@@ -337,7 +336,7 @@ export const WorkspaceGrid = ({
     variables: {
       workspaceId: activeCustomer?.id as string,
     },
-    refetchQueries: ['GetWorkspaceDialogueStatistics', 'GetWorkspaceLayoutDetails'],
+    refetchQueries: ['GetWorkspaceDialogueStatistics', 'GetWorkspaceLayoutDetails', 'GetIssues'],
     onCompleted: () => {
       resetWorkspaceGrid();
       toast.success({ title: 'Workspace data successfully resetted' });
@@ -391,7 +390,6 @@ export const WorkspaceGrid = ({
 
                   </LS.ResetDataCard>
                 )}
-
               </UI.Flex>
             </UI.Div>
           </UI.Flex>
@@ -433,10 +431,7 @@ export const WorkspaceGrid = ({
                   themeBg="main.500"
                   themeColor="white"
                   name="Action Requests"
-                  value={
-                    issueStats.actionsRequested
-                    // sumBy(issues.filter((issue) => issue.followUpAction), ((issue) => issue.basicStats.responseCount))
-                  }
+                  value={issueStats.actionsRequested}
                   isFilterEnabled={historyQueue.length > 0}
                   onNavigate={() => goToWorkspaceFeedbackOverview(
                     findDialoguesInGroup([currentState.currentNode as HexagonNode]),
