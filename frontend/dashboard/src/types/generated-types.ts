@@ -3191,7 +3191,7 @@ export type GetCustomerOfUserQuery = (
     { __typename?: 'UserCustomer' }
     & { customer: (
       { __typename?: 'Customer' }
-      & Pick<Customer, 'id' | 'name' | 'slug'>
+      & Pick<Customer, 'id' | 'isDemo' | 'name' | 'slug'>
       & { settings?: Maybe<(
         { __typename?: 'CustomerSettings' }
         & Pick<CustomerSettings, 'id' | 'logoUrl'>
@@ -4494,6 +4494,7 @@ export const GetCustomerOfUserDocument = gql`
   UserOfCustomer(input: $input) {
     customer {
       id
+      isDemo
       name
       slug
       settings {
