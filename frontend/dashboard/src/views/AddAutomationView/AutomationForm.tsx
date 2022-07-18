@@ -52,11 +52,11 @@ import { DateFormat, useDate } from 'hooks/useDate';
 import { DialogueNodePicker } from 'components/NodePicker/DialogueNodePicker';
 import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
 import { NodeCell } from 'components/NodeCell';
+import { Switch, SwitchContainer, SwitchThumb } from 'components/Common/Switch';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useMenu } from 'components/Common/Menu/useMenu';
 import Dropdown from 'components/Dropdown';
 
-import { Switch, SwitchContainer, SwitchThumb } from 'components/Common/Switch';
 import { ActionCell } from './ActionCell';
 import { ActionEntry, CreateActionModalCard } from './CreateActionModalCard';
 import { ChildBuilderEntry } from './ChildBuilderEntry';
@@ -64,9 +64,9 @@ import { ConditionCell } from './ConditionCell';
 import { ConditionEntry } from './CreateConditionModalCardTypes';
 import { CreateConditionModalCard } from './CreateConditionModalCard';
 import { CronScheduleHeader, ModalState, ModalType, OPERATORS } from './AutomationTypes';
+import { CustomRecurringType } from './AutomationForm.types';
 import { DayPicker } from './DayPicker';
 import { TimePicker, TimePickerContent } from './TimePicker';
-import { zonedTimeToUtc } from 'date-fns-tz';
 import useCronSchedule from './useCronSchedule';
 
 const schema = yup.object({
@@ -202,21 +202,35 @@ const schema = yup.object({
     dayOfWeek: yup.string(),
     frequency: yup.string(),
     time: yup.string(),
-    dayRange: yup.array().required().of(
-      yup.object().required().shape({
-        label: yup.string().required(),
-        index: yup.number().required(),
+    dayRange: yup.array().of(
+      yup.object().shape({
+        label: yup.string(),
+        index: yup.number(),
       }),
     ),
   }).when('automationType', {
     is: (autoType) => autoType === AutomationType.Scheduled,
     then: yup.object().shape({
       type: yup.mixed<RecurringPeriodType>().oneOf(Object.values(RecurringPeriodType)).required(),
-      minutes: yup.string().required(),
-      hours: yup.string().required(),
-      dayOfMonth: yup.string().required(),
-      month: yup.string().required(),
-      dayOfWeek: yup.string().required(),
+      frequency: yup.string().required(),
+      time: yup.string().required(),
+      dayRange: yup.array().when('frequency', {
+        is: (frequencyType) => {
+          console.log('Frequency type: ', frequencyType);
+          return frequencyType === CustomRecurringType.DAILY;
+        },
+        then: yup.array().required().of(
+          yup.object().required().shape({
+            label: yup.string().required(),
+            index: yup.number().required(),
+          }),
+        ),
+      }).of(
+        yup.object().shape({
+          label: yup.string(),
+          index: yup.number(),
+        }),
+      ),
       activeDialogue: yup.object().shape({
         type: yup.string().required(),
         label: yup.string().required(),
@@ -270,12 +284,35 @@ const SCHEDULE_TYPE_OPTIONS = [
   },
 ];
 
-enum CustomRecurringType {
-  YEARLY = '1 JAN *',
-  MONTHLY = '1 * *',
-  WEEKLY = '* * MON',
-  DAILY = '* *',
-}
+const getDayOfWeek = (type: RecurringPeriodType, data: FormDataProps) => {
+  console.log('Recurring type: ', type);
+  if (type !== RecurringPeriodType.Custom) {
+    console.log('Day of week without custom');
+    return data.schedule?.dayOfWeek as string;
+  }
+
+  return data?.schedule?.frequency === CustomRecurringType.DAILY
+    ? data?.schedule?.dayRange?.map((day) => day?.label).join('-')
+    : data.schedule?.frequency.split(' ')[2];
+};
+
+const getDayOfMonth = (type: CustomRecurringType) => {
+  switch (type) {
+    case CustomRecurringType.DAILY:
+      return '*';
+    default:
+      return type.split(' ')[0];
+  }
+};
+
+const getMonth = (type: CustomRecurringType) => {
+  switch (type) {
+    case CustomRecurringType.YEARLY:
+      return type.split(' ')[1];
+    default:
+      return '*';
+  }
+};
 
 const getCronByScheduleType = (scheduleType: RecurringPeriodType) => {
   switch (scheduleType) {
@@ -434,6 +471,9 @@ const AutomationForm = ({
         hours: automation?.schedule?.hours,
         minutes: automation?.schedule?.minutes,
         activeDialogue: automation?.schedule?.activeDialogue || null,
+        frequency: automation?.schedule?.frequency || CustomRecurringType.WEEKLY,
+        time: automation?.schedule?.time || '0 8',
+        dayRange: automation?.schedule?.dayRange || [],
       },
       conditionBuilder:
       {
@@ -500,7 +540,8 @@ const AutomationForm = ({
 
   console.log('Watch schedule: ', watchSchedule);
 
-  // const cronners = useCronSchedule(`${watchSchedule?.minutes} ${watchSchedule?.hours} ${watchSchedule?.dayOfMonth} ${watchSchedule?.month} ${watchSchedule?.dayOfWeek}`);
+  console.log('Errors: ', form.formState.errors);
+
   const cronners = useCronSchedule(`${watchSchedule?.time || ''} ${watchSchedule?.frequency || ''} ${watchSchedule?.frequency === '* *' ? watchSchedule?.dayRange?.map((day) => day.label).join('-') : ''}`);
 
   const onSubmit = (formData: FormDataProps) => {
@@ -515,6 +556,13 @@ const AutomationForm = ({
         payload: { targets: actionEntry.targets },
       };
     });
+
+    const splittedTime = formData.schedule?.time?.split(' ');
+    const minutes = splittedTime?.[0];
+    const hours = splittedTime?.[1];
+    const dayOfWeek = getDayOfWeek(formData.schedule?.type as RecurringPeriodType, formData);
+    const dayOfMonth = getDayOfMonth(formData.schedule?.frequency);
+    const month = getMonth(formData.schedule?.frequency);
 
     const input: CreateAutomationInput = {
       automationType: formData.automationType,
@@ -532,15 +580,17 @@ const AutomationForm = ({
       actions: activeActions,
       schedule: formData.automationType === AutomationType.Scheduled ? {
         type: formData?.schedule?.type as RecurringPeriodType,
-        month: formData?.schedule?.month as string,
-        dayOfMonth: formData?.schedule?.dayOfMonth as string,
-        dayOfWeek: formData?.schedule?.dayOfWeek as string,
-        hours: formData?.schedule?.hours as string,
-        minutes: formData?.schedule?.minutes as string,
+        month,
+        dayOfMonth,
+        dayOfWeek,
+        hours,
+        minutes,
         id: automation?.schedule?.id,
         dialogueId: formData.schedule?.activeDialogue?.id,
       } : undefined,
     };
+
+    console.log('Input: ', input);
 
     if (!isInEdit && onCreateAutomation) {
       onCreateAutomation({
@@ -561,8 +611,6 @@ const AutomationForm = ({
       });
     }
   };
-
-  console.log('Timezone offset: ', -new Date().getTimezoneOffset() / 60);
 
   return (
     <>
@@ -919,7 +967,6 @@ const AutomationForm = ({
                   <Controller
                     name="schedule.type"
                     control={form.control}
-                    // defaultValue={automation?.schedule?.type as RecurringPeriodType}
                     render={({ field: { value, onChange, onBlur } }) => (
                       <RadioGroup.Root
                         defaultValue={value}
@@ -930,9 +977,6 @@ const AutomationForm = ({
                           if (data) {
                             form.setValue('schedule', {
                               ...data,
-                              // frequency: watchSchedule?.frequency,
-                              // time: watchSchedule?.time,
-                              // dayRange: watchSchedule?.dayRange as any,
                               activeDialogue: watchSchedule?.activeDialogue as any,
                               type: watchSchedule?.type as RecurringPeriodType,
                             });
@@ -974,10 +1018,13 @@ const AutomationForm = ({
                       <Controller
                         name="schedule.frequency"
                         control={form.control}
-                        // defaultValue={automation?.schedule?.type as RecurringPeriodType}
                         render={({ field: { value, onChange, onBlur } }) => (
                           <UI.Div>
-                            <RadixSelect.Root value={value} onValueChange={onChange} defaultValue="* * MON">
+                            <RadixSelect.Root
+                              value={value}
+                              onValueChange={onChange}
+                              defaultValue={value}
+                            >
                               <RadixSelect.SelectTrigger aria-label="Food">
                                 <RadixSelect.SelectValue />
                                 <RadixSelect.SelectIcon>
@@ -1042,85 +1089,24 @@ const AutomationForm = ({
                         )}
                       />
                     </UI.FormControl>
-                    <UI.FormControl>
-                      <UI.FormLabel htmlFor="automationType">{t('automation:type')}</UI.FormLabel>
-                      <InputHelper>{t('automation:type_helper')}</InputHelper>
-                      <Controller
-                        name="schedule.dayRange"
-                        control={form.control}
-                        defaultValue={[{ label: 'SUN', index: 0 }, { label: 'SAT', index: 6 }]}
-                        // defaultValue={automation?.schedule?.type as RecurringPeriodType}
-                        render={({ field: { value, onChange } }) => (
-                          <DayPicker value={value} onChange={onChange} />
-                        )}
-                      />
-                    </UI.FormControl>
-                    <FormControl isRequired isInvalid={!!form.formState.errors.schedule?.minutes}>
-                      <FormLabel htmlFor="minutes">{t('minutes')}</FormLabel>
-                      <InputHelper>{t('minutes_helper')}</InputHelper>
-                      <Input
-                        placeholder={t('cron_minutes_placeholder')}
-                        leftEl={<Type />}
-                        {...form.register('schedule.minutes')}
-                      />
-                      <UI.ErrorMessage>{t(form.formState.errors.schedule?.minutes?.message || '')}</UI.ErrorMessage>
-                    </FormControl>
 
-                    <FormControl isRequired isInvalid={!!form.formState.errors.schedule?.hours}>
-                      <FormLabel htmlFor="hours">{t('hours')}</FormLabel>
-                      <InputHelper>{t('hours_helper')}</InputHelper>
-                      <Input
-                        placeholder={t('cron_hours_placeholder')}
-                        leftEl={<Type />}
-                        {...form.register('schedule.hours')}
-                      />
-                      <UI.ErrorMessage>{t(form.formState.errors.schedule?.hours?.message || '')}</UI.ErrorMessage>
-                    </FormControl>
+                    {RecurringPeriodType.Custom && watchSchedule.frequency === CustomRecurringType.DAILY && (
+                      <UI.FormControl>
+                        <UI.FormLabel htmlFor="automationType">{t('automation:type')}</UI.FormLabel>
+                        <InputHelper>{t('automation:type_helper')}</InputHelper>
+                        <Controller
+                          name="schedule.dayRange"
+                          control={form.control}
+                          render={({ field: { value, onChange } }) => (
+                            <DayPicker value={value} onChange={onChange} />
+                          )}
+                        />
+                      </UI.FormControl>
+                    )}
 
-                    <FormControl isRequired isInvalid={!!form.formState.errors.schedule?.dayOfMonth}>
-                      <FormLabel htmlFor="day_of_month">{t('day_of_month')}</FormLabel>
-                      <InputHelper>{t('day_of_month_helper')}</InputHelper>
-                      <Input
-                        placeholder={t('cron_day_of_month_placeholder')}
-                        leftEl={<Type />}
-                        {...form.register('schedule.dayOfMonth')}
-                      />
-                      <UI.ErrorMessage>{t(form.formState.errors.schedule?.dayOfMonth?.message || '')}</UI.ErrorMessage>
-                    </FormControl>
-
-                    <FormControl isRequired isInvalid={!!form.formState.errors.schedule?.month}>
-                      <FormLabel htmlFor="month">{t('month')}</FormLabel>
-                      <InputHelper>{t('month_helper')}</InputHelper>
-                      <Input
-                        placeholder={t('cron_month_placeholder')}
-                        leftEl={<Type />}
-                        {...form.register('schedule.month')}
-                      />
-                      <UI.ErrorMessage>{t(form.formState.errors.schedule?.month?.message || '')}</UI.ErrorMessage>
-                    </FormControl>
-
-                    <FormControl isRequired isInvalid={!!form.formState.errors.schedule?.dayOfWeek}>
-                      <FormLabel htmlFor="dayOfWeek">{t('day_of_week')}</FormLabel>
-                      <InputHelper>{t('day_of_week_helper')}</InputHelper>
-                      <Input
-                        placeholder={t('cron_day_of_week_placeholder')}
-                        leftEl={<Type />}
-                        {...form.register('schedule.dayOfWeek')}
-                      />
-                      <UI.ErrorMessage>{t(form.formState.errors.schedule?.dayOfWeek?.message || '')}</UI.ErrorMessage>
-                    </FormControl>
                   </UI.Grid>
 
                 )}
-
-                <UI.Div>
-                  <TimePicker />
-                </UI.Div>
-
-                {/* <UI.Div>
-                  <DayPicker />
-                </UI.Div> */}
-
                 <UI.Div
                   p={2}
                   borderRadius="6px"
@@ -1147,7 +1133,6 @@ const AutomationForm = ({
                         <UI.Icon color="main.500">
                           <Clock />
                           <UI.Div position="absolute" bottom="0" right={5}>
-                            +
                             {index + 1}
                           </UI.Div>
                         </UI.Icon>
@@ -1285,7 +1270,7 @@ const AutomationForm = ({
 
           <ButtonGroup>
             <Button
-              isDisabled={!form.formState.isValid}
+              // isDisabled={!form.formState.isValid}
               isLoading={isLoading}
               variantColor="teal"
               type="submit"

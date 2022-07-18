@@ -26,6 +26,7 @@ import { AutomationInput, ConditionInput, ConditionQueryResult } from './EditAut
 import {
   ConditionEntry,
 } from '../AddAutomationView/CreateConditionModalCardTypes';
+import { CustomRecurringType } from 'views/AddAutomationView/AutomationForm.types';
 import AutomationForm from '../AddAutomationView/AutomationForm';
 import cuid from 'cuid';
 
@@ -151,6 +152,9 @@ const mapAutomation = (input: GetAutomationQuery['automation']): AutomationInput
       minutes: input?.automationScheduled?.minutes,
       month: input?.automationScheduled?.month,
       type: input?.automationScheduled?.type,
+      dayRange: input?.automationScheduled?.dayRange || [],
+      frequency: input?.automationScheduled?.frequency || CustomRecurringType.WEEKLY,
+      time: input?.automationScheduled?.time || '0 8',
       activeDialogue: input?.automationScheduled?.activeDialogue?.id ? {
         label: input?.automationScheduled?.activeDialogue?.title,
         type: 'DIALOGUE',

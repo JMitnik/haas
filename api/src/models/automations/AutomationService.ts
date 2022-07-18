@@ -44,6 +44,7 @@ import {
 import { AutomationActionService } from './AutomationActionService';
 import { GenerateReportPayload } from 'models/users/UserServiceTypes';
 import CustomerService from '../../models/customer/CustomerService';
+import { buildFrequencyCronString, getDayRange } from './AutomationService.helpers';
 
 class AutomationService {
   automationPrismaAdapter: AutomationPrismaAdapter;
@@ -963,7 +964,10 @@ class AutomationService {
     const validatedInput = this.constructUpdateAutomationInput(input);
     const updatedAutomation = await this.automationPrismaAdapter.updateAutomation(validatedInput);
 
-    if (updatedAutomation.type === AutomationType.SCHEDULED && updatedAutomation.automationScheduled) {
+    if (updatedAutomation.type === AutomationType.SCHEDULED
+      && updatedAutomation.automationScheduled
+      && config.env !== 'local'
+    ) {
       await this.upsertEventBridge(
         input.workspaceId as string,
         updatedAutomation.automationScheduled,
@@ -986,7 +990,10 @@ class AutomationService {
     const validatedInput = this.constructCreateAutomationInput(input);
     const createdAutomation = await this.automationPrismaAdapter.createAutomation(validatedInput);
 
-    if (createdAutomation.type === AutomationType.SCHEDULED && createdAutomation.automationScheduled) {
+    if (createdAutomation.type === AutomationType.SCHEDULED
+      && createdAutomation.automationScheduled
+      && config.env !== 'local'
+    ) {
       await this.upsertEventBridge(
         input.workspaceId as string,
         createdAutomation.automationScheduled,
@@ -1003,8 +1010,18 @@ class AutomationService {
    * @param automationId the ID of the automation
    * @returns an Automation with relationships included or null if no automation with specified ID exist in the database
    */
-  public findAutomationById = (automationId: string) => {
-    return this.automationPrismaAdapter.findAutomationById(automationId);
+  public findAutomationById = async (automationId: string) => {
+    const automation = await this.automationPrismaAdapter.findAutomationById(automationId);
+    const scheduledAutomation = automation?.automationScheduled;
+
+    const newScheduledAutomation = automation?.automationScheduled ? {
+      ...scheduledAutomation,
+      time: `${scheduledAutomation?.minutes} ${scheduledAutomation?.hours}`,
+      frequency: buildFrequencyCronString(scheduledAutomation as AutomationScheduled),
+      dayRange: getDayRange(scheduledAutomation?.dayOfWeek as string),
+    } : scheduledAutomation;
+
+    return { ...automation, automationScheduled: newScheduledAutomation };
   }
 
   /**

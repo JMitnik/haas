@@ -46,7 +46,7 @@ const times = [
   { label: '7:45AM', value: '45 7' },
   { label: '8:00AM', value: '0 8' },
   { label: '8:15AM', value: '15 8' },
-  { label: '1:00PM', value: '30 8' },
+  { label: '1:00PM', value: '0 13' },
 ];
 
 interface TimePickerSelectProps {
@@ -56,7 +56,6 @@ interface TimePickerSelectProps {
 
 export const TimePickerContent = ({ onChange, value }: TimePickerSelectProps) => {
   const [search, setSearch] = useState('');
-  console.log('Search: ', search);
   const [filteredItems, setFilteredItems] = useState(times);
 
   useEffect(
@@ -68,7 +67,7 @@ export const TimePickerContent = ({ onChange, value }: TimePickerSelectProps) =>
   );
   return (
     <UI.Div>
-      <RadixSelect.Root value={value} onValueChange={onChange} defaultValue="8 0">
+      <RadixSelect.Root value={value} onValueChange={onChange} defaultValue="0 8">
         <RadixSelect.SelectTrigger aria-label="Food">
           <RadixSelect.SelectValue />
           <RadixSelect.SelectIcon>

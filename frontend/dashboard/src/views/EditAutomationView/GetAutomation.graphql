@@ -21,6 +21,12 @@ query getAutomation($input: GetAutomationInput) {
       dayOfMonth
       dayOfWeek
       month
+      frequency
+      time
+      dayRange {
+        label
+        index
+      }
       activeDialogue {
         id
         slug

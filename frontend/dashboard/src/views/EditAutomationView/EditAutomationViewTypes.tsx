@@ -60,6 +60,9 @@ export interface AutomationInput {
     dayOfMonth?: string,
     month?: string,
     dayOfWeek?: string,
+    frequency: string,
+    time: string,
+    dayRange: { label: string, index: number }[],
     activeDialogue: {
       id?: string;
       label?: string;

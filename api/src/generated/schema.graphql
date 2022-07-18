@@ -211,11 +211,14 @@ type AutomationScheduledModel {
   createdAt: Date!
   dayOfMonth: String!
   dayOfWeek: String!
+  dayRange: [DayRange!]
   dialogueId: String!
+  frequency: String!
   hours: String!
   id: ID!
   minutes: String!
   month: String!
+  time: String!
   type: RecurringPeriodType!
   updatedAt: Date!
 }
@@ -593,6 +596,11 @@ type CustomFieldType {
 
 """Date custom scalar type"""
 scalar Date
+
+type DayRange {
+  index: Int!
+  label: String!
+}
 
 input DeleteAutomationInput {
   automationId: String!
