@@ -26,6 +26,7 @@ import AutomationService from '../models/automations/AutomationService'
 import DialogueStatisticsService from '../models/questionnaire/DialogueStatisticsService'
 import QuestionStatisticsService from '../models/QuestionNode/QuestionStatisticsService'
 import GenerateWorkspaceService from '../models/generate-workspace/GenerateWorkspaceService'
+import { OrganizationService } from '../models/Organization/OrganizationService';
 import TemplateService from '../models/templates/TemplateService'
 import { TopicService } from '../models/Topic/TopicService'
 
@@ -56,8 +57,10 @@ export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOption
   const topicService = new TopicService(prisma);
   const issueService = new IssueService(prisma);
   const redisService = new RedisService(redis);
+  const organizationService = new OrganizationService(prisma);
 
   return {
+    organizationService,
     redisService,
     templateService,
     generateWorkspaceService,

@@ -71,8 +71,8 @@ class SessionPrismaAdapter {
    */
   findCustomerSessions = async (
     customerId: string,
-    startDateTime: Date,
-    endDateTime: Date,
+    startDateTime?: Date,
+    endDateTime?: Date,
   ) => {
     return this.prisma.session.findMany({
       where: {
