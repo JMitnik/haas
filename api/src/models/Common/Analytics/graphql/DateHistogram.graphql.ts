@@ -7,7 +7,7 @@ export const DateHistogramItem = objectType({
   definition(t) {
     t.id('id');
     t.date('date');
-    t.int('frequency');
+    t.nonNull.int('frequency');
   },
 });
 

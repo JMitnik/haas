@@ -2,7 +2,8 @@ import * as UI from '@haas/ui';
 import { AlertTriangle, MessageCircle, User } from 'react-feather';
 import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { Zoom } from '@visx/zoom';
-import { sumBy } from 'lodash';
+import { endOfDay, startOfDay } from 'date-fns';
+import { isPresent } from 'ts-is-present';
 import { useTranslation } from 'react-i18next';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import useMeasure from 'react-use-measure';
@@ -16,7 +17,6 @@ import { SimpleIssueTable } from 'components/Analytics/Issues/SimpleIssueTable';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useNavigator } from 'hooks/useNavigator';
 
-import { endOfDay, startOfDay } from 'date-fns';
 import * as LS from './WorkspaceGrid.styles';
 import { BreadCrumb } from './BreadCrumb';
 import {
@@ -316,8 +316,8 @@ export const WorkspaceGrid = ({
 
   const issues = issuesData?.customer?.issues || [];
   const issueStats = issues.reduce((acc, issue) => {
-    acc.problems += issue.basicStats.responseCount;
-    acc.actionsRequested += issue.actionRequiredCount || 0;
+    acc.problems += (issue?.basicStats?.responseCount || 0);
+    acc.actionsRequested += (issue?.actionRequiredCount || 0);
     return acc;
   }, { problems: 0, actionsRequested: 0 });
 
@@ -354,6 +354,7 @@ export const WorkspaceGrid = ({
             </UI.Div>
           </UI.Flex>
         </UI.Div>
+
         <UI.Hr />
         <UI.Grid gridTemplateColumns={['1fr', '1fr', '1fr', '1fr', '2fr 1fr']}>
           <UI.Div>
@@ -391,10 +392,7 @@ export const WorkspaceGrid = ({
                   themeBg="main.500"
                   themeColor="white"
                   name="Action Requests"
-                  value={
-                    issueStats.actionsRequested
-                    // sumBy(issues.filter((issue) => issue.followUpAction), ((issue) => issue.basicStats.responseCount))
-                  }
+                  value={issueStats.actionsRequested}
                   isFilterEnabled={historyQueue.length > 0}
                   onNavigate={() => goToWorkspaceFeedbackOverview(
                     findDialoguesInGroup([currentState.currentNode as HexagonNode]),
@@ -410,7 +408,7 @@ export const WorkspaceGrid = ({
                   inPreview
                   onResetFilter={() => popToIndex(0)}
                   isFilterEnabled={historyQueue.length > 0}
-                  issues={issues}
+                  issues={issues.filter(isPresent)}
                   onIssueClick={handleIssueClick}
                   isLoading={issuesLoading}
                   onOpenIssueModal={() => setIssuesModalIsOpen(true)}
@@ -466,7 +464,7 @@ export const WorkspaceGrid = ({
       <Modal.Root open={issuesModalIsOpen} onClose={() => setIssuesModalIsOpen(false)}>
         <IssuesModal
           onResetFilters={() => popToIndex(0)}
-          issues={issues}
+          issues={issues.filter(isPresent)}
           onIssueClick={(issue) => {
             handleIssueClick(issue);
             setIssuesModalIsOpen(false);

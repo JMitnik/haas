@@ -3,7 +3,6 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { CustomThemeProviders } from 'providers/ThemeProvider';
-import { ErrorBoundary } from 'react-error-boundary';
 import { Loader } from 'components/Common/Loader/Loader';
 import { useCustomer } from 'providers/CustomerProvider';
 import useMediaDevice from 'hooks/useMediaDevice';
@@ -11,7 +10,6 @@ import useMediaDevice from 'hooks/useMediaDevice';
 import * as LS from './WorkpaceLayout.styles';
 import { TopSubNavBar } from './TopSubNavBar';
 import { TopbarContainer, WorkspaceTopbar } from './WorkspaceTopbar';
-import NotAuthorizedView from '../NotAuthorizedView';
 
 const WorkspaceLayoutContainer = styled(UI.Div) <{ isMobile?: boolean }>`
   ${({ theme, isMobile = false }) => css`
@@ -40,31 +38,29 @@ const WorkspaceLayout = ({ children }: WorskpaceLayoutProps) => {
   const { isLoading } = useCustomer();
 
   return (
-    <ErrorBoundary FallbackComponent={NotAuthorizedView}>
-      <CustomThemeProviders>
-        {/* With topbar */}
-        {isLoading && (
-          <UI.Div position="absolute" bottom={0} right={0}>
-            <Loader testId="runner" />
-          </UI.Div>
-        )}
-        <UI.Div
-          style={{
-            boxShadow: '2px 2px 2px rgba(0, 0, 0, 0.03)',
-          }}
-          position="relative"
-          zIndex={100000}
-        >
-          <WorkspaceTopbar withNav />
-          <TopSubNavBar />
-        </UI.Div>
-        <WorkspaceLayoutContainer isMobile={device.isSmall}>
-          <LS.DashboardViewContainer>
-            {children}
-          </LS.DashboardViewContainer>
-        </WorkspaceLayoutContainer>
-      </CustomThemeProviders>
-    </ErrorBoundary>
+    <CustomThemeProviders>
+      {/* With topbar */}
+      {isLoading && (
+      <UI.Div position="absolute" bottom={0} right={0}>
+        <Loader testId="runner" />
+      </UI.Div>
+      )}
+      <UI.Div
+        style={{
+          boxShadow: '2px 2px 2px rgba(0, 0, 0, 0.03)',
+        }}
+        position="relative"
+        zIndex={100000}
+      >
+        <WorkspaceTopbar withNav />
+        <TopSubNavBar />
+      </UI.Div>
+      <WorkspaceLayoutContainer isMobile={device.isSmall}>
+        <LS.DashboardViewContainer>
+          {children}
+        </LS.DashboardViewContainer>
+      </WorkspaceLayoutContainer>
+    </CustomThemeProviders>
   );
 };
 

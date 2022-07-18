@@ -26,7 +26,7 @@ export const ROUTES = {
   NEW_OPTION_CTA_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/builder/option/:optionIndex/new-cta',
 };
 
-interface DashboardParams {
+export interface DashboardParams {
   customerSlug: string;
   dialogueSlug: string;
   campaignId: string;

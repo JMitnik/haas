@@ -44,6 +44,8 @@
         "dev:api": "yarn workspace @haas/api dev",
         "build:client": "yarn workspace @haas/client build",
         "build:api": "yarn workspace @haas/api generate && yarn workspace @haas/api build",
+        "clean": "yarn clean:cache && yarn clean:npm",
+        "clean:cache": "yarn cache clean",
         "clean:npm": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
         "deploy:ecs:staging": "bash aws/stack/scripts/update_ecs_staging.sh",
         "deploy:ecs:prod": "bash aws/stack/scripts/update_ecs_prod.sh",

@@ -20,8 +20,6 @@ export type Scalars = {
    *
    */
   DateString: any;
-  /** The `Upload` scalar type represents a file upload. */
-  Upload: any;
   /** The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSONObject: any;
   /** The `Upload` scalar type represents a file upload. */
@@ -260,6 +258,15 @@ export enum AutomationType {
   Campaign = 'CAMPAIGN'
 }
 
+/** Basic statistics for a general statistics */
+export type BasicStatistics = {
+  __typename?: 'BasicStatistics';
+  /** Number of responses */
+  responseCount?: Maybe<Scalars['Int']>;
+  /** Average value of summarizable statistic */
+  average?: Maybe<Scalars['Float']>;
+};
+
 export type CtaLinkInputObjectType = {
   url?: Maybe<Scalars['String']>;
   type?: Maybe<LinkTypeEnumType>;
@@ -282,15 +289,6 @@ export type CtaShareInputObjectType = {
   tooltip?: Maybe<Scalars['String']>;
   title?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['String']>;
-};
-
-/** Basic statistics for a general statistics */
-export type BasicStatistics = {
-  __typename?: 'BasicStatistics';
-  /** Number of responses */
-  responseCount: Scalars['Int'];
-  /** Average value of summarizable statistic */
-  average: Scalars['Float'];
 };
 
 /** Campaign */
@@ -573,18 +571,18 @@ export type Customer = {
   sessionConnection?: Maybe<SessionConnection>;
   /** Workspace statistics */
   statistics?: Maybe<WorkspaceStatistics>;
-  issues?: Maybe<Array<Issue>>;
+  issues?: Maybe<Array<Maybe<Issue>>>;
   dialogueConnection?: Maybe<DialogueConnection>;
   automationConnection?: Maybe<AutomationConnection>;
   usersConnection?: Maybe<UserConnection>;
-  automations?: Maybe<Array<AutomationModel>>;
+  automations?: Maybe<Array<Maybe<AutomationModel>>>;
   /** @deprecated Deprectaed, see statistics */
   nestedHealthScore?: Maybe<HealthScore>;
   nestedMostPopular?: Maybe<MostPopularPath>;
   nestedMostChanged?: Maybe<MostChangedPath>;
   nestedMostTrendingTopic?: Maybe<MostTrendingTopic>;
   /** @deprecated Deprecated, see statistics */
-  nestedDialogueStatisticsSummary?: Maybe<Array<DialogueStatisticsSummaryModel>>;
+  nestedDialogueStatisticsSummary?: Maybe<Array<Maybe<DialogueStatisticsSummaryModel>>>;
   dialogue?: Maybe<Dialogue>;
   dialogues?: Maybe<Array<Maybe<Dialogue>>>;
   users?: Maybe<Array<Maybe<UserType>>>;
@@ -682,15 +680,15 @@ export type CustomerWhereUniqueInput = {
 /** A histogram contains a list of entries sorted typically by date, along with their frequency. */
 export type DateHistogram = {
   __typename?: 'DateHistogram';
-  id: Scalars['ID'];
-  items: Array<DateHistogramItem>;
+  id?: Maybe<Scalars['ID']>;
+  items?: Maybe<Array<Maybe<DateHistogramItem>>>;
 };
 
 /** A histogram item contains a date */
 export type DateHistogramItem = {
   __typename?: 'DateHistogramItem';
-  id: Scalars['ID'];
-  date: Scalars['Date'];
+  id?: Maybe<Scalars['ID']>;
+  date?: Maybe<Scalars['Date']>;
   frequency: Scalars['Int'];
 };
 
@@ -993,7 +991,7 @@ export type DialogueStatisticsSummaryModel = {
   endDateTime?: Maybe<Scalars['Date']>;
   nrVotes?: Maybe<Scalars['Int']>;
   impactScore?: Maybe<Scalars['Float']>;
-  title: Scalars['String'];
+  title?: Maybe<Scalars['String']>;
   dialogue?: Maybe<Dialogue>;
 };
 
@@ -1096,7 +1094,7 @@ export type FormNodeEntryInput = {
 export type FormNodeEntryType = {
   __typename?: 'FormNodeEntryType';
   id?: Maybe<Scalars['Int']>;
-  values: Array<FormNodeEntryValueType>;
+  values?: Maybe<Array<Maybe<FormNodeEntryValueType>>>;
 };
 
 export type FormNodeEntryValueType = {
@@ -1211,9 +1209,9 @@ export type HandleUserStateInWorkspaceInput = {
 
 export type HealthScore = {
   __typename?: 'HealthScore';
-  score: Scalars['Float'];
-  negativeResponseCount: Scalars['Int'];
-  nrVotes: Scalars['Int'];
+  score?: Maybe<Scalars['Float']>;
+  negativeResponseCount?: Maybe<Scalars['Int']>;
+  nrVotes?: Maybe<Scalars['Int']>;
 };
 
 export type HealthScoreInput = {
@@ -1257,9 +1255,9 @@ export type InviteUserOutput = {
  */
 export type Issue = {
   __typename?: 'Issue';
-  id: Scalars['ID'];
-  rankScore: Scalars['Float'];
-  topic: Scalars['String'];
+  id?: Maybe<Scalars['ID']>;
+  rankScore?: Maybe<Scalars['Float']>;
+  topic?: Maybe<Scalars['String']>;
   dialogueId: Scalars['String'];
   dialogue?: Maybe<Dialogue>;
   history: DateHistogram;
@@ -1267,9 +1265,9 @@ export type Issue = {
   status: StatusType;
   followUpAction?: Maybe<SessionActionType>;
   /** Number of actions required */
-  actionRequiredCount?: Maybe<Scalars['Int']>;
-  createdAt: Scalars['Date'];
-  updatedAt: Scalars['Date'];
+  actionRequiredCount: Scalars['Int'];
+  createdAt?: Maybe<Scalars['Date']>;
+  updatedAt?: Maybe<Scalars['Date']>;
 };
 
 /** Filter input for Issues */
@@ -1279,6 +1277,7 @@ export type IssueFilterInput = {
   dialogueStrings?: Maybe<Array<Scalars['String']>>;
   topicStrings?: Maybe<Array<Scalars['String']>>;
 };
+
 
 export type JobObjectType = {
   __typename?: 'JobObjectType';
@@ -1404,8 +1403,9 @@ export type MostTrendingTopic = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  sandbox?: Maybe<Scalars['String']>;
   generateWorkspaceFromCSV?: Maybe<Customer>;
-  createJobProcessLocation: JobProcessLocation;
+  createJobProcessLocation?: Maybe<JobProcessLocation>;
   generateAutodeck?: Maybe<CreateWorkspaceJobType>;
   retryAutodeckJob?: Maybe<CreateWorkspaceJobType>;
   confirmCreateWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
@@ -1416,6 +1416,8 @@ export type Mutation = {
   assignTags?: Maybe<Dialogue>;
   createTag?: Maybe<Tag>;
   deleteTag?: Maybe<Tag>;
+  /** Deselcting a topic implies that all question-options related to the topic string are disregarded as topic. */
+  deselectTopic?: Maybe<Scalars['Boolean']>;
   /** Creates a new automation. */
   createAutomation?: Maybe<AutomationModel>;
   updateAutomation?: Maybe<AutomationModel>;
@@ -1427,12 +1429,11 @@ export type Mutation = {
   createTrigger?: Maybe<TriggerType>;
   createPermission?: Maybe<PermssionType>;
   updatePermissions?: Maybe<RoleType>;
-  createRole: RoleType;
-  updateRoles: RoleType;
-  singleUpload: ImageType;
-  createWorkspace: Customer;
-  editWorkspace: Customer;
-  deselectTopic?: Maybe<Scalars['Boolean']>;
+  createRole?: Maybe<RoleType>;
+  updateRoles?: Maybe<RoleType>;
+  singleUpload?: Maybe<ImageType>;
+  createWorkspace?: Maybe<Customer>;
+  editWorkspace?: Maybe<Customer>;
   massSeed?: Maybe<Customer>;
   deleteCustomer?: Maybe<Customer>;
   handleUserStateInWorkspace?: Maybe<UserCustomer>;
@@ -1465,6 +1466,11 @@ export type Mutation = {
   createCTA?: Maybe<QuestionNode>;
   updateCTA?: Maybe<QuestionNode>;
   updateQuestion?: Maybe<QuestionNode>;
+};
+
+
+export type MutationSandboxArgs = {
+  input?: Maybe<SandboxInput>;
 };
 
 
@@ -1535,6 +1541,11 @@ export type MutationCreateTagArgs = {
 
 export type MutationDeleteTagArgs = {
   tagId?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationDeselectTopicArgs = {
+  input?: Maybe<DeselectTopicInput>;
 };
 
 
@@ -1616,11 +1627,6 @@ export type MutationCreateWorkspaceArgs = {
 
 export type MutationEditWorkspaceArgs = {
   input?: Maybe<EditWorkspaceInput>;
-};
-
-
-export type MutationDeselectTopicArgs = {
-  input?: Maybe<DeselectTopicInput>;
 };
 
 
@@ -1885,19 +1891,19 @@ export type PaginationWhereInput = {
   orderBy?: Maybe<Array<Maybe<PaginationSortInput>>>;
 };
 
+/** A path is the traversal of topics in a dialogue. */
+export type Path = {
+  __typename?: 'Path';
+  id?: Maybe<Scalars['ID']>;
+  topicStrings?: Maybe<Array<Maybe<Scalars['String']>>>;
+};
+
 export type PathTopic = {
   __typename?: 'PathTopic';
   nrVotes?: Maybe<Scalars['Int']>;
   depth?: Maybe<Scalars['Int']>;
   topic?: Maybe<Scalars['String']>;
   impactScore?: Maybe<Scalars['Float']>;
-};
-
-/** A path is the traversal of topics in a dialogue. */
-export type Path = {
-  __typename?: 'Path';
-  id: Scalars['ID'];
-  topicStrings: Array<Scalars['String']>;
 };
 
 export type PathedSessionsInput = {
@@ -1944,8 +1950,8 @@ export type PreviewDataType = {
 export type PublicDialogueConnection = ConnectionInterface & {
   __typename?: 'PublicDialogueConnection';
   totalPages?: Maybe<Scalars['Int']>;
-  pageInfo: PaginationPageInfo;
-  dialogues: Array<PublicDialogueInfo>;
+  pageInfo?: Maybe<PaginationPageInfo>;
+  dialogues?: Maybe<Array<Maybe<PublicDialogueInfo>>>;
 };
 
 export type PublicDialogueInfo = {
@@ -1979,10 +1985,10 @@ export type Query = {
   users?: Maybe<Array<Maybe<UserType>>>;
   user?: Maybe<UserType>;
   dialogue?: Maybe<Dialogue>;
-  dialogues: Array<Dialogue>;
+  dialogues?: Maybe<Array<Maybe<Dialogue>>>;
   dialogueLinks?: Maybe<PublicDialogueConnection>;
-  refreshAccessToken: RefreshAccessTokenOutput;
-  sessions: Array<Session>;
+  refreshAccessToken?: Maybe<RefreshAccessTokenOutput>;
+  sessions?: Maybe<Array<Maybe<Session>>>;
   /** A session is one entire user-interaction */
   session?: Maybe<Session>;
   question?: Maybe<QuestionNode>;
@@ -2195,9 +2201,9 @@ export type QuestionNodeWhereUniqueInput = {
 
 export type QuestionOption = {
   __typename?: 'QuestionOption';
-  id: Scalars['Int'];
-  value: Scalars['String'];
-  isTopic: Scalars['Boolean'];
+  id?: Maybe<Scalars['Int']>;
+  value?: Maybe<Scalars['String']>;
+  isTopic?: Maybe<Scalars['Boolean']>;
   questionId?: Maybe<Scalars['String']>;
   publicValue?: Maybe<Scalars['String']>;
   overrideLeaf?: Maybe<QuestionNode>;
@@ -2312,22 +2318,28 @@ export type RoleType = {
   permissions?: Maybe<Array<Maybe<SystemPermission>>>;
 };
 
+export type SandboxInput = {
+  name?: Maybe<Scalars['String']>;
+  onlyGet?: Maybe<Scalars['Boolean']>;
+  value?: Maybe<Scalars['Int']>;
+};
+
 export type Session = {
   __typename?: 'Session';
   id: Scalars['ID'];
-  createdAt: Scalars['Date'];
-  dialogueId: Scalars['String'];
-  mainScore: Scalars['Float'];
-  browser: Scalars['String'];
-  paths: Scalars['Int'];
-  score: Scalars['Float'];
+  createdAt?: Maybe<Scalars['Date']>;
+  dialogueId?: Maybe<Scalars['String']>;
+  mainScore?: Maybe<Scalars['Float']>;
+  browser?: Maybe<Scalars['String']>;
+  paths?: Maybe<Scalars['Int']>;
+  score?: Maybe<Scalars['Float']>;
   dialogue?: Maybe<Dialogue>;
   totalTimeInSec?: Maybe<Scalars['Int']>;
   originUrl?: Maybe<Scalars['String']>;
   device?: Maybe<Scalars['String']>;
   deliveryId?: Maybe<Scalars['String']>;
   delivery?: Maybe<DeliveryType>;
-  nodeEntries: Array<NodeEntry>;
+  nodeEntries?: Maybe<Array<Maybe<NodeEntry>>>;
   followUpAction?: Maybe<FormNodeEntryType>;
 };
 
@@ -2565,17 +2577,10 @@ export type TopicNodeEntryValue = {
 export type TopicType = {
   __typename?: 'TopicType';
   name: Scalars['String'];
-  impactScore: Scalars['Float'];
-  nrVotes: Scalars['Int'];
-  subTopics?: Maybe<Array<TopicType>>;
+  impactScore?: Maybe<Scalars['Float']>;
+  nrVotes?: Maybe<Scalars['Int']>;
+  subTopics?: Maybe<Array<Maybe<TopicType>>>;
   basicStats?: Maybe<BasicStatistics>;
-};
-
-export type TopPathType = {
-  __typename?: 'topPathType';
-  answer?: Maybe<Scalars['String']>;
-  quantity?: Maybe<Scalars['Int']>;
-  basicSentiment?: Maybe<Scalars['String']>;
 };
 
 export enum TriggerConditionEnum {
@@ -2696,11 +2701,11 @@ export type UploadSellImageInputType = {
  */
 export type UrgentPath = {
   __typename?: 'UrgentPath';
-  id: Scalars['ID'];
-  path: Path;
+  id?: Maybe<Scalars['ID']>;
+  path?: Maybe<Path>;
   dialogueId: Scalars['String'];
   dialogue?: Maybe<Dialogue>;
-  basicStats: BasicStatistics;
+  basicStats?: Maybe<BasicStatistics>;
 };
 
 export type UserConnection = ConnectionInterface & {
@@ -2818,16 +2823,16 @@ export type WorkspaceConditionScopeModel = {
 
 export type WorkspaceStatistics = {
   __typename?: 'WorkspaceStatistics';
-  id: Scalars['ID'];
-  workspaceStatisticsSummary?: Maybe<Array<DialogueStatisticsSummaryModel>>;
+  id?: Maybe<Scalars['ID']>;
+  workspaceStatisticsSummary?: Maybe<Array<Maybe<DialogueStatisticsSummaryModel>>>;
   /** Basic statistics of a workspace (e.g. number of responses, average general score, etc) */
-  basicStats: BasicStatistics;
+  basicStats?: Maybe<BasicStatistics>;
   /** Topics of a workspace ranked by either impact score or number of responses */
-  rankedTopics: Array<TopicType>;
+  rankedTopics?: Maybe<Array<Maybe<TopicType>>>;
   /** Gets the health score of the workspace */
-  health: HealthScore;
+  health?: Maybe<HealthScore>;
   /** Get the path (sequence of topics) with the most changed impact score. */
-  mostChangedPath: MostChangedPath;
+  mostChangedPath?: Maybe<MostChangedPath>;
   mostTrendingTopic?: Maybe<MostTrendingTopic>;
   mostPopularPath?: Maybe<MostPopularPath>;
 };
@@ -2865,6 +2870,26 @@ export type WorkspaceStatisticsMostTrendingTopicArgs = {
 
 export type WorkspaceStatisticsMostPopularPathArgs = {
   input?: Maybe<DialogueStatisticsSummaryFilterInput>;
+};
+
+export type CreateJobProcessLocationInput = {
+  name?: Maybe<Scalars['String']>;
+  path?: Maybe<Scalars['String']>;
+  type?: Maybe<JobProcessLocationType>;
+};
+
+export type LineChartDataType = {
+  __typename?: 'lineChartDataType';
+  x?: Maybe<Scalars['String']>;
+  y?: Maybe<Scalars['Int']>;
+  entryId?: Maybe<Scalars['String']>;
+};
+
+export type TopPathType = {
+  __typename?: 'topPathType';
+  answer?: Maybe<Scalars['String']>;
+  quantity?: Maybe<Scalars['Int']>;
+  basicSentiment?: Maybe<Scalars['String']>;
 };
 
 export type DeselectTopicMutationVariables = Exact<{
@@ -2910,7 +2935,7 @@ export type GetIssuesQuery = (
   & { customer?: Maybe<(
     { __typename?: 'Customer' }
     & Pick<Customer, 'id'>
-    & { issues?: Maybe<Array<(
+    & { issues?: Maybe<Array<Maybe<(
       { __typename?: 'Issue' }
       & Pick<Issue, 'id' | 'topic' | 'rankScore' | 'followUpAction' | 'actionRequiredCount'>
       & { dialogue?: Maybe<(
@@ -2922,12 +2947,12 @@ export type GetIssuesQuery = (
       ), history: (
         { __typename?: 'DateHistogram' }
         & Pick<DateHistogram, 'id'>
-        & { items: Array<(
+        & { items?: Maybe<Array<Maybe<(
           { __typename?: 'DateHistogramItem' }
           & Pick<DateHistogramItem, 'id' | 'date' | 'frequency'>
-        )> }
+        )>>> }
       ) }
-    )>> }
+    )>>> }
   )> }
 );
 
@@ -2966,14 +2991,14 @@ export type GetWorkspaceDialogueStatisticsQuery = (
     { __typename?: 'Customer' }
     & { statistics?: Maybe<(
       { __typename?: 'WorkspaceStatistics' }
-      & { workspaceStatisticsSummary?: Maybe<Array<(
+      & { workspaceStatisticsSummary?: Maybe<Array<Maybe<(
         { __typename?: 'DialogueStatisticsSummaryModel' }
         & Pick<DialogueStatisticsSummaryModel, 'id' | 'nrVotes' | 'impactScore' | 'updatedAt' | 'title'>
         & { dialogue?: Maybe<(
           { __typename?: 'Dialogue' }
           & Pick<Dialogue, 'title' | 'id'>
         )> }
-      )>> }
+      )>>> }
     )> }
   )> }
 );
@@ -2993,17 +3018,17 @@ export type GetWorkspaceSummaryDetailsQuery = (
     & { statistics?: Maybe<(
       { __typename?: 'WorkspaceStatistics' }
       & Pick<WorkspaceStatistics, 'id'>
-      & { health: (
+      & { health?: Maybe<(
         { __typename?: 'HealthScore' }
         & Pick<HealthScore, 'nrVotes' | 'negativeResponseCount' | 'score'>
-      ), rankedTopics: Array<(
+      )>, rankedTopics?: Maybe<Array<Maybe<(
         { __typename?: 'TopicType' }
         & Pick<TopicType, 'name'>
         & { basicStats?: Maybe<(
           { __typename?: 'BasicStatistics' }
           & Pick<BasicStatistics, 'average' | 'responseCount'>
         )> }
-      )> }
+      )>>> }
     )> }
   )> }
 );
@@ -3053,7 +3078,7 @@ export type NodeEntryFragmentFragment = (
 export type SessionFragmentFragment = (
   { __typename?: 'Session' }
   & Pick<Session, 'id' | 'createdAt' | 'score' | 'originUrl' | 'totalTimeInSec' | 'device' | 'dialogueId'>
-  & { nodeEntries: Array<(
+  & { nodeEntries?: Maybe<Array<Maybe<(
     { __typename?: 'NodeEntry' }
     & NodeEntryFragmentFragment
   )>>>, delivery?: Maybe<(
@@ -3064,10 +3089,10 @@ export type SessionFragmentFragment = (
     & Pick<Dialogue, 'id' | 'title' | 'slug'>
   )>, followUpAction?: Maybe<(
     { __typename?: 'FormNodeEntryType' }
-    & { values: Array<(
+    & { values?: Maybe<Array<Maybe<(
       { __typename?: 'FormNodeEntryValueType' }
       & Pick<FormNodeEntryValueType, 'shortText'>
-    )> }
+    )>>> }
   )> }
 );
 
@@ -3085,10 +3110,10 @@ export type GetWorkspaceLayoutDetailsQuery = (
     & { statistics?: Maybe<(
       { __typename?: 'WorkspaceStatistics' }
       & Pick<WorkspaceStatistics, 'id'>
-      & { health: (
+      & { health?: Maybe<(
         { __typename?: 'HealthScore' }
         & Pick<HealthScore, 'nrVotes' | 'negativeResponseCount' | 'score'>
-      ) }
+      )> }
     )> }
   )> }
 );
@@ -3503,13 +3528,13 @@ export type GetDialogueLinksQuery = (
   & { dialogueLinks?: Maybe<(
     { __typename?: 'PublicDialogueConnection' }
     & Pick<PublicDialogueConnection, 'totalPages'>
-    & { dialogues: Array<(
+    & { dialogues?: Maybe<Array<Maybe<(
       { __typename?: 'PublicDialogueInfo' }
       & Pick<PublicDialogueInfo, 'title' | 'slug' | 'description' | 'url'>
-    )>, pageInfo: (
+    )>>>, pageInfo?: Maybe<(
       { __typename?: 'PaginationPageInfo' }
       & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'prevPageOffset' | 'nextPageOffset' | 'pageIndex'>
-    ) }
+    )> }
   )> }
 );
 
@@ -3520,10 +3545,10 @@ export type DeleteDialogueMutationVariables = Exact<{
 
 export type DeleteDialogueMutation = (
   { __typename?: 'Mutation' }
-  & { deleteDialogue: (
+  & { deleteDialogue?: Maybe<(
     { __typename?: 'Dialogue' }
     & Pick<Dialogue, 'id' | 'slug'>
-  ) }
+  )> }
 );
 
 export type DialogueConnectionQueryVariables = Exact<{
@@ -3665,13 +3690,13 @@ export type GetWorkspaceSessionsQuery = (
     & { sessionConnection?: Maybe<(
       { __typename?: 'SessionConnection' }
       & Pick<SessionConnection, 'totalPages'>
-      & { sessions: Array<(
+      & { sessions?: Maybe<Array<Maybe<(
         { __typename?: 'Session' }
         & SessionFragmentFragment
-      )>, pageInfo: (
+      )>>>, pageInfo?: Maybe<(
         { __typename?: 'PaginationPageInfo' }
         & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'nextPageOffset' | 'prevPageOffset' | 'pageIndex'>
-      ) }
+      )> }
     )> }
   )> }
 );
@@ -4190,7 +4215,9 @@ export const GetWorkspaceDialogueStatisticsDocument = gql`
     query GetWorkspaceDialogueStatistics($workspaceId: ID!, $startDateTime: String!, $endDateTime: String!) {
   customer(id: $workspaceId) {
     statistics {
-      workspaceStatisticsSummary(input: {startDateTime: $startDateTime, endDateTime: $endDateTime, impactType: AVERAGE, refresh: true}) {
+      workspaceStatisticsSummary(
+        input: {startDateTime: $startDateTime, endDateTime: $endDateTime, impactType: AVERAGE, refresh: true}
+      ) {
         id
         nrVotes
         impactScore

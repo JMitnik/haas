@@ -31,16 +31,16 @@ export const Issue = objectType({
     });
 
     /** An issue might have a history over time (rising / falling) */
-    t.field('history', { type: DateHistogram });
+    t.nonNull.field('history', { type: DateHistogram });
 
     /** Basic statistics (such as average/total count) */
-    t.field('basicStats', { type: BasicStatistics });
+    t.nonNull.field('basicStats', { type: BasicStatistics });
 
     /** The status of the current issue. */
-    t.field('status', { type: StatusType });
+    t.nonNull.field('status', { type: StatusType });
 
-    t.field('followUpAction', { type: SessionActionType, nullable: true });
-    t.int('actionRequiredCount', { nullable: true, description: 'Number of actions required' });
+    t.field('followUpAction', { type: SessionActionType });
+    t.nonNull.int('actionRequiredCount', { description: 'Number of actions required' });
 
     /** Timestamps */
     t.date('createdAt');

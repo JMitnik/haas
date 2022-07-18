@@ -536,7 +536,7 @@ export interface NexusGenInputs {
   RegisterInput: { // input type
     customerId: string; // String!
     email: string; // String!
-    firstName: string; // String!
+    firstName?: string | null; // String
     lastName: string; // String!
     password: string; // String!
     roleId?: string | null; // String
@@ -942,7 +942,7 @@ export interface NexusGenObjects {
   }
   DateHistogramItem: { // root type
     date?: NexusGenScalars['Date'] | null; // Date
-    frequency?: number | null; // Int
+    frequency: number; // Int!
     id?: string | null; // ID
   }
   DeleteUserOutput: { // root type
@@ -1064,15 +1064,15 @@ export interface NexusGenObjects {
     didInvite?: boolean | null; // Boolean
   }
   Issue: { // root type
-    actionRequiredCount?: number | null; // Int
-    basicStats?: NexusGenRootTypes['BasicStatistics'] | null; // BasicStatistics
+    actionRequiredCount: number; // Int!
+    basicStats: NexusGenRootTypes['BasicStatistics']; // BasicStatistics!
     createdAt?: NexusGenScalars['Date'] | null; // Date
     dialogueId: string; // String!
     followUpAction?: NexusGenEnums['SessionActionType'] | null; // SessionActionType
-    history?: NexusGenRootTypes['DateHistogram'] | null; // DateHistogram
+    history: NexusGenRootTypes['DateHistogram']; // DateHistogram!
     id?: string | null; // ID
     rankScore?: number | null; // Float
-    status?: NexusGenEnums['StatusType'] | null; // StatusType
+    status: NexusGenEnums['StatusType']; // StatusType!
     topic?: string | null; // String
     updatedAt?: NexusGenScalars['Date'] | null; // Date
   }
@@ -1555,7 +1555,7 @@ export interface NexusGenFieldTypes {
   }
   DateHistogramItem: { // field return type
     date: NexusGenScalars['Date'] | null; // Date
-    frequency: number | null; // Int
+    frequency: number; // Int!
     id: string | null; // ID
   }
   DeleteUserOutput: { // field return type
@@ -1731,16 +1731,16 @@ export interface NexusGenFieldTypes {
     didInvite: boolean | null; // Boolean
   }
   Issue: { // field return type
-    actionRequiredCount: number | null; // Int
-    basicStats: NexusGenRootTypes['BasicStatistics'] | null; // BasicStatistics
+    actionRequiredCount: number; // Int!
+    basicStats: NexusGenRootTypes['BasicStatistics']; // BasicStatistics!
     createdAt: NexusGenScalars['Date'] | null; // Date
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogueId: string; // String!
     followUpAction: NexusGenEnums['SessionActionType'] | null; // SessionActionType
-    history: NexusGenRootTypes['DateHistogram'] | null; // DateHistogram
+    history: NexusGenRootTypes['DateHistogram']; // DateHistogram!
     id: string | null; // ID
     rankScore: number | null; // Float
-    status: NexusGenEnums['StatusType'] | null; // StatusType
+    status: NexusGenEnums['StatusType']; // StatusType!
     topic: string | null; // String
     updatedAt: NexusGenScalars['Date'] | null; // Date
   }

@@ -521,7 +521,7 @@ const UsersOverview = () => {
                 <Table.InnerCell isDisabled={!canAccessAdmin && !canEditUsers}>
                   <UI.Div onClick={(e) => {
                     e.stopPropagation();
-                    openRoleModal({ roleId: user.role.id, userId: user.id });
+                    openRoleModal({ roleId: user.role?.id || '', userId: user.id || '' });
                   }}
                   >
                     <UI.Helper>

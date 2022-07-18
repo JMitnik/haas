@@ -568,7 +568,7 @@ type DateHistogram {
 """A histogram item contains a date"""
 type DateHistogramItem {
   date: Date
-  frequency: Int
+  frequency: Int!
   id: ID
 }
 
@@ -1060,16 +1060,16 @@ type InviteUserOutput {
 """
 type Issue {
   """Number of actions required"""
-  actionRequiredCount: Int
-  basicStats: BasicStatistics
+  actionRequiredCount: Int!
+  basicStats: BasicStatistics!
   createdAt: Date
   dialogue: Dialogue
   dialogueId: String!
   followUpAction: SessionActionType
-  history: DateHistogram
+  history: DateHistogram!
   id: ID
   rankScore: Float
-  status: StatusType
+  status: StatusType!
   topic: String
   updatedAt: Date
 }
@@ -1608,7 +1608,7 @@ type RefreshAccessTokenOutput {
 input RegisterInput {
   customerId: String!
   email: String!
-  firstName: String!
+  firstName: String
   lastName: String!
   password: String!
   roleId: String
