@@ -1270,7 +1270,7 @@ const AutomationForm = ({
 
           <ButtonGroup>
             <Button
-              // isDisabled={!form.formState.isValid}
+              isDisabled={!form.formState.isValid}
               isLoading={isLoading}
               variantColor="teal"
               type="submit"
