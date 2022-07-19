@@ -10,11 +10,17 @@ export enum DateFormat {
   /** Example: Monday 16 July, 20:00 */
   HumanDateTime = 'EEEE do, HH:mm',
 
-  /** Example: Monday 16 July, 20:00 (GMT+1) */
+  /** Example: Monday 16 of July, 20:00 (GMT+1) */
   HumanMonthDateTimeUTC = "EEEE do 'of' LLLL, 'at' HH:mm '('zzzz')'",
 
-  /** Example: Monday 16 July, 20:00 */
+  /** Example: Monday 16 of July, 20:00 */
   HumanMonthDateTime = "EEEE do 'of' LLLL, 'at' HH:mm",
+
+  /** Example: Monday 16 of July */
+  MonthDate = "EEEE do 'of' LLLL",
+
+  /** Example: 13:37 */
+  Time = 'HH:mm',
 }
 
 const formatInTimeZone = (date: Date, format: DateFormat, tz: string) => tzFormat(utcToZonedTime(date, tz),

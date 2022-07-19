@@ -216,7 +216,6 @@ const schema = yup.object({
       time: yup.string().required(),
       dayRange: yup.array().when('frequency', {
         is: (frequencyType) => {
-          console.log('Frequency type: ', frequencyType);
           return frequencyType === CustomRecurringType.DAILY;
         },
         then: yup.array().required().of(
@@ -285,9 +284,7 @@ const SCHEDULE_TYPE_OPTIONS = [
 ];
 
 const getDayOfWeek = (type: RecurringPeriodType, data: FormDataProps) => {
-  console.log('Recurring type: ', type);
   if (type !== RecurringPeriodType.Custom) {
-    console.log('Day of week without custom');
     return data.schedule?.dayOfWeek as string;
   }
 
@@ -329,9 +326,9 @@ const getCronByScheduleType = (scheduleType: RecurringPeriodType) => {
       };
     case RecurringPeriodType.EndOfWeek:
       return {
-        time: '0 0',
-        dayRange: [],
-        frequency: CustomRecurringType.WEEKLY,
+        time: '0 18',
+        dayRange: [{ label: 'FRI', index: 4 }],
+        frequency: CustomRecurringType.DAILY,
         minutes: '0',
         hours: '18',
         dayOfMonth: '*',
@@ -452,7 +449,7 @@ const AutomationForm = ({
 }: AutomationFormProps) => {
   const [createModalIsOpen, setCreateModalIsOpen] = useState<ModalState>({ isOpen: false });
   const { openMenu, closeMenu, menuProps, activeItem } = useMenu<any>();
-  const [isUTC, setIsUTC] = useState(true);
+  const [isLocalTime, setisLocalTime] = useState(true);
   const { format, toUTC, toZonedTime, formatUTC } = useDate();
 
   const history = useHistory();
@@ -538,11 +535,7 @@ const AutomationForm = ({
     control: form.control,
   });
 
-  console.log('Watch schedule: ', watchSchedule);
-
-  console.log('Errors: ', form.formState.errors);
-
-  const cronners = useCronSchedule(`${watchSchedule?.time || ''} ${watchSchedule?.frequency || ''} ${watchSchedule?.frequency === '* *' ? watchSchedule?.dayRange?.map((day) => day.label).join('-') : ''}`);
+  const cronners = useCronSchedule(`${watchSchedule?.time || ''} ${watchSchedule?.frequency || ''} ${watchSchedule?.frequency === '* *' ? watchSchedule?.dayRange?.map((day) => day?.label).join('-') : ''}`);
 
   const onSubmit = (formData: FormDataProps) => {
     // TODO: Create a field for event type
@@ -636,7 +629,7 @@ const AutomationForm = ({
                   <UI.ErrorMessage>{t(form.formState.errors.title?.message || '')}</UI.ErrorMessage>
                 </FormControl>
 
-                <UI.FormControl>
+                <UI.FormControl style={{ display: 'none' }}>
                   <UI.FormLabel htmlFor="automationType">{t('automation:type')}</UI.FormLabel>
                   <InputHelper>{t('automation:type_helper')}</InputHelper>
                   <Controller
@@ -1013,12 +1006,12 @@ const AutomationForm = ({
                     backgroundColor={DEPTH_BACKGROUND_COLORS[0]}
                   >
                     <UI.FormControl>
-                      <UI.FormLabel htmlFor="automationType">{t('automation:type')}</UI.FormLabel>
-                      <InputHelper>{t('automation:type_helper')}</InputHelper>
+                      <UI.FormLabel htmlFor="schedule.frequency">{t('automation:frequency')}</UI.FormLabel>
+                      <InputHelper>{t('automation:frequency_helper')}</InputHelper>
                       <Controller
                         name="schedule.frequency"
                         control={form.control}
-                        render={({ field: { value, onChange, onBlur } }) => (
+                        render={({ field: { value, onChange } }) => (
                           <UI.Div>
                             <RadixSelect.Root
                               value={value}
@@ -1039,28 +1032,28 @@ const AutomationForm = ({
                                   <RadixSelect.SelectGroup>
 
                                     <RadixSelect.SelectItem value={CustomRecurringType.YEARLY}>
-                                      <RadixSelect.SelectItemText>Every Year</RadixSelect.SelectItemText>
+                                      <RadixSelect.SelectItemText>{t('automation:yearly')}</RadixSelect.SelectItemText>
                                       <RadixSelect.SelectItemIndicator>
                                         <CheckIcon />
                                       </RadixSelect.SelectItemIndicator>
                                     </RadixSelect.SelectItem>
 
                                     <RadixSelect.SelectItem value={CustomRecurringType.MONTHLY}>
-                                      <RadixSelect.SelectItemText>Every Month</RadixSelect.SelectItemText>
+                                      <RadixSelect.SelectItemText>{t('automation:monthly')}</RadixSelect.SelectItemText>
                                       <RadixSelect.SelectItemIndicator>
                                         <CheckIcon />
                                       </RadixSelect.SelectItemIndicator>
                                     </RadixSelect.SelectItem>
 
                                     <RadixSelect.SelectItem value={CustomRecurringType.WEEKLY}>
-                                      <RadixSelect.SelectItemText>Every Week</RadixSelect.SelectItemText>
+                                      <RadixSelect.SelectItemText>{t('automation:weekly')}</RadixSelect.SelectItemText>
                                       <RadixSelect.SelectItemIndicator>
                                         <CheckIcon />
                                       </RadixSelect.SelectItemIndicator>
                                     </RadixSelect.SelectItem>
 
                                     <RadixSelect.SelectItem value={CustomRecurringType.DAILY}>
-                                      <RadixSelect.SelectItemText>Every Day</RadixSelect.SelectItemText>
+                                      <RadixSelect.SelectItemText>{t('automation:daily')}</RadixSelect.SelectItemText>
                                       <RadixSelect.SelectItemIndicator>
                                         <CheckIcon />
                                       </RadixSelect.SelectItemIndicator>
@@ -1078,13 +1071,12 @@ const AutomationForm = ({
                       />
                     </UI.FormControl>
                     <UI.FormControl>
-                      <UI.FormLabel htmlFor="automationType">{t('automation:type')}</UI.FormLabel>
-                      <InputHelper>{t('automation:type_helper')}</InputHelper>
+                      <UI.FormLabel htmlFor="schedule.time">{t('automation:time')}</UI.FormLabel>
+                      <InputHelper>{t('automation:time_helper')}</InputHelper>
                       <Controller
                         name="schedule.time"
                         control={form.control}
-                        // defaultValue={automation?.schedule?.type as RecurringPeriodType}
-                        render={({ field: { value, onChange, onBlur } }) => (
+                        render={({ field: { value, onChange } }) => (
                           <TimePickerContent value={value} onChange={onChange} />
                         )}
                       />
@@ -1092,13 +1084,13 @@ const AutomationForm = ({
 
                     {RecurringPeriodType.Custom && watchSchedule.frequency === CustomRecurringType.DAILY && (
                       <UI.FormControl>
-                        <UI.FormLabel htmlFor="automationType">{t('automation:type')}</UI.FormLabel>
-                        <InputHelper>{t('automation:type_helper')}</InputHelper>
+                        <UI.FormLabel htmlFor="schedule.dayRange">{t('automation:days')}</UI.FormLabel>
+                        <InputHelper>{t('automation:days_helper')}</InputHelper>
                         <Controller
                           name="schedule.dayRange"
                           control={form.control}
                           render={({ field: { value, onChange } }) => (
-                            <DayPicker value={value} onChange={onChange} />
+                            <DayPicker value={value as any} onChange={onChange} />
                           )}
                         />
                       </UI.FormControl>
@@ -1107,46 +1099,56 @@ const AutomationForm = ({
                   </UI.Grid>
 
                 )}
-                <UI.Div
+                <UI.Grid
                   p={2}
                   borderRadius="6px"
                   border="1px solid #edf2f7"
                   backgroundColor={DEPTH_BACKGROUND_COLORS[0]}
+                  gridTemplateColumns="repeat(auto-fill, minmax(200px, 1fr))"
+                  gridGap="0 1em"
                 >
-                  <UI.Flex justifyContent="space-between">
-                    <CronScheduleHeader pb={2}>Next 5 dates this automation will be ran:</CronScheduleHeader>
+                  <UI.Flex gridColumn="1/-1" justifyContent="space-between">
+                    <UI.H4 color="default.text" fontWeight={500} pb={2}>{t('automation:future_dates')}</UI.H4>
                     <UI.Flex>
-                      <UI.Span mr={2}>Show UTC?</UI.Span>
+                      <UI.Text mr={2}>{t('automation:show_local_time')}</UI.Text>
                       <Switch
-                        isChecked={isUTC}
-                        onChange={() => setIsUTC((prev) => !prev)}
+                        isChecked={isLocalTime}
+                        onChange={() => setisLocalTime((prev) => !prev)}
                       >
                         <SwitchThumb />
                       </Switch>
                     </UI.Flex>
-
                   </UI.Flex>
-
                   {cronners?.map((entry, index) => (
                     <UI.Flex alignItems="center" pb={1}>
-                      <UI.Div padding="1em" mr={1} position="relative">
+                      <UI.Div padding="1em" mr={1} paddingLeft="0" position="relative">
                         <UI.Icon color="main.500">
-                          <Clock />
-                          <UI.Div position="absolute" bottom="0" right={5}>
+                          <Clock width="1.5em" />
+                          <UI.Div position="absolute" bottom={5} right={5}>
                             {index + 1}
                           </UI.Div>
                         </UI.Icon>
                       </UI.Div>
-                      <UI.Span>
-                        {isUTC
-                          ? formatUTC(entry, DateFormat.HumanMonthDateTime)
-                          : format(entry, DateFormat.HumanMonthDateTimeUTC)}
+                      <UI.Div>
+                        <UI.Div>
+                          <UI.Text>
+                            {isLocalTime
+                              ? format(entry, DateFormat.Time)
+                              : formatUTC(entry, DateFormat.Time)}
+                          </UI.Text>
+                          <UI.Text>
+                            {isLocalTime
+                              ? format(entry, DateFormat.MonthDate)
+                              : formatUTC(entry, DateFormat.MonthDate)}
+                          </UI.Text>
+                        </UI.Div>
+                      </UI.Div>
 
-                      </UI.Span>
                     </UI.Flex>
                   ))
-                    || <UI.Span>CRON format not correct</UI.Span>}
-                </UI.Div>
+                    || <UI.Span>{t('automation:no_future_dates_available')}</UI.Span>}
+
+                </UI.Grid>
 
               </InputGrid>
             </UI.FormSection>

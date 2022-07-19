@@ -11,6 +11,34 @@ const language = {
     },
   },
   general: {
+    monday: {
+      en: 'Monday',
+      de: 'Montag',
+    },
+    tuesday: {
+      en: 'Tuesday',
+      de: 'Dienstag',
+    },
+    wednesday: {
+      en: 'Wednesday',
+      de: 'Mittwoch',
+    },
+    thursday: {
+      en: 'Thursday',
+      de: 'Donnerstag',
+    },
+    friday: {
+      en: 'Friday',
+      de: 'Freitag',
+    },
+    saturday: {
+      en: 'Saturday',
+      de: 'Samstag',
+    },
+    sunday: {
+      en: 'Sunday',
+      de: 'Sonntag',
+    },
     day_of_week: {
       en: 'Day of the week',
       de: 'Wochentag',
@@ -1995,6 +2023,58 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   automation: {
+    no_future_dates_available: {
+      en: 'No future dates available.',
+      de: 'Keine zukünftigen Daten verfügbar.',
+    },
+    show_local_time: {
+      en: 'Show local time',
+      de: 'Ortszeit anzeigen',
+    },
+    future_dates: {
+      en: 'Future dates',
+      de: 'Zukünftige Termine',
+    },
+    days: {
+      en: 'Days',
+      de: 'Tage',
+    },
+    days_helper: {
+      en: 'Determine on which days (Monday-Sunday) this automation should run',
+      de: 'Legen Sie fest, an welchen Tagen (Montag-Sonntag) diese Automatisierung ausgeführt werden soll',
+    },
+    yearly: {
+      en: 'Every year',
+      de: 'Jedes Jahr',
+    },
+    monthly: {
+      en: 'Every month',
+      de: 'Jeden Monat',
+    },
+    weekly: {
+      en: 'Every week',
+      de: 'Jede Woche',
+    },
+    daily: {
+      en: 'Every day',
+      de: 'Jeden Tag',
+    },
+    time: {
+      en: 'Time',
+      de: 'Zeit',
+    },
+    time_helper: {
+      en: 'Determine at what time this automation should run',
+      de: 'Legen Sie fest, zu welcher Uhrzeit diese Automatisierung ausgeführt werden soll',
+    },
+    frequency: {
+      en: 'Schedule frequency',
+      de: 'Häufigkeit einplanen',
+    },
+    frequency_helper: {
+      en: 'Determine how frequent this automation should run',
+      de: 'Legen Sie fest, wie häufig diese Automatisierung ausgeführt werden soll',
+    },
     compare_to: {
       en: 'Compare value',
       de: 'Wert vergleichen',

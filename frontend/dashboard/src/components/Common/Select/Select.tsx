@@ -18,7 +18,7 @@ ${({ theme }) => css`
   border: 1px solid #edf2f7;
   background-color: white;
   color: ${theme.colors.main['500']};
-  box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35), 0px 10px 20px -15px rgba(22, 23, 24, 0.2);
+  box-shadow: ${theme.boxShadows.sm};
 
   &:hover { 
     background-color: ${theme.colors.main['50']};
@@ -32,8 +32,7 @@ export const SelectContent = styled(Select.Content)`
   overflow: hidden;
   background-color: white;
   border-radius: 6px;
-  box-shadow:
-    0px 10px 38px -10px rgba(22, 23, 24, 0.35), 0px 10px 20px -15px rgba(22, 23, 24, 0.2);
+  box-shadow: ${theme.boxShadows.sm};
   `}
 `;
 

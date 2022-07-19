@@ -22,11 +22,11 @@ import {
 } from 'types/generated-types';
 import { useNavigator } from 'hooks/useNavigator';
 
+import { CustomRecurringType } from 'views/AddAutomationView/AutomationForm.types';
 import { AutomationInput, ConditionInput, ConditionQueryResult } from './EditAutomationViewTypes';
 import {
   ConditionEntry,
 } from '../AddAutomationView/CreateConditionModalCardTypes';
-import { CustomRecurringType } from 'views/AddAutomationView/AutomationForm.types';
 import AutomationForm from '../AddAutomationView/AutomationForm';
 import cuid from 'cuid';
 
@@ -153,7 +153,7 @@ const mapAutomation = (input: GetAutomationQuery['automation']): AutomationInput
       month: input?.automationScheduled?.month,
       type: input?.automationScheduled?.type,
       dayRange: input?.automationScheduled?.dayRange || [],
-      frequency: input?.automationScheduled?.frequency || CustomRecurringType.WEEKLY,
+      frequency: input?.automationScheduled?.frequency || CustomRecurringType.YEARLY,
       time: input?.automationScheduled?.time || '0 8',
       activeDialogue: input?.automationScheduled?.activeDialogue?.id ? {
         label: input?.automationScheduled?.activeDialogue?.title,
@@ -243,7 +243,6 @@ const EditAutomationView = () => {
   const automation: GetAutomationQuery['automation'] = automationData?.automation;
   const mappedAutomation: AutomationInput = mapAutomation(automation);
 
-  console.log('mapped automation: ', mappedAutomation.schedule?.activeDialogue);
   // TODO: Add child builder
   const conditionEntries: ConditionEntry[] = findUniqueConditionEntries(
     mappedAutomation.conditionBuilder.conditions.map(

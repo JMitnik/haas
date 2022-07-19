@@ -86,6 +86,8 @@ ${({ isSelected, isWithinRange, theme }) => css`
   cursor: pointer;
   padding: 0.5em;
   border-radius: 180px;
+  border: 1px solid ${theme.colors.main['50']};
+  box-shadow: ${theme.boxShadows.md};
   
   color: auto;
 
@@ -182,10 +184,15 @@ interface DayPickerSelectProps {
   value: { label: string, index: number }[];
 }
 
-const findDayName = (input: { label: Day, index: number }) => DayMap[input.label];
-
 export const DayPicker = ({ onChange, value }: DayPickerSelectProps) => {
   const [open, setOpen] = React.useState(false);
+  const { t } = useTranslation();
+
+  const findDayName = (input: { label: Day, index: number }) => {
+    const dLabel = DayMap[input.label].toLowerCase();
+    const translated = t(dLabel);
+    return translated;
+  };
 
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
