@@ -183,7 +183,7 @@ const ShareDialogue = ({ dialogueName, shareUrl }: ShareDialogueDropdownProps) =
                 {/* @ts-ignore */}
                 <QRCode fgColor={qrColor} value={`${shareUrl}?origin=qrc`} />
               </UI.Div>
-              <Button
+              <UI.Button
                 margin="0 auto"
                 onClick={handleDownload}
                 as="a"
@@ -193,7 +193,7 @@ const ShareDialogue = ({ dialogueName, shareUrl }: ShareDialogueDropdownProps) =
                 leftIcon={() => <Download size={12} />}
               >
                 <UI.Text ml={1}>Download</UI.Text>
-              </Button>
+              </UI.Button>
             </UI.ColumnFlex>
           </UI.Grid>
         </UI.Div>

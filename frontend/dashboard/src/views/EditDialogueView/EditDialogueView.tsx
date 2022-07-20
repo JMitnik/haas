@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import { Activity, Minus, Plus, Type } from 'react-feather';
-import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, Stack } from '@chakra-ui/core';
+import { ButtonGroup, FormErrorMessage, RadioButtonGroup, Stack } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
 import {
   Div, Flex, Form, FormContainer, FormControl, FormLabel,
@@ -303,12 +303,12 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
                 <Div>
                   <InputGrid gridTemplateColumns="1fr">
                     <Div>
-                      <Button
+                      <UI.Button
                         leftIcon={() => <Plus />}
                         onClick={() => setActiveTags((prevTags) => [...prevTags, null])}
                       >
                         {t('add_tag')}
-                      </Button>
+                      </UI.Button>
                     </Div>
 
                     <Stack>
@@ -328,7 +328,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
                             <FormErrorMessage>{form.errors.tags?.[index]?.value?.message}</FormErrorMessage>
                           </Div>
                           <Flex justifyContent="center" alignContent="center" flexGrow={1}>
-                            <Button
+                            <UI.Button
                               size="xs"
                               variantColor="red"
                               variant="outline"
@@ -336,7 +336,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
                               onClick={() => deleteTag(index)}
                             >
                               {t('remove')}
-                            </Button>
+                            </UI.Button>
                           </Flex>
                         </Flex>
                       ))}
@@ -390,15 +390,15 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
               )}
 
               <ButtonGroup>
-                <Button
+                <UI.Button
                   isLoading={isLoading}
                   isDisabled={!form.formState.isValid}
                   variantColor="teal"
                   type="submit"
                 >
                   {t('save')}
-                </Button>
-                <Button variant="outline" onClick={() => history.goBack()}>{t('cancel')}</Button>
+                </UI.Button>
+                <UI.Button variant="outline" onClick={() => history.goBack()}>{t('cancel')}</UI.Button>
               </ButtonGroup>
             </Form>
           </FormContainer>

@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
-import { Button, ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/core';
+import { ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
 import {
   DeprecatedViewTitle, Div, Form, FormContainer,
@@ -219,15 +219,15 @@ const EditUserForm = ({ userCustomer }: { userCustomer: any }) => {
               </FormSection>
 
               <ButtonGroup>
-                <Button
+                <UI.Button
                   isLoading={isLoading}
                   isDisabled={!form.formState.isValid}
                   variantColor="teal"
                   type="submit"
                 >
                   {t('edit')}
-                </Button>
-                <Button variant="outline" onClick={() => history.goBack()}>{t('cancel')}</Button>
+                </UI.Button>
+                <UI.Button variant="outline" onClick={() => history.goBack()}>{t('cancel')}</UI.Button>
               </ButtonGroup>
             </Form>
           </FormContainer>

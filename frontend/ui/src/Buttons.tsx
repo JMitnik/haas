@@ -12,9 +12,12 @@ import styled, { css } from 'styled-components';
 export interface ButtonProps extends ChakraButtonProps { };
 
 const ButtonContainer = styled.div`
-  svg {
-    width: 1rem;
-  }
+  ${({ theme }) => css`
+    svg {
+      width: 1rem;
+      margin-right: ${theme.gutter / 4}px;
+    }
+  `}
 `;
 
 export const Button = React.forwardRef((props: ButtonProps, ref) => (

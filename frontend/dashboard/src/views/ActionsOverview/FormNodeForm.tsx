@@ -12,7 +12,6 @@ import {
   Phone,
   Type,
 } from 'react-feather';
-import { Button } from '@chakra-ui/core';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { IllustrationCard } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
@@ -370,10 +369,10 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
 
               {fields.length === 0 ? (
                 <UI.IllustrationCard svg={<FieldIll />} text={t('add_field_reminder')}>
-                  <Button type="button" onClick={() => handleNewField()}>{t('add_field')}</Button>
+                  <UI.Button type="button" onClick={() => handleNewField()}>{t('add_field')}</UI.Button>
                 </UI.IllustrationCard>
               ) : (
-                <Button mt={4} type="button" onClick={() => handleNewField()}>{t('add_field')}</Button>
+                <UI.Button mt={4} type="button" onClick={() => handleNewField()}>{t('add_field')}</UI.Button>
               )}
             </UI.Div>
           </UI.InputGrid>
