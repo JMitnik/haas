@@ -742,16 +742,33 @@ model AutomationCondition {
   workspaceScope               WorkspaceConditionScope?
 }
 
+enum AutomationActionChannelType {
+  EMAIL
+  SMS
+  SLACK
+}
+
+model AutomationActionChannel {
+  id                 String    @id @default(cuid())
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime? @updatedAt
+  payload            Json?
+  automationActionId String?
+
+  type             AutomationActionChannelType @default(EMAIL)
+  AutomationAction AutomationAction?           @relation(fields: [automationActionId], references: [id])
+}
+
 model AutomationAction {
-  id                    String               @id @default(cuid())
-  createdAt             DateTime             @default(now())
-  updatedAt             DateTime?            @updatedAt
+  id                    String                    @id @default(cuid())
+  createdAt             DateTime                  @default(now())
+  updatedAt             DateTime?                 @updatedAt
   type                  AutomationActionType
   apiKey                String?
   endpoint              String?
-  payload               Json?
+  channels              AutomationActionChannel[]
   automationTriggers    AutomationTrigger[]
-  AutomationScheduled   AutomationScheduled? @relation(fields: [automationScheduledId], references: [id])
+  AutomationScheduled   AutomationScheduled?      @relation(fields: [automationScheduledId], references: [id])
   automationScheduledId String?
 }
 

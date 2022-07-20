@@ -143,6 +143,7 @@ export interface CreateAutomationActionInput {
   type: NexusGenEnums['AutomationActionType'];
   apiKey?: string | null;
   endpoint?: string | null;
+  channels: Prisma.AutomationActionChannelCreateInput[];
   payload?: object | null;
 }
 

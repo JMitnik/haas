@@ -1,4 +1,4 @@
-import { AutomationActionType, PrismaClient, UserOfCustomer } from '@prisma/client';
+import { AutomationActionChannel, AutomationActionChannelType, AutomationActionType, PrismaClient, UserOfCustomer } from '@prisma/client';
 import { ApolloError } from 'apollo-server-express';
 import { uniqBy } from 'lodash';
 
@@ -28,6 +28,15 @@ export class AutomationActionService {
     this.automationPrismaAdapter = new AutomationPrismaAdapter(prisma);
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prisma);
     this.userPrismaAdapter = new UserPrismaAdapter(prisma);
+  }
+
+  /**
+   * Finds all AutomationAction Channels by an automation action ID
+   * @param automationActionId 
+   * @returns 
+   */
+  findChannelsByActionId = (automationActionId: string) => {
+    return this.automationPrismaAdapter.findChannelsByAutomationActionId(automationActionId);
   }
 
   /**
@@ -112,25 +121,28 @@ export class AutomationActionService {
       where: {
         id: automationActionId,
       },
+      include: {
+        channels: true,
+      },
     });
 
     if (!automationAction) throw new ApolloError('No automation action found for ID!');
 
-    const payload = (automationAction.payload as unknown) as GenerateReportPayload;
+    // FIXME: Handle all channels!
+    const payload = (automationAction.channels[0].payload as unknown) as GenerateReportPayload;
     const users = await this.userService.findTargetUsers(workspaceSlug, payload);
 
     return users;
-  }
+  };
 
-  /**
-   * Sends an email with a report to all users provided in an automation action
-   * @param automationActionId
-   * @param workspaceSlug
-   * @param reportUrl
-   * @returns
-   */
-  sendReport = async (automationActionId: string, workspaceSlug: string, reportUrl: string) => {
-    const recipients = await this.findActionRecipients(automationActionId, workspaceSlug);
+  handleEmailChannel = async (
+    channel: AutomationActionChannel,
+    workspaceSlug: string,
+    reportUrl: string
+  ) => {
+    const payload = (channel.payload as unknown) as GenerateReportPayload;
+    const recipients = await this.userService.findTargetUsers(workspaceSlug, payload);
+
     recipients.forEach((recipient) => {
       const triggerBody = makeReportMailTemplate(
         {
@@ -145,6 +157,51 @@ export class AutomationActionService {
         subject: 'A new HAAS Report Has been released',
       });
     })
+  };
+
+  handleChannel = async (
+    channel: AutomationActionChannel,
+    workspaceSlug: string,
+    reportUrl: string
+  ) => {
+    switch (channel.type) {
+      case AutomationActionChannelType.EMAIL:
+        await this.handleEmailChannel(channel, workspaceSlug, reportUrl);
+        break;
+      case AutomationActionChannelType.SMS:
+        // TODO: Implement
+        break;
+      case AutomationActionChannelType.SLACK:
+        // TODO: Implement
+        break;
+      default:
+        await this.handleEmailChannel(channel, workspaceSlug, reportUrl);
+        break;
+    }
+  }
+
+  /**
+   * Sends an email with a report to all users provided in an automation action
+   * @param automationActionId
+   * @param workspaceSlug
+   * @param reportUrl
+   * @returns
+   */
+  sendReport = async (automationActionId: string, workspaceSlug: string, reportUrl: string) => {
+    const automationAction = await this.prisma.automationAction.findUnique({
+      where: {
+        id: automationActionId,
+      },
+      include: {
+        channels: true,
+      },
+    });
+
+    if (!automationAction) throw new ApolloError('No automation action found for ID!');
+
+    for (const channel of automationAction.channels) {
+      await this.handleChannel(channel, workspaceSlug, reportUrl);
+    }
 
     return true;
   };
@@ -158,7 +215,6 @@ export class AutomationActionService {
   public async generateReport(
     automationActionId: string,
     workspaceSlug: string,
-    targets: string[],
     dialogueSlug?: string
   ) {
     // Get bot user to create report with
@@ -176,7 +232,6 @@ export class AutomationActionService {
       DASHBOARD_URL: dashboardUrl,
       REPORT_URL: reportUrl,
       WORKSPACE_EMAIL: botUser?.email || '',
-      TARGETS: targets,
       WORKSPACE_SLUG: workspaceSlug,
       USER_ID: botUser?.id as string,
       AUTOMATION_ACTION_ID: automationActionId,

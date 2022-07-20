@@ -31,3 +31,5 @@ export * from './graphql/SendAutomationDialogueLinkResolver';
 export * from './graphql/AutomationScheduled';
 export * from './graphql/SendAutomationReportResolver';
 export * from './graphql/DayRange';
+export * from './graphql/AutomationActionChannel';
+export * from './graphql/AutomationActionChannelType';

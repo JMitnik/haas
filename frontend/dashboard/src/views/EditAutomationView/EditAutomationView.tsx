@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
+import cuid from 'cuid';
 
 import {
   AutomationConditionBuilderType,
@@ -20,15 +21,14 @@ import {
   useGetAutomationQuery,
   useUpdateAutomationMutation,
 } from 'types/generated-types';
+import { CustomRecurringType } from 'views/AddAutomationView/AutomationForm.types';
 import { useNavigator } from 'hooks/useNavigator';
 
-import { CustomRecurringType } from 'views/AddAutomationView/AutomationForm.types';
 import { AutomationInput, ConditionInput, ConditionQueryResult } from './EditAutomationViewTypes';
 import {
   ConditionEntry,
 } from '../AddAutomationView/CreateConditionModalCardTypes';
 import AutomationForm from '../AddAutomationView/AutomationForm';
-import cuid from 'cuid';
 
 const mapConditionOperator = (type: AutomationConditionOperatorType) => {
   switch (type) {
@@ -141,7 +141,7 @@ const mapAutomation = (input: GetAutomationQuery['automation']): AutomationInput
       : input?.automationScheduled?.actions?.map((action) => ({
         action: {
           type: action?.type,
-          targets: action.payload?.targets || [],
+          targets: action.channels?.[0]?.payload?.targets || [],
         },
       })) || [],
     schedule: {

@@ -1,4 +1,5 @@
 import {
+  AutomationActionChannelType,
   AutomationCondition, AutomationConditionScopeType, AutomationType,
   ConditionPropertyAggregateType, DialogueConditionScope,
   Prisma, PrismaClient, QuestionAspect, QuestionConditionScope,
@@ -23,6 +24,19 @@ export class AutomationPrismaAdapter {
   }
 
   /**
+   * Finds all AutomationAction Channels by an automation action ID
+   * @param automationActionId 
+   * @returns 
+   */
+  findChannelsByAutomationActionId = async (automationActionId: string) => {
+    return this.prisma.automationActionChannel.findMany({
+      where: {
+        automationActionId,
+      },
+    });
+  };
+
+  /**
    * Finds a scheduled automation by its id
    * @param automationScheduledId 
    * @returns 
@@ -33,7 +47,11 @@ export class AutomationPrismaAdapter {
         id: automationScheduledId,
       },
       include: {
-        actions: true,
+        actions: {
+          include: {
+            channels: true,
+          },
+        },
       },
     });
     return automationScheduled;
@@ -468,7 +486,11 @@ export class AutomationPrismaAdapter {
                 },
               },
             },
-            actions: true,
+            actions: {
+              include: {
+                channels: true,
+              },
+            },
           },
         },
       },
@@ -950,14 +972,18 @@ export class AutomationPrismaAdapter {
     return {
       ...schedule as Prisma.AutomationScheduledCreateInput,
       actions: {
-        create: actions.map((action) => {
-          return {
-            type: action.type,
-            apiKey: action.apiKey,
-            endpoint: action.endpoint,
-            payload: action.payload as Prisma.InputJsonObject || Prisma.JsonNull,
-          }
-        }),
+        create: actions.map((action) => ({
+          type: action.type,
+          apiKey: action.apiKey,
+          endpoint: action.endpoint,
+          channels: {
+            create: {
+              type: AutomationActionChannelType.EMAIL, // TODO: Change this based on front-end
+              payload: action.payload as Prisma.InputJsonObject || Prisma.JsonNull, // TODO: payload based on channel type
+            },
+          },
+
+        })),
       },
     }
   }
@@ -1251,13 +1277,28 @@ export class AutomationPrismaAdapter {
               type: action.type,
               apiKey: action?.apiKey,
               endpoint: action?.endpoint,
-              payload: action?.payload as Prisma.InputJsonObject || Prisma.JsonNull,
+              channels: { // FIXME: Handle this better when we support multiple channels
+                create: {
+                  type: AutomationActionChannelType.EMAIL,
+                  payload: action?.payload as Prisma.InputJsonObject || Prisma.JsonNull,
+                },
+              },
             },
             update: {
               type: action.type,
               apiKey: action?.apiKey,
               endpoint: action?.endpoint,
-              payload: action?.payload as Prisma.InputJsonObject || Prisma.JsonNull,
+              // channels: { // FIXME: Handle this better when we support multiple channels
+              //   update: {
+              //     where: {
+              //       id: action.channels?.[0].id, // FIXME: DOESNT EXIST YET AS INPUT FROM FRONT-END
+              //     },
+              //     data: {
+              //       type: AutomationActionChannelType.EMAIL,
+              //       payload: action?.payload as Prisma.InputJsonObject || Prisma.JsonNull,
+              //     },
+              //   },
+              // },
             },
           };
         }),

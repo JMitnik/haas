@@ -15,6 +15,8 @@ import {
   Role,
   User,
   UserOfCustomer,
+  AutomationActionChannel,
+  AutomationActionChannelType,
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import { ApolloError, UserInputError } from 'apollo-server-express';
@@ -544,21 +546,15 @@ class AutomationService {
    * @returns the succesfull running of a SNS related to the action
    */
   public handleAutomationAction = async (
-    automationAction: AutomationAction,
+    automationAction: AutomationAction & { channels: AutomationActionChannel[] },
     workspaceSlug: string,
     dialogueSlug?: string
   ) => {
     switch (automationAction.type) {
       case AutomationActionType.GENERATE_REPORT: {
-        const payload = (automationAction.payload as unknown) as GenerateReportPayload;
-
-        const users = await this.userService.findTargetUsers(workspaceSlug, payload);
-        const emailAddresses = users.map((user) => user.user.email);
-
         return this.automationActionService.generateReport(
           automationAction.id,
           workspaceSlug,
-          emailAddresses,
           dialogueSlug,
         );
       };

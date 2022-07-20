@@ -43,6 +43,21 @@ type AutodeckConnectionType implements DeprecatedConnectionInterface {
   startDate: String
 }
 
+"""AutomationActionChannel"""
+type AutomationActionChannel {
+  createdAt: Date!
+  id: ID!
+  payload: JSONObject
+  type: AutomationActionChannelType!
+  updatedAt: Date!
+}
+
+enum AutomationActionChannelType {
+  EMAIL
+  SLACK
+  SMS
+}
+
 input AutomationActionInput {
   apiKey: String
   endpoint: String
@@ -53,6 +68,7 @@ input AutomationActionInput {
 
 """AutomationAction"""
 type AutomationActionModel {
+  channels: [AutomationActionChannel!]
   createdAt: Date!
   id: ID!
   payload: JSONObject
