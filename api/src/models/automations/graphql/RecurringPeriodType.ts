@@ -3,6 +3,8 @@ import { enumType } from '@nexus/schema';
 export const RecurringPeriodType = enumType({
   name: 'RecurringPeriodType',
   members: [
+    'EVERY_YEAR',
+    'EVERY_MONTH',
     'EVERY_WEEK',
     'EVERY_DAY',
     'START_OF_DAY',

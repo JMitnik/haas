@@ -92,7 +92,7 @@ export const CreateActionModalCard = ({ onClose, onCreate, onUpdate, action }: N
     mode: 'onChange',
     shouldUnregister: false,
     defaultValues: {
-      type: activeAction?.type || AutomationActionType.GenerateReport,
+      type: activeAction?.type || AutomationActionType.WeekReport,
       targets: activeAction?.targets || [{}],
     },
   });
@@ -149,7 +149,7 @@ export const CreateActionModalCard = ({ onClose, onCreate, onUpdate, action }: N
                         render={({ field: { onBlur, onChange, value } }) => (
                           <UI.RadioButtons onBlur={onBlur} onChange={onChange} value={value}>
                             <UI.RadioButton
-                              value={AutomationActionType.GenerateReport}
+                              value={AutomationActionType.WeekReport}
                               mr={2}
                               text={(t('automation:generate_report'))}
                               description={t('automation:generate_report_helper')}

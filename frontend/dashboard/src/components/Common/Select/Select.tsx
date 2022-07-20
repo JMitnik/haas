@@ -3,12 +3,13 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 export const SelectTrigger = styled(Select.Trigger)`
-${({ theme }) => css`
+${({ theme, disabled }) => css`
   all: unset;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  cursor: ${!disabled ? 'pointer' : 'not-allowed'};
+  border-radius: 4px;;
   border-radius: 4px;
   padding: 0 15px;
   font-size: 0.9rem;
@@ -21,7 +22,7 @@ ${({ theme }) => css`
   box-shadow: ${theme.boxShadows.sm};
 
   &:hover { 
-    background-color: ${theme.colors.main['50']};
+    background-color: ${!disabled ? theme.colors.main['50'] : 'auto'};
   };
   
   `}

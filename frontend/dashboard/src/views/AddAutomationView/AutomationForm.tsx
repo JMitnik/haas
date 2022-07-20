@@ -52,7 +52,7 @@ import { DateFormat, useDate } from 'hooks/useDate';
 import { DialogueNodePicker } from 'components/NodePicker/DialogueNodePicker';
 import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
 import { NodeCell } from 'components/NodeCell';
-import { Switch, SwitchContainer, SwitchThumb } from 'components/Common/Switch';
+import { Switch, SwitchThumb } from 'components/Common/Switch';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useMenu } from 'components/Common/Menu/useMenu';
 import Dropdown from 'components/Dropdown';
@@ -255,6 +255,34 @@ const schema = yup.object({
   ).required(),
 }).required();
 
+const ACTION_OPTIONS = [
+  {
+    label: 'Customizable report',
+    description: 'Sending out a report based on a customer schedule to requested stakeholder',
+    value: AutomationActionType.CustomReport,
+  },
+  {
+    label: 'Weekly report',
+    description: 'Sending out a weekly report to requested stakeholders',
+    value: AutomationActionType.WeekReport,
+  },
+  {
+    label: 'Monthly report',
+    description: 'Sending out a monthly report to requested stakeholders',
+    value: AutomationActionType.MonthReport,
+  },
+  {
+    label: 'Yearly report',
+    description: 'Sending out a yearly report to requested stakeholders',
+    value: AutomationActionType.YearReport,
+  },
+  {
+    label: 'Send dialogue link',
+    description: 'Sending out a new unique dialogue link to each team representative',
+    value: AutomationActionType.SendDialogueLink,
+  },
+];
+
 const SCHEDULE_TYPE_OPTIONS = [
   {
     label: 'End of the day',
@@ -316,6 +344,7 @@ const getCronByScheduleType = (scheduleType: RecurringPeriodType) => {
     case RecurringPeriodType.EndOfDay:
       return {
         time: '0 18',
+        type: scheduleType,
         dayRange: [{ label: 'MON', index: 1 }, { label: 'FRI', index: 4 }],
         frequency: CustomRecurringType.DAILY,
         minutes: '0',
@@ -327,6 +356,7 @@ const getCronByScheduleType = (scheduleType: RecurringPeriodType) => {
     case RecurringPeriodType.EndOfWeek:
       return {
         time: '0 18',
+        type: scheduleType,
         dayRange: [{ label: 'FRI', index: 4 }],
         frequency: CustomRecurringType.DAILY,
         minutes: '0',
@@ -338,6 +368,7 @@ const getCronByScheduleType = (scheduleType: RecurringPeriodType) => {
     case RecurringPeriodType.StartOfDay:
       return {
         time: '0 9',
+        type: scheduleType,
         dayRange: [{ label: 'MON', index: 1 }, { label: 'FRI', index: 4 }],
         frequency: CustomRecurringType.DAILY,
         minutes: '0',
@@ -348,7 +379,8 @@ const getCronByScheduleType = (scheduleType: RecurringPeriodType) => {
       };
     case RecurringPeriodType.StartOfWeek:
       return {
-        time: '0 0',
+        time: '0 9',
+        type: scheduleType,
         dayRange: [],
         frequency: CustomRecurringType.WEEKLY,
         minutes: '0',
@@ -357,29 +389,84 @@ const getCronByScheduleType = (scheduleType: RecurringPeriodType) => {
         month: '*',
         dayOfWeek: 'MON',
       };
+    case RecurringPeriodType.EveryWeek:
+      return {
+        time: '0 0',
+        type: scheduleType,
+        dayRange: [{ label: 'MON', index: 1 }],
+        frequency: CustomRecurringType.WEEKLY,
+        minutes: '0',
+        hours: '0',
+        dayOfMonth: '*',
+        month: '*',
+        dayOfWeek: 'MON',
+      };
+    case RecurringPeriodType.EveryMonth:
+      return {
+        time: '0 0',
+        type: scheduleType,
+        dayRange: [],
+        frequency: CustomRecurringType.MONTHLY,
+        minutes: '0',
+        hours: '0',
+        dayOfMonth: '1',
+        month: '*',
+        dayOfWeek: '*',
+      };
+    case RecurringPeriodType.EveryYear:
+      return {
+        time: '0 0',
+        type: scheduleType,
+        dayRange: [],
+        frequency: CustomRecurringType.YEARLY,
+        minutes: '0',
+        hours: '0',
+        dayOfMonth: '1',
+        month: 'JAN',
+        dayOfWeek: '*',
+      };
     default:
-      return null;
+      return {
+        time: '0 0',
+        type: RecurringPeriodType.Custom,
+        dayRange: [{ label: 'MON', index: 1 }],
+        frequency: CustomRecurringType.WEEKLY,
+        minutes: '0',
+        hours: '0',
+        dayOfMonth: '*',
+        month: '*',
+        dayOfWeek: 'MON',
+      };
+  }
+};
+
+const getCronByActionType = (actionType: AutomationActionType) => {
+  switch (actionType) {
+    case AutomationActionType.CustomReport:
+      return getCronByScheduleType(RecurringPeriodType.Custom);
+    case AutomationActionType.YearReport:
+      return getCronByScheduleType(RecurringPeriodType.EveryYear);
+    case AutomationActionType.MonthReport:
+      return getCronByScheduleType(RecurringPeriodType.EveryMonth);
+    default:
+      return getCronByScheduleType(RecurringPeriodType.EveryWeek);
+  }
+};
+
+const getTypeByActionType = (actionType: AutomationActionType) => {
+  switch (actionType) {
+    case AutomationActionType.YearReport:
+      return RecurringPeriodType.EveryYear;
+    case AutomationActionType.MonthReport:
+      return RecurringPeriodType.EveryMonth;
+    case AutomationActionType.WeekReport:
+      return RecurringPeriodType.EveryWeek;
+    default:
+      return RecurringPeriodType.Custom;
   }
 };
 
 type FormDataProps = yup.InferType<typeof schema>;
-
-export const ChoiceDropdown = ({ onChange, onClose, value }: any) => {
-  const { t } = useTranslation();
-
-  return (
-    <UI.List maxWidth={400}>
-      <UI.ListHeader>{t('choice')}</UI.ListHeader>
-      <UI.CloseButton onClose={onClose} />
-      <UI.ListItem hasNoSelect width="100%">
-        <UI.FormControl width="100%" isRequired>
-          <UI.FormLabel htmlFor="value">{t('choice')}</UI.FormLabel>
-          <UI.Textarea width="100%" name="value" defaultValue={value} onChange={onChange} />
-        </UI.FormControl>
-      </UI.ListItem>
-    </UI.List>
-  );
-};
 
 const DEPTH_BACKGROUND_COLORS = [
   '#fbfcff',
@@ -660,87 +747,129 @@ const AutomationForm = ({
                 </UI.FormControl>
 
                 {watchAutomationType === AutomationType.Scheduled && (
-                  <UI.FormControl isRequired isInvalid={!!form.formState.errors.schedule?.activeDialogue}>
-                    <UI.FormLabel htmlFor="activeDialogue">
-                      {t('dialogue')}
-                    </UI.FormLabel>
-                    <UI.InputHelper>
-                      {t('automation:dialogue_helper_DIALOGUE')}
-                    </UI.InputHelper>
-                    <UI.Div>
-                      <UI.Flex>
-                        {/* TODO: Make a theme out of it */}
-                        <UI.Div
-                          width="100%"
-                          backgroundColor="#fbfcff"
-                          border="1px solid #edf2f7"
-                          borderRadius="10px"
-                          padding={4}
-                        >
-                          <>
-                            <UI.Grid gridTemplateColumns="2fr 1fr">
-                              <UI.Helper>{t('dialogue')}</UI.Helper>
-                            </UI.Grid>
+                  <>
+                    <UI.FormControl>
+                      <UI.FormLabel htmlFor="automationType">{t('automation:action_type')}</UI.FormLabel>
+                      <InputHelper>{t('automation:action_type_helper')}</InputHelper>
+                      <Controller
+                        name={`actions.${0}.action.type`}
+                        control={form.control}
+                        render={({ field: { value, onChange, onBlur } }) => (
+                          <RadioGroup.Root
+                            defaultValue={value}
+                            onBlur={onBlur}
+                            variant="spaced"
+                            onValueChange={(e) => {
+                              const cron = getCronByActionType(e as AutomationActionType);
+                              form.setValue('schedule', {
+                                ...cron,
+                                activeDialogue: watchSchedule?.activeDialogue as any,
+                                type: getTypeByActionType(e as AutomationActionType),
+                              });
+                              return onChange(e);
+                            }}
+                          >
+                            {ACTION_OPTIONS.map((option) => (
+                              <RadioGroup.Item
+                                isActive={value === option.value}
+                                value={option.value}
+                                key={option.value}
+                                contentVariant="twoLine"
+                                variant="boxed"
+                              >
+                                <RadioGroup.Label>
+                                  {option.label}
+                                </RadioGroup.Label>
+                                <RadioGroup.Subtitle>
+                                  {option.description}
+                                </RadioGroup.Subtitle>
+                              </RadioGroup.Item>
+                            ))}
+                          </RadioGroup.Root>
+                        )}
+                      />
+                    </UI.FormControl>
+                    <UI.FormControl isRequired isInvalid={!!form.formState.errors.schedule?.activeDialogue}>
+                      <UI.FormLabel htmlFor="activeDialogue">
+                        {t('dialogue')}
+                      </UI.FormLabel>
+                      <UI.InputHelper>
+                        {t('automation:dialogue_helper_DIALOGUE')}
+                      </UI.InputHelper>
+                      <UI.Div>
+                        <UI.Flex>
+                          {/* TODO: Make a theme out of it */}
+                          <UI.Div
+                            width="100%"
+                            backgroundColor="#fbfcff"
+                            border="1px solid #edf2f7"
+                            borderRadius="10px"
+                            padding={4}
+                          >
+                            <>
+                              <UI.Grid gridTemplateColumns="2fr 1fr">
+                                <UI.Helper>{t('dialogue')}</UI.Helper>
+                              </UI.Grid>
 
-                            <UI.Grid
-                              pt={2}
-                              pb={2}
-                              pl={0}
-                              pr={0}
-                              borderBottom="1px solid #edf2f7"
-                              gridTemplateColumns="1fr"
-                            >
-                              <UI.Div alignItems="center" display="flex">
-                                <Controller
-                                  name="schedule.activeDialogue"
-                                  control={form.control}
-                                  render={({ field: { value, onChange } }) => (
-                                    <Dropdown
-                                      isRelative
-                                      renderOverlay={({ onClose: onDialoguePickerClose }) => (
-                                        <DialogueNodePicker
-                                          // Handle items (in this case dialogues)
-                                          items={dialogueItems}
-                                          onClose={onDialoguePickerClose}
-                                          onChange={onChange}
-                                        />
-                                      )}
-                                    >
-                                      {({ onOpen }) => (
-                                        <UI.Div
-                                          width="100%"
-                                          justifyContent="center"
-                                          display="flex"
-                                          alignItems="center"
-                                        >
-                                          {(value as any)?.label ? (
-                                            <NodeCell onRemove={() => onChange(null)} onClick={onOpen} node={value} />
-                                          ) : (
-                                            <UI.Button
-                                              size="sm"
-                                              variant="outline"
-                                              onClick={onOpen}
-                                              variantColor="altGray"
-                                            >
-                                              <UI.Icon mr={1}>
-                                                <PlusCircle />
-                                              </UI.Icon>
-                                              {t('add_dialogue')}
-                                            </UI.Button>
-                                          )}
-                                        </UI.Div>
-                                      )}
-                                    </Dropdown>
-                                  )}
-                                />
-                              </UI.Div>
-                            </UI.Grid>
-                          </>
-                        </UI.Div>
-                      </UI.Flex>
-                    </UI.Div>
-                  </UI.FormControl>
-
+                              <UI.Grid
+                                pt={2}
+                                pb={2}
+                                pl={0}
+                                pr={0}
+                                borderBottom="1px solid #edf2f7"
+                                gridTemplateColumns="1fr"
+                              >
+                                <UI.Div alignItems="center" display="flex">
+                                  <Controller
+                                    name="schedule.activeDialogue"
+                                    control={form.control}
+                                    render={({ field: { value, onChange } }) => (
+                                      <Dropdown
+                                        isRelative
+                                        renderOverlay={({ onClose: onDialoguePickerClose }) => (
+                                          <DialogueNodePicker
+                                            // Handle items (in this case dialogues)
+                                            items={dialogueItems}
+                                            onClose={onDialoguePickerClose}
+                                            onChange={onChange}
+                                          />
+                                        )}
+                                      >
+                                        {({ onOpen }) => (
+                                          <UI.Div
+                                            width="100%"
+                                            justifyContent="center"
+                                            display="flex"
+                                            alignItems="center"
+                                          >
+                                            {(value as any)?.label ? (
+                                              <NodeCell onRemove={() => onChange(null)} onClick={onOpen} node={value} />
+                                            ) : (
+                                              <UI.Button
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={onOpen}
+                                                variantColor="altGray"
+                                              >
+                                                <UI.Icon mr={1}>
+                                                  <PlusCircle />
+                                                </UI.Icon>
+                                                {t('add_dialogue')}
+                                              </UI.Button>
+                                            )}
+                                          </UI.Div>
+                                        )}
+                                      </Dropdown>
+                                    )}
+                                  />
+                                </UI.Div>
+                              </UI.Grid>
+                            </>
+                          </UI.Div>
+                        </UI.Flex>
+                      </UI.Div>
+                    </UI.FormControl>
+                  </>
                 )}
 
               </InputGrid>
@@ -954,9 +1083,9 @@ const AutomationForm = ({
                 </Muted>
               </Div>
               <InputGrid>
-                <UI.FormControl>
-                  <UI.FormLabel htmlFor="automationType">{t('automation:type')}</UI.FormLabel>
-                  <InputHelper>{t('automation:type_helper')}</InputHelper>
+                {/* <UI.FormControl>
+                  <UI.FormLabel htmlFor="automationType">{t('automation:recurring_type')}</UI.FormLabel>
+                  <InputHelper>{t('automation:recurring_type_helper')}</InputHelper>
                   <Controller
                     name="schedule.type"
                     control={form.control}
@@ -996,7 +1125,7 @@ const AutomationForm = ({
                       </RadioGroup.Root>
                     )}
                   />
-                </UI.FormControl>
+                </UI.FormControl> */}
                 {watchSchedule?.type === RecurringPeriodType.Custom && (
                   <UI.Grid
                     gridTemplateColumns="1fr 1fr"
@@ -1018,7 +1147,9 @@ const AutomationForm = ({
                               onValueChange={onChange}
                               defaultValue={value}
                             >
-                              <RadixSelect.SelectTrigger aria-label="Food">
+                              <RadixSelect.SelectTrigger
+                                aria-label="schedule frequency"
+                              >
                                 <RadixSelect.SelectValue />
                                 <RadixSelect.SelectIcon>
                                   <ChevronDownIcon />

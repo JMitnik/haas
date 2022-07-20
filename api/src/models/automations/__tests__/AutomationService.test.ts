@@ -154,7 +154,7 @@ export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, 
           },
           actions: {
             create: [
-              { type: 'GENERATE_REPORT' },
+              { type: 'WEEK_REPORT' },
             ],
           },
         },

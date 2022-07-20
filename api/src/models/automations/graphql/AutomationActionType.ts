@@ -1,4 +1,4 @@
-import { enumType } from "@nexus/schema";
+import { enumType } from '@nexus/schema';
 
 export const AutomationActionType = enumType({
   name: 'AutomationActionType',
@@ -6,7 +6,11 @@ export const AutomationActionType = enumType({
     'SEND_SMS',
     'SEND_EMAIL',
     'API_CALL',
-    'GENERATE_REPORT',
+    'SEND_DIALOGUE_LINK',
+    'WEEK_REPORT',
+    'MONTH_REPORT',
+    'YEAR_REPORT',
+    'CUSTOM_REPORT',
     'WEBHOOK',
   ],
 });

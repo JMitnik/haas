@@ -9,7 +9,7 @@
     },
     "actions": [
       {
-        "type": "GENERATE_REPORT"
+        "type": "WEEK_REPORT"
       }
     ],
     "conditionBuilder": {

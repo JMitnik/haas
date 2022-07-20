@@ -2091,7 +2091,7 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       en: 'Action',
       de: 'Aktion',
     },
-    target_helper_GENERATE_REPORT: {
+    target_helper_WEEK_REPORT: {
       en: 'Who are the people the report should be sent so?',
       de: 'Wer sind die Personen, denen der Bericht gesendet werden soll?',
     },

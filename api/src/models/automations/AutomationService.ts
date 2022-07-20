@@ -46,7 +46,7 @@ import {
 import { AutomationActionService } from './AutomationActionService';
 import { GenerateReportPayload } from 'models/users/UserServiceTypes';
 import CustomerService from '../../models/customer/CustomerService';
-import { buildFrequencyCronString, getDayRange } from './AutomationService.helpers';
+import { buildFrequencyCronString, findLambdaArnByActionType, findLambdaParamsByActionType, getDayRange } from './AutomationService.helpers';
 
 class AutomationService {
   automationPrismaAdapter: AutomationPrismaAdapter;
@@ -96,14 +96,12 @@ class AutomationService {
     dialogueSlug?: string,
   ): AWS.EventBridge.TargetList => {
     return actions.map((action, index) => {
-      // TODO: Not very scalable, need to split this up
-      const lambdaTargetArn = action.type === AutomationActionType.GENERATE_REPORT
-        ? process.env.GENERATE_REPORT_LAMBDA_ARN as string
-        : process.env.SEND_DIALOGUE_LINK_LAMBDA_ARN as string;
+      const lambdaTargetArn = findLambdaArnByActionType(action.type);
 
       const dashboardUrl = config.dashboardUrl;
 
       // TODO: Create a workspace scoped url instead dialogue scoped url when no dialogueSlug provided
+      // TODO: Add url params OR different endpoints cus might wanna show diff things for diff time periods 🤔
       const reportUrl = `${dashboardUrl}/dashboard/b/${workspaceSlug}/d/${dialogueSlug}/_reports/weekly`;
 
       const extraGenerateParams = {
@@ -125,9 +123,7 @@ class AutomationService {
         WORKSPACE_SLUG: workspaceSlug,
       }
 
-      const finalInput = action.type === AutomationActionType.GENERATE_REPORT
-        ? extraGenerateParams
-        : sendDialogueLinkParams;
+      const finalInput = findLambdaParamsByActionType(action.type, extraGenerateParams, sendDialogueLinkParams);
 
       return {
         Id: `${automationScheduledId}-${index}-action`,
@@ -551,13 +547,27 @@ class AutomationService {
     dialogueSlug?: string
   ) => {
     switch (automationAction.type) {
-      case AutomationActionType.GENERATE_REPORT: {
+      case AutomationActionType.SEND_DIALOGUE_LINK:
+        // TODO: Implement
+        return;
+      case AutomationActionType.WEEK_REPORT:
         return this.automationActionService.generateReport(
           automationAction.id,
           workspaceSlug,
           dialogueSlug,
         );
-      };
+      case AutomationActionType.MONTH_REPORT:
+        return this.automationActionService.generateReport(
+          automationAction.id,
+          workspaceSlug,
+          dialogueSlug,
+        );
+      case AutomationActionType.YEAR_REPORT:
+        return this.automationActionService.generateReport(
+          automationAction.id,
+          workspaceSlug,
+          dialogueSlug,
+        );
 
       default: {
         return new Promise((resolve) => resolve(''));

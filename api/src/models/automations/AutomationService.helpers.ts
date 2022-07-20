@@ -1,37 +1,50 @@
-import { AutomationScheduled } from '@prisma/client';
+import { AutomationActionType, AutomationScheduled } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
-import { CustomRecurringType, DayType } from './AutomationService.types';
+import {
+  CustomRecurringType,
+  DAYS,
+  GenerateReportLambdaParams,
+  SendDialogueLinkLambdaParams,
+} from './AutomationService.types';
 
-const DAYS: { index: number; label: DayType }[] = [
-  {
-    index: 0,
-    label: 'SUN',
-  },
-  {
-    index: 1,
-    label: 'MON',
-  },
-  {
-    index: 2,
-    label: 'TUE',
-  },
-  {
-    index: 3,
-    label: 'WED',
-  },
-  {
-    index: 4,
-    label: 'THU',
-  },
-  {
-    index: 5,
-    label: 'FRI',
-  },
-  {
-    index: 6,
-    label: 'SAT',
-  },
-];
+
+export const findLambdaParamsByActionType = (
+  type: AutomationActionType,
+  generateLambdaParams: GenerateReportLambdaParams,
+  sendDialogueLinkParams: SendDialogueLinkLambdaParams,
+) => {
+  switch (type) {
+    case AutomationActionType.SEND_DIALOGUE_LINK:
+      return sendDialogueLinkParams;
+    case AutomationActionType.WEEK_REPORT:
+      return generateLambdaParams;
+    case AutomationActionType.MONTH_REPORT:
+      return sendDialogueLinkParams;
+    case AutomationActionType.YEAR_REPORT:
+      return generateLambdaParams;
+    default:
+      return generateLambdaParams;
+  }
+}
+/**
+ * Finds the correct lambdaArn based on automation action
+ * @param type AutomationActionType
+ * @returns lambda arn
+ */
+export const findLambdaArnByActionType = (type: AutomationActionType) => {
+  switch (type) {
+    case AutomationActionType.SEND_DIALOGUE_LINK:
+      return process.env.SEND_DIALOGUE_LINK_LAMBDA_ARN as string;
+    case AutomationActionType.WEEK_REPORT:
+      return process.env.GENERATE_REPORT_LAMBDA_ARN as string
+    case AutomationActionType.MONTH_REPORT:
+      return process.env.GENERATE_REPORT_LAMBDA_ARN as string
+    case AutomationActionType.YEAR_REPORT:
+      return process.env.GENERATE_REPORT_LAMBDA_ARN as string
+    default:
+      return process.env.GENERATE_REPORT_LAMBDA_ARN as string
+  }
+}
 
 export const getDayRange = (dayOfWeek: string) => {
   const isWildcard = dayOfWeek.length === 1;

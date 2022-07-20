@@ -78,10 +78,14 @@ type AutomationActionModel {
 
 enum AutomationActionType {
   API_CALL
-  GENERATE_REPORT
+  CUSTOM_REPORT
+  MONTH_REPORT
+  SEND_DIALOGUE_LINK
   SEND_EMAIL
   SEND_SMS
   WEBHOOK
+  WEEK_REPORT
+  YEAR_REPORT
 }
 
 input AutomationConditionBuilderInput {
@@ -1618,7 +1622,9 @@ enum RecurringPeriodType {
   END_OF_DAY
   END_OF_WEEK
   EVERY_DAY
+  EVERY_MONTH
   EVERY_WEEK
+  EVERY_YEAR
   START_OF_DAY
   START_OF_WEEK
 }
