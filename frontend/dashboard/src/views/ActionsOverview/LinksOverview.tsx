@@ -103,14 +103,13 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
             <UI.Div gridColumn="1 / -1">
               <Flex flexDirection="row" alignItems="center" justifyContent="space-between" marginBottom={5}>
                 <UI.H4>Links</UI.H4>
-                <Button
-                  leftIcon={PlusCircle}
+                <UI.Button
+                  leftIcon={() => <PlusCircle />}
                   onClick={() => append(appendNewField())}
                   size="sm"
                 >
                   {t('cta:add_link')}
-
-                </Button>
+                </UI.Button>
               </Flex>
               <UI.Hr />
               {linkFields.length === 0 && (

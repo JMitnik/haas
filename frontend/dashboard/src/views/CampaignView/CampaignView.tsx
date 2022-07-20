@@ -196,7 +196,7 @@ export const CampaignView = () => {
             <UI.Stack isInline alignItems="center" spacing={4}>
               <UI.DeprecatedViewTitle>{campaign?.label}</UI.DeprecatedViewTitle>
               <UI.Button
-                leftIcon={Plus}
+                leftIcon={() => <Plus />}
                 onClick={() => setIsOpenImportModal(true)}
                 size="sm"
                 variantColor="teal"
@@ -207,7 +207,7 @@ export const CampaignView = () => {
           </UI.Stack>
 
           <UI.Button
-            leftIcon={Settings}
+            leftIcon={() => <Settings />}
             size="md"
             variant="outline"
             onClick={() => setIsOpenSettingsModal(true)}
@@ -363,23 +363,29 @@ export const CampaignView = () => {
                 <Menu.Item
                   onClick={() => handleMultiDateFilterChange(undefined, new Date(activeItem?.updatedAt))}
                 >
-                  {t('before_day_of')}
-                  {' '}
-                  {formatSimpleDate(activeItem?.updatedAt)}
+                  <>
+                    {t('before_day_of')}
+                    {' '}
+                    {formatSimpleDate(activeItem?.updatedAt)}
+                  </>
                 </Menu.Item>
                 <Menu.Item
                   onClick={() => handleSingleDateFilterChange(activeItem?.updatedAt)}
                 >
-                  {t('on_day_of')}
-                  {' '}
-                  {formatSimpleDate(activeItem?.updatedAt)}
+                  <>
+                    {t('on_day_of')}
+                    {' '}
+                    {formatSimpleDate(activeItem?.updatedAt)}
+                  </>
                 </Menu.Item>
                 <Menu.Item
                   onClick={() => handleMultiDateFilterChange(new Date(activeItem?.updatedAt), undefined)}
                 >
-                  {t('after_day_of')}
-                  {' '}
-                  {formatSimpleDate(activeItem?.updatedAt)}
+                  <>
+                    {t('after_day_of')}
+                    {' '}
+                    {formatSimpleDate(activeItem?.updatedAt)}
+                  </>
                 </Menu.Item>
               </Menu.SubMenu>
               <Menu.SubMenu label={(

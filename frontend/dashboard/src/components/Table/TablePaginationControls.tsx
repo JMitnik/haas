@@ -33,13 +33,13 @@ const StyledInput = styled.input`
     }
   `}
   ::-webkit-inner-spin-button{
-        -webkit-appearance: none; 
-        margin: 0; 
+        -webkit-appearance: none;
+        margin: 0;
     }
     ::-webkit-outer-spin-button{
-        -webkit-appearance: none; 
-        margin: 0; 
-    }    
+        -webkit-appearance: none;
+        margin: 0;
+    }
 `;
 
 interface TablePaginationControlsProps {
@@ -55,7 +55,7 @@ const TablePaginationControls = ({ paginationProps, onPageChange }: TablePaginat
       <Flex marginRight="20px" alignItems="center" justifyContent="center">
         <UI.IconButton
           aria-label="Go back"
-          icon={ChevronLeft}
+          icon={() => <ChevronLeft />}
           size="sm"
           mr={2}
           onClick={() => onPageChange(paginationProps.pageIndex - 1)}
@@ -74,7 +74,7 @@ const TablePaginationControls = ({ paginationProps, onPageChange }: TablePaginat
           size="sm"
           ml={2}
           aria-label="Go forward"
-          icon={ChevronRight}
+          icon={() => <ChevronRight />}
           onClick={() => onPageChange(paginationProps.pageIndex + 1)}
           isDisabled={paginationProps.pageIndex === paginationProps.pageCount - 1}
         />

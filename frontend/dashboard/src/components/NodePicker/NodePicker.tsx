@@ -120,7 +120,7 @@ export const NodePicker = ({ onChange, onClose, items, onModalOpen, onModalClose
         <UI.ListHeader style={{ borderBottom: 0 }}>{t('call_to_action')}</UI.ListHeader>
 
         <UI.Button
-          leftIcon={Plus}
+          leftIcon={() => <Plus />}
           variantColor="teal"
           ml={0}
           size="xs"

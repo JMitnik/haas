@@ -86,7 +86,7 @@ export const calcGroupTotal = (group: HexagonGroupNode): number => {
  * TODO: Refactor this to work for any number of groups, and any dialogue titles.
  */
 const filterDialogues = (groupFragments: string, dialogues: Dialogue[]): Dialogue[] => (
-  dialogues.filter((dialogue) => dialogue.title.startsWith(groupFragments))
+  dialogues.filter((dialogue) => dialogue?.title?.startsWith(groupFragments))
 );
 
 /**
@@ -160,7 +160,7 @@ export const recursiveBuildGroup = (
 export const dialogueToNode = (dialogue: Dialogue): HexagonNode => ({
   id: dialogue?.id as string,
   type: HexagonNodeType.Dialogue,
-  label: dialogue.title,
+  label: dialogue.title || '',
   score: dialogue?.impactScore ?? 0,
   dialogue,
 });
@@ -170,8 +170,8 @@ export const dialogueToNode = (dialogue: Dialogue): HexagonNode => ({
  */
 export const groupsFromDialogues = (dialogues: Dialogue[]): HexagonNode[] => {
   const dialogueGroups: DialogueGroup[] = dialogues.map((dialogue) => ({
-    groupFragments: parseGroupNames(dialogue.title),
-    dialogueTitle: dialogue.title,
+    groupFragments: parseGroupNames(dialogue?.title || ''),
+    dialogueTitle: dialogue.title || '',
   }));
 
   const groupToChild: GroupToChild[] = dialogueGroups.flatMap(parseDialogueGroup);

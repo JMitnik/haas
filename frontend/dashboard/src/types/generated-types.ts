@@ -262,9 +262,9 @@ export enum AutomationType {
 export type BasicStatistics = {
   __typename?: 'BasicStatistics';
   /** Number of responses */
-  responseCount?: Maybe<Scalars['Int']>;
+  responseCount: Scalars['Int'];
   /** Average value of summarizable statistic */
-  average?: Maybe<Scalars['Float']>;
+  average: Scalars['Float'];
 };
 
 export type CtaLinkInputObjectType = {
@@ -681,7 +681,7 @@ export type CustomerWhereUniqueInput = {
 export type DateHistogram = {
   __typename?: 'DateHistogram';
   id?: Maybe<Scalars['ID']>;
-  items?: Maybe<Array<Maybe<DateHistogramItem>>>;
+  items: Array<DateHistogramItem>;
 };
 
 /** A histogram item contains a date */
@@ -745,7 +745,7 @@ export type DeliveryConnectionType = ConnectionInterface & {
   __typename?: 'DeliveryConnectionType';
   totalPages?: Maybe<Scalars['Int']>;
   pageInfo?: Maybe<PaginationPageInfo>;
-  deliveries?: Maybe<Array<Maybe<DeliveryType>>>;
+  deliveries: Array<DeliveryType>;
 };
 
 export type DeliveryEventType = {
@@ -769,7 +769,7 @@ export enum DeliveryStatusEnum {
 /** Delivery */
 export type DeliveryType = {
   __typename?: 'DeliveryType';
-  id?: Maybe<Scalars['ID']>;
+  id: Scalars['ID'];
   deliveryRecipientFirstName?: Maybe<Scalars['String']>;
   deliveryRecipientLastName?: Maybe<Scalars['String']>;
   deliveryRecipientEmail?: Maybe<Scalars['String']>;
@@ -1209,9 +1209,9 @@ export type HandleUserStateInWorkspaceInput = {
 
 export type HealthScore = {
   __typename?: 'HealthScore';
-  score?: Maybe<Scalars['Float']>;
-  negativeResponseCount?: Maybe<Scalars['Int']>;
-  nrVotes?: Maybe<Scalars['Int']>;
+  score: Scalars['Float'];
+  negativeResponseCount: Scalars['Int'];
+  nrVotes: Scalars['Int'];
 };
 
 export type HealthScoreInput = {
@@ -1919,7 +1919,7 @@ export type PathedSessionsType = {
   startDateTime?: Maybe<Scalars['String']>;
   endDateTime?: Maybe<Scalars['String']>;
   path?: Maybe<Array<Maybe<Scalars['String']>>>;
-  pathedSessions?: Maybe<Array<Maybe<Session>>>;
+  pathedSessions?: Maybe<Array<Session>>;
 };
 
 export type PermissionIdsInput = {
@@ -2332,14 +2332,14 @@ export type Session = {
   mainScore?: Maybe<Scalars['Float']>;
   browser?: Maybe<Scalars['String']>;
   paths?: Maybe<Scalars['Int']>;
-  score?: Maybe<Scalars['Float']>;
+  score: Scalars['Float'];
   dialogue?: Maybe<Dialogue>;
   totalTimeInSec?: Maybe<Scalars['Int']>;
   originUrl?: Maybe<Scalars['String']>;
   device?: Maybe<Scalars['String']>;
   deliveryId?: Maybe<Scalars['String']>;
   delivery?: Maybe<DeliveryType>;
-  nodeEntries?: Maybe<Array<Maybe<NodeEntry>>>;
+  nodeEntries?: Maybe<Array<NodeEntry>>;
   followUpAction?: Maybe<FormNodeEntryType>;
 };
 
@@ -2352,7 +2352,7 @@ export type SessionConnection = ConnectionInterface & {
   __typename?: 'SessionConnection';
   totalPages?: Maybe<Scalars['Int']>;
   pageInfo?: Maybe<PaginationPageInfo>;
-  sessions?: Maybe<Array<Maybe<Session>>>;
+  sessions: Array<Session>;
 };
 
 export type SessionConnectionFilterInput = {
@@ -2824,7 +2824,7 @@ export type WorkspaceConditionScopeModel = {
 export type WorkspaceStatistics = {
   __typename?: 'WorkspaceStatistics';
   id?: Maybe<Scalars['ID']>;
-  workspaceStatisticsSummary?: Maybe<Array<Maybe<DialogueStatisticsSummaryModel>>>;
+  workspaceStatisticsSummary: Array<DialogueStatisticsSummaryModel>;
   /** Basic statistics of a workspace (e.g. number of responses, average general score, etc) */
   basicStats?: Maybe<BasicStatistics>;
   /** Topics of a workspace ranked by either impact score or number of responses */
@@ -2947,10 +2947,10 @@ export type GetIssuesQuery = (
       ), history: (
         { __typename?: 'DateHistogram' }
         & Pick<DateHistogram, 'id'>
-        & { items?: Maybe<Array<Maybe<(
+        & { items: Array<(
           { __typename?: 'DateHistogramItem' }
           & Pick<DateHistogramItem, 'id' | 'date' | 'frequency'>
-        )>>> }
+        )> }
       ) }
     )>>> }
   )> }
@@ -2970,10 +2970,10 @@ export type GetSessionPathsQuery = (
     & { pathedSessionsConnection?: Maybe<(
       { __typename?: 'PathedSessionsType' }
       & Pick<PathedSessionsType, 'startDateTime' | 'endDateTime' | 'path'>
-      & { pathedSessions?: Maybe<Array<Maybe<(
+      & { pathedSessions?: Maybe<Array<(
         { __typename?: 'Session' }
         & Pick<Session, 'id' | 'mainScore' | 'createdAt' | 'score' | 'totalTimeInSec'>
-      )>>> }
+      )>> }
     )> }
   )> }
 );
@@ -2991,14 +2991,14 @@ export type GetWorkspaceDialogueStatisticsQuery = (
     { __typename?: 'Customer' }
     & { statistics?: Maybe<(
       { __typename?: 'WorkspaceStatistics' }
-      & { workspaceStatisticsSummary?: Maybe<Array<Maybe<(
+      & { workspaceStatisticsSummary: Array<(
         { __typename?: 'DialogueStatisticsSummaryModel' }
         & Pick<DialogueStatisticsSummaryModel, 'id' | 'nrVotes' | 'impactScore' | 'updatedAt' | 'title'>
         & { dialogue?: Maybe<(
           { __typename?: 'Dialogue' }
           & Pick<Dialogue, 'title' | 'id'>
         )> }
-      )>>> }
+      )> }
     )> }
   )> }
 );
@@ -3078,10 +3078,10 @@ export type NodeEntryFragmentFragment = (
 export type SessionFragmentFragment = (
   { __typename?: 'Session' }
   & Pick<Session, 'id' | 'createdAt' | 'score' | 'originUrl' | 'totalTimeInSec' | 'device' | 'dialogueId'>
-  & { nodeEntries?: Maybe<Array<Maybe<(
+  & { nodeEntries?: Maybe<Array<(
     { __typename?: 'NodeEntry' }
     & NodeEntryFragmentFragment
-  )>>>, delivery?: Maybe<(
+  )>>, delivery?: Maybe<(
     { __typename?: 'DeliveryType' }
     & DeliveryFragmentFragment
   )>, dialogue?: Maybe<(
@@ -3413,7 +3413,7 @@ export type GetWorkspaceCampaignQuery = (
       & { deliveryConnection?: Maybe<(
         { __typename?: 'DeliveryConnectionType' }
         & Pick<DeliveryConnectionType, 'totalPages'>
-        & { deliveries?: Maybe<Array<Maybe<(
+        & { deliveries: Array<(
           { __typename?: 'DeliveryType' }
           & Pick<DeliveryType, 'id' | 'deliveryRecipientFirstName' | 'deliveryRecipientLastName' | 'deliveryRecipientEmail' | 'deliveryRecipientPhone' | 'scheduledAt' | 'updatedAt' | 'currentStatus'>
           & { campaignVariant?: Maybe<(
@@ -3423,7 +3423,7 @@ export type GetWorkspaceCampaignQuery = (
             { __typename?: 'DeliveryEventType' }
             & Pick<DeliveryEventType, 'id' | 'createdAt' | 'status' | 'failureMessage'>
           )>>> }
-        )>>>, pageInfo?: Maybe<(
+        )>, pageInfo?: Maybe<(
           { __typename?: 'PaginationPageInfo' }
           & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'prevPageOffset' | 'nextPageOffset' | 'pageIndex'>
         )> }
@@ -3616,7 +3616,7 @@ export type GetDialogueStatisticsQuery = (
       & { sessions?: Maybe<Array<Maybe<(
         { __typename?: 'Session' }
         & Pick<Session, 'id' | 'createdAt' | 'mainScore'>
-        & { nodeEntries?: Maybe<Array<Maybe<(
+        & { nodeEntries?: Maybe<Array<(
           { __typename?: 'NodeEntry' }
           & { relatedNode?: Maybe<(
             { __typename?: 'QuestionNode' }
@@ -3625,7 +3625,7 @@ export type GetDialogueStatisticsQuery = (
             { __typename?: 'NodeEntryValue' }
             & Pick<NodeEntryValue, 'sliderNodeEntry' | 'textboxNodeEntry' | 'registrationNodeEntry' | 'choiceNodeEntry' | 'linkNodeEntry'>
           )> }
-        )>>> }
+        )>> }
       )>>>, statistics?: Maybe<(
         { __typename?: 'DialogueStatistics' }
         & Pick<DialogueStatistics, 'nrInteractions'>
@@ -3690,10 +3690,10 @@ export type GetWorkspaceSessionsQuery = (
     & { sessionConnection?: Maybe<(
       { __typename?: 'SessionConnection' }
       & Pick<SessionConnection, 'totalPages'>
-      & { sessions?: Maybe<Array<Maybe<(
+      & { sessions: Array<(
         { __typename?: 'Session' }
         & SessionFragmentFragment
-      )>>>, pageInfo?: Maybe<(
+      )>, pageInfo?: Maybe<(
         { __typename?: 'PaginationPageInfo' }
         & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'nextPageOffset' | 'prevPageOffset' | 'pageIndex'>
       )> }
@@ -3739,10 +3739,10 @@ export type GetInteractionsQueryQuery = (
       )>>>, sessionConnection?: Maybe<(
         { __typename?: 'SessionConnection' }
         & Pick<SessionConnection, 'totalPages'>
-        & { sessions?: Maybe<Array<Maybe<(
+        & { sessions: Array<(
           { __typename?: 'Session' }
           & SessionFragmentFragment
-        )>>>, pageInfo?: Maybe<(
+        )>, pageInfo?: Maybe<(
           { __typename?: 'PaginationPageInfo' }
           & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'pageIndex' | 'nextPageOffset' | 'prevPageOffset'>
         )> }

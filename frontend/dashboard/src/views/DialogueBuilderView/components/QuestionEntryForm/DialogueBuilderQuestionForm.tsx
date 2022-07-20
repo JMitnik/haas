@@ -778,7 +778,7 @@ const DialogueBuilderQuestionForm = ({
                     <Button
                       variant="outline"
                       variantColor="red"
-                      leftIcon={Trash}
+                      leftIcon={() => <Trash />}
                     >
                       {t('delete')}
                     </Button>

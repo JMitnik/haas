@@ -20,7 +20,7 @@ export const WorkspaceStatistics = objectType({
     // This ID is the same as the ID of the Customer / Workspace
     t.id('id');
 
-    t.list.field('workspaceStatisticsSummary', {
+    t.nonNull.list.nonNull.field('workspaceStatisticsSummary', {
       type: DialogueStatisticsSummaryModel,
       args: {
         input: DialogueStatisticsSummaryFilterInput,

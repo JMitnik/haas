@@ -8,6 +8,6 @@ export const DeliveryConnectionModel = objectType({
 
   definition(t) {
     t.implements(ConnectionInterface);
-    t.list.field('deliveries', { type: DeliveryModel });
+    t.nonNull.list.nonNull.field('deliveries', { type: DeliveryModel });
   },
 });

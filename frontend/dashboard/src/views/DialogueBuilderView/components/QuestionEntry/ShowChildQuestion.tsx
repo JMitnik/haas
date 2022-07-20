@@ -23,7 +23,7 @@ const ShowChildQuestionComponent = ({
   return (
     <AddChildContainer isDisabled={isDisabled}>
       <Div>
-        <Button leftIcon={isExpanded ? FolderMinus : FolderPlus} onClick={() => onExpandChange()}>
+        <Button leftIcon={isExpanded ? () => <FolderMinus /> : () => <FolderPlus />} onClick={() => onExpandChange()}>
           <Span padding="4px">
             {isExpanded ? `${t('dialogue:fold_branch')} (${amtChildren})` : `${t('dialogue:expand_branch')} (${amtChildren})`}
           </Span>

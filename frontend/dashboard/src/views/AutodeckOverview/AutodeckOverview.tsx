@@ -129,7 +129,7 @@ export const AutodeckOverview = () => {
             </BackButtonContainer>
             <UI.DeprecatedViewTitle>Autodeck overview</UI.DeprecatedViewTitle>
             <UI.Button
-              leftIcon={Plus}
+              leftIcon={() => <Plus />}
               onClick={() => setIsOpenImportModal(true)}
               size="sm"
               variantColor="teal"
@@ -266,7 +266,7 @@ export const AutodeckOverview = () => {
                   {activeJob?.status !== JobStatusType.Failed
                     && (
                       <UI.Button
-                        leftIcon={Download}
+                        leftIcon={() => <Download />}
                         isDisabled={activeJob?.status !== JobStatusType.Completed || !activeJob.resourcesUrl}
                         size="sm"
                         variantColor="green"
@@ -294,7 +294,7 @@ export const AutodeckOverview = () => {
                             jobId: activeJob?.id,
                           },
                         })}
-                        leftIcon={RefreshCcw}
+                        leftIcon={() => <RefreshCcw />}
                         size="sm"
                         variantColor="red"
                       >

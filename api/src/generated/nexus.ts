@@ -536,7 +536,7 @@ export interface NexusGenInputs {
   RegisterInput: { // input type
     customerId: string; // String!
     email: string; // String!
-    firstName?: string | null; // String
+    firstName: string; // String!
     lastName: string; // String!
     password: string; // String!
     roleId?: string | null; // String
@@ -885,8 +885,8 @@ export interface NexusGenObjects {
     updatedAt?: NexusGenScalars['Date'] | null; // Date
   }
   BasicStatistics: { // root type
-    average?: number | null; // Float
-    responseCount?: number | null; // Int
+    average: number; // Float!
+    responseCount: number; // Int!
   }
   CampaignType: { // root type
     id?: string | null; // ID
@@ -938,7 +938,7 @@ export interface NexusGenObjects {
   CustomerSettings: prisma.CustomerSettings;
   DateHistogram: { // root type
     id?: string | null; // ID
-    items?: Array<NexusGenRootTypes['DateHistogramItem'] | null> | null; // [DateHistogramItem]
+    items: NexusGenRootTypes['DateHistogramItem'][]; // [DateHistogramItem!]!
   }
   DateHistogramItem: { // root type
     date?: NexusGenScalars['Date'] | null; // Date
@@ -949,7 +949,7 @@ export interface NexusGenObjects {
     deletedUser?: boolean | null; // Boolean
   }
   DeliveryConnectionType: { // root type
-    deliveries?: Array<NexusGenRootTypes['DeliveryType'] | null> | null; // [DeliveryType]
+    deliveries: NexusGenRootTypes['DeliveryType'][]; // [DeliveryType!]!
     pageInfo?: NexusGenRootTypes['PaginationPageInfo'] | null; // PaginationPageInfo
     totalPages?: number | null; // Int
   }
@@ -966,7 +966,7 @@ export interface NexusGenObjects {
     deliveryRecipientFirstName?: string | null; // String
     deliveryRecipientLastName?: string | null; // String
     deliveryRecipientPhone?: string | null; // String
-    id?: string | null; // ID
+    id: string; // ID!
     scheduledAt?: NexusGenScalars['Date'] | null; // Date
     updatedAt?: NexusGenScalars['Date'] | null; // Date
   }
@@ -1044,9 +1044,9 @@ export interface NexusGenObjects {
     id?: string | null; // String
   }
   HealthScore: { // root type
-    negativeResponseCount?: number | null; // Int
-    nrVotes?: number | null; // Int
-    score?: number | null; // Float
+    negativeResponseCount: number; // Int!
+    nrVotes: number; // Int!
+    score: number; // Float!
   }
   ImageType: { // root type
     encoding?: string | null; // String
@@ -1151,7 +1151,7 @@ export interface NexusGenObjects {
   PathedSessionsType: { // root type
     endDateTime?: string | null; // String
     path?: Array<string | null> | null; // [String]
-    pathedSessions?: Array<NexusGenRootTypes['Session'] | null> | null; // [Session]
+    pathedSessions?: NexusGenRootTypes['Session'][] | null; // [Session!]
     startDateTime?: string | null; // String
   }
   PermssionType: { // root type
@@ -1220,7 +1220,7 @@ export interface NexusGenObjects {
   Session: prisma.Session;
   SessionConnection: { // root type
     pageInfo?: NexusGenRootTypes['PaginationPageInfo'] | null; // PaginationPageInfo
-    sessions?: Array<NexusGenRootTypes['Session'] | null> | null; // [Session]
+    sessions: NexusGenRootTypes['Session'][]; // [Session!]!
     totalPages?: number | null; // Int
   }
   ShareNodeType: { // root type
@@ -1451,8 +1451,8 @@ export interface NexusGenFieldTypes {
     updatedAt: NexusGenScalars['Date'] | null; // Date
   }
   BasicStatistics: { // field return type
-    average: number | null; // Float
-    responseCount: number | null; // Int
+    average: number; // Float!
+    responseCount: number; // Int!
   }
   CampaignType: { // field return type
     deliveryConnection: NexusGenRootTypes['DeliveryConnectionType'] | null; // DeliveryConnectionType
@@ -1551,7 +1551,7 @@ export interface NexusGenFieldTypes {
   }
   DateHistogram: { // field return type
     id: string | null; // ID
-    items: Array<NexusGenRootTypes['DateHistogramItem'] | null> | null; // [DateHistogramItem]
+    items: NexusGenRootTypes['DateHistogramItem'][]; // [DateHistogramItem!]!
   }
   DateHistogramItem: { // field return type
     date: NexusGenScalars['Date'] | null; // Date
@@ -1562,7 +1562,7 @@ export interface NexusGenFieldTypes {
     deletedUser: boolean | null; // Boolean
   }
   DeliveryConnectionType: { // field return type
-    deliveries: Array<NexusGenRootTypes['DeliveryType'] | null> | null; // [DeliveryType]
+    deliveries: NexusGenRootTypes['DeliveryType'][]; // [DeliveryType!]!
     pageInfo: NexusGenRootTypes['PaginationPageInfo'] | null; // PaginationPageInfo
     totalPages: number | null; // Int
   }
@@ -1581,7 +1581,7 @@ export interface NexusGenFieldTypes {
     deliveryRecipientLastName: string | null; // String
     deliveryRecipientPhone: string | null; // String
     events: Array<NexusGenRootTypes['DeliveryEventType'] | null> | null; // [DeliveryEventType]
-    id: string | null; // ID
+    id: string; // ID!
     scheduledAt: NexusGenScalars['Date'] | null; // Date
     updatedAt: NexusGenScalars['Date'] | null; // Date
   }
@@ -1711,9 +1711,9 @@ export interface NexusGenFieldTypes {
     id: string | null; // String
   }
   HealthScore: { // field return type
-    negativeResponseCount: number | null; // Int
-    nrVotes: number | null; // Int
-    score: number | null; // Float
+    negativeResponseCount: number; // Int!
+    nrVotes: number; // Int!
+    score: number; // Float!
   }
   ImageType: { // field return type
     encoding: string | null; // String
@@ -1894,7 +1894,7 @@ export interface NexusGenFieldTypes {
   PathedSessionsType: { // field return type
     endDateTime: string | null; // String
     path: Array<string | null> | null; // [String]
-    pathedSessions: Array<NexusGenRootTypes['Session'] | null> | null; // [Session]
+    pathedSessions: NexusGenRootTypes['Session'][] | null; // [Session!]
     startDateTime: string | null; // String
   }
   PermssionType: { // field return type
@@ -2030,15 +2030,15 @@ export interface NexusGenFieldTypes {
     followUpAction: NexusGenRootTypes['FormNodeEntryType'] | null; // FormNodeEntryType
     id: string; // ID!
     mainScore: number | null; // Float
-    nodeEntries: Array<NexusGenRootTypes['NodeEntry'] | null> | null; // [NodeEntry]
+    nodeEntries: NexusGenRootTypes['NodeEntry'][] | null; // [NodeEntry!]
     originUrl: string | null; // String
     paths: number | null; // Int
-    score: number | null; // Float
+    score: number; // Float!
     totalTimeInSec: number | null; // Int
   }
   SessionConnection: { // field return type
     pageInfo: NexusGenRootTypes['PaginationPageInfo'] | null; // PaginationPageInfo
-    sessions: Array<NexusGenRootTypes['Session'] | null> | null; // [Session]
+    sessions: NexusGenRootTypes['Session'][]; // [Session!]!
     totalPages: number | null; // Int
   }
   ShareNodeType: { // field return type
@@ -2176,7 +2176,7 @@ export interface NexusGenFieldTypes {
     mostPopularPath: NexusGenRootTypes['MostPopularPath'] | null; // MostPopularPath
     mostTrendingTopic: NexusGenRootTypes['MostTrendingTopic'] | null; // MostTrendingTopic
     rankedTopics: Array<NexusGenRootTypes['TopicType'] | null> | null; // [TopicType]
-    workspaceStatisticsSummary: Array<NexusGenRootTypes['DialogueStatisticsSummaryModel'] | null> | null; // [DialogueStatisticsSummaryModel]
+    workspaceStatisticsSummary: NexusGenRootTypes['DialogueStatisticsSummaryModel'][]; // [DialogueStatisticsSummaryModel!]!
   }
   lineChartDataType: { // field return type
     entryId: string | null; // String

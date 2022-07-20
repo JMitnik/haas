@@ -9,7 +9,7 @@ export const DeliveryModel = objectType({
   name: 'DeliveryType',
   description: 'Delivery',
   definition(t) {
-    t.id('id');
+    t.nonNull.id('id');
     t.string('deliveryRecipientFirstName', { nullable: true });
     t.string('deliveryRecipientLastName', { nullable: true });
     t.string('deliveryRecipientEmail', { nullable: true });

@@ -18,6 +18,6 @@ export const DateHistogram = objectType({
   definition(t) {
     t.id('id');
 
-    t.list.field('items', { type: DateHistogramItem });
+    t.nonNull.list.nonNull.field('items', { type: DateHistogramItem });
   },
 })

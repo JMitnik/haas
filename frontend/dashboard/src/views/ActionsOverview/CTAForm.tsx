@@ -142,7 +142,7 @@ const CTAForm = ({
 }: CTAFormProps) => {
   const { activeCustomer } = useCustomer();
   const { customerSlug, dialogueSlug, questionId } = useParams<
-    { customerSlug: string, dialogueSlug: string, questionId?: string }
+  { customerSlug: string, dialogueSlug: string, questionId?: string }
   >();
 
   const form = useForm<FormDataProps>({
@@ -434,7 +434,7 @@ const CTAForm = ({
                       <Button
                         variant="outline"
                         variantColor="red"
-                        leftIcon={Trash}
+                        leftIcon={() => <Trash />}
                       >
                         {t('delete')}
                       </Button>

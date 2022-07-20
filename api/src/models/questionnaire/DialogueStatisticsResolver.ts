@@ -47,7 +47,7 @@ export const PathedSessionsType = objectType({
     t.string('endDateTime');
 
     t.list.string('path');
-    t.list.field('pathedSessions', {
+    t.list.nonNull.field('pathedSessions', {
       type: SessionType,
     });
   },

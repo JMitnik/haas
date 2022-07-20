@@ -134,7 +134,7 @@ const FormNodePreview = ({ field, onMoveRight, onMoveLeft, onOpen, fieldIndex, n
             <UI.IconButton
               size="sm"
               aria-label="Move field left"
-              icon={ArrowLeft}
+              icon={() => <ArrowLeft />}
               type="button"
               isDisabled={fieldIndex === 0}
               onClick={(event) => {
@@ -148,7 +148,7 @@ const FormNodePreview = ({ field, onMoveRight, onMoveLeft, onOpen, fieldIndex, n
             <UI.IconButton
               size="sm"
               aria-label="Move field right"
-              icon={ArrowRight}
+              icon={() => <ArrowRight />}
               type="button"
               isDisabled={fieldIndex === nrFields - 1}
               onClick={(event) => {

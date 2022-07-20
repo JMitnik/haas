@@ -226,10 +226,10 @@ enum AutomationType {
 """Basic statistics for a general statistics"""
 type BasicStatistics {
   """Average value of summarizable statistic"""
-  average: Float
+  average: Float!
 
   """Number of responses"""
-  responseCount: Int
+  responseCount: Int!
 }
 
 input CTALinkInputObjectType {
@@ -562,7 +562,7 @@ A histogram contains a list of entries sorted typically by date, along with thei
 """
 type DateHistogram {
   id: ID
-  items: [DateHistogramItem]
+  items: [DateHistogramItem!]!
 }
 
 """A histogram item contains a date"""
@@ -627,7 +627,7 @@ input DeliveryConnectionOrderByInput {
 }
 
 type DeliveryConnectionType implements ConnectionInterface {
-  deliveries: [DeliveryType]
+  deliveries: [DeliveryType!]!
   pageInfo: PaginationPageInfo
   totalPages: Int
 }
@@ -659,7 +659,7 @@ type DeliveryType {
   deliveryRecipientLastName: String
   deliveryRecipientPhone: String
   events: [DeliveryEventType]
-  id: ID
+  id: ID!
   scheduledAt: Date
   updatedAt: Date
 }
@@ -1015,9 +1015,9 @@ input HandleUserStateInWorkspaceInput {
 }
 
 type HealthScore {
-  negativeResponseCount: Int
-  nrVotes: Int
-  score: Float
+  negativeResponseCount: Int!
+  nrVotes: Int!
+  score: Float!
 }
 
 input HealthScoreInput {
@@ -1418,7 +1418,7 @@ input PathedSessionsInput {
 type PathedSessionsType {
   endDateTime: String
   path: [String]
-  pathedSessions: [Session]
+  pathedSessions: [Session!]
   startDateTime: String
 }
 
@@ -1608,7 +1608,7 @@ type RefreshAccessTokenOutput {
 input RegisterInput {
   customerId: String!
   email: String!
-  firstName: String
+  firstName: String!
   lastName: String!
   password: String!
   roleId: String
@@ -1687,10 +1687,10 @@ type Session {
   followUpAction: FormNodeEntryType
   id: ID!
   mainScore: Float
-  nodeEntries: [NodeEntry]
+  nodeEntries: [NodeEntry!]
   originUrl: String
   paths: Int
-  score: Float
+  score: Float!
   totalTimeInSec: Int
 }
 
@@ -1701,7 +1701,7 @@ enum SessionActionType {
 
 type SessionConnection implements ConnectionInterface {
   pageInfo: PaginationPageInfo
-  sessions: [Session]
+  sessions: [Session!]!
   totalPages: Int
 }
 
@@ -2176,7 +2176,7 @@ type WorkspaceStatistics {
   Topics of a workspace ranked by either impact score or number of responses
   """
   rankedTopics(input: DialogueStatisticsSummaryFilterInput): [TopicType]
-  workspaceStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel]
+  workspaceStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!]!
 }
 
 input createJobProcessLocationInput {

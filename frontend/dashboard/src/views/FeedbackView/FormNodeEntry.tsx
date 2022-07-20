@@ -113,7 +113,8 @@ export const FormNodeEntry = ({ nodeEntry }: { nodeEntry: FormNodeEntryType }) =
     <UI.CardBody>
       <UI.Grid gridTemplateColumns={['1fr', '1fr', '1fr', '1fr 1fr']}>
         {nodeEntry.values?.map((formNodeFieldEntry, index) => {
-          // eslint-disable-next-line @typescript-eslint/naming-convention
+          // eslint-disable-next-line
+          // @ts-ignore
           const { relatedField, __typename, ...entryData } = formNodeFieldEntry;
           // We can't rely on the relatedField.type because users may have changed the type whilst the value remains
           // on previous type.

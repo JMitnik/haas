@@ -1,19 +1,17 @@
-import React from 'react';
-import { QuestionNodeTypeEnum } from 'types/globalTypes';
 import { ReactComponent as ChatIcon } from 'assets/icons/icon-chat-group.svg';
-import { ReactComponent as LinkIcon } from 'assets/icons/icon-link.svg';
-import { ReactComponent as FormIcon } from 'assets/icons/icon-identification.svg';
-import { ReactComponent as RegisterIcon } from 'assets/icons/icon-pencil.svg';
 import { ReactComponent as CursorIcon } from 'assets/icons/icon-cursorclick.svg';
-import { ReactComponent as TextboxIcon  } from 'assets/icons/icon-annotation.svg';
+import { ReactComponent as FormIcon } from 'assets/icons/icon-identification.svg';
+import { ReactComponent as LinkIcon } from 'assets/icons/icon-link.svg';
+import { QuestionNodeTypeEnum } from 'types/globalTypes';
+import { ReactComponent as RegisterIcon } from 'assets/icons/icon-pencil.svg';
+import { ReactComponent as TextboxIcon } from 'assets/icons/icon-annotation.svg';
 
 export interface MapNodeToPropertiesOutput {
-  icon: React.FC<React.SVGProps<SVGSVGElement>>;
+  icon: any;
   bg: string;
   color: string;
   stroke?: string;
 }
-
 
 export const MapNodeToProperties = (type: QuestionNodeTypeEnum): MapNodeToPropertiesOutput => {
   switch (type) {
@@ -29,7 +27,7 @@ export const MapNodeToProperties = (type: QuestionNodeTypeEnum): MapNodeToProper
       return {
         icon: LinkIcon,
         bg: '#7997f8',
-        color: '#f9fbfa'
+        color: '#f9fbfa',
       };
     }
 
@@ -38,7 +36,7 @@ export const MapNodeToProperties = (type: QuestionNodeTypeEnum): MapNodeToProper
         icon: RegisterIcon,
         bg: '#dddded',
         color: 'transparent',
-        stroke: '#323546'
+        stroke: '#323546',
       };
     }
 
@@ -47,7 +45,7 @@ export const MapNodeToProperties = (type: QuestionNodeTypeEnum): MapNodeToProper
         icon: TextboxIcon,
         bg: '#dddded',
         color: 'transparent',
-        stroke: '#323546'
+        stroke: '#323546',
       };
     }
 
@@ -55,7 +53,7 @@ export const MapNodeToProperties = (type: QuestionNodeTypeEnum): MapNodeToProper
       return {
         icon: FormIcon,
         bg: '#fe3274',
-        color: '#f9fbfa'
+        color: '#f9fbfa',
       };
     }
 
@@ -63,8 +61,8 @@ export const MapNodeToProperties = (type: QuestionNodeTypeEnum): MapNodeToProper
       return {
         icon: CursorIcon,
         bg: '#e4e5ec',
-        color: '#323546'
+        color: '#323546',
       };
     }
   }
-}
+};
