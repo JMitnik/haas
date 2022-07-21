@@ -1,4 +1,4 @@
-import { GetCustomerOfUserQuery, GetCustomerOfUserQueryVariables, SystemPermission } from 'types/generated-types';
+import { GetCustomerOfUserQuery, GetCustomerOfUserQueryVariables } from 'types/generated-types';
 import { graphql } from 'msw';
 
 import { defaultAdminRole } from './MockDefaultRole';
@@ -10,38 +10,39 @@ import { defaultAdminRole } from './MockDefaultRole';
  * - User with workspace has generally all permissions a customer is expected to have (with role Admin).
  */
 export const defaultMockGetCustomerOfUserHandler = graphql.query
-  <GetCustomerOfUserQuery, GetCustomerOfUserQueryVariables>(
-    'getCustomerOfUser', (req, res, ctx) => res(ctx.data({
-      UserOfCustomer: {
-        user: {
-          id: 'ID_1',
-          privateDialogues: {
-            assignedDialogues: [],
-            privateWorkspaceDialogues: [],
-            __typename: 'AssignedDialogues',
-          },
-          __typename: 'UserType',
+<GetCustomerOfUserQuery, GetCustomerOfUserQueryVariables>(
+  'getCustomerOfUser', (req, res, ctx) => res(ctx.data({
+    UserOfCustomer: {
+      user: {
+        id: 'ID_1',
+        privateDialogues: {
+          assignedDialogues: [],
+          privateWorkspaceDialogues: [],
+          __typename: 'AssignedDialogues',
         },
-        role: defaultAdminRole,
-        customer: {
-          id: 'WORKSPACE_1',
-          name: 'Workspace 1',
-          slug: 'workspace_1',
-          campaigns: [],
-          settings: {
-            id: 'SETTINGS_1',
-            colourSettings: {
-              id: 'COLOUR_SETTINGS_1',
-              primary: '#013643',
-              __typename: 'ColourSettings',
-            },
-            logoUrl: '',
-            __typename: 'CustomerSettings',
-          },
-          __typename: 'Customer',
-        },
-        __typename: 'UserCustomer',
+        __typename: 'UserType',
       },
-      __typename: 'Query',
-    })),
-  );
+      role: defaultAdminRole,
+      customer: {
+        id: 'WORKSPACE_1',
+        isDemo: false,
+        name: 'Workspace 1',
+        slug: 'workspace_1',
+        campaigns: [],
+        settings: {
+          id: 'SETTINGS_1',
+          colourSettings: {
+            id: 'COLOUR_SETTINGS_1',
+            primary: '#013643',
+            __typename: 'ColourSettings',
+          },
+          logoUrl: '',
+          __typename: 'CustomerSettings',
+        },
+        __typename: 'Customer',
+      },
+      __typename: 'UserCustomer',
+    },
+    __typename: 'Query',
+  })),
+);

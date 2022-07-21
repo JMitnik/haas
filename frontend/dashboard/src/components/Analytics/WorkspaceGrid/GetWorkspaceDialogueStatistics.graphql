@@ -1,5 +1,13 @@
 query GetWorkspaceDialogueStatistics($workspaceId: ID!, $startDateTime: String!, $endDateTime: String!) {
   customer(id: $workspaceId) {
+    organization {
+      id
+      layers {
+        id
+        depth
+        type
+      }
+    }
     statistics {
 			workspaceStatisticsSummary(input: { startDateTime: $startDateTime, endDateTime: $endDateTime, impactType: AVERAGE, refresh: true 
 			}) {

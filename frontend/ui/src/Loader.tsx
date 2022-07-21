@@ -7,13 +7,14 @@ const LOADER_SIZE = 24;
 
 interface LoaderContainerProps {
   brand?: string;
+  size?: number;
 }
 
 const LoaderContainer = styled.div<LoaderContainerProps>`
-  ${({ theme, brand = 'off.500' }) => css`
+  ${({ theme, brand = 'off.500', size = LOADER_SIZE }) => css`
     .spinner {
-      width: ${LOADER_SIZE}px;
-      height: ${LOADER_SIZE}px;
+      width: ${size}px;
+      height: ${size}px;
       position: relative;
     }
 
@@ -56,10 +57,11 @@ const LoaderContainer = styled.div<LoaderContainerProps>`
 
 interface LoaderProps {
   brand?: string;
+  size?: number;
 }
 
-export const Loader = ({ brand = 'off.500' } : LoaderProps) => (
-  <LoaderContainer className="loader" brand={brand}>
+export const Loader = ({ brand = 'off.500', size = LOADER_SIZE }: LoaderProps) => (
+  <LoaderContainer size={size} className="loader" brand={brand}>
     <div className="spinner">
       <div className="double-bounce1"></div>
       <div className="double-bounce2"></div>

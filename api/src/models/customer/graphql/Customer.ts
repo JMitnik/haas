@@ -17,9 +17,11 @@ import { isValidDateTime } from '../../../utils/isValidDate';
 import { DialogueStatisticsSummaryFilterInput, DialogueStatisticsSummaryModel, MostTrendingTopic } from '../../questionnaire';
 import { DialogueConnection, DialogueConnectionFilterInput } from '../../questionnaire';
 import { HealthScore, HealthScoreInput } from './HealthScore';
+import { Organization } from '../../Organization/graphql/Organization';
 import { Issue, IssueFilterInput } from '../../Issue/graphql';
 import { IssueValidator } from '../../Issue/IssueValidator';
-import { SessionConnectionFilterInput, SessionConnection } from '../../../models/session/graphql';
+import { SessionConnectionFilterInput } from '../../../models/session/graphql';
+import { SessionConnection } from '../../session/graphql/Session.graphql'
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -35,6 +37,15 @@ export const CustomerType = objectType({
     t.id('id');
     t.string('slug');
     t.string('name');
+
+    t.boolean('isDemo');
+    t.field('organization', {
+      type: Organization,
+      nullable: true,
+      resolve() {
+        return {};
+      },
+    });
 
     t.field('settings', {
       type: CustomerSettingsType,
@@ -435,6 +446,7 @@ const CreateWorkspaceInput = inputObjectType({
     // Creation specific data
     t.boolean('isSeed', { default: false, required: false });
     t.boolean('willGenerateFakeData', { default: false });
+    t.boolean('isDemo', { default: false });
   },
 });
 

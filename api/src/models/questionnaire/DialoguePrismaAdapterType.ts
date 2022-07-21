@@ -1,4 +1,4 @@
-import { DialogueImpactScore, FormNodeFieldType, LanguageEnum, LinkTypeEnum, NodeType, Prisma } from '@prisma/client';
+import { DialogueImpactScore, DialogueTemplateType, FormNodeFieldType, LanguageEnum, LinkTypeEnum, NodeType, Prisma } from '@prisma/client';
 
 export interface UpsertDialogueTopicCacheInput {
   id?: string;
@@ -35,6 +35,7 @@ export interface CreateDialogueInput {
   endScreenText?: string | null;
   wasGeneratedWithGenData?: boolean;
   language?: LanguageEnum;
+  template?: DialogueTemplateType;
   postLeafText?: {
     header?: string;
     subHeader?: string;

@@ -476,6 +476,7 @@ input CreateTriggerInputType {
 
 """Creates a workspace"""
 input CreateWorkspaceInput {
+  isDemo: Boolean = false
   isSeed: Boolean = false
   logo: String
   logoOpacity: Int
@@ -521,16 +522,30 @@ type Customer {
   campaigns: [CampaignType]
   dialogue(where: DialogueWhereUniqueInput): Dialogue
   dialogueConnection(filter: DialogueConnectionFilterInput): DialogueConnection
+<<<<<<< HEAD
   dialogues(filter: DialogueFilterInputType): [Dialogue]
   id: ID
   issues(filter: IssueFilterInput): [Issue]
   name: String
   nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel] @deprecated(reason: "Deprecated, see statistics")
+=======
+  dialogues(filter: DialogueFilterInputType): [Dialogue!]
+  id: ID!
+  isDemo: Boolean!
+  issues(filter: IssueFilterInput): [Issue!]
+  name: String!
+  nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!] @deprecated(reason: "Deprecated, see statistics")
+>>>>>>> dev
   nestedHealthScore(input: HealthScoreInput): HealthScore @deprecated(reason: "Deprectaed, see statistics")
   nestedMostChanged(input: DialogueStatisticsSummaryFilterInput): MostChangedPath
   nestedMostPopular(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
   nestedMostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
+<<<<<<< HEAD
   roles: [RoleType]
+=======
+  organization: Organization
+  roles: [RoleType!]
+>>>>>>> dev
   sessionConnection(filter: SessionConnectionFilterInput): SessionConnection
   settings: CustomerSettings
   slug: String
@@ -1257,7 +1272,12 @@ type Mutation {
   massSeed(input: MassSeedInput): Customer
   register(input: RegisterInput): String
   removePixelRange(input: RemovePixelRangeInput): AWSImageType
+<<<<<<< HEAD
   requestInvite(input: RequestInviteInput): RequestInviteOutput
+=======
+  requestInvite(input: RequestInviteInput): RequestInviteOutput!
+  resetWorkspaceData(workspaceId: String): Boolean!
+>>>>>>> dev
   retryAutodeckJob(jobId: String): CreateWorkspaceJobType
   sandbox(input: SandboxInput): String
   setDialoguePrivacy(input: SetDialoguePrivacyInput): Dialogue
@@ -1336,6 +1356,30 @@ input OptionInputType {
 
 input OptionsInputType {
   options: [OptionInputType]
+}
+
+"""
+
+    An Organization defines the underlying members structure of a workspace, corresponding to an org-chart.
+  
+"""
+type Organization {
+  id: ID!
+  layers: [OrganizationLayer!]
+}
+
+"""A layer of an organization"""
+type OrganizationLayer {
+  depth: Int!
+  id: ID!
+  type: OrganizationLayerType!
+}
+
+"""Type of an organizational layer"""
+enum OrganizationLayerType {
+  DIALOGUE
+  GROUP
+  INTERACTION
 }
 
 """Information with regards to current page."""
@@ -1854,6 +1898,7 @@ enum SystemPermission {
   CAN_EDIT_USERS
   CAN_EDIT_WORKSPACE
   CAN_GENERATE_WORKSPACE_FROM_CSV
+  CAN_RESET_WORKSPACE_DATA
   CAN_UPDATE_AUTOMATIONS
   CAN_VIEW_AUTOMATIONS
   CAN_VIEW_CAMPAIGNS

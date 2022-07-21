@@ -4,6 +4,7 @@ query GetWorkspaceSummaryDetails($id: ID,
 ) {
   customer(id: $id) {
     id
+    isDemo
     statistics {
       id
       health(input: $healthInput) {

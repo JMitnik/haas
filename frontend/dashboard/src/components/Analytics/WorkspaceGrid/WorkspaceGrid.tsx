@@ -1,21 +1,30 @@
 import * as UI from '@haas/ui';
-import { AlertTriangle, MessageCircle, User } from 'react-feather';
+import { AlertTriangle, Aperture, MessageCircle, User } from 'react-feather';
 import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { Zoom } from '@visx/zoom';
 import { endOfDay, startOfDay } from 'date-fns';
 import { isPresent } from 'ts-is-present';
+
 import { useTranslation } from 'react-i18next';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import useMeasure from 'react-use-measure';
 
 import * as Modal from 'components/Common/Modal';
+import { ControlButton } from 'components/Common/Button';
 import { DateFormat, useDate } from 'hooks/useDate';
 import { DatePicker } from 'components/Common/DatePicker';
-import { DialogueImpactScoreType, useGetIssuesQuery, useGetWorkspaceSummaryDetailsQuery } from 'types/generated-types';
+import {
+  DialogueImpactScoreType,
+  useGetIssuesQuery,
+  useGetWorkspaceSummaryDetailsQuery,
+  useResetWorkspaceDataMutation,
+} from 'types/generated-types';
 import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModalCard';
 import { SimpleIssueTable } from 'components/Analytics/Issues/SimpleIssueTable';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useNavigator } from 'hooks/useNavigator';
+import { useToast } from 'hooks/useToast';
+import useAuth from 'hooks/useAuth';
 
 import * as LS from './WorkspaceGrid.styles';
 import { BreadCrumb } from './BreadCrumb';
@@ -50,13 +59,9 @@ export interface DataLoadOptions {
 
 export interface WorkspaceGridProps {
   initialData: HexagonNode[];
-  width: number;
-  height: number;
   backgroundColor: string;
   dateRange: [Date, Date];
   setDateRange: (dateRange: [Date, Date]) => void;
-  isLoading?: boolean;
-  isServerLoading?: boolean;
   initialViewMode?: HexagonViewMode;
   onLoadData?: (options: DataLoadOptions) => Promise<[HexagonNode[], HexagonViewMode]>;
 }
@@ -72,6 +77,8 @@ export const WorkspaceGrid = ({
   const { format } = useDate();
   const { goToWorkspaceFeedbackOverview } = useNavigator();
   const { activeCustomer } = useCustomer();
+  const { canResetWorkspaceData } = useAuth();
+  const toast = useToast();
   const initialRef = React.useRef<HTMLDivElement>();
   const { t } = useTranslation();
   // Local loading
@@ -324,6 +331,17 @@ export const WorkspaceGrid = ({
   // Various stats fields
   const health = summary?.health;
 
+  const [resetWorkspaceData, { loading: resetLoading }] = useResetWorkspaceDataMutation({
+    variables: {
+      workspaceId: activeCustomer?.id as string,
+    },
+    refetchQueries: ['GetWorkspaceDialogueStatistics', 'GetWorkspaceLayoutDetails', 'GetIssues'],
+    onCompleted: () => {
+      resetWorkspaceGrid();
+      toast.success({ title: 'Workspace data successfully resetted' });
+    },
+  });
+
   return (
     <LS.WorkspaceGridContainer backgroundColor={backgroundColor}>
       {isLoading && (
@@ -343,14 +361,37 @@ export const WorkspaceGrid = ({
 
             <UI.Div>
               <UI.Helper>Filters</UI.Helper>
-              <UI.Div mt={1}>
-                <DatePicker
-                  type="range"
-                  startDate={startDate}
-                  endDate={endDate}
-                  onChange={setDateRange}
-                />
-              </UI.Div>
+              <UI.Flex mt={1}>
+                <>
+                  <DatePicker
+                    type="range"
+                    startDate={startDate}
+                    endDate={endDate}
+                    onChange={setDateRange}
+                  />
+                  {data?.customer?.isDemo && canResetWorkspaceData && (
+                    <ControlButton onClick={() => resetWorkspaceData()} ml={2}>
+                      <UI.Flex alignItems="center">
+                        <UI.Div mr={1}>
+                          {resetLoading && (
+                            <UI.Loader size={18} />
+                          )}
+
+                          {!resetLoading && (
+                            <UI.Icon>
+                              <Aperture width="18px" height="auto" />
+                            </UI.Icon>
+                          )}
+                        </UI.Div>
+                        <UI.Span>
+                          {t('reset_data')}
+                        </UI.Span>
+                      </UI.Flex>
+
+                    </ControlButton>
+                  )}
+                </>
+              </UI.Flex>
             </UI.Div>
           </UI.Flex>
         </UI.Div>
