@@ -31,6 +31,10 @@ const defaultCreateDialogueInput: CreateDialogueInput = {
 }
 
 describe('DialoguePrismaAdapter', () => {
+  beforeEach(async () => {
+    await clearDialogueDatabase(prisma);
+  });
+
   afterEach(async () => {
     await clearDialogueDatabase(prisma);
     await prisma.$disconnect();
