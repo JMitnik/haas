@@ -996,6 +996,7 @@ input GenerateAutodeckInput {
 
 input GenerateWorkspaceCSVInputType {
   generateDemoData: Boolean = false
+  isDemo: Boolean! = false
   managerCsv: Upload
   type: String! = "DEFAULT"
   uploadedCsv: Upload
@@ -1351,6 +1352,11 @@ input OptionsInputType {
   options: [OptionInputType!]
 }
 
+"""
+
+    An Organization defines the underlying members structure of a workspace, corresponding to an org-chart.
+  
+"""
 type Organization {
   id: ID!
   layers: [OrganizationLayer!]
