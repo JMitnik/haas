@@ -52,6 +52,10 @@ type AutomationActionChannel {
   updatedAt: Date!
 }
 
+input AutomationActionChannelInput {
+  id: ID
+}
+
 enum AutomationActionChannelType {
   EMAIL
   SLACK
@@ -60,6 +64,7 @@ enum AutomationActionChannelType {
 
 input AutomationActionInput {
   apiKey: String
+  channels: [AutomationActionChannelInput!]
   endpoint: String
   id: ID
   payload: JSONObject

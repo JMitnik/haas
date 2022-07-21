@@ -134,14 +134,17 @@ const mapAutomation = (input: GetAutomationQuery['automation']): AutomationInput
     actions: input?.type === AutomationType.Trigger
       ? input?.automationTrigger?.actions?.map((action) => ({
         action: {
+          id: action.id,
           type: action.type,
           targets: action.payload?.targets || [],
         },
       })) || []
       : input?.automationScheduled?.actions?.map((action) => ({
         action: {
+          id: action.id,
           type: action?.type,
           targets: action.channels?.[0]?.payload?.targets || [],
+          channelId: action.channels?.[0]?.id,
         },
       })) || [],
     schedule: {

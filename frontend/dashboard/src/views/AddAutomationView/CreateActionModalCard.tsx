@@ -42,6 +42,8 @@ export interface TargetEntry {
 }
 
 export interface ActionEntry {
+  id?: string;
+  channelId?: string;
   type: AutomationActionType;
   targets?: {
     target?: TargetEntry;

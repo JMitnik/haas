@@ -1250,6 +1250,7 @@ export class AutomationPrismaAdapter {
     const { actions: inputActions, schedule } = input;
 
     const inputActionIds = inputActions.map((action) => action.id).filter(isPresent);
+    console.log('Input action IDS: ', inputActionIds);
 
     return {
       ...schedule,
@@ -1288,17 +1289,17 @@ export class AutomationPrismaAdapter {
               type: action.type,
               apiKey: action?.apiKey,
               endpoint: action?.endpoint,
-              // channels: { // FIXME: Handle this better when we support multiple channels
-              //   update: {
-              //     where: {
-              //       id: action.channels?.[0].id, // FIXME: DOESNT EXIST YET AS INPUT FROM FRONT-END
-              //     },
-              //     data: {
-              //       type: AutomationActionChannelType.EMAIL,
-              //       payload: action?.payload as Prisma.InputJsonObject || Prisma.JsonNull,
-              //     },
-              //   },
-              // },
+              channels: { // FIXME: Handle this better when we support multiple channels
+                update: {
+                  where: {
+                    id: action.channels?.[0].id,
+                  },
+                  data: {
+                    type: AutomationActionChannelType.EMAIL,
+                    payload: action?.payload as Prisma.InputJsonObject || Prisma.JsonNull,
+                  },
+                },
+              },
             },
           };
         }),

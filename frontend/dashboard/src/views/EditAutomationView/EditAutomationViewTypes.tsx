@@ -40,6 +40,8 @@ export interface ConditionInput {
 }
 
 export interface ActionInput {
+  id: string;
+  channelId?: string;
   type: AutomationActionType;
   targets: {
     label: string;

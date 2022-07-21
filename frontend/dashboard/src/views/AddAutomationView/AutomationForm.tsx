@@ -37,13 +37,17 @@ import {
   CreateAutomationInput,
   CreateAutomationMutation,
   CreateAutomationOperandInput,
+  Customer,
   Exact,
   Maybe,
   OperandType,
   QuestionAspectType,
   QuestionNodeTypeEnum,
   RecurringPeriodType,
+  RoleType,
   UpdateAutomationMutation,
+  UserType,
+  useGetUsersAndRolesQuery,
   useGetWorkspaceDialoguesQuery,
 } from 'types/generated-types';
 import { AutomationInput } from 'views/EditAutomationView/EditAutomationViewTypes';
@@ -58,15 +62,19 @@ import { useMenu } from 'components/Common/Menu/useMenu';
 import Dropdown from 'components/Dropdown';
 
 import { ActionCell } from './ActionCell';
-import { ActionEntry, CreateActionModalCard } from './CreateActionModalCard';
+import { ActionEntry, CreateActionModalCard, TargetEntry } from './CreateActionModalCard';
 import { ChildBuilderEntry } from './ChildBuilderEntry';
 import { ConditionCell } from './ConditionCell';
 import { ConditionEntry } from './CreateConditionModalCardTypes';
+import { ContactsCell } from 'views/ActionsOverview/ContactsCell';
 import { CreateConditionModalCard } from './CreateConditionModalCard';
 import { CronScheduleHeader, ModalState, ModalType, OPERATORS } from './AutomationTypes';
 import { CustomRecurringType } from './AutomationForm.types';
 import { DayPicker } from './DayPicker';
+import { TargetCell } from './TargetCell';
+import { TargetTypeEnum, UserNodePicker } from 'components/NodePicker/UserNodePicker';
 import { TimePicker, TimePickerContent } from './TimePicker';
+import { data } from 'msw/lib/types/context';
 import useCronSchedule from './useCronSchedule';
 
 const schema = yup.object({
@@ -240,7 +248,14 @@ const schema = yup.object({
   actions: yup.array().of(
     yup.object().shape({
       action: yup.object().shape({
+        channelId: yup.string(),
+        id: yup.string(),
         type: yup.mixed<AutomationActionType>().oneOf(Object.values(AutomationActionType)),
+        target: yup.object().shape({
+          label: yup.string(),
+          type: yup.string(),
+          value: yup.string(),
+        }),
         targets: yup.array().of(
           yup.object().shape({
             target: yup.object().shape({
@@ -513,6 +528,41 @@ const mapConditions = (formData: FormDataProps, workspaceId?: string) => {
   );
 };
 
+const mapToUserPickerEntries = (customer: Maybe<{
+  __typename?: 'Customer' | undefined;
+} & Pick<Customer, 'id'> & {
+  users?: Maybe<({
+    __typename?: 'UserType' | undefined;
+  } & Pick<UserType, 'id' | 'firstName' | 'lastName' | 'email' | 'phone'> & {
+    role?: Maybe<{
+      __typename?: 'RoleType' | undefined;
+    } & Pick<RoleType, 'id' | 'name'>> | undefined;
+  })[]> | undefined;
+  roles?: Maybe<({
+    __typename?: 'RoleType' | undefined;
+  } & Pick<RoleType, 'id' | 'name'>)[]> | undefined;
+}> | undefined) => {
+  const userPickerEntries: TargetEntry[] = [];
+
+  customer?.roles?.forEach((role) => {
+    userPickerEntries.push({
+      label: role.name,
+      value: role.id,
+      type: TargetTypeEnum.Role,
+    });
+  });
+
+  customer?.users?.forEach((user) => {
+    userPickerEntries.push({
+      label: `${user.firstName} ${user.lastName}`,
+      value: user.id,
+      type: TargetTypeEnum.User,
+    });
+  });
+
+  return userPickerEntries;
+};
+
 interface AutomationFormProps {
   isInEdit?: boolean;
   onCreateAutomation?: (options?: MutationFunctionOptions<CreateAutomationMutation, Exact<{
@@ -555,7 +605,7 @@ const AutomationForm = ({
         hours: automation?.schedule?.hours,
         minutes: automation?.schedule?.minutes,
         activeDialogue: automation?.schedule?.activeDialogue || null,
-        frequency: automation?.schedule?.frequency || CustomRecurringType.WEEKLY,
+        frequency: automation?.schedule?.frequency || null,
         time: automation?.schedule?.time || '0 8',
         dayRange: automation?.schedule?.dayRange || [],
       },
@@ -580,6 +630,14 @@ const AutomationForm = ({
       customerSlug: activeCustomer?.slug as string,
     },
   });
+
+  const { data: userRoleData } = useGetUsersAndRolesQuery({
+    variables: {
+      customerSlug: activeCustomer?.slug as string,
+    },
+  });
+
+  const userPickerEntries = mapToUserPickerEntries(userRoleData?.customer);
 
   const dialogueItems = dialoguesData?.customer?.dialogues?.map(
     (dialogue) => ({ id: dialogue.id, value: dialogue.slug, label: dialogue.title, type: 'DIALOGUE' }),
@@ -632,7 +690,9 @@ const AutomationForm = ({
     const activeActions = formData.actions.map((action) => {
       const actionEntry: ActionEntry = (action as any)?.action;
       return {
+        id: actionEntry.id,
         type: actionEntry.type,
+        channels: [{ id: actionEntry.channelId }],
         payload: { targets: actionEntry.targets },
       };
     });
@@ -692,6 +752,8 @@ const AutomationForm = ({
     }
   };
 
+  console.log(form.watch('actions'));
+
   return (
     <>
       <UI.FormContainer>
@@ -748,6 +810,8 @@ const AutomationForm = ({
 
                 {watchAutomationType === AutomationType.Scheduled && (
                   <>
+                    <input type="hidden" {...form.register(`actions.${0}.action.id`)} />
+                    <input type="hidden" {...form.register(`actions.${0}.action.channelId`)} />
                     <UI.FormControl>
                       <UI.FormLabel htmlFor="automationType">{t('automation:action_type')}</UI.FormLabel>
                       <InputHelper>{t('automation:action_type_helper')}</InputHelper>
@@ -1286,12 +1350,84 @@ const AutomationForm = ({
           )}
           <FormSection id="actions">
             <Div>
-              <H3 color="default.text" fontWeight={500} pb={2}>{t('automation:actions')}</H3>
+              <H3 color="default.text" fontWeight={500} pb={2}>{t('automation:recipients')}</H3>
               <Muted color="gray.600">
-                {t('automation:actions_helper')}
+                {t('automation:recipients_helper')}
               </Muted>
             </Div>
-            <UI.Flex>
+            <UI.Div
+              width="100%"
+              backgroundColor="#fbfcff"
+              border="1px solid #edf2f7"
+              borderRadius="10px"
+              padding={2}
+            >
+              <UI.Grid m={2} ml={0} gridTemplateColumns="1fr">
+                <UI.Helper>{t('automation:recipient')}</UI.Helper>
+              </UI.Grid>
+              <UI.Grid
+                pt={2}
+                pb={2}
+                pl={0}
+                pr={0}
+                borderBottom="1px solid #edf2f7"
+                gridTemplateColumns="1fr"
+              >
+                <UI.Div alignItems="center" display="flex">
+                  <Controller
+                    name={`actions.${0}.action.targets`}
+                    control={form.control}
+                    defaultValue={undefined}
+                    render={({ field: { value, onChange } }) => (
+                      <Dropdown
+                        isRelative
+                        renderOverlay={({ onClose: onDialoguePickerClose }) => (
+                          <UserNodePicker
+                            items={userPickerEntries}
+                            isMulti
+                            onClose={onDialoguePickerClose}
+                            onChange={onChange}
+                          // TODO: Add currValues={contacts} equivalent
+                          />
+                        )}
+                      >
+                        {({ onOpen }) => (
+                          <UI.Div
+                            width="100%"
+                            justifyContent="center"
+                            display="flex"
+                            alignItems="center"
+                          >
+                            {value?.length ? (
+                              <ContactsCell
+                                onRemove={() => {
+                                  onChange(null);
+                                }}
+                                onClick={onOpen}
+                                users={value as any}
+                              />
+                            ) : (
+                              <UI.Button
+                                size="sm"
+                                variant="outline"
+                                onClick={onOpen}
+                                variantColor="altGray"
+                              >
+                                <UI.Icon mr={1}>
+                                  <PlusCircle />
+                                </UI.Icon>
+                                {t('automation:add_target')}
+                              </UI.Button>
+                            )}
+                          </UI.Div>
+                        )}
+                      </Dropdown>
+                    )}
+                  />
+                </UI.Div>
+              </UI.Grid>
+            </UI.Div>
+            {/* <UI.Flex>
               <UI.Div
                 width="100%"
                 backgroundColor="#fbfcff"
@@ -1398,7 +1534,7 @@ const AutomationForm = ({
                   </UI.IllustrationCard>
                 )}
               </UI.Div>
-            </UI.Flex>
+            </UI.Flex> */}
           </FormSection>
 
           <ButtonGroup>

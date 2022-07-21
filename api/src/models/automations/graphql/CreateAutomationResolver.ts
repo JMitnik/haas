@@ -90,6 +90,14 @@ export const CreateAutomationCondition = inputObjectType({
   },
 });
 
+export const AutomationActionChannelInput = inputObjectType({
+  name: 'AutomationActionChannelInput',
+  definition(t) {
+    t.id('id', { nullable: true });
+    // TODO: Add other fields such as payload here later
+  },
+});
+
 export const AutomationActionInput = inputObjectType({
   name: 'AutomationActionInput',
   definition(t) {
@@ -98,6 +106,7 @@ export const AutomationActionInput = inputObjectType({
     t.string('apiKey');
     t.string('endpoint');
     t.json('payload');
+    t.list.field('channels', { type: AutomationActionChannelInput });
   },
 });
 
