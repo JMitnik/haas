@@ -120,7 +120,7 @@ export const FormNodeInputType = inputObjectType({
     t.string('id', { nullable: true });
     t.string('helperText', { nullable: true });
 
-    t.list.field('fields', { type: FormNodeFieldInput });
+    t.list.nonNull.field('fields', { type: FormNodeFieldInput });
   },
 });
 
@@ -130,7 +130,7 @@ export const FormNodeField = objectType({
   definition(t) {
     t.id('id');
     t.string('label');
-    t.field('type', { type: FormNodeFieldTypeEnum });
+    t.nonNull.field('type', { type: FormNodeFieldTypeEnum });
     t.boolean('isRequired');
     t.int('position');
     t.string('placeholder', {
@@ -149,7 +149,7 @@ export const FormNodeType = objectType({
     t.string('id', { nullable: true });
     t.string('helperText', { nullable: true });
 
-    t.list.field('fields', { type: FormNodeField });
+    t.list.nonNull.field('fields', { type: FormNodeField });
   },
 });
 
@@ -197,7 +197,7 @@ export const SliderNodeType = objectType({
     t.string('happyText', { nullable: true });
     t.string('unhappyText', { nullable: true });
 
-    t.list.field('markers', {
+    t.list.nonNull.field('markers', {
       type: SliderNodeMarkerType,
       nullable: true,
       resolve: (parent: any) => parent.markers || SliderNode.DEFAULT_MARKERS,
@@ -209,10 +209,10 @@ export const QuestionNodeType = objectType({
   name: 'QuestionNode',
 
   definition(t) {
-    t.id('id');
-    t.boolean('isLeaf');
+    t.nonNull.id('id');
+    t.nonNull.boolean('isLeaf');
     t.boolean('isRoot');
-    t.string('title');
+    t.nonNull.string('title');
     t.string('updatedAt');
 
     t.string('extraContent', {
@@ -363,7 +363,7 @@ export const QuestionNodeType = objectType({
       },
     });
 
-    t.list.field('links', {
+    t.nonNull.list.nonNull.field('links', {
       type: LinkType,
       async resolve(parent, args, ctx) {
         if (parent.isLeaf) {
@@ -409,7 +409,7 @@ export const QuestionNodeType = objectType({
       },
     });
 
-    t.list.field('children', {
+    t.list.nonNull.field('children', {
       type: EdgeType,
       resolve(parent, args, ctx) {
         return ctx.services.nodeService.getChildEdgesOfNode(parent.id);
@@ -512,7 +512,7 @@ export const SliderNodeInputType = inputObjectType({
 
   definition(t) {
     t.id('id', { nullable: true });
-    t.list.field('markers', { type: SliderNodeMarkerInputType });
+    t.list.nonNull.field('markers', { type: SliderNodeMarkerInputType });
   },
 });
 

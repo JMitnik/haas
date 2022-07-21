@@ -1,5 +1,5 @@
 import { inputObjectType, mutationField, objectType, queryField } from 'nexus';
-import { ApolloError, UserInputError } from 'apollo-server-express';
+import { ApolloError } from 'apollo-server-express';
 import { GraphQLYogaError } from '@graphql-yoga/node';
 
 import { UserType } from '../users/graphql/User';

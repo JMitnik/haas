@@ -39,7 +39,7 @@ const multiChoiceItemAnimation: Variants = {
 
 const MultiChoiceNode = ({ node, onRunAction }: MultiChoiceNodeProps) => {
   const handleSubmit = async (multiChoiceOption: any) => {
-    const childEdge = findChoiceChildEdge(multiChoiceOption, node.children);
+    const childEdge = findChoiceChildEdge(multiChoiceOption, node.children || []);
     const childNode = childEdge?.childNode?.id;
 
     onRunAction({
@@ -52,7 +52,7 @@ const MultiChoiceNode = ({ node, onRunAction }: MultiChoiceNodeProps) => {
       },
       reward: {
         overrideCallToActionId: multiChoiceOption.overrideLeaf?.id || node.overrideLeaf?.id,
-        toEdge: childEdge?.id,
+        toEdge: childEdge?.id || undefined,
         toNode: childNode,
       },
     });

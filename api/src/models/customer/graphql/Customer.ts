@@ -35,8 +35,8 @@ export const CustomerType = objectType({
   name: 'Customer',
   definition(t) {
     t.id('id');
-    t.string('slug');
-    t.string('name');
+    t.nonNull.string('slug');
+    t.nonNull.string('name');
 
     t.boolean('isDemo');
     t.field('organization', {

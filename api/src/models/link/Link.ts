@@ -44,10 +44,10 @@ export const CTALinksInputType = inputObjectType({
 export const LinkType = objectType({
   name: 'LinkType',
   definition(t) {
-    t.string('id');
-    t.string('url');
+    t.nonNull.string('id');
+    t.nonNull.string('url');
     t.string('questionNodeId', { nullable: true });
-    t.string('type');
+    t.nonNull.string('type');
 
     t.string('title', { nullable: true });
     t.string('iconUrl', { nullable: true });

@@ -379,7 +379,7 @@ export interface NexusGenInputs {
     type?: NexusGenEnums['FormNodeFieldTypeEnum'] | null; // FormNodeFieldTypeEnum
   }
   FormNodeInputType: { // input type
-    fields?: Array<NexusGenInputs['FormNodeFieldInput'] | null> | null; // [FormNodeFieldInput]
+    fields?: NexusGenInputs['FormNodeFieldInput'][] | null; // [FormNodeFieldInput!]
     helperText?: string | null; // String
     id?: string | null; // String
   }
@@ -627,7 +627,7 @@ export interface NexusGenInputs {
   }
   SliderNodeInputType: { // input type
     id?: string | null; // ID
-    markers?: Array<NexusGenInputs['SlideNodeMarkerInput'] | null> | null; // [SlideNodeMarkerInput]
+    markers?: NexusGenInputs['SlideNodeMarkerInput'][] | null; // [SlideNodeMarkerInput!]
   }
   SliderNodeRangeInputType: { // input type
     end?: number | null; // Float
@@ -1041,7 +1041,7 @@ export interface NexusGenObjects {
   }
   FormNodeField: prisma.FormNodeField;
   FormNodeType: { // root type
-    fields?: Array<NexusGenRootTypes['FormNodeField'] | null> | null; // [FormNodeField]
+    fields?: NexusGenRootTypes['FormNodeField'][] | null; // [FormNodeField!]
     helperText?: string | null; // String
     id?: string | null; // String
   }
@@ -1094,13 +1094,13 @@ export interface NexusGenObjects {
     buttonText?: string | null; // String
     header?: string | null; // String
     iconUrl?: string | null; // String
-    id?: string | null; // String
+    id: string; // String!
     imageUrl?: string | null; // String
     questionNodeId?: string | null; // String
     subHeader?: string | null; // String
     title?: string | null; // String
-    type?: string | null; // String
-    url?: string | null; // String
+    type: string; // String!
+    url: string; // String!
   }
   LoginOutput: { // root type
     expiryDate?: number | null; // Int
@@ -1536,7 +1536,7 @@ export interface NexusGenFieldTypes {
     id: string | null; // ID
     isDemo: boolean | null; // Boolean
     issues: Array<NexusGenRootTypes['Issue'] | null> | null; // [Issue]
-    name: string | null; // String
+    name: string; // String!
     nestedDialogueStatisticsSummary: Array<NexusGenRootTypes['DialogueStatisticsSummaryModel'] | null> | null; // [DialogueStatisticsSummaryModel]
     nestedHealthScore: NexusGenRootTypes['HealthScore'] | null; // HealthScore
     nestedMostChanged: NexusGenRootTypes['MostChangedPath'] | null; // MostChangedPath
@@ -1546,7 +1546,7 @@ export interface NexusGenFieldTypes {
     roles: Array<NexusGenRootTypes['RoleType'] | null> | null; // [RoleType]
     sessionConnection: NexusGenRootTypes['SessionConnection'] | null; // SessionConnection
     settings: NexusGenRootTypes['CustomerSettings'] | null; // CustomerSettings
-    slug: string | null; // String
+    slug: string; // String!
     statistics: NexusGenRootTypes['WorkspaceStatistics'] | null; // WorkspaceStatistics
     userCustomer: NexusGenRootTypes['UserCustomer'] | null; // UserCustomer
     users: Array<NexusGenRootTypes['UserType'] | null> | null; // [UserType]
@@ -1615,14 +1615,14 @@ export interface NexusGenFieldTypes {
     isPrivate: boolean | null; // Boolean
     isWithoutGenData: boolean | null; // Boolean
     language: NexusGenEnums['LanguageEnumType'] | null; // LanguageEnumType
-    leafs: Array<NexusGenRootTypes['QuestionNode'] | null> | null; // [QuestionNode]
+    leafs: NexusGenRootTypes['QuestionNode'][] | null; // [QuestionNode!]
     mostChangedPath: NexusGenRootTypes['MostChangedPath'] | null; // MostChangedPath
     mostPopularPath: NexusGenRootTypes['MostPopularPath'] | null; // MostPopularPath
     mostTrendingTopic: NexusGenRootTypes['MostTrendingTopic'] | null; // MostTrendingTopic
     pathedSessionsConnection: NexusGenRootTypes['PathedSessionsType'] | null; // PathedSessionsType
     postLeafNode: NexusGenRootTypes['DialogueFinisherObjectType'] | null; // DialogueFinisherObjectType
     publicTitle: string | null; // String
-    questions: Array<NexusGenRootTypes['QuestionNode'] | null> | null; // [QuestionNode]
+    questions: NexusGenRootTypes['QuestionNode'][] | null; // [QuestionNode!]
     rootQuestion: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     sessionConnection: NexusGenRootTypes['SessionConnection'] | null; // SessionConnection
     sessions: Array<NexusGenRootTypes['Session'] | null> | null; // [Session]
@@ -1672,7 +1672,7 @@ export interface NexusGenFieldTypes {
   Edge: { // field return type
     childNode: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     childNodeId: string | null; // String
-    conditions: Array<NexusGenRootTypes['EdgeCondition'] | null> | null; // [EdgeCondition]
+    conditions: NexusGenRootTypes['EdgeCondition'][] | null; // [EdgeCondition!]
     createdAt: string | null; // String
     id: string | null; // ID
     parentNode: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
@@ -1713,10 +1713,10 @@ export interface NexusGenFieldTypes {
     label: string | null; // String
     placeholder: string | null; // String
     position: number | null; // Int
-    type: NexusGenEnums['FormNodeFieldTypeEnum'] | null; // FormNodeFieldTypeEnum
+    type: NexusGenEnums['FormNodeFieldTypeEnum']; // FormNodeFieldTypeEnum!
   }
   FormNodeType: { // field return type
-    fields: Array<NexusGenRootTypes['FormNodeField'] | null> | null; // [FormNodeField]
+    fields: NexusGenRootTypes['FormNodeField'][] | null; // [FormNodeField!]
     helperText: string | null; // String
     id: string | null; // String
   }
@@ -1778,14 +1778,14 @@ export interface NexusGenFieldTypes {
     buttonText: string | null; // String
     header: string | null; // String
     iconUrl: string | null; // String
-    id: string | null; // String
+    id: string; // String!
     imageUrl: string | null; // String
     questionNode: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     questionNodeId: string | null; // String
     subHeader: string | null; // String
     title: string | null; // String
-    type: string | null; // String
-    url: string | null; // String
+    type: string; // String!
+    url: string; // String!
   }
   LoginOutput: { // field return type
     expiryDate: number | null; // Int
@@ -1976,15 +1976,15 @@ export interface NexusGenFieldTypes {
     id: string | null; // ID
   }
   QuestionNode: { // field return type
-    children: Array<NexusGenRootTypes['Edge'] | null> | null; // [Edge]
+    children: NexusGenRootTypes['Edge'][] | null; // [Edge!]
     creationDate: string | null; // String
     extraContent: string | null; // String
     form: NexusGenRootTypes['FormNodeType'] | null; // FormNodeType
-    id: string | null; // ID
+    id: string; // ID!
     indepthQuestionStatisticsSummary: Array<NexusGenRootTypes['IndepthQuestionStatisticsSummary'] | null> | null; // [IndepthQuestionStatisticsSummary]
-    isLeaf: boolean | null; // Boolean
+    isLeaf: boolean; // Boolean!
     isRoot: boolean | null; // Boolean
-    links: Array<NexusGenRootTypes['LinkType'] | null> | null; // [LinkType]
+    links: NexusGenRootTypes['LinkType'][]; // [LinkType!]!
     options: Array<NexusGenRootTypes['QuestionOption'] | null> | null; // [QuestionOption]
     overrideLeaf: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     overrideLeafId: string | null; // String
@@ -1993,7 +1993,7 @@ export interface NexusGenFieldTypes {
     questionStatisticsSummary: NexusGenRootTypes['QuestionStatisticsSummary'] | null; // QuestionStatisticsSummary
     share: NexusGenRootTypes['ShareNodeType'] | null; // ShareNodeType
     sliderNode: NexusGenRootTypes['SliderNodeType'] | null; // SliderNodeType
-    title: string | null; // String
+    title: string; // String!
     type: NexusGenEnums['QuestionNodeTypeEnum'] | null; // QuestionNodeTypeEnum
     updatedAt: string | null; // String
   }
@@ -2083,7 +2083,7 @@ export interface NexusGenFieldTypes {
   SliderNodeType: { // field return type
     happyText: string | null; // String
     id: string | null; // ID
-    markers: Array<NexusGenRootTypes['SliderNodeMarkerType'] | null> | null; // [SliderNodeMarkerType]
+    markers: NexusGenRootTypes['SliderNodeMarkerType'][] | null; // [SliderNodeMarkerType!]
     unhappyText: string | null; // String
   }
   Tag: { // field return type

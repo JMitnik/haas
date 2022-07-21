@@ -50,7 +50,7 @@ export const EdgeType = objectType({
         return childNode;
       },
     });
-    t.list.field('conditions', {
+    t.list.nonNull.field('conditions', {
       type: EdgeConditionType,
       nullable: true,
 

@@ -66,14 +66,14 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
 
   const { isValid } = formState;
 
-  const fields = node?.form?.fields;
+  const fields = node?.form?.fields || [];
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>, ignoreFields = false) => {
     event.preventDefault();
     const formEntry = getValues();
 
     const formFieldValues = formEntry.fields?.map((fieldEntry, index) => ({
-      relatedFieldId: fields?.[index].id,
+      relatedFieldId: fields?.[index]?.id,
       [fields?.[index]?.type || '']: !ignoreFields ? getFieldValue(fieldEntry, fields?.[index]) : undefined,
     }));
 
@@ -114,15 +114,15 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
           <UI.Form onSubmit={(e: React.FormEvent<HTMLFormElement>) => { handleSubmit(e); return false; }}>
             <Div>
               <UI.Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
-                {fields?.map((field, index) => (
+                {fields.map((field, index) => (
                   <UI.Div key={index} gridColumn={field.type === 'longText' ? 'span 2' : '1fr'}>
-                    <UI.FormControl isRequired={field.isRequired}>
+                    <UI.FormControl isRequired={field.isRequired || false}>
                       <UI.FormLabel htmlFor={`fields[${index}].value`}>{field.label}</UI.FormLabel>
                       {field.type === 'longText' ? (
                         <UI.Textarea
                           id={`fields[${index}].value`}
                           variant="outline"
-                          ref={register({ required: field.isRequired })}
+                          ref={register({ required: field.isRequired || false })}
                           name={`fields.${index}.value`}
                           minHeight="150px"
                           placeholder={field.placeholder || undefined}
@@ -133,7 +133,7 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                           variant="outline"
                           leftEl={mapIcon[field?.type] || <Type />}
                           type={mapFieldType[field?.type] || 'text'}
-                          ref={register({ required: field.isRequired })}
+                          ref={register({ required: field.isRequired || false })}
                           name={`fields.${index}.value`}
                           placeholder={field.placeholder || undefined}
                           maxWidth={mapFieldType[field?.type] === 'number' ? '100px' : 'auto'}

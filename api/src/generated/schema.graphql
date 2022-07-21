@@ -526,7 +526,7 @@ type Customer {
   id: ID
   isDemo: Boolean
   issues(filter: IssueFilterInput): [Issue]
-  name: String
+  name: String!
   nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel] @deprecated(reason: "Deprecated, see statistics")
   nestedHealthScore(input: HealthScoreInput): HealthScore @deprecated(reason: "Deprectaed, see statistics")
   nestedMostChanged(input: DialogueStatisticsSummaryFilterInput): MostChangedPath
@@ -536,7 +536,7 @@ type Customer {
   roles: [RoleType]
   sessionConnection(filter: SessionConnectionFilterInput): SessionConnection
   settings: CustomerSettings
-  slug: String
+  slug: String!
 
   """Workspace statistics"""
   statistics: WorkspaceStatistics
@@ -705,14 +705,14 @@ type Dialogue {
   isPrivate: Boolean
   isWithoutGenData: Boolean
   language: LanguageEnumType
-  leafs(searchTerm: String): [QuestionNode]
+  leafs(searchTerm: String): [QuestionNode!]
   mostChangedPath(input: DialogueStatisticsSummaryFilterInput): MostChangedPath
   mostPopularPath(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
   mostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
   pathedSessionsConnection(input: PathedSessionsInput): PathedSessionsType
   postLeafNode: DialogueFinisherObjectType
   publicTitle: String
-  questions: [QuestionNode]
+  questions: [QuestionNode!]
   rootQuestion: QuestionNode
   sessionConnection(filter: SessionConnectionFilterInput): SessionConnection
   sessions(take: Int): [Session]
@@ -830,7 +830,7 @@ input DialogueWhereUniqueInput {
 type Edge {
   childNode: QuestionNode
   childNodeId: String
-  conditions: [EdgeCondition]
+  conditions: [EdgeCondition!]
   createdAt: String
   id: ID
   parentNode: QuestionNode
@@ -926,7 +926,7 @@ type FormNodeField {
   label: String
   placeholder: String
   position: Int
-  type: FormNodeFieldTypeEnum
+  type: FormNodeFieldTypeEnum!
 }
 
 input FormNodeFieldInput {
@@ -949,13 +949,13 @@ enum FormNodeFieldTypeEnum {
 }
 
 input FormNodeInputType {
-  fields: [FormNodeFieldInput]
+  fields: [FormNodeFieldInput!]
   helperText: String
   id: String
 }
 
 type FormNodeType {
-  fields: [FormNodeField]
+  fields: [FormNodeField!]
   helperText: String
   id: String
 }
@@ -1146,14 +1146,14 @@ type LinkType {
   buttonText: String
   header: String
   iconUrl: String
-  id: String
+  id: String!
   imageUrl: String
   questionNode: QuestionNode
   questionNodeId: String
   subHeader: String
   title: String
-  type: String
-  url: String
+  type: String!
+  url: String!
 }
 
 enum LinkTypeEnumType {
@@ -1537,17 +1537,17 @@ enum QuestionImpactScoreType {
 }
 
 type QuestionNode {
-  children: [Edge]
+  children: [Edge!]
   creationDate: String
   extraContent: String
 
   """FormNode resolver"""
   form: FormNodeType
-  id: ID
+  id: ID!
   indepthQuestionStatisticsSummary(input: QuestionStatisticsSummaryFilterInput): [IndepthQuestionStatisticsSummary]
-  isLeaf: Boolean
+  isLeaf: Boolean!
   isRoot: Boolean
-  links: [LinkType]
+  links: [LinkType!]!
   options: [QuestionOption]
   overrideLeaf: QuestionNode
   overrideLeafId: String
@@ -1558,7 +1558,7 @@ type QuestionNode {
 
   """Slidernode resolver"""
   sliderNode: SliderNodeType
-  title: String
+  title: String!
   type: QuestionNodeTypeEnum
   updatedAt: String
 }
@@ -1823,7 +1823,7 @@ input SliderNodeEntryInput {
 
 input SliderNodeInputType {
   id: ID
-  markers: [SlideNodeMarkerInput]
+  markers: [SlideNodeMarkerInput!]
 }
 
 type SliderNodeMarkerType {
@@ -1847,7 +1847,7 @@ type SliderNodeRangeType {
 type SliderNodeType {
   happyText: String
   id: ID
-  markers: [SliderNodeMarkerType]
+  markers: [SliderNodeMarkerType!]
   unhappyText: String
 }
 

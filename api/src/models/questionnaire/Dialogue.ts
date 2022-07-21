@@ -458,7 +458,7 @@ export const DialogueType = objectType({
       },
     });
 
-    t.list.field('questions', {
+    t.list.nonNull.field('questions', {
       type: QuestionNodeType,
 
       async resolve(parent, args, ctx) {
@@ -467,7 +467,7 @@ export const DialogueType = objectType({
       },
     });
 
-    t.list.field('leafs', {
+    t.list.nonNull.field('leafs', {
       type: QuestionNodeType,
       args: {
         searchTerm: 'String',

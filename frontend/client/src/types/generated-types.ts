@@ -566,8 +566,8 @@ export type CustomFieldType = {
 export type Customer = {
   __typename?: 'Customer';
   id?: Maybe<Scalars['ID']>;
-  slug?: Maybe<Scalars['String']>;
-  name?: Maybe<Scalars['String']>;
+  slug: Scalars['String'];
+  name: Scalars['String'];
   isDemo?: Maybe<Scalars['Boolean']>;
   organization?: Maybe<Organization>;
   settings?: Maybe<CustomerSettings>;
@@ -840,8 +840,8 @@ export type Dialogue = {
   customer?: Maybe<Customer>;
   rootQuestion?: Maybe<QuestionNode>;
   edges?: Maybe<Array<Maybe<Edge>>>;
-  questions?: Maybe<Array<Maybe<QuestionNode>>>;
-  leafs?: Maybe<Array<Maybe<QuestionNode>>>;
+  questions?: Maybe<Array<QuestionNode>>;
+  leafs?: Maybe<Array<QuestionNode>>;
   campaignVariants?: Maybe<Array<CampaignVariantType>>;
 };
 
@@ -1021,7 +1021,7 @@ export type Edge = {
   childNodeId?: Maybe<Scalars['String']>;
   parentNode?: Maybe<QuestionNode>;
   childNode?: Maybe<QuestionNode>;
-  conditions?: Maybe<Array<Maybe<EdgeCondition>>>;
+  conditions?: Maybe<Array<EdgeCondition>>;
 };
 
 export type EdgeCondition = {
@@ -1115,7 +1115,7 @@ export type FormNodeField = {
   __typename?: 'FormNodeField';
   id?: Maybe<Scalars['ID']>;
   label?: Maybe<Scalars['String']>;
-  type?: Maybe<FormNodeFieldTypeEnum>;
+  type: FormNodeFieldTypeEnum;
   isRequired?: Maybe<Scalars['Boolean']>;
   position?: Maybe<Scalars['Int']>;
   placeholder?: Maybe<Scalars['String']>;
@@ -1143,14 +1143,14 @@ export enum FormNodeFieldTypeEnum {
 export type FormNodeInputType = {
   id?: Maybe<Scalars['String']>;
   helperText?: Maybe<Scalars['String']>;
-  fields?: Maybe<Array<Maybe<FormNodeFieldInput>>>;
+  fields?: Maybe<Array<FormNodeFieldInput>>;
 };
 
 export type FormNodeType = {
   __typename?: 'FormNodeType';
   id?: Maybe<Scalars['String']>;
   helperText?: Maybe<Scalars['String']>;
-  fields?: Maybe<Array<Maybe<FormNodeField>>>;
+  fields?: Maybe<Array<FormNodeField>>;
 };
 
 /** Generate savales documents */
@@ -1338,10 +1338,10 @@ export enum LanguageEnumType {
 
 export type LinkType = {
   __typename?: 'LinkType';
-  id?: Maybe<Scalars['String']>;
-  url?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
+  url: Scalars['String'];
   questionNodeId?: Maybe<Scalars['String']>;
-  type?: Maybe<Scalars['String']>;
+  type: Scalars['String'];
   title?: Maybe<Scalars['String']>;
   iconUrl?: Maybe<Scalars['String']>;
   backgroundColor?: Maybe<Scalars['String']>;
@@ -2174,10 +2174,10 @@ export enum QuestionImpactScoreType {
 
 export type QuestionNode = {
   __typename?: 'QuestionNode';
-  id?: Maybe<Scalars['ID']>;
-  isLeaf?: Maybe<Scalars['Boolean']>;
+  id: Scalars['ID'];
+  isLeaf: Scalars['Boolean'];
   isRoot?: Maybe<Scalars['Boolean']>;
-  title?: Maybe<Scalars['String']>;
+  title: Scalars['String'];
   updatedAt?: Maybe<Scalars['String']>;
   extraContent?: Maybe<Scalars['String']>;
   creationDate?: Maybe<Scalars['String']>;
@@ -2191,11 +2191,11 @@ export type QuestionNode = {
   form?: Maybe<FormNodeType>;
   share?: Maybe<ShareNodeType>;
   questionDialogueId?: Maybe<Scalars['String']>;
-  links?: Maybe<Array<Maybe<LinkType>>>;
+  links: Array<LinkType>;
   questionDialogue?: Maybe<Dialogue>;
   overrideLeaf?: Maybe<QuestionNode>;
   options?: Maybe<Array<Maybe<QuestionOption>>>;
-  children?: Maybe<Array<Maybe<Edge>>>;
+  children?: Maybe<Array<Edge>>;
 };
 
 
@@ -2477,7 +2477,7 @@ export type SliderNodeEntryInput = {
 
 export type SliderNodeInputType = {
   id?: Maybe<Scalars['ID']>;
-  markers?: Maybe<Array<Maybe<SlideNodeMarkerInput>>>;
+  markers?: Maybe<Array<SlideNodeMarkerInput>>;
 };
 
 export type SliderNodeMarkerType = {
@@ -2505,7 +2505,7 @@ export type SliderNodeType = {
   id?: Maybe<Scalars['ID']>;
   happyText?: Maybe<Scalars['String']>;
   unhappyText?: Maybe<Scalars['String']>;
-  markers?: Maybe<Array<Maybe<SliderNodeMarkerType>>>;
+  markers?: Maybe<Array<SliderNodeMarkerType>>;
 };
 
 /** Details regarding interaction with social node */
@@ -3004,19 +3004,19 @@ export type CustomerFragmentFragment = (
 export type EdgeFragmentFragment = (
   { __typename?: 'Edge' }
   & Pick<Edge, 'id'>
-  & { conditions?: Maybe<Array<Maybe<(
+  & { conditions?: Maybe<Array<(
     { __typename?: 'EdgeCondition' }
     & Pick<EdgeCondition, 'id' | 'conditionType' | 'matchValue' | 'renderMin' | 'renderMax'>
-  )>>>, parentNode?: Maybe<(
+  )>>, parentNode?: Maybe<(
     { __typename?: 'QuestionNode' }
     & Pick<QuestionNode, 'id' | 'title'>
   )>, childNode?: Maybe<(
     { __typename?: 'QuestionNode' }
     & Pick<QuestionNode, 'id' | 'title' | 'isRoot' | 'type'>
-    & { children?: Maybe<Array<Maybe<(
+    & { children?: Maybe<Array<(
       { __typename?: 'Edge' }
       & Pick<Edge, 'id'>
-    )>>> }
+    )>> }
   )> }
 );
 
@@ -3037,16 +3037,16 @@ export type GetCustomerQuery = (
       & { postLeafNode?: Maybe<(
         { __typename?: 'DialogueFinisherObjectType' }
         & Pick<DialogueFinisherObjectType, 'header' | 'subtext'>
-      )>, leafs?: Maybe<Array<Maybe<(
+      )>, leafs?: Maybe<Array<(
         { __typename?: 'QuestionNode' }
         & QuestionFragmentFragment
-      )>>>, rootQuestion?: Maybe<(
+      )>>, rootQuestion?: Maybe<(
         { __typename?: 'QuestionNode' }
         & QuestionFragmentFragment
-      )>, questions?: Maybe<Array<Maybe<(
+      )>, questions?: Maybe<Array<(
         { __typename?: 'QuestionNode' }
         & QuestionFragmentFragment
-      )>>>, edges?: Maybe<Array<Maybe<(
+      )>>, edges?: Maybe<Array<Maybe<(
         { __typename?: 'Edge' }
         & EdgeFragmentFragment
       )>>> }
@@ -3064,7 +3064,7 @@ export type GetCustomerQuery = (
 export type QuestionFragmentFragment = (
   { __typename?: 'QuestionNode' }
   & Pick<QuestionNode, 'id' | 'title' | 'isRoot' | 'isLeaf' | 'type' | 'extraContent'>
-  & { children?: Maybe<Array<Maybe<(
+  & { children?: Maybe<Array<(
     { __typename?: 'Edge' }
     & { parentNode?: Maybe<(
       { __typename?: 'QuestionNode' }
@@ -3074,7 +3074,7 @@ export type QuestionFragmentFragment = (
       & Pick<QuestionNode, 'id'>
     )> }
     & EdgeFragmentFragment
-  )>>>, overrideLeaf?: Maybe<(
+  )>>, overrideLeaf?: Maybe<(
     { __typename?: 'QuestionNode' }
     & Pick<QuestionNode, 'id' | 'title' | 'type'>
   )>, share?: Maybe<(
@@ -3083,24 +3083,24 @@ export type QuestionFragmentFragment = (
   )>, form?: Maybe<(
     { __typename?: 'FormNodeType' }
     & Pick<FormNodeType, 'id' | 'helperText'>
-    & { fields?: Maybe<Array<Maybe<(
+    & { fields?: Maybe<Array<(
       { __typename?: 'FormNodeField' }
       & Pick<FormNodeField, 'id' | 'label' | 'type' | 'placeholder' | 'isRequired' | 'position'>
-    )>>> }
-  )>, links?: Maybe<Array<Maybe<(
+    )>> }
+  )>, links: Array<(
     { __typename?: 'LinkType' }
     & Pick<LinkType, 'url' | 'type' | 'title' | 'iconUrl' | 'backgroundColor' | 'buttonText' | 'header' | 'subHeader' | 'imageUrl'>
-  )>>>, sliderNode?: Maybe<(
+  )>, sliderNode?: Maybe<(
     { __typename?: 'SliderNodeType' }
     & Pick<SliderNodeType, 'id' | 'happyText' | 'unhappyText'>
-    & { markers?: Maybe<Array<Maybe<(
+    & { markers?: Maybe<Array<(
       { __typename?: 'SliderNodeMarkerType' }
       & Pick<SliderNodeMarkerType, 'id' | 'label' | 'subLabel'>
       & { range?: Maybe<(
         { __typename?: 'SliderNodeRangeType' }
         & Pick<SliderNodeRangeType, 'id' | 'start' | 'end'>
       )> }
-    )>>> }
+    )>> }
   )>, options?: Maybe<Array<Maybe<(
     { __typename?: 'QuestionOption' }
     & Pick<QuestionOption, 'id' | 'value' | 'publicValue'>
