@@ -522,30 +522,18 @@ type Customer {
   campaigns: [CampaignType]
   dialogue(where: DialogueWhereUniqueInput): Dialogue
   dialogueConnection(filter: DialogueConnectionFilterInput): DialogueConnection
-<<<<<<< HEAD
   dialogues(filter: DialogueFilterInputType): [Dialogue]
   id: ID
+  isDemo: Boolean
   issues(filter: IssueFilterInput): [Issue]
   name: String
   nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel] @deprecated(reason: "Deprecated, see statistics")
-=======
-  dialogues(filter: DialogueFilterInputType): [Dialogue!]
-  id: ID!
-  isDemo: Boolean!
-  issues(filter: IssueFilterInput): [Issue!]
-  name: String!
-  nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!] @deprecated(reason: "Deprecated, see statistics")
->>>>>>> dev
   nestedHealthScore(input: HealthScoreInput): HealthScore @deprecated(reason: "Deprectaed, see statistics")
   nestedMostChanged(input: DialogueStatisticsSummaryFilterInput): MostChangedPath
   nestedMostPopular(input: DialogueStatisticsSummaryFilterInput): MostPopularPath
   nestedMostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
-<<<<<<< HEAD
-  roles: [RoleType]
-=======
   organization: Organization
-  roles: [RoleType!]
->>>>>>> dev
+  roles: [RoleType]
   sessionConnection(filter: SessionConnectionFilterInput): SessionConnection
   settings: CustomerSettings
   slug: String
@@ -1272,12 +1260,8 @@ type Mutation {
   massSeed(input: MassSeedInput): Customer
   register(input: RegisterInput): String
   removePixelRange(input: RemovePixelRangeInput): AWSImageType
-<<<<<<< HEAD
   requestInvite(input: RequestInviteInput): RequestInviteOutput
-=======
-  requestInvite(input: RequestInviteInput): RequestInviteOutput!
-  resetWorkspaceData(workspaceId: String): Boolean!
->>>>>>> dev
+  resetWorkspaceData(workspaceId: String): Boolean
   retryAutodeckJob(jobId: String): CreateWorkspaceJobType
   sandbox(input: SandboxInput): String
   setDialoguePrivacy(input: SetDialoguePrivacyInput): Dialogue
@@ -1364,15 +1348,15 @@ input OptionsInputType {
   
 """
 type Organization {
-  id: ID!
-  layers: [OrganizationLayer!]
+  id: ID
+  layers: [OrganizationLayer]
 }
 
 """A layer of an organization"""
 type OrganizationLayer {
-  depth: Int!
-  id: ID!
-  type: OrganizationLayerType!
+  depth: Int
+  id: ID
+  type: OrganizationLayerType
 }
 
 """Type of an organizational layer"""
