@@ -88,7 +88,7 @@
         "test-e2e:client": "yarn workspace @haas/client cypress open",
         "test-e2e-ci:client": "yarn workspace @haas/client cypress run",
         "restart:api": "yarn kill:api && yarn start:api",
-        "types": "yarn types:api && yarn types:dashboard",
+        "types": "yarn types:api && yarn types:dashboard && yarn types:client",
         "types:api": "yarn workspace @haas/api types",
         "types:client": "yarn workspace @haas/client types",
         "types:dashboard": "yarn workspace @haas/dashboard types",

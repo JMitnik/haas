@@ -36,7 +36,7 @@ const cardItemAnimation: Variants = {
   },
 };
 
-const MotionGrid = motion.custom(UI.Grid);
+const MotionGrid = motion(UI.Grid);
 
 export const WorkspaceOverview = ({ customers, isLoading }: { customers: any[]; isLoading: boolean }) => {
   const { t } = useTranslation();
