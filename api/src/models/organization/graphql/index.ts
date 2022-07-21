@@ -1,3 +1,3 @@
-export * from './Organizationblah';
-export * from './OrganizationLayerblah';
-export * from './OrganizationLayerTypeblah';
+export * from './Organization';
+export * from './OrganizationLayer';
+export * from './OrganizationLayerType';
