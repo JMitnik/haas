@@ -110,7 +110,7 @@ export const FeedbackOverview = () => {
   const { loading: isLoading } = useGetWorkspaceSessionsQuery({
     fetchPolicy: 'cache-and-network',
     variables: {
-      id: activeCustomer?.id as string,
+      workspaceId: activeCustomer?.id as string,
       filter: {
         offset: filter.pageIndex * filter.perPage,
         startDate: filter.startDate ? filter.startDate : undefined,

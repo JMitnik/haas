@@ -34,8 +34,12 @@ class ContextSessionService {
       return customer;
     };
 
-    if (vars?.customerId || vars?.input?.customerId || vars?.workspaceId || vars?.input?.workspaceId) {
-      const customerId = vars?.customerId || vars?.input?.customerId || vars?.workspaceId || vars?.input?.workspaceId;
+    if (vars?.customerId || vars?.input?.customerId || vars?.workspaceId || vars?.input?.workspaceId || vars?.id) {
+      const customerId = vars?.customerId
+        || vars?.input?.customerId
+        || vars?.workspaceId
+        || vars?.input?.workspaceId
+        || vars?.id;
       const customer = await this.customerService.findWorkspaceById(customerId);
       return customer;
     };
