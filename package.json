@@ -90,6 +90,7 @@
         "restart:api": "yarn kill:api && yarn start:api",
         "types": "yarn types:api && yarn types:dashboard",
         "types:api": "yarn workspace @haas/api types",
+        "types:client": "yarn workspace @haas/client types",
         "types:dashboard": "yarn workspace @haas/dashboard types",
         "dock:test:start-db": "(cd container/test && docker-compose up -d) && sleep 10 && (export DB_STRING=postgresql://prisma:prisma@localhost:5431/postgres?schema=public && yarn migrate)",
         "dock:test:restart-db": "yarn dock:test:end-db  && yarn dock:test:start-db ",

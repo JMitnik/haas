@@ -86,7 +86,7 @@ export const VideoEmbeddedNode = ({ node, onRunAction }: MultiChoiceNodeProps) =
                   type="button"
                   onClick={() => handleSubmit(multiChoiceOption)}
                   key={index}
-                  leftIcon={SpeechIcon}
+                  leftIcon={() => <SpeechIcon />}
                 >
                   <ButtonBody>
                     <H5>

@@ -59,17 +59,17 @@ const ShareNode = ({ node }: SocialShareNodeProps) => {
           justifyContent="center"
         >
           <UI.Div width="auto">
-            <ClientButton leftIcon={Share2} onClick={handleCopy} usePulse size="lg">
+            <ClientButton leftIcon={() => <Share2 />} onClick={handleCopy} usePulse size="lg">
               {share?.tooltip || 'Share'}
             </ClientButton>
           </UI.Div>
           {copied && (
-          <SuccesMessageContainer
-            animate={{ opacity: 1, bottom: -30 }}
-            initial={{ opacity: 0, bottom: -80 }}
-          >
-            Copied Link!
-          </SuccesMessageContainer>
+            <SuccesMessageContainer
+              animate={{ opacity: 1, bottom: -30 }}
+              initial={{ opacity: 0, bottom: -80 }}
+            >
+              Copied Link!
+            </SuccesMessageContainer>
           )}
 
         </Flex>
