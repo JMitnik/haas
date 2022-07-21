@@ -1,7 +1,7 @@
 import { objectType } from '@nexus/schema';
 import { UserInputError } from 'apollo-server-express';
 
-import { OrganizationLayer } from './OrganizationLayerblah';
+import { OrganizationLayer } from './OrganizationLayer';
 
 export const Organization = objectType({
   name: 'Organization',
