@@ -2,8 +2,8 @@ import { PrismaClient } from '@prisma/client';
 import { maxBy } from 'lodash';
 import { isPresent } from 'ts-is-present';
 
-import CustomerService from./ Organization.helpersblahService';
-import { makeLayer } from './Organization.helpers';./Organization.typesb
+import CustomerService from '../../models/customer/CustomerService';
+import { makeLayer } from './Organization.helpers';
 import { OrganizationLayer, OrganizationLayerTypeEnum } from './Organization.types';
 
 export class OrganizationService {
