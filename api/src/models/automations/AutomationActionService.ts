@@ -48,7 +48,7 @@ export class AutomationActionService {
   sendDialogueLink = async (automationScheduleId: string, workspaceSlug: string): Promise<boolean> => {
     const scheduledAutomation = await this.automationPrismaAdapter.findScheduledAutomationById(automationScheduleId);
     const sendEmailActions = scheduledAutomation?.actions.filter(
-      (action) => action.type === AutomationActionType.SEND_EMAIL
+      (action) => action.type === AutomationActionType.SEND_DIALOGUE_LINK
     ) || [];
 
     if (!sendEmailActions.length) {

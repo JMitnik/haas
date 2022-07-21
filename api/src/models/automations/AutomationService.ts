@@ -548,8 +548,9 @@ class AutomationService {
   ) => {
     switch (automationAction.type) {
       case AutomationActionType.SEND_DIALOGUE_LINK:
-        // TODO: Implement
-        return;
+        return this.automationActionService.sendDialogueLink(
+          automationAction.automationScheduledId as string, workspaceSlug
+        );
       case AutomationActionType.WEEK_REPORT:
         return this.automationActionService.generateReport(
           automationAction.id,
