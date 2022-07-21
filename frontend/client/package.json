@@ -100,7 +100,7 @@
   "scripts": {
     "start": "vite --host",
     "build": "tsc --noEmit && vite build",
-    "serve": "vite preview",
+    "serve": "vite build && vite preview",
     "dev": "cra-workspaces start",
     "start:https": "HTTPS=true SSL_CERT_FILE=secrets/server.cert SSL_KEY_FILE=server.key cra-workspaces start",
     "test": "react-scripts test",
