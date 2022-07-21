@@ -1250,7 +1250,6 @@ export class AutomationPrismaAdapter {
     const { actions: inputActions, schedule } = input;
 
     const inputActionIds = inputActions.map((action) => action.id).filter(isPresent);
-    console.log('Input action IDS: ', inputActionIds);
 
     return {
       ...schedule,

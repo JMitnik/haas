@@ -13,9 +13,7 @@ export interface GenerateReportPayload {
 export type TargetType = 'ROLE' | 'USER';
 
 export interface TargetsPayload {
-  target: {
-    type: TargetType;
-    label: string;
-    value: string;
-  };
+  type: TargetType;
+  label: string;
+  value: string;
 }

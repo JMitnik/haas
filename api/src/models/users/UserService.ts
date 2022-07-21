@@ -38,13 +38,12 @@ class UserService {
     const userIds: string[] = [];
 
     targets.forEach((target) => {
-      const tar = target?.target;
-      if (tar.type === 'ROLE') {
-        roleIds.push(tar.value);
+      if (target.type === 'ROLE') {
+        roleIds.push(target.value);
       };
 
-      if (tar.type === 'USER') {
-        userIds.push(tar.value);
+      if (target.type === 'USER') {
+        userIds.push(target.value);
       }
     });
 

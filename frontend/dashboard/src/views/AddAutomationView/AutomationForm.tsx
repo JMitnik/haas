@@ -4,10 +4,7 @@ import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import {
   Bell,
-  Check,
-  ChevronDown,
-  ChevronUp,
-  Clock, Copy, MessageSquare, MoreVertical, PlusCircle, RefreshCcw, Trash2, Type,
+  Clock, Copy, MoreVertical, PlusCircle, Trash2, Type,
 } from 'react-feather';
 import { Button, ButtonGroup } from '@chakra-ui/core';
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons';
@@ -52,29 +49,27 @@ import {
 } from 'types/generated-types';
 import { AutomationInput } from 'views/EditAutomationView/EditAutomationViewTypes';
 import { ConditionNodePicker } from 'components/NodePicker/ConditionNodePicker';
+import { ContactsCell } from 'views/ActionsOverview/ContactsCell';
 import { DateFormat, useDate } from 'hooks/useDate';
 import { DialogueNodePicker } from 'components/NodePicker/DialogueNodePicker';
 import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
 import { NodeCell } from 'components/NodeCell';
 import { Switch, SwitchThumb } from 'components/Common/Switch';
+import { TargetTypeEnum, UserNodePicker } from 'components/NodePicker/UserNodePicker';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useMenu } from 'components/Common/Menu/useMenu';
 import Dropdown from 'components/Dropdown';
 
-import { ActionCell } from './ActionCell';
 import { ActionEntry, CreateActionModalCard, TargetEntry } from './CreateActionModalCard';
 import { ChildBuilderEntry } from './ChildBuilderEntry';
 import { ConditionCell } from './ConditionCell';
 import { ConditionEntry } from './CreateConditionModalCardTypes';
-import { ContactsCell } from 'views/ActionsOverview/ContactsCell';
 import { CreateConditionModalCard } from './CreateConditionModalCard';
-import { CronScheduleHeader, ModalState, ModalType, OPERATORS } from './AutomationTypes';
 import { CustomRecurringType } from './AutomationForm.types';
 import { DayPicker } from './DayPicker';
-import { TargetCell } from './TargetCell';
-import { TargetTypeEnum, UserNodePicker } from 'components/NodePicker/UserNodePicker';
-import { TimePicker, TimePickerContent } from './TimePicker';
-import { data } from 'msw/lib/types/context';
+import { ModalState, ModalType, OPERATORS } from './AutomationTypes';
+
+import { TimePickerContent } from './TimePicker';
 import useCronSchedule from './useCronSchedule';
 
 const schema = yup.object({
@@ -251,18 +246,11 @@ const schema = yup.object({
         channelId: yup.string(),
         id: yup.string(),
         type: yup.mixed<AutomationActionType>().oneOf(Object.values(AutomationActionType)),
-        target: yup.object().shape({
-          label: yup.string(),
-          type: yup.string(),
-          value: yup.string(),
-        }),
         targets: yup.array().of(
           yup.object().shape({
-            target: yup.object().shape({
-              label: yup.string(),
-              type: yup.string(),
-              value: yup.string(),
-            }),
+            label: yup.string(),
+            type: yup.string(),
+            value: yup.string(),
           }),
         ),
       }).nullable(),
