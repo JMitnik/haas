@@ -14,7 +14,7 @@ module.exports = {
         '**/?(*.)+(spec|test).+(ts|tsx|js)',
       ],
       roots: ['<rootDir>/src'],
+      setupFilesAfterEnv: ['<rootDir>/src/test/globalSetup.ts'],
     },
-    // ...
   ],
 }

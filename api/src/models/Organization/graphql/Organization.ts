@@ -1,4 +1,4 @@
-import { objectType } from '@nexus/schema';
+import { objectType } from 'nexus';
 import { UserInputError } from 'apollo-server-express';
 
 import { OrganizationLayer } from './OrganizationLayer';

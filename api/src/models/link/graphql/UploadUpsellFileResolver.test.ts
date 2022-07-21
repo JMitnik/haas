@@ -5,7 +5,7 @@ import AuthService from '../../auth/AuthService';
 import { clearDatabase, prepDefaultData } from './testUtils';
 import { prisma } from '../../../test/setup/singletonDeps';
 
-jest.mock('../../..//utils/upload/uploadCloudinary', () => {
+jest.mock('../../Common/Upload/Cloudinary/uploadCloudinary', () => {
   return {
     __esModule: true,
     default: jest.fn(() => ({ url: 'https://cloudinary-url.mock' })),
@@ -15,18 +15,13 @@ jest.mock('../../..//utils/upload/uploadCloudinary', () => {
 
 const ctx = makeTestContext(prisma);
 
+beforeEach(async () => {
+  try {
+    await clearDatabase(prisma);
+  } catch (error) {}
+});
 
 describe('UploadUpsellFileResolver', () => {
-
-  afterEach(async () => {
-    await clearDatabase(prisma);
-    await prisma.$disconnect();
-  });
-
-  afterAll(async () => {
-    await clearDatabase(prisma);
-    await prisma.$disconnect();
-  });
 
   test('Uploads upsell file to cloudinary', async () => {
     const { user, workspace } = await prepDefaultData(prisma);
