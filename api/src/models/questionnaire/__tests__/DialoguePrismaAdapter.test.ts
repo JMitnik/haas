@@ -250,7 +250,10 @@ describe('DialoguePrismaAdapter', () => {
     const dialogueNotFoundIncorrectDialogueSlug = await dialoguePrismaAdapter.getDialogueBySlug(targetDialogueOne.customerId, '-1');
     expect(dialogueNotFoundIncorrectDialogueSlug).toBeNull();
 
-    const foundDialogue = await dialoguePrismaAdapter.getDialogueBySlug(targetDialogueOne.customerId, targetDialogueOne.slug);
+    const foundDialogue = await dialoguePrismaAdapter.getDialogueBySlug(
+      targetDialogueOne.customerId,
+      targetDialogueOne.slug
+    );
     expect(foundDialogue).not.toBeNull();
     expect(foundDialogue?.title).toBe(targetDialogueOne.title);
   });
@@ -283,7 +286,10 @@ describe('DialoguePrismaAdapter', () => {
     expect(notFoundDialogueIncorrectCustomerSlug).toBeNull();
 
     // correct customer slug, correct dialogue slug
-    const foundDialogue = await dialoguePrismaAdapter.getDialogueBySlugs(targetDialogueOne.customer.slug, targetDialogueOne.slug);
+    const foundDialogue = await dialoguePrismaAdapter.getDialogueBySlugs(
+      targetDialogueOne.customer.slug,
+      targetDialogueOne.slug
+    );
     expect(foundDialogue).not.toBeNull();
     expect(foundDialogue?.title).toBe(targetDialogueOne.title);
   });

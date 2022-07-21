@@ -43,16 +43,16 @@ it('Group generation using CSV', async () => {
       }
     }
   `,
-      {
-        input: {
-          uploadedCsv: file,
-          workspaceSlug: 'newWorkspaceSlug',
-          workspaceTitle: 'newWorkspaceTitle',
-        },
+    {
+      input: {
+        uploadedCsv: file,
+        workspaceSlug: 'newWorkspaceSlug',
+        workspaceTitle: 'newWorkspaceTitle',
       },
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
 
     expect(res).toMatchObject({

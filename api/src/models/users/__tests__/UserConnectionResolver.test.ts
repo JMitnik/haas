@@ -22,7 +22,7 @@ const ctx = makeTestContext(prisma);
  */
 const prepEnvironment = async (prisma: PrismaClient) => {
   const workspace = await seedWorkspace(prisma);
-  const dialogue = await seedDialogue(prisma, workspace.id);
+  await seedDialogue(prisma, workspace.id);
 
   return { workspace };
 }
@@ -79,14 +79,14 @@ const seedUsers = async (prisma: PrismaClient, workspace: Customer) => {
     permissions: { set: ['CAN_VIEW_USERS'] },
   }, { firstName: 'Zion', lastName: 'Zzzz', email: 'Zionzzzz@gmail.com' });
 
-  await Promise.all(range(10).map(async (i) => (
+  await Promise.all(range(10).map(async () => (
     seedUser(prisma, workspace.id, {
       name: 'Manager',
       permissions: { set: ['CAN_VIEW_DIALOGUE'] },
     })
   )));
 
-  await Promise.all(range(10).map(async (i) => (
+  await Promise.all(range(10).map(async () => (
     seedUser(prisma, workspace.id, {
       name: 'Admin',
       permissions: { set: ['CAN_VIEW_DIALOGUE', 'CAN_VIEW_USERS'] },

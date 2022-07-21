@@ -1,4 +1,3 @@
-import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { automationTriggerInput, choiceQuestionCompareDataInput, conditionInput, sliderQuestionCompareDataInput } from './testData';
 import { clearDatabase } from './testUtils';
 import AutomationService from '../AutomationService';
@@ -94,7 +93,8 @@ export const seedSession = async (
   return session;
 }
 
-export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, dialogueId: string, questionId: string, type: AutomationType) => {
+export const seedAutomation = async (
+  prisma: PrismaClient, workspaceId: string, dialogueId: string, questionId: string, type: AutomationType) => {
   return prisma.automation.create({
     data: {
       label: 'Automation',

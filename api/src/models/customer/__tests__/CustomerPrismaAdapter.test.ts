@@ -1,4 +1,3 @@
-import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { CustomerPrismaAdapter } from '../CustomerPrismaAdapter';
 import { NexusGenInputs } from '../../../generated/nexus';
 import { clearCustomerDatabase } from './testUtils';

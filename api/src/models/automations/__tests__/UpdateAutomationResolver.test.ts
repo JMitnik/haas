@@ -1,4 +1,3 @@
-import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
 import { clearDatabase, prepDefaultCreateData, prepDefaultUpdateData } from './testUtils';
 import AuthService from '../../auth/AuthService';

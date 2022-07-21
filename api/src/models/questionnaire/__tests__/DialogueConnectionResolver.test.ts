@@ -1,5 +1,4 @@
 import { clearDialogueDatabase, prepDefaultCreateData, seedDialogue, assignUserToDialogue } from './testUtils';
-import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
 import AuthService from '../../auth/AuthService';
 import { prisma } from '../../../test/setup/singletonDeps';
@@ -67,7 +66,7 @@ describe('DialogueConnection resolver', () => {
   });
 
   test('user can access dialogue-connection', async () => {
-    const { user, workspace, dialogue } = await prepDefaultCreateData(prisma);
+    const { user, workspace } = await prepDefaultCreateData(prisma);
     await seedDialogue(prisma, workspace.id, 'dialogue_two');
     await seedDialogue(prisma, workspace.id, 'dialogue_three');
     await seedDialogue(prisma, workspace.id, 'dialogue_four');
@@ -143,7 +142,7 @@ describe('DialogueConnection resolver', () => {
   });
 
   test('user can filter dialogue-connection by generic search', async () => {
-    const { user, workspace, dialogue } = await prepDefaultCreateData(prisma);
+    const { user, workspace } = await prepDefaultCreateData(prisma);
     await seedDialogue(prisma, workspace.id, 'dialogue_two', false, 'sear');
     await seedDialogue(prisma, workspace.id, 'dialogue_three', false, 'sear');
     await seedDialogue(prisma, workspace.id, 'dialogue_four', false, 'nope', 'description_test');

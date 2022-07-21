@@ -1,7 +1,6 @@
 import { createReadStream, existsSync } from 'fs';
 
 import { makeTestContext } from '../../../test/utils/makeTestContext';
-import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import AuthService from '../../auth/AuthService';
 import { clearDatabase, prepDefaultData } from './testUtils';
 import { prisma } from '../../../test/setup/singletonDeps';
@@ -45,15 +44,15 @@ describe('UploadUpsellFileResolver', () => {
       }
     }
   `,
-      {
-        input: {
-          workspaceId: workspace.id,
-          file: image,
-        },
+    {
+      input: {
+        workspaceId: workspace.id,
+        file: image,
       },
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
 
     expect(res?.uploadUpsellImage?.url).not.toBeNull();
@@ -81,15 +80,15 @@ describe('UploadUpsellFileResolver', () => {
       }
     }
   `,
-      {
-        input: {
-          workspaceId: workspace.id,
-          file: image,
-        },
+    {
+      input: {
+        workspaceId: workspace.id,
+        file: image,
       },
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     )
       .catch((reason) => expect(reason.message).toContain('Not Authorised!'));
   });
