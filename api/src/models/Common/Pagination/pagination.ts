@@ -1,5 +1,4 @@
-import prisma from '../../config/prisma';
-import { NexusGenEnums, NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
+import { NexusGenEnums, NexusGenInputs, NexusGenRootTypes } from '../../../generated/nexus';
 
 export interface FindManyProps {
   findArgs: any;
@@ -124,6 +123,7 @@ export const paginate = async <GenericModelType>({
 ) => {
   const { offset, limit, pageIndex } = paginationOpts;
   const { countCallBack, countWhereInput, ...countRest } = countArgs;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { findArgs, findManyCallBack, orderFields, searchFields, ...rest } = findManyArgs;
   // Find entries logic
   const findManyInput = constructFindManyInput({ ...findManyArgs, paginationOpts });

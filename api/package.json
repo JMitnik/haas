@@ -18,6 +18,7 @@
     "restart": "yarn kill && yarn start",
     "serve": "ts-node -P tsconfig.json ./src/app.ts",
     "test": "yarn test:integration",
+    "eslint": "eslint --ext .js,.jsx,.ts,.tsx ./src",
     "test:integration": "jest -i --logHeapUsage",
     "test:watch": "jest --watch --maxWorkers=0",
     "migrate:create": "prisma migrate dev --create-only",

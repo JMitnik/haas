@@ -7,7 +7,6 @@ module.exports = {
       },
       transformIgnorePatterns: ["/node_modules/(?!(formdata-node)/)", "/bar/"],
       testEnvironment: "node",
-      setupFilesAfterEnv: ['<rootDir>/src/test/globalSetup.ts'],
       testPathIgnorePatterns: ["<rootDir>/node_modules/"],
       moduleFileExtensions: ["ts", "js", "node"],
       testMatch: [

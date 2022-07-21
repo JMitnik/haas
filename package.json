@@ -54,7 +54,7 @@
         "deploy:aws-temp:prod": "(cd aws/stack && cdk deploy ProdCoreTemp --profile haas-prod)",
         "deploy:aws-fixed:prod": "(cd aws/stack && cdk deploy ProdCoreFixed --profile haas-prod)",
         "eslint": "yarn eslint:client",
-        "eslint:api": "yarn workspace @haas/api eslint",
+        "eslint:api": "eslint --ext .js,.jsx,.ts,.tsx ./api/src",
         "eslint:client": "yarn workspace @haas/client eslint",
         "eslint:dashboard": "yarn workspace @haas/dashboard eslint",
         "dev:prep": "yarn && yarn migrate && yarn seed:basic && yarn gen",
