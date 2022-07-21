@@ -1,4 +1,3 @@
-import { Button } from '@chakra-ui/core';
 import * as UI from '@haas/ui';
 import { FolderMinus, FolderPlus } from 'react-feather';
 import { useTranslation } from 'react-i18next';
@@ -23,7 +22,10 @@ const ShowChildQuestionComponent = ({
   return (
     <AddChildContainer isDisabled={isDisabled}>
       <UI.Div>
-        <UI.Button leftIcon={isExpanded ? () => <FolderMinus /> : () => <FolderPlus/>} onClick={() => onExpandChange()}>
+        <UI.Button
+          leftIcon={isExpanded ? () => <FolderMinus /> : () => <FolderPlus />}
+          onClick={() => onExpandChange()}
+        >
           <UI.Span padding="4px">
             {isExpanded ? `${t('dialogue:fold_branch')} (${amtChildren})` : `${t('dialogue:expand_branch')} (${amtChildren})`}
           </UI.Span>

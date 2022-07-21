@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import {
-  Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow,
+  ButtonGroup, FormErrorMessage, Popover, PopoverArrow,
   PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
 } from '@chakra-ui/core';
 import { Controller, useForm, useWatch } from 'react-hook-form';

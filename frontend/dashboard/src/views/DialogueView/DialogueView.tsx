@@ -4,7 +4,7 @@ import {
   Activity, Award, Clipboard, Download, MessageCircle,
   ThumbsDown, ThumbsUp, TrendingDown, TrendingUp,
 } from 'react-feather';
-import { Button, Tag, TagIcon, TagLabel, useClipboard } from '@chakra-ui/core';
+import { Tag, TagIcon, TagLabel, useClipboard } from '@chakra-ui/core';
 import { sub } from 'date-fns';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';

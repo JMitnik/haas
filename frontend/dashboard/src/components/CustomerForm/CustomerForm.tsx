@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import { Activity, Briefcase, Clipboard, Link, Link2, Loader, Minus, Upload } from 'react-feather';
-import { Button, ButtonGroup, RadioButtonGroup, useToast } from '@chakra-ui/core';
+import { RadioButtonGroup, useToast } from '@chakra-ui/core';
 import { Controller, UseFormMethods } from 'react-hook-form';
 import {
   Div, Form, FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper,
@@ -61,8 +61,7 @@ const CustomerUploadLogoInput = ({ onChange, value, logoOpacity, overrideColor }
 
       onChange(result.singleUpload.url);
     },
-    onError: (e) => {
-      console.log('ERROR: ', e);
+    onError: () => {
       toast({
         title: 'Something went wrong',
         description: 'We were unable to upload file. Try again',

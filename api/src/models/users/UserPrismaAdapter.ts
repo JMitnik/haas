@@ -4,7 +4,6 @@ import _, { cloneDeep, reject } from 'lodash';
 import { RegisterUserInput } from './UserPrismaAdapterType';
 import RoleService from '../role/RoleService';
 import { NexusGenInputs } from '../../generated/nexus';
-import { isPresent } from 'ts-is-present';
 
 
 class UserPrismaAdapter {
