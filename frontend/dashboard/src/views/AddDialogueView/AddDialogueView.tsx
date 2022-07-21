@@ -400,7 +400,11 @@ const AddDialogueView = () => {
                                 setTags(qOption, index);
                               }}
                             />
-                            <FormErrorMessage>{form.errors.tags?.[index]}</FormErrorMessage>
+                            <FormErrorMessage>
+                              <>
+                                {form.errors.tags?.[index]}
+                              </>
+                            </FormErrorMessage>
                           </Div>
                           <Flex justifyContent="center" alignContent="center" flexGrow={1}>
                             <UI.Button

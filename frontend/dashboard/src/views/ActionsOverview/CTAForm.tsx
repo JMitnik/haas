@@ -361,7 +361,11 @@ const CTAForm = ({
                       defaultValue={share?.title}
                       ref={form.register({ required: true })}
                     />
-                    <FormErrorMessage>{form.errors.share?.title}</FormErrorMessage>
+                    <FormErrorMessage>
+                      <>
+                        {form.errors.share?.title}
+                      </>
+                    </FormErrorMessage>
                   </FormControl>
 
                   {/* TODO: Change default value and error */}
@@ -376,7 +380,11 @@ const CTAForm = ({
                       defaultValue={share?.url}
                       ref={form.register({ required: true })}
                     />
-                    <FormErrorMessage>{form.errors.share?.url}</FormErrorMessage>
+                    <FormErrorMessage>
+                      <>
+                        {form.errors.share?.url}
+                      </>
+                    </FormErrorMessage>
                   </FormControl>
 
                   <FormControl isRequired>
@@ -389,7 +397,11 @@ const CTAForm = ({
                       defaultValue={share?.tooltip}
                       ref={form.register({ required: true })}
                     />
-                    <FormErrorMessage>{form.errors.share?.tooltip}</FormErrorMessage>
+                    <FormErrorMessage>
+                      <>
+                        {form.errors.share?.tooltip}
+                      </>
+                    </FormErrorMessage>
                   </FormControl>
                 </UI.InputGrid>
               </FormSection>

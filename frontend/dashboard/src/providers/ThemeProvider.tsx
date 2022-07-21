@@ -31,6 +31,7 @@ const makeBrandTheme = (settings: any) => {
 };
 
 export const DefaultThemeProviders = ({ children }: ThemeProvidersProps) => (
+  // @ts-ignore
   <ChakraThemeProvider theme={chakraDefaultTheme}>
     <CSSReset />
     <ThemeProvider theme={defaultTheme}>
