@@ -7,7 +7,7 @@ import request from 'request';
 import config from '../../config/config';
 import { NexusGenInputs } from '../../generated/nexus';
 import { CustomField, Prisma, PrismaClient } from '@prisma/client';
-import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
+import { FindManyCallBackProps, PaginateProps, paginate } from '../Common/Pagination/pagination';
 import CustomerService from '../customer/CustomerService';
 import JobProcessLocationPrismaAdapter from './JobProcessLocationPrismaAdapter';
 import CreateWorkspaceJobPrismaAdapter from './CreateWorkspaceJobPrismaAdapter';
@@ -36,8 +36,8 @@ class AutodeckService {
   };
 
   /**
-   * 
-   * @param input Update input containing status, resourceUrl and/or errorMessage 
+   *
+   * @param input Update input containing status, resourceUrl and/or errorMessage
    * @returns An updated CreateWorkspaceJob
    */
   update(input: { id: string; resourceUrl: string | null | undefined; status: 'PRE_PROCESSING' | 'PRE_PROCESSING_LOGO' | 'PRE_PROCESSING_WEBSITE_SCREENSHOT' | 'READY_FOR_PROCESSING' | 'IN_PHOTOSHOP_QUEUE' | 'PHOTOSHOP_PROCESSING' | 'PROCESSING' | 'WRAPPING_UP' | 'PENDING' | 'COMPLETED' | 'FAILED' | 'TRANSFORMING_PSDS_TO_PNGS' | 'STITCHING_SLIDES' | 'COMPRESSING_SALES_MATERIAL'; errorMessage: string | undefined }) {
@@ -49,7 +49,7 @@ class AutodeckService {
   };
 
   /**
-   * 
+   *
    * @param jobId The id of an Autodeck job
    * @returns An autodeck job
    */
@@ -58,7 +58,7 @@ class AutodeckService {
   };
 
   /**
-   * Find the corresponding Job location by a job ID 
+   * Find the corresponding Job location by a job ID
    * @param createWorkspaceJobId The id of an Autodeck job
    * @returns JobProcessLocation prisma entry
    */
@@ -76,7 +76,7 @@ class AutodeckService {
   };
 
   /**
-   * 
+   *
    * @returns All JobProcessLocations currently available
    */
   getJobProcessLocations = async () => {
@@ -95,7 +95,7 @@ class AutodeckService {
 
   /**
    * Finds a subset of all Autodeck jobs
-   * @param paginationOpts 
+   * @param paginationOpts
    * @returns An subset of all Autodeck jobs based on pagination input
    */
   paginatedAutodeckJobs = async (
@@ -210,7 +210,7 @@ class AutodeckService {
 
   /**
    * Updates a new Autodeck job when pre-processing is accepted, and starts the photoshop process.
-   * @param input 
+   * @param input
    * @param userId The ID of the user creating the job
    * @returns An updated autodeck job
    */
@@ -336,7 +336,7 @@ class AutodeckService {
   }
 
   /**
-   * Starts the whitify lambda 
+   * Starts the whitify lambda
    * @param whitifyImageInput An object containing:
    * - A Autodeck job id (string)
    * - A S3 bucket (string)
@@ -372,7 +372,7 @@ class AutodeckService {
 
   /**
    * Start the removePixel lambda
-   * @param removePixelRangeEventInput 
+   * @param removePixelRangeEventInput
    */
   static removePixelRange = (removePixelRangeEventInput: NexusGenInputs['RemovePixelRangeInput']) => {
 
@@ -516,10 +516,10 @@ class AutodeckService {
 
   /**
    * Uploads a file to a S3 bucket
-   * @param bucket 
-   * @param fileKey 
+   * @param bucket
+   * @param fileKey
    * @param data file as a stream
-   * @param mimeType 
+   * @param mimeType
    */
   static uploadDataToS3 = (bucket: string, fileKey: string, data: string, mimeType: string) => {
     return s3.upload({
@@ -533,8 +533,8 @@ class AutodeckService {
 
   /**
    * Uploads a file to a S3 bucket
-   * @param bucket 
-   * @param fileKey 
+   * @param bucket
+   * @param fileKey
    * @param filePath path to file
    */
   static uploadFileToS3 = (bucket: string, fileKey: string, filePath: string) => {
