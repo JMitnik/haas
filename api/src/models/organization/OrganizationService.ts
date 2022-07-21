@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { maxBy } from 'lodash';
+import { isPresent } from 'ts-is-present';
 
 import CustomerService from '../customer/CustomerService';
 import { makeLayer } from './Organization.helpers';
@@ -22,7 +23,7 @@ export class OrganizationService {
     const dialogueTitles = dialogues.map((dialogue) => dialogue.title.split('-'));
 
     // Find the dialogue with the most amount of layers
-    const deepestLayers = maxBy(dialogueTitles,  (splittedTitle) => splittedTitle.length) as string[];
+    const deepestLayers = maxBy(dialogueTitles, (splittedTitle) => splittedTitle.length) as string[];
 
     // Every organization consists at least of a dialogue and interaction layer.
     if (!deepestLayers.length) return [
@@ -30,15 +31,20 @@ export class OrganizationService {
       makeLayer(workspaceId, 1, OrganizationLayerTypeEnum.INTERACTION),
     ];
 
+    const groupLayers = [...Array(deepestLayers.length - 1)].map(
+      (_, index) => makeLayer(workspaceId, index, OrganizationLayerTypeEnum.GROUP)
+    );
+
     const layers: OrganizationLayer[] = [
       // Fill starting layers with groups
-      ...Array(deepestLayers.length - 1).map((depth) => makeLayer(workspaceId, depth, OrganizationLayerTypeEnum.GROUP)),
+      ...groupLayers,
       // Then add dialogue
       makeLayer(workspaceId, deepestLayers.length, OrganizationLayerTypeEnum.DIALOGUE),
       // Then add interaction
-      makeLayer(workspaceId, deepestLayers.length + 1, OrganizationLayerTypeEnum.GROUP),
-    ];
+      makeLayer(workspaceId, deepestLayers.length + 1, OrganizationLayerTypeEnum.INTERACTION),
+    ].filter(isPresent);
 
     return layers;
   }
 };
+

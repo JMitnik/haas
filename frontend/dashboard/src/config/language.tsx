@@ -11,6 +11,10 @@ const language = {
     },
   },
   general: {
+    reset_data: {
+      en: 'Reset data',
+      de: 'Daten zurücksetzen',
+    },
     is_topic: {
       en: 'Is a topic',
       de: 'Ist ein Thema',

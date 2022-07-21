@@ -46,7 +46,6 @@ export const WorkspaceTopNavBar = () => {
   const score = health?.score;
   const total = health?.nrVotes || 0;
   const positive = total - (health?.negativeResponseCount || 0);
-  console.log('Health: ', data?.customer?.statistics?.health);
 
   return (
     <TopSubNavBarContainer>
