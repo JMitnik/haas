@@ -18,6 +18,7 @@ const schema = yup.object({
   workspaceSlug: yup.string().required(),
   dialogueType: yup.string().required(),
   generateDemoData: yup.number().required(),
+  isDemo: yup.number().required(),
 }).required();
 
 type FormProps = yup.InferType<typeof schema>;
@@ -107,8 +108,9 @@ export const GenerateWorkspaceView = () => {
   };
 
   const handleSubmit = (formData: FormProps) => {
-    const { workspaceTitle, workspaceSlug, dialogueType, generateDemoData } = formData;
+    const { workspaceTitle, workspaceSlug, dialogueType, generateDemoData, isDemo } = formData;
     const generateDemoDataCheck = intToBool(generateDemoData);
+    const isDemoCheck = intToBool(isDemo);
 
     importWorkspaceCSV({
       variables: {
@@ -188,6 +190,33 @@ export const GenerateWorkspaceView = () => {
                   </RadioGroup.Root>
                 )}
               />
+            </UI.FormControl>
+
+            <UI.FormControl>
+              <UI.Flex alignItems="center">
+                <UI.Div>
+                  <UI.FormLabel>{t('make_demo_workspace')}</UI.FormLabel>
+                  <UI.InputHelper>{t('make_demo_workspace_helper')}</UI.InputHelper>
+                </UI.Div>
+
+                <UI.Div ml={120}>
+                  <Controller
+                    control={form.control}
+                    name="isDemo"
+                    defaultValue={0}
+                    render={({ onChange, value, onBlur }) => (
+                      <UI.Toggle
+                        size="lg"
+                        onChange={() => (value === 1 ? onChange(0) : onChange(1))}
+                        value={value}
+                        onBlur={onBlur}
+                      />
+                    )}
+                  />
+                </UI.Div>
+
+              </UI.Flex>
+
             </UI.FormControl>
 
             <UI.FormControl>
