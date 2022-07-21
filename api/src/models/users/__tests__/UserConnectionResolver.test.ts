@@ -1,19 +1,17 @@
 import { Customer, PrismaClient } from '@prisma/client';
 
 import { clearDatabase } from './testUtils';
-import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
 import { expectUnauthorizedErrorOnResolver } from '../../../test/utils/expects';
 import { seedDialogue, seedUser, seedWorkspace } from '../../../test/utils/seedTestData';
 import AuthService from '../../auth/AuthService';
 import { range } from 'lodash';
-import { name, random } from 'faker';
 import { ApolloError } from 'apollo-server-express';
+import { prisma } from '../../../test/setup/singletonDeps';
 
 
 jest.setTimeout(30000);
 
-import { prisma } from 'test/setup/singletonDeps';
 const ctx = makeTestContext(prisma);
 
 

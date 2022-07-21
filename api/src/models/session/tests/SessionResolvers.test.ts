@@ -2,14 +2,13 @@ import { PrismaClient } from '@prisma/client';
 import { ApolloError } from 'apollo-server';
 
 import { clearDatabase } from './testUtils';
-import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
 import { seedDialogue, seedSessions, seedUser, seedWorkspace } from '../../../test/utils/seedTestData';
 import AuthService from '../../auth/AuthService';
 import { expectUnauthorizedErrorOnResolver } from '../../../test/utils/expects';
 import { defaultAdminRole, defaultManagerRole, defaultUserRole } from '../../templates/TemplateTypes';
+import { prisma } from '../../../test/setup/singletonDeps';
 
-import { prisma } from 'test/setup/singletonDeps';
 const ctx = makeTestContext(prisma);
 
 

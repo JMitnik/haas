@@ -5,7 +5,7 @@ import { clearCustomerDatabase } from './testUtils';
 import { UpdateCustomerInput } from '../CustomerServiceType';
 import defaultWorkspaceTemplate from '../../templates/defaultWorkspaceTemplate';
 
-import { prisma } from 'test/setup/singletonDeps';
+import { prisma } from '../../../test/setup/singletonDeps';
 
 const customerPrismaAdapter = new CustomerPrismaAdapter(prisma);
 

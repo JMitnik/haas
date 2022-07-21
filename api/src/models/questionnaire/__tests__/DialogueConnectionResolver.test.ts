@@ -2,10 +2,10 @@ import { clearDialogueDatabase, prepDefaultCreateData, seedDialogue, assignUserT
 import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
 import AuthService from '../../auth/AuthService';
+import { prisma } from '../../../test/setup/singletonDeps';
 
 jest.setTimeout(30000);
 
-import { prisma } from 'test/setup/singletonDeps';
 const ctx = makeTestContext(prisma);
 
 
@@ -30,7 +30,7 @@ query dialogueConnection($customerSlug: String, $filter: DialogueConnectionFilte
       }
     }
   }
-} 
+}
 `;
 
 describe('DialogueConnection resolver', () => {
@@ -108,7 +108,7 @@ describe('DialogueConnection resolver', () => {
     }, { 'Authorization': `Bearer ${token}` });
 
     // Although 3 dialogues created, only 2 should show up and therefore there is
-    // only 1 page available dialogue connection 
+    // only 1 page available dialogue connection
     expect(res.customer.dialogueConnection.totalPages).toBe(1);
     expect(res.customer.dialogueConnection.pageInfo.hasPrevPage).toBe(false);
     expect(res.customer.dialogueConnection.pageInfo.hasNextPage).toBe(false);
@@ -126,7 +126,7 @@ describe('DialogueConnection resolver', () => {
     }, { 'Authorization': `Bearer ${token}` });
 
     // Although 3 dialogues created, only 2 should show up and therefore there is
-    // only 1 page available dialogue connection 
+    // only 1 page available dialogue connection
     expect(res.customer.dialogueConnection.totalPages).toBe(1);
 
     await assignUserToDialogue(prisma, privateDialogue.id, user.id);
@@ -136,7 +136,7 @@ describe('DialogueConnection resolver', () => {
       filter: { offset: 0, perPage: 2 },
     }, { 'Authorization': `Bearer ${token}` });
 
-    // Now that user is assigned to private dialogue it should appear in connection 
+    // Now that user is assigned to private dialogue it should appear in connection
     // and therefor there will be 2 pages now
     expect(resWithPrivate.customer.dialogueConnection.totalPages).toBe(2);
 

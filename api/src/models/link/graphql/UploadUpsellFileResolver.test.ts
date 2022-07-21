@@ -4,6 +4,7 @@ import { makeTestContext } from '../../../test/utils/makeTestContext';
 import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import AuthService from '../../auth/AuthService';
 import { clearDatabase, prepDefaultData } from './testUtils';
+import { prisma } from '../../../test/setup/singletonDeps';
 
 jest.mock('../../..//utils/upload/uploadCloudinary', () => {
   return {
@@ -13,7 +14,6 @@ jest.mock('../../..//utils/upload/uploadCloudinary', () => {
   }
 });
 
-import { prisma } from 'test/setup/singletonDeps';
 const ctx = makeTestContext(prisma);
 
 

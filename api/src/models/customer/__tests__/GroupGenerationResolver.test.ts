@@ -1,13 +1,12 @@
 import { createReadStream } from 'fs';
 
-import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
 import { clearDatabase, prepDefaultCreateData } from './testUtils';
 import AuthService from '../../auth/AuthService';
+import { prisma } from '../../../test/setup/singletonDeps';
 
 jest.setTimeout(30000);
 
-import { prisma } from 'test/setup/singletonDeps';
 const ctx = makeTestContext(prisma);
 
 

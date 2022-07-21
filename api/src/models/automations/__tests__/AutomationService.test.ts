@@ -7,7 +7,7 @@ import { AutomationConditionBuilderType, AutomationConditionOperatorType, Automa
 import { sample } from 'lodash';
 import { cloneDeep } from 'lodash';
 
-import { prisma } from 'test/setup/singletonDeps';
+import { prisma } from '../../../test/setup/singletonDeps';
 
 const automationService = new AutomationService(prisma);
 

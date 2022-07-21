@@ -3,7 +3,7 @@ import { makeTestContext } from '../../../test/utils/makeTestContext';
 import AuthService from '../../auth/AuthService';
 import { prepDefaultCreateData, seedSession } from './testUtils';
 
-import { prisma } from 'test/setup/singletonDeps';
+import { prisma } from '../../../test/setup/singletonDeps';
 const ctx = makeTestContext(prisma);
 
 
@@ -122,14 +122,14 @@ describe('Dialogue Pathed Sessions', () => {
             }
           }
         }
-      }  
+      }
     }
     `,
-      undefined
-      ,
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    undefined
+    ,
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     ).then((data) => data?.customer?.dialogue.pathedSessionsConnection.pathedSessions);
 
     // All with Facilities within date range
@@ -157,17 +157,17 @@ describe('Dialogue Pathed Sessions', () => {
             }
           }
         }
-      }  
+      }
     }
     `,
-      undefined
-      ,
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    undefined
+    ,
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     ).then((data) => data?.customer?.dialogue.pathedSessionsConnection.pathedSessions);
 
-    // All with Facilities & Atmosphere 
+    // All with Facilities & Atmosphere
     expect(resSubWeekly).toHaveLength(2);
 
     const resNotFoundWeekly = await ctx.client.request(`
@@ -192,14 +192,14 @@ describe('Dialogue Pathed Sessions', () => {
             }
           }
         }
-      }  
+      }
     }
     `,
-      undefined
-      ,
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    undefined
+    ,
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     ).then((data) => data?.customer?.dialogue.pathedSessionsConnection.pathedSessions);
 
     // All with Facilities & Atmosphere & NOT_FOUND

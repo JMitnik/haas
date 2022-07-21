@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 import { makeRestServer } from '../../../test/utils/makeRestServer';
+import { prisma } from '../../../test/setup/singletonDeps';
 
-import { prisma } from 'test/setup/singletonDeps';
 const server = makeRestServer(prisma);
 
 

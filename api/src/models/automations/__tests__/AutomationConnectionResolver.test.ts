@@ -2,13 +2,12 @@ import { Customer, Dialogue, PrismaClient } from '@prisma/client';
 import { range } from 'lodash';
 
 import { clearDatabase, prepDefaultCreateData, seedAutomation } from './testUtils';
-import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
+import { prisma } from '../../../test/setup/singletonDeps';
 import AuthService from '../../auth/AuthService';
 
 jest.setTimeout(30000);
 
-import { prisma } from 'test/setup/singletonDeps';
 const ctx = makeTestContext(prisma);
 
 

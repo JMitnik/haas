@@ -1,11 +1,10 @@
-import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import DialoguePrismaAdapter from '../DialoguePrismaAdapter';
 import { clearDialogueDatabase } from './testUtils';
 import { Prisma } from '@prisma/client';
 import cuid from 'cuid';
 import { CreateDialogueInput } from '../DialoguePrismaAdapterType';
+import { prisma } from '../../../test/setup/singletonDeps';
 
-import { prisma } from 'test/setup/singletonDeps';
 const dialoguePrismaAdapter = new DialoguePrismaAdapter(prisma);
 
 const defaultDialogueCreateInput: Prisma.DialogueCreateInput = {
