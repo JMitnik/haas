@@ -103,7 +103,8 @@
     "test:cypress": "(DEBUG=cypress:* && cypress open)",
     "eject": "react-scripts eject",
     "gen": "graphql-codegen",
-    "eslint": "eslint --ext .js,.jsx,.ts,.tsx ./src"
+    "eslint": "eslint --ext .js,.jsx,.ts,.tsx ./src",
+    "types": "tsc --noEmit"
   },
   "browserslist": {
     "production": [
