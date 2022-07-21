@@ -1593,7 +1593,7 @@ export interface NexusGenFieldTypes {
   Dialogue: { // field return type
     assignees: Array<NexusGenRootTypes['UserType'] | null> | null; // [UserType]
     averageScore: number | null; // Float
-    campaignVariants: Array<NexusGenRootTypes['CampaignVariantType'] | null> | null; // [CampaignVariantType]
+    campaignVariants: NexusGenRootTypes['CampaignVariantType'][] | null; // [CampaignVariantType!]
     creationDate: string | null; // String
     customer: NexusGenRootTypes['Customer'] | null; // Customer
     customerId: string | null; // String

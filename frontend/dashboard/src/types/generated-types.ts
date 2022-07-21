@@ -839,7 +839,7 @@ export type Dialogue = {
   edges?: Maybe<Array<Maybe<Edge>>>;
   questions?: Maybe<Array<Maybe<QuestionNode>>>;
   leafs?: Maybe<Array<Maybe<QuestionNode>>>;
-  campaignVariants?: Maybe<Array<Maybe<CampaignVariantType>>>;
+  campaignVariants?: Maybe<Array<CampaignVariantType>>;
 };
 
 
@@ -3729,14 +3729,14 @@ export type GetInteractionsQueryQuery = (
     & { dialogue?: Maybe<(
       { __typename?: 'Dialogue' }
       & Pick<Dialogue, 'id'>
-      & { campaignVariants?: Maybe<Array<Maybe<(
+      & { campaignVariants?: Maybe<Array<(
         { __typename?: 'CampaignVariantType' }
         & Pick<CampaignVariantType, 'id' | 'label'>
         & { campaign?: Maybe<(
           { __typename?: 'CampaignType' }
           & Pick<CampaignType, 'id' | 'label'>
         )> }
-      )>>>, sessionConnection?: Maybe<(
+      )>>, sessionConnection?: Maybe<(
         { __typename?: 'SessionConnection' }
         & Pick<SessionConnection, 'totalPages'>
         & { sessions: Array<(

@@ -690,7 +690,7 @@ input DeselectTopicInput {
 type Dialogue {
   assignees: [UserType]
   averageScore(input: DialogueFilterInputType): Float
-  campaignVariants: [CampaignVariantType]
+  campaignVariants: [CampaignVariantType!]
   creationDate: String
   customer: Customer
   customerId: String

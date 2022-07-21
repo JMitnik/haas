@@ -477,7 +477,7 @@ export const DialogueType = objectType({
       },
     });
 
-    t.list.field('campaignVariants', {
+    t.list.nonNull.field('campaignVariants', {
       type: 'CampaignVariantType',
       // @ts-ignore
       resolve: (parent, args, ctx) => {
