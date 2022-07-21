@@ -221,7 +221,7 @@ class GenerateWorkspaceService {
       primaryColour: '',
       logo: '',
       slug: workspaceSlug,
-      isDemo: input.generateDemoData,
+      isDemo: isDemo,
     }, template);
 
     try {

@@ -1196,6 +1196,7 @@ export type GenerateWorkspaceCsvInputType = {
   managerCsv?: Maybe<Scalars['Upload']>;
   type?: Scalars['String'];
   generateDemoData?: Maybe<Scalars['Boolean']>;
+  isDemo?: Scalars['Boolean'];
 };
 
 export type GetAutomationInput = {

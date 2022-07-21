@@ -85,6 +85,12 @@ export const GenerateWorkspaceView = () => {
     defaultValue: 0,
   });
 
+  const isDemoWatch = useWatch({
+    control: form.control,
+    name: 'isDemo',
+    defaultValue: 0,
+  });
+
   const handleManagerCancel = () => {
     setActiveManagerCSV(null);
   };
@@ -121,6 +127,7 @@ export const GenerateWorkspaceView = () => {
           managerCsv: activeManagerCSV,
           type: dialogueType as DialogueTemplateType,
           generateDemoData: generateDemoDataCheck,
+          isDemo: isDemoCheck,
         },
       },
     });
@@ -207,7 +214,12 @@ export const GenerateWorkspaceView = () => {
                     render={({ onChange, value, onBlur }) => (
                       <UI.Toggle
                         size="lg"
-                        onChange={() => (value === 1 ? onChange(0) : onChange(1))}
+                        onChange={() => {
+                          if (value === 1) {
+                            form.setValue('generateDemoData', 0);
+                          }
+                          return (value === 1 ? onChange(0) : onChange(1));
+                        }}
                         value={value}
                         onBlur={onBlur}
                       />
@@ -233,6 +245,8 @@ export const GenerateWorkspaceView = () => {
                     defaultValue={0}
                     render={({ onChange, value, onBlur }) => (
                       <UI.Toggle
+                        isDisabled={isDemoWatch !== 1}
+                        isChecked={value === 1}
                         size="lg"
                         onChange={() => (value === 1 ? onChange(0) : onChange(1))}
                         value={value}

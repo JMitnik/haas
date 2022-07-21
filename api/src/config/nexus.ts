@@ -7,7 +7,7 @@ import * as InteractionAPI from '../models/session/graphql';
 import * as NodeEntryAPI from '../models/node-entry/NodeEntry';
 import * as PaginationAPI from '../models/general/Pagination';
 import * as SandboxAPI from '../models/Common/Sandbox/graphql/SandboxMutation.graphql';
-import * as OrganizationAPI from '../models/Organization/graphql';
+import * as OrganizationAPI from '../models/organization/graphql';
 import * as QuestionNodeAPI from '../models/QuestionNode';
 import * as DateAPI from '../models/Common/Date/graphql';
 import * as IssueAPI from '../models/Issue/graphql';
