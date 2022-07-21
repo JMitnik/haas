@@ -213,7 +213,7 @@ class GenerateWorkspaceService {
    * @returns the created workspace
    */
   async generateWorkspaceFromCSV(input: GenerateWorkspaceCSVInput, userId?: string) {
-    const { uploadedCsv, workspaceSlug, workspaceTitle, type, managerCsv } = input;
+    const { uploadedCsv, workspaceSlug, workspaceTitle, type, managerCsv, isDemo } = input;
 
     const template = this.getTemplate(type);
     const workspace = await this.customerPrismaAdapter.createWorkspace({
@@ -221,7 +221,7 @@ class GenerateWorkspaceService {
       primaryColour: '',
       logo: '',
       slug: workspaceSlug,
-      isDemo: input.generateDemoData,
+      isDemo: isDemo,
     }, template);
 
     try {
