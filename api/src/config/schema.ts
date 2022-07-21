@@ -19,7 +19,6 @@ const schema = makeSchema({
     TimeResolverPlugin,
     QueryCounterPlugin,
   ],
-
   sourceTypes: {
     modules: [
       {

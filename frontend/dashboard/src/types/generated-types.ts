@@ -565,17 +565,11 @@ export type CustomFieldType = {
 
 export type Customer = {
   __typename?: 'Customer';
-<<<<<<< HEAD
   id?: Maybe<Scalars['ID']>;
   slug?: Maybe<Scalars['String']>;
   name?: Maybe<Scalars['String']>;
-=======
-  id: Scalars['ID'];
-  slug: Scalars['String'];
-  name: Scalars['String'];
-  isDemo: Scalars['Boolean'];
+  isDemo?: Maybe<Scalars['Boolean']>;
   organization?: Maybe<Organization>;
->>>>>>> dev
   settings?: Maybe<CustomerSettings>;
   sessionConnection?: Maybe<SessionConnection>;
   /** Workspace statistics */
@@ -1412,16 +1406,10 @@ export type MostTrendingTopic = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-<<<<<<< HEAD
   sandbox?: Maybe<Scalars['String']>;
   generateWorkspaceFromCSV?: Maybe<Customer>;
+  resetWorkspaceData?: Maybe<Scalars['Boolean']>;
   createJobProcessLocation?: Maybe<JobProcessLocation>;
-=======
-  sandbox: Scalars['String'];
-  generateWorkspaceFromCSV?: Maybe<Customer>;
-  resetWorkspaceData: Scalars['Boolean'];
-  createJobProcessLocation: JobProcessLocation;
->>>>>>> dev
   generateAutodeck?: Maybe<CreateWorkspaceJobType>;
   retryAutodeckJob?: Maybe<CreateWorkspaceJobType>;
   confirmCreateWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
@@ -1429,15 +1417,9 @@ export type Mutation = {
   removePixelRange?: Maybe<AwsImageType>;
   uploadJobImage?: Maybe<AwsImageType>;
   updateCreateWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
-<<<<<<< HEAD
   assignTags?: Maybe<Dialogue>;
   createTag?: Maybe<Tag>;
   deleteTag?: Maybe<Tag>;
-=======
-  assignTags: Dialogue;
-  createTag: Tag;
-  deleteTag: Tag;
->>>>>>> dev
   /** Deselcting a topic implies that all question-options related to the topic string are disregarded as topic. */
   deselectTopic?: Maybe<Scalars['Boolean']>;
   /** Creates a new automation. */
@@ -1451,19 +1433,11 @@ export type Mutation = {
   createTrigger?: Maybe<TriggerType>;
   createPermission?: Maybe<PermssionType>;
   updatePermissions?: Maybe<RoleType>;
-<<<<<<< HEAD
   createRole?: Maybe<RoleType>;
   updateRoles?: Maybe<RoleType>;
   singleUpload?: Maybe<ImageType>;
   createWorkspace?: Maybe<Customer>;
   editWorkspace?: Maybe<Customer>;
-=======
-  createRole: RoleType;
-  updateRoles: RoleType;
-  singleUpload: ImageType;
-  createWorkspace: Customer;
-  editWorkspace: Customer;
->>>>>>> dev
   massSeed?: Maybe<Customer>;
   deleteCustomer?: Maybe<Customer>;
   handleUserStateInWorkspace?: Maybe<UserCustomer>;
@@ -1496,11 +1470,6 @@ export type Mutation = {
   createCTA?: Maybe<QuestionNode>;
   updateCTA?: Maybe<QuestionNode>;
   updateQuestion?: Maybe<QuestionNode>;
-};
-
-
-export type MutationSandboxArgs = {
-  input?: Maybe<SandboxInput>;
 };
 
 
@@ -1877,16 +1846,16 @@ export type OptionsInputType = {
 /** An Organization defines the underlying members structure of a workspace, corresponding to an org-chart. */
 export type Organization = {
   __typename?: 'Organization';
-  id: Scalars['ID'];
-  layers?: Maybe<Array<OrganizationLayer>>;
+  id?: Maybe<Scalars['ID']>;
+  layers?: Maybe<Array<Maybe<OrganizationLayer>>>;
 };
 
 /** A layer of an organization */
 export type OrganizationLayer = {
   __typename?: 'OrganizationLayer';
-  id: Scalars['ID'];
-  depth: Scalars['Int'];
-  type: OrganizationLayerType;
+  id?: Maybe<Scalars['ID']>;
+  depth?: Maybe<Scalars['Int']>;
+  type?: Maybe<OrganizationLayerType>;
 };
 
 /** Type of an organizational layer */
@@ -2378,12 +2347,6 @@ export type RoleType = {
   nrPermissions?: Maybe<Scalars['Int']>;
   allPermissions?: Maybe<Array<Maybe<SystemPermission>>>;
   permissions?: Maybe<Array<Maybe<SystemPermission>>>;
-};
-
-export type SandboxInput = {
-  name?: Maybe<Scalars['String']>;
-  onlyGet?: Maybe<Scalars['Boolean']>;
-  value?: Maybe<Scalars['Int']>;
 };
 
 export type SandboxInput = {
@@ -3061,10 +3024,10 @@ export type GetWorkspaceDialogueStatisticsQuery = (
     & { organization?: Maybe<(
       { __typename?: 'Organization' }
       & Pick<Organization, 'id'>
-      & { layers?: Maybe<Array<(
+      & { layers?: Maybe<Array<Maybe<(
         { __typename?: 'OrganizationLayer' }
         & Pick<OrganizationLayer, 'id' | 'depth' | 'type'>
-      )>> }
+      )>>> }
     )>, statistics?: Maybe<(
       { __typename?: 'WorkspaceStatistics' }
       & { workspaceStatisticsSummary: Array<(
