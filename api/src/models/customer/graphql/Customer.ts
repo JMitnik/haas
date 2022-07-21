@@ -17,7 +17,7 @@ import { isValidDateTime } from '../../../utils/isValidDate';
 import { DialogueStatisticsSummaryFilterInput, DialogueStatisticsSummaryModel, MostTrendingTopic } from '../../questionnaire';
 import { DialogueConnection, DialogueConnectionFilterInput } from '../../questionnaire';
 import { HealthScore, HealthScoreInput } from './HealthScore';
-import { Organization } from '../../organization/graphql/Organization';
+import { Organization } from '../../Organization/graphql/Organization';
 import { Issue, IssueFilterInput } from '../../Issue/graphql';
 import { IssueValidator } from '../../Issue/IssueValidator';
 import { SessionConnectionFilterInput } from '../../../models/session/graphql';
