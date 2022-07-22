@@ -1,5 +1,5 @@
-import { Prisma, PrismaClient, Dialogue, Customer, Tag, CustomerSettings, ColourSettings, FontSettings, DialogueImpactScore } from '@prisma/client';
-import WorkspaceTemplate, { DemoWorkspaceTemplate } from 'models/templates/TemplateTypes';
+import { Prisma, PrismaClient, Dialogue, Customer, Tag, CustomerSettings, ColourSettings, FontSettings } from '@prisma/client';
+import WorkspaceTemplate, { DemoWorkspaceTemplate } from '..//templates/TemplateTypes';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import defaultWorkspaceTemplate from '../templates/defaultWorkspaceTemplate';
@@ -246,6 +246,7 @@ export class CustomerPrismaAdapter {
       data: {
         name: input.name,
         slug: input.slug,
+        isDemo: input.isDemo || undefined,
         tags: { create: template.tags },
         settings: {
           create: {

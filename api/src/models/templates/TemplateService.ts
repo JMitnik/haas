@@ -27,8 +27,8 @@ const businessOptions = [
 ];
 
 const yesNoOptions = [
-  { value: 'Yes', position: 1 }, // TODO: Add isTopic: false to both entries so they won't be shown in top topics
-  { value: 'No', position: 2 },
+  { value: 'Yes', position: 1, isTopic: false },
+  { value: 'No', position: 2, isTopic: false },
 ]
 
 const sportOptionsEng = [
@@ -122,10 +122,10 @@ class TemplateService {
   };
 
   /**
-   * Creates a post leaf node based on template type and whether content for the node is specified. 
+   * Creates a post leaf node based on template type and whether content for the node is specified.
    * If not, default settings are used
-   * @param templateType 
-   * @param dialogueId 
+   * @param templateType
+   * @param dialogueId
    */
   createTemplatePostLeafNode = async (
     templateType: NexusGenEnums['DialogueTemplateType'],
@@ -755,19 +755,21 @@ class TemplateService {
 
     await this.edgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout,
       whatWouldYouLikeToTalkAboutToProduct, {
-      conditionType: 'match',
-      matchValue: 'Product/Services',
-      renderMin: null,
-      renderMax: null,
-    });
+        conditionType: 'match',
+        matchValue: 'Product/Services',
+        renderMin: null,
+        renderMax: null,
+      }
+    );
 
     await this.edgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout,
       whatWouldYouLikeToTalkAboutToCustomerSupport, {
-      conditionType: 'match',
-      matchValue: 'Customer Support',
-      renderMin: null,
-      renderMax: null,
-    });
+        conditionType: 'match',
+        matchValue: 'Customer Support',
+        renderMin: null,
+        renderMax: null,
+      }
+    );
 
     // Negative edges
     await this.edgeService.createEdge(rootQuestion, rootToWeAreSorryToHearThat,
@@ -789,11 +791,12 @@ class TemplateService {
 
     await this.edgeService.createEdge(rootToWeAreSorryToHearThat,
       weAreSorryToHearThatToCustomerSupport, {
-      conditionType: 'match',
-      matchValue: 'Customer Support',
-      renderMax: null,
-      renderMin: null,
-    });
+        conditionType: 'match',
+        matchValue: 'Customer Support',
+        renderMax: null,
+        renderMin: null,
+      }
+    );
   };
 
 

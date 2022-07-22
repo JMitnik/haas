@@ -131,6 +131,46 @@ const language = {
       en: 'We could not find any automations with the current filters.',
       de: 'We could not find any automations with the current filters.',
     },
+    reset_data: {
+      en: 'Reset data',
+      de: 'Daten zurücksetzen',
+    },
+    is_topic: {
+      en: 'Is a topic',
+      de: 'Ist ein Thema',
+    },
+    dashboard_description: {
+      en: 'See how your teams and people are doing.',
+      de: 'See how your teams and people are doing.',
+    },
+    workspace_overview_description: {
+      en: 'Use the table to get to pressing issues immediately, or navigate your organisation manually via the hexagon grid.',
+      de: 'Understand your teams and people by drilling down.',
+    },
+    dashboard_no_issues: {
+      en: 'Good news! No negative teams can be found in this date-range and filter level.',
+      de: 'Good news! No negative teams can be found in this date-range and filter level.',
+    },
+    dashboard_no_data_with_filter: {
+      en: 'Currently there is no data available on this date-range and filter level.',
+      de: 'Currently there is no data available on this date-range and filter level.',
+    },
+    zoom_in: {
+      en: 'Zoom in',
+      de: 'Zoom in',
+    },
+    zoom_out: {
+      en: 'Zoom out',
+      de: 'Zoom out',
+    },
+    teams_with_problems: {
+      en: 'Teams with problems',
+      de: 'Mannschaften mit Problemen',
+    },
+    issues: {
+      en: 'Issues',
+      de: 'Issues',
+    },
     happy_people: {
       en: 'Happy people',
       de: 'Glückliche Leute',
@@ -158,6 +198,14 @@ const language = {
     groups: {
       en: 'Groups',
       de: 'Groups',
+    },
+    make_demo_workspace: {
+      en: 'Make demo workspace',
+      de: 'Erstellen Sie einen Demo-Arbeitsbereich',
+    },
+    make_demo_workspace_helper: {
+      en: 'Marks a workspace as a demo workspace. Toggling this allows an admin to reset the data to a baseline dataset.',
+      de: 'Markiert einen Arbeitsbereich als Demo-Arbeitsbereich. Wenn Sie dies umschalten, kann ein Administrator die Daten auf einen Basisdatensatz zurücksetzen',
     },
     create_demo_data: {
       en: 'Generate prefilled data',
@@ -466,6 +514,10 @@ const language = {
     filter_by_search: {
       en: 'Filter by search',
       de: 'Nach Suche filtern',
+    },
+    filter_by_score: {
+      en: 'Filter by score',
+      de: 'Nach Punktzahl filtern',
     },
     filter_by_date: {
       en: 'Filter by date',
@@ -1347,6 +1399,10 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       en: 'Maximum value',
       de: 'Maximalwert',
     },
+    score: {
+      en: 'Score',
+      de: 'Punktzahl',
+    },
     search: {
       en: 'Search',
       de: 'Suche',
@@ -1461,10 +1517,6 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     teams_subtitle: {
       en: 'Create, edit and manage your teams',
       de: 'Erstellen, bearbeiten und verwalten von Dialogen',
-    },
-    score: {
-      en: 'Score',
-      de: 'Ergebnis',
     },
     export_to_csv: {
       en: 'CSV export',
@@ -1913,9 +1965,13 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       en: 'Add automation',
       de: 'Automatisierung hinzufügen',
     },
+    feedback: {
+      en: 'Feedback',
+      de: 'Feedback',
+    },
     dashboard: {
-      en: 'Overview',
-      de: 'Overview',
+      en: 'Dashboard',
+      de: 'Dashboard',
     },
     configurations: {
       en: 'Configurations',

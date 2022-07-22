@@ -1,6 +1,6 @@
 export const useFormatter = () => ({
   formatScore: (score: number | undefined) => {
-    if (!score) return ' ';
+    if (!score) return '0';
 
     return (score / 10).toFixed(1);
   },

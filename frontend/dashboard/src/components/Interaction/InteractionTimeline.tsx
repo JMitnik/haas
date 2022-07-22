@@ -23,9 +23,9 @@ const FormNodeDescription = ({ nodeEntry }: InteractionNodeEntryDescriptionProps
   <>
     {nodeEntry.value?.formNodeEntry ? (
       <>
-        <UI.SectionHeader>
+        <UI.Span>
           User provided these values:
-        </UI.SectionHeader>
+        </UI.Span>
         {/* @ts-ignore */}
         <FormNodeEntry nodeEntry={nodeEntry.value.formNodeEntry} />
       </>
@@ -41,22 +41,22 @@ const TextboxNodeDescription = ({ nodeEntry }: InteractionNodeEntryDescriptionPr
   <>
     {nodeEntry.value?.textboxNodeEntry ? (
       <>
-        <UI.SectionHeader>
+        <UI.Span>
           When asked
           &quot;
           {nodeEntry.relatedNode?.title}
           &quot;
-        </UI.SectionHeader>
-        <UI.Span>
-          User wrote the following down:
         </UI.Span>
-        <UI.Div
+        <UI.SectionHeader>
+          User wrote the following down:
+        </UI.SectionHeader>
+        <UI.SectionHeader
           bg="white"
-          borderRadius="10px"
+          style={{ borderRadius: '10px' }}
           padding={2}
         >
           {nodeEntry.value?.textboxNodeEntry}
-        </UI.Div>
+        </UI.SectionHeader>
 
       </>
     ) : (
@@ -71,18 +71,18 @@ const MultiChoiceEntryDescription = ({ nodeEntry }: InteractionNodeEntryDescript
   <>
     {nodeEntry.value?.choiceNodeEntry && (
       <>
-        <UI.SectionHeader>
+        <UI.Span>
           When asked
           &quot;
           {nodeEntry.relatedNode?.title}
           &quot;
-        </UI.SectionHeader>
-        <UI.Span>
+        </UI.Span>
+        <UI.SectionHeader>
           User selected:
           &quot;
           {nodeEntry.value?.choiceNodeEntry}
           &quot;
-        </UI.Span>
+        </UI.SectionHeader>
       </>
     )}
   </>
@@ -92,17 +92,17 @@ const VideoEmbedEntryDescription = ({ nodeEntry }: InteractionNodeEntryDescripti
   <>
     {nodeEntry.value?.videoNodeEntry && (
       <>
-        <UI.SectionHeader>
+        <UI.Span>
           When asked
           &quot;
           {nodeEntry.relatedNode?.title}
           &quot;
-        </UI.SectionHeader>
-        <UI.Span>
+        </UI.Span>
+        <UI.SectionHeader>
           User made choice:
           {' '}
           {nodeEntry.value?.videoNodeEntry}
-        </UI.Span>
+        </UI.SectionHeader>
       </>
     )}
   </>
@@ -112,17 +112,17 @@ const SliderEntryDescription = ({ nodeEntry }: InteractionNodeEntryDescriptionPr
   <>
     {nodeEntry.value?.sliderNodeEntry && (
       <>
-        <UI.SectionHeader>
+        <UI.Span>
           When asked
           &quot;
           {nodeEntry.relatedNode?.title}
           &quot;
-        </UI.SectionHeader>
-        <UI.Span>
+        </UI.Span>
+        <UI.SectionHeader>
           User slid the bunny to value:
           {' '}
           {formatSliderValue(nodeEntry.value?.sliderNodeEntry)}
-        </UI.Span>
+        </UI.SectionHeader>
       </>
     )}
   </>
@@ -167,7 +167,16 @@ export const InteractionTimeline = ({ interaction }: InteractionTimelineProps) =
             )}
           </Circle>
           <UI.Div>
-            <UI.Helper color="blue.400">{nodeEntry.relatedNode?.type}</UI.Helper>
+            {nodeEntry.relatedNode?.type === QuestionNodeTypeEnum.Form ? (
+              <UI.Flex justifyContent="space-between">
+                <UI.Helper color="blue.400">{nodeEntry.relatedNode?.type}</UI.Helper>
+
+                <UI.Helper color="red.500">Requires action</UI.Helper>
+              </UI.Flex>
+            ) : (
+              <UI.Helper color="blue.400">{nodeEntry.relatedNode?.type}</UI.Helper>
+            )}
+
             <StatusDescription nodeEntry={nodeEntry} />
           </UI.Div>
         </TimelineItem>

@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "SystemPermissionEnum" ADD VALUE 'CAN_RESET_WORKSPACE_DATA';

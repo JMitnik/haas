@@ -5,7 +5,7 @@ import React from 'react';
 import { fadeMotion } from 'components/animation/config';
 
 interface ProgressCircleProps {
-  percentage: number;
+  percentage: number | undefined;
   strokeWidth: number;
   size: number;
   radius: number;
@@ -20,11 +20,11 @@ export const ProgressCircle = ({
   backgroundStroke,
   strokeWidth,
   children,
-  percentage = 80,
+  percentage,
   radius = 45,
 }: ProgressCircleProps) => {
   const circumference = Math.ceil(2 * Math.PI * radius);
-  const fillPercentage = Math.abs(Math.ceil((circumference / 100) * (percentage - 100)));
+  const fillPercentage = percentage !== undefined ? Math.abs(Math.ceil((circumference / 100) * (percentage - 100))) : 0;
 
   const { transition } = fadeMotion;
 
@@ -70,20 +70,22 @@ export const ProgressCircle = ({
           top: 0,
         }}
       >
-        <motion.circle
-          cx="50"
-          cy="50"
-          r={radius}
-          strokeWidth={strokeWidth}
-          strokeLinecap="round"
-          stroke={stroke}
-          fill="transparent"
-          strokeDashoffset={fillPercentage}
-          strokeDasharray={circumference}
-          variants={variants}
-          initial="hidden"
-          animate="show"
-        />
+        {!!percentage && (
+          <motion.circle
+            cx="50"
+            cy="50"
+            r={radius}
+            strokeWidth={strokeWidth}
+            strokeLinecap="round"
+            stroke={stroke}
+            fill="transparent"
+            strokeDashoffset={fillPercentage}
+            strokeDasharray={circumference}
+            variants={variants}
+            initial="hidden"
+            animate="show"
+          />
+        )}
       </svg>
 
       {!!children && (

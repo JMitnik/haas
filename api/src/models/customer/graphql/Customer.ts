@@ -17,6 +17,11 @@ import { isValidDateTime } from '../../../utils/isValidDate';
 import { DialogueStatisticsSummaryFilterInput, DialogueStatisticsSummaryModel, MostTrendingTopic } from '../../questionnaire';
 import { DialogueConnection, DialogueConnectionFilterInput } from '../../questionnaire';
 import { HealthScore, HealthScoreInput } from './HealthScore';
+import { Organization } from '../../Organization/graphql/Organization';
+import { Issue, IssueFilterInput } from '../../Issue/graphql';
+import { IssueValidator } from '../../Issue/IssueValidator';
+import { SessionConnectionFilterInput } from '../../../models/session/graphql';
+import { SessionConnection } from '../../session/graphql/Session.graphql'
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -33,6 +38,15 @@ export const CustomerType = objectType({
     t.string('slug');
     t.string('name');
 
+    t.boolean('isDemo');
+    t.field('organization', {
+      type: Organization,
+      nullable: true,
+      resolve() {
+        return {};
+      },
+    });
+
     t.field('settings', {
       type: CustomerSettingsType,
       nullable: true,
@@ -40,6 +54,23 @@ export const CustomerType = objectType({
       async resolve(parent: Customer, args, ctx) {
         const customerSettings = await ctx.services.customerService.getCustomerSettingsByCustomerId(parent.id);
         return customerSettings;
+      },
+    });
+
+    t.field('sessionConnection', {
+      type: SessionConnection,
+      args: { filter: SessionConnectionFilterInput },
+      nullable: true,
+
+      async resolve(parent, args, ctx) {
+        if (!parent.id) return null;
+
+        const sessionConnection = await ctx.services.sessionService.getWorkspaceSessionConnection(
+          parent.id,
+          args.filter
+        );
+
+        return sessionConnection;
       },
     });
 
@@ -55,7 +86,21 @@ export const CustomerType = objectType({
       resolve: async (parent) => {
         return { id: parent.id }
       },
-    })
+    });
+
+    /**
+     * Issues
+     */
+    t.list.field('issues', {
+      type: Issue,
+      nullable: true,
+      args: { filter: IssueFilterInput },
+
+      resolve: async (parent, args, { services }) => {
+        const filter = IssueValidator.resolveFilter(args.filter);
+        return await services.issueService.getProblemDialoguesByWorkspace(parent.id, filter);
+      },
+    });
 
 
     t.field('dialogueConnection', {
@@ -430,6 +475,7 @@ const CreateWorkspaceInput = inputObjectType({
     // Creation specific data
     t.boolean('isSeed', { default: false, required: false });
     t.boolean('willGenerateFakeData', { default: false });
+    t.boolean('isDemo', { default: false });
   },
 });
 
@@ -453,12 +499,10 @@ export const WorkspaceMutations = Upload && extendType({
         const stream = new Promise<UploadApiResponse>((resolve, reject) => {
           const cld_upload_stream = cloudinary.v2.uploader.upload_stream({
             folder: 'company_logos',
-          },
-            (error, result: UploadApiResponse | undefined) => {
-              if (result) return resolve(result);
-
-              return reject(error);
-            });
+          }, (error, result: UploadApiResponse | undefined) => {
+            if (result) return resolve(result);
+            return reject(error);
+          });
 
           return createReadStream().pipe(cld_upload_stream);
         });

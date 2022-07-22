@@ -16,6 +16,7 @@ export const GenerateWorkspaceCSVInputType = inputObjectType({
     t.upload('managerCsv', { required: false });
     t.string('type', { required: true, default: 'DEFAULT' });
     t.boolean('generateDemoData', { required: false, default: false });
+    t.boolean('isDemo', { required: true, default: false });
   },
 });
 

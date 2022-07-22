@@ -17,6 +17,7 @@ export const getCustomerOfUserResponse: GetCustomerOfUserQuery = {
   UserOfCustomer: {
     customer: {
       id: 'cl1vs0dd10002xczgbx999ehj',
+      isDemo: false,
       name: 'Metrics',
       slug: 'cl1vs0dcr0000xczg6gmj6dfn',
       settings:

@@ -1,9 +1,8 @@
 import {
-  NodeEntry, //NodeEntryCreateWithoutSessionInput, NodeEntryWhereInput
+  NodeEntry,
   PrismaClient,
   Prisma,
 } from '@prisma/client';
-import { isPresent } from 'ts-is-present';
 import _ from 'lodash';
 
 import { NexusGenInputs } from '../../generated/nexus';
@@ -13,7 +12,7 @@ import NodeEntryPrismaAdapter from './NodeEntryPrismaAdapter';
 import { NodeEntryWithTypes } from './NodeEntryServiceType';
 import SessionPrismaAdapter from '../../models/session/SessionPrismaAdapter';
 import DialoguePrismaAdapter from '../../models/questionnaire/DialoguePrismaAdapter';
-import { DialogueWithCustomer } from 'models/session/SessionTypes';
+import { DialogueWithCustomer } from '../../models/session/Session.types';
 import makeEmergencyTemplate from '../../services/mailings/templates/makeEmergencyTemplate';
 import config from '../../config/config';
 import MailService from '../../services/mailings/MailService';

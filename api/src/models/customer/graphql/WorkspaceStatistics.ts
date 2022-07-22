@@ -150,45 +150,9 @@ export const WorkspaceStatistics = objectType({
       },
     });
 
-    t.field('urgentPath', {
-      type: UrgentPath,
-      args: { input: DialogueStatisticsSummaryFilterInput },
-      description: 'Returns potentially the most urgent path of the workspace (one at most)',
-      nullable: true,
-      useParentResolve: true,
-      // TODO: Middleware for validation
-
-      resolve: async (parent, args, ctx) => {
-        if (!args.input) throw new UserInputError('Not input object!');
-        const { startDateTime, endDateTime } = args.input;
-        let utcStartDateTime: Date | undefined;
-        let utcEndDateTime: Date | undefined;
-
-        if (startDateTime) {
-          utcStartDateTime = isValidDateTime(startDateTime, 'START_DATE') as Date;
-        }
-
-        if (endDateTime) {
-          utcEndDateTime = isValidDateTime(endDateTime, 'END_DATE') as Date;
-        }
-
-        const topicFilter = args.input.topicsFilter || undefined;
-
-        return (
-          ctx.services.dialogueStatisticsService.calculateUrgentPath(
-            parent.id,
-            // TODO: Add validator in middleware field
-            utcStartDateTime as Date,
-            utcEndDateTime as Date,
-            topicFilter,
-          )
-        );
-      },
-    })
-
     /**
- * Get the path (sequence of topics) with the most changed impact score.
- */
+    * Get the path (sequence of topics) with the most changed impact score.
+    */
     t.field('mostChangedPath', {
       type: MostChangedPath,
       args: { input: DialogueStatisticsSummaryFilterInput },

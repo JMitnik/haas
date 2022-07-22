@@ -9,9 +9,10 @@ import { graphqlUploadExpress } from 'graphql-upload';
 import DeliveryWebhookRoute from '../routes/webhooks/DeliveryWebhookRoute';
 import { makeApollo } from './apollo';
 import config from './config';
+import { logger } from './logger';
 
 export const makeServer = async (port: number, prismaClient: PrismaClient) => {
-  console.log('🏳️\tStarting application');
+  logger.logLifeCycle('Starting application');
   const app = express();
 
   const corsOptions: CorsOptions = {
@@ -55,6 +56,7 @@ export const makeServer = async (port: number, prismaClient: PrismaClient) => {
   }
 
   const serverInstance = app.listen(port);
-  console.log('🏁\tStarted the server!');
+  logger.logLifeCycle('Started the server!');
+
   return serverInstance;
 };

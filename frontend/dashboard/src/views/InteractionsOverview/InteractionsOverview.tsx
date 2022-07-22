@@ -38,7 +38,7 @@ import { useMenu } from 'components/Common/Menu/useMenu';
 import { useRouteModal } from 'components/Common/Modal';
 import SearchBar from 'components/Common/SearchBar/SearchBar';
 
-import { InteractionModalCard } from './InteractionModalCard';
+import { InteractionModalCard } from '../FeedbackView/InteractionModalCard';
 
 const undefinedToNull = (value: any) => {
   if (value === undefined) {

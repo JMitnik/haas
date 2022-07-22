@@ -103,6 +103,7 @@ model Customer {
   id              String            @id @default(cuid())
   slug            String            @unique(map: "Customer.slug_unique")
   name            String
+  isDemo          Boolean           @default(false)
   automations     Automation[]
   campaigns       Campaign[]
   CampaignVariant CampaignVariant[]
@@ -147,6 +148,7 @@ model Dialogue {
   isWithoutGenData            Boolean                          @default(false)
   endScreenText               String?
   wasGeneratedWithGenData     Boolean                          @default(false)
+  template                    DialogueTemplateType?            @default(DEFAULT)
   customer                    Customer                         @relation(fields: [customerId], references: [id], onDelete: Cascade)
   postLeafNode                PostLeafNode?                    @relation(fields: [postLeafNodeId], references: [id])
   automationConditions        AutomationCondition[]
@@ -337,6 +339,7 @@ model QuestionOption {
   questionId     String?
   questionNodeId String?
   position       Int?
+  isTopic        Boolean       @default(true)
   overrideLeaf   QuestionNode? @relation("ChoiceCTANode", fields: [overrideLeafId], references: [id])
   question       QuestionNode? @relation("QuestionNodeOptions", fields: [questionId], references: [id])
   QuestionNode   QuestionNode? @relation(fields: [questionNodeId], references: [id])
@@ -368,7 +371,7 @@ model NodeEntry {
   inputSource           InputSource            @default(CLIENT)
   relatedEdge           Edge?                  @relation(fields: [relatedEdgeId], references: [id])
   relatedNode           QuestionNode?          @relation(fields: [relatedNodeId], references: [id])
-  session               Session?               @relation(fields: [sessionId], references: [id])
+  session               Session?               @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   choiceNodeEntry       ChoiceNodeEntry?
   formNodeEntry         FormNodeEntry?
   linkNodeEntry         LinkNodeEntry?
@@ -892,6 +895,7 @@ enum InputSource {
 }
 
 enum SystemPermissionEnum {
+  CAN_RESET_WORKSPACE_DATA
   CAN_ACCESS_ADMIN_PANEL
   CAN_GENERATE_WORKSPACE_FROM_CSV
   CAN_ASSIGN_USERS_TO_DIALOGUE

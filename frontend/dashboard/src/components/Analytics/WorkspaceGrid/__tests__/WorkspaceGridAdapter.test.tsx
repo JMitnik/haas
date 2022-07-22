@@ -12,6 +12,4 @@ test('render layers', async () => {
   mockGetWorkspaceDialogueStatistics((res) => ({ ...res }));
   mockQueryDialogueConnection((res) => ({ ...res }));
   renderComponent();
-
-  expect(await screen.findByText('Layers')).toBeInTheDocument();
 });

@@ -360,7 +360,6 @@ const DialogueBuilderQuestionForm = ({
 
     const isSlider = type === QuestionNodeTypeEnum.Slider && sliderNodeData;
     const values = form.getValues();
-    console.log('values', values);
 
     const unhappyText = formData.useCustomerSatisfactionTexts === 1 ? formData.unhappyText : null;
     const happyText = formData.useCustomerSatisfactionTexts === 1 ? formData.happyText : null;
@@ -385,6 +384,7 @@ const DialogueBuilderQuestionForm = ({
                 publicValue: option?.value,
                 overrideLeafId: option?.overrideLeaf?.value,
                 position: index + 1,
+                isTopic: option.isTopic,
               })),
             },
             edgeCondition,
@@ -421,6 +421,7 @@ const DialogueBuilderQuestionForm = ({
                 publicValue: option?.value,
                 overrideLeafId: option?.overrideLeaf?.value,
                 position: index + 1,
+                isTopic: option.isTopic,
               })),
             },
             edgeCondition,

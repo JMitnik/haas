@@ -1,0 +1,28 @@
+query GetIssues($workspaceId: ID!, $filter: IssueFilterInput) {
+  customer(id: $workspaceId) {
+		id
+		issues(filter: $filter) {
+			id
+			topic
+			rankScore
+      followUpAction
+      actionRequiredCount
+      dialogue {
+        id
+        title
+      }
+      basicStats {
+				responseCount
+				average
+			}
+			history {
+				id
+				items {
+					id
+					date
+					frequency
+				}
+			}
+		}
+	}
+}

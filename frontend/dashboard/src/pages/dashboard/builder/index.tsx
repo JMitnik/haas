@@ -112,6 +112,7 @@ const mapQuestionsInputData = (nodes: QuestionEntryProps[]) => {
           value: option.value,
           publicValue: option.publicValue,
           overrideLeaf: option.overrideLeaf,
+          isTopic: option.isTopic,
         })),
         children: children?.map((edge: EdgeChildProps) => ({
           id: edge.id,

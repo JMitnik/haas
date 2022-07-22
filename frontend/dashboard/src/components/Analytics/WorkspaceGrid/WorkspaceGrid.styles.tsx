@@ -2,11 +2,7 @@ import * as UI from '@haas/ui';
 import { motion } from 'framer-motion';
 import styled, { css } from 'styled-components';
 
-export const WorkspaceGridAdapterContainer = styled(UI.Div)`
-  ${({ theme }) => css`
-    border: 1px solid ${theme.colors.gray[200]};
-  `}
-`;
+export const WorkspaceGridAdapterContainer = styled(UI.Div)``;
 
 export const WidgetHeader = styled(UI.Div)`
   ${({ theme }) => css`
@@ -264,6 +260,32 @@ export const Tooltip = motion.custom(styled.div`
     }
   `}
 `);
+
+export const ControlBody = styled(UI.Span)`
+  display: block;
+  padding: 8px;
+`;
+
+export const ControlContainer = styled(UI.Span)`
+  ${({ theme }) => css`
+    display: block;
+    background-color: ${theme.colors.white} !important;
+    box-shadow: ${theme.boxShadows.md};
+    border-radius: ${theme.borderRadiuses.md}px;
+    color: ${theme.colors.main[500]} !important;
+    transition: all ${theme.transitions.normal};
+
+    &[aria-disabled='true'] {
+      opacity: 0.5;
+      background: ${theme.colors.off[200]} !important;
+      box-shadow: ${theme.boxShadows.md} !important;
+    }
+
+    ${UI.Icon} svg {
+      width: 21px !important;
+    }
+  `}
+`;
 
 export const ControlButton = styled(UI.Button)`
   ${({ theme }) => css`
