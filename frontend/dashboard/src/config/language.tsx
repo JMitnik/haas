@@ -79,6 +79,14 @@ const language = {
       en: 'Groups',
       de: 'Groups',
     },
+    make_demo_workspace: {
+      en: 'Make demo workspace',
+      de: 'Erstellen Sie einen Demo-Arbeitsbereich',
+    },
+    make_demo_workspace_helper: {
+      en: 'Marks a workspace as a demo workspace. Toggling this allows an admin to reset the data to a baseline dataset.',
+      de: 'Markiert einen Arbeitsbereich als Demo-Arbeitsbereich. Wenn Sie dies umschalten, kann ein Administrator die Daten auf einen Basisdatensatz zurücksetzen',
+    },
     create_demo_data: {
       en: 'Generate prefilled data',
       de: 'Verwenden Sie Demodaten',
