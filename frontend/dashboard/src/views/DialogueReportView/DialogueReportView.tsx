@@ -15,7 +15,7 @@ import { ReactComponent as PathsIcon } from 'assets/icons/icon-launch.svg';
 import { ReactComponent as TrendingIcon } from 'assets/icons/icon-trending-up.svg';
 import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
 
-import { addDays, addWeeks } from 'date-fns';
+import { addWeeks } from 'date-fns';
 import { useNavigator } from 'hooks/useNavigator';
 import NegativePathsModule from 'views/DialogueView/Modules/NegativePathsModule/NegativePathsModule';
 import PositivePathsModule from 'views/DialogueView/Modules/PositivePathsModule';
@@ -36,7 +36,7 @@ interface ReportViewInput {
   dateLabel: ActiveDateType;
 }
 
-export const ReportView = ({ compareStatisticStartDate, dateLabel, startDate }: ReportViewInput) => {
+export const DialogueReportView = ({ compareStatisticStartDate, dateLabel, startDate }: ReportViewInput) => {
   const { dialogueSlug, customerSlug } = useNavigator();
   const history = useHistory();
   const { t } = useTranslation();
@@ -249,4 +249,4 @@ export const ReportView = ({ compareStatisticStartDate, dateLabel, startDate }: 
   );
 };
 
-export default ReportView;
+export default DialogueReportView;

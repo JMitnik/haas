@@ -3,7 +3,7 @@
 /* eslint-disable radix */
 import '@szhsin/react-menu/dist/index.css';
 import * as UI from '@haas/ui';
-import { AlertTriangle, AlignLeft, BarChart2, Calendar, Filter, Plus, Search, User } from 'react-feather';
+import { AlignLeft, BarChart2, Calendar, Filter, Plus, Search, User } from 'react-feather';
 import {
   ArrayParam,
   BooleanParam,
@@ -30,7 +30,7 @@ import {
 import { TabbedMenu } from 'components/Common/TabMenu';
 import { View } from 'layouts/View';
 import { formatSimpleDate } from 'utils/dateUtils';
-import { getChoiceNodeValues, getMainTopicValue } from 'components/Session/Session.helpers';
+import { getMainTopicValue } from 'components/Session/Session.helpers';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useFormatter } from 'hooks/useFormatter';
 import { useMenu } from 'components/Common/Menu/useMenu';
@@ -38,22 +38,6 @@ import SearchBar from 'components/Common/SearchBar/SearchBar';
 
 import { ContactableUserCell } from './InteractionTableCells';
 import { InteractionModalCard } from '../InteractionsOverview/InteractionModalCard';
-
-const AnonymousCell = ({ sessionId }: { sessionId: string }) => {
-  const { t } = useTranslation();
-  return (
-    <UI.Flex alignItems="center">
-      <UI.ColumnFlex>
-        <UI.Span fontWeight={600} color="off.500">
-          {t('anonymous')}
-        </UI.Span>
-        <UI.Span color="off.400" fontSize="0.7rem">
-          {sessionId}
-        </UI.Span>
-      </UI.ColumnFlex>
-    </UI.Flex>
-  );
-};
 
 const DateCell = ({ timestamp }: { timestamp: string }) => {
   const date = new Date(parseInt(timestamp, 10));

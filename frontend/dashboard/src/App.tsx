@@ -8,14 +8,15 @@ import { CampaignView } from 'views/CampaignView/CampaignView';
 import { DashboardView } from 'views/DashboardView';
 import { DialogueLinkFetchOverview } from 'views/DialogueLinkFetchOverview';
 import { DialogueProvider } from 'providers/DialogueProvider';
+import { DialogueReportView } from 'views/DialogueReportView';
 import { FeedbackOverview } from 'views/FeedbackView/index';
 import { FirstTimeView } from 'views/FirstTimeView';
 import { GenerateWorkspaceView } from 'views/GenerateWorkspaceView';
 import { InteractionsOverview } from 'views/InteractionsOverview';
 import { ROUTES } from 'hooks/useNavigator';
-import { ReportView } from 'views/ReportView';
 import { SystemPermission } from 'types/generated-types';
 import { VerifyTokenView } from 'views/VerifyTokenView';
+import { WorkspaceReportView } from 'views/WorkspaceReportView';
 import { WorkspaceSettingsView } from 'views/WorkspaceSettingsView';
 import { fadeMotion } from 'components/animation/config';
 import { sub } from 'date-fns';
@@ -58,6 +59,17 @@ const CustomerRoutes = () => (
       <DialogueProvider>
         <WorkspaceLayout>
           <Switch>
+            <BotRoute
+              allowedPermission={SystemPermission.CanAccessReportPage}
+              path={ROUTES.WORKSPACE_REPORT_VIEW}
+              render={() => (
+                <WorkspaceReportView
+                  startDate={sub(new Date(), { weeks: 1 })}
+                  dateLabel="last_week"
+                  compareStatisticStartDate={sub(new Date(), { weeks: 2 })}
+                />
+              )}
+            />
             <CustomerRoute
               path="/dashboard/b/:customerSlug/d/:dialogueSlug"
               render={() => (
@@ -234,9 +246,9 @@ const ReportRoutes = () => (
         <Switch>
           <BotRoute
             allowedPermission={SystemPermission.CanAccessReportPage}
-            path={ROUTES.WEEKLY_REPORT_VIEW}
+            path={ROUTES.DIALOGUE_REPORT_VIEW}
             render={() => (
-              <ReportView
+              <DialogueReportView
                 startDate={sub(new Date(), { weeks: 1 })}
                 dateLabel="last_week"
                 compareStatisticStartDate={sub(new Date(), { weeks: 2 })}
