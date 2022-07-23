@@ -1,8 +1,8 @@
 query GetWorkspaceSessions(
-	$id: ID,
+	$workspaceId: ID,
 	$filter: SessionConnectionFilterInput
 ) {
-  customer(id: $id) {
+  customer(id: $workspaceId) {
     id
    	sessionConnection(filter: $filter) {
 			sessions {

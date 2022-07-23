@@ -41,8 +41,9 @@ export interface DemoWorkspaceTemplate extends WorkspaceTemplate {
 export const defaultSportTextFieldForm: NexusGenInputs['FormNodeInputType'] = {
   fields: [
     {
-      isRequired: false,
-      label: 'Leave your name and a senior leader will contact you ⇣',
+      type: 'email',
+      isRequired: true,
+      label: 'Leave your email and a senior leader will contact you ⇣',
     },
   ],
 }
@@ -50,8 +51,9 @@ export const defaultSportTextFieldForm: NexusGenInputs['FormNodeInputType'] = {
 export const defaultBusinessTextFieldForm: NexusGenInputs['FormNodeInputType'] = {
   fields: [
     {
-      isRequired: false,
-      label: 'Leave your name and a senior leader will contact you ⇣',
+      type: 'email',
+      isRequired: true,
+      label: 'Leave your email and a senior leader will contact you ⇣',
     },
   ],
 }
@@ -71,7 +73,7 @@ export const defaultForm: NexusGenInputs['FormNodeInputType'] = {
       position: 1,
     },
     {
-      isRequired: false,
+      isRequired: true,
       label: 'Email',
       type: 'email',
       position: 1,
@@ -115,6 +117,9 @@ export const defaultAdminRole: Prisma.RoleCreateInput = {
       'CAN_EDIT_WORKSPACE',
       'CAN_VIEW_DIALOGUE',
       'CAN_VIEW_DIALOGUE_ANALYTICS',
+      'CAN_RESET_WORKSPACE_DATA',
+      'CAN_ASSIGN_USERS_TO_DIALOGUE',
+      'CAN_GENERATE_WORKSPACE_FROM_CSV',
     ],
   },
 }

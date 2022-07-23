@@ -992,6 +992,7 @@ input GenerateAutodeckInput {
 
 input GenerateWorkspaceCSVInputType {
   generateDemoData: Boolean = false
+  isDemo: Boolean! = false
   managerCsv: Upload
   type: String! = "DEFAULT"
   uploadedCsv: Upload

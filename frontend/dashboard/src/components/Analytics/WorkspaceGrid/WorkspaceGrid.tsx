@@ -335,7 +335,12 @@ export const WorkspaceGrid = ({
     variables: {
       workspaceId: activeCustomer?.id as string,
     },
-    refetchQueries: ['GetWorkspaceDialogueStatistics', 'GetWorkspaceLayoutDetails', 'GetIssues'],
+    refetchQueries: [
+      'GetWorkspaceDialogueStatistics',
+      'GetWorkspaceLayoutDetails',
+      'GetIssues',
+      'GetWorkspaceSummaryDetails',
+    ],
     onCompleted: () => {
       resetWorkspaceGrid();
       toast.success({ title: 'Workspace data successfully resetted' });
