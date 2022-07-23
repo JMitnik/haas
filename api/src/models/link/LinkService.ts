@@ -14,6 +14,8 @@ class LinkService {
    * @returns File object including uploaded image URL
    */
   uploadImage = async (file: any) => {
+    console.log({ uploadCloudinary });
+
     const image = await uploadCloudinary(file, 'sellable_items');
     return image;
   }

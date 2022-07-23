@@ -22,7 +22,6 @@ beforeEach(async () => {
 });
 
 describe('UploadUpsellFileResolver', () => {
-
   test('Uploads upsell file to cloudinary', async () => {
     const { user, workspace } = await prepDefaultData(prisma);
 

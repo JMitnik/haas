@@ -7,19 +7,19 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install modules
         run: yarn
-      - name: Check types
-        run: yarn types
-      - name: Run ESLint
-        run: yarn eslint
-      - name: Run E2E (Client)
-        uses: cypress-io/github-action@v4
-        with:
-          browser: chrome
-          start: yarn serve
-          wait-on: 'http://localhost:3000'
-          working-directory: ./frontend/client
-        env:
-          SKIP_PREFLIGHT_CHECK: true
+      # - name: Check types
+      #   run: yarn types
+      # - name: Run ESLint
+      #   run: yarn eslint
+      # - name: Run E2E (Client)
+      #   uses: cypress-io/github-action@v4
+      #   with:
+      #     browser: chrome
+      #     start: yarn serve
+      #     wait-on: 'http://localhost:3000'
+      #     working-directory: ./frontend/client
+      #   env:
+      #     SKIP_PREFLIGHT_CHECK: true
       - name: Start Testing Containers
         run: yarn dock:up:test
       - name: Generate required artifacts
@@ -27,7 +27,7 @@ jobs:
         env:
           DB_STRING: postgresql://prisma:prisma@localhost:5431/postgres?schema=public
       - name: Run API Unit and integration Tests
-        run: yarn test:integration:api
+        run: yarn test:integration:api UploadUpsell
         env:
           # These ENV values are not reflecting actual secrets from production
           DB_STRING: postgresql://prisma:prisma@localhost:5431/postgres?schema=public
