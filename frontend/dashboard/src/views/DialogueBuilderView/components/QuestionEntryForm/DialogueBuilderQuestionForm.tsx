@@ -1,13 +1,11 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import {
-  Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow,
+  ButtonGroup, FormErrorMessage, Popover, PopoverArrow,
   PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
 } from '@chakra-ui/core';
-import { Controller, useForm } from 'react-hook-form';
-import { Trash } from 'react-feather';
-import { debounce } from 'lodash';
+import { Controller, useForm, useWatch } from 'react-hook-form';
+import { List, PlusCircle, Sliders, Trash, Youtube } from 'react-feather';
 import { gql, useMutation } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
@@ -15,18 +13,23 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 
 import {
-  Div, Flex, Form, FormContainer, FormControl, FormLabel,
-  FormSection, Hr, Input, InputGrid, InputHelper, Span, Text,
+  Div, FormControl, FormLabel,
+  InputGrid, InputHelper,
 } from '@haas/ui';
+import { NodeCell } from 'components/NodeCell';
+import { NodePicker } from 'components/NodePicker';
+import { QuestionNodeTypeEnum } from 'types/generated-types';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useNavigator } from 'hooks/useNavigator';
+import Dropdown from 'components/Dropdown';
 import updateQuestionMutation from 'mutations/updateQuestion';
 
 import {
   CTANode,
   EdgeConditionProps,
-  OverrideLeafProps, QuestionEntryProps, QuestionOptionProps,
+  MappedQuestionOptionProps,
+  OverrideLeafProps, QuestionEntryProps,
 } from '../../DialogueBuilderInterfaces';
 import { ChoiceNodeForm } from './ChoiceNodeForm';
 import SliderNodeForm from './SliderNodeForm';
@@ -49,6 +52,7 @@ interface FormDataProps {
   questionType: string;
   matchText: string;
   activeLeaf: string;
+  overrideLeaf?: { label: string, value: string, type: string } | null;
   parentQuestionType: string;
   sliderNode: {
     id: string;
@@ -59,6 +63,7 @@ interface FormDataProps {
   unhappyText: string;
   happyText: string;
   useCustomerSatisfactionTexts: number;
+  range: number[];
 }
 
 const isChoiceType = (questionType: string) => {
@@ -73,16 +78,6 @@ const schema = yup.object().shape({
   questionType: yup.string().required(),
   videoEmbedded: yup.string().when(['questionType'], {
     is: (questionType: string) => questionType === 'VIDEO_EMBEDDED',
-    then: yup.string().required(),
-    otherwise: yup.string().notRequired(),
-  }),
-  minValue: yup.string().when(['parentQuestionType'], {
-    is: (parentQuestionType: string) => parentQuestionType === 'Slider',
-    then: yup.string().required(),
-    otherwise: yup.string().notRequired(),
-  }),
-  maxValue: yup.string().when(['parentQuestionType'], {
-    is: (parentQuestionType: string) => parentQuestionType === 'Slider',
     then: yup.string().required(),
     otherwise: yup.string().notRequired(),
   }),
@@ -105,14 +100,12 @@ interface QuestionEntryFormProps {
   id: string;
   title: string;
   overrideLeaf?: OverrideLeafProps;
-  isRoot: boolean;
   type: { label: string, value: string };
-  options: QuestionOptionProps[];
-  leafs: Array<{ label: string, value: string }>;
+  options: MappedQuestionOptionProps[];
   ctaNodes: CTANode[];
   onActiveQuestionChange: React.Dispatch<React.SetStateAction<string | null>>;
   condition: EdgeConditionProps | undefined;
-  parentOptions: QuestionOptionProps[] | undefined;
+  parentOptions: MappedQuestionOptionProps[] | undefined;
   edgeId: string | undefined;
   question: QuestionEntryProps;
   parentQuestionId?: string;
@@ -120,12 +113,6 @@ interface QuestionEntryFormProps {
   onDeleteEntry: any;
   onScroll: () => void;
 }
-
-const questionTypes = [
-  { value: 'SLIDER', label: 'Slider' },
-  { value: 'CHOICE', label: 'Choice' },
-  { value: 'VIDEO_EMBEDDED', label: 'Video embedded' },
-];
 
 const createQuestionMutation = gql`
   mutation createQuestion($input: CreateQuestionNodeInputType!) {
@@ -135,6 +122,13 @@ const createQuestionMutation = gql`
   }
 `;
 
+const setOverrideLeaf = (ctaNodes: CTANode[], overrideLeafId?: string) => {
+  const activeLeaf = ctaNodes.find((node) => node.id === overrideLeafId);
+  if (!activeLeaf) return null;
+
+  return { value: activeLeaf.id, label: activeLeaf.title, type: activeLeaf.type };
+};
+
 const DialogueBuilderQuestionForm = ({
   onAddExpandChange,
   id,
@@ -142,7 +136,6 @@ const DialogueBuilderQuestionForm = ({
   overrideLeaf,
   type,
   options,
-  leafs,
   ctaNodes,
   onActiveQuestionChange,
   condition,
@@ -155,8 +148,8 @@ const DialogueBuilderQuestionForm = ({
   onScroll,
 }: QuestionEntryFormProps) => {
   const { activeCustomer } = useCustomer();
-  const { customerSlug, dialogueSlug } = useNavigator();
   const { t } = useTranslation();
+  const { customerSlug, dialogueSlug } = useNavigator();
 
   const sliderNode = {
     id: question.sliderNode?.id,
@@ -180,35 +173,44 @@ const DialogueBuilderQuestionForm = ({
       sliderNode,
       unhappyText: question.sliderNode?.unhappyText,
       happyText: question.sliderNode?.happyText,
-      optionsFull: options.map((option) => ({
-        id: option.id,
-        position: option.position,
-        value: option.value,
-        publicValue: option.publicValue,
-        overrideLeaf: {
-          label: option.overrideLeaf?.title,
-          value: option.overrideLeaf?.id,
-          type: option.overrideLeaf?.type,
-        },
-      })),
+      overrideLeaf: setOverrideLeaf(ctaNodes, overrideLeaf?.id),
+      optionsFull: options,
+      range: [condition?.renderMin ?? 30, condition?.renderMax ?? 70],
+      questionType: type?.value,
+      // optionsFull: options.map((option) => ({
+      //   id: option.id,
+      //   position: option.position,
+      //   value: option.value,
+      //   publicValue: option.publicValue,
+      //   overrideLeaf: {
+      //     label: option.overrideLeaf?.title,
+      //     value: option.overrideLeaf?.id,
+      //     type: option.overrideLeaf?.type,
+      //   },
+      // })),
     },
   });
 
   const toast = useToast();
-  const [activeQuestionType, setActiveQuestionType] = useState(type);
 
   const matchValue = condition?.matchValue ? { label: condition.matchValue, value: condition.matchValue } : null;
   const [activeMatchValue, setActiveMatchValue] = useState<null | { label: string, value: string }>(matchValue);
-  const [activeLeaf, setActiveLeaf] = useState({ label: overrideLeaf?.title, value: overrideLeaf?.id });
   const [activeConditionSelect, setActiveConditionSelect] = useState<null | { label: string, value: string }>(
     condition?.conditionType ? {
       value: condition.conditionType,
       label: condition.conditionType,
     } : null,
   );
+
   const [activeCondition, setActiveCondition] = useState<null | EdgeConditionProps>(
     condition || { conditionType: parentQuestionType === 'Slider' ? 'valueBoundary' : 'match' },
   );
+
+  const questionType = useWatch({
+    control: form.control,
+    name: 'questionType',
+    defaultValue: type?.value,
+  });
 
   const setConditionType = useCallback((conditionOption: any) => {
     setActiveConditionSelect(conditionOption);
@@ -221,21 +223,10 @@ const DialogueBuilderQuestionForm = ({
     });
   }, [setActiveConditionSelect, setActiveCondition]);
 
-  const handleQuestionTypeChange = useCallback((selectOption: any) => {
-    form.setValue('questionType', selectOption?.value);
-    setActiveQuestionType(selectOption);
-  }, [setActiveQuestionType]);
-
   useEffect(() => {
     form.register({ name: 'parentQuestionType' });
     form.setValue('parentQuestionType', parentQuestionType);
   }, [parentQuestionType]);
-
-  useEffect(() => {
-    if (activeQuestionType) {
-      handleQuestionTypeChange(activeQuestionType);
-    }
-  }, [activeQuestionType, handleQuestionTypeChange]);
 
   const handleConditionTypeChange = useCallback((selectedOption: any) => {
     form.setValue('conditionType', selectedOption?.value);
@@ -247,17 +238,6 @@ const DialogueBuilderQuestionForm = ({
       handleConditionTypeChange(activeConditionSelect);
     }
   }, [activeConditionSelect, handleConditionTypeChange]);
-
-  const handleLeafChange = useCallback((selectedOption: any) => {
-    form.setValue('activeLeaf', selectedOption?.value);
-    setActiveLeaf(selectedOption);
-  }, [setActiveLeaf]);
-
-  useEffect(() => {
-    if (activeLeaf) {
-      handleLeafChange(activeLeaf);
-    }
-  }, [activeLeaf, handleLeafChange]);
 
   const setMatchTextValue = (qOption: any) => {
     const matchText = qOption.value;
@@ -356,36 +336,25 @@ const DialogueBuilderQuestionForm = ({
     onScroll();
   };
 
-  const setMinValue = (event: React.FocusEvent<HTMLInputElement>) => {
-    const minValue = Number(event.target.value);
-    return setActiveCondition((prevCondition) => {
-      if (!prevCondition) {
-        return { renderMin: minValue };
-      }
-      prevCondition.renderMin = minValue;
-      return prevCondition;
-    });
+  const handleRemoveCTA = () => {
+    form.setValue('overrideLeaf', null);
   };
-
-  const setMaxValue = useCallback(debounce((value: string) => {
-    const maxValue = Number(value);
-    return setActiveCondition((prevCondition) => {
-      if (!prevCondition) {
-        return { renderMax: maxValue };
-      }
-      prevCondition.renderMax = maxValue;
-      return prevCondition;
-    });
-  }, 250), []);
 
   const onSubmit = (formData: FormDataProps) => {
     const { title } = formData;
-    const type = activeQuestionType?.value;
-    const overrideLeafId = activeLeaf?.value;
-    const edgeCondition = activeCondition;
+    const type = formData.questionType;
+    const overrideLeafId = formData.overrideLeaf?.value;
+    const edgeCondition: EdgeConditionProps = {
+      id: activeCondition?.id,
+      conditionType: activeCondition?.conditionType,
+      matchValue: activeCondition?.conditionType === 'match' ? activeCondition?.matchValue : null,
+      renderMin: activeCondition?.conditionType === 'valueBoundary' ? formData.range[0] : null,
+      renderMax: activeCondition?.conditionType === 'valueBoundary' ? formData.range[1] : null,
+    };
+
     const sliderNodeData = formData.sliderNode || sliderNode;
 
-    const isSlider = activeQuestionType?.value === 'SLIDER' && sliderNodeData;
+    const isSlider = type === QuestionNodeTypeEnum.Slider && sliderNodeData;
     const values = form.getValues();
 
     const unhappyText = formData.useCustomerSatisfactionTexts === 1 ? formData.unhappyText : null;
@@ -411,6 +380,7 @@ const DialogueBuilderQuestionForm = ({
                 publicValue: option?.value,
                 overrideLeafId: option?.overrideLeaf?.value,
                 position: index + 1,
+                isTopic: option.isTopic,
               })),
             },
             edgeCondition,
@@ -438,7 +408,7 @@ const DialogueBuilderQuestionForm = ({
             unhappyText,
             happyText,
             extraContent: formData.videoEmbedded,
-            overrideLeafId: overrideLeafId || 'None',
+            overrideLeafId: overrideLeafId || '',
             parentQuestionId,
             optionEntries: {
               options: values.optionsFull?.map((option, index) => ({
@@ -447,6 +417,7 @@ const DialogueBuilderQuestionForm = ({
                 publicValue: option?.value,
                 overrideLeafId: option?.overrideLeaf?.value,
                 position: index + 1,
+                isTopic: option.isTopic,
               })),
             },
             edgeCondition,
@@ -467,22 +438,28 @@ const DialogueBuilderQuestionForm = ({
   };
 
   const parentOptionsSelect = parentOptions?.map((option) => ({ label: option.value, value: option.value }));
+  const formattedCtaNodes = ctaNodes.map((ctaNode) => ({
+    value: ctaNode.id,
+    label: ctaNode.title,
+    type: ctaNode.type,
+  }));
+
   return (
-    <FormContainer expandedForm>
-      <Hr />
-      <Form onSubmit={form.handleSubmit(onSubmit)}>
-        <Div>
-          <FormSection id="general">
-            <Div>
+    <UI.FormContainer expandedForm>
+      <UI.Hr />
+      <UI.Form onSubmit={form.handleSubmit(onSubmit)}>
+        <UI.Div>
+          <UI.FormSection id="general">
+            <UI.Div>
               <UI.FormSectionHeader>{t('dialogue:about_question')}</UI.FormSectionHeader>
               <UI.FormSectionHelper>
                 {t('dialogue:about_question_helper')}
               </UI.FormSectionHelper>
-            </Div>
-            <InputGrid>
-              <FormControl isRequired isInvalid={!!form.errors.title}>
-                <FormLabel htmlFor="title">{t('title')}</FormLabel>
-                <InputHelper>{t('dialogue:title_question_helper')}</InputHelper>
+            </UI.Div>
+            <UI.InputGrid>
+              <UI.FormControl isRequired isInvalid={!!form.errors.title}>
+                <UI.FormLabel htmlFor="title">{t('title')}</UI.FormLabel>
+                <UI.InputHelper>{t('dialogue:title_question_helper')}</UI.InputHelper>
                 <Controller
                   name="title"
                   control={form.control}
@@ -495,83 +472,80 @@ const DialogueBuilderQuestionForm = ({
                   )}
                 />
                 <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
-              </FormControl>
-            </InputGrid>
-          </FormSection>
+              </UI.FormControl>
+            </UI.InputGrid>
+          </UI.FormSection>
 
           {parentQuestionType === 'Slider' && (
             <>
-              <Hr />
+              <UI.Hr />
               <UI.Div />
-              <FormSection>
-                <Div>
+              <UI.FormSection>
+                <UI.Div>
                   <UI.FormSectionHeader>{t('dialogue:condition')}</UI.FormSectionHeader>
                   <UI.FormSectionHelper>
                     {t('dialogue:condition_helper')}
                   </UI.FormSectionHelper>
-                </Div>
+                </UI.Div>
                 <Div>
                   <InputGrid>
                     <FormControl isRequired isInvalid={!!form.errors.minValue}>
                       <FormLabel htmlFor="minValue">
-                        {t('min_value')}
+                        {t('range')}
                       </FormLabel>
                       <InputHelper>
-                        {t('dialogue:min_value_helper')}
+                        {t('range_helper')}
                       </InputHelper>
-                      <Input
-                        name="minValue"
-                        ref={form.register({ required: false })}
-                        defaultValue={condition?.renderMin}
-                        onBlur={(event: React.FocusEvent<HTMLInputElement>) => setMinValue(event)}
-                      />
-                      <FormErrorMessage>{form.errors.minValue?.message}</FormErrorMessage>
-                    </FormControl>
+                      <UI.Div position="relative" pb={3}>
+                        <Controller
+                          control={form.control}
+                          name="range"
+                          defaultValue={[40, 69]}
+                          render={({ onChange, value }) => (
+                            <UI.RangeSlider
+                              onChange={onChange}
+                              defaultValue={value}
+                              // isDisabled
+                              stepSize={1}
+                              min={0}
+                              max={100}
+                            />
+                          )}
+                        />
+                        <FormErrorMessage>{form.errors.minValue?.message}</FormErrorMessage>
+                        <UI.Div position="absolute" bottom={0} left={0}>0</UI.Div>
+                        <UI.Div position="absolute" bottom={0} right={-7.5}>100</UI.Div>
+                      </UI.Div>
 
-                    <FormControl isRequired isInvalid={!!form.errors.maxValue}>
-                      <FormLabel htmlFor="maxValue">
-                        {t('max_value')}
-                      </FormLabel>
-                      <InputHelper>
-                        {t('dialogue:max_value_helper')}
-                      </InputHelper>
-                      <Input
-                        name="maxValue"
-                        ref={form.register({ required: false })}
-                        defaultValue={condition?.renderMax}
-                        onChange={(event: any) => setMaxValue(event.target.value)}
-                      />
-                      <FormErrorMessage>{form.errors.maxValue?.message}</FormErrorMessage>
                     </FormControl>
-
                   </InputGrid>
                 </Div>
-              </FormSection>
+              </UI.FormSection>
             </>
           )}
 
           {(parentQuestionType === 'Choice' || parentQuestionType === 'Video embedded') && (
             <>
-              <Hr />
-              <FormSection>
-                <Div>
+              <UI.Hr />
+              <UI.FormSection>
+                <UI.Div>
                   <UI.FormSectionHeader>{t('dialogue:condition')}</UI.FormSectionHeader>
                   <UI.FormSectionHelper>
                     {t('dialogue:condition_helper')}
                   </UI.FormSectionHelper>
-                </Div>
-                <Div>
-                  <InputGrid>
-                    <FormControl isRequired isInvalid={!!form.errors.matchText}>
-                      <FormLabel htmlFor="matchText">{t('match_value')}</FormLabel>
-                      <InputHelper>What is the multi-choice question to trigger this question?</InputHelper>
+                </UI.Div>
+                <UI.Div>
+                  <UI.InputGrid>
+                    <UI.FormControl isRequired isInvalid={!!form.errors.matchText}>
+                      <UI.FormLabel htmlFor="matchText">{t('match_value')}</UI.FormLabel>
+                      <UI.InputHelper>What is the multi-choice question to trigger this question?</UI.InputHelper>
 
                       <Controller
                         id="question-match-select"
                         name="matchText"
                         control={form.control}
                         defaultValue={activeMatchValue}
-                        render={({ onChange, onBlur, value }) => (
+                        render={() => (
                           <Select
                             options={parentOptionsSelect}
                             value={activeMatchValue}
@@ -582,104 +556,173 @@ const DialogueBuilderQuestionForm = ({
                         )}
                       />
                       <FormErrorMessage>{form.errors.matchText?.message}</FormErrorMessage>
-                    </FormControl>
-                  </InputGrid>
-                </Div>
-              </FormSection>
+                    </UI.FormControl>
+                  </UI.InputGrid>
+                </UI.Div>
+              </UI.FormSection>
             </>
           )}
 
-          <Hr />
+          <UI.Hr />
 
-          <FormSection>
-            <Div>
+          <UI.FormSection>
+            <UI.Div>
               <UI.FormSectionHeader>
                 {t('dialogue:question_type')}
               </UI.FormSectionHeader>
               <UI.FormSectionHelper>
                 {t('dialogue:about_type_helper')}
               </UI.FormSectionHelper>
-            </Div>
+            </UI.Div>
             <Div>
               <InputGrid>
-                <FormControl isRequired isInvalid={!!form.errors.questionType}>
-                  <FormLabel htmlFor="questionType">
-                    {t('dialogue:question_type')}
-                  </FormLabel>
-                  <InputHelper>
+                <UI.FormControl isRequired isInvalid={!!form.errors.questionType}>
+                  <UI.FormLabel htmlFor="questionType">{t('dialogue:question_type')}</UI.FormLabel>
+                  <UI.InputHelper>
                     {t('dialogue:question_type_helper')}
-                  </InputHelper>
+                  </UI.InputHelper>
                   <Controller
+                    control={form.control}
                     id="question-type-select"
                     name="questionType"
-                    control={form.control}
-                    defaultValue={activeQuestionType}
-                    render={({ onChange, onBlur, value }) => (
-                      <Select
-                        options={questionTypes}
-                        value={activeQuestionType}
-                        onChange={(opt: any) => {
-                          handleQuestionTypeChange(opt);
-                          onChange(opt.value);
-                        }}
-                      />
+                    render={({ onChange, value, onBlur }) => (
+                      <UI.RadioButtons
+                        value={value}
+                        onChange={onChange}
+                        onBlur={onBlur}
+                      >
+                        <UI.RadioButton
+                          icon={Sliders}
+                          value={QuestionNodeTypeEnum.Slider}
+                          text={t('slider')}
+                          description={t('slider_helper')}
+                        />
+                        <UI.RadioButton
+                          icon={List}
+                          value={QuestionNodeTypeEnum.Choice}
+                          text={t('multiple_choice')}
+                          description={t('multiple_choice_helper')}
+                        />
+                        <UI.RadioButton
+                          icon={Youtube}
+                          value={QuestionNodeTypeEnum.VideoEmbedded}
+                          text={t('video')}
+                          description={t('video_helper')}
+                        />
+                      </UI.RadioButtons>
                     )}
                   />
                   <FormErrorMessage>{form.errors.questionType?.message}</FormErrorMessage>
-                </FormControl>
+                </UI.FormControl>
 
-                {form.watch('questionType') === 'VIDEO_EMBEDDED' && (
-                  <FormControl isRequired isInvalid={!!form.errors.videoEmbedded}>
-                    <FormLabel htmlFor="videoEmbedded">
+                {questionType === QuestionNodeTypeEnum.VideoEmbedded && (
+                  <UI.FormControl isRequired isInvalid={!!form.errors.videoEmbedded}>
+                    <UI.FormLabel htmlFor="videoEmbedded">
                       {t('video_embedded')}
-                    </FormLabel>
-                    <InputHelper>
+                    </UI.FormLabel>
+                    <UI.InputHelper>
                       {t('video_embedded_helper')}
-                    </InputHelper>
-                    <Input
+                    </UI.InputHelper>
+                    <UI.Input
                       name="videoEmbedded"
                       leftAddOn="https://www.youtube.com/watch?v="
                       ref={form.register()}
                       defaultValue={question.extraContent || undefined}
                     />
                     <FormErrorMessage>{form.errors.videoEmbedded?.message}</FormErrorMessage>
-                  </FormControl>
+                  </UI.FormControl>
                 )}
 
-                <FormControl isInvalid={!!form.errors.activeLeaf}>
-                  <FormLabel htmlFor="questionType">
+                <UI.FormControl isInvalid={!!form.errors.activeLeaf}>
+                  <UI.FormLabel htmlFor="questionType">
                     {t('call_to_action')}
-                  </FormLabel>
-                  <InputHelper>
+                  </UI.FormLabel>
+                  <UI.InputHelper>
                     {t('dialogue:cta_helper')}
-                  </InputHelper>
-                  <Controller
-                    id="question-type-select"
-                    name="activeLeaf"
-                    control={form.control}
-                    defaultValue={(activeLeaf?.value && activeLeaf) || leafs[0]}
-                    render={({ onChange, onBlur, value }) => (
-                      <Select
-                        options={leafs}
-                        // @ts-ignore
-                        value={(activeLeaf?.value && activeLeaf) || leafs[0] || ''}
-                        onChange={(opt: any) => {
-                          handleLeafChange(opt);
-                          onChange(opt.value);
-                        }}
-                      />
-                    )}
-                  />
+                  </UI.InputHelper>
+                  <UI.Div>
+                    <UI.Flex>
+                      {/* TODO: Make a theme out of it */}
+                      <UI.Div
+                        width="100%"
+                        backgroundColor="#fbfcff"
+                        border="1px solid #edf2f7"
+                        borderRadius="10px"
+                        padding={4}
+                      >
+                        <>
+                          <UI.Grid gridTemplateColumns="2fr 1fr">
+                            <UI.Helper>{t('call_to_action')}</UI.Helper>
+                          </UI.Grid>
+
+                          <UI.Grid
+                            pt={2}
+                            pb={2}
+                            pl={0}
+                            pr={0}
+                            borderBottom="1px solid #edf2f7"
+                            gridTemplateColumns="1fr"
+                          >
+                            <UI.Div alignItems="center" display="flex">
+                              <Controller
+                                name="overrideLeaf"
+                                control={form.control}
+                                // defaultValue={currentOverrideLeaf}
+                                render={({ value, onChange }) => (
+                                  <Dropdown renderOverlay={({ setCloseClickOnOutside, onClose }) => (
+                                    <NodePicker
+                                      questionId={question.id}
+                                      items={formattedCtaNodes}
+                                      onClose={onClose}
+                                      onChange={onChange}
+                                      onModalOpen={() => setCloseClickOnOutside(false)}
+                                      onModalClose={() => setCloseClickOnOutside(true)}
+                                    />
+                                  )}
+                                  >
+                                    {({ onOpen }) => (
+                                      <UI.Div
+                                        width="100%"
+                                        justifyContent="center"
+                                        display="flex"
+                                        alignItems="center"
+                                      >
+                                        {value?.label ? (
+                                          <NodeCell onRemove={handleRemoveCTA} onClick={onOpen} node={value} />
+                                        ) : (
+                                          <UI.Button
+                                            size="sm"
+                                            variant="outline"
+                                            onClick={onOpen}
+                                            variantColor="altGray"
+                                          >
+                                            <UI.Icon mr={1}>
+                                              <PlusCircle />
+                                            </UI.Icon>
+                                            {t('add_call_to_action')}
+                                          </UI.Button>
+                                        )}
+                                      </UI.Div>
+                                    )}
+                                  </Dropdown>
+                                )}
+                              />
+                            </UI.Div>
+                          </UI.Grid>
+                        </>
+                      </UI.Div>
+                    </UI.Flex>
+                  </UI.Div>
                   <FormErrorMessage>{form.errors.activeLeaf?.message}</FormErrorMessage>
-                </FormControl>
+                </UI.FormControl>
               </InputGrid>
             </Div>
-          </FormSection>
+          </UI.FormSection>
 
-          {activeQuestionType && activeQuestionType.value === 'SLIDER' && (
+          {questionType === QuestionNodeTypeEnum.Slider && (
             <>
               <UI.Hr />
-              <FormSection>
+              <UI.FormSection>
                 <UI.Div>
                   <UI.FormSectionHeader>{t('dialogue:about_slider')}</UI.FormSectionHeader>
                   <UI.FormSectionHelper>
@@ -689,11 +732,11 @@ const DialogueBuilderQuestionForm = ({
                 <SliderNodeForm
                   form={form}
                 />
-              </FormSection>
+              </UI.FormSection>
             </>
           )}
 
-          {activeQuestionType && (activeQuestionType.value === 'CHOICE' || activeQuestionType.value === 'VIDEO_EMBEDDED') && (
+          {(questionType === QuestionNodeTypeEnum.Choice || questionType === QuestionNodeTypeEnum.VideoEmbedded) && (
             <>
               <UI.Hr />
               <UI.FormSection>
@@ -710,59 +753,59 @@ const DialogueBuilderQuestionForm = ({
               </UI.FormSection>
             </>
           )}
-        </Div>
+        </UI.Div>
 
-        <Flex justifyContent="space-between">
+        <UI.Flex justifyContent="space-between">
           <ButtonGroup>
-            <Button
+            <UI.Button
               isLoading={createLoading || updateLoading}
               isDisabled={!form.formState.isValid}
               variantColor="teal"
               type="submit"
             >
               {t('save')}
-            </Button>
-            <Button variant="outline" onClick={() => handleCancelQuestion()}>Cancel</Button>
+            </UI.Button>
+            <UI.Button variant="outline" onClick={() => handleCancelQuestion()}>Cancel</UI.Button>
           </ButtonGroup>
-          <Span onClick={(e) => e.stopPropagation()}>
+          <UI.Span onClick={(e) => e.stopPropagation()}>
             <Popover
               usePortal
             >
-              {({ onClose }) => (
+              {() => (
                 <>
                   <PopoverTrigger>
-                    <Button
+                    <UI.Button
                       variant="outline"
                       variantColor="red"
-                      leftIcon={Trash}
+                      leftIcon={() => <Trash />}
                     >
                       {t('delete')}
-                    </Button>
+                    </UI.Button>
                   </PopoverTrigger>
                   <PopoverContent zIndex={4}>
                     <PopoverArrow />
                     <PopoverHeader>{t('delete')}</PopoverHeader>
                     <PopoverCloseButton />
                     <PopoverBody>
-                      <Text>{t('delete_question_popover')}</Text>
+                      <UI.Text>{t('delete_question_popover')}</UI.Text>
                     </PopoverBody>
                     <PopoverFooter>
-                      <Button
+                      <UI.Button
                         variant="outline"
                         variantColor="red"
                         onClick={() => onDeleteEntry && onDeleteEntry()}
                       >
                         {t('delete')}
-                      </Button>
+                      </UI.Button>
                     </PopoverFooter>
                   </PopoverContent>
                 </>
               )}
             </Popover>
-          </Span>
-        </Flex>
-      </Form>
-    </FormContainer>
+          </UI.Span>
+        </UI.Flex>
+      </UI.Form>
+    </UI.FormContainer>
 
   );
 };

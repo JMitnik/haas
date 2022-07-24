@@ -11,11 +11,16 @@ import { QuestionNodeProblem } from 'views/DialogueBuilderView/DialogueBuilderTy
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useDuplicateQuestionMutation } from 'types/generated-types';
-import ShowMoreButton from 'components/ShowMoreButton';
+import ShowMoreButton from 'components/Common/ShowMoreButton';
 import deleteQuestionMutation from 'mutations/deleteQuestion';
 import useAuth from 'hooks/useAuth';
 
-import { CTANode, EdgeConditionProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
+import {
+  CTANode,
+  EdgeConditionProps,
+  MappedQuestionOptionProps,
+  QuestionEntryProps,
+} from '../../DialogueBuilderInterfaces';
 import { OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer } from './QuestionEntryStyles';
 import BuilderIcon from './BuilderIcon';
 import CTALabel from './CTALabel';
@@ -30,7 +35,6 @@ interface QuestionEntryItemProps {
   // eslint-disable-next-line react/no-unused-prop-types
   questionsQ: Array<QuestionEntryProps>;
   question: QuestionEntryProps;
-  leafs: any;
   // eslint-disable-next-line react/no-unused-prop-types
   index: number;
   Icon: (props: any) => JSX.Element;
@@ -41,7 +45,7 @@ interface QuestionEntryItemProps {
   onDeleteQuestion?: (event: any, questionId: string) => void;
   onActiveQuestionChange: React.Dispatch<React.SetStateAction<string | null>>;
   condition: EdgeConditionProps | undefined;
-  parentOptions: QuestionOptionProps[] | undefined;
+  parentOptions: MappedQuestionOptionProps[] | undefined;
   edgeId: string | undefined;
   parentQuestionId?: string;
   depth: number;
@@ -84,7 +88,6 @@ const QuestionEntryItem = ({ depth,
   activeQuestion,
   onActiveQuestionChange,
   Icon,
-  leafs,
   onExpandChange,
   isExpanded,
   condition,
@@ -93,7 +96,7 @@ const QuestionEntryItem = ({ depth,
   parentQuestionId,
   ctaNodes,
   onAddExpandChange,
-  problems } : QuestionEntryItemProps) => {
+  problems }: QuestionEntryItemProps) => {
   const { activeCustomer } = useCustomer();
   const { dialogueSlug } = useParams<{ dialogueSlug: string }>();
   const { canAccessAdmin } = useAuth();
@@ -180,6 +183,19 @@ const QuestionEntryItem = ({ depth,
     });
   };
 
+  const mappedOptions = question?.options?.map((option) => ({
+    id: option.id,
+    position: option.position,
+    value: option.value,
+    publicValue: option.publicValue,
+    overrideLeaf: {
+      label: option.overrideLeaf?.title,
+      value: option.overrideLeaf?.id,
+      type: option.overrideLeaf?.type,
+    },
+    isTopic: option.isTopic,
+  })) || [];
+
   return (
     <Flex
       ref={questionRef}
@@ -252,10 +268,8 @@ const QuestionEntryItem = ({ depth,
               condition={condition}
               id={question.id}
               title={question.title}
-              isRoot={question.isRoot}
-              leafs={leafs}
               ctaNodes={ctaNodes}
-              options={question?.options || []}
+              options={mappedOptions}
               overrideLeaf={question.overrideLeaf}
               type={activeType}
               onActiveQuestionChange={onActiveQuestionChange}

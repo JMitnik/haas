@@ -5,10 +5,10 @@ import { GraphQLClient } from 'graphql-request';
 
 import { makeServer } from '../../config/server';
 
-type TestContext = {
+interface TestContext {
   client: GraphQLClient;
   port: number;
-};
+}
 
 export const makeTestContext = (prisma: PrismaClient): TestContext => {
   let ctx = {} as TestContext;
@@ -27,21 +27,47 @@ export const makeTestContext = (prisma: PrismaClient): TestContext => {
     await graphqlCtx.after();
   });
 
+  afterAll(async () => {
+    await graphqlCtx.after();
+  })
+
   return ctx;
 }
 
-function graphqlTestContext(prisma: PrismaClient) {
+export function graphqlTestContext(prisma: PrismaClient) {
   let serverInstance: Server | null = null;
+  let client: GraphQLClient | null = null;
+  let port: number | null = null;
+  let rand = 'test' + Math.random();
+  let isRun = false;
 
   return {
-    async before() {
-      const port = await getPort({ port: makeRange(4002, 6000) });
-      serverInstance = await makeServer(port, prisma);
+    server() {
+      if (!client) throw Error('Not initialized yet; run before');
 
-      return { client: new GraphQLClient(`http://localhost:${port}/graphql`), port: port };
+      return { client, port, rand }
+    },
+    isRun() {
+      return isRun
+    },
+    async before() {
+      isRun = true;
+      port = await getPort({ port: makeRange(4002, 6000) });
+      serverInstance = await makeServer(port, prisma);
+      client = new GraphQLClient(`http://localhost:${port}/graphql`);
+
+      return { isRun, client, port: port, rand };
     },
 
     async after() {
+      serverInstance?.close();
+    },
+
+    afterAll() {
+      serverInstance?.close();
+    },
+
+    afterEach() {
       serverInstance?.close();
     },
   };

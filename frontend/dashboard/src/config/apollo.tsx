@@ -1,7 +1,9 @@
-import { ApolloClient, ApolloLink, from } from '@apollo/client';
+import { ApolloClient, ApolloLink } from '@apollo/client';
 import { InMemoryCache } from '@apollo/client/cache';
 import { createUploadLink } from 'apollo-upload-client';
 import { onError } from '@apollo/client/link/error';
+
+import { getApiEndpoint } from 'utils/getApiEndpoint';
 
 const authorizeLink = new ApolloLink((operation, forward) => {
   const localToken = localStorage.getItem('access_token');
@@ -18,8 +20,9 @@ const authorizeLink = new ApolloLink((operation, forward) => {
 });
 
 const client = new ApolloClient({
-  link: from([
-    onError(({ graphQLErrors, networkError }) => {
+  credentials: 'include',
+  link: ApolloLink.from([
+    onError(({ graphQLErrors }) => {
       if (graphQLErrors) {
         const authorizedErrors = graphQLErrors.filter((error) => (
           error?.extensions?.code === 'UNAUTHENTICATED'
@@ -36,8 +39,9 @@ const client = new ApolloClient({
     }),
     authorizeLink,
     createUploadLink({
-      credentials: 'include',
-      uri: import.meta.env.VITE_API_ENDPOINT?.toString() || 'http://localhost:4000/graphql',
+      // credentials: 'include', // FIXME: does this need to be here instead of as property of client
+      // IF so, it doesn't work
+      uri: getApiEndpoint(),
     }),
   ]),
   cache: new InMemoryCache(),

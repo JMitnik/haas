@@ -1,0 +1,40 @@
+query getCustomerOfUser($input: UserOfCustomerInput) {
+    UserOfCustomer(input: $input) {
+      customer {
+        id
+        isDemo
+        name
+        slug
+        settings {
+          id
+          logoUrl
+          colourSettings {
+            id
+            primary
+          }
+        }
+        campaigns {
+          id
+          label
+        }
+      }
+      role {
+        name
+        permissions
+      }
+      user {
+        id
+        assignedDialogues(input: $input) {
+          privateWorkspaceDialogues {
+            title
+            slug
+            id
+          }
+          assignedDialogues {
+            slug
+            id
+          }
+        }
+      }
+    }
+  }

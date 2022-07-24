@@ -1,10 +1,9 @@
-import { UserOfCustomer, PrismaClient, Customer, Prisma, User } from '@prisma/client';
+import { UserOfCustomer, PrismaClient, Customer, Prisma, User, CustomerSettings } from '@prisma/client';
 import { UserInputError } from 'apollo-server';
 import _ from 'lodash';
 
-import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import { mailService } from '../../services/mailings/MailService';
-import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
+import { NexusGenInputs } from '../../generated/nexus';
 import AuthService from '../auth/AuthService';
 import makeInviteTemplate from '../../services/mailings/templates/makeInviteTemplate';
 import makeRoleUpdateTemplate from '../../services/mailings/templates/makeRoleUpdateTemplate';
@@ -12,25 +11,109 @@ import UserPrismaAdapter from './UserPrismaAdapter';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import UserOfCustomerPrismaAdapter from './UserOfCustomerPrismaAdapter';
 import { DeletedUserOutput, UserWithWorkspaces } from './UserServiceTypes';
+import { offsetPaginate } from '../general/PaginationHelpers';
+import DialogueService from '../../models/questionnaire/DialogueService';
+import CustomerService from '../../models/customer/CustomerService';
 
 class UserService {
   prisma: PrismaClient;
   userPrismaAdapter: UserPrismaAdapter;
   customerPrismaAdapter: CustomerPrismaAdapter;
   userOfCustomerPrismaAdapter: UserOfCustomerPrismaAdapter;
+  customerService: CustomerService;
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
     this.userPrismaAdapter = new UserPrismaAdapter(prismaClient);
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
     this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
+    this.customerService = new CustomerService(prismaClient);
   };
+
+  /**
+   * Creates a "root" user without any workspace associated.
+   */
+  public async createUser(email: string, firstName: string, lastName: string, isSuperAdmin: boolean) {
+    return this.userPrismaAdapter.upsertUserByEmail({
+      email,
+      firstName,
+      lastName,
+      globalPermissions: {
+        set: isSuperAdmin ? ['CAN_ACCESS_ADMIN_PANEL'] : [],
+      },
+    })
+  }
+
+  /**
+   * Finds all private dialogues of a workspace and connects them to a user
+   * @param userId
+   * @param workspaceId
+   */
+  connectPrivateDialoguesToUser = async (userId: string, workspaceId: string) => {
+    const customerWithDialogues = await this.customerService.findPrivateDialoguesOfWorkspace(workspaceId);
+    const privateDialogueIds = customerWithDialogues?.dialogues.map((dialogue) => ({ id: dialogue.id })) || [];
+    await this.userOfCustomerPrismaAdapter.connectPrivateDialoguesToUser(userId, privateDialogueIds);
+  }
+
+  /**
+   * Upserts a user by checking if the email already exists or not
+   * @param input
+   * @returns
+   */
+  upsertUserByEmail = async (input: Prisma.UserCreateInput) => {
+    return this.userPrismaAdapter.upsertUserByEmail(input);
+  }
+
+  /**
+   * Finds the private dialogues of a user as well as all private dialogues within a workspace
+   * @param input
+   * @param userId
+   * @returns
+   */
+  findPrivateDialoguesOfUser = async (input: NexusGenInputs['UserOfCustomerInput'], userId?: string) => {
+    const allPrivateDialoguesWorkspace = await this.customerPrismaAdapter.findPrivateDialoguesOfWorkspace(
+      input?.workspaceId || input?.customerId || undefined,
+      input?.customerSlug || undefined,
+    );
+
+    const user = await this.userPrismaAdapter.findPrivateDialogueOfUser(userId || input?.userId as string);
+
+    return {
+      assignedDialogues: user?.isAssignedTo || [],
+      privateWorkspaceDialogues: allPrivateDialoguesWorkspace?.dialogues || [],
+    }
+  }
+
+  /**
+   * Adjusts the dialogue privacy settings of a user based on the input.
+   * @param input
+   * @returns
+   */
+  assignUserToPrivateDialogues = async (input: NexusGenInputs['AssignUserToDialoguesInput']) => {
+    const updatedUser = await this.userPrismaAdapter.updateUserPrivateDialogues(input);
+
+    const allPrivateDialoguesWorkspace = await this.customerPrismaAdapter.findPrivateDialoguesOfWorkspace(
+      input.workspaceId
+    );
+
+    return {
+      ...updatedUser,
+      privateDialogues: {
+        assignedDialogues: updatedUser.isAssignedTo || [],
+        privateWorkspaceDialogues: allPrivateDialoguesWorkspace?.dialogues || [],
+      },
+    }
+  }
 
   async deleteUser(userId: string, customerId: string): Promise<DeletedUserOutput> {
     const removedUser = await this.userOfCustomerPrismaAdapter.delete(userId, customerId);
     if (removedUser) return { deletedUser: true };
 
     return { deletedUser: false };
+  };
+
+  async updateLastSeen(userId: string) {
+    return this.userPrismaAdapter.updateLastSeen(userId, new Date());
   };
 
   async editUser(
@@ -75,6 +158,14 @@ class UserService {
     return user?.customers.map((customerOfUser) => customerOfUser.customer) || [];
   };
 
+  async findActiveWorkspacesOfUser(userId: string) {
+    const userWorkspaces = await this.userPrismaAdapter.findAllWorkspacesByUserId(userId)
+    const activeUserWorkspacesRelations = userWorkspaces.filter((userInWorkspace) => userInWorkspace.isActive);
+    const activeWorkspaces = activeUserWorkspacesRelations.map((workspaceRelation) => workspaceRelation.customer);
+
+    return activeWorkspaces;
+  }
+
   async getUserCustomers(userId: string) {
     const user = await this.userPrismaAdapter.getUserById(userId);
 
@@ -83,6 +174,8 @@ class UserService {
     const { customers, ...rest } = user;
 
     return customers?.map((customerOfUser) => ({
+      createdAt: customerOfUser.createdAt,
+      isActive: customerOfUser.isActive,
       customer: customerOfUser.customer,
       role: customerOfUser.role,
       user: rest, //TODO: check if changes to rest covers user: parent from resolver (parent === User),
@@ -93,6 +186,16 @@ class UserService {
     const user = await this.userPrismaAdapter.getUserById(userId);
     return user?.globalPermissions || [];
   };
+
+  /**
+   * Finds the bot account within a workspace
+   * @param workspaceName the slug of the workspace
+   * @returns the bot account within a workspace
+   */
+  async findBotByWorkspaceName(workspaceName: string) {
+    const botEmail = `${workspaceName}@haas.live`
+    return this.userPrismaAdapter.getUserByEmail(botEmail);
+  }
 
   async getUserOfCustomer(workspaceId: string | null | undefined, customerSlug: string | null | undefined, userId: string) {
     let customerId = '';
@@ -144,11 +247,49 @@ class UserService {
     return this.userPrismaAdapter.getValidUsers(loginToken, userId);
   };
 
+  async setUserStateInWorkspace(input: { userId: string; workspaceId: string; isActive: boolean }) {
+    return this.userPrismaAdapter.setIsActive(input);
+  }
+
+  /**
+   * Send an invitation email to a user of a customer
+   * @param invitedUser
+   */
+  sendInvitationMail = async (
+    invitedUser: UserOfCustomer & {
+      customer: {
+        id: string;
+        name: string;
+        settings: {
+          colourSettings: {
+            primary: string;
+          } | null;
+        } | null;
+      };
+      user: User;
+    }) => {
+    const inviteLoginToken = AuthService.createUserToken(invitedUser.userId);
+    await this.userPrismaAdapter.setLoginToken(invitedUser.userId, inviteLoginToken);
+
+    const emailBody = makeInviteTemplate({
+      customerName: invitedUser.customer.name,
+      recipientMail: invitedUser.user.email,
+      token: inviteLoginToken,
+      bgColor: invitedUser.customer.settings?.colourSettings?.primary,
+    });
+
+    mailService.send({
+      recipient: invitedUser.user.email,
+      subject: `HAAS: You have been invited to ${invitedUser.customer.name}`,
+      body: emailBody,
+    });
+  }
+
   /**
    * Invites a new user to a current customer, and mails them with a login-token.
    */
   async inviteNewUserToCustomer(email: string, customerId: string, roleId: string) {
-    const createdUser = await this.userPrismaAdapter.createNewUser(customerId, roleId, email)
+    const createdUser = await this.userPrismaAdapter.createWorkspaceUser(customerId, roleId, email)
 
     const inviteLoginToken = AuthService.createUserToken(createdUser.id);
 
@@ -174,7 +315,7 @@ class UserService {
     const emailBody = makeRoleUpdateTemplate({
       customerName: updatedUser.customer.name,
       recipientMail: updatedUser.user.email,
-      newRoleName: updatedUser.role.name
+      newRoleName: updatedUser.role.name,
     });
 
     mailService.send({
@@ -212,7 +353,7 @@ class UserService {
         firstName: string;
         lastName: string;
         email: string;
-      },
+      };
       role: {
         name: string;
       };
@@ -246,7 +387,7 @@ class UserService {
         firstName: string;
         lastName: string;
         email: string;
-      },
+      };
       role: {
         name: string;
       };
@@ -268,55 +409,19 @@ class UserService {
 
   paginatedUsers = async (
     customerSlug: string,
-    paginationOpts: NexusGenInputs['PaginationWhereInput'],
+    filter?: NexusGenInputs['UserConnectionFilterInput'] | null,
   ) => {
-    const userOfCustomerFindManyArgs: Prisma.UserOfCustomerFindManyArgs = {
-      where: {
-        customer: { slug: customerSlug },
-      },
-      include: {
-        customer: true,
-        role: true,
-        user: true,
-      },
-    };
+    const offset = filter?.offset ?? 0;
+    const perPage = filter?.perPage ?? 5;
 
-    const countWhereInput: Prisma.UserOfCustomerFindManyArgs = {
-      where: {
-        customer: { slug: customerSlug },
-      }
-    };
+    const users = await this.userPrismaAdapter.findPaginatedUsers(customerSlug, filter);
+    const totalUsers = await this.userPrismaAdapter.countUsers(customerSlug, filter);
 
-    const findManyUsers = async ({ props, paginationOpts }: FindManyCallBackProps) => {
-      const users: any = await this.prisma.userOfCustomer.findMany(props);
-      const filteredBySearch = UserService.filterBySearchTerm(users, paginationOpts?.searchTerm);
-      const orderedUsers = UserService.orderUsersBy(filteredBySearch, paginationOpts?.orderBy?.[0]);
-      return orderedUsers;
-    };
-    const countUsers = async ({ props: countArgs }: FindManyCallBackProps) => this.prisma.userOfCustomer.count(countArgs);
-
-    const paginateProps: PaginateProps = {
-      findManyArgs: {
-        findArgs: userOfCustomerFindManyArgs,
-        searchFields: [],
-        orderFields: [],
-        findManyCallBack: findManyUsers,
-      },
-      countArgs: {
-        countWhereInput,
-        countCallBack: countUsers,
-      },
-      paginationOpts,
-    };
-
-    const { entries, pageInfo } = await paginate(paginateProps);
+    const { totalPages, ...pageInfo } = offsetPaginate(totalUsers, offset, perPage);
 
     return {
-      userCustomers: entries,
-      offset: paginationOpts?.offset || 0,
-      limit: paginationOpts?.limit || 0,
-      startDate: paginationOpts?.startDate?.toString(),
-      endDate: paginationOpts?.endDate?.toString(),
+      userCustomers: users,
+      totalPages,
       pageInfo,
     };
   };

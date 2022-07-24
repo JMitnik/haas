@@ -1,0 +1,15 @@
+query GetDialogueTopics($dialogueId: ID!, $input: TopicInputType!) {
+  dialogue(where: { id: $dialogueId }) {
+		id
+		topic(input: $input) {
+			name
+			impactScore
+			nrVotes
+			subTopics {
+				name
+        impactScore
+			  nrVotes
+			}
+		}
+	}
+}

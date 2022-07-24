@@ -3,14 +3,14 @@ import * as UI from '@haas/ui';
 import { Controller, UseFormMethods, useFieldArray, useWatch } from 'react-hook-form';
 import {
   CornerRightDown, CornerRightUp, Mail, Maximize2,
-  Minimize2, MousePointer, PlusCircle, Smartphone, Target, Thermometer, Type, UserPlus, Watch
+  Minimize2, MousePointer, PlusCircle, Smartphone, Target, Thermometer, Type, UserPlus, Watch,
 } from 'react-feather';
 import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
 import { ReactComponent as PaperIll } from 'assets/images/paper.svg';
 import { ReactComponent as SMSIll } from 'assets/images/sms.svg';
 import { Slider } from 'antd';
+import { gql, useLazyQuery, useQuery } from '@apollo/client';
 import { useHistory, useParams } from 'react-router';
-import { useLazyQuery, useQuery } from '@apollo/client';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Select from 'react-select';
 import styled from 'styled-components';
@@ -22,10 +22,10 @@ import {
   FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, RadioButton, Span,
 } from '@haas/ui';
 import { SelectType } from 'types/generic';
+
 import { useTranslation } from 'react-i18next';
 import ServerError from 'components/ServerError';
 import getQuestionsQuery from 'queries/getQuestionnaireQuery';
-import { gql } from '@apollo/client';
 
 import { getCustomerTriggerData as CustomerTriggerData } from './__generated__/getCustomerTriggerData';
 
@@ -229,10 +229,8 @@ const FormConditionFragment = ({
 
   return (
     <UI.Card
-      noHover
       borderTop="3px solid"
       borderColor="primary"
-      outline
       mt={2}
       gridColumn="1 / -1"
       padding={4}
@@ -335,23 +333,23 @@ const FormConditionFragment = ({
                     />
                   </RadioButtonGroup>
                 ) : (
-                    <RadioButtonGroup
-                      display="flex"
-                      value={value}
-                      onChange={(val) => {
-                        onChange(val);
-                        onBlur();
-                      }}
-                    >
-                      <RadioButton
-                        mr={2}
-                        icon={Target}
-                        value="TEXT_MATCH"
-                        text="Match text"
-                        description="Match specific text"
-                      />
-                    </RadioButtonGroup>
-                  )}
+                  <RadioButtonGroup
+                    display="flex"
+                    value={value}
+                    onChange={(val) => {
+                      onChange(val);
+                      onBlur();
+                    }}
+                  >
+                    <RadioButton
+                      mr={2}
+                      icon={Target}
+                      value="TEXT_MATCH"
+                      text="Match text"
+                      description="Match specific text"
+                    />
+                  </RadioButtonGroup>
+                )}
               </>
             )}
           />
@@ -416,7 +414,7 @@ const FormConditionFragment = ({
                 step={0.5}
                 min={0}
                 max={10}
-                tipFormatter={(value) => (value ? `${10 - value}` : 10)}
+                tipFormatter={(val) => (val ? `${10 - val}` : 10)}
                 defaultValue={value}
                 reverse
                 onAfterChange={(e: number) => {
@@ -456,8 +454,8 @@ const FormConditionFragment = ({
                     min={0}
                     max={10}
                     defaultValue={value}
-                    onAfterChange={(value) => {
-                      onChange(value);
+                    onAfterChange={(val) => {
+                      onChange(val);
                     }}
                   />
                 </OuterSliderContainer>
@@ -485,8 +483,8 @@ const FormConditionFragment = ({
                 step={0.5}
                 min={0}
                 max={10}
-                onAfterChange={(value) => {
-                  onChange(value);
+                onAfterChange={(val) => {
+                  onChange(val);
                 }}
               />
             )}
@@ -680,7 +678,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
             {!activeDialogue ? (
               <UI.IllustrationCard svg={<PaperIll />} text={t('trigger:select_dialogue_placeholder')}>
                 <Button
-                  leftIcon={MousePointer}
+                  leftIcon={() => <MousePointer />}
                   onClick={() => questionSelectRef.current.focus()}
                   size="sm"
                   variant="outline"
@@ -690,39 +688,37 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 </Button>
               </UI.IllustrationCard>
             ) : (
-                <>
-                  {fields.length === 0 ? (
-                    <UI.IllustrationCard svg={<EmptyIll />} text={t('trigger:condition_placeholder')}>
-                      <Button
-                        leftIcon={PlusCircle}
-                        onClick={addCondition}
-                        isDisabled={!activeDialogue}
-                        size="sm"
-                        variant="outline"
-                        variantColor="teal"
-                      >
-                        {t('trigger:add_condition')}
-                      </Button>
-                    </UI.IllustrationCard>
-                  ) : (
-                      <UI.Div>
-                        <Button
-                          leftIcon={PlusCircle}
-                          onClick={addCondition}
-                          isDisabled={!activeDialogue}
-                          size="sm"
-                          variant="outline"
-                          variantColor="teal"
-                        >
-                          {t('trigger:add_condition')}
-                        </Button>
-                      </UI.Div>
-                    )}
-                </>
-              )}
-
+              <>
+                {fields.length === 0 ? (
+                  <UI.IllustrationCard svg={<EmptyIll />} text={t('trigger:condition_placeholder')}>
+                    <UI.Button
+                      leftIcon={() => <PlusCircle />}
+                      onClick={addCondition}
+                      isDisabled={!activeDialogue}
+                      size="sm"
+                      variant="outline"
+                      variantColor="teal"
+                    >
+                      {t('trigger:add_condition')}
+                    </UI.Button>
+                  </UI.IllustrationCard>
+                ) : (
+                  <UI.Div>
+                    <UI.Button
+                      leftIcon={() => <PlusCircle />}
+                      onClick={addCondition}
+                      isDisabled={!activeDialogue}
+                      size="sm"
+                      variant="outline"
+                      variantColor="teal"
+                    >
+                      {t('trigger:add_condition')}
+                    </UI.Button>
+                  </UI.Div>
+                )}
+              </>
+            )}
           </InputGrid>
-
         </Div>
       </FormSection>
 
@@ -736,8 +732,6 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
         <UI.InputGrid>
           {activeRecipients.map((recipient, index) => (
             <UI.Card
-              noHover
-              outline
               borderTop="3px solid"
               borderColor="tertiary"
               key={index}
@@ -789,24 +783,24 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 size="sm"
                 variant="outline"
                 variantColor="teal"
-                leftIcon={UserPlus}
+                leftIcon={() => <UserPlus />}
               >
                 {t('add_recipient')}
               </Button>
             </UI.IllustrationCard>
           ) : (
-              <Div>
-                <Button
-                  onClick={addRecipient}
-                  size="sm"
-                  variant="outline"
-                  variantColor="teal"
-                  leftIcon={UserPlus}
-                >
-                  {t('add_recipient')}
-                </Button>
-              </Div>
-            )}
+            <Div>
+              <Button
+                onClick={addRecipient}
+                size="sm"
+                variant="outline"
+                variantColor="teal"
+                leftIcon={() => <UserPlus />}
+              >
+                {t('add_recipient')}
+              </Button>
+            </Div>
+          )}
         </UI.InputGrid>
       </FormSection>
 

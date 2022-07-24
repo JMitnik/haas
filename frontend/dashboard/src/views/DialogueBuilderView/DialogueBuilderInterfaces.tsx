@@ -1,17 +1,14 @@
-enum QuestionNodeTypeEnum {
-  Generic = 'GENERIC',
-  Slider = 'SLIDER',
-  Choice = 'CHOICE',
-  Registration = 'REGISTRATION',
-  Form = 'FORM',
-  Textbox = 'TEXTBOX',
-  Link = 'LINK',
-  Share = 'SHARE'
-}
+import { QuestionNodeTypeEnum } from 'types/generated-types';
 
 export interface CTANode {
   id: string;
   title: string;
+  type?: QuestionNodeTypeEnum;
+}
+
+export interface MappedCTANode {
+  label?: string;
+  value?: string;
   type?: QuestionNodeTypeEnum;
 }
 
@@ -36,12 +33,22 @@ export interface QuestionEntryProps {
   sliderNode?: any;
 }
 
+export interface MappedQuestionOptionProps {
+  id?: number;
+  value: string;
+  publicValue?: string;
+  overrideLeaf?: MappedCTANode;
+  newOverrideLeaf?: MappedCTANode;
+  position?: number;
+}
+
 export interface QuestionOptionProps {
   id?: number;
   value: string;
   publicValue?: string;
   overrideLeaf?: CTANode;
   position?: number;
+  isTopic: boolean;
 }
 
 export interface ShallowQuestionEntryProps {
@@ -59,7 +66,7 @@ export interface EdgeChildProps {
 export interface EdgeConditionProps {
   id?: number;
   conditionType?: string;
-  renderMin?: number;
-  renderMax?: number;
-  matchValue?: string;
+  renderMin?: number | null;
+  renderMax?: number | null;
+  matchValue?: string | null;
 }

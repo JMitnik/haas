@@ -1,4 +1,4 @@
-import { mutationField } from '@nexus/schema';
+import { mutationField } from 'nexus';
 import { UserInputError } from 'apollo-server';
 
 import prisma from '../../../config/prisma';
@@ -23,14 +23,14 @@ export const UpdateDeliveryStatusResolver = mutationField('updateDeliveryStatus'
       where: { id: args.deliveryId },
       data: {
         currentStatus: args.status,
-      }
+      },
     });
 
     const createUpdateEvent = ctx.prisma.deliveryEvents.create({
       data: {
         status: args.status,
         Delivery: { connect: { id: args.deliveryId } },
-      }
+      },
     })
 
     await prisma.$transaction([updateDelivery, createUpdateEvent]);

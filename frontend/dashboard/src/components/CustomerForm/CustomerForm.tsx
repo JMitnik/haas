@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import { Activity, Briefcase, Clipboard, Link, Link2, Loader, Minus, Upload } from 'react-feather';
-import { Button, ButtonGroup, RadioButtonGroup, useToast } from '@chakra-ui/core';
+import { RadioButtonGroup, useToast } from '@chakra-ui/core';
 import { Controller, UseFormMethods } from 'react-hook-form';
 import {
   Div, Form, FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper,
@@ -249,7 +249,7 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
             {t('customer:branding_helper')}
           </Muted>
         </Div>
-        <Div>
+        <InputGrid>
           <InputGrid>
             <FormControl isInvalid={!!form.errors.primaryColour} isRequired>
               <FormLabel htmlFor="primaryColour">{t('branding_color')}</FormLabel>
@@ -266,7 +266,7 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
           <InputGrid>
             <CustomerLogoFormFragment form={form} />
           </InputGrid>
-        </Div>
+        </InputGrid>
       </FormSection>
 
       {!isInEdit && canAccessAdmin && (
@@ -345,17 +345,17 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
         </>
       )}
 
-      <ButtonGroup>
-        <Button
+      <UI.Flex>
+        <UI.Button
           isLoading={isLoading}
           isDisabled={!form.formState.isValid}
-          variantColor="teal"
           type="submit"
+          mr={4}
         >
           {isInEdit ? t('edit') : t('create')}
-        </Button>
-        <Button variant="outline" onClick={() => history.goBack()}>{t('cancel')}</Button>
-      </ButtonGroup>
+        </UI.Button>
+        <UI.Button variant="outline" onClick={() => history.goBack()}>{t('cancel')}</UI.Button>
+      </UI.Flex>
     </Form>
   );
 };

@@ -1,139 +1,160 @@
 import * as UI from '@haas/ui';
-import { ErrorBoundary } from 'react-error-boundary';
-import { Plus } from 'react-feather';
-import {
-  Popover,
-  PopoverArrow,
-  PopoverBody,
-  PopoverCloseButton,
-  PopoverContent,
-  PopoverFooter,
-  PopoverHeader,
-  PopoverTrigger,
-  useToast,
-} from '@chakra-ui/core';
-import { debounce } from 'lodash';
-import { useHistory, useParams } from 'react-router';
-import { useLazyQuery, useMutation } from '@apollo/client';
+import { BooleanParam, DateTimeParam, NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
+import { Calendar, Filter, Search, User } from 'react-feather';
+import { endOfDay, startOfDay } from 'date-fns';
+import { useHistory } from 'react-router-dom';
+import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
-import { GenericCell, RoleCell } from 'components/Table/CellComponents/CellComponents';
-import { ReactComponent as UsersIcon } from 'assets/icons/icon-user-group.svg';
+import * as Menu from 'components/Common/Menu';
+import * as Modal from 'components/Common/Modal';
+import * as Table from 'components/Common/Table';
+import { Avatar } from 'components/Common/Avatar';
+import { FormatTimestamp } from 'components/Common/DateAndTime';
+import {
+  GetPaginatedUsersQuery,
+  PaginationSortByEnum,
+  UserConnectionOrder,
+  useDeleteUserMutation,
+  useGetPaginatedUsersQuery,
+  useHandleUserStateInWorkspaceMutation,
+} from 'types/generated-types';
+import { PickerButton } from 'components/Common/Picker/PickerButton';
+import { ROUTES, useNavigator } from 'hooks/useNavigator';
+import { TabbedMenu } from 'components/Common/TabMenu';
+import { View } from 'layouts/View';
+import { formatSimpleDate } from 'utils/dateUtils';
 import { useCustomer } from 'providers/CustomerProvider';
-import SearchBar from 'components/SearchBar/SearchBar';
-import ShowMoreButton from 'components/ShowMoreButton';
-import Table from 'components/Table/Table';
-import getPaginatedUsers from 'queries/getPaginatedUsers';
+import { useMenu } from 'components/Common/Menu/useMenu';
+import { useRouteModal } from 'components/Common/Modal';
+import SearchBar from 'components/Common/SearchBar/SearchBar';
+import Searchbar from 'components/Common/SearchBar';
 import useAuth from 'hooks/useAuth';
 
-import deleteUserQuery from '../../mutations/deleteUser';
+import { UserModalCard } from './UserModalCard';
+import InviteUserButton from './InviteUserButton';
+import InviteUserForm from './InviteUserForm';
+import RoleUserModalCard from './RoleUserModalCard';
 
-interface TableProps {
-  activeStartDate: Date | null;
-  activeEndDate: Date | null;
-  activeSearchTerm: string;
-  pageIndex: number;
-  pageSize: number;
-  sortBy: {
-    by: string;
-    desc: boolean;
-  }[];
+const columns = `
+  minmax(50px, 1fr)
+  minmax(50px, 1fr)
+  minmax(200px, 1fr)
+  minmax(30px, 1fr)
+  minmax(50px, 1fr)
+  minmax(50px, 1fr)
+  minmax(50px, 1fr)
+`;
+
+const UserAvatarCell = ({ firstName }: { firstName?: string | null }) => {
+  const nameExists = !!firstName;
+
+  return (
+    <UI.Flex alignItems="center">
+      <UI.Div mr={2}>
+        {nameExists ? <Avatar name={firstName || ''} brand="blue" /> : <Avatar name="A" brand="gray" />}
+      </UI.Div>
+      <UI.ColumnFlex>
+        {nameExists && (
+          <UI.Span fontWeight={600} color="gray.500">
+            {firstName}
+          </UI.Span>
+        )}
+      </UI.ColumnFlex>
+    </UI.Flex>
+  );
+};
+
+interface RoleModalRouteParams {
+  userId: string;
+  roleId: string;
 }
 
-const HEADERS = [
-  { Header: 'first_name', accessor: 'firstName', Cell: GenericCell },
-  { Header: 'last_name', accessor: 'lastName', Cell: GenericCell },
-  { Header: 'email', accessor: 'email', Cell: GenericCell },
-  { Header: 'role', accessor: 'role', Cell: RoleCell },
-];
+interface ContextualMenuProps {
+  userId: string;
+}
 
 const UsersOverview = () => {
-  const { canDeleteUsers, canInviteUsers, canEditUsers } = useAuth();
+  const { canAccessAdmin, canEditUsers, canDeleteUsers } = useAuth();
   const { activeCustomer } = useCustomer();
-  const { customerSlug } = useParams<{ customerSlug: string }>();
+  const { customerSlug } = useNavigator();
   const { t } = useTranslation();
   const history = useHistory();
   const toast = useToast();
-  const [fetchUsers, { data, refetch }] = useLazyQuery(getPaginatedUsers, {
-    fetchPolicy: 'cache-and-network',
+
+  const { menuProps, openMenu, closeMenu, activeItem: contextUser } = useMenu<ContextualMenuProps>();
+
+  const [activePaginatedUsersResult, setActivePaginatedUsersResult] = useState<GetPaginatedUsersQuery>();
+
+  const [filter, setFilter] = useQueryParams({
+    startDate: DateTimeParam,
+    endDate: DateTimeParam,
+    search: StringParam,
+    firstName: StringParam,
+    lastName: StringParam,
+    email: StringParam,
+    pageIndex: withDefault(NumberParam, 0),
+    perPage: withDefault(NumberParam, 10),
+    role: StringParam,
+    orderByField: withDefault(StringParam, PaginationSortByEnum.CreatedAt),
+    orderByDescending: withDefault(BooleanParam, true),
   });
 
-  const [paginationProps, setPaginationProps] = useState<TableProps>({
-    activeStartDate: null,
-    activeEndDate: null,
-    activeSearchTerm: '',
-    pageIndex: 0,
-    pageSize: 8,
-    sortBy: [{ by: 'email', desc: true }],
-  });
-
-  const tableData: any = data?.customer?.usersConnection?.userCustomers?.map((userCustomer: any) => ({
-    ...userCustomer.user,
-    role: userCustomer.role,
-  })) || [];
-
-  useEffect(() => {
-    const {
-      activeStartDate,
-      activeEndDate,
-      pageIndex,
-      pageSize,
-      sortBy,
-      activeSearchTerm,
-    } = paginationProps;
-    fetchUsers({
-      variables: {
-        customerSlug,
-        filter: {
-          startDate: activeStartDate,
-          endDate: activeEndDate,
-          searchTerm: activeSearchTerm,
-          offset: pageIndex * pageSize,
-          limit: pageSize,
-          pageIndex,
-          orderBy: sortBy,
-        },
+  const { refetch, loading: isLoading } = useGetPaginatedUsersQuery({
+    fetchPolicy: 'network-only',
+    variables: {
+      customerSlug,
+      filter: {
+        firstName: filter.firstName,
+        lastName: filter.lastName,
+        email: filter.email,
+        role: filter.role,
+        startDate: filter.startDate ? filter.startDate.toISOString() : undefined,
+        endDate: filter.endDate ? filter.endDate.toISOString() : undefined,
+        search: filter.search,
+        offset: filter.pageIndex * filter.perPage,
+        perPage: filter.perPage,
+        orderBy: { by: filter.orderByField as UserConnectionOrder, desc: filter.orderByDescending },
       },
-    });
-  }, [customerSlug, fetchUsers, paginationProps]);
+    },
+    errorPolicy: 'ignore',
+    notifyOnNetworkStatusChange: true,
+    onCompleted: (fetchedData) => {
+      setActivePaginatedUsersResult(fetchedData);
+    },
+  });
 
-  const [deleteUser] = useMutation(deleteUserQuery, {
-    onCompleted: () => {
-      refetch?.({
-        customerSlug,
-        filter: {
-          startDate: paginationProps.activeStartDate,
-          endDate: paginationProps.activeEndDate,
-          searchTerm: paginationProps.activeSearchTerm,
-          offset: paginationProps.pageIndex * paginationProps.pageSize,
-          limit: paginationProps.pageSize,
-          pageIndex: paginationProps.pageIndex,
-          orderBy: paginationProps.sortBy,
-        },
-      });
+  const [setUserAccess] = useHandleUserStateInWorkspaceMutation({
+    onCompleted: (userOfCustomer) => {
+      const email = userOfCustomer?.handleUserStateInWorkspace?.user?.email;
+      const state = userOfCustomer?.handleUserStateInWorkspace?.isActive ? t('active') : t('inactive');
+      refetch();
       toast({
-        title: 'User removed!',
-        description: 'The user has been removed from the workspace.',
+        title: t('toast:user_access_changed'),
+        description: t('toast:user_access_helper', { email, state }),
         status: 'success',
         position: 'bottom-right',
         duration: 1500,
       });
     },
-    onError: () => {
+  });
+
+  const [deleteUser] = useDeleteUserMutation({
+    onCompleted: () => {
+      refetch();
+
       toast({
-        title: 'An error ocurred!',
-        description: 'It was not possible to remove user.',
-        status: 'error',
+        title: t('toast:user_removed'),
+        description: t('toast:user_removed_helper'),
+        status: 'success',
         position: 'bottom-right',
         duration: 1500,
       });
     },
   });
 
-  const handleDeleteUser = (event: any, userId: string) => {
-    event.stopPropagation();
-
+  const handleDeleteUser = (userId: string) => {
     deleteUser({
       variables: {
         input: {
@@ -144,118 +165,431 @@ const UsersOverview = () => {
     });
   };
 
-  const handleEditUser = (event: any, userId: string) => {
-    event.stopPropagation();
+  const handleEditUser = (userId: string) => {
     history.push(`/dashboard/b/${customerSlug}/u/${userId}/edit`);
   };
 
-  const handleAddUser = (event: any) => {
-    event.stopPropagation();
-    history.push(`/dashboard/b/${customerSlug}/users/invite/`);
+  const handleSearchTermChange = (search: string) => {
+    setFilter((prevValues) => ({
+      ...prevValues,
+      search,
+      pageIndex: 0,
+    }));
   };
 
-  const handleSearchTermChange = useCallback(
-    debounce((newSearchTerm: string) => {
-      setPaginationProps((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm }));
-    }, 250),
-    [],
-  );
+  const handleSearchChange = (search: string) => {
+    setFilter((prevValues) => ({
+      ...prevValues,
+      search,
+      pageIndex: 0,
+    }));
+  };
 
-  const pageCount = data?.customer?.usersConnection?.pageInfo?.nrPages || 1;
-  const pageIndex = data?.customer?.usersConnection?.pageInfo?.pageIndex || 0;
+  const handleDateChange = (dates: Date[] | null) => {
+    if (dates) {
+      const [newStartDate, newEndDate] = dates;
+      setFilter({
+        ...filter,
+        startDate: startOfDay(newStartDate),
+        endDate: endOfDay(newEndDate),
+        pageIndex: 0,
+      });
+    } else {
+      setFilter({
+        ...filter,
+        startDate: null,
+        endDate: null,
+        pageIndex: 0,
+      });
+    }
+  };
+
+  const handleMultiDateFilterChange = (newStartDate?: Date, newEndDate?: Date) => {
+    setFilter({
+      ...filter,
+      startDate: newStartDate,
+      endDate: newEndDate,
+      pageIndex: 0,
+    });
+  };
+
+  const handleRole = (role?: string | null) => {
+    setFilter({ role, pageIndex: 0 });
+  };
+
+  const handleRecipientFirstName = (firstName?: string | null) => {
+    setFilter({ firstName, pageIndex: 0 });
+  };
+
+  const handleRecipientLastName = (lastName?: string | null) => {
+    setFilter({ lastName, pageIndex: 0 });
+  };
+
+  const handleRecipientEmail = (email?: string | null) => {
+    setFilter({ email, pageIndex: 0 });
+  };
+
+  const tableData = activePaginatedUsersResult?.customer?.usersConnection?.userCustomers?.map((userCustomer) => ({
+    ...userCustomer!.user,
+    isActive: userCustomer!.isActive,
+    createdAt: userCustomer!.createdAt,
+    userId: userCustomer!.user!.id,
+    role: userCustomer!.role,
+  })) || [];
+
+  const pageCount = activePaginatedUsersResult?.customer?.usersConnection?.totalPages || 0;
+
+  const [openRoleModal, closeRoleModal, isRoleModalOpen, roleParams] = useRouteModal<RoleModalRouteParams>({
+    matchUrlKey: ROUTES.ROLE_USER_VIEW,
+    exitUrl: `/dashboard/b/${customerSlug}/users`,
+  });
+
+  const [openUserModal, closeUserModal, isUserModalOpen, userParams] = useRouteModal<{ userId: string }>({
+    matchUrlKey: ROUTES.USER_VIEW,
+    exitUrl: `/dashboard/b/${customerSlug}/users`,
+  });
 
   return (
-    <>
+    <View documentTitle="haas | Users">
       <UI.ViewHead>
         <UI.Flex width="100%" justifyContent="space-between">
-          <UI.Flex alignItems="center">
-            <UI.ViewTitle leftIcon={<UsersIcon fill="currentColor" />}>{t('views:users_overview')}</UI.ViewTitle>
-            <UI.Button
-              isDisabled={!canInviteUsers}
-              size="sm"
-              ml={4}
-              onClick={handleAddUser}
-              leftIcon={Plus}
-              variantColor="teal"
-            >
-              {t('invite_user')}
-            </UI.Button>
+          <UI.Flex alignItems="flex-end">
+            <UI.Div>
+              <UI.ViewTitle>{t('views:users_overview')}</UI.ViewTitle>
+              <UI.ViewSubTitle>
+                {t('users_subtitle')}
+              </UI.ViewSubTitle>
+            </UI.Div>
+
+            <UI.Div ml={8}>
+              <InviteUserButton>
+                {(onClose) => (
+                  <InviteUserForm onRefetch={refetch} onClose={onClose} />
+                )}
+              </InviteUserButton>
+            </UI.Div>
           </UI.Flex>
 
-          <SearchBar
-            activeSearchTerm={paginationProps.activeSearchTerm}
-            onSearchTermChange={handleSearchTermChange}
-          />
+          <UI.Div>
+            <SearchBar
+              search={filter.search}
+              onSearchChange={handleSearchTermChange}
+            />
+          </UI.Div>
+
         </UI.Flex>
       </UI.ViewHead>
 
       <UI.ViewBody>
-
-        <UI.Div borderRadius="lg" flexGrow={1} backgroundColor="white" mb="1%">
-          <ErrorBoundary
-            FallbackComponent={() => (
-              <UI.Div>
-                We are experiencing some maintenance with the Users data. We will be back shortly.
-              </UI.Div>
-            )}
-          >
-            <Table
-              headers={HEADERS}
-              paginationProps={{ ...paginationProps, pageCount, pageIndex }}
-              onPaginationChange={setPaginationProps}
-              data={tableData}
-              renderOptions={(usersData: any) => (
-                <>
-                  {canDeleteUsers && (
-                    <ShowMoreButton
-                      renderMenu={(
-                        <UI.List>
-                          <UI.ListHeader>{t('edit_user')}</UI.ListHeader>
-                          {canDeleteUsers && (
-                            <>
-                              {canEditUsers && (
-                                <UI.ListItem onClick={(e: any) => handleEditUser(e, usersData?.id)}>
-                                  {t('edit_user')}
-                                </UI.ListItem>
-                              )}
-                              <Popover>
-                                {() => (
-                                  <>
-                                    <PopoverTrigger>
-                                      <UI.ListItem>{t('delete_user')}</UI.ListItem>
-                                    </PopoverTrigger>
-                                    <PopoverContent zIndex={4}>
-                                      <PopoverArrow />
-                                      <PopoverHeader>{t('delete')}</PopoverHeader>
-                                      <PopoverCloseButton />
-                                      <PopoverBody>
-                                        <UI.Text>{t('delete_user_popover')}</UI.Text>
-                                      </PopoverBody>
-                                      <PopoverFooter>
-                                        <UI.Button
-                                          variantColor="red"
-                                          onClick={(e: any) => handleDeleteUser(e, usersData?.id)}
-                                        >
-                                          {t('delete')}
-                                        </UI.Button>
-                                      </PopoverFooter>
-                                    </PopoverContent>
-                                  </>
-                                )}
-                              </Popover>
-                            </>
-                          )}
-                        </UI.List>
-                      )}
+        <UI.Div>
+          <UI.Flex mb={2} justifyContent="space-between">
+            <PickerButton label={t('filter_users')} icon={(<Filter />)}>
+              {() => (
+                <TabbedMenu
+                  menuHeader={t('filter_users')}
+                  tabs={[
+                    { label: t('search'), icon: <Search /> },
+                    { label: t('date'), icon: <Calendar /> },
+                    { label: t('recipient'), icon: <User /> },
+                  ]}
+                >
+                  <UI.Div>
+                    <UI.RadioHeader>
+                      {t('filter_by_search')}
+                    </UI.RadioHeader>
+                    <Searchbar
+                      search={filter.search}
+                      onSearchChange={handleSearchChange}
                     />
-                  )}
-                </>
+                  </UI.Div>
+
+                  <UI.Div>
+                    <UI.RadioHeader>
+                      {t('filter_by_date')}
+                    </UI.RadioHeader>
+                    <UI.SectionSubHeader mb={2}>
+                      {t('filter_by_updated_date_description')}
+                    </UI.SectionSubHeader>
+                    <UI.DatePicker
+                      value={[filter.startDate, filter.endDate]}
+                      onChange={handleDateChange}
+                      range
+                    />
+                  </UI.Div>
+
+                  <UI.Div>
+                    <UI.Stack spacing={4}>
+                      <UI.Div>
+                        <UI.RadioHeader>
+                          {t('filter_by_recipient_first_name')}
+                        </UI.RadioHeader>
+                        <Searchbar
+                          search={filter.firstName}
+                          onSearchChange={handleRecipientFirstName}
+                        />
+                      </UI.Div>
+                      <UI.Div>
+                        <UI.RadioHeader>
+                          {t('filter_by_recipient_last_name')}
+                        </UI.RadioHeader>
+                        <Searchbar
+                          search={filter.lastName}
+                          onSearchChange={handleRecipientLastName}
+                        />
+                      </UI.Div>
+                      <UI.Div>
+                        <UI.RadioHeader>
+                          {t('filter_by_recipient_email')}
+                        </UI.RadioHeader>
+                        <Searchbar
+                          search={filter.email}
+                          onSearchChange={handleRecipientEmail}
+                        />
+                      </UI.Div>
+                      <UI.Div>
+                        <UI.RadioHeader>
+                          {t('filter_by_role_name')}
+                        </UI.RadioHeader>
+                        <Searchbar
+                          search={filter.role}
+                          onSearchChange={handleRole}
+                        />
+                      </UI.Div>
+                    </UI.Stack>
+                  </UI.Div>
+                </TabbedMenu>
               )}
-            />
-          </ErrorBoundary>
+            </PickerButton>
+
+            <UI.Separator bg="gray.200" />
+
+            <UI.Stack spacing={2} isInline>
+              <Table.FilterButton
+                condition={!!filter.search}
+                filterKey="search"
+                value={filter.search}
+                onClose={() => handleSearchChange('')}
+              />
+              <Table.FilterButton
+                condition={!!filter.firstName}
+                filterKey="recipientFirstName"
+                value={filter.firstName}
+                onClose={() => handleRecipientFirstName('')}
+              />
+              <Table.FilterButton
+                condition={!!filter.lastName}
+                filterKey="recipientLastName"
+                value={filter.lastName}
+                onClose={() => handleRecipientLastName('')}
+              />
+              <Table.FilterButton
+                condition={!!(filter.startDate || filter.endDate)}
+                filterKey="updatedAt"
+                value={`${formatSimpleDate(filter.startDate?.toISOString())} - ${formatSimpleDate(filter.endDate?.toISOString())}`}
+                onClose={() => handleMultiDateFilterChange(undefined, undefined)}
+              />
+              <Table.FilterButton
+                condition={!!filter.email}
+                filterKey="recipientEmail"
+                value={filter.email}
+                onClose={() => handleRecipientEmail('')}
+              />
+            </UI.Stack>
+
+          </UI.Flex>
+
+          <Table.HeadingRow gridTemplateColumns={columns}>
+            <Table.HeadingCell
+              sorting={filter.orderByField === UserConnectionOrder.FirstName}
+              descending={filter.orderByDescending || false}
+              onDescendChange={(isDescend) => setFilter({
+                orderByField: UserConnectionOrder.FirstName,
+                orderByDescending: isDescend,
+              })}
+            >
+              {t('first_name')}
+            </Table.HeadingCell>
+            <Table.HeadingCell
+              sorting={filter.orderByField === UserConnectionOrder.LastName}
+              descending={filter.orderByDescending || false}
+              onDescendChange={(isDescend) => setFilter({
+                orderByField: UserConnectionOrder.LastName,
+                orderByDescending: isDescend,
+              })}
+            >
+              {t('last_name')}
+            </Table.HeadingCell>
+            <Table.HeadingCell
+              sorting={filter.orderByField === UserConnectionOrder.Email}
+              descending={filter.orderByDescending || false}
+              onDescendChange={(isDescend) => setFilter({
+                orderByField: UserConnectionOrder.Email,
+                orderByDescending: isDescend,
+              })}
+            >
+              {t('email')}
+            </Table.HeadingCell>
+            <Table.HeadingCell
+              sorting={filter.orderByField === UserConnectionOrder.Role}
+              descending={filter.orderByDescending || false}
+              onDescendChange={(isDescend) => setFilter({
+                orderByField: UserConnectionOrder.Role,
+                orderByDescending: isDescend,
+              })}
+            >
+              {t('role')}
+            </Table.HeadingCell>
+            <Table.HeadingCell
+              sorting={filter.orderByField === UserConnectionOrder.CreatedAt}
+              descending={filter.orderByDescending || false}
+              onDescendChange={(isDescend) => setFilter({
+                orderByField: UserConnectionOrder.CreatedAt,
+                orderByDescending: isDescend,
+              })}
+            >
+              {t('created_at')}
+            </Table.HeadingCell>
+            <Table.HeadingCell
+              sorting={filter.orderByField === UserConnectionOrder.LastActivity}
+              descending={filter.orderByDescending || false}
+              onDescendChange={(isDescend) => setFilter({
+                orderByField: UserConnectionOrder.LastActivity,
+                orderByDescending: isDescend,
+              })}
+            >
+              {t('last_activity')}
+            </Table.HeadingCell>
+            <Table.HeadingCell
+              sorting={filter.orderByField === UserConnectionOrder.IsActive}
+              descending={filter.orderByDescending || false}
+              onDescendChange={(isDescend) => setFilter({
+                orderByField: UserConnectionOrder.IsActive,
+                orderByDescending: isDescend,
+              })}
+            >
+              {t('user_workspace_access')}
+            </Table.HeadingCell>
+          </Table.HeadingRow>
+          <Menu.Base
+            {...menuProps}
+            onClose={closeMenu}
+          >
+            <Menu.Header>
+              {t('actions')}
+            </Menu.Header>
+
+            <Menu.Item
+              disabled={!canDeleteUsers && !canAccessAdmin}
+              onClick={() => handleEditUser(contextUser?.userId || '')}
+            >
+              {t('edit_user')}
+            </Menu.Item>
+            <Menu.Item
+              disabled={tableData.length === 1 || (!canEditUsers && !canAccessAdmin)}
+              onClick={() => handleDeleteUser(contextUser?.userId || '')}
+            >
+              {t('remove_user')}
+            </Menu.Item>
+          </Menu.Base>
+          {tableData.map((user) => (
+            <Table.Row
+              onContextMenu={(e) => openMenu(e, { userId: user.userId! })}
+              isDisabled={!user.isActive}
+              onClick={() => openUserModal({ userId: user.userId })}
+              isLoading={isLoading}
+              key={user.id}
+              gridTemplateColumns={columns}
+            >
+              <Table.Cell>
+                <UserAvatarCell firstName={user.firstName} />
+              </Table.Cell>
+
+              <Table.Cell>
+                {user?.lastName && (
+                  <UI.Span fontWeight={600} color="gray.500">
+                    {user?.lastName}
+                  </UI.Span>
+                )}
+              </Table.Cell>
+
+              <Table.Cell>
+                {user?.email}
+              </Table.Cell>
+
+              <Table.Cell>
+
+                <Table.InnerCell isDisabled={!canAccessAdmin && !canEditUsers}>
+                  <UI.Div onClick={(e) => {
+                    e.stopPropagation();
+                    openRoleModal({ roleId: user.role?.id || '', userId: user.id || '' });
+                  }}
+                  >
+                    <UI.Helper>
+                      {user?.role?.name}
+                    </UI.Helper>
+                  </UI.Div>
+                </Table.InnerCell>
+
+              </Table.Cell>
+
+              <Table.Cell>
+                <FormatTimestamp timestamp={user.createdAt} />
+              </Table.Cell>
+
+              <Table.Cell>
+                {user.lastActivity ? <FormatTimestamp timestamp={user.lastActivity} /> : <UI.Helper>-</UI.Helper>}
+              </Table.Cell>
+
+              <Table.Cell onClick={(e) => e.stopPropagation()}>
+                <UI.Toggle
+                  size="lg"
+                  isChecked={user.isActive!}
+                  color="teal"
+                  isDisabled={!canAccessAdmin && !canEditUsers}
+                  onChange={() => {
+                    setUserAccess({
+                      variables: {
+                        input: {
+                          isActive: !user.isActive,
+                          userId: user.userId,
+                          workspaceId: activeCustomer?.id,
+                        },
+                      },
+                    });
+                  }}
+                />
+              </Table.Cell>
+            </Table.Row>
+          ))}
         </UI.Div>
+        <UI.Flex justifyContent="flex-end">
+          <Table.Pagination
+            pageIndex={filter.pageIndex}
+            maxPages={pageCount}
+            perPage={filter.perPage}
+            isLoading={isLoading}
+            setPageIndex={(page) => setFilter((newFilter) => ({ ...newFilter, pageIndex: page - 1 }))}
+          />
+        </UI.Flex>
+        <Modal.Root open={isRoleModalOpen} onClose={closeRoleModal}>
+          {roleParams && (
+            <RoleUserModalCard
+              onClose={closeRoleModal}
+              id={roleParams.roleId}
+              userId={roleParams?.userId}
+            />
+          )}
+        </Modal.Root>
+        <Modal.Root open={isUserModalOpen} onClose={closeUserModal}>
+          {userParams && (
+            <UserModalCard
+              onClose={() => closeUserModal()}
+              id={userParams.userId}
+            />
+          )}
+        </Modal.Root>
       </UI.ViewBody>
-    </>
+    </View>
   );
 };
 

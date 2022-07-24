@@ -1,6 +1,340 @@
 /* eslint-disable max-len */
 const language = {
+  default_values: {
+    workspace_placeholder: {
+      en: 'Club Hades',
+      de: 'Club Hades',
+    },
+    workspace_slug: {
+      en: 'club-hades',
+      de: 'club-hades',
+    },
+  },
   general: {
+    reset_data: {
+      en: 'Reset data',
+      de: 'Daten zurücksetzen',
+    },
+    is_topic: {
+      en: 'Is a topic',
+      de: 'Ist ein Thema',
+    },
+    dashboard_description: {
+      en: 'See how your teams and people are doing.',
+      de: 'See how your teams and people are doing.',
+    },
+    workspace_overview_description: {
+      en: 'Use the table to get to pressing issues immediately, or navigate your organisation manually via the hexagon grid.',
+      de: 'Understand your teams and people by drilling down.',
+    },
+    dashboard_no_issues: {
+      en: 'Good news! No negative teams can be found in this date-range and filter level.',
+      de: 'Good news! No negative teams can be found in this date-range and filter level.',
+    },
+    dashboard_no_data_with_filter: {
+      en: 'Currently there is no data available on this date-range and filter level.',
+      de: 'Currently there is no data available on this date-range and filter level.',
+    },
+    zoom_in: {
+      en: 'Zoom in',
+      de: 'Zoom in',
+    },
+    zoom_out: {
+      en: 'Zoom out',
+      de: 'Zoom out',
+    },
+    teams_with_problems: {
+      en: 'Teams with problems',
+      de: 'Mannschaften mit Problemen',
+    },
+    issues: {
+      en: 'Issues',
+      de: 'Issues',
+    },
+    happy_people: {
+      en: 'Happy people',
+      de: 'Glückliche Leute',
+    },
+    unhappy_people: {
+      en: 'Unhappy people',
+      de: 'Unglückliche Menschen',
+    },
+    happiness_score: {
+      en: 'Happiness score',
+      de: 'Glückspunktzahl',
+    },
+    center_hexagons: {
+      en: 'Center the hexagons',
+      de: 'Zentrieren Sie die Sechsecke',
+    },
+    go_up_one_layer: {
+      en: 'Go up one layer',
+      de: 'Gehen Sie eine Ebene nach oben',
+    },
+    individuals: {
+      en: 'Individuals',
+      de: 'Individuals',
+    },
+    groups: {
+      en: 'Groups',
+      de: 'Groups',
+    },
+    make_demo_workspace: {
+      en: 'Make demo workspace',
+      de: 'Erstellen Sie einen Demo-Arbeitsbereich',
+    },
+    make_demo_workspace_helper: {
+      en: 'Marks a workspace as a demo workspace. Toggling this allows an admin to reset the data to a baseline dataset.',
+      de: 'Markiert einen Arbeitsbereich als Demo-Arbeitsbereich. Wenn Sie dies umschalten, kann ein Administrator die Daten auf einen Basisdatensatz zurücksetzen',
+    },
+    create_demo_data: {
+      en: 'Generate prefilled data',
+      de: 'Verwenden Sie Demodaten',
+    },
+    create_demo_data_helper: {
+      en: 'Prefil each generated dialogue with static data. This is useful for generating demo data for your workspace.',
+      de: 'Generieren Sie Demodaten für Verkaufsgespräche',
+    },
+    snapshot: {
+      en: 'Generate data',
+      de: 'Daten generieren',
+    },
+    snapshot_helper: {
+      en: 'Generate demo data for every dialogue',
+      de: 'Generieren Sie Demodaten für jeden Dialog',
+    },
+    no_snapshot: {
+      en: 'Don\'t generate data',
+      de: 'Keine Daten generieren',
+    },
+    no_snapshot_helper: {
+      en: 'No demo data will be generated for dialogues',
+      de: 'Für Dialoge werden keine Demodaten generiert',
+    },
+    unknown: {
+      en: 'Not available',
+      de: 'Nicht verfügbar',
+    },
+    clear_filters: {
+      en: 'Clear filters',
+      de: 'Clear filters',
+    },
+    no_dialogues_found: {
+      en: 'We could not find any dialogues with the current filters.',
+      de: 'We could not find any dialogues with the current filters.',
+    },
+    set_private: {
+      en: 'Make private',
+      de: 'Make private',
+    },
+    set_assignable: {
+      en: 'Set assignable',
+      de: 'Set assignable',
+    },
+    add_dialogue: {
+      en: 'Add dialogue',
+      de: 'Dialog hinzufügen',
+    },
+    add_team: {
+      en: 'Add team',
+      de: 'Dialog hinzufügen',
+    },
+    copied: {
+      en: 'Copied!',
+      de: 'Kopiert!',
+    },
+    copy_link: {
+      en: 'Copy link',
+      de: 'Link kopieren',
+    },
+    workspaces: {
+      en: 'Workspaces',
+      de: 'Workspaces',
+    },
+    workspaces_subtitle: {
+      en: 'Manage your workspaces',
+      de: 'Manage your workspaces',
+    },
+    teams: {
+      en: 'Teams',
+      de: 'Teams',
+    },
+    dialogues_guest_helper: {
+      en: 'Send your {{ unit }} a link to the dialogue by clicking on the corresponding dialogue card below here.',
+      de: 'Senden Sie Ihren {{ unit }} einen Link zur Dialogeseite, indem Sie auf die entsprechende Dialogeseitekarte klicken.',
+    },
+    overview: {
+      en: 'Overview',
+      de: 'Übersicht',
+    },
+    good_morning_user: {
+      en: 'Good morning, {{ user }}.',
+      de: 'Guten Morgen, {{ user }}.',
+    },
+    good_afternoon_user: {
+      en: 'Good afternoon, {{ user }}.',
+      de: 'Guten Tag, {{ user }}.',
+    },
+    good_evening_user: {
+      en: 'Good evening, {{ user }}.',
+      de: 'Guten Abend, {{ user }}.',
+    },
+    workspace_role: {
+      en: '{{workspace}} as {{role}}',
+      de: '{{workspace}} als {{role}}',
+    },
+    to_language_de: {
+      en: 'Switch to German',
+      de: 'Wechseln zu Deutsch',
+    },
+    to_language_en: {
+      en: 'Switch to English',
+      de: 'Wechseln zu Englisch',
+    },
+    account_settings: {
+      en: 'Account settings',
+      de: 'Konto-Einstellungen',
+    },
+    switch_workspace: {
+      en: 'Switch workspace',
+      de: 'Workspace wechseln',
+    },
+    continue: {
+      en: 'Continue',
+      de: 'Weiter',
+    },
+    login_header: {
+      en: 'Sign in with your email',
+      de: 'Mit E-Mail-Adresse anmelden',
+    },
+    login_description: {
+      en: 'Enter your email and we will send you a login link to access the dashboard.',
+      de: 'Gib deine E-Mail-Adresse ein und wir senden dir einen Login-Link zum Dashboard.',
+    },
+    general_success: {
+      en: 'Success!',
+      de: 'Erfolg!',
+    },
+    whoops: {
+      en: 'Whoops!',
+      de: 'Whoops!',
+    },
+    user_received_mail: {
+      en: 'We just sent a mail to {{ user }} with a link to access the dashboard. This link is only accessible for 3 days.',
+      de: 'Wir haben eine Mail an {{ user }} mit einem Link zum Zugriff auf das Dashboard geschickt. Dieser Link ist nur für 3 Tage gültig.',
+    },
+    user_not_exist: {
+      en: 'It seems that the user with mail {{ user }} does not exist in our user-base.',
+      de: 'Es scheint, dass der Benutzer mit der Mail {{ user }} nicht in unserer Benutzer-Datenbank existiert.',
+    },
+    go_back: {
+      en: 'Go back',
+      de: 'Zurück',
+    },
+    observable_insights: {
+      en: 'Actionable insights',
+      de: 'Actionable insights',
+    },
+    observable_insights_description: {
+      en: 'The haas dashboard makes observing and maintaining the happiness of your accessible and observable.',
+      de: 'Das haas dashboard macht die Beobachtung und Aufrechterhaltung des Glücks Ihres Unternehmens zugänglich und beobachtbar.',
+    },
+    create_new_cta: {
+      en: 'Create Call-to-Action',
+      de: 'Neuen Call-to-Action erstellen',
+    },
+    workspace_title: {
+      en: 'Name of workspace',
+      de: 'Name des Workspace',
+    },
+    workspace_slug: {
+      en: 'Workspace URL Extension',
+      de: 'Workspace URL Extension',
+    },
+    no_dialogues_message: {
+      en: 'No Dialogues available for this workspace...',
+      de: 'Keine Dialogues für diesen Workspace verfügbar...',
+    },
+    no_private_dialogue_message: {
+      en: 'No private dialogues available in this workspace...',
+      de: 'Keine private Dialogues in diesem Workspace verfügbar...',
+    },
+    generate_workspace: {
+      en: 'Generate workspace',
+      de: 'Workspace generieren',
+    },
+    generate_workspace_subtitle: {
+      en: 'Create a new workspace based on one of our predefined templates',
+      de: 'Erstellen Sie einen neuen Workspace basierend auf einem von uns vordefinierten Templates',
+    },
+    new: {
+      en: 'New',
+      de: 'Neu',
+    },
+    range: {
+      en: 'Range',
+      de: 'Reichweite',
+    },
+    range_helper: {
+      en: 'What is the range to trigger the following question?',
+      de: 'Was ist der Bereich, um die folgende Frage auszulösen?',
+    },
+    multiple_choice: {
+      en: 'Multiple choice',
+      de: 'Mehrfachauswah',
+    },
+    multiple_choice_helper: {
+      en: 'Answer from a list',
+      de: 'Antwort aus einer Liste',
+    },
+    slider: {
+      en: 'Slider',
+      de: 'Schieberegler',
+    },
+    slider_helper: {
+      en: 'Answer by moving a slider',
+      de: 'Antworten Sie, indem Sie einen Schieberegler bewegen',
+    },
+    video: {
+      en: 'Video',
+      de: 'Video',
+    },
+    video_helper: {
+      en: 'Multi-choice with a video',
+      de: 'Multi-Choice mit einem Video',
+    },
+    last_activity: {
+      en: 'Last seen',
+      de: 'Zuletzt gesehen',
+    },
+    active: {
+      en: 'Active',
+      de: 'Aktiv',
+    },
+    inactive: {
+      en: 'Inactive',
+      de: 'Inaktiv',
+    },
+    last_logged_in: {
+      en: 'Last logged in',
+      de: 'Zuletzt eingeloggt',
+    },
+    user_workspace_access: {
+      en: 'Access',
+      de: 'Betreten',
+    },
+    filter_users: {
+      en: 'Filter users',
+      de: 'Benutzer filtern',
+    },
+    invite_user_description: {
+      en: 'Invite a new user to your workspace. The user will receive an email with a notification of this.',
+      de: 'Einen neuen Benutzer in Ihre Arbeitsumgebung einladen. Der Benutzer erhält eine Benachrichtigung darüber.',
+    },
+    filter_by_role_name: {
+      en: 'Filter by role name',
+      de: 'Nach Rollennamen filtern',
+    },
     filter_by_recipient_first_name: {
       en: 'Filter by first name',
       de: 'Nach Vornamen filtern',
@@ -60,6 +394,10 @@ const language = {
     filter_by_search: {
       en: 'Filter by search',
       de: 'Nach Suche filtern',
+    },
+    filter_by_score: {
+      en: 'Filter by score',
+      de: 'Nach Punktzahl filtern',
     },
     filter_by_date: {
       en: 'Filter by date',
@@ -295,6 +633,14 @@ const language = {
       en: "Delivery's dialogue was finished",
       de: 'Der Dialog der Lieferung wurde abgeschlossen',
     },
+    role_permissions: {
+      en: 'Role Permissions',
+      de: 'Rollenberechtigungen',
+    },
+    assigned_dialogues: {
+      en: 'Assigned dialogues',
+      de: 'Zugewiesene Dialoge',
+    },
     details: {
       en: 'Details',
       de: 'Detail',
@@ -302,6 +648,26 @@ const language = {
     upload_deliveries: {
       en: 'Upload deliveries',
       de: 'Lieferungen hochladen.',
+    },
+    upload_user_csv: {
+      en: 'Upload top down user csv',
+      de: 'Laden Sie die Top-Down-Benutzer-CSV-Datei hoch',
+    },
+    upload_user_csv_helper: {
+      en:
+        'Upload a CSV file with details about your top down users. \n - The appropriate format is to use ";" as delimiter \n - Use email;first_name?;last_name?;phone_number? as your columns \n - Prefix the phone numbers with their country code: for example +49 30901820',
+      de:
+        'Laden Sie eine CSV-Datei mit Details zu Ihren Top-Down-Benutzern hoch. \n - Das geeignete Format ist ";" als Trennzeichen zu verwenden. \n - Verwenden Sie email;first_name?;last_name?;phone_number? als Ihre Spalten. \n - Stellen Sie den Telefonnummern die Ländervorwahl voran: zum Beispiel +49 30901820',
+    },
+    upload_workspace_csv: {
+      en: 'Upload workspace generation csv',
+      de: 'CSV-Datei für die Arbeitsbereichsgenerierung hochladen.',
+    },
+    upload_workspace_csv_helper: {
+      en:
+        'Upload a CSV file with details about your workspace. \n - The appropriate format is to use ";" as delimiter \n - Use layer_0;layer_1;layer_etc;emailAssignee;phoneAssignee as your columns \n - Prefix the phone numbers with their country code: for example +49 30901820',
+      de:
+        'Laden Sie eine CSV-Datei mit Details zu Ihrem Arbeitsbereich hoch. \n - Das geeignete Format ist ";" als Trennzeichen zu verwenden. \n - Verwenden Sie Layer_0;Layer_1;Layer_etc;emailAssignee;phoneAssignee als Ihre Spalten. \n - Stellen Sie den Telefonnummern die Ländervorwahl voran: zum Beispiel +49 30901820',
     },
     upload_deliveries_helper: {
       en:
@@ -404,6 +770,10 @@ const language = {
     campaigns: {
       en: 'Campaigns',
       de: 'Kampagnen',
+    },
+    campaigns_subtitle: {
+      en: 'View, edit, and create campaigns',
+      de: 'Kampagnen anzeigen, bearbeiten und erstellen',
     },
     placeholder: {
       en: 'Field placeholder',
@@ -598,6 +968,10 @@ const language = {
     register: {
       en: 'Register',
       de: 'Registrieren',
+    },
+    remove_user: {
+      en: 'Remove user',
+      de: 'Benutzer entfernen',
     },
     delete_user: {
       en: 'Delete user',
@@ -807,6 +1181,14 @@ const language = {
       en: 'End',
       de: 'Ende',
     },
+    make_dialogue_private: {
+      en: 'Make private',
+      de: 'Privatisieren',
+    },
+    make_dialogue_public: {
+      en: 'Make public',
+      de: 'Veröffentlichen',
+    },
     edit: {
       en: 'Edit',
       de: 'Bestätigen',
@@ -849,6 +1231,10 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       en: 'Maximum value',
       de: 'Maximalwert',
     },
+    score: {
+      en: 'Score',
+      de: 'Punktzahl',
+    },
     search: {
       en: 'Search',
       de: 'Suche',
@@ -880,6 +1266,14 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     visit: {
       en: 'Visit',
       de: 'Besuchen',
+    },
+    delete_dialogue_complete: {
+      en: 'Dialogue deleted',
+      de: 'Dialog gelöscht',
+    },
+    delete_dialogue_complete_helper: {
+      en: 'The selected dialogue has been successfully removed',
+      de: 'Der ausgewählte Dialog wurde erfolgreich entfernt',
     },
     delete_dialogue_popover: {
       en:
@@ -946,9 +1340,13 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       en: 'Dialogues',
       de: 'Dialog',
     },
-    score: {
-      en: 'Score',
-      de: 'Ergebnis',
+    dialogues_subtitle: {
+      en: 'Create, edit and manage dialogues',
+      de: 'Erstellen, bearbeiten und verwalten von Dialogen',
+    },
+    teams_subtitle: {
+      en: 'Create, edit and manage your teams',
+      de: 'Erstellen, bearbeiten und verwalten von Dialogen',
     },
     export_to_csv: {
       en: 'CSV export',
@@ -990,6 +1388,10 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       en: 'Users',
       de: 'Benutzer',
     },
+    users_subtitle: {
+      en: 'Manage users, roles, and permissions',
+      de: 'Benutzer, Rollen und Berechtigungen verwalten',
+    },
     alerts: {
       en: 'Alerts',
       de: 'Alerts',
@@ -1001,10 +1403,6 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     latest_interactions: {
       en: 'Latest interactions',
       de: 'Die letzten Interaktionen',
-    },
-    overview: {
-      en: 'Overview',
-      de: 'Übersicht',
     },
     interactions: {
       en: 'Interactions',
@@ -1122,6 +1520,12 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     edit_complete_description: {
       en: 'The Call-to-Action has been edited.',
       de: 'Der Call-to-Action wurde bearbeitet.',
+    },
+  },
+  report: {
+    name: {
+      en: 'Report',
+      de: 'Prüfbericht',
     },
   },
   register: {
@@ -1383,6 +1787,14 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   views: {
+    feedback: {
+      en: 'Feedback',
+      de: 'Feedback',
+    },
+    dashboard: {
+      en: 'Dashboard',
+      de: 'Dashboard',
+    },
     configurations: {
       en: 'Configurations',
       de: 'Konfigurationen',
@@ -1428,8 +1840,12 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       de: 'Alerts',
     },
     edit_business_settings_view: {
-      en: 'Edit workspace settings',
-      de: 'Wähle Unternehmenseinstellungen',
+      en: 'Settings',
+      de: 'Einstellungen',
+    },
+    edit_business_settings_subtitle: {
+      en: 'Manage your workspace, including the name, url extension, and branding.',
+      de: 'Verwalte dein Unternehmen, inklusive der Name, URL-Erweiterung und Marke.',
     },
     create_trigger_view: {
       en: 'Create alert',
@@ -1858,6 +2274,58 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   toast: {
+    general_error: {
+      en: 'Something went wrong!',
+      de: 'Irgendetwas ist schief gelaufen!',
+    },
+    general_error_helper: {
+      en: 'Currently unable to edit your detail. Please try again.',
+      de: 'Aktuell kann deine Detail nicht bearbeitet werden. Bitte versuche es erneut.',
+    },
+    general_success: {
+      en: 'Success!',
+      de: 'Erfolg!',
+    },
+    general_success_helper: {
+      en: 'The task has been finished successfully.',
+      de: 'Die Aufgabe wurde erfolgreich abgeschlossen.',
+    },
+    workspace_generated_helper: {
+      en: 'Workspace has been generated',
+      de: 'Workspace wurde erstellt',
+    },
+    updated_assigned_dialogues: {
+      en: 'Updated assigned dialogues',
+      de: 'Zugewiesene Dialoge aktualisiert',
+    },
+    updated_assigned_dialogues_helper: {
+      en: 'The assigned dialogues have been succesfully updated.',
+      de: 'Die zugeordneten Dialoge wurden erfolgreich aktualisiert.',
+    },
+    updated_permissions: {
+      en: 'Updated permissions',
+      de: 'Berechtigungen aktualisiert',
+    },
+    updated_permissions_helper: {
+      en: 'The permissions have been updated.',
+      de: 'Die Berechtigungen wurden aktualisiert.',
+    },
+    user_removed: {
+      en: 'User removed',
+      de: 'Benutzer entfernt',
+    },
+    user_removed_helper: {
+      en: 'The user has been removed from the workspace.',
+      de: 'Der Benutzer wurde aus dem Arbeitsbereich entfernt.',
+    },
+    user_access_changed: {
+      en: 'User access changed!',
+      de: 'Benutzerzugang geändert!',
+    },
+    user_access_helper: {
+      en: 'User with email {{email}} has been set to {{state}}',
+      de: 'Benutzer mit der E-Mail {{email}} wurde auf {{state}} gesetzt',
+    },
     branch_duplicated: {
       en: 'Branch duplicated!',
       de: 'Zweig dupliziert!',
@@ -2265,6 +2733,80 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       de: 'Niederländisch',
     },
   },
+  permissions: {
+    can_assign_users_to_dialogue: {
+      en: 'This permission allows a user to make private dialogues (in)-accessible for other users',
+      de: 'Diese Berechtigung erlaubt es einem Benutzer, private Dialoge für andere Benutzer (un)zugänglich zu machen',
+    },
+    can_access_admin_panel: {
+      en: 'This system-wide permission allows a user to do everything (overrules others) within the haas dashboard. It is specified per user and cannot be set within a workspace.',
+      de: 'Diese systemweite Berechtigung ermöglicht es einem Benutzer, alles innerhalb des haas-Dashboards zu tun. Sie wird pro Benutzer angegeben und kann nicht innerhalb eines Arbeitsbereichs festgelegt werden.',
+    },
+    can_edit_dialogue: {
+      en: 'This permissions allows a user to change the settings of a dialogue.',
+      de: 'Diese Berechtigungen ermöglichen es einem Benutzer, die Einstellungen eines Dialogs zu ändern.',
+    },
+    can_build_dialogue: {
+      en: 'This permissions gives a user access to the dialogue builder and trigger overview',
+      de: 'Diese Berechtigungen geben einem Benutzer Zugriff auf den Dialog-Builder und die Trigger-Übersicht',
+    },
+    can_view_dialogue: {
+      en: 'This permission allows a user to view the dialogue builder',
+      de: 'Diese Berechtigung ermöglicht es einem Benutzer, den Dialog-Builder anzuzeigen',
+    },
+    can_delete_dialogue: {
+      en: 'This permission allows a user to remove a dialogue from a workspace',
+      de: 'Mit dieser Berechtigung kann ein Benutzer einen Dialog aus einem Arbeitsbereich entfernen',
+    },
+    can_view_dialogue_analytics: {
+      en: 'This permission allows a user to view the analytics page of a workspace',
+      de: 'Mit dieser Berechtigung kann ein Benutzer die Analyseseite eines Arbeitsbereichs anzeigen',
+    },
+    can_view_users: {
+      en: 'This permission allows a user to view the users overview',
+      de: 'Mit dieser Berechtigung kann ein Benutzer die Benutzerübersicht anzeigen',
+    },
+    can_add_users: {
+      en: 'This permission allows a user to add new users to a workspace',
+      de: 'Mit dieser Berechtigung kann ein Benutzer einem Arbeitsbereich neue Benutzer hinzufügen',
+    },
+    can_delete_users: {
+      en: 'This permission allows a user to remove other users from a workspace',
+      de: 'Mit dieser Berechtigung kann ein Benutzer andere Benutzer aus einem Arbeitsbereich entfernen',
+    },
+    can_edit_users: {
+      en: 'This permission allows a user to edit users within a workspace',
+      de: 'Mit dieser Berechtigung kann ein Benutzer Benutzer innerhalb eines Arbeitsbereichs bearbeiten',
+    },
+    can_create_triggers: {
+      en: 'This permissions allows a user to create triggers in the action overview',
+      de: 'Diese Berechtigungen ermöglichen es einem Benutzer, Trigger in der Aktionsübersicht zu erstellen',
+    },
+    can_delete_triggers: {
+      en: 'This permission allows a users to delete triggers from the action overview',
+      de: 'Diese Berechtigung ermöglicht es einem Benutzer, Trigger aus der Aktionsübersicht zu löschen',
+    },
+    can_delete_workspace: {
+      en: 'This permission allows a user to remove an entire workspace from the dashboard',
+      de: 'Mit dieser Berechtigung kann ein Benutzer einen gesamten Arbeitsbereich aus dem Dashboard entfernen.',
+    },
+    can_edit_workspace: {
+      en: 'This permissions allows a user to edit the workspace settings',
+      de: 'Mit diesen Berechtigungen kann ein Benutzer die Arbeitsbereichseinstellungen bearbeiten',
+    },
+    can_view_campaigns: {
+      en: 'This permissions allows users to access the campaign overview of a workspace',
+      de: 'Mit dieser Berechtigung können Benutzer auf die Kampagnenübersicht eines Arbeitsbereichs zugreifen',
+    },
+    can_create_campaigns: {
+      en: 'This permission allows a user to create new campaigns for a workspace',
+      de: 'Mit dieser Berechtigung kann ein Nutzer neue Kampagnen für einen Arbeitsbereich erstellen',
+    },
+    can_create_deliveries: {
+      en: 'This permissions allows a user to create new deliveries for a campaign',
+      de: 'Mit dieser Berechtigung kann ein Benutzer neue Lieferungen für eine Kampagne erstellen',
+    },
+  },
   validation: {
     field_required: {
       en: 'This field is required.',
@@ -2281,6 +2823,7 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
   },
 };
 
+// eslint-disable-next-line @typescript-eslint/no-shadow
 export const parseLanguages = (language: string, input: any, output?: any) => {
   output = output || {};
 

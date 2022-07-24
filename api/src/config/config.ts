@@ -2,6 +2,7 @@ require('dotenv').config();
 
 export interface ConfigProps {
   baseUrl: string;
+  apiSecret: string;
   jwtSecret: string;
   jwtExpiryMinutes: number;
   env: string;
@@ -10,6 +11,7 @@ export interface ConfigProps {
   endpoint: string;
   isDebug: boolean;
   clientUrl: string;
+  redisUrl: string;
   dashboardUrl: string;
   cloudinaryUrl: string;
   prismaUrl: string;
@@ -27,10 +29,12 @@ export interface ConfigProps {
 }
 
 if (!process.env.JWT_SECRET) throw new Error('Ensure you set a JWT secret in your env');
+if (!process.env.API_SECRET) throw new Error('Ensure you set a API secret in your env');
 if (!process.env.MAIL_SENDER) console.log('Mail sender not defined; wont send mails as a result');
 
 const config: ConfigProps = {
   baseUrl: process.env.BASE_URL || 'http://localhost:4000',
+  apiSecret: process.env.API_SECRET,
   jwtSecret: process.env.JWT_SECRET,
   jwtExpiryMinutes: 4320,
   env: process.env.ENVIRONMENT || 'local',
@@ -39,6 +43,7 @@ const config: ConfigProps = {
   endpoint: process.env.APP_ENDPOINT || '/graphql',
   isDebug: Boolean(process.env.ENABLE_DEBUG) || false,
   clientUrl: process.env.CLIENT_URL || 'http://localhost:3000',
+  redisUrl: process.env.REDIS_URL || 'redis://127.0.0.1:6380',
   dashboardUrl: process.env.DASHBOARD_URL || 'http://localhost:3002',
   cloudinaryUrl: process.env.CLOUDINARY_URL || '',
   prismaUrl: process.env.PRISMA_SERVICE_ENDPOINT || 'http://localhost:4466',

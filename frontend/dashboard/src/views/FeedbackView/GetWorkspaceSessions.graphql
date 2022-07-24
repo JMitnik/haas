@@ -1,0 +1,21 @@
+query GetWorkspaceSessions(
+	$workspaceId: ID,
+	$filter: SessionConnectionFilterInput
+) {
+  customer(id: $workspaceId) {
+    id
+   	sessionConnection(filter: $filter) {
+			sessions {
+				...SessionFragment
+			}
+			totalPages
+			pageInfo {
+				hasPrevPage
+				hasNextPage
+				nextPageOffset
+				prevPageOffset
+				pageIndex
+			}
+		}
+  }
+}

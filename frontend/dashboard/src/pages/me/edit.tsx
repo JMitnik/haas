@@ -1,5 +1,5 @@
 import * as UI from '@haas/ui';
-import { Button, ButtonGroup, useToast } from '@chakra-ui/core';
+import { ButtonGroup, useToast } from '@chakra-ui/core';
 import {
   Div, Form, FormContainer,
   FormControl, FormLabel, FormSection, H3, Hr,
@@ -8,9 +8,9 @@ import {
 import { Mail, Phone, User } from 'react-feather';
 import { Variants, motion } from 'framer-motion';
 import { gql, useMutation } from '@apollo/client';
-import { queryMe, useUser } from 'providers/UserProvider';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
+import { useUser } from 'providers/UserProvider';
 
 import { useTranslation } from 'react-i18next';
 import React from 'react';
@@ -52,12 +52,13 @@ const editUserMutation = gql`
 
 const EditMeForm = () => {
   const { t } = useTranslation();
-  const { user } = useUser();
+  const { user, refreshUser } = useUser();
   const toast = useToast();
   const history = useHistory();
 
   const [editUser, { loading: isLoading, error: serverErrors }] = useMutation(editUserMutation, {
     onCompleted: () => {
+      refreshUser();
       toast({
         title: t('toast:user_edited'),
         description: t('toast:user_edited_helper'),
@@ -71,6 +72,7 @@ const EditMeForm = () => {
       }, 500);
     },
     onError: () => {
+      refreshUser();
       toast({
         title: 'Something went wrong!',
         description: 'Currently unable to edit your detail. Please try again.',
@@ -79,7 +81,6 @@ const EditMeForm = () => {
         duration: 1500,
       });
     },
-    refetchQueries: [{ query: queryMe }],
   });
 
   const form = useForm({
@@ -166,15 +167,15 @@ const EditMeForm = () => {
         <Hr />
 
         <ButtonGroup mt={4}>
-          <Button
+          <UI.Button
             isLoading={isLoading}
             isDisabled={!form.formState.isValid}
             variantColor="teal"
             type="submit"
           >
             {t('save')}
-          </Button>
-          <Button variant="outline" onClick={() => history.goBack()}>{t('cancel')}</Button>
+          </UI.Button>
+          <UI.Button variant="outline" onClick={() => history.goBack()}>{t('cancel')}</UI.Button>
         </ButtonGroup>
       </Form>
     </FormContainer>
@@ -186,7 +187,7 @@ const EditMePage = () => {
   return (
     <>
       <UI.ViewHead>
-        <UI.ViewTitle>{t('edit_user')}</UI.ViewTitle>
+        <UI.DeprecatedViewTitle>{t('edit_user')}</UI.DeprecatedViewTitle>
       </UI.ViewHead>
       <UI.ViewBody>
         <motion.div variants={EditMeAnimation} initial="initial" animate="animate">

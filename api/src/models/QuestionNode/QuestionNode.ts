@@ -1,11 +1,14 @@
 import { PrismaClient, NodeType } from '@prisma/client';
-import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
-import { UserInputError } from 'apollo-server-express';
+import { enumType, extendType, inputObjectType, objectType, queryField } from 'nexus';
+import { ApolloError, UserInputError } from 'apollo-server-express';
 
 import { CTALinksInputType, LinkType } from '../link/Link';
 import { DialogueType } from '../questionnaire/Dialogue';
 import { EdgeType } from '../edge/Edge';
 import { SliderNode } from './SliderNode';
+import { IndepthQuestionStatisticsSummary, QuestionImpactScoreType, QuestionStatisticsSummary } from './QuestionStatisticsSummary';
+import { isValidDateTime } from '../../utils/isValidDate';
+import { isPresent } from 'ts-is-present';
 
 export const CTAShareInputObjectType = inputObjectType({
   name: 'CTAShareInputObjectType',
@@ -23,6 +26,8 @@ export const QuestionOptionType = objectType({
   definition(t) {
     t.int('id');
     t.string('value');
+
+    t.boolean('isTopic');
 
     // TODO: Make this required in prisma.
     t.string('questionId', {
@@ -44,7 +49,7 @@ export const QuestionOptionType = objectType({
         if (!parent.overrideLeafId) return null;
         const cta = await ctx.services.nodeService.findNodeById(parent.overrideLeafId);
         return cta as any;
-      }
+      },
     });
 
     t.int('position', {
@@ -115,7 +120,7 @@ export const FormNodeInputType = inputObjectType({
     t.string('id', { nullable: true });
     t.string('helperText', { nullable: true });
 
-    t.list.field('fields', { type: FormNodeFieldInput });
+    t.list.nonNull.field('fields', { type: FormNodeFieldInput });
   },
 });
 
@@ -125,7 +130,7 @@ export const FormNodeField = objectType({
   definition(t) {
     t.id('id');
     t.string('label');
-    t.field('type', { type: FormNodeFieldTypeEnum });
+    t.nonNull.field('type', { type: FormNodeFieldTypeEnum });
     t.boolean('isRequired');
     t.int('position');
     t.string('placeholder', {
@@ -144,7 +149,7 @@ export const FormNodeType = objectType({
     t.string('id', { nullable: true });
     t.string('helperText', { nullable: true });
 
-    t.list.field('fields', { type: FormNodeField });
+    t.list.nonNull.field('fields', { type: FormNodeField });
   },
 });
 
@@ -169,6 +174,21 @@ export const SliderNodeMarkerType = objectType({
   },
 });
 
+export const QuestionStatisticsSummaryFilterInput = inputObjectType({
+  name: 'QuestionStatisticsSummaryFilterInput',
+  definition(t) {
+    t.string('startDateTime', { required: true });
+    t.field('impactType', {
+      type: QuestionImpactScoreType,
+      required: true,
+    });
+
+    t.string('endDateTime');
+    t.int('impactTreshold');
+    t.boolean('refresh');
+  },
+})
+
 export const SliderNodeType = objectType({
   name: 'SliderNodeType',
 
@@ -177,7 +197,7 @@ export const SliderNodeType = objectType({
     t.string('happyText', { nullable: true });
     t.string('unhappyText', { nullable: true });
 
-    t.list.field('markers', {
+    t.list.nonNull.field('markers', {
       type: SliderNodeMarkerType,
       nullable: true,
       resolve: (parent: any) => parent.markers || SliderNode.DEFAULT_MARKERS,
@@ -189,10 +209,10 @@ export const QuestionNodeType = objectType({
   name: 'QuestionNode',
 
   definition(t) {
-    t.id('id');
-    t.boolean('isLeaf');
+    t.nonNull.id('id');
+    t.nonNull.boolean('isLeaf');
     t.boolean('isRoot');
-    t.string('title');
+    t.nonNull.string('title');
     t.string('updatedAt');
 
     t.string('extraContent', {
@@ -212,6 +232,76 @@ export const QuestionNodeType = objectType({
       resolve: (parent) => parent.updatedAt?.toString() || '',
     });
 
+    t.field('indepthQuestionStatisticsSummary', {
+      type: IndepthQuestionStatisticsSummary,
+      nullable: true,
+      list: true,
+      args: {
+        input: QuestionStatisticsSummaryFilterInput,
+      },
+      async resolve(parent, args, ctx) {
+        if (!parent.questionDialogueId) throw new ApolloError('No dialogue Id available for question!');
+        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE');
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        const analysis = await ctx.services.questionStatisticsService.indepthAnalysis({
+          dialogueId: parent.questionDialogueId,
+          questionId: parent.id,
+          startDateTime: utcStartDateTime as Date,
+          endDateTime: utcEndDateTime,
+          type: args.input.impactType,
+          impactTreshold: args.input.impactTreshold || undefined,
+        });
+        return analysis;
+      },
+    })
+
+    t.field('questionStatisticsSummary', {
+      type: QuestionStatisticsSummary,
+      nullable: true,
+      args: {
+        input: QuestionStatisticsSummaryFilterInput,
+      },
+      useTimeResolve: true,
+      resolve(parent, args, ctx) {
+        if (!parent.questionDialogueId) throw new ApolloError('No dialogue Id available for question!');
+        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE');
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        // return ctx.services.questionStatisticsService.initiate({
+        //   dialogueId: parent.questionDialogueId,
+        //   questionId: parent.id,
+        //   startDateTime: utcStartDateTime as Date,
+        //   endDateTime: utcEndDateTime,
+        //   type: args.input.impactType,
+        //   impactTreshold: args.input.impactTreshold || undefined,
+        // });
+        return null;
+      },
+    })
+
     // Node-types
     // TODO: Remove `any` once we figure out how to not make prisma the backing-type
     t.field('sliderNode', {
@@ -224,7 +314,7 @@ export const QuestionNodeType = objectType({
         }
 
         return null;
-      }
+      },
     });
 
     // Node-types
@@ -239,7 +329,7 @@ export const QuestionNodeType = objectType({
         }
 
         return null;
-      }
+      },
     });
 
     t.field('share', {
@@ -273,7 +363,7 @@ export const QuestionNodeType = objectType({
       },
     });
 
-    t.list.field('links', {
+    t.nonNull.list.nonNull.field('links', {
       type: LinkType,
       async resolve(parent, args, ctx) {
         if (parent.isLeaf) {
@@ -319,7 +409,7 @@ export const QuestionNodeType = objectType({
       },
     });
 
-    t.list.field('children', {
+    t.list.nonNull.field('children', {
       type: EdgeType,
       resolve(parent, args, ctx) {
         return ctx.services.nodeService.getChildEdgesOfNode(parent.id);
@@ -352,6 +442,7 @@ export const OptionInputType = inputObjectType({
     t.string('publicValue', { nullable: true });
     t.string('overrideLeafId', { required: false });
     t.int('position', { required: true });
+    t.boolean('isTopic');
   },
 });
 
@@ -380,6 +471,7 @@ export const CreateCTAInputType = inputObjectType({
     t.string('dialogueSlug');
     t.string('title');
     t.string('type');
+    t.string('questionId', { description: 'Linked question-node id', nullable: true });
 
     t.field('links', {
       type: CTALinksInputType,
@@ -420,7 +512,7 @@ export const SliderNodeInputType = inputObjectType({
 
   definition(t) {
     t.id('id', { nullable: true });
-    t.list.field('markers', { type: SliderNodeMarkerInputType });
+    t.list.nonNull.field('markers', { type: SliderNodeMarkerInputType });
   },
 });
 
@@ -454,6 +546,25 @@ export const DeleteNodeInputType = inputObjectType({
     t.string('dialogueSlug');
   },
 });
+
+export const QuestionWhereUniqueInput = inputObjectType({
+  name: 'QuestionWhereUniqueInput',
+  definition(t) {
+    t.id('id', { required: true });
+  },
+});
+
+export const QuestionQuery = queryField('question', {
+  type: QuestionNodeType,
+  args: {
+    where: QuestionWhereUniqueInput,
+  },
+  nullable: true,
+  async resolve(parent, args, ctx) {
+    if (!args.where?.id) throw new UserInputError('No question id provided');
+    return ctx.services.nodeService.findNodeById(args.where?.id);
+  },
+})
 
 export const QuestionNodeMutations = extendType({
   type: 'Mutation',
@@ -558,7 +669,7 @@ export const QuestionNodeMutations = extendType({
         } : undefined;
 
 
-        const mappedLinks = links?.linkTypes?.map(({ backgroundColor, iconUrl, id, title, type, url, buttonText, subHeader, header, imageUrl }) => ({
+        const mappedLinks = links?.linkTypes?.filter(isPresent).map(({ backgroundColor, iconUrl, id, title, type, url, buttonText, subHeader, header, imageUrl }) => ({
           id: id || undefined,
           backgroundColor: backgroundColor || undefined,
           iconUrl: iconUrl || undefined,
@@ -579,9 +690,10 @@ export const QuestionNodeMutations = extendType({
           title: args.input?.title,
           type: validatedType,
           links: mappedLinks,
+          questionId: args.input.questionId,
         }
 
-        return ctx.services.nodeService.createCTA(createCTAInput);
+        return ctx.services.nodeService.createCallToAction(createCTAInput);
       },
     });
   },

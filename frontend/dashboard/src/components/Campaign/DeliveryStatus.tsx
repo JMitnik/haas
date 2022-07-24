@@ -1,6 +1,5 @@
 import * as UI from '@haas/ui';
 import { Clock } from 'react-feather';
-import { ErrorBoundary } from 'react-error-boundary';
 import { format } from 'date-fns';
 import React from 'react';
 
@@ -48,25 +47,23 @@ export const DeliveryStatus = ({ delivery, onlyStatus = false }: DeliveryStatusP
     case DeliveryStatusEnum.Scheduled: {
       return (
         <UI.Label>
-          <ErrorBoundary FallbackComponent={() => <div>{status}</div>}>
-            <UI.Div py={1}>
-              <UI.Stack>
-                <>
-                  <UI.Span>
-                    {status}
-                  </UI.Span>
-                  {!onlyStatus && (
-                    <UI.Span fontSize="0.6rem">
-                      {!!delivery.scheduledAt && (
-                        // @ts-ignore
-                        <DeliveryScheduledLabel scheduledAt={delivery.scheduledAt} />
-                      )}
-                    </UI.Span>
+          <UI.Div py={1}>
+            <UI.Stack>
+              <>
+                <UI.Span>
+                  {status}
+                </UI.Span>
+                {!onlyStatus && (
+                <UI.Span fontSize="0.6rem">
+                  {!!delivery.scheduledAt && (
+                  // @ts-ignore
+                  <DeliveryScheduledLabel scheduledAt={delivery.scheduledAt} />
                   )}
-                </>
-              </UI.Stack>
-            </UI.Div>
-          </ErrorBoundary>
+                </UI.Span>
+                )}
+              </>
+            </UI.Stack>
+          </UI.Div>
         </UI.Label>
       );
     }

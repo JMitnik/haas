@@ -2,14 +2,25 @@
 
 import * as UI from '@haas/ui';
 import { ArrowLeft, Download, Plus, RefreshCcw } from 'react-feather';
-import { CreateWorkspaceJobType, JobStatusType, PaginationSortByEnum, PaginationWhereInput, useConfirmWorkspaceJobMutation, useCreateWorkspaceJobMutation, useGetAutodeckJobsQuery, useRetryAutodeckJobMutation } from 'types/generated-types';
-import { DeepPartial } from 'types/customTypes';
-import { useEffect } from 'react';
 import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import AutodeckForm from 'views/AutodeckView/Components/AutodeckForm'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
+
+import * as Modal from 'components/Common/Modal';
+import {
+  CreateWorkspaceJobType,
+  JobStatusType,
+  PaginationSortByEnum,
+  PaginationWhereInput,
+  useConfirmWorkspaceJobMutation,
+  useCreateWorkspaceJobMutation,
+  useGetAutodeckJobsQuery,
+  useRetryAutodeckJobMutation,
+} from 'types/generated-types';
+import { DeepPartial } from 'types/customTypes';
+import AutodeckForm from 'views/AutodeckView/Components/AutodeckForm';
+
 import { DateLabel, ProcessingStatus } from './Components';
 
 export const paginationFilter: PaginationWhereInput = {
@@ -116,9 +127,9 @@ export const AutodeckOverview = () => {
             <BackButtonContainer onClick={() => history.goBack()}>
               <ArrowLeft />
             </BackButtonContainer>
-            <UI.ViewTitle>Autodeck overview</UI.ViewTitle>
+            <UI.DeprecatedViewTitle>Autodeck overview</UI.DeprecatedViewTitle>
             <UI.Button
-              leftIcon={Plus}
+              leftIcon={() => <Plus />}
               onClick={() => setIsOpenImportModal(true)}
               size="sm"
               variantColor="teal"
@@ -130,7 +141,7 @@ export const AutodeckOverview = () => {
         </UI.Stack>
       </UI.ViewHead>
       <UI.ViewContainer>
-        <UI.Card noHover>
+        <UI.Card>
           <UI.Div p={2}>
             <UI.Table width="100%">
               <UI.TableHeading>
@@ -149,22 +160,22 @@ export const AutodeckOverview = () => {
               </UI.TableHeading>
 
               <UI.TableBody>
-                {data?.getAutodeckJobs?.jobs.map((job) => (
-                  <UI.TableRow hasHover key={job.id} onClick={() => handleActiveJob(job, job.status)}>
+                {data?.getAutodeckJobs?.jobs?.map((job) => (
+                  <UI.TableRow hasHover key={job!.id} onClick={() => handleActiveJob(job!, job!.status!)}>
                     <UI.TableCell>
                       {job?.name || ''}
                     </UI.TableCell>
                     <UI.TableCell>
-                      <DateLabel dateString={job.createdAt} />
+                      <DateLabel dateString={job!.createdAt!} />
                     </UI.TableCell>
                     <UI.TableCell>
-                      {job.updatedAt
-                        ? <DateLabel dateString={job.updatedAt} />
+                      {job!.updatedAt
+                        ? <DateLabel dateString={job!.updatedAt} />
                         : 'Not updated yet'}
                     </UI.TableCell>
                     <UI.TableCell>
                       <ProcessingStatus
-                        job={job}
+                        job={job!}
                       />
                     </UI.TableCell>
                   </UI.TableRow>
@@ -219,8 +230,8 @@ export const AutodeckOverview = () => {
           )}
         </UI.Card>
 
-        <UI.Modal isOpen={isOpenDetailModel} onClose={() => setActiveJob(null)}>
-          <UI.Card bg="white" width={600} noHover>
+        <Modal.Root open={isOpenDetailModel} onClose={() => setActiveJob(null)}>
+          <UI.Card bg="white" width={600}>
             <UI.CardBody>
               <UI.FormSectionHeader>{t('details')}</UI.FormSectionHeader>
               <UI.Stack mb={4}>
@@ -255,14 +266,18 @@ export const AutodeckOverview = () => {
                   {activeJob?.status !== JobStatusType.Failed
                     && (
                       <UI.Button
-                        leftIcon={Download}
+                        leftIcon={() => <Download />}
                         isDisabled={activeJob?.status !== JobStatusType.Completed || !activeJob.resourcesUrl}
                         size="sm"
                         variantColor="green"
                       >
                         {activeJob?.resourcesUrl
                           ? (
-                            <a style={{ color: 'white', textDecoration: 'none' }} href={activeJob?.resourcesUrl} download>
+                            <a
+                              style={{ color: 'white', textDecoration: 'none' }}
+                              href={activeJob?.resourcesUrl}
+                              download
+                            >
                               {t('autodeck:download_result')}
                             </a>
                           )
@@ -279,7 +294,7 @@ export const AutodeckOverview = () => {
                             jobId: activeJob?.id,
                           },
                         })}
-                        leftIcon={RefreshCcw}
+                        leftIcon={() => <RefreshCcw />}
                         size="sm"
                         variantColor="red"
                       >
@@ -291,16 +306,16 @@ export const AutodeckOverview = () => {
               </UI.Stack>
             </UI.CardBody>
           </UI.Card>
-        </UI.Modal>
+        </Modal.Root>
 
-        <UI.Modal
-          isOpen={isOpenImportModal}
+        <Modal.Root
+          open={isOpenImportModal}
           onClose={() => {
             setIsOpenImportModal(false);
             setActiveJob(null);
           }}
         >
-          <UI.Card bg="white" noHover overflowY="scroll" height={800} width={1200}>
+          <UI.Card bg="white" overflowY="scroll" height={800} width={1200}>
             <UI.CardBody>
               <AutodeckForm
                 job={activeJob}
@@ -313,7 +328,7 @@ export const AutodeckOverview = () => {
               />
             </UI.CardBody>
           </UI.Card>
-        </UI.Modal>
+        </Modal.Root>
       </UI.ViewContainer>
     </>
   );

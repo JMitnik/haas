@@ -23,14 +23,26 @@ const DialogueBuilderView = ({ nodes, selectLeafs, ctaNodes, root }: DialogueBui
   const [activeQuestion, setActiveQuestion] = useState<null | string>(null);
 
   const { t } = useTranslation();
+  const mappedRootOptions = root?.options?.map((option) => ({
+    id: option.id,
+    position: option.position,
+    value: option.value,
+    publicValue: option.publicValue,
+    overrideLeaf: {
+      label: option.overrideLeaf?.title,
+      value: option.overrideLeaf?.id,
+      type: option.overrideLeaf?.type,
+    },
+    isTopic: option.isTopic,
+  })) || [];
 
   return (
     <>
       <UI.ViewHead>
-        <UI.ViewTitle>
+        <UI.DeprecatedViewTitle>
           <UI.Icon as={Zap} mr={1} />
           {t('views:builder_view')}
-        </UI.ViewTitle>
+        </UI.DeprecatedViewTitle>
       </UI.ViewHead>
 
       <UI.ViewBody>
@@ -43,7 +55,7 @@ const DialogueBuilderView = ({ nodes, selectLeafs, ctaNodes, root }: DialogueBui
             <QuestionSection
               parentQuestionType=""
               edgeId={undefined}
-              options={root.options}
+              options={mappedRootOptions}
               condition={undefined}
               depth={1}
               activeQuestion={activeQuestion}

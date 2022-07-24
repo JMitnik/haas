@@ -1,36 +1,37 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import {
-  Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
+  ButtonGroup, FormErrorMessage, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
   PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
 } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
+import {
+  Div, Flex, Form, FormContainer,
+  FormControl, FormLabel, FormSection, Input, InputGrid, InputHelper, Span, Text,
+} from '@haas/ui';
 import { Link, Trash, Type } from 'react-feather';
 import { useMutation } from '@apollo/client';
-
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React from 'react';
 import Select from 'react-select';
 
-import {
-  Div, Flex, Form, FormContainer,
-  FormControl, FormLabel, FormSection, Input, InputGrid, InputHelper, Span, Text,
-} from '@haas/ui';
-import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
+import { MappedCTANode } from 'views/DialogueBuilderView/DialogueBuilderInterfaces';
+// import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
+import { useCreateCtaMutation } from 'types/generated-types';
 import { useCustomer } from 'providers/CustomerProvider';
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
 import RegisterIcon from 'components/Icons/RegisterIcon';
 import ShareIcon from 'components/Icons/ShareIcon';
 import boolToInt from 'utils/booleanToNumber';
-import createCTAMutation from 'mutations/createCTA';
 import getCTANodesQuery from 'queries/getCTANodes';
 import intToBool from 'utils/intToBool';
 import updateCTAMutation from 'mutations/updateCTA';
 
 import { FormDataProps, LinkInputProps } from './CTATypes';
+
 import FormNodeForm from './FormNodeForm';
 import LinksOverview from './LinksOverview';
 
@@ -48,12 +49,16 @@ interface CTAFormProps {
   type: { label: string, value: string };
   share: ShareProps | null;
   form: any;
-  onActiveCTAChange: React.Dispatch<React.SetStateAction<string | null>>;
-  onNewCTAChange: React.Dispatch<React.SetStateAction<boolean>>;
+  onActiveCTAChange?: React.Dispatch<React.SetStateAction<string | null>>;
+  onNewCTAChange?: React.Dispatch<React.SetStateAction<boolean>>;
   onDeleteCTA: (onComplete: (() => void) | undefined) => void | Promise<any>;
+  onSuccess?: (callToAction: any) => void;
+  onCancel?: () => void;
+  onCTAIdFetch?: React.Dispatch<React.SetStateAction<MappedCTANode | null>>;
 }
 
 const isShareType = (ctaType: any) => ctaType?.value === 'SHARE';
+const isLinkType = (ctaType: any) => ctaType?.value === 'LINK';
 
 const schema = yup.object().shape({
   title: yup.string().required(),
@@ -61,8 +66,8 @@ const schema = yup.object().shape({
     { label: yup.string().required(), value: yup.string().required() },
   ).required('CTA type is required'),
   links: yup.array().when('ctaType', {
-    is: (ctaType: { label: string, value: string }) => isShareType(ctaType),
-    then: yup.array().min(1).of(yup.object().shape({
+    is: (ctaType: { label: string, value: string }) => !isLinkType(ctaType),
+    then: yup.array().of(yup.object().shape({
       url: yup.string().required(),
       title: yup.string().required(),
       type: yup.string().notRequired(),
@@ -113,19 +118,32 @@ const CTA_TYPES = [
   { label: 'Share', value: 'SHARE', ShareIcon },
 ];
 
+export function stopPropagate(callback: () => void) {
+  return (e: { preventDefault: () => void, stopPropagation: () => void }) => {
+    e.stopPropagation();
+    e.preventDefault();
+    callback();
+  };
+}
+
 const CTAForm = ({
   id,
   title,
   type,
   links,
   share,
+  onSuccess,
+  onCancel,
   onActiveCTAChange,
   onNewCTAChange,
   onDeleteCTA,
+  onCTAIdFetch,
   form: formNode,
 }: CTAFormProps) => {
   const { activeCustomer } = useCustomer();
-  const { customerSlug, dialogueSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
+  const { customerSlug, dialogueSlug, questionId } = useParams<
+  { customerSlug: string, dialogueSlug: string, questionId?: string }
+  >();
 
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
@@ -161,18 +179,19 @@ const CTAForm = ({
         searchTerm: '',
       },
     },
-    {
-      query: getTopicBuilderQuery,
-      variables: {
-        customerSlug,
-        dialogueSlug,
-      },
-    }];
+    // {
+    //   query: getTopicBuilderQuery,
+    //   variables: {
+    //     customerSlug,
+    //     dialogueSlug,
+    //   },
+    // }
+  ];
 
   const toast = useToast();
 
-  const [addCTA, { loading: addLoading }] = useMutation(createCTAMutation, {
-    onCompleted: () => {
+  const [addCTA, { loading: addLoading }] = useCreateCtaMutation({
+    onCompleted: (data) => {
       toast({
         title: t('cta:add_complete_title'),
         description: t('cta:add_complete_description'),
@@ -181,8 +200,15 @@ const CTAForm = ({
         duration: 1500,
       });
 
-      onNewCTAChange(false);
-      onActiveCTAChange(null);
+      const CTA: MappedCTANode = {
+        value: data?.createCTA?.id || undefined,
+        label: data?.createCTA?.title || undefined,
+        type: data?.createCTA?.type || undefined,
+      };
+      if (onCTAIdFetch) onCTAIdFetch(CTA);
+      onSuccess?.(data?.createCTA);
+      onNewCTAChange?.(false);
+      onActiveCTAChange?.(null);
     },
     onError: (serverError: any) => {
       console.log(serverError);
@@ -201,7 +227,7 @@ const CTAForm = ({
       });
 
       setTimeout(() => {
-        onActiveCTAChange(null);
+        onActiveCTAChange?.(null);
       }, 200);
     },
     onError: (serverError: any) => {
@@ -223,15 +249,16 @@ const CTAForm = ({
           input: {
             customerSlug,
             dialogueSlug,
+            questionId: questionId || null,
             title: formData.title,
             type: formData.ctaType.value || undefined,
-            links: mappedLinks,
+            links: mappedLinks as any, // TODO: Fix typing
             share: formData.share,
             form: {
               ...formData.formNode,
               fields: formData.formNode?.fields?.map(
                 (field) => ({ ...field, isRequired: intToBool(field.isRequired) }),
-              ),
+              ) as any, // TODO: Fix typing
             },
           },
         },
@@ -263,15 +290,16 @@ const CTAForm = ({
 
   const cancelCTA = () => {
     if (id === '-1') {
-      onNewCTAChange(false);
+      onNewCTAChange?.(false);
     }
-    onActiveCTAChange(null);
+    onActiveCTAChange?.(null);
+
+    onCancel?.();
   };
 
   return (
     <FormContainer expandedForm>
-      <UI.Hr />
-      <Form onSubmit={form.handleSubmit(onSubmit)}>
+      <Form onSubmit={stopPropagate(form.handleSubmit(onSubmit))}>
         <Div>
           <FormSection id="general">
             <Div>
@@ -333,7 +361,11 @@ const CTAForm = ({
                       defaultValue={share?.title}
                       ref={form.register({ required: true })}
                     />
-                    <FormErrorMessage>{form.errors.share?.title}</FormErrorMessage>
+                    <FormErrorMessage>
+                      <>
+                        {form.errors.share?.title}
+                      </>
+                    </FormErrorMessage>
                   </FormControl>
 
                   {/* TODO: Change default value and error */}
@@ -348,7 +380,11 @@ const CTAForm = ({
                       defaultValue={share?.url}
                       ref={form.register({ required: true })}
                     />
-                    <FormErrorMessage>{form.errors.share?.url}</FormErrorMessage>
+                    <FormErrorMessage>
+                      <>
+                        {form.errors.share?.url}
+                      </>
+                    </FormErrorMessage>
                   </FormControl>
 
                   <FormControl isRequired>
@@ -361,7 +397,11 @@ const CTAForm = ({
                       defaultValue={share?.tooltip}
                       ref={form.register({ required: true })}
                     />
-                    <FormErrorMessage>{form.errors.share?.tooltip}</FormErrorMessage>
+                    <FormErrorMessage>
+                      <>
+                        {form.errors.share?.tooltip}
+                      </>
+                    </FormErrorMessage>
                   </FormControl>
                 </UI.InputGrid>
               </FormSection>
@@ -385,52 +425,54 @@ const CTAForm = ({
 
         <Flex justifyContent="space-between">
           <ButtonGroup>
-            <Button
+            <UI.Button
               isLoading={addLoading || updateLoading}
               isDisabled={!form.formState.isValid}
-              variantColor="teal"
               type="submit"
             >
               {t('save')}
-            </Button>
-            <Button variant="ghost" onClick={() => cancelCTA()}>Cancel</Button>
+            </UI.Button>
+            <UI.Button variant="ghost" onClick={() => cancelCTA()}>Cancel</UI.Button>
           </ButtonGroup>
-          <Span onClick={(e) => e.stopPropagation()}>
-            <Popover
-              usePortal
-            >
-              {({ onClose }) => (
-                <>
-                  <PopoverTrigger>
-                    <Button
-                      variant="outline"
-                      variantColor="red"
-                      leftIcon={Trash}
-                    >
-                      {t('delete')}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent zIndex={4}>
-                    <PopoverArrow />
-                    <PopoverHeader>{t('delete')}</PopoverHeader>
-                    <PopoverCloseButton />
-                    <PopoverBody>
-                      <Text>{t('delete_cta_popover')}</Text>
-                    </PopoverBody>
-                    <PopoverFooter>
-                      <Button
+          {id !== '-1' && (
+            <Span onClick={(e) => e.stopPropagation()}>
+              <Popover
+                usePortal
+              >
+                {({ onClose }) => (
+                  <>
+                    <PopoverTrigger>
+                      <UI.Button
                         variant="outline"
                         variantColor="red"
-                        onClick={() => onDeleteCTA && onDeleteCTA(onClose)}
+                        leftIcon={() => <Trash />}
                       >
                         {t('delete')}
-                      </Button>
-                    </PopoverFooter>
-                  </PopoverContent>
-                </>
-              )}
-            </Popover>
-          </Span>
+                      </UI.Button>
+                    </PopoverTrigger>
+                    <PopoverContent zIndex={4}>
+                      <PopoverArrow />
+                      <PopoverHeader>{t('delete')}</PopoverHeader>
+                      <PopoverCloseButton />
+                      <PopoverBody>
+                        <Text>{t('delete_cta_popover')}</Text>
+                      </PopoverBody>
+                      <PopoverFooter>
+                        <UI.Button
+                          variant="outline"
+                          variantColor="red"
+                          onClick={() => onDeleteCTA && onDeleteCTA(onClose)}
+                        >
+                          {t('delete')}
+                        </UI.Button>
+                      </PopoverFooter>
+                    </PopoverContent>
+                  </>
+                )}
+              </Popover>
+            </Span>
+          )}
+
         </Flex>
       </Form>
     </FormContainer>

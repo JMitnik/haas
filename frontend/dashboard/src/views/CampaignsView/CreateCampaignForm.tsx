@@ -87,8 +87,8 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant, isReadOnly }: Ac
   });
 
   const dialogues = data?.customer?.dialogues?.map((dialogue) => ({
-    label: dialogue.title,
-    value: dialogue.id,
+    label: dialogue!.title,
+    value: dialogue!.id,
   })) || [];
 
   const percentageFull = Math.min(Math.floor((activeVariant.body.length / SMS_LIMIT_CHARACTERS) * 100), 100);
@@ -363,7 +363,7 @@ const CreateCampaignForm = ({ onClose, isReadOnly = false, campaign }: CreateCam
                   <UI.ButtonCard
                     onClick={() => switchActiveVariant(index)}
                     isActive={activeVariantIndex === index}
-                    bg="white"
+                    variant={activeVariantIndex === index ? 'solid' : 'outline'}
                   >
                     {`${t('variant')} ${mapVariantIndexToLabel[index]}`}
                   </UI.ButtonCard>
@@ -410,23 +410,24 @@ const CreateCampaignForm = ({ onClose, isReadOnly = false, campaign }: CreateCam
             </UI.FormControl>
           </UI.Div>
         </UI.Stack>
-        <UI.Card isFlat noHover bg="gray.100">
-          {(activeVariantIndex === 0 || activeVariantIndex) ? (
+
+        {(activeVariantIndex === 0 || activeVariantIndex) ? (
+          <UI.Card>
             <ActiveVariantForm
               isReadOnly={isReadOnly}
               variant={variants[activeVariantIndex]}
               activeVariantIndex={activeVariantIndex}
               form={form}
             />
-          ) : (
-            <UI.IllustrationCard
-              svg={<DecideIll />}
-              text={t('select_a_variant')}
-              isFlat
-            />
-          )}
-        </UI.Card>
-        <UI.Button type="submit" isDisabled={!form.formState.isValid || isReadOnly}>
+          </UI.Card>
+        ) : (
+          <UI.IllustrationCard
+            svg={<DecideIll />}
+            text={t('select_a_variant')}
+          />
+        )}
+
+        <UI.Button mt={2} type="submit" isDisabled={!form.formState.isValid || isReadOnly}>
           {t('save')}
         </UI.Button>
       </UI.Grid>

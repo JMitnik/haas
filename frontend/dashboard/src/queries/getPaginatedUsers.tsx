@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client';
 
 const getPaginatedUsers = gql`
-  query getPaginatedUsers($customerSlug: String!, $filter: PaginationWhereInput) {
+  query getPaginatedUsers($customerSlug: String!, $filter: UserConnectionFilterInput) {
     customer(slug: $customerSlug) {
       id
 

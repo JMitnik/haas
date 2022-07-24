@@ -2,13 +2,14 @@ import {
   Prisma,
   TriggerEnum,
 } from '@prisma/client';
-import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
+import { enumType, extendType, inputObjectType, objectType } from 'nexus';
 import { UserInputError } from 'apollo-server-express';
+import { isPresent } from 'ts-is-present';
 
 import { DialogueType } from '../questionnaire/Dialogue';
 import { PaginationWhereInput } from '../general/Pagination';
 import { QuestionNodeType } from '../QuestionNode/QuestionNode';
-import { UserType } from '../users/User';
+import { UserType } from '../users/graphql/User';
 import TriggerService from './TriggerService';
 import { CreateTriggerInput } from './TriggerServiceType';
 import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
@@ -46,6 +47,8 @@ const TriggerConditionType = objectType({
       nullable: true,
       type: QuestionNodeType,
       async resolve(parent, args, ctx) {
+        if (!parent.triggerId || !parent.id) return null;
+
         return ctx.services.triggerService.getQuestionOfTrigger(parent.triggerId, parent.id);
       },
     });
@@ -67,6 +70,8 @@ const TriggerType = objectType({
       nullable: true,
 
       async resolve(parent, args, ctx) {
+        if (!parent.id) return null;
+
         return ctx.services.triggerService.findDialogueOfTrigger(parent.id)
       },
     });
@@ -74,12 +79,16 @@ const TriggerType = objectType({
     t.list.field('conditions', {
       type: TriggerConditionType,
       resolve(parent, args, ctx) {
+        if (!parent.id) return null;
+
         return ctx.services.triggerService.getConditionsOfTrigger(parent.id);
       },
     });
     t.list.field('recipients', {
       type: UserType,
       async resolve(parent, args, ctx) {
+        if (!parent.id) return null;
+
         return ctx.services.userService.getRecipientsOfTrigger(parent.id);
       },
     });
@@ -169,8 +178,8 @@ const TriggerMutations = extendType({
           medium: args.trigger?.medium,
         };
 
-        const recipientIds = args.recipients?.ids || [];
-        const conditions: Array<NexusGenInputs['TriggerConditionInputType']> = args.trigger.conditions || [];
+        const recipientIds = args.recipients?.ids?.filter(isPresent) || [];
+        const conditions: Array<NexusGenInputs['TriggerConditionInputType']> = args.trigger.conditions?.filter(isPresent) || [];
 
         return ctx.services.triggerService.editTrigger(args.triggerId, updateTriggerArgs, recipientIds, conditions) as any;
       },
@@ -192,10 +201,12 @@ const TriggerMutations = extendType({
           medium: args.input.trigger?.medium,
           type: args.input.trigger?.type,
           customerSlug: args.input.customerSlug,
-          recipients: args.input.recipients?.ids?.map((id: string) => ({ id })) || [],
+          recipients: args.input.recipients?.ids?.map((id) => id ? ({ id }) : null).filter(isPresent) || [],
         };
 
-        return ctx.services.triggerService.createTrigger(createArgs, args.input.trigger?.conditions || []);
+        return ctx.services.triggerService.createTrigger(
+          createArgs, args.input.trigger?.conditions?.filter(isPresent
+          ) || []);
       },
     });
   },
@@ -238,7 +249,7 @@ const TriggerQueries = extendType({
           triggers: entries as NexusGenFieldTypes['TriggerType'][],
           pageInfo,
           offset: args.filter?.offset || 0,
-          limit: args.filter?.limit || 0
+          limit: args.filter?.limit || 0,
         };
       },
     });

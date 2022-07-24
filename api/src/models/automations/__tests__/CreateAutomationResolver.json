@@ -1,0 +1,86 @@
+{
+  "input": {
+    "label": "First API created condition builder",
+    "workspaceId": "ckxfrar6g0164qzoic98y2k86",
+    "automationType": "TRIGGER",
+    "event": {
+      "eventType": "NEW_INTERACTION_QUESTION",
+      "questionId": "ckxfrarez0759qzoi8vmwwd90"
+    },
+    "actions": [
+      {
+        "type": "GENERATE_REPORT"
+      }
+    ],
+    "conditionBuilder": {
+      "type": "AND",
+      "conditions": [
+        {
+          "scope": {
+            "type": "QUESTION",
+            "questionScope": {
+              "aspect": "NODE_VALUE",
+              "aggregate": {
+                "type": "AVG",
+                "latest": 5
+              }
+            }
+          },
+          "operator": "SMALLER_OR_EQUAL_THAN",
+          "operands": [
+            {
+              "operandType": "INT",
+              "numberValue": 69
+            }
+          ],
+          "questionId": "ckxfrarez0759qzoi8vmwwd90"
+        }
+      ],
+      "childConditionBuilder": {
+        "type": "OR",
+        "conditions": [
+          {
+            "scope": {
+              "type": "QUESTION",
+              "questionScope": {
+                "aspect": "NODE_VALUE",
+                "aggregate": {
+                  "type": "AVG",
+                  "latest": 5
+                }
+              }
+            },
+            "operator": "SMALLER_OR_EQUAL_THAN",
+            "operands": [
+              {
+                "operandType": "INT",
+                "numberValue": 69
+              }
+            ],
+            "questionId": "ckxfrarez0759qzoi8vmwwd90"
+          },
+          {
+            "scope": {
+              "type": "QUESTION",
+              "questionScope": {
+                "aspect": "NODE_VALUE",
+                "aggregate": {
+                  "type": "AVG",
+                  "latest": 5
+                }
+              }
+            },
+            "operator": "SMALLER_OR_EQUAL_THAN",
+            "operands": [
+              {
+                "operandType": "INT",
+                "numberValue": 69
+              }
+            ],
+            "questionId": "ckxfrarez0759qzoi8vmwwd90"
+          }
+        ]
+      }
+    }
+  }
+}

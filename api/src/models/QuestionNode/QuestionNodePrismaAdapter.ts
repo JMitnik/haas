@@ -1,15 +1,105 @@
-import { Prisma, PrismaClient, Edge, QuestionNode, QuestionOption, VideoEmbeddedNode, NodeType, Link, Share } from "@prisma/client";
+import { Prisma, PrismaClient, Edge, QuestionNode, QuestionOption, VideoEmbeddedNode, NodeType, Link, Share } from '@prisma/client';
 
-import { CreateQuestionInput } from "../questionnaire/DialoguePrismaAdapterType";
-import NodeService from "./NodeService";
-import { QuestionOptionProps } from "./NodeServiceType";
-import { CreateFormFieldsInput, UpdateFormFieldsInput, CreateCTAInput, UpdateQuestionInput, CreateLinkInput, UpdateLinkInput, CreateShareInput, UpdateShareInput, UpdateSliderNodeInput, CreateSliderNodeInput, CreateVideoEmbeddedNodeInput } from "./QuestionNodePrismaAdapterType";
+import { CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType';
+import NodeService from './NodeService';
+import { QuestionOptionProps } from './NodeServiceType';
+import { CreateFormFieldsInput, UpdateFormFieldsInput, CreateCTAInput, UpdateQuestionInput, CreateLinkInput, UpdateLinkInput, CreateShareInput, UpdateShareInput, UpdateSliderNodeInput, CreateSliderNodeInput, CreateVideoEmbeddedNodeInput } from './QuestionNodePrismaAdapterType';
 
 class QuestionNodePrismaAdapter {
   prisma: PrismaClient;
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
+  }
+
+  /**
+   * Finds all topic question options within a list of dialogues matching a string
+   * @param dialogueIds
+   * @param topic
+   * @returns
+   */
+  public async findQuestionOptionsBySelectedTopic (dialogueIds: string[], topic: string) {
+    const questionOptions = await this.prisma.questionOption.findMany({
+      where: {
+        value: topic,
+        isTopic: true,
+        QuestionNode: {
+          questionDialogueId: {
+            in: dialogueIds,
+          },
+        },
+      },
+    });
+
+    return questionOptions
+  }
+
+  public async findSliderNodeByDialogueId (dialogueId: string) {
+    return this.prisma.questionNode.findFirst({
+      where: {
+        questionDialogueId: dialogueId,
+        isRoot: true,
+      },
+      select: {
+        children: {
+          take: 1, // Assumption: Options of all children of slider are the same
+          select: {
+            childNode: {
+              select: {
+                options: true,
+              },
+            },
+          },
+        },
+        id: true,
+      },
+    });
+  }
+
+  /**
+   * Finds a cache entry of a dialogue statistics summary based on id and date range
+   * @param dialogueId
+   * @param startDateTime
+   * @param endDateTime
+   * @returns DialogueStatisticsSummaryCache | null
+   */
+  findQuestionStatisticsSummaryByQuestionId = async (dialogueId: string, startDateTime: Date, endDateTime: Date) => {
+    const prevStatistics = await this.prisma.dialogueStatisticsSummaryCache.findFirst({
+      where: {
+        dialogueId,
+        startDateTime: {
+          equals: startDateTime,
+        },
+        endDateTime: {
+          equals: endDateTime,
+        },
+      },
+      orderBy: {
+        updatedAt: 'desc',
+      },
+    });
+    return prevStatistics;
+  }
+
+  /**
+   * Update a question node to have a new call-to-action as leaf.
+   * @param questionId
+   * @param ctaId
+   * @returns
+   */
+  connectCallToActionToQuestion = async (questionId: string, ctaId: string) => {
+    return this.prisma.questionNode.update({
+      where: {
+        id: questionId,
+      },
+      data: {
+        overrideLeaf: {
+          connect: {
+            id: ctaId,
+          },
+        },
+      },
+    });
   }
 
   updateVideoNode(nodeId: string, data: Prisma.VideoEmbeddedNodeUpdateInput): Promise<VideoEmbeddedNode> {
@@ -37,7 +127,7 @@ class QuestionNodePrismaAdapter {
     return this.prisma.videoEmbeddedNode.delete({
       where: {
         id,
-      }
+      },
     });
   };
 
@@ -45,7 +135,7 @@ class QuestionNodePrismaAdapter {
     return this.prisma.videoEmbeddedNode.findUnique({
       where: {
         id: nodeId,
-      }
+      },
     })
   }
 
@@ -107,9 +197,9 @@ class QuestionNodePrismaAdapter {
         url: create.url,
         questionNode: {
           connect: {
-            id: create.questionId
-          }
-        }
+            id: create.questionId,
+          },
+        },
       },
       update: {
         title: update.title,
@@ -167,8 +257,8 @@ class QuestionNodePrismaAdapter {
         questionNode: {
           connect: {
             id: create.questionId,
-          }
-        }
+          },
+        },
       },
       update: {
         title: update.title,
@@ -180,7 +270,7 @@ class QuestionNodePrismaAdapter {
         header: create.header,
         imageUrl: create.imageUrl,
         subHeader: create.subHeader,
-      }
+      },
     });
   };
 
@@ -206,9 +296,9 @@ class QuestionNodePrismaAdapter {
           create: {
             helperText: input.helperText,
             ...input.fields,
-          }
+          },
         },
-      }
+      },
     })
   }
 
@@ -226,14 +316,13 @@ class QuestionNodePrismaAdapter {
             },
           },
         },
-      }
+      },
     })
   }
 
-  createCTANode(input: CreateCTAInput) {
+  createCallToAction(input: CreateCTAInput) {
     return this.prisma.questionNode.create({
-      data:
-      {
+      data: {
         title: input.title,
         type: input.type,
         isLeaf: true,
@@ -251,15 +340,15 @@ class QuestionNodePrismaAdapter {
             id: input.dialogueId,
           },
         },
-      }
-    })
+      },
+    });
   }
 
   delete(id: string): Promise<QuestionNode> {
     return this.prisma.questionNode.delete({
       where: {
         id,
-      }
+      },
     });
   };
 
@@ -278,8 +367,8 @@ class QuestionNodePrismaAdapter {
         position: 'asc',
       },
       include: {
-        overrideLeaf: true
-      }
+        overrideLeaf: true,
+      },
     });
   }
 
@@ -295,6 +384,7 @@ class QuestionNodePrismaAdapter {
         publicValue: option.publicValue,
         overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : undefined,
         position: option.position,
+        isTopic: option.isTopic,
       }
       const updatedQOption = await this.upsertQuestionOption(optionId, optionUpsertInput, optionUpsertInput);
 
@@ -326,11 +416,11 @@ class QuestionNodePrismaAdapter {
       },
       include: {
         videoEmbeddedNode: true,
-      }
+      },
     })
   }
 
-  getDialogueBuilderNode(nodeId: string): Promise<(QuestionNode & { videoEmbeddedNode: VideoEmbeddedNode | null; children: Edge[]; options: QuestionOption[]; questionDialogue: { id: string; } | null; overrideLeaf: { id: string; } | null; }) | null> {
+  getDialogueBuilderNode(nodeId: string): Promise<(QuestionNode & { videoEmbeddedNode: VideoEmbeddedNode | null; children: Edge[]; options: QuestionOption[]; questionDialogue: { id: string } | null; overrideLeaf: { id: string } | null }) | null> {
     return this.prisma.questionNode.findUnique({
       where: { id: nodeId },
       include: {
@@ -347,7 +437,7 @@ class QuestionNodePrismaAdapter {
             id: true,
           },
         },
-      }
+      },
     });
   }
 
@@ -361,30 +451,31 @@ class QuestionNodePrismaAdapter {
         questionDialogue: question.dialogueId ? {
           connect: {
             id: question.dialogueId,
-          }
+          },
         } : undefined,
         videoEmbeddedNode: question.videoEmbeddedNode?.videoUrl ? {
           create: {
             videoUrl: question.videoEmbeddedNode.videoUrl,
-          }
+          },
         } : undefined,
         links: question.links?.length ? {
           create: question.links,
         } : undefined,
         options: question.options?.length ? {
-          create: question.options.map(({ value, overrideLeafId, publicValue, position }) => {
+          create: question.options.map(({ value, overrideLeafId, publicValue, position, isTopic }) => {
             return {
               value,
               publicValue,
               position,
-              overrideLeaf: overrideLeafId ? { connect: { id: overrideLeafId } } : undefined
+              overrideLeaf: overrideLeafId ? { connect: { id: overrideLeafId } } : undefined,
+              isTopic,
             }
           }),
         } : undefined,
         overrideLeaf: question.overrideLeafId ? {
           connect: {
             id: question.overrideLeafId,
-          }
+          },
         } : undefined,
         form: question.form ? {
           create: {

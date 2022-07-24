@@ -1,10 +1,9 @@
 
-import { enumType, inputObjectType, mutationField, objectType, queryField } from '@nexus/schema';
+import { enumType, inputObjectType, mutationField, objectType, queryField } from 'nexus';
 
 import AutodeckService from './AutodeckService';
 import { PaginationWhereInput } from '../general/Pagination';
 import { NexusGenFieldTypes } from '../../generated/nexus';
-import { Upload } from '../customer/Customer';
 
 export const JobProcessLocationType = enumType({
   name: 'JobProcessLocationType',
@@ -16,9 +15,9 @@ export const CustomFieldType = objectType({
   definition(t) {
     t.string('id')
     t.string('key')
-    t.string('value', { nullable: true })
+    t.nullable.string('value')
     t.string('jobProcessLocationId')
-  }
+  },
 });
 
 export const JobProcessLocation = objectType({
@@ -30,17 +29,16 @@ export const JobProcessLocation = objectType({
     t.int('xMaterialDimension');
     t.int('yMaterialDimension');
     t.field('type', {
-      type: JobProcessLocationType
+      type: JobProcessLocationType,
     })
 
     t.list.field('customFields', {
       type: CustomFieldType,
-      nullable: true,
       resolve(parent, args, ctx) {
         return ctx.services.autodeckService.getCustomFieldsOfJobProcessLocation(parent.id);
-      }
+      },
     })
-  }
+  },
 })
 
 export const JobProcessLocations = objectType({
@@ -49,7 +47,7 @@ export const JobProcessLocations = objectType({
     t.list.field('jobProcessLocations', {
       type: JobProcessLocation,
     })
-  }
+  },
 })
 
 export const GetJobProcessLocationQuery = queryField('getJobProcessLocations', {
@@ -57,7 +55,7 @@ export const GetJobProcessLocationQuery = queryField('getJobProcessLocations', {
   async resolve(parent, args, ctx) {
     const jobProcessLocations = await ctx.services.autodeckService.getJobProcessLocations()
     return { jobProcessLocations: jobProcessLocations || [] };
-  }
+  },
 })
 
 export const createJobProcessLocationInput = inputObjectType({
@@ -68,7 +66,7 @@ export const createJobProcessLocationInput = inputObjectType({
     t.field('type', {
       type: JobProcessLocationType,
     })
-  }
+  },
 })
 
 export const CreateJobProcessLocationMutation = mutationField('createJobProcessLocation', {
@@ -76,7 +74,7 @@ export const CreateJobProcessLocationMutation = mutationField('createJobProcessL
   args: { input: createJobProcessLocationInput },
   resolve(parent, args, ctx) {
     return ctx.services.autodeckService.createJobProcessLocation(args.input);
-  }
+  },
 })
 
 export const CloudReferenceType = enumType({
@@ -97,7 +95,7 @@ export const PreviewDataType = objectType({
     t.list.string('colors');
     t.string('rembgLogoUrl');
     t.string('websiteScreenshotUrl');
-  }
+  },
 })
 
 export const CreateWorkspaceJobType = objectType({
@@ -111,11 +109,11 @@ export const CreateWorkspaceJobType = objectType({
     t.boolean('requiresRembg')
     t.boolean('requiresScreenshot')
 
-    t.string('resourcesUrl', { nullable: true });
-    t.string('updatedAt', { nullable: true })
-    t.string('referenceId', { nullable: true });
-    t.string('errorMessage', { nullable: true });
-    t.string('message', { nullable: true })
+    t.nullable.string('resourcesUrl');
+    t.nullable.string('updatedAt')
+    t.nullable.string('referenceId');
+    t.nullable.string('errorMessage');
+    t.nullable.string('message');
 
     t.field('referenceType', {
       type: CloudReferenceType,
@@ -127,12 +125,13 @@ export const CreateWorkspaceJobType = objectType({
     t.field('processLocation', {
       type: JobProcessLocation,
       async resolve(parent, args, ctx) {
+        if (!parent.id) return null;
         const processLocation = await ctx.services.autodeckService.getJobProcessLocationOfJob(parent.id);
 
         if (!processLocation) throw Error('Process location not found!');
 
         return processLocation;
-      }
+      },
     })
   },
 });
@@ -146,7 +145,6 @@ export const JobObjectType = objectType({
     t.string('createWorkspaceJobId');
     t.field('createWorkspaceJob', {
       type: CreateWorkspaceJobType,
-      nullable: true,
     });
   },
 });
@@ -156,7 +154,7 @@ export const CustomFieldInputType = inputObjectType({
   definition(t) {
     t.string('key')
     t.string('value')
-  }
+  },
 })
 
 export const GenerateAutodeckInput = inputObjectType({
@@ -164,32 +162,32 @@ export const GenerateAutodeckInput = inputObjectType({
   description: 'Generate savales documents',
 
   definition(t) {
-    t.string('id', { required: true });
-    t.boolean('requiresRembgLambda', { required: true });
-    t.boolean('requiresWebsiteScreenshot', { required: true });
-    t.boolean('requiresColorExtraction', { required: true });
-    t.boolean('usesAdjustedLogo', { required: true });
+    t.nonNull.string('id');
+    t.nonNull.boolean('requiresRembgLambda');
+    t.nonNull.boolean('requiresWebsiteScreenshot');
+    t.nonNull.boolean('requiresColorExtraction');
+    t.nonNull.boolean('usesAdjustedLogo');
 
-    t.string('jobLocationId', { required: false })
-    t.string('name', { required: false });
-    t.string('website', { required: false });
-    t.string('logo', { required: false });
-    t.string('primaryColour', { required: false });
-    t.string('firstName', { required: false });
-    t.string('companyName', { required: false });
-    t.string('answer1', { required: false });
-    t.string('answer2', { required: false });
-    t.string('answer3', { required: false });
-    t.string('answer4', { required: false });
-    t.string('sorryAboutX', { required: false });
-    t.string('youLoveX', { required: false });
-    t.string('reward', { required: false });
-    t.string('emailContent', { required: false });
-    t.string('textMessage', { required: false });
+    t.string('jobLocationId')
+    t.string('name');
+    t.string('website');
+    t.string('logo');
+    t.string('primaryColour');
+    t.string('firstName');
+    t.string('companyName');
+    t.string('answer1');
+    t.string('answer2');
+    t.string('answer3');
+    t.string('answer4');
+    t.string('sorryAboutX');
+    t.string('youLoveX');
+    t.string('reward');
+    t.string('emailContent');
+    t.string('textMessage');
 
     // Generate workspace
-    t.string('slug', { required: false });
-    t.boolean('isGenerateWorkspace', { required: false });
+    t.string('slug');
+    t.boolean('isGenerateWorkspace');
 
     t.list.field('standardFields', {
       type: CustomFieldInputType,
@@ -207,19 +205,19 @@ export const GenerateAutodeckInput = inputObjectType({
 
 export const GetPreviewDataQuery = queryField('getPreviewData', {
   type: PreviewDataType,
-  nullable: true,
+
   args: { id: 'String' },
   async resolve(parent, args) {
     if (!args.id) return null;
 
     const previewData = await AutodeckService.getPreviewData(args.id);
     return previewData as any;
-  }
+  },
 })
 
 export const GenerateAutodeckMutation = mutationField('generateAutodeck', {
   type: CreateWorkspaceJobType,
-  nullable: true,
+
   args: { input: GenerateAutodeckInput },
 
   async resolve(parent, args, ctx) {
@@ -248,7 +246,7 @@ export const GenerateAutodeckMutation = mutationField('generateAutodeck', {
 
 export const RetryAutodeckJobMutation = mutationField('retryAutodeckJob', {
   type: CreateWorkspaceJobType,
-  nullable: true,
+
   args: { jobId: 'String' },
 
   async resolve(parent, args, ctx) {
@@ -266,7 +264,7 @@ export const RetryAutodeckJobMutation = mutationField('retryAutodeckJob', {
 
 export const ConfirmCreateWorkspaceJobMutation = mutationField('confirmCreateWorkspaceJob', {
   type: CreateWorkspaceJobType,
-  nullable: true,
+
   args: { input: GenerateAutodeckInput },
   async resolve(parent, args, ctx) {
     const { input } = args;
@@ -276,12 +274,12 @@ export const ConfirmCreateWorkspaceJobMutation = mutationField('confirmCreateWor
     }
 
     return ctx.services.autodeckService.confirmWorkspaceJob(input, userId) as any;
-  }
+  },
 })
 
 export const GetJobQuery = queryField('getJob', {
   type: CreateWorkspaceJobType,
-  nullable: true,
+
   args: { id: 'String' },
   async resolve(parent, args, ctx) {
     if (!args.id) return null;
@@ -295,7 +293,7 @@ export const AutodeckConnectionModel = objectType({
   definition(t) {
     t.implements('DeprecatedConnectionInterface');
     t.list.field('jobs', { type: CreateWorkspaceJobType });
-  }
+  },
 });
 
 export const GetAutodeckJobsQuery = queryField('getAutodeckJobs', {
@@ -314,7 +312,7 @@ export const GetAutodeckJobsQuery = queryField('getAutodeckJobs', {
       jobs: entries as NexusGenFieldTypes['CreateWorkspaceJobType'][],
       pageInfo,
       offset: args.filter?.offset || 0,
-      limit: args.filter?.limit || 0
+      limit: args.filter?.limit || 0,
     };
   },
 })
@@ -322,10 +320,10 @@ export const GetAutodeckJobsQuery = queryField('getAutodeckJobs', {
 export const AWSImageType = objectType({
   name: 'AWSImageType',
   definition(t) {
-    t.string('filename', { nullable: true });
-    t.string('mimetype', { nullable: true });
-    t.string('encoding', { nullable: true });
-    t.string('url', { nullable: true });
+    t.string('filename');
+    t.string('mimetype');
+    t.string('encoding');
+    t.string('url');
   },
 });
 
@@ -338,43 +336,43 @@ export const RemovePixelRangeInput = inputObjectType({
     t.int('green');
     t.int('blue');
     t.int('range');
-  }
+  },
 })
 
 export const AdjustedImageInput = inputObjectType({
   name: 'AdjustedImageInput',
   definition(t) {
-    t.string('id', { nullable: true });
-    t.string('key', { nullable: true });
+    t.string('id');
+    t.string('key');
     t.string('bucket');
-    t.boolean('reset', { nullable: true })
-  }
+    t.boolean('reset')
+  },
 })
 
 export const GetAdjustedLogoQuery = queryField('getAdjustedLogo', {
   type: AWSImageType,
-  nullable: true,
+
   args: { input: AdjustedImageInput },
   resolve(parent, args) {
     if (!args.input) return null;
     return AutodeckService.getAdjustedLogo(args.input);
-  }
+  },
 })
 
 export const WhitifyImageMutation = mutationField('whitifyImage', {
   type: AWSImageType,
-  nullable: true,
+
   args: { input: AdjustedImageInput },
   resolve(parent, args) {
     if (!args.input) return null;
     AutodeckService.whitifyImage(args.input)
     return { url: 'Succesfully started lambda' }
-  }
+  },
 })
 
 export const RemovePixelRangeMutation = mutationField('removePixelRange', {
   type: AWSImageType,
-  nullable: true,
+
   args: { input: RemovePixelRangeInput },
   async resolve(parent, args) {
     if (!args.input) return null;
@@ -382,28 +380,28 @@ export const RemovePixelRangeMutation = mutationField('removePixelRange', {
     AutodeckService.removePixelRange(args.input)
 
     return { url: 'succesfully start lambda i guess' };
-  }
+  },
 })
 
 export const UploadImageEnumType = enumType({
   name: 'UploadImageEnumType',
-  members: ['LOGO', 'WEBSITE_SCREENSHOT']
+  members: ['LOGO', 'WEBSITE_SCREENSHOT'],
 })
 
-export const UploadImageMutation = Upload && mutationField('uploadJobImage', {
+export const UploadImageMutation = mutationField('uploadJobImage', {
   type: AWSImageType,
-  nullable: true,
+
   args: {
-    file: Upload,
-    jobId: "String",
+    file: 'Upload',
+    jobId: 'String',
     type: UploadImageEnumType,
-    disapproved: "Boolean",
+    disapproved: 'Boolean',
   },
   async resolve(parent, args) {
     const { file, jobId } = args;
     const waitedFile = await file;
     const { createReadStream, filename, mimetype, encoding }:
-      { createReadStream: any, filename: string, mimetype: string, encoding: string } = waitedFile.file;
+      { createReadStream: any; filename: string; mimetype: string; encoding: string } = waitedFile.file;
 
     const extension = filename.split('.')[1]
     let fileName;
@@ -432,7 +430,7 @@ export const UploadImageMutation = Upload && mutationField('uploadJobImage', {
 
 export const UpdateCreatWorkspaceJobMutation = mutationField('updateCreateWorkspaceJob', {
   type: CreateWorkspaceJobType,
-  nullable: true,
+
   args: { id: 'String', status: JobStatusType, resourceUrl: 'String', referenceId: 'String', errorMessage: 'String' },
   resolve(parent, args, ctx) {
     const { id, resourceUrl, status, errorMessage } = args;

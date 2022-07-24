@@ -2,25 +2,38 @@ name: CI_PR
 on: [push]
 jobs:
   build:
+    timeout-minutes: 30
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Install modules
-      run: yarn
-    - name: Check types
-      run: yarn types
-    - name: Run ESLint
-      run: yarn eslint
-    - name: Start Testing Containers
-      run: yarn dock:test:start-db
-    - name: Generate required artifacts
-      run: yarn gen:api:prisma
-      env:
-        DB_STRING: postgresql://prisma:prisma@localhost:5431/postgres?schema=public
-    - name: Run Unit and integration Tests
-      run: yarn test:integration
-      env:
-        # These ENV values are not reflecting actual secrets from production
-        DB_STRING: postgresql://prisma:prisma@localhost:5431/postgres?schema=public
-        JWT_SECRET: 'test123'
-        MAIL_SENDER: 'test123'
+      - uses: actions/checkout@v2
+      - name: Install modules
+        run: yarn
+      - name: Check types
+        run: yarn types
+      - name: Run ESLint
+        run: yarn eslint
+      - name: Run E2E (Client)
+        uses: cypress-io/github-action@v4
+        with:
+          browser: chrome
+          start: yarn serve
+          wait-on: 'http://localhost:3000'
+          working-directory: ./frontend/client
+        env:
+          SKIP_PREFLIGHT_CHECK: true
+      - name: Start Testing Containers
+        run: yarn dock:up:test
+      - name: Generate required artifacts
+        run: yarn gen:api:prisma
+        env:
+          DB_STRING: postgresql://prisma:prisma@localhost:5431/postgres?schema=public
+      - name: Run API Unit and integration Tests
+        run: yarn test:integration:api
+        env:
+          # These ENV values are not reflecting actual secrets from production
+          DB_STRING: postgresql://prisma:prisma@localhost:5431/postgres?schema=public
+          JWT_SECRET: "test123"
+          API_SECRET: "test123"
+          MAIL_SENDER: "test123"
+      - name: Run Dashboard Unit and integration Tests
+        run: yarn test:integration:dashboard

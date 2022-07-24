@@ -1,4 +1,5 @@
 import * as UI from '@haas/ui';
+import { isPresent } from 'ts-is-present';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -23,9 +24,9 @@ const FormNodeDescription = ({ nodeEntry }: InteractionNodeEntryDescriptionProps
   <>
     {nodeEntry.value?.formNodeEntry ? (
       <>
-        <UI.SectionHeader>
+        <UI.Span>
           User provided these values:
-        </UI.SectionHeader>
+        </UI.Span>
         {/* @ts-ignore */}
         <FormNodeEntry nodeEntry={nodeEntry.value.formNodeEntry} />
       </>
@@ -41,22 +42,23 @@ const TextboxNodeDescription = ({ nodeEntry }: InteractionNodeEntryDescriptionPr
   <>
     {nodeEntry.value?.textboxNodeEntry ? (
       <>
-        <UI.SectionHeader>
-          User wrote the following down:
-        </UI.SectionHeader>
-        <UI.Div
-          bg="white"
-          borderRadius="10px"
-          padding={2}
-        >
-          {nodeEntry.value?.textboxNodeEntry}
-        </UI.Div>
         <UI.Span>
-          when asked
+          When asked
           &quot;
           {nodeEntry.relatedNode?.title}
           &quot;
         </UI.Span>
+        <UI.SectionHeader>
+          User wrote the following down:
+        </UI.SectionHeader>
+        <UI.SectionHeader
+          bg="white"
+          style={{ borderRadius: '10px' }}
+          padding={2}
+        >
+          {nodeEntry.value?.textboxNodeEntry}
+        </UI.SectionHeader>
+
       </>
     ) : (
       <>
@@ -70,18 +72,18 @@ const MultiChoiceEntryDescription = ({ nodeEntry }: InteractionNodeEntryDescript
   <>
     {nodeEntry.value?.choiceNodeEntry && (
       <>
+        <UI.Span>
+          When asked
+          &quot;
+          {nodeEntry.relatedNode?.title}
+          &quot;
+        </UI.Span>
         <UI.SectionHeader>
           User selected:
           &quot;
           {nodeEntry.value?.choiceNodeEntry}
           &quot;
         </UI.SectionHeader>
-        <UI.Span>
-          when asked
-          &quot;
-          {nodeEntry.relatedNode?.title}
-          &quot;
-        </UI.Span>
       </>
     )}
   </>
@@ -91,17 +93,17 @@ const VideoEmbedEntryDescription = ({ nodeEntry }: InteractionNodeEntryDescripti
   <>
     {nodeEntry.value?.videoNodeEntry && (
       <>
+        <UI.Span>
+          When asked
+          &quot;
+          {nodeEntry.relatedNode?.title}
+          &quot;
+        </UI.Span>
         <UI.SectionHeader>
           User made choice:
           {' '}
           {nodeEntry.value?.videoNodeEntry}
         </UI.SectionHeader>
-        <UI.Span>
-          when asked
-          &quot;
-          {nodeEntry.relatedNode?.title}
-          &quot;
-        </UI.Span>
       </>
     )}
   </>
@@ -111,17 +113,17 @@ const SliderEntryDescription = ({ nodeEntry }: InteractionNodeEntryDescriptionPr
   <>
     {nodeEntry.value?.sliderNodeEntry && (
       <>
+        <UI.Span>
+          When asked
+          &quot;
+          {nodeEntry.relatedNode?.title}
+          &quot;
+        </UI.Span>
         <UI.SectionHeader>
           User slid the bunny to value:
           {' '}
           {formatSliderValue(nodeEntry.value?.sliderNodeEntry)}
         </UI.SectionHeader>
-        <UI.Span>
-          when asked
-          &quot;
-          {nodeEntry.relatedNode?.title}
-          &quot;
-        </UI.Span>
       </>
     )}
   </>
@@ -156,7 +158,7 @@ const InteractionTimelineContainer = styled.div`
 export const InteractionTimeline = ({ interaction }: InteractionTimelineProps) => (
   <InteractionTimelineContainer>
     <Timeline enableFold isBlock nrItems={interaction.nodeEntries?.length} brand="blue">
-      {interaction.nodeEntries.map((nodeEntry) => (
+      {interaction?.nodeEntries?.filter(isPresent).map((nodeEntry) => (
         <TimelineItem gridTemplateColumns="40px 1fr" key={nodeEntry.id}>
           <Circle brand="blue">
             {nodeEntry.relatedNode?.type && (
@@ -166,7 +168,16 @@ export const InteractionTimeline = ({ interaction }: InteractionTimelineProps) =
             )}
           </Circle>
           <UI.Div>
-            <UI.Helper color="blue.400">{nodeEntry.relatedNode?.type}</UI.Helper>
+            {nodeEntry.relatedNode?.type === QuestionNodeTypeEnum.Form ? (
+              <UI.Flex justifyContent="space-between">
+                <UI.Helper color="blue.400">{nodeEntry.relatedNode?.type}</UI.Helper>
+
+                <UI.Helper color="red.500">Requires action</UI.Helper>
+              </UI.Flex>
+            ) : (
+              <UI.Helper color="blue.400">{nodeEntry.relatedNode?.type}</UI.Helper>
+            )}
+
             <StatusDescription nodeEntry={nodeEntry} />
           </UI.Div>
         </TimelineItem>

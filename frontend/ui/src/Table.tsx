@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import React from "react";
 import styled, { css } from "styled-components";
-import Card, { CardBody } from "./Cards";
+import { CardBody, Card } from "./Cards";
 import { IconCheck } from "./assets/icon-check";
 
 interface TableRowProps {
@@ -155,8 +155,10 @@ export const TableSelect = ({
 
   return (
     <TableSelectContainer onClick={handleClick}>
-      {isSelected && <IconCheck />}
-      {children}
+      <>
+        {isSelected && <IconCheck />}
+        {children}
+      </>
     </TableSelectContainer>
   );
 };
@@ -176,7 +178,7 @@ export const TableActionBar = ({ children }: TableActionBarProps) => {
   return (
     <TableActionBarContainer>
       <motion.div animate={{ y: 0 }} initial={{ y: 50 }}>
-        <Card bg="white" noHover>
+        <Card bg="white">
           <CardBody>{children}</CardBody>
         </Card>
       </motion.div>

@@ -31,6 +31,30 @@ class EdgePrismaAdapter {
     });
   }
 
+  /**
+   * Finds edges that belong to certain conditions
+   * @param parentId
+   * @param conditions Values that correspond to the conditions of an edge.
+   * @returns a list of edges with their condition
+   */
+  findEdgesOfConditions = (parentId: string, conditions: string[]) => {
+    return this.prisma.edge.findMany({
+      where: {
+        parentNodeId: parentId,
+        conditions: {
+          some: {
+            matchValue: {
+              in: conditions,
+            }
+          }
+        }
+      },
+      include: {
+        conditions: true,
+      }
+    })
+  }
+
   getEdgesByParentQuestionId(parentId: string): Promise<Edge[]> {
     return this.prisma.edge.findMany({
       where: {

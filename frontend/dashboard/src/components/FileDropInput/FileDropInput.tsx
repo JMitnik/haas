@@ -1,5 +1,6 @@
-import { Div } from '@haas/ui';
+import * as UI from '@haas/ui';
 import { Spinner } from '@chakra-ui/core';
+import { X } from 'react-feather';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
@@ -18,7 +19,8 @@ const getDropColor = (props: any) => {
   return '#eeeeee';
 };
 
-export const DropContainer = styled.div<{disabled?: boolean}>`
+export const DropContainer = styled.div<{ disabled?: boolean }>`
+  position: relative;
   flex: 1;
   pointer-events: ${(props) => (props.disabled ? 'none' : 'auto')};
   display: flex;
@@ -35,7 +37,7 @@ export const DropContainer = styled.div<{disabled?: boolean}>`
   transition: border .24s ease-in-out;
 `;
 
-export const UploadPreviewContainer = styled(Div)`
+export const UploadPreviewContainer = styled(UI.Div)`
   ${({ theme }) => css`
     border-radius: 10px;
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
@@ -56,7 +58,7 @@ export const UploadPreviewContainer = styled(Div)`
 `;
 
 const FileDropInput = (props: any) => {
-  const { onDrop, isLoading, value, isInEditing } = props;
+  const { onDrop, isLoading, value, isInEditing, isDisabled, onCancel } = props;
 
   const {
     acceptedFiles,
@@ -75,15 +77,38 @@ const FileDropInput = (props: any) => {
 
   const { t } = useTranslation();
 
+  const handleCancel = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    e.stopPropagation();
+    acceptedFiles.splice(0);
+    return onCancel && onCancel();
+  };
+
   return (
     <section className="container">
       {/* @ts-ignore */}
-      <DropContainer disabled={isInEditing} {...getRootProps({ isDragActive, isDragAccept, isDragReject })}>
+      <DropContainer
+        disabled={isDisabled || isInEditing}
+        {...getRootProps({ isDragActive, isDragAccept, isDragReject })}
+      >
+        {acceptedFile && onCancel && (
+          <UI.Div
+            onClick={(e) => handleCancel(e)}
+            style={{ cursor: 'pointer' }}
+            position="absolute"
+            top="5px"
+            right="10px"
+          >
+            <UI.Icon>
+              <X />
+            </UI.Icon>
+          </UI.Div>
+        )}
+
         {value && (
           <UploadPreviewContainer mb={2}>
-            <Div>
+            <UI.Div>
               <img src={value} alt="" />
-            </Div>
+            </UI.Div>
           </UploadPreviewContainer>
         )}
         {isLoading ? (

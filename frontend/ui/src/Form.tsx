@@ -5,12 +5,12 @@ import AntdDatePickerGenerate from 'rc-picker/lib/generate/dateFns';
 import generatePicker from 'antd/lib/date-picker/generatePicker';
 import {
   Slider as AntdSlider,
-  // DatePicker as AntdDatepicker,
 } from 'antd';
 import { Div, Paragraph, SectionHeader, Strong } from '@haas/ui';
 import SimpleMDE from 'react-simplemde-editor';
 import {
-  ButtonProps as ChakraButtonProps,
+  Checkbox as ChakraCheckbox,
+  CheckboxProps as ChakraCheckboxProps,
   Button,
   FormControl as ChakraFormControl,
   FormLabel as ChakraFormLabel,
@@ -23,8 +23,10 @@ import {
   InputProps as ChakraInputProps,
   InputGroupProps,
   FormControlProps,
+  Switch as ChakraSwitch,
   Textarea as ChakraTextArea,
   RadioButtonGroup as ChakraRadioButtonGroup,
+  SwitchProps,
 } from '@chakra-ui/core';
 import styled, { css } from 'styled-components';
 import { SpaceProps, GridProps } from 'styled-system';
@@ -32,8 +34,10 @@ import ReactSelect from 'react-select';
 import { InputHTMLAttributes } from 'react';
 import Color from 'color';
 import { FormLabelProps } from '@chakra-ui/core/dist/FormLabel';
-import { Grid, Stack } from './Container';
-import { Text } from './Type';
+import { Flex, Grid } from './Container';
+import { Card } from './Cards';
+import { Span } from './Span';
+import { Helper, Text } from './Type';
 
 const AntdDatepicker = generatePicker<Date>(AntdDatePickerGenerate);
 const { RangePicker: AntdRangePicker } = AntdDatepicker;
@@ -55,6 +59,8 @@ export const FormContainer = styled(Div) <FormContainerProps>`
     `}
   `}
 `;
+
+export const Checkbox = (props: ChakraCheckboxProps) => <ChakraCheckbox {...props} color="red" />;
 
 export const FormGroupContainer = styled.div`
   ${({ theme }) => css`
@@ -119,7 +125,7 @@ export const InputLabel = styled.label`
 `;
 
 export const FormLabel = forwardRef((props: FormLabelProps, ref) => (
-  <ChakraFormLabel fontSize="0.8rem" color="gray.600" fontWeight="600" {...props} ref={ref} />
+  <ChakraFormLabel fontSize="0.95rem" color="off.500" fontWeight="600" {...props} ref={ref} />
 ));
 
 interface InputProps extends ChakraInputProps {
@@ -175,7 +181,7 @@ export const Input = forwardRef(({ id, ...props }: InputProps, ref: Ref<HTMLInpu
       roundedTopRight={props.rightAddOn ? '0' : 'auto'}
       id={id}
       {...props}
-      fontSize="0.8rem"
+      fontSize="0.9rem"
       ref={ref}
     />
   </InputGroup>
@@ -237,56 +243,6 @@ export const StyledTextInput = styled(Input).attrs({ as: 'textarea' })`
   min-height: 150px;
 `;
 
-export const CheckBoxWrapper = styled.div`
-  position: relative;
-  display: flex;
-  align-items: center;
-`;
-
-export const CheckBoxLabel = styled.label`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 42px;
-  height: 26px;
-  border-radius: 15px;
-  background: #bebebe;
-  cursor: pointer;
-
-  &::after {
-    content: '';
-    display: block;
-    border-radius: 50%;
-    width: 18px;
-    height: 18px;
-    margin: 3px;
-    background: #ffffff;
-    box-shadow: 1px 3px 3px 1px rgba(0, 0, 0, 0.2);
-    transition: 0.2s;
-  }
-`;
-
-export const CheckBox = styled.input`
-  opacity: 0;
-  z-index: 1;
-  border-radius: 15px;
-  width: 42px;
-  height: 26px;
-
-  &:checked + ${CheckBoxLabel} {
-    background: #3847b2;
-
-    &::after {
-      content: '';
-      display: block;
-      border-radius: 50%;
-      width: 18px;
-      height: 18px;
-      margin-left: 21px;
-      transition: 0.2s;
-    }
-  }
-`;
 
 type SliderProps = InputHTMLAttributes<HTMLInputElement> | SpaceProps;
 
@@ -559,7 +515,7 @@ export const FormSection = forwardRef((props: FormSectionProps, ref: Ref<HTMLDiv
   <FormSectionContainer
     ref={ref}
     py={4}
-    gridTemplateColumns={['1fr', '1fr', '1fr', '1fr 3fr']}
+    gridTemplateColumns={['1fr', '1fr', '1fr', '1fr', '1fr 3fr']}
     {...props}
   >
     {props.children}
@@ -613,7 +569,7 @@ export const RadioButtons = forwardRef(({ children, onChange, value, defaultValu
 ));
 
 export const InputGrid = (props: InputGridProps) => (
-  <Grid mb={4} gridTemplateColumns={['1fr', '1fr', '1fr']} {...props}>
+  <Grid gridTemplateColumns={['1fr', '1fr', '1fr']} {...props}>
     {props.children}
   </Grid>
 );
@@ -628,7 +584,7 @@ export const CardForm = styled(Div) <CardFormProps>`
     css`
       display: flex;
 
-      > *:first-child {
+      > *:first-of-type {
         border-right: 1px solid ${theme.colors.gray[200]};
       }
     `}
@@ -651,6 +607,7 @@ interface RangeSliderProps {
   isDisabled?: boolean;
   stepSize?: number;
   onChange?: (vals: [number, number] | number) => void;
+  defaultValue?: number[]
 }
 
 interface FormSliderProps {
@@ -688,15 +645,16 @@ export const RangeSlider = ({
   onChange,
   stepSize = 0.5,
   isDisabled = false,
+  defaultValue
 }: RangeSliderProps) => {
   return (
     <AntdSlider
       range
       disabled={isDisabled}
-      max={10}
-      min={0}
+      max={max}
+      min={min}
       step={stepSize}
-      defaultValue={[min, max]}
+      defaultValue={defaultValue?.length ? [defaultValue[0], defaultValue[1]] : [min, max]}
       onAfterChange={onChange}
     />
   );
@@ -902,7 +860,10 @@ export const SwitchItem = styled.button.attrs({ type: 'button' }) <SwitchItemPro
     font-weight: 700;
     padding: 4px 8px;
     border-radius: 10px;
-    margin-right: 12px;
+
+    & + & {
+      margin-left: ${theme.gutter / 2}px;
+    }
 
     &:active, &:focus {
       outline: none;
@@ -915,6 +876,16 @@ export const SwitchItem = styled.button.attrs({ type: 'button' }) <SwitchItemPro
     `}
   `}
 `
+
+export const Toggle = forwardRef((props: SwitchProps, ref) => {
+  const { children, ...restProps } = props;
+
+  return (
+    <ChakraSwitch ref={ref} color="teal" {...restProps}>
+      {children}
+    </ChakraSwitch>
+  );
+});
 
 type ReactSelectProps = ReactSelect<any>['props'];
 
@@ -970,3 +941,81 @@ export const FormControl = forwardRef((props: FormControlProps, ref) => {
     </ChakraFormControl>
   );
 });
+
+export const FieldLabel = styled(Span)`
+  ${({ theme }) => css`
+    margin: 0;
+    color: ${theme.colors.main[600]};
+    background: ${theme.colors.main[100]};
+    font-weight: 700;
+    line-height: 1rem;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    border-radius: 5px;
+    padding: 4px 8px;
+    font-weight: 600;
+    display: inline-block;
+    letter-spacing: 0.05em;
+  `}
+`;
+
+export const CheckBoxCardContainer = styled(Card) <{ isChecked?: boolean }>`
+  ${({ theme, isChecked }) => css`
+    width: 100%;
+    min-height: 100px;
+    border: 1px solid transparent;
+    padding: 0;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    &:hover {
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 6px 0px, rgba(0, 0, 0, 0.06) 0px 1px 5px 0px;
+    }
+
+    ${isChecked && css`
+      border: 2px solid ${theme.colors.off[500]};
+    `}
+  `}
+`;
+
+interface CheckboxCardProps {
+  value: any;
+  onChange: (value: any) => void;
+  title: string;
+  isDisabled?: boolean;
+  description: string;
+}
+
+export const CheckboxCard = ({ title, description, value, onChange, isDisabled = false }: CheckboxCardProps) => (
+  <CheckBoxCardContainer
+    isChecked={value}
+    padding={1}
+    onClick={() => onChange(!value)}
+  >
+    <Flex
+      justifyContent="space-between"
+      alignItems="center"
+      borderBottom="1px solid"
+      backgroundColor="neutral.100"
+      borderRadius="10px 10px 0 0"
+      borderBottomColor="gray.100"
+      py={2}
+      px={2}
+    >
+      <Helper>
+        {title}
+      </Helper>
+      <Checkbox
+        // Without stopPropagation, checkbox and checkboxcard cancel each other out
+        onClick={(e) => e.stopPropagation()}
+        isChecked={value}
+        onChange={() => onChange(!value)}
+        isDisabled={isDisabled}
+        ml={1}
+        variantColor="main"
+      />
+    </Flex>
+    <Text px={2} py={1}>{description}</Text>
+  </CheckBoxCardContainer>
+);

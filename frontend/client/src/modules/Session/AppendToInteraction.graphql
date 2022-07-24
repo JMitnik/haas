@@ -1,0 +1,5 @@
+mutation appendToInteraction($input: AppendToInteractionInput) {
+  appendToInteraction(input: $input) {
+    id
+  }
+}

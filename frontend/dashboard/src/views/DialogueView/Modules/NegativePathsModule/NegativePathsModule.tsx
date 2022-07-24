@@ -1,6 +1,5 @@
+import * as UI from '@haas/ui';
 import React from 'react';
-
-import { Card, CardBody, Div, Flex, H3, Text } from '@haas/ui';
 import styled, { css } from 'styled-components';
 
 import { Frown } from 'react-feather';
@@ -11,14 +10,13 @@ import ModuleContainer from '../Module';
 
 const NegativePathsModuleList = styled.ol`
   ${({ theme }) => css`
-   list-style: none;
-   padding: 12px 0 0 0 !important;
-   counter-reset: item;
-   
+    list-style: none;
+    padding: 12px 0 0 0 !important;
+    counter-reset: item;
+
     li {
       counter-increment: item;
       color: ${theme.colors.default.darkest};
-      border-bottom: 1px solid ${theme.colors.default.normalAlt};
       padding: 18px 24px;
 
       &:last-of-type {
@@ -35,39 +33,43 @@ const NegativePathsModuleList = styled.ol`
         font-size: 0.7rem;
       }
     }
-  `} 
+  `}
 `;
 
 const NegativePathsModule = ({ negativePaths }: { negativePaths: any }) => {
   const { t } = useTranslation();
   return (
     <ModuleContainer>
-      <Card height="100%" bg="white">
-        <CardBody display="flex" flexDirection="column" height="100%">
-          <Text fontSize="1.3rem" color="red.200">{t('dialogue:top_negative_paths')}</Text>
-          <Flex marginTop="10px" flexGrow={1} flexDirection="column">
-            {negativePaths.length > 0 && (
-            <NegativePathsModuleList>
-              {negativePaths.map(({ answer, quantity }: { answer: string, quantity: number }) => (
-                <li key={`${answer}-${quantity}`}>
-                  {`${answer}`}
-                </li>
-              ))}
-            </NegativePathsModuleList>
+      <UI.Card height="100%" bg="white">
+        <UI.CardBody display="flex" flexDirection="column" height="100%">
+          <UI.Text fontSize="1.3rem" color="red.200">{t('dialogue:top_negative_paths')}</UI.Text>
+          <UI.Flex marginTop="10px" flexGrow={1} flexDirection="column">
+            {negativePaths?.length > 0 && (
+              <NegativePathsModuleList>
+                {negativePaths.map(({ answer, quantity }: { answer: string, quantity: number }) => (
+                  <li key={`${answer}-${quantity}`}>
+                    {`${answer}`}
+                  </li>
+                ))}
+              </NegativePathsModuleList>
             )}
-          </Flex>
-        </CardBody>
-        {!negativePaths.length && (
+          </UI.Flex>
+        </UI.CardBody>
+        {!negativePaths?.length && (
           <FallbackContainer>
-            <Text fontWeight="600" fontSize="1.2rem" color="gray.400">{t('dialogue:fallback_no_negative_paths')}</Text>
-            <Div>
+            <UI.Text
+              fontWeight="600"
+              fontSize="1.2rem"
+              color="gray.400"
+            >
+              {t('dialogue:fallback_no_negative_paths')}
+            </UI.Text>
+            <UI.Div>
               <Icon size="175px" color="gray.50" as={Frown} />
-            </Div>
+            </UI.Div>
           </FallbackContainer>
         )}
-      </Card>
-      <H3 />
-
+      </UI.Card>
     </ModuleContainer>
   );
 };

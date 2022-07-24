@@ -1,6 +1,6 @@
 import { TriggerMedium, TriggerEnum, Trigger, User, TriggerCondition as PrismaTriggerCondition, TriggerConditionEnum } from "@prisma/client";
 
-import { CustomerWithCustomerSettings } from "../customer/Customer";
+import { CustomerWithCustomerSettings } from "../customer/graphql/Customer";
 
 export interface CreateTriggerInput {
   name: string;

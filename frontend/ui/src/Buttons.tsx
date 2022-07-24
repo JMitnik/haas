@@ -1,4 +1,5 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 import Color from 'color';
 import {
   Button as ChakraButton, ButtonProps as ChakraButtonProps,
@@ -8,17 +9,26 @@ import {
 import styled, { css } from 'styled-components';
 
 
-export interface ButtonProps extends ChakraButtonProps { };
+export interface ButtonProps extends ChakraButtonProps {
+  iconOnly?: boolean;
+};
 
-const ButtonContainer = styled.div`
-  svg {
-    width: 1rem;
-  }
+const ButtonContainer = styled.div<{ iconOnly?: boolean; }>`
+  ${({ theme, iconOnly }) => css`
+    svg {
+      width: 1rem;
+      margin-right: ${theme.gutter / 4}px;
+
+      ${iconOnly && css`
+        margin-right: 0;
+      `}
+    }
+  `}
 `;
 
-export const Button = React.forwardRef((props: ButtonProps, ref) => (
-  <ButtonContainer>
-    <ChakraButton {...props} ref={ref} />
+export const Button = React.forwardRef(({ iconOnly = false, ...props}: ButtonProps, ref) => (
+  <ButtonContainer iconOnly={iconOnly}>
+    <ChakraButton borderRadius={10} variantColor="main" {...props} ref={ref} />
   </ButtonContainer>
 ));
 
@@ -35,8 +45,9 @@ export const GradientButton = styled(Button)`
     font-size: 1rem;
     background: linear-gradient(45deg, ${Color(theme.colors.primary).lighten(0.3).hex()}, ${Color(theme.colors.primary).lighten(0.3).saturate(1).hex()});
     font-family: 'Inter', sans-serif;
-    color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.8).saturate(1).hex()
-      : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
+    color: ${Color(theme.colors.primary).isDark() ?
+      Color(theme.colors.primary).mix(Color('white'), 0.8).saturate(1).hex()
+      : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()} !important;
     white-space: normal !important;
 
     &:hover {
@@ -48,3 +59,22 @@ export const GradientButton = styled(Button)`
 export const IconButton = (props: ChakraIconButtonProps) => (
   <ChakraIconButton {...props} />
 );
+
+interface NavButtonProps extends ButtonProps {
+  to?: string;
+}
+
+const NavButtonLink = styled(NavLink)`
+  color: white;
+
+  &:hover {
+    color: white;
+  }
+`;
+
+export const NavButton = ({ to, children, ...props }: NavButtonProps) => (
+  // @ts-ignore
+  <Button as={NavButtonLink} to={to} {...props}>
+    {children}
+  </Button>
+)

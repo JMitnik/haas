@@ -1,58 +1,47 @@
 import { useHistory, useParams } from 'react-router-dom';
-import { useQuery } from '@apollo/client';
 import React, { useContext, useEffect, useState } from 'react';
-import { gql } from '@apollo/client';
 
-import { SystemPermission } from 'types/globalTypes';
-import {
-  getCustomerOfUser_UserOfCustomer_customer as Customer,
-  getCustomerOfUser_UserOfCustomer_role as Role,
-  getCustomerOfUser as UserCustomerData,
-  getCustomerOfUserVariables as UserCustomerVariables,
-} from './__generated__/getCustomerOfUser';
+import { Customer, Dialogue, RoleType, SystemPermission, useGetCustomerOfUserQuery } from 'types/generated-types';
+
+import { isPresent } from 'ts-is-present';
 import { useUser } from './UserProvider';
 
 const CustomerContext = React.createContext({} as CustomerContextProps);
 
-const getCustomerOfUser = gql`
-  query getCustomerOfUser($input: UserOfCustomerInput) {
-    UserOfCustomer(input: $input) {
-      customer {
-        id
-        name
-        slug
-        settings {
-          logoUrl
-          colourSettings {
-            primary
-          }
-        }
-      }
-      role {
-        name
-        permissions
-      }
-      user {
-        id
-      }
-    }
-  }
-`;
-
 interface CustomerProps extends Customer {
-  userRole: Role;
+  userRole: {
+    __typename?: 'RoleType' | undefined;
+  } & Pick<RoleType, 'name' | 'permissions'>;
+  user?: {
+    id: string | undefined;
+    assignedDialogues?: PrivateDialogueProps | null;
+  }
+}
+
+interface PrivateDialogueProps {
+  privateWorkspaceDialogues?: ({} & Pick<Dialogue, 'title' | 'slug' | 'id'>)[];
+  assignedDialogues?: ({} & Pick<Dialogue, 'slug' | 'id'>)[];
 }
 
 interface CustomerContextProps {
+  isLoading: boolean;
   setActiveCustomer: (customer: CustomerProps | null) => void;
   activeCustomer?: CustomerProps | null;
   activePermissions?: SystemPermission[];
+  assignedDialogues?: PrivateDialogueProps | null;
 }
 
-const CustomerProvider = ({ children }: { children: React.ReactNode }) => {
+interface CustomerProviderProps {
+  children: React.ReactNode;
+  workspaceOverrideSlug?: string;
+  __test__?: boolean;
+}
+
+const CustomerProvider = ({ children, workspaceOverrideSlug, __test__ = false }: CustomerProviderProps) => {
   const { user } = useUser();
   const history = useHistory();
   const { customerSlug } = useParams<{ customerSlug: string }>();
+  const workspaceSlug = customerSlug || workspaceOverrideSlug;
 
   // Synchronize customer with localstorage
   const [activeCustomer, setActiveCustomer] = useState<CustomerProps | null>(() => {
@@ -75,17 +64,19 @@ const CustomerProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, [activeCustomer]);
 
-  useQuery<UserCustomerData, UserCustomerVariables>(getCustomerOfUser, {
-    skip: !customerSlug,
+  const { loading: isLoading } = useGetCustomerOfUserQuery({
+    skip: !workspaceSlug || __test__,
+    fetchPolicy: 'cache-and-network',
     variables: {
       input: {
-        customerSlug,
+        customerSlug: workspaceSlug,
         userId: user?.id,
       },
     },
     onCompleted: (data) => {
       const customer = data.UserOfCustomer?.customer;
       const role = data.UserOfCustomer?.role;
+      const newUser = data.UserOfCustomer?.user;
 
       if (!customer) {
         history.push('unauthorized');
@@ -100,15 +91,24 @@ const CustomerProvider = ({ children }: { children: React.ReactNode }) => {
 
       setActiveCustomer({
         ...customer,
+        user: newUser as any,
         userRole: role,
+        statistics: null,
       });
     },
   });
 
-  const activePermissions = [...(user?.globalPermissions || []), ...(activeCustomer?.userRole?.permissions || [])];
+  const activePermissions = [
+    ...(user?.globalPermissions?.filter(isPresent) || []),
+    ...(activeCustomer?.userRole?.permissions?.filter(isPresent) || [])];
+
+  const assignedDialogues = activeCustomer?.user?.assignedDialogues;
 
   return (
-    <CustomerContext.Provider value={{ activeCustomer, setActiveCustomer, activePermissions }}>
+    <CustomerContext.Provider value={{
+      activeCustomer, setActiveCustomer, activePermissions, isLoading, assignedDialogues,
+    }}
+    >
       {children}
     </CustomerContext.Provider>
   );

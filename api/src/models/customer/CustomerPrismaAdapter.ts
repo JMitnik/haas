@@ -1,4 +1,5 @@
-import { PrismaClient, Dialogue, Customer, Tag, CustomerSettings, ColourSettings, FontSettings } from '@prisma/client';
+import { Prisma, PrismaClient, Dialogue, Customer, Tag, CustomerSettings, ColourSettings, FontSettings } from '@prisma/client';
+import WorkspaceTemplate, { DemoWorkspaceTemplate } from '..//templates/TemplateTypes';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import defaultWorkspaceTemplate from '../templates/defaultWorkspaceTemplate';
@@ -9,6 +10,42 @@ export class CustomerPrismaAdapter {
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
+  }
+
+  /**
+   * Fetches all dialogues
+   */
+  async getDialogues(workspaceId: string, dialogueFragments?: string[]) {
+    let query: Prisma.DialogueWhereInput = { customerId: workspaceId };
+
+    if (dialogueFragments?.length) {
+      query.title = { contains: dialogueFragments.join(' - ') };
+    }
+
+    return this.prisma.dialogue.findMany({
+      where: query,
+    });
+  }
+
+  /**
+   * Find all the private dialogues within a workspace
+   * @param workspaceId
+   * @returns a list of private dialogues
+   */
+  findPrivateDialoguesOfWorkspace = async (workspaceId?: string, workspaceSlug?: string) => {
+    return this.prisma.customer.findUnique({
+      where: {
+        id: workspaceId || undefined,
+        slug: workspaceSlug || undefined,
+      },
+      include: {
+        dialogues: {
+          where: {
+            isPrivate: true,
+          },
+        },
+      },
+    });
   }
 
   async deleteFontSettings(fontSettingsId: number): Promise<FontSettings> {
@@ -105,7 +142,7 @@ export class CustomerPrismaAdapter {
   };
 
   async exists(customerId: string): Promise<Boolean> {
-    const customerExists = await this.prisma.customer.findFirst({
+    const customerExists = await this.prisma.customer.findUnique({
       where: { id: customerId },
     });
 
@@ -115,7 +152,7 @@ export class CustomerPrismaAdapter {
   async getAllCustomersBySlug(customerSlug?: string | null) {
     return this.prisma.customer.findMany({
       where: {
-        slug: customerSlug || undefined
+        slug: customerSlug || undefined,
       },
     });
   };
@@ -173,10 +210,10 @@ export class CustomerPrismaAdapter {
             colourSettings: input.primaryColour ? {
               update: {
                 primary: input.primaryColour,
-              }
+              },
             } : undefined,
-          }
-        } : undefined
+          },
+        } : undefined,
       },
       include: {
         settings: {
@@ -204,24 +241,25 @@ export class CustomerPrismaAdapter {
     return customerWithDialogue?.dialogues?.[0];
   }
 
-  async createWorkspace(input: NexusGenInputs['CreateWorkspaceInput']) {
+  async createWorkspace(input: NexusGenInputs['CreateWorkspaceInput'], template: WorkspaceTemplate | DemoWorkspaceTemplate = defaultWorkspaceTemplate) {
     return this.prisma.customer.create({
       data: {
         name: input.name,
         slug: input.slug,
-        tags: { create: defaultWorkspaceTemplate.tags },
+        isDemo: input.isDemo || undefined,
+        tags: { create: template.tags },
         settings: {
           create: {
-            logoUrl: input.logo,
+            logoUrl: input.logo || '',
             logoOpacity: input.logoOpacity || 30,
             colourSettings: {
               create: {
-                primary: input.primaryColour || defaultWorkspaceTemplate.primaryColor,
+                primary: input.primaryColour || template.primaryColor,
               },
             },
           },
         },
-        roles: { create: defaultWorkspaceTemplate.roles },
+        roles: { create: template.roles },
         dialogues: { create: [] },
       },
       include: {

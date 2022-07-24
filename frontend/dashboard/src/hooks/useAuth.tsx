@@ -1,9 +1,11 @@
+import { SystemPermission } from 'types/generated-types';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useUser } from 'providers/UserProvider';
 
-import { SystemPermission } from 'types/globalTypes';
-
 interface UseAuthProps {
+  canResetWorkspaceData: boolean;
+  canGenerateWorkspaceFromCsv: boolean;
+  canAssignUsersToDialogue: boolean;
   canCreateCustomers: boolean;
   canDeleteDialogue: boolean;
   canDeleteCustomers: boolean;
@@ -24,19 +26,47 @@ interface UseAuthProps {
   canDeleteUsers: boolean;
   canViewDialogueView: boolean;
   hasPermission: (permission: SystemPermission) => boolean;
+  canAccessDialogue: (dialogueSlug: string) => boolean;
 }
 
 const useAuth = (): UseAuthProps => {
   const { user } = useUser();
 
   // Technically this should not work in views without CustomerProvider <- Will return undefined thus
-  const { activePermissions } = useCustomer();
+  const { activePermissions, assignedDialogues: privateDialogues } = useCustomer();
 
   const authPermissions = activePermissions || user?.globalPermissions;
-  const isSuperAdmin = user?.globalPermissions?.includes(SystemPermission.CAN_ACCESS_ADMIN_PANEL);
+  const isSuperAdmin = user?.globalPermissions?.includes(SystemPermission.CanAccessAdminPanel);
+
+  const canAccessDialogue = (dialogueSlug: string) => {
+    const privateDialoguesInWorkspace = privateDialogues?.privateWorkspaceDialogues || [];
+    const assignedDialogues = privateDialogues?.assignedDialogues || [];
+
+    const privateDialogue = privateDialoguesInWorkspace?.find(
+      (dialogue) => dialogue.slug === dialogueSlug,
+    );
+
+    // Dialogue is not private => It is allowed to see dialogue
+    if (!privateDialogue) return true;
+
+    const isPrivateDialogue = !!privateDialogue;
+
+    // Dialogue is private && no assigned dialogues for user => Not allowed to see dialogue
+    if (assignedDialogues.length === 0 && privateDialoguesInWorkspace.length > 0) return false;
+
+    const privateDialogueIds = privateDialogues?.privateWorkspaceDialogues?.map((dialogue) => dialogue.id) || [];
+
+    const isAssignedToPrivateDialogue = isPrivateDialogue
+      ? privateDialogueIds.includes(privateDialogue?.id)
+      : true;
+
+    return isSuperAdmin
+      || !isPrivateDialogue
+      || isAssignedToPrivateDialogue;
+  };
 
   /**
-   * Chcek if user has permission to features,
+   * Check if user has permission to features,
    * 1. Check if user is SuperAdmin (allow *).
    * 2. Check if feature is in user's workspace permissions or globalpermissions.
    * 3. Else, return false.
@@ -48,26 +78,30 @@ const useAuth = (): UseAuthProps => {
   );
 
   return {
-    canDeleteDialogue: hasPermission(SystemPermission.CAN_DELETE_DIALOGUE),
-    canEditDialogue: hasPermission(SystemPermission.CAN_EDIT_DIALOGUE),
-    canViewCampaigns: hasPermission(SystemPermission.CAN_VIEW_CAMPAIGNS),
-    canCreateCampaigns: hasPermission(SystemPermission.CAN_CREATE_CAMPAIGNS),
-    canCreateDeliveries: hasPermission(SystemPermission.CAN_CREATE_DELIVERIES),
-    canViewDialogueView: hasPermission(SystemPermission.CAN_VIEW_DIALOGUE_ANALYTICS),
-    canEditTriggers: hasPermission(SystemPermission.CAN_CREATE_TRIGGERS),
-    canDeleteTriggers: hasPermission(SystemPermission.CAN_DELETE_TRIGGERS),
-    canCreateCustomers: hasPermission(SystemPermission.CAN_ACCESS_ADMIN_PANEL),
-    canDeleteCustomers: hasPermission(SystemPermission.CAN_ACCESS_ADMIN_PANEL),
-    canCreateTriggers: hasPermission(SystemPermission.CAN_CREATE_TRIGGERS),
-    canEditUsers: hasPermission(SystemPermission.CAN_EDIT_USERS),
-    canEditCustomer: hasPermission(SystemPermission.CAN_EDIT_WORKSPACE),
-    canInviteUsers: hasPermission(SystemPermission.CAN_ADD_USERS),
-    canAccessAdmin: hasPermission(SystemPermission.CAN_ACCESS_ADMIN_PANEL),
-    canViewUsers: hasPermission(SystemPermission.CAN_VIEW_USERS),
-    canDeleteUsers: hasPermission(SystemPermission.CAN_DELETE_USERS),
-    canViewDialogueBuilder: hasPermission(SystemPermission.CAN_VIEW_DIALOGUE),
-    canBuildDialogues: hasPermission(SystemPermission.CAN_BUILD_DIALOGUE),
+    canResetWorkspaceData: hasPermission(SystemPermission.CanResetWorkspaceData),
+    canGenerateWorkspaceFromCsv: hasPermission(SystemPermission.CanGenerateWorkspaceFromCsv),
+    canAssignUsersToDialogue: hasPermission(SystemPermission.CanAssignUsersToDialogue),
+    canDeleteDialogue: hasPermission(SystemPermission.CanDeleteDialogue),
+    canEditDialogue: hasPermission(SystemPermission.CanEditDialogue),
+    canViewCampaigns: hasPermission(SystemPermission.CanViewCampaigns),
+    canCreateCampaigns: hasPermission(SystemPermission.CanCreateCampaigns),
+    canCreateDeliveries: hasPermission(SystemPermission.CanCreateDeliveries),
+    canViewDialogueView: hasPermission(SystemPermission.CanViewDialogueAnalytics),
+    canEditTriggers: hasPermission(SystemPermission.CanCreateTriggers),
+    canDeleteTriggers: hasPermission(SystemPermission.CanDeleteTriggers),
+    canCreateCustomers: hasPermission(SystemPermission.CanAccessAdminPanel),
+    canDeleteCustomers: hasPermission(SystemPermission.CanAccessAdminPanel),
+    canCreateTriggers: hasPermission(SystemPermission.CanCreateTriggers),
+    canEditUsers: hasPermission(SystemPermission.CanEditUsers),
+    canEditCustomer: hasPermission(SystemPermission.CanEditWorkspace),
+    canInviteUsers: hasPermission(SystemPermission.CanAddUsers),
+    canAccessAdmin: hasPermission(SystemPermission.CanAccessAdminPanel),
+    canViewUsers: hasPermission(SystemPermission.CanViewUsers),
+    canDeleteUsers: hasPermission(SystemPermission.CanDeleteUsers),
+    canViewDialogueBuilder: hasPermission(SystemPermission.CanViewDialogue),
+    canBuildDialogues: hasPermission(SystemPermission.CanBuildDialogue),
     hasPermission,
+    canAccessDialogue,
   };
 };
 

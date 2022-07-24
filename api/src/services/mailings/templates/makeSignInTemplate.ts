@@ -44,16 +44,16 @@ const makeSignInTemplate = ({ recipientMail, token, bgColor = '#0059f8' }: makeS
             <mj-text>
             Hi ${recipientMail}, you have requested a sign in link.
             </mj-text>
-            
-           
+
+
             ${token && `
                 <mj-text>
-                To sign in, please click on the following link:         
+                To sign in, please click on the following link:
                 </mj-text>
-                <mj-button href="${config.dashboardUrl}/verify_token?token=${token}" background-color="#36d399">
+                <mj-button href="${config.dashboardUrl}/verify_token/?token=${token}" background-color="#36d399">
                 ✨ Magic link
                 </mj-button>
-                
+
                 <mj-text>
                 Please note that this link expires in <span style="font-weight: 700">3 days</span>. If you wish to request a new login link, simply
                 go to <a href="${config.dashboardUrl}">the dashboard login</a> and fill in your mail again.

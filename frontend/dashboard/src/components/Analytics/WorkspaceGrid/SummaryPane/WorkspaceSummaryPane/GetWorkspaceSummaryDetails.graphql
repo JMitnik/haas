@@ -1,0 +1,24 @@
+query GetWorkspaceSummaryDetails($id: ID,
+	$summaryInput: DialogueStatisticsSummaryFilterInput!,
+	$healthInput: HealthScoreInput!
+) {
+  customer(id: $id) {
+    id
+    isDemo
+    statistics {
+      id
+      health(input: $healthInput) {
+        nrVotes
+        negativeResponseCount
+        score
+      }
+      rankedTopics(input: $summaryInput) {
+				name
+				basicStats {
+					average
+					responseCount
+				}
+			}
+    }
+  }
+}
