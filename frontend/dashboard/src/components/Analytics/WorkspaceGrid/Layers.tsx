@@ -14,7 +14,7 @@ interface LayerContainerProps {
   hideAll?: boolean;
 }
 
-const LayerContainer = motion.custom(styled.button<LayerContainerProps>`
+const LayerContainer = motion(styled.button<LayerContainerProps>`
   ${({ theme, hide, hideAll }) => css`
     position: relative;
     display: flex;

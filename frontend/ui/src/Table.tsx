@@ -155,8 +155,10 @@ export const TableSelect = ({
 
   return (
     <TableSelectContainer onClick={handleClick}>
-      {isSelected && <IconCheck />}
-      {children}
+      <>
+        {isSelected && <IconCheck />}
+        {children}
+      </>
     </TableSelectContainer>
   );
 };

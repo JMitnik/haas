@@ -57,7 +57,7 @@ export const DialogueInitializer = ({ children }: { children: React.ReactNode })
         device: navigator.platform || 'unknown',
         originUrl: window.location.origin,
       });
-      initLanguage(dialogue.language);
+      initLanguage(dialogue.language || undefined);
     },
   });
 

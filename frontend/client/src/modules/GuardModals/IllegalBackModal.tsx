@@ -26,7 +26,7 @@ export const IllegalBackModal = ({ open, onRestart, onRedo }: IllegalBackModalPr
         <UI.Div mt={4}>
           <UI.Flex flexWrap="wrap">
             <UI.Button
-              leftIcon={FastForward}
+              leftIcon={() => <FastForward />}
               variantColor="main"
               mr={4}
               mb={[2, 2, 0]}
@@ -35,7 +35,7 @@ export const IllegalBackModal = ({ open, onRestart, onRedo }: IllegalBackModalPr
               {t('illegal_back_go_back')}
             </UI.Button>
             <UI.Button
-              leftIcon={Repeat}
+              leftIcon={() => <Repeat />}
               variantColor="off"
               onClick={onRestart}
             >

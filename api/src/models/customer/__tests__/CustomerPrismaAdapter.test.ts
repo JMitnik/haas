@@ -1,11 +1,11 @@
-import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { CustomerPrismaAdapter } from '../CustomerPrismaAdapter';
 import { NexusGenInputs } from '../../../generated/nexus';
 import { clearCustomerDatabase } from './testUtils';
 import { UpdateCustomerInput } from '../CustomerServiceType';
 import defaultWorkspaceTemplate from '../../templates/defaultWorkspaceTemplate';
 
-const prisma = makeTestPrisma();
+import { prisma } from '../../../test/setup/singletonDeps';
+
 const customerPrismaAdapter = new CustomerPrismaAdapter(prisma);
 
 const defaultCustomerInput: NexusGenInputs['CreateWorkspaceInput'] = {
@@ -17,6 +17,11 @@ const defaultCustomerInput: NexusGenInputs['CreateWorkspaceInput'] = {
 
 describe('CustomerPrismaAdapter', () => {
   afterEach(async () => {
+    await clearCustomerDatabase(prisma);
+    await prisma.$disconnect();
+  });
+
+  afterAll(async () => {
     await clearCustomerDatabase(prisma);
     await prisma.$disconnect();
   });

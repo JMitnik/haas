@@ -1,6 +1,8 @@
 import { useReducer } from 'react';
 
-import { HAASIdle, HAASRun, HAASStopping } from 'assets/animations';
+import HAASIdle from 'assets/animations/lottie-rabbit-idle.json';
+import HAASRun from 'assets/animations/lottie-rabbit-run.json';
+import HAASStopping from 'assets/animations/lottie-rabbit-stopping.json';
 
 interface SliderAnimationStateProps {
   isStopped: boolean;

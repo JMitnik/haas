@@ -1,4 +1,4 @@
-import { objectType, queryField } from '@nexus/schema';
+import { objectType, queryField } from 'nexus';
 import { UserInputError } from 'apollo-server-express';
 
 import { ConnectionInterface } from '../../general/Pagination';

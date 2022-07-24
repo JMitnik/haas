@@ -134,7 +134,7 @@ const MapCampaignDescription: { [key in DeliveryStatusEnum]?: React.FC<StatusDes
 };
 
 const StatusDescription = ({ event, delivery }: StatusDescriptionProps) => {
-  const DeliveryStatusDescription = MapCampaignDescription[event.status];
+  const DeliveryStatusDescription = MapCampaignDescription[event.status!];
 
   if (!DeliveryStatusDescription) {
     return <></>;
@@ -149,7 +149,7 @@ export const CampaignTimeline = ({ delivery }: CampaignTimelineProps) => (
       <TimelineItem gridTemplateColumns="40px 1fr" key={event.id}>
         <Circle brand={event.status === DeliveryStatusEnum.Failed ? 'red' : 'teal'}>
           <UI.Icon>
-            <CampaignIcon deliveryType={event.status} />
+            <CampaignIcon deliveryType={event.status!} />
           </UI.Icon>
         </Circle>
         <UI.Div>

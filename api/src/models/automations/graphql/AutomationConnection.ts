@@ -1,16 +1,16 @@
-import { enumType, inputObjectType, objectType } from "@nexus/schema";
+import { enumType, inputObjectType, objectType } from 'nexus';
 
-import { AutomationModel } from "..";
-import { ConnectionInterface } from "../../general/Pagination";
-import { AutomationType } from "./AutomationType";
+import { AutomationModel } from '..';
+import { ConnectionInterface } from '../../general/Pagination';
+import { AutomationType } from './AutomationType';
 
 export const AutomationConnectionOrderByInput = inputObjectType({
   name: 'AutomationConnectionOrderByInput',
   description: 'Sorting of UserConnection',
 
   definition(t) {
-    t.field('by', { type: AutomationConnectionOrderType, nullable: false });
-    t.boolean('desc', { default: true, required: false });
+    t.nonNull.field('by', { type: AutomationConnectionOrderType });
+    t.boolean('desc', { default: true });
   },
 });
 
@@ -18,24 +18,24 @@ export const AutomationConnectionOrderType = enumType({
   name: 'AutomationConnectionOrderType',
   description: 'Fields to order UserConnection by.',
 
-  members: ['updatedAt', 'type']
+  members: ['updatedAt', 'type'],
 });
 
 export const AutomationConnectionFilterInput = inputObjectType({
   name: 'AutomationConnectionFilterInput',
   definition(t) {
     // Pre-filter
-    t.string('label', { required: false });
-    t.string('search', { nullable: true })
-    t.field('type', { type: AutomationType, required: false });
+    t.string('label');
+    t.string('search')
+    t.field('type', { type: AutomationType });
 
     // Post-order
     t.field('orderBy', { type: AutomationConnectionOrderByInput });
 
     // Paginate
-    t.int('offset', { nullable: true });
-    t.int('perPage', { required: false, default: 10 });
-  }
+    t.int('offset');
+    t.int('perPage', { default: 10 });
+  },
 });
 
 export const AutomationConnection = objectType({

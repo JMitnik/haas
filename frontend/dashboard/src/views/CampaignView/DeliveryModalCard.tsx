@@ -58,7 +58,7 @@ export const DeliveryModalCard = ({ id }: DeliveryModalCardProps) => {
 
             <UI.SectionHeader mb={1} color="teal.600">{t('events')}</UI.SectionHeader>
             <CampaignTimeline
-              delivery={delivery}
+              delivery={delivery as any}
             />
           </>
         )}

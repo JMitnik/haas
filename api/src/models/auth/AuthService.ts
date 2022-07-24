@@ -53,7 +53,7 @@ class AuthService {
       firstName: userInput.firstName,
       lastName: userInput.lastName,
       password: hashedPassword,
-      workspaceId: userInput.customerId
+      workspaceId: userInput.customerId,
     }
 
     const user = await this.userPrismaAdapter.registerUser(registerUserInput);
@@ -134,7 +134,6 @@ class AuthService {
    */
   static createUserToken(userId: string, duration: number | null = null) {
     const tokenMinutes = duration || config.jwtExpiryMinutes;
-
     return jwt.sign({
       id: userId,
       exp: Math.floor(Date.now() / 1000) + (tokenMinutes * 60),

@@ -1,4 +1,4 @@
-import { mutationField } from '@nexus/schema';
+import { mutationField } from 'nexus';
 import { UserInputError } from 'apollo-server-express';
 
 export const ResetWorkspaceDataMutation = mutationField('resetWorkspaceData', {

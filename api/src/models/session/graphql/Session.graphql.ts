@@ -1,4 +1,4 @@
-import { extendType, inputObjectType, mutationField, objectType } from '@nexus/schema';
+import { extendType, inputObjectType, mutationField, objectType } from 'nexus';
 import { UserInputError } from 'apollo-server-express';
 
 import { FormNodeEntryType, NodeEntryDataInput, NodeEntryInput, NodeEntryType } from '../../node-entry/NodeEntry';
@@ -8,7 +8,7 @@ import SessionService from '../SessionService';
 export const SessionType = objectType({
   name: 'Session',
   definition(t) {
-    t.id('id');
+    t.nonNull.id('id');
     t.date('createdAt');
     t.string('dialogueId');
 
@@ -23,7 +23,7 @@ export const SessionType = objectType({
       },
     });
 
-    t.float('score', {
+    t.nonNull.float('score', {
       async resolve(parent) {
         // @ts-ignore
         if (parent.score) return parent.score;
@@ -66,7 +66,7 @@ export const SessionType = objectType({
     });
 
 
-    t.list.field('nodeEntries', {
+    t.list.nonNull.field('nodeEntries', {
       type: NodeEntryType,
 
       async resolve(parent, args, ctx) {
@@ -104,7 +104,7 @@ export const SessionConnection = objectType({
 
   definition(t) {
     t.implements(ConnectionInterface);
-    t.list.field('sessions', { type: SessionType });
+    t.nonNull.list.nonNull.field('sessions', { type: SessionType });
   },
 });
 

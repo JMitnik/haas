@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useState } from 'react';
 
 import { Customer, Dialogue, RoleType, SystemPermission, useGetCustomerOfUserQuery } from 'types/generated-types';
 
+import { isPresent } from 'ts-is-present';
 import { useUser } from './UserProvider';
 
 const CustomerContext = React.createContext({} as CustomerContextProps);
@@ -90,14 +91,16 @@ const CustomerProvider = ({ children, workspaceOverrideSlug, __test__ = false }:
 
       setActiveCustomer({
         ...customer,
-        user: newUser,
+        user: newUser as any,
         userRole: role,
         statistics: null,
       });
     },
   });
 
-  const activePermissions = [...(user?.globalPermissions || []), ...(activeCustomer?.userRole?.permissions || [])];
+  const activePermissions = [
+    ...(user?.globalPermissions?.filter(isPresent) || []),
+    ...(activeCustomer?.userRole?.permissions?.filter(isPresent) || [])];
 
   const assignedDialogues = activeCustomer?.user?.assignedDialogues;
 

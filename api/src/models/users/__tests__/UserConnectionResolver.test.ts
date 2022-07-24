@@ -1,20 +1,19 @@
 import { Customer, PrismaClient } from '@prisma/client';
 
 import { clearDatabase } from './testUtils';
-import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
 import { expectUnauthorizedErrorOnResolver } from '../../../test/utils/expects';
 import { seedDialogue, seedUser, seedWorkspace } from '../../../test/utils/seedTestData';
 import AuthService from '../../auth/AuthService';
 import { range } from 'lodash';
-import { name, random } from 'faker';
 import { ApolloError } from 'apollo-server-express';
+import { prisma } from '../../../test/setup/singletonDeps';
 
 
 jest.setTimeout(30000);
 
-const prisma = makeTestPrisma();
 const ctx = makeTestContext(prisma);
+
 
 /**
  * Prepare the database by seeding, etc.
@@ -23,7 +22,7 @@ const ctx = makeTestContext(prisma);
  */
 const prepEnvironment = async (prisma: PrismaClient) => {
   const workspace = await seedWorkspace(prisma);
-  const dialogue = await seedDialogue(prisma, workspace.id);
+  await seedDialogue(prisma, workspace.id);
 
   return { workspace };
 }
@@ -80,14 +79,14 @@ const seedUsers = async (prisma: PrismaClient, workspace: Customer) => {
     permissions: { set: ['CAN_VIEW_USERS'] },
   }, { firstName: 'Zion', lastName: 'Zzzz', email: 'Zionzzzz@gmail.com' });
 
-  await Promise.all(range(10).map(async (i) => (
+  await Promise.all(range(10).map(async () => (
     seedUser(prisma, workspace.id, {
       name: 'Manager',
       permissions: { set: ['CAN_VIEW_DIALOGUE'] },
     })
   )));
 
-  await Promise.all(range(10).map(async (i) => (
+  await Promise.all(range(10).map(async () => (
     seedUser(prisma, workspace.id, {
       name: 'Admin',
       permissions: { set: ['CAN_VIEW_DIALOGUE', 'CAN_VIEW_USERS'] },
@@ -104,6 +103,11 @@ describe('UserConnection resolvers', () => {
     await prisma.$disconnect();
   });
 
+  afterAll(async () => {
+    await clearDatabase(prisma);
+    await prisma.$disconnect();
+  });
+
   test('user with no valid has no access to users-connection', async () => {
     const { workspace } = await prepEnvironment(prisma);
     const user = await seedUsers(prisma, workspace);
@@ -112,7 +116,7 @@ describe('UserConnection resolvers', () => {
     try {
       await ctx.client.request(Query, {
         customerSlug: workspace.slug,
-      },{ 'Authorization': `Bearer ${token}`});
+      }, { 'Authorization': `Bearer ${token}` });
     } catch (error) {
       if (error instanceof ApolloError) {
         expect(error.response.errors).toHaveLength(1);

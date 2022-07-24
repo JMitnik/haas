@@ -5,8 +5,8 @@ module.exports = {
       transform: {
         "^.+\\.(t|j)sx?$": "@swc/jest",
       },
+      transformIgnorePatterns: ["/node_modules/(?!(formdata-node)/)", "/bar/"],
       testEnvironment: "node",
-      setupFilesAfterEnv: ['<rootDir>/src/test/globalSetup.ts'],
       testPathIgnorePatterns: ["<rootDir>/node_modules/"],
       moduleFileExtensions: ["ts", "js", "node"],
       testMatch: [
@@ -14,7 +14,7 @@ module.exports = {
         '**/?(*.)+(spec|test).+(ts|tsx|js)',
       ],
       roots: ['<rootDir>/src'],
+      setupFilesAfterEnv: ['<rootDir>/src/test/globalSetup.ts'],
     },
-    // ...
   ],
 }

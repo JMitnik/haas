@@ -64,7 +64,10 @@ export const InteractionModalCard = ({ sessionId }: InteractionModalCardProps) =
                       </UI.Stack>
                     </UI.Div>
                   </UI.Div>
-                  <CampaignTimeline delivery={delivery} />
+                  {delivery && (
+                    // @ts-ignore
+                    <CampaignTimeline delivery={delivery} />
+                  )}
                 </UI.Div>
               </TimelineItem>
             )}

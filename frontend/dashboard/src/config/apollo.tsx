@@ -1,4 +1,4 @@
-import { ApolloClient, ApolloLink, from } from '@apollo/client';
+import { ApolloClient, ApolloLink } from '@apollo/client';
 import { InMemoryCache } from '@apollo/client/cache';
 import { createUploadLink } from 'apollo-upload-client';
 import { onError } from '@apollo/client/link/error';
@@ -20,7 +20,8 @@ const authorizeLink = new ApolloLink((operation, forward) => {
 });
 
 const client = new ApolloClient({
-  link: from([
+  credentials: 'include',
+  link: ApolloLink.from([
     onError(({ graphQLErrors }) => {
       if (graphQLErrors) {
         const authorizedErrors = graphQLErrors.filter((error) => (
@@ -38,7 +39,8 @@ const client = new ApolloClient({
     }),
     authorizeLink,
     createUploadLink({
-      credentials: 'include',
+      // credentials: 'include', // FIXME: does this need to be here instead of as property of client
+      // IF so, it doesn't work
       uri: getApiEndpoint(),
     }),
   ]),

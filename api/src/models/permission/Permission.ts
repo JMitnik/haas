@@ -1,4 +1,4 @@
-import { extendType, inputObjectType, objectType } from '@nexus/schema';
+import { extendType, inputObjectType, objectType } from 'nexus';
 
 import { CustomerType } from '../customer/graphql/Customer';
 import PermissionService from './PermissionService';

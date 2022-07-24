@@ -1,4 +1,4 @@
-import { HAASRun } from 'assets/animations';
+import HAASRun from 'assets/animations/lottie-rabbit-run.json';
 import Lottie from 'react-lottie';
 import React from 'react';
 import styled from 'styled-components';

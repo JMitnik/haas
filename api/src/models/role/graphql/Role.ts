@@ -1,4 +1,4 @@
-import { enumType, extendType, inputObjectType, mutationField, objectType, queryField } from '@nexus/schema';
+import { enumType, extendType, inputObjectType, mutationField, objectType, queryField } from 'nexus';
 import { UserInputError } from 'apollo-server-express';
 
 import { PaginationWhereInput } from '../../general/Pagination';
