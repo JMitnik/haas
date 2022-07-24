@@ -134,7 +134,6 @@ class AuthService {
    */
   static createUserToken(userId: string, duration: number | null = null) {
     const tokenMinutes = duration || config.jwtExpiryMinutes;
-
     return jwt.sign({
       id: userId,
       exp: Math.floor(Date.now() / 1000) + (tokenMinutes * 60),

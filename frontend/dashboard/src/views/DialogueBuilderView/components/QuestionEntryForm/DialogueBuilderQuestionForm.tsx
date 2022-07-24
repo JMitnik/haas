@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import {
-  Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow,
+  ButtonGroup, FormErrorMessage, Popover, PopoverArrow,
   PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
 } from '@chakra-ui/core';
 import { Controller, useForm, useWatch } from 'react-hook-form';
@@ -356,7 +356,6 @@ const DialogueBuilderQuestionForm = ({
 
     const isSlider = type === QuestionNodeTypeEnum.Slider && sliderNodeData;
     const values = form.getValues();
-    console.log('values', values);
 
     const unhappyText = formData.useCustomerSatisfactionTexts === 1 ? formData.unhappyText : null;
     const happyText = formData.useCustomerSatisfactionTexts === 1 ? formData.happyText : null;
@@ -381,6 +380,7 @@ const DialogueBuilderQuestionForm = ({
                 publicValue: option?.value,
                 overrideLeafId: option?.overrideLeaf?.value,
                 position: index + 1,
+                isTopic: option.isTopic,
               })),
             },
             edgeCondition,
@@ -417,6 +417,7 @@ const DialogueBuilderQuestionForm = ({
                 publicValue: option?.value,
                 overrideLeafId: option?.overrideLeaf?.value,
                 position: index + 1,
+                isTopic: option.isTopic,
               })),
             },
             edgeCondition,
@@ -756,15 +757,15 @@ const DialogueBuilderQuestionForm = ({
 
         <UI.Flex justifyContent="space-between">
           <ButtonGroup>
-            <Button
+            <UI.Button
               isLoading={createLoading || updateLoading}
               isDisabled={!form.formState.isValid}
               variantColor="teal"
               type="submit"
             >
               {t('save')}
-            </Button>
-            <Button variant="outline" onClick={() => handleCancelQuestion()}>Cancel</Button>
+            </UI.Button>
+            <UI.Button variant="outline" onClick={() => handleCancelQuestion()}>Cancel</UI.Button>
           </ButtonGroup>
           <UI.Span onClick={(e) => e.stopPropagation()}>
             <Popover
@@ -773,13 +774,13 @@ const DialogueBuilderQuestionForm = ({
               {() => (
                 <>
                   <PopoverTrigger>
-                    <Button
+                    <UI.Button
                       variant="outline"
                       variantColor="red"
-                      leftIcon={Trash}
+                      leftIcon={() => <Trash />}
                     >
                       {t('delete')}
-                    </Button>
+                    </UI.Button>
                   </PopoverTrigger>
                   <PopoverContent zIndex={4}>
                     <PopoverArrow />
@@ -789,13 +790,13 @@ const DialogueBuilderQuestionForm = ({
                       <UI.Text>{t('delete_question_popover')}</UI.Text>
                     </PopoverBody>
                     <PopoverFooter>
-                      <Button
+                      <UI.Button
                         variant="outline"
                         variantColor="red"
                         onClick={() => onDeleteEntry && onDeleteEntry()}
                       >
                         {t('delete')}
-                      </Button>
+                      </UI.Button>
                     </PopoverFooter>
                   </PopoverContent>
                 </>

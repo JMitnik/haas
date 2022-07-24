@@ -1,4 +1,4 @@
-import { objectType } from '@nexus/schema';
+import { objectType } from 'nexus';
 
 import { DeliveryStatusEnum } from './DeliveryStatusEnum';
 
@@ -10,5 +10,5 @@ export const DeliveryEventModel = objectType({
     t.field('status', { type: DeliveryStatusEnum });
     t.date('createdAt');
     t.string('failureMessage', { nullable: true });
-  }
+  },
 });

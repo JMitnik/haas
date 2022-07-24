@@ -1,4 +1,4 @@
-import { inputObjectType, objectType, queryField } from '@nexus/schema';
+import { inputObjectType, objectType, queryField } from 'nexus';
 import { AutomationType } from './AutomationType';
 import { AutomationTriggerModel } from './AutomationTrigger'
 import { CustomerType } from '../../customer/index'
@@ -15,7 +15,7 @@ export const AutomationModel = objectType({
     t.boolean('isActive');
     t.string('label');
 
-    t.string('description', { nullable: true })
+    t.string('description')
 
     t.field('type', {
       type: AutomationType,
@@ -23,12 +23,12 @@ export const AutomationModel = objectType({
 
     t.field('automationTrigger', {
       type: AutomationTriggerModel,
-      nullable: true,
+
     });
 
     t.field('workspace', {
       type: CustomerType,
-      nullable: true,
+
     });
   },
 });
@@ -37,12 +37,12 @@ export const GetAutomationInput = inputObjectType({
   name: 'GetAutomationInput',
   definition(t) {
     t.string('id');
-  }
+  },
 })
 
 export const GetAutomationQuery = queryField('automation', {
   type: AutomationModel,
-  nullable: true,
+
   args: {
     where: GetAutomationInput,
   },
@@ -52,5 +52,5 @@ export const GetAutomationQuery = queryField('automation', {
     const automation = await ctx.services.automationService.findAutomationById(args.where.id);
 
     return automation as any;
-  }
+  },
 })

@@ -3,23 +3,22 @@
 /* eslint-disable radix */
 import '@szhsin/react-menu/dist/index.css';
 import * as UI from '@haas/ui';
-import { Activity, Calendar, Filter, Link2, Mail, MessageCircle, Plus, Search, Smartphone } from 'react-feather';
-import { AnimatePresence, motion } from 'framer-motion';
 import { BooleanParam, DateTimeParam, NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
+import { Calendar, Filter, Link2, Mail, MessageCircle, Plus, Search, Smartphone } from 'react-feather';
 import { Controller, useForm } from 'react-hook-form';
-import { Flex, ViewTitle } from '@haas/ui';
+import { Flex } from '@haas/ui';
+import { ROUTES, useNavigator } from 'hooks/useNavigator';
 import {
-  Icon,
   Radio,
   RadioGroup,
 } from '@chakra-ui/core';
-import { ROUTES, useNavigator } from 'hooks/useNavigator';
-import { Route, Switch, useLocation } from 'react-router';
 import { endOfDay, format, startOfDay } from 'date-fns';
+import { isPresent } from 'ts-is-present';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
 import * as Menu from 'components/Common/Menu';
+import * as Modal from 'components/Common/Modal';
 import * as Table from 'components/Common/Table';
 import { Avatar } from 'components/Common/Avatar';
 import {
@@ -34,11 +33,13 @@ import {
 import { DeliveryRecipient } from 'components/Campaign/DeliveryRecipient';
 import { PickerButton } from 'components/Common/Picker/PickerButton';
 import { TabbedMenu } from 'components/Common/TabMenu';
+import { View } from 'layouts/View';
 import { formatSimpleDate } from 'utils/dateUtils';
 import { useMenu } from 'components/Common/Menu/useMenu';
-import SearchBar from 'components/SearchBar/SearchBar';
+import { useRouteModal } from 'components/Common/Modal';
+import SearchBar from 'components/Common/SearchBar/SearchBar';
 
-import { InteractionModalCard } from './InteractionModalCard';
+import { InteractionModalCard } from '../FeedbackView/InteractionModalCard';
 
 const undefinedToNull = (value: any) => {
   if (value === undefined) {
@@ -85,116 +86,63 @@ interface DistributionInnerCellProps {
   session: SessionFragmentFragment;
 }
 
-const DistributionInnerCell = ({ session }: DistributionInnerCellProps) => {
-  const { goToCampaignView } = useNavigator();
-
-  return (
-
-    <UI.Div>
-      {session.delivery ? (
-        <Table.InnerCell
-          header="Origin"
-          renderBody={() => (
-            <>
-              <UI.Stack spacing={1}>
-                <UI.Stack isInline>
-                  <UI.Text>Url:</UI.Text>
-                  <UI.Muted>
-                    <UI.Span fontSize="0.7rem">
-                      {session.originUrl}
-                    </UI.Span>
-                  </UI.Muted>
-                </UI.Stack>
-                <UI.Div>
-                  <UI.Stack isInline>
-                    <UI.Text>Campaign:</UI.Text>
-                    <UI.Div>
-                      <UI.Muted>
-                        <UI.Span fontSize="0.7rem">
-                          {session.delivery?.campaignVariant?.campaign?.label}
-                        </UI.Span>
-                      </UI.Muted>
-                      {!!session.delivery?.campaignVariant?.campaign?.id && (
-                        <UI.Button
-                          size="xs"
-                          onClick={
-                            () => goToCampaignView(session.delivery?.campaignVariant?.campaign?.id || '')
-                          }
-                        >
-                          View campaign
-                        </UI.Button>
-                      )}
-                    </UI.Div>
-                  </UI.Stack>
-                </UI.Div>
-                <UI.Stack isInline alignItems="center">
-                  <UI.Text>Campaign variant:</UI.Text>
-                  <UI.Muted>
-                    <UI.Span fontSize="0.7rem">
-                      {session.delivery?.campaignVariant?.label}
-                      {' - '}
-                      {session.delivery?.campaignVariant?.type}
-                    </UI.Span>
-                  </UI.Muted>
-                </UI.Stack>
-              </UI.Stack>
-            </>
-          )}
-        >
-          <UI.Flex>
-            <UI.Div>
-              {session.delivery.campaignVariant?.type === CampaignVariantEnum.Email ? (
-                <Circle flexShrink={0} brand="blue" mr={2}>
-                  <UI.Icon>
-                    <Smartphone />
-                  </UI.Icon>
-                </Circle>
-              ) : (
-                <Circle flexShrink={0} brand="blue" mr={2}>
-                  <UI.Icon>
-                    <Mail />
-                  </UI.Icon>
-                </Circle>
-              )}
-            </UI.Div>
-            <UI.Div>
-              <UI.Helper color="blue.500">
-                Campaign:
-                {' '}
-                {session.delivery.campaignVariant?.campaign?.label}
-              </UI.Helper>
-              <UI.Flex>
+const DistributionInnerCell = ({ session }: DistributionInnerCellProps) => (
+  <UI.Div>
+    {session.delivery ? (
+      <Table.InnerCell>
+        <UI.Flex>
+          <UI.Div>
+            {session.delivery.campaignVariant?.type === CampaignVariantEnum.Email ? (
+              <Circle flexShrink={0} brand="blue" mr={2}>
+                <UI.Icon>
+                  <Smartphone />
+                </UI.Icon>
+              </Circle>
+            ) : (
+              <Circle flexShrink={0} brand="blue" mr={2}>
+                <UI.Icon>
+                  <Mail />
+                </UI.Icon>
+              </Circle>
+            )}
+          </UI.Div>
+          <UI.Div>
+            <UI.Helper color="blue.500">
+              Campaign:
+              {' '}
+              {session.delivery.campaignVariant?.campaign?.label}
+            </UI.Helper>
+            <UI.Flex>
+              <UI.Muted>
+                {session.originUrl}
+              </UI.Muted>
+            </UI.Flex>
+          </UI.Div>
+        </UI.Flex>
+      </Table.InnerCell>
+    ) : (
+      <UI.Div>
+        <Table.InnerCell>
+          <UI.Div>
+            <UI.Flex>
+              <Circle flexShrink={0} brand="gray" mr={2}>
+                <UI.Icon>
+                  <Link2 />
+                </UI.Icon>
+              </Circle>
+              <UI.Div>
+                <UI.Helper color="gray.500">Link click</UI.Helper>
                 <UI.Muted>
                   {session.originUrl}
                 </UI.Muted>
-              </UI.Flex>
-            </UI.Div>
-          </UI.Flex>
+              </UI.Div>
+            </UI.Flex>
+          </UI.Div>
         </Table.InnerCell>
-      ) : (
-        <>
-          <Table.InnerCell>
-            <UI.Div>
-              <UI.Flex>
-                <Circle flexShrink={0} brand="gray" mr={2}>
-                  <UI.Icon>
-                    <Link2 />
-                  </UI.Icon>
-                </Circle>
-                <UI.Div>
-                  <UI.Helper color="gray.500">Link click</UI.Helper>
-                  <UI.Muted>
-                    {session.originUrl}
-                  </UI.Muted>
-                </UI.Div>
-              </UI.Flex>
-            </UI.Div>
-          </Table.InnerCell>
-        </>
-      )}
-    </UI.Div>
-  );
-};
+      </UI.Div>
+    )}
+  </UI.Div>
+);
 
 interface CampaignVariant {
   id: string;
@@ -207,8 +155,7 @@ interface CampaignVariant {
 
 export const InteractionsOverview = () => {
   const { t } = useTranslation();
-  const { customerSlug, dialogueSlug, goToInteractionsView } = useNavigator();
-  const location = useLocation();
+  const { customerSlug, dialogueSlug } = useNavigator();
 
   const [campaignVariants, setCampaignVariants] = useState<CampaignVariant[]>([]);
   const [sessions, setSessions] = useState<SessionFragmentFragment[]>(() => []);
@@ -248,11 +195,11 @@ export const InteractionsOverview = () => {
     errorPolicy: 'ignore',
     onCompleted: (fetchedData) => {
       setCampaignVariants(
-        fetchedData?.customer?.dialogue?.campaignVariants || [],
+        fetchedData?.customer?.dialogue?.campaignVariants?.filter(isPresent) as any || [],
       );
 
       setSessions(
-        fetchedData?.customer?.dialogue?.sessionConnection?.sessions || [],
+        fetchedData?.customer?.dialogue?.sessionConnection?.sessions as any || [],
       );
 
       setTotalPages(fetchedData.customer?.dialogue?.sessionConnection?.totalPages || 0);
@@ -315,21 +262,25 @@ export const InteractionsOverview = () => {
   const { menuProps, openMenu, closeMenu, activeItem: contextInteraction } = useMenu<SessionFragmentFragment>();
   const columns = 'minmax(200px, 1fr) minmax(150px, 1fr) minmax(300px, 1fr) minmax(300px, 1fr)';
 
+  const [openModal, closeModal, isOpenModal, params] = useRouteModal<{ interactionId: string }>({
+    matchUrlKey: ROUTES.INTERACTION_VIEW,
+    exitUrl: `/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions`,
+  });
+
   return (
-    <>
+    <View documentTitle="haas | Interactions">
       <UI.ViewHead>
         <UI.Flex alignItems="center" justifyContent="space-between" width="100%">
           <UI.Flex alignItems="center">
-            <ViewTitle>
-              <Icon as={Activity} mr={1} />
+            <UI.ViewTitle>
               {t('views:interactions_view')}
-            </ViewTitle>
+            </UI.ViewTitle>
           </UI.Flex>
 
           <Flex alignItems="center">
             <SearchBar
-              activeSearchTerm={filter.search}
-              onSearchTermChange={handleSearchTermChange}
+              search={filter.search}
+              onSearchChange={handleSearchTermChange}
             />
           </Flex>
         </UI.Flex>
@@ -338,7 +289,7 @@ export const InteractionsOverview = () => {
       <UI.ViewBody>
         <UI.Flex mb={2} justifyContent="flex-start">
           <UI.Stack isInline spacing={2} alignItems="center">
-            <PickerButton arrowBg="gray.50" label={t('add_filter')} icon={<Plus />}>
+            <PickerButton label={t('add_filter')} icon={<Plus />}>
               {() => (
                 <TabbedMenu
                   menuHeader={t('add_filter')}
@@ -357,8 +308,8 @@ export const InteractionsOverview = () => {
                         <UI.Muted>{t('filter_by_search_helper')}</UI.Muted>
                       </UI.Div>
                       <SearchBar
-                        activeSearchTerm={filter.search}
-                        onSearchTermChange={handleSearchTermChange}
+                        search={filter.search}
+                        onSearchChange={handleSearchTermChange}
                       />
                     </UI.Stack>
                   </UI.Div>
@@ -473,23 +424,29 @@ export const InteractionsOverview = () => {
                 <Menu.Item
                   onClick={() => handleMultiDateFilterChange(undefined, new Date(contextInteraction?.createdAt))}
                 >
-                  {t('before_day_of')}
-                  {' '}
-                  {formatSimpleDate(contextInteraction?.createdAt)}
+                  <>
+                    {t('before_day_of')}
+                    {' '}
+                    {formatSimpleDate(contextInteraction?.createdAt)}
+                  </>
                 </Menu.Item>
                 <Menu.Item
                   onClick={() => handleSingleDateFilterChange(contextInteraction?.createdAt)}
                 >
-                  {t('on_day_of')}
-                  {' '}
-                  {formatSimpleDate(contextInteraction?.createdAt)}
+                  <>
+                    {t('on_day_of')}
+                    {' '}
+                    {formatSimpleDate(contextInteraction?.createdAt)}
+                  </>
                 </Menu.Item>
                 <Menu.Item
                   onClick={() => handleMultiDateFilterChange(new Date(contextInteraction?.createdAt), undefined)}
                 >
-                  {t('after_day_of')}
-                  {' '}
-                  {formatSimpleDate(contextInteraction?.createdAt)}
+                  <>
+                    {t('after_day_of')}
+                    {' '}
+                    {formatSimpleDate(contextInteraction?.createdAt)}
+                  </>
                 </Menu.Item>
               </Menu.SubMenu>
               {contextInteraction?.delivery && (
@@ -508,21 +465,25 @@ export const InteractionsOverview = () => {
                         `${contextInteraction?.delivery?.deliveryRecipientFirstName} ${contextInteraction?.delivery?.deliveryRecipientLastName}` || '',
                       )}
                     >
-                      {t('more_from')}
-                      {' '}
-                      {contextInteraction?.delivery?.deliveryRecipientFirstName}
-                      {' '}
-                      {contextInteraction?.delivery?.deliveryRecipientLastName}
+                      <>
+                        {t('more_from')}
+                        {' '}
+                        {contextInteraction?.delivery?.deliveryRecipientFirstName}
+                        {' '}
+                        {contextInteraction?.delivery?.deliveryRecipientLastName}
+                      </>
                     </Menu.Item>
                     <Menu.Item onClick={() => handleCampaignVariantFilterChange({
                       filterCampaignVariant: contextInteraction?.delivery?.campaignVariant?.id,
                     })}
                     >
-                      {t('more_from')}
-                      {' '}
-                      {t('campaign_variant')}
-                      {' '}
-                      {contextInteraction?.delivery?.campaignVariant?.label}
+                      <>
+                        {t('more_from')}
+                        {' '}
+                        {t('campaign_variant')}
+                        {' '}
+                        {contextInteraction?.delivery?.campaignVariant?.label}
+                      </>
                     </Menu.Item>
                   </Menu.SubMenu>
                 </>
@@ -532,7 +493,7 @@ export const InteractionsOverview = () => {
             {sessions.map((session) => (
               <Table.Row
                 isLoading={isLoading}
-                onClick={() => goToInteractionsView(session.id)}
+                onClick={() => openModal({ interactionId: session.id })}
                 gridTemplateColumns={columns}
                 key={session.id}
                 onContextMenu={(e) => openMenu(e, session)}
@@ -569,37 +530,13 @@ export const InteractionsOverview = () => {
             )}
           </UI.Flex>
         </UI.Div>
-
-        <AnimatePresence>
-          <Switch
-            location={location}
-            key={location.pathname}
-          >
-            <Route
-              path={ROUTES.INTERACTION_VIEW}
-            >
-              {({ match }) => (
-                <motion.div
-                  key={location.pathname}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <UI.Modal isOpen onClose={() => goToInteractionsView()}>
-                    <InteractionModalCard
-                      onClose={() => goToInteractionsView()}
-                      // @ts-ignore
-                      sessionId={match?.params?.interactionId}
-                    />
-                  </UI.Modal>
-                </motion.div>
-              )}
-            </Route>
-          </Switch>
-        </AnimatePresence>
-
+        <Modal.Root onClose={closeModal} open={isOpenModal}>
+          <InteractionModalCard
+            sessionId={params?.interactionId}
+          />
+        </Modal.Root>
       </UI.ViewBody>
-    </>
+    </View>
   );
 };
 

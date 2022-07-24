@@ -1,8 +1,14 @@
 version: '3'
 services:
+  redis:
+    image: 'redis:7.0.2'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - '6380:6379'
   postgres:
     restart: always
-    image: postgres:10.3
+    image: postgres:12.2
     environment:
       POSTGRES_USER: prisma
       POSTGRES_PASSWORD: prisma

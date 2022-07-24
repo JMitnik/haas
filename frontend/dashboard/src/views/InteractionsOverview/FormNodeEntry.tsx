@@ -3,7 +3,7 @@ import { AtSign, FileText, Hash, Link2, Phone, Type } from 'react-feather';
 import React from 'react';
 import styled from 'styled-components';
 
-import { FormNodeEntryType, FormNodeFieldTypeEnum } from 'types/generated-types';
+import { FormNodeEntryType, FormNodeEntryValueType, FormNodeFieldTypeEnum } from 'types/generated-types';
 
 /**
  * Wrap the underlying element to be full-width
@@ -109,12 +109,18 @@ const MapFormNodeEntryVal: { [key in FormNodeFieldTypeEnum]?: React.FC<{ formNod
 };
 
 export const FormNodeEntry = ({ nodeEntry }: { nodeEntry: FormNodeEntryType }) => (
-  <UI.Card noHover bg="white">
+  <UI.Card>
     <UI.CardBody>
       <UI.Grid gridTemplateColumns={['1fr', '1fr', '1fr', '1fr 1fr']}>
         {nodeEntry.values?.map((formNodeFieldEntry, index) => {
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          const { relatedField, __typename, ...entryData } = formNodeFieldEntry;
+          const entryData: FormNodeEntryValueType = {
+            email: formNodeFieldEntry?.email,
+            longText: formNodeFieldEntry?.longText,
+            number: formNodeFieldEntry?.number,
+            phoneNumber: formNodeFieldEntry?.phoneNumber,
+            shortText: formNodeFieldEntry?.shortText,
+            url: formNodeFieldEntry?.url,
+          };
           // We can't rely on the relatedField.type because users may have changed the type whilst the value remains
           // on previous type.
           if (!entryData) return null;

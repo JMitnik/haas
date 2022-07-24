@@ -1,0 +1,18 @@
+query GetDialogueLinks($workspaceId: String, $filter: DialogueConnectionFilterInput) {
+	dialogueLinks(workspaceId: $workspaceId, filter: $filter) {
+    dialogues {
+      title
+		  slug
+		  description
+		  url
+    }
+    totalPages
+    pageInfo {
+      hasPrevPage
+      hasNextPage
+      prevPageOffset
+      nextPageOffset
+      pageIndex
+    }
+	}
+}

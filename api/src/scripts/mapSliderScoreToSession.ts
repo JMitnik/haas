@@ -49,9 +49,9 @@ export const mapSliderScoreToSession = async () => {
 
   console.log('Amount of sessions being converted: ', sessions.length);
 
-  await Promise.all(sessions.map(async (session) => {
+  // TODO: Make it a single RAW Postgres JOIN COALESCE QUERY
+  for (const session of sessions) {
     const score = session.nodeEntries[0].sliderNodeEntry?.value;
-
     if (!score) {
       console.log('Find session with 0 score but nog sliderNodeValue. CANCELD.');
       return;
@@ -65,8 +65,7 @@ export const mapSliderScoreToSession = async () => {
         mainScore: score,
       },
     })
-  }));
-
+  }
   console.log('Successfully mapped slider scores to their sessions');
   process.exit(0);
 };

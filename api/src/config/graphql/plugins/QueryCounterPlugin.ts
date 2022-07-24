@@ -1,5 +1,9 @@
-import { plugin } from '@nexus/schema';
-
+import { plugin } from 'nexus';
+declare global {
+  namespace NodeJS {
+    interface Global { }
+  }
+}
 
 interface CustomNodeJsGlobal extends NodeJS.Global {
   nrQueries: number;
@@ -11,9 +15,10 @@ declare const global: CustomNodeJsGlobal;
 export const QueryCounterPlugin = plugin({
   name: 'QueryCounterPlugin',
   description: 'Counts number of queries performed in the current field',
-  fieldDefTypes: `useQueryCounter?: boolean`,
+  fieldDefTypes: 'useQueryCounter?: boolean',
   onCreateFieldResolver(test) {
     return async (root, args, ctx, info, next) => {
+      const isTest = process.env.NODE_ENV === 'test';
       const useQueryCounter = test.fieldConfig.extensions?.nexus?.config?.useQueryCounter;
 
       let nrQueriesStart = global.nrQueries;
@@ -22,7 +27,7 @@ export const QueryCounterPlugin = plugin({
 
       // Reset nrQueries
       global.nrQueries = 0;
-      if (useQueryCounter && global && global.nrQueries !== undefined) {
+      if (!isTest && useQueryCounter && global && global.nrQueries !== undefined) {
         if (test.parentTypeConfig.name === 'Mutation') {
           console.log(`Nr Queries ran for operation ${info.operation.name?.value} : ${nrQueriesEnd - nrQueriesStart}`);
         } else {
@@ -32,5 +37,5 @@ export const QueryCounterPlugin = plugin({
 
       return value;
     }
-  }
+  },
 });

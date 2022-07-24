@@ -5,15 +5,21 @@ import Fastify from 'fastify';
 import ExpressPlugin from 'fastify-express';
 import MultiPartPlugin from 'fastify-multipart';
 import CookiePlugin from 'fastify-cookie';
-
 import { processRequest } from 'graphql-upload';
+import fs from 'fs';
+import https from 'https';
+import cookieParser from 'cookie-parser';
+import cors, { CorsOptions } from 'cors';
+import express from 'express';
+import { graphqlUploadExpress } from 'graphql-upload';
 
+import { logger } from './logger';
 import DeliveryWebhookRoute from '../routes/webhooks/DeliveryWebhookRoute';
 import { makeApollo } from './apollo';
 import config from './config';
 
 export const makeServer = async (port: number, prismaClient: PrismaClient) => {
-  console.log('🏳️\tStarting application');
+  logger.logLifeCycle('Starting application');
   const app = Fastify();
 
   await app.register(ExpressPlugin);
@@ -52,28 +58,13 @@ export const makeServer = async (port: number, prismaClient: PrismaClient) => {
 
   app.use(cookieParser());
   app.use(cors(corsOptions));
-
+  app.use(express.json());
   const apollo = await makeApollo(prismaClient, app);
-
-  // if (config.useSSL) {
-  //   const key: any = process.env.HTTPS_SERVER_KEY_PATH;
-  //   const certificate: any = process.env.HTTPS_SERVER_CERT_PATH;
-
-  //   https.createServer({
-  //     key: fs.readFileSync(key),
-  //     cert: fs.readFileSync(certificate),
-  //   }, app).listen(port, () => {
-  //     console.log('🏁\Listening on https server!');
-  //     console.log(`Listening on port ${port}!`);
-  //   });
-  // }
-
   await apollo.start();
   await app.register(apollo.createHandler({ cors: false }));
-
   await app.listen(port);
-  console.log('🏁\Listening on standard server!');
-  console.log('🏁\tStarted the server!');
-
+  logger.logLifeCycle('Started the server!');
+  // app.use('/graphql', apollo)
+  app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }));
   return app.server;
 };

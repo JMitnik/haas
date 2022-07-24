@@ -1,22 +1,27 @@
-import { ColourSettings, Customer, CustomerSettings, DialogueImpactScore, DialogueStatisticsSummaryCache, NodeEntry, PrismaClient, SliderNodeEntry } from '@prisma/client';
+import { ColourSettings, Customer, CustomerSettings } from '@prisma/client';
 import { GraphQLError } from 'graphql';
-import { GraphQLUpload, UserInputError } from 'apollo-server-express';
-import { extendType, inputObjectType, mutationField, objectType, scalarType } from '@nexus/schema';
+import { ApolloError, UserInputError } from 'apollo-server-express';
+import { arg, extendType, inputObjectType, mutationField, nonNull, objectType, scalarType } from 'nexus';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
 
+import { WorkspaceStatistics } from './WorkspaceStatistics';
 import { CustomerSettingsType } from '../../settings/CustomerSettings';
 import { DialogueFilterInputType, DialogueType, DialogueWhereUniqueInput } from '../../questionnaire/Dialogue';
 import { UserConnection } from '../../users/graphql/User';
-import DialogueService from '../../questionnaire/DialogueService';
 import isValidColor from '../../../utils/isValidColor';
 import { CampaignModel } from '../../Campaigns';
 import { UserConnectionFilterInput } from '../../users/graphql/UserConnection';
 import { AutomationModel } from '../../automations/graphql/AutomationModel';
 import { AutomationConnection, AutomationConnectionFilterInput } from '../../automations/graphql/AutomationConnection';
 import { isValidDateTime } from '../../../utils/isValidDate';
-import { DialogueStatisticsSummaryFilterInput, DialogueStatisticsSummaryModel } from '../../questionnaire';
-import { addDays, differenceInHours, isEqual } from 'date-fns';
-import { groupBy, meanBy } from 'lodash';
+import { DialogueStatisticsSummaryFilterInput, DialogueStatisticsSummaryModel, MostTrendingTopic } from '../../questionnaire';
+import { DialogueConnection, DialogueConnectionFilterInput } from '../../questionnaire';
+import { HealthScore, HealthScoreInput } from './HealthScore';
+import { Organization } from '../../Organization/graphql/Organization';
+import { Issue, IssueFilterInput } from '../../Issue/graphql';
+import { IssueValidator } from '../../Issue/IssueValidator';
+import { SessionConnectionFilterInput } from '../../../models/session/graphql';
+import { SessionConnection } from '../../session/graphql/Session.graphql'
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -30,8 +35,17 @@ export const CustomerType = objectType({
   name: 'Customer',
   definition(t) {
     t.id('id');
-    t.string('slug');
-    t.string('name');
+    t.nonNull.string('slug');
+    t.nonNull.string('name');
+
+    t.boolean('isDemo');
+    t.field('organization', {
+      type: Organization,
+      nullable: true,
+      resolve() {
+        return {};
+      },
+    });
 
     t.field('settings', {
       type: CustomerSettingsType,
@@ -40,6 +54,68 @@ export const CustomerType = objectType({
       async resolve(parent: Customer, args, ctx) {
         const customerSettings = await ctx.services.customerService.getCustomerSettingsByCustomerId(parent.id);
         return customerSettings;
+      },
+    });
+
+    t.field('sessionConnection', {
+      type: SessionConnection,
+      args: { filter: SessionConnectionFilterInput },
+      nullable: true,
+
+      async resolve(parent, args, ctx) {
+        if (!parent.id) return null;
+
+        const sessionConnection = await ctx.services.sessionService.getWorkspaceSessionConnection(
+          parent.id,
+          args.filter
+        );
+
+        return sessionConnection;
+      },
+    });
+
+    /**
+     * Workspace-statistics
+     * - Note: These statistics share the same ID as the Workspace / Customer.
+     */
+    t.field('statistics', {
+      type: WorkspaceStatistics,
+      nullable: true,
+      description: 'Workspace statistics',
+
+      resolve: async (parent) => {
+        return { id: parent.id }
+      },
+    });
+
+    /**
+     * Issues
+     */
+    t.list.field('issues', {
+      type: Issue,
+      nullable: true,
+      args: { filter: IssueFilterInput },
+
+      resolve: async (parent, args, { services }) => {
+        const filter = IssueValidator.resolveFilter(args.filter);
+        return await services.issueService.getProblemDialoguesByWorkspace(parent.id, filter);
+      },
+    });
+
+
+    t.field('dialogueConnection', {
+      type: DialogueConnection,
+      args: { filter: DialogueConnectionFilterInput },
+      nullable: true,
+      async resolve(parent, args, ctx) {
+        if (!ctx.session?.user?.id) throw new ApolloError('No user in session found!');
+
+        let dialogues = await ctx.services.dialogueService.paginatedDialogues(
+          parent.slug,
+          ctx.session?.user?.id,
+          args.filter
+        );
+        return dialogues;
       },
     });
 
@@ -74,15 +150,110 @@ export const CustomerType = objectType({
       },
     });
 
-    t.field('nestedDialogueStatisticsSummary', {
-      type: DialogueStatisticsSummaryModel,
-      list: true,
+    t.field('nestedHealthScore', {
+      nullable: true,
+      deprecation: 'Deprectaed, see statistics',
+      type: HealthScore,
+      args: {
+        input: HealthScoreInput,
+      },
+      async resolve(parent, args, ctx) {
+        if (!args.input) throw new UserInputError('Not input object!');
+        const { startDateTime, endDateTime, threshold } = args.input;
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (startDateTime) {
+          utcStartDateTime = isValidDateTime(startDateTime, 'START_DATE') as Date;
+        }
+
+        if (endDateTime) {
+          utcEndDateTime = isValidDateTime(endDateTime, 'END_DATE');
+        }
+
+        return ctx.services.dialogueStatisticsService.findWorkspaceHealthScore(
+          parent.id,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          undefined,
+          threshold || undefined,
+        );
+      },
+    });
+
+    t.field('nestedMostPopular', {
+      type: 'MostPopularPath',
+      nullable: true,
       args: {
         input: DialogueStatisticsSummaryFilterInput,
       },
+      async resolve(parent, args, ctx) {
+        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE') as Date;
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        return ctx.services.customerService.findNestedMostPopularPath(
+          parent.id,
+          args.input.impactType,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          args.input.refresh || false,
+        );
+      },
+    });
+
+    t.field('nestedMostChanged', {
+      type: 'MostChangedPath',
       nullable: true,
+      args: {
+        input: DialogueStatisticsSummaryFilterInput,
+      },
       useParentResolve: true,
-      // useQueryCounter: true,
+      useTimeResolve: true,
+      async resolve(parent, args, ctx) {
+        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+        if (args?.input?.cutoff && args.input.cutoff < 1) throw new UserInputError('Cutoff cannot be a negative number!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE') as Date;
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        return ctx.services.customerService.findNestedMostChangedPath(
+          parent.id,
+          args.input.impactType,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          args.input.refresh || false,
+          args.input.cutoff || undefined,
+        );
+      },
+    });
+
+    t.field('nestedMostTrendingTopic', {
+      type: MostTrendingTopic,
+      nullable: true,
+      args: {
+        input: DialogueStatisticsSummaryFilterInput,
+      },
+      useParentResolve: true,
       useTimeResolve: true,
       async resolve(parent, args, ctx) {
         if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
@@ -99,13 +270,29 @@ export const CustomerType = objectType({
           utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
         }
 
-        return ctx.services.customerService.findNestedDialogueStatisticsSummary(
+        return ctx.services.customerService.findNestedMostTrendingTopic(
           parent.id,
           args.input.impactType,
           utcStartDateTime as Date,
           utcEndDateTime,
           args.input.refresh || false,
         )
+      },
+    });
+
+    t.field('nestedDialogueStatisticsSummary', {
+      type: DialogueStatisticsSummaryModel,
+      deprecation: 'Deprecated, see statistics',
+      list: true,
+      args: {
+        input: DialogueStatisticsSummaryFilterInput,
+      },
+      nullable: true,
+      useParentResolve: true,
+      // useQueryCounter: true,
+      useTimeResolve: true,
+      async resolve(parent, args, ctx) {
+        return null;
       },
     });
 
@@ -140,16 +327,14 @@ export const CustomerType = objectType({
         filter: DialogueFilterInputType,
       },
       useQueryCounter: true,
+      useTimeResolve: true,
       async resolve(parent: Customer, args, ctx) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
+        let dialogues = await ctx.services.dialogueService.findDialoguesByCustomerId(
+          parent.id,
+          args.filter?.searchTerm || undefined,
+        );
 
-        let dialogues = await ctx.services.dialogueService.findDialoguesByCustomerId(parent.id);
-
-        if (args.filter && args.filter.searchTerm) {
-          dialogues = DialogueService.filterDialoguesBySearchTerm(dialogues, args.filter.searchTerm);
-        }
-
-        return dialogues as any;
+        return dialogues;
       },
     });
 
@@ -230,15 +415,6 @@ export const ImageType = objectType({
   },
 });
 
-export const Upload = GraphQLUpload && scalarType({
-  name: GraphQLUpload.name,
-  asNexusMethod: 'upload', // We set this to be used as a method later as `t.upload()` if needed
-  description: GraphQLUpload.description,
-  serialize: GraphQLUpload.serialize,
-  parseValue: GraphQLUpload.parseValue,
-  parseLiteral: GraphQLUpload.parseLiteral,
-});
-
 const EditWorkspaceInput = inputObjectType({
   name: 'EditWorkspaceInput',
   description: 'Edit a workspace',
@@ -270,41 +446,46 @@ const CreateWorkspaceInput = inputObjectType({
     // Creation specific data
     t.boolean('isSeed', { default: false, required: false });
     t.boolean('willGenerateFakeData', { default: false });
+    t.boolean('isDemo', { default: false });
   },
 });
 
-export const WorkspaceMutations = Upload && extendType({
+export const UploadScalar = scalarType({
+  name: 'Upload',
+  asNexusMethod: 'upload',
+  description: 'The `Upload` scalar type represents a file upload.',
+  // sourceType: 'File',
+})
+
+export const WorkspaceMutations = extendType({
   type: 'Mutation',
 
   definition(t) {
     t.field('singleUpload', {
       type: ImageType,
       args: {
-        file: Upload,
+        file: nonNull(arg({ type: 'Upload' })),
       },
       async resolve(parent, args) {
         const { file } = args;
 
-        const waitedFile = await file;
         const { createReadStream, filename, mimetype, encoding }:
-          { createReadStream: any; filename: string; mimetype: string; encoding: string } = waitedFile.file;
-
+          { createReadStream: any; filename: string; mimetype: string; encoding: string } = await file.file;
 
         const stream = new Promise<UploadApiResponse>((resolve, reject) => {
           const cld_upload_stream = cloudinary.v2.uploader.upload_stream({
             folder: 'company_logos',
-          },
-            (error, result: UploadApiResponse | undefined) => {
-              if (result) return resolve(result);
-
-              return reject(error);
-            });
+          }, (error, result: UploadApiResponse | undefined) => {
+            if (result) return resolve(result);
+            return reject(error);
+          });
 
           return createReadStream().pipe(cld_upload_stream);
         });
 
         const result = await stream;
         const { secure_url } = result;
+
         return { filename, mimetype, encoding, url: secure_url };
       },
     });

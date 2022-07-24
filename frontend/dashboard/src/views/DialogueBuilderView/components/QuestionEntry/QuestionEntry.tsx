@@ -11,7 +11,7 @@ import { QuestionNodeProblem } from 'views/DialogueBuilderView/DialogueBuilderTy
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useDuplicateQuestionMutation } from 'types/generated-types';
-import ShowMoreButton from 'components/ShowMoreButton';
+import ShowMoreButton from 'components/Common/ShowMoreButton';
 import deleteQuestionMutation from 'mutations/deleteQuestion';
 import useAuth from 'hooks/useAuth';
 
@@ -193,6 +193,7 @@ const QuestionEntryItem = ({ depth,
       value: option.overrideLeaf?.id,
       type: option.overrideLeaf?.type,
     },
+    isTopic: option.isTopic,
   })) || [];
 
   return (

@@ -8,7 +8,7 @@ import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
 import * as codebuild from '@aws-cdk/aws-codebuild';
 import * as codepipeline_actions from '@aws-cdk/aws-codepipeline-actions';
 import * as ecs_patterns from '@aws-cdk/aws-ecs-patterns';
-import { Construct, SecretValue, Stack, StackProps } from '@aws-cdk/core';
+import { App, Construct, SecretValue, Stack, StackProps } from '@aws-cdk/core';
 import { CdkPipeline, SimpleSynthAction } from "@aws-cdk/pipelines";
 
 interface MainPipelineStackProps extends StackProps {

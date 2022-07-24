@@ -1,4 +1,4 @@
-import { inputObjectType, objectType } from '@nexus/schema';
+import { inputObjectType, objectType } from 'nexus';
 
 import { FormNodeField, QuestionNodeType } from '../QuestionNode/QuestionNode';
 
@@ -30,7 +30,7 @@ export const FormNodeEntryType = objectType({
   name: 'FormNodeEntryType',
 
   definition(t) {
-    t.int('id');
+    t.int('id', { nullable: true });
 
     t.list.field('values', { type: FormNodeEntryValueType });
   },

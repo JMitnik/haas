@@ -3,9 +3,11 @@ import styled, { css } from 'styled-components';
 
 export const HeadingRow = styled(UI.Grid)`
   ${({ theme }) => css`
-    background: ${theme.colors.gray[100]};
-    padding: 12px 16px;
-    border-radius: 10px;
+    background: ${theme.colors.neutral[300]};
+    border: 1px solid ${theme.colors.off[100]};
+    padding: 8px ${theme.gutter}px;
+    box-shadow: ${theme.boxShadows.sm};
+    border-radius: ${theme.borderRadiuses.lg}px;
     margin-bottom: 12px;
   `}
 `;

@@ -1,4 +1,4 @@
-import { Dialogue, Edge, NodeType, PrismaClient, QuestionCondition, QuestionNode } from '@prisma/client';
+import { Dialogue, Edge, NodeType, PrismaClient, QuestionCondition, QuestionNode, SystemPermissionEnum } from '@prisma/client';
 import { sample } from 'lodash';
 
 interface SeedSessionInput {
@@ -13,6 +13,51 @@ interface SeedSessionInput {
   subChoiceQuestionId?: string;
   subChoiceValue?: string;
   subEdgeId?: string;
+}
+
+export const assignUserToDialogue = async (prisma: PrismaClient, dialogueId: string, userId: string) => {
+  return prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      isAssignedTo: {
+        connect: {
+          id: dialogueId,
+        },
+      },
+    },
+    include: {
+      isAssignedTo: true,
+    },
+  });
+}
+
+/**
+ * Generates a dialogue, connected to a specific dialogue.
+ * @param prisma
+ * @param customerId
+ * @returns
+ */
+export const seedDialogue = async (
+  prisma: PrismaClient,
+  workspaceId: string,
+  slug: string,
+  isPrivate: boolean = false,
+  title: string = 'Test dialogue',
+  description: string = 'none',
+) => {
+  const dialogue = await prisma.dialogue.create({
+    data: {
+      customerId: workspaceId,
+      title,
+      slug,
+      description: description,
+      isPrivate,
+    },
+  });
+
+  return dialogue;
 }
 
 export const seedSession = async (
@@ -39,60 +84,82 @@ export const seedSession = async (
       browser: sample(['Firefox', 'IEEdge', 'Chrome', 'Safari']),
       dialogueId,
       device: sample(['iPhone', 'Android', 'Mac', 'Windows ']),
-      nodeEntries: {
-        create: [{
-          creationDate: createdAt,
-          depth: 0,
-          relatedNode: {
-            create: !sliderQuestionId ? { title: 'Test', type: NodeType.SLIDER } : undefined,
-            connect: sliderQuestionId ? { id: sliderQuestionId } : undefined,
-          },
-          sliderNodeEntry: {
-            create: { value: mainScore },
-          },
+    },
+  });
+
+  await prisma.nodeEntry.create({
+    data: {
+      session: {
+        connect: {
+          id: session.id,
         },
-        {
-          creationDate: createdAt,
-          depth: 1,
-          relatedEdge: {
-            connect: {
-              id: edgeId,
-            },
-          },
-          choiceNodeEntry: {
-            create: {
-              value: choiceValue || sample(['Customer support', 'Facilities', 'Website', 'Application']),
-            },
-          },
-          relatedNode: {
-            create: !choiceQuestionId ? { title: 'What did you think of this?', type: NodeType.CHOICE } : undefined,
-            connect: choiceQuestionId ? { id: choiceQuestionId } : undefined,
-          },
-        },
-        subChoiceQuestionId && subChoiceValue && subEdgeId ? {
-          creationDate: createdAt,
-          depth: 2,
-          relatedEdge: {
-            connect: {
-              id: subEdgeId,
-            },
-          },
-          relatedNode: {
-            connect: {
-              id: subChoiceQuestionId,
-            },
-          },
-          choiceNodeEntry: {
-            create: {
-              value: subChoiceValue,
-            },
-          },
-        } : undefined,
-        ],
+      },
+      creationDate: createdAt,
+      depth: 0,
+      relatedNode: {
+        create: !sliderQuestionId ? { title: 'Test', type: NodeType.SLIDER } : undefined,
+        connect: sliderQuestionId ? { id: sliderQuestionId } : undefined,
+      },
+      sliderNodeEntry: {
+        create: { value: mainScore },
       },
     },
   });
 
+  await prisma.nodeEntry.create({
+    data: {
+      session: {
+        connect: {
+          id: session.id,
+        },
+      },
+      creationDate: createdAt,
+      depth: 1,
+      relatedEdge: {
+        connect: {
+          id: edgeId,
+        },
+      },
+      choiceNodeEntry: {
+        create: {
+          value: choiceValue || sample(['Customer support', 'Facilities', 'Website', 'Application']),
+        },
+      },
+      relatedNode: {
+        create: !choiceQuestionId ? { title: 'What did you think of this?', type: NodeType.CHOICE } : undefined,
+        connect: choiceQuestionId ? { id: choiceQuestionId } : undefined,
+      },
+    },
+  });
+
+  if (subEdgeId && subChoiceQuestionId && subChoiceValue) {
+    await prisma.nodeEntry.create({
+      data: {
+        session: {
+          connect: {
+            id: session.id,
+          },
+        },
+        creationDate: createdAt,
+        depth: 2,
+        relatedEdge: {
+          connect: {
+            id: subEdgeId,
+          },
+        },
+        relatedNode: {
+          connect: {
+            id: subChoiceQuestionId,
+          },
+        },
+        choiceNodeEntry: {
+          create: {
+            value: subChoiceValue,
+          },
+        },
+      },
+    })
+  }
   return session;
 }
 
@@ -315,7 +382,7 @@ export const prepDefaultCreateData = async (prisma: PrismaClient) => {
   const userRole = await prisma.role.create({
     data: {
       name: 'UserRole',
-      permissions: ['CAN_VIEW_AUTOMATIONS', 'CAN_CREATE_AUTOMATIONS'],
+      permissions: ['CAN_VIEW_AUTOMATIONS', 'CAN_CREATE_AUTOMATIONS', 'CAN_VIEW_DIALOGUE'],
     },
   });
 

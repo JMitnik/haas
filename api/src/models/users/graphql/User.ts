@@ -1,5 +1,5 @@
 import { ApolloError, UserInputError } from 'apollo-server-express';
-import { extendType, inputObjectType, mutationField, objectType, queryField, scalarType } from '@nexus/schema';
+import { extendType, inputObjectType, mutationField, objectType, queryField, scalarType } from 'nexus';
 import { Prisma } from '@prisma/client';
 import { Kind } from 'graphql';
 
@@ -26,6 +26,7 @@ export const UserOfCustomerInput = inputObjectType({
     // Provide one of the two
     t.string('customerId', { required: false });
     t.string('customerSlug', { required: false });
+    t.string('workspaceId', { required: false });
   },
 });
 
@@ -46,10 +47,10 @@ export const DateScalar = scalarType({
   name: 'Date',
   asNexusMethod: 'date',
   description: 'Date custom scalar type',
-  parseValue(value) {
+  parseValue(value: any) {
     return new Date(value);
   },
-  serialize(value) {
+  serialize(value: any) {
     return value.getTime();
   },
   parseLiteral(ast) {
@@ -60,10 +61,24 @@ export const DateScalar = scalarType({
   },
 });
 
+export const AssignedDialogues = objectType({
+  name: 'AssignedDialogues',
+  definition(t) {
+    t.list.field('privateWorkspaceDialogues', {
+      type: 'Dialogue',
+      required: true,
+    });
+    t.list.field('assignedDialogues', {
+      type: 'Dialogue',
+      required: true,
+    });
+  },
+})
+
 export const UserType = objectType({
   name: 'UserType',
   definition(t) {
-    t.id('id');
+    t.nonNull.id('id');
     t.string('email');
     t.string('phone', { nullable: true });
     t.string('firstName', { nullable: true });
@@ -71,11 +86,29 @@ export const UserType = objectType({
     t.date('lastLoggedIn', { nullable: true });
     t.date('lastActivity', { nullable: true });
 
+    t.field('assignedDialogues', {
+      type: AssignedDialogues,
+      nullable: true,
+      args: { input: UserOfCustomerInput },
+      async resolve(parent, args, ctx) {
+        // @ts-ignore
+        if (parent.privateDialogues) return parent.privateDialogues;
+        // @ts-ignore
+        if (!parent.id) return null;
+        // @ts-ignore
+        if (!args.input?.workspaceId && !args.input?.customerId && !args.input?.customerSlug) return null;
+
+        return ctx.services.userService.findPrivateDialoguesOfUser(args.input, parent.id);
+      },
+    })
+
     t.list.field('globalPermissions', {
       nullable: true,
       type: SystemPermission,
 
       async resolve(parent, args, ctx) {
+        if (!parent.id) return null;
+
         return ctx.services.userService.getGlobalPermissions(parent.id);
       },
     });
@@ -84,6 +117,8 @@ export const UserType = objectType({
       type: UserCustomerType,
 
       async resolve(parent, args, ctx) {
+        if (!parent.id) return null;
+
         return ctx.services.userService.getUserCustomers(parent.id);
       },
     });
@@ -92,6 +127,8 @@ export const UserType = objectType({
       type: 'Customer',
 
       async resolve(parent, args, ctx) {
+        if (!parent.id) return null;
+
         return ctx.services.userService.findActiveWorkspacesOfUser(parent.id);
       },
     });
@@ -102,7 +139,8 @@ export const UserType = objectType({
       nullable: true,
 
       async resolve(parent, args, ctx, info) {
-        return ctx.services.userService.getRoleOfWorkspaceUser(parent.id, info.variableValues.customerSlug);
+        if (!parent.id) return null;
+        return ctx.services.userService.getRoleOfWorkspaceUser(parent.id, info.variableValues.customerSlug as string);
       },
     });
   },
@@ -164,7 +202,6 @@ export const RootUserQueries = extendType({
   definition(t) {
     t.field('me', {
       type: UserType,
-
       async resolve(parent, args, ctx) {
         if (!ctx.session?.user?.id) throw new ApolloError('No valid user');
         const userId = ctx.session?.user?.id;

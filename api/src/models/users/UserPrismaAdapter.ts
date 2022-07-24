@@ -1,5 +1,5 @@
 import { PrismaClient, User, Prisma, UserOfCustomer } from '@prisma/client';
-import _, { cloneDeep } from 'lodash';
+import _, { cloneDeep, reject } from 'lodash';
 
 import { RegisterUserInput } from './UserPrismaAdapterType';
 import RoleService from '../role/RoleService';
@@ -13,6 +13,109 @@ class UserPrismaAdapter {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
     this.roleService = new RoleService(prismaClient);
+  }
+
+  /**
+   * Upserts a user by checking if the email already exists or not
+   * @param input
+   * @returns
+   */
+  upsertUserByEmail = async (input: Prisma.UserCreateInput) => {
+    return this.prisma.user.upsert({
+      where: {
+        email: input.email,
+      },
+      create: { ...input, id: input.id },
+      update: { ...input, id: input.id },
+    })
+  }
+
+  /**
+   * Finds the private dialogues assigned to an user
+   * @param userId
+   */
+  findPrivateDialogueOfUser = async (userId: string) => {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      include: {
+        isAssignedTo: true,
+      },
+    });
+
+    return user;
+  }
+
+  /**
+   * Upserts a user and assignes it to a private dialogue
+   * @param emailAddress
+   * @param dialogueId
+   * @param phoneNumber
+   * @returns
+  */
+  addUserToPrivateDialogue = (emailAddress: string, dialogueId: string, phoneNumber?: string) => {
+    return this.prisma.user.upsert({
+      where: {
+        email: emailAddress,
+      },
+      create: {
+        email: emailAddress,
+        phone: phoneNumber,
+        isAssignedTo: {
+          connect: {
+            id: dialogueId,
+          },
+        },
+      },
+      update: {
+        isAssignedTo: {
+          connect: {
+            id: dialogueId,
+          },
+        },
+      },
+    });
+  }
+
+  /**
+   * Adjusts the dialogue privacy settings of a user based on the input. The input consits one list of dialogue ids
+   * which should be disconnected and another which should be connected to the user
+   * @param input
+   * @returns
+   */
+  updateUserPrivateDialogues = async (input: NexusGenInputs['AssignUserToDialoguesInput']) => {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: input.userId,
+      },
+      include: {
+        isAssignedTo: {
+          where: {
+            customerId: input.workspaceId,
+          },
+        },
+      },
+    });
+
+    const dbAssignedDialogues = user?.isAssignedTo.map((dialogue) => ({ id: dialogue.id })) || [];
+    const disconnectedDialogues = reject(dbAssignedDialogues,
+      (dialogue) => input.assignedDialogueIds?.includes(dialogue.id) || false) || [];
+
+    return this.prisma.user.update({
+      where: {
+        id: input?.userId,
+      },
+      data: {
+        isAssignedTo: {
+          disconnect: disconnectedDialogues,
+          connect: input?.assignedDialogueIds?.map((dialogueId) => ({ id: dialogueId })) || [],
+        },
+      },
+      include: {
+        isAssignedTo: true,
+      },
+    });
   }
 
   /**
@@ -253,7 +356,7 @@ class UserPrismaAdapter {
     });
   };
 
-  async createNewUser(customerId: string, roleId: string, email: string) {
+  async createWorkspaceUser(customerId: string, roleId: string, email: string) {
     return this.prisma.user.create({
       data: {
         email,
@@ -328,7 +431,7 @@ class UserPrismaAdapter {
   };
 
   async findUserWithinWorkspace(email: string, workspaceId: string) {
-    return this.prisma.user.findFirst({
+    return this.prisma.user.findUnique({
       where: { email },
       include: {
         customers: {

@@ -63,7 +63,7 @@ const InviteUserForm = ({ onClose, onRefetch }: InviteUserFormProps) => {
     fetchPolicy: 'network-only',
   });
 
-  const selectRoles = roleData?.customer?.roles?.map((role) => ({ label: role.name, value: role.id }));
+  const selectRoles = roleData?.customer?.roles?.map((role) => ({ label: role?.name, value: role?.id }));
 
   const [addUser, { loading: isLoading }] = useMutation(inviteUserMutation, {
     onCompleted: (resData) => {
@@ -129,7 +129,7 @@ const InviteUserForm = ({ onClose, onRefetch }: InviteUserFormProps) => {
   };
 
   return (
-    <UI.Div py={2} px={4}>
+    <UI.Div>
       <UI.FormSectionHelper mb={1}>
         {t('invite_user_description')}
       </UI.FormSectionHelper>

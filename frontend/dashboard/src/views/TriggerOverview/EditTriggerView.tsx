@@ -221,7 +221,7 @@ const EditTriggerForm = ({ trigger }: { trigger: any }) => {
   return (
     <>
       <UI.ViewHead>
-        <UI.ViewTitle>{t('views:edit_trigger_view')}</UI.ViewTitle>
+        <UI.DeprecatedViewTitle>{t('views:edit_trigger_view')}</UI.DeprecatedViewTitle>
       </UI.ViewHead>
       <UI.ViewBody>
         <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>

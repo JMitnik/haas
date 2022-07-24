@@ -1,4 +1,3 @@
-import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { clearDialogueDatabase } from './testUtils';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
 import AuthService from '../../auth/AuthService';
@@ -6,14 +5,21 @@ import { prepDefaultCreateData, seedSession } from './testUtils';
 
 jest.setTimeout(30000);
 
-const prisma = makeTestPrisma();
+import { prisma } from '../../../test/setup/singletonDeps';
 const ctx = makeTestContext(prisma);
+
 
 describe('Dialogue Topic', () => {
   afterEach(async () => {
     await clearDialogueDatabase(prisma);
     await prisma.$disconnect();
   });
+
+  afterAll(async () => {
+    await clearDialogueDatabase(prisma);
+    await prisma.$disconnect();
+  });
+
 
   it('can find average impact scores of root question sub topics', async () => {
     const { user, workspace, dialogue, sliderQuestion, choiceQuestion } = await prepDefaultCreateData(prisma);
@@ -70,7 +76,7 @@ describe('Dialogue Topic', () => {
       customer(slug: "${workspace.slug}") {
         id
         dialogue(where: { slug: "${dialogue.slug}"}) {
-          topic(input: { 
+          topic(input: {
             impactScoreType: AVERAGE
             isRoot: true,
             value: "",
@@ -87,21 +93,20 @@ describe('Dialogue Topic', () => {
             }
           }
         }
-      }  
+      }
     }
     `,
-      undefined
-      ,
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    undefined
+    ,
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     ).then((data) => data?.customer?.dialogue.topic);
     expect(resWeekly).toMatchObject({
       nrVotes: 3,
       impactScore: 40,
     });
     const subTopics: { name: string; impactScore: number; nrVotes: number }[] = resWeekly?.subTopics;
-    console.log('SUB TOPICS: ', resWeekly?.subTopics);
     expect(resWeekly?.subTopics).toHaveLength(3);
 
     // Expect only 2 entries to be available cus one falls out of provided ate range
@@ -185,7 +190,7 @@ describe('Dialogue Topic', () => {
       customer(slug: "${workspace.slug}") {
         id
         dialogue(where: { slug: "${dialogue.slug}"}) {
-          topic(input: { 
+          topic(input: {
             impactScoreType: AVERAGE
             isRoot: false,
             value: "Facilities",
@@ -202,14 +207,14 @@ describe('Dialogue Topic', () => {
             }
           }
         }
-      }  
+      }
     }
     `,
-      undefined
-      ,
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    undefined
+    ,
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     ).then((data) => data?.customer?.dialogue.topic);
     expect(resFacilities).toMatchObject({
       name: 'Facilities',
@@ -229,7 +234,7 @@ describe('Dialogue Topic', () => {
       customer(slug: "${workspace.slug}") {
         id
         dialogue(where: { slug: "${dialogue.slug}"}) {
-          topic(input: { 
+          topic(input: {
             impactScoreType: AVERAGE
             isRoot: false,
             value: "Website",
@@ -246,14 +251,14 @@ describe('Dialogue Topic', () => {
             }
           }
         }
-      }  
+      }
     }
     `,
-      undefined
-      ,
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    undefined
+    ,
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     ).then((data) => data?.customer?.dialogue.topic);
 
     const subTopicsWebsite: { name: string; impactScore: number; nrVotes: number }[] = resWebsite?.subTopics;

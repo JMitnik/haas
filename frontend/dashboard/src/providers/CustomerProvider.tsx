@@ -1,8 +1,9 @@
 import { useHistory, useParams } from 'react-router-dom';
 import React, { useContext, useEffect, useState } from 'react';
 
-import { Customer, RoleType, SystemPermission, useGetCustomerOfUserQuery } from 'types/generated-types';
+import { Customer, Dialogue, RoleType, SystemPermission, useGetCustomerOfUserQuery } from 'types/generated-types';
 
+import { isPresent } from 'ts-is-present';
 import { useUser } from './UserProvider';
 
 const CustomerContext = React.createContext({} as CustomerContextProps);
@@ -11,6 +12,15 @@ interface CustomerProps extends Customer {
   userRole: {
     __typename?: 'RoleType' | undefined;
   } & Pick<RoleType, 'name' | 'permissions'>;
+  user?: {
+    id: string | undefined;
+    assignedDialogues?: PrivateDialogueProps | null;
+  }
+}
+
+interface PrivateDialogueProps {
+  privateWorkspaceDialogues?: ({} & Pick<Dialogue, 'title' | 'slug' | 'id'>)[];
+  assignedDialogues?: ({} & Pick<Dialogue, 'slug' | 'id'>)[];
 }
 
 interface CustomerContextProps {
@@ -18,14 +28,16 @@ interface CustomerContextProps {
   setActiveCustomer: (customer: CustomerProps | null) => void;
   activeCustomer?: CustomerProps | null;
   activePermissions?: SystemPermission[];
+  assignedDialogues?: PrivateDialogueProps | null;
 }
 
 interface CustomerProviderProps {
   children: React.ReactNode;
   workspaceOverrideSlug?: string;
+  __test__?: boolean;
 }
 
-const CustomerProvider = ({ children, workspaceOverrideSlug }: CustomerProviderProps) => {
+const CustomerProvider = ({ children, workspaceOverrideSlug, __test__ = false }: CustomerProviderProps) => {
   const { user } = useUser();
   const history = useHistory();
   const { customerSlug } = useParams<{ customerSlug: string }>();
@@ -53,7 +65,8 @@ const CustomerProvider = ({ children, workspaceOverrideSlug }: CustomerProviderP
   }, [activeCustomer]);
 
   const { loading: isLoading } = useGetCustomerOfUserQuery({
-    skip: !workspaceSlug,
+    skip: !workspaceSlug || __test__,
+    fetchPolicy: 'cache-and-network',
     variables: {
       input: {
         customerSlug: workspaceSlug,
@@ -63,6 +76,7 @@ const CustomerProvider = ({ children, workspaceOverrideSlug }: CustomerProviderP
     onCompleted: (data) => {
       const customer = data.UserOfCustomer?.customer;
       const role = data.UserOfCustomer?.role;
+      const newUser = data.UserOfCustomer?.user;
 
       if (!customer) {
         history.push('unauthorized');
@@ -77,15 +91,24 @@ const CustomerProvider = ({ children, workspaceOverrideSlug }: CustomerProviderP
 
       setActiveCustomer({
         ...customer,
+        user: newUser as any,
         userRole: role,
+        statistics: null,
       });
     },
   });
 
-  const activePermissions = [...(user?.globalPermissions || []), ...(activeCustomer?.userRole?.permissions || [])];
+  const activePermissions = [
+    ...(user?.globalPermissions?.filter(isPresent) || []),
+    ...(activeCustomer?.userRole?.permissions?.filter(isPresent) || [])];
+
+  const assignedDialogues = activeCustomer?.user?.assignedDialogues;
 
   return (
-    <CustomerContext.Provider value={{ activeCustomer, setActiveCustomer, activePermissions, isLoading }}>
+    <CustomerContext.Provider value={{
+      activeCustomer, setActiveCustomer, activePermissions, isLoading, assignedDialogues,
+    }}
+    >
       {children}
     </CustomerContext.Provider>
   );

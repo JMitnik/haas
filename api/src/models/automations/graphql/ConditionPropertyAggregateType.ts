@@ -1,4 +1,4 @@
-import { enumType } from "@nexus/schema";
+import { enumType } from 'nexus';
 
 export const ConditionPropertyAggregateType = enumType({
   name: 'ConditionPropertyAggregateType',

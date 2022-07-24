@@ -106,7 +106,7 @@ class NodeEntryService {
       create: {
         values: {
           create: nodeEntryInput?.data?.form?.values?.map((val) => ({
-            relatedField: { connect: { id: val.relatedFieldId || '-1' } },
+            relatedField: { connect: { id: val?.relatedFieldId || '-1' } },
             ...pickProperties(
               val,
               ['email', 'phoneNumber', 'url', 'shortText', 'longText', 'number'],
@@ -125,14 +125,6 @@ class NodeEntryService {
 
     if (nodeEntry.relatedNode?.type === 'CHOICE') {
       return nodeEntry.choiceNodeEntry?.value?.toLowerCase().includes(processedSearch);
-    };
-
-    if (nodeEntry.relatedNode?.type === 'REGISTRATION') {
-      return nodeEntry.registrationNodeEntry?.value?.toString().includes(processedSearch);
-    };
-
-    if (nodeEntry.relatedNode?.type === 'TEXTBOX') {
-      return nodeEntry.textboxNodeEntry?.value?.toString().includes(processedSearch);
     };
 
     return false;
@@ -182,37 +174,6 @@ class NodeEntryService {
         return nodeEntry?.choiceNodeEntry?.value;
       } catch {
         throw new Error('ChoiceNodeEntry was not included on initial retrieval.');
-      };
-    };
-
-    if (nodeEntry.relatedNode?.type === 'LINK') {
-      try {
-        return nodeEntry?.linkNodeEntry?.value;
-      } catch {
-        throw new Error('LinkNodeEntry was not included on initial retrieval.');
-      };
-    };
-
-    if (nodeEntry.relatedNode?.type === 'REGISTRATION') {
-      try {
-        return nodeEntry?.registrationNodeEntry?.value;
-      } catch {
-        throw new Error('RegistrationNodeEntry was not included on initial retrieval.');
-      };
-    };
-
-    if (nodeEntry.relatedNode?.type === 'FORM') {
-      try {
-        return nodeEntry?.formNodeEntry?.values.map((val) => Object.values(_.pick(val, [
-          'email',
-          'phoneNumber',
-          'url',
-          'shortText',
-          'longText',
-          'number',
-        ])).find(isPresent)).join(', ');
-      } catch {
-        throw new Error('RegistrationNodeEntry was not included on initial retrieval.');
       };
     };
 
@@ -309,7 +270,6 @@ class NodeEntryService {
 
   static getTextValueFromEntry = (entry: NodeEntryWithTypes): (string | null) => {
     if (entry.relatedNode?.type === 'CHOICE') return entry.choiceNodeEntry?.value || null;
-    if (entry.relatedNode?.type === 'TEXTBOX') return entry.textboxNodeEntry?.value || null;
 
     return null;
   };

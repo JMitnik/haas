@@ -13,7 +13,6 @@ const getDialoguesOfCustomer = gql`
         creationDate
         updatedAt
         customerId
-        averageScore
         customer {
           slug
         }

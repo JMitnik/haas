@@ -11,8 +11,9 @@ import { useTranslation } from 'react-i18next';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { GenericCell } from 'components/Table/CellComponents/CellComponents';
-import SearchBar from 'components/SearchBar/SearchBar';
-import ShowMoreButton from 'components/ShowMoreButton';
+import { View } from 'layouts/View';
+import SearchBar from 'components/Common/SearchBar/SearchBar';
+import ShowMoreButton from 'components/Common/ShowMoreButton';
 import Table from 'components/Table/Table';
 import deleteTriggerMutation from 'mutations/deleteTrigger';
 import getTriggerTableQuery from 'queries/getTriggerTable';
@@ -131,15 +132,16 @@ const TriggersOverview = () => {
   const { t } = useTranslation();
 
   return (
-    <>
+    <View documentTitle="haas | Alerts">
       <UI.ViewHead>
         <UI.Flex justifyContent="space-between" width="100%">
           <UI.Flex alignItems="center">
-            <UI.ViewTitle>{t('views:trigger_overview')}</UI.ViewTitle>
+            <UI.ViewTitle>
+              {t('views:trigger_overview')}
+            </UI.ViewTitle>
             <UI.Button
               onClick={handleAddUser}
-              leftIcon={Plus}
-              variantColor="teal"
+              leftIcon={() => <Plus />}
               size="sm"
               ml={4}
             >
@@ -147,8 +149,8 @@ const TriggersOverview = () => {
             </UI.Button>
           </UI.Flex>
           <SearchBar
-            activeSearchTerm={paginationProps.activeSearchTerm}
-            onSearchTermChange={handleSearchTermChange}
+            search={paginationProps.activeSearchTerm}
+            onSearchChange={handleSearchTermChange}
           />
         </UI.Flex>
       </UI.ViewHead>
@@ -217,7 +219,7 @@ const TriggersOverview = () => {
           />
         </UI.Div>
       </UI.ViewBody>
-    </>
+    </View>
   );
 };
 

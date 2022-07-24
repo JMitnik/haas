@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Button, Flex, FormControl, FormErrorMessage, FormLabel, Grid, useToast } from '@chakra-ui/core';
 import { Controller, UseFormMethods, useFieldArray } from 'react-hook-form';
+import { Flex, FormControl, FormErrorMessage, FormLabel, Grid, useToast } from '@chakra-ui/core';
 import { PlusCircle, Type } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useUploadUpsellImageMutation } from 'types/generated-types';
@@ -103,19 +103,17 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
             <UI.Div gridColumn="1 / -1">
               <Flex flexDirection="row" alignItems="center" justifyContent="space-between" marginBottom={5}>
                 <UI.H4>Links</UI.H4>
-                <Button
-                  leftIcon={PlusCircle}
+                <UI.Button
+                  leftIcon={() => <PlusCircle />}
                   onClick={() => append(appendNewField())}
                   size="sm"
                 >
                   {t('cta:add_link')}
-
-                </Button>
+                </UI.Button>
               </Flex>
               <UI.Hr />
               {linkFields.length === 0 && (
-
-                <UI.IllustrationCard isFlat svg={<NoDataIll />} text={t('no_data')} />
+                <UI.IllustrationCard svg={<NoDataIll />} text={t('no_data')} />
               )}
               <AnimatePresence>
                 {linkFields.map((link, index) => (
@@ -277,7 +275,7 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
                         </FormControl>
 
                       </Grid>
-                      <Button
+                      <UI.Button
                         mt={4}
                         variant="outline"
                         size="sm"
@@ -287,7 +285,7 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
                         }}
                       >
                         {t('cta:delete_link')}
-                      </Button>
+                      </UI.Button>
                     </UI.Div>
                   </motion.div>
                 ))}

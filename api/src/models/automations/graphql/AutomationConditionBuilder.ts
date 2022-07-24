@@ -1,4 +1,4 @@
-import { objectType } from '@nexus/schema';
+import { objectType } from 'nexus';
 import { AutomationConditionModel } from './AutomationCondition';
 import { AutomationConditionBuilderType } from './AutomationConditionBuilderType';
 
@@ -8,7 +8,7 @@ export const AutomationConditionBuilderModel = objectType({
   definition(t) {
     t.id('id');
 
-    t.string('childConditionBuilderId', { nullable: true });
+    t.nullable.string('childConditionBuilderId');
 
     t.field('type', {
       type: AutomationConditionBuilderType,
@@ -20,7 +20,6 @@ export const AutomationConditionBuilderModel = objectType({
 
     t.field('childConditionBuilder', {
       type: AutomationConditionBuilderModel,
-      nullable: true,
       resolve(parent, args, ctx) {
         if (!parent.childConditionBuilderId) return null;
         return ctx.services.automationService.findAutomationConditionBuilder(parent.childConditionBuilderId) as any;

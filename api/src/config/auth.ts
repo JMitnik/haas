@@ -82,12 +82,15 @@ const containsWorkspacePermission = (guardedPermission: SystemPermissionEnum) =>
 
 const authShield = shield({
   Query: {
+    dialogueLinks: allow,
     users: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_USERS)),
     user: or(isSelf, containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_USERS)),
   },
   Customer: {
+    dialogueConnection: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_DIALOGUE)),
     automationConnection: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_AUTOMATIONS)),
     usersConnection: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_USERS)),
+    sessionConnection: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_DIALOGUE)),
   },
   DeliveryType: {
     deliveryRecipientFirstName: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_DELIVERIES)),
@@ -107,6 +110,8 @@ const authShield = shield({
     verifyUserToken: allow,
     requestInvite: allow,
     authenticateLambda: allow,
+    resetWorkspaceData: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_RESET_WORKSPACE_DATA)),
+    assignUserToDialogues: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_ASSIGN_USERS_TO_DIALOGUE)),
     uploadUpsellImage: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
     deleteCustomer: isSuperAdmin,
     createAutomationToken: isSuperAdmin,

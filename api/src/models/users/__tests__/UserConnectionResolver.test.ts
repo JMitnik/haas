@@ -1,19 +1,19 @@
 import { Customer, PrismaClient } from '@prisma/client';
 
 import { clearDatabase } from './testUtils';
-import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
 import { expectUnauthorizedErrorOnResolver } from '../../../test/utils/expects';
 import { seedDialogue, seedUser, seedWorkspace } from '../../../test/utils/seedTestData';
 import AuthService from '../../auth/AuthService';
 import { range } from 'lodash';
-import { name, random } from 'faker';
+import { ApolloError } from 'apollo-server-express';
+import { prisma } from '../../../test/setup/singletonDeps';
 
 
 jest.setTimeout(30000);
 
-const prisma = makeTestPrisma();
 const ctx = makeTestContext(prisma);
+
 
 /**
  * Prepare the database by seeding, etc.
@@ -22,7 +22,7 @@ const ctx = makeTestContext(prisma);
  */
 const prepEnvironment = async (prisma: PrismaClient) => {
   const workspace = await seedWorkspace(prisma);
-  const dialogue = await seedDialogue(prisma, workspace.id);
+  await seedDialogue(prisma, workspace.id);
 
   return { workspace };
 }
@@ -68,37 +68,42 @@ query getPaginatedUsers($customerSlug: String!, $filter: UserConnectionFilterInp
  * @returns
  */
 const seedUsers = async (prisma: PrismaClient, workspace: Customer) => {
-    // Make 22 users: 2 Reader, 10 Admins, 10 Managers
-    const { user } = await seedUser(prisma, workspace.id, {
-      name: 'Reader',
-      permissions: { set: ['CAN_VIEW_USERS'] },
-    }, { firstName: 'John', lastName: 'Aaaa', email: 'JohnAaaa@gmail.com' });
+  // Make 22 users: 2 Reader, 10 Admins, 10 Managers
+  const { user } = await seedUser(prisma, workspace.id, {
+    name: 'Reader',
+    permissions: { set: ['CAN_VIEW_USERS'] },
+  }, { firstName: 'John', lastName: 'Aaaa', email: 'JohnAaaa@gmail.com' });
 
-    await seedUser(prisma, workspace.id, {
-      name: 'Reader',
-      permissions: { set: ['CAN_VIEW_USERS'] },
-    }, { firstName: 'Zion', lastName: 'Zzzz', email: 'Zionzzzz@gmail.com' });
+  await seedUser(prisma, workspace.id, {
+    name: 'Reader',
+    permissions: { set: ['CAN_VIEW_USERS'] },
+  }, { firstName: 'Zion', lastName: 'Zzzz', email: 'Zionzzzz@gmail.com' });
 
-    await Promise.all(range(10).map(async (i) => (
-      seedUser(prisma, workspace.id, {
-        name: 'Manager',
-        permissions: { set: ['CAN_VIEW_DIALOGUE'] },
-      })
-    )));
+  await Promise.all(range(10).map(async () => (
+    seedUser(prisma, workspace.id, {
+      name: 'Manager',
+      permissions: { set: ['CAN_VIEW_DIALOGUE'] },
+    })
+  )));
 
-    await Promise.all(range(10).map(async (i) => (
-      seedUser(prisma, workspace.id, {
-        name: 'Admin',
-        permissions: { set: ['CAN_VIEW_DIALOGUE', 'CAN_VIEW_USERS'] },
-      })
-    )));
+  await Promise.all(range(10).map(async () => (
+    seedUser(prisma, workspace.id, {
+      name: 'Admin',
+      permissions: { set: ['CAN_VIEW_DIALOGUE', 'CAN_VIEW_USERS'] },
+    })
+  )));
 
-    return user;
+  return user;
 }
 
 
 describe('UserConnection resolvers', () => {
   afterEach(async () => {
+    await clearDatabase(prisma);
+    await prisma.$disconnect();
+  });
+
+  afterAll(async () => {
     await clearDatabase(prisma);
     await prisma.$disconnect();
   });
@@ -111,10 +116,12 @@ describe('UserConnection resolvers', () => {
     try {
       await ctx.client.request(Query, {
         customerSlug: workspace.slug,
-      },{ 'Authorization': `Bearer ${token}`});
+      }, { 'Authorization': `Bearer ${token}` });
     } catch (error) {
-      expect(error.response.errors).toHaveLength(1);
-      expectUnauthorizedErrorOnResolver(error.response.errors[0], 'usersConnection');
+      if (error instanceof ApolloError) {
+        expect(error.response.errors).toHaveLength(1);
+        expectUnauthorizedErrorOnResolver(error.response.errors[0], 'usersConnection');
+      }
     }
   });
 

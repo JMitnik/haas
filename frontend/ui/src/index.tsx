@@ -14,3 +14,4 @@ export * from './Lists';
 export * from './Modal';
 export * from './Special';
 export * from './View';
+export * from './Animation';

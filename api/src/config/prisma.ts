@@ -1,4 +1,9 @@
 import { PrismaClient } from '@prisma/client';
+declare global {
+  namespace NodeJS {
+    interface Global {}
+  }
+}
 
 interface CustomNodeJsGlobal extends NodeJS.Global {
   prisma: PrismaClient;
@@ -34,7 +39,7 @@ prisma.$on('beforeExit', () => {
   console.log('Prisma: BeforeExit is being run (it is disconnecting)');
 })
 
-if (process.env.DEBUG_PRISMA) {
+if (process.env.DEBUG_PRISMA === 'true') {
   // @ts-ignore
   prisma.$on('query', (event) => {
     // @ts-ignore

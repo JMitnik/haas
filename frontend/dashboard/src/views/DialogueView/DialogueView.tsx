@@ -4,28 +4,35 @@ import {
   Activity, Award, Clipboard, Download, MessageCircle,
   ThumbsDown, ThumbsUp, TrendingDown, TrendingUp,
 } from 'react-feather';
-import { Button, Tag, TagIcon, TagLabel, useClipboard } from '@chakra-ui/core';
-import { ThemeContext } from 'styled-components';
+import { Tag, TagIcon, TagLabel, useClipboard } from '@chakra-ui/core';
 import { sub } from 'date-fns';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import QRCode from 'qrcode.react';
 import React, { useContext, useEffect, useReducer, useRef, useState } from 'react';
+import styled, { ThemeContext } from 'styled-components';
 
-import * as Popover from 'components/Common/Popover';
-import { ReactComponent as ChartbarIcon } from 'assets/icons/icon-chartbar.svg';
+import * as Popover from '@radix-ui/react-popover';
 import { GetDialogueStatisticsQuery, useGetDialogueStatisticsQuery } from 'types/generated-types';
 import { ReactComponent as PathsIcon } from 'assets/icons/icon-launch.svg';
 import { ReactComponent as QRIcon } from 'assets/icons/icon-qr.svg';
 import { ReactComponent as TrendingIcon } from 'assets/icons/icon-trending-up.svg';
 import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
 
+import { AnimatePresence, motion } from 'framer-motion';
+
+import { View } from 'layouts/View';
+import { slideUpFadeMotion } from 'components/animation/config';
 import { useNavigator } from 'hooks/useNavigator';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
 import NegativePathsModule from './Modules/NegativePathsModule/index.tsx';
 import PositivePathsModule from './Modules/PositivePathsModule/PositivePathsModule';
 import ScoreGraphModule from './Modules/ScoreGraphModule';
 import SummaryModule from './Modules/SummaryModules/SummaryModule';
+
+const Content = styled(Popover.Content)`
+  transformOrigin: var(--radix-popover-content-transform-origin);
+`;
 
 type ActiveDateType = 'last_hour' | 'last_day' | 'last_week' | 'last_month' | 'last_year';
 
@@ -136,6 +143,7 @@ interface ShareDialogueDropdownProps {
 }
 
 const ShareDialogue = ({ dialogueName, shareUrl }: ShareDialogueDropdownProps) => {
+  // @ts-ignore
   const themeContext = useContext(ThemeContext);
 
   const qrColor = themeContext.colors.primary || '#FFFFFF';
@@ -159,9 +167,8 @@ const ShareDialogue = ({ dialogueName, shareUrl }: ShareDialogueDropdownProps) =
   const { t } = useTranslation();
 
   return (
-    <>
-      <>
-        <UI.Div />
+    <UI.Card maxWidth={500}>
+      <UI.CardBody>
         <UI.Div mb={4}>
           <UI.Text fontWeight={600} fontSize="1.3rem" color="gray.700">{t('dialogue:share_qr')}</UI.Text>
           <UI.Hr />
@@ -173,9 +180,10 @@ const ShareDialogue = ({ dialogueName, shareUrl }: ShareDialogueDropdownProps) =
             </UI.Div>
             <UI.ColumnFlex alignItems="center">
               <UI.Div ref={qrContainerRef}>
+                {/* @ts-ignore */}
                 <QRCode fgColor={qrColor} value={`${shareUrl}?origin=qrc`} />
               </UI.Div>
-              <Button
+              <UI.Button
                 margin="0 auto"
                 onClick={handleDownload}
                 as="a"
@@ -185,7 +193,7 @@ const ShareDialogue = ({ dialogueName, shareUrl }: ShareDialogueDropdownProps) =
                 leftIcon={() => <Download size={12} />}
               >
                 <UI.Text ml={1}>Download</UI.Text>
-              </Button>
+              </UI.Button>
             </UI.ColumnFlex>
           </UI.Grid>
         </UI.Div>
@@ -197,7 +205,7 @@ const ShareDialogue = ({ dialogueName, shareUrl }: ShareDialogueDropdownProps) =
             <UI.Div flexGrow={1} pt={2}>
               <UI.Input
                 rightEl={(
-                  <UI.Button width="auto" size="sm" onClick={onCopy} leftIcon={Clipboard}>
+                  <UI.Button width="auto" size="sm" onClick={onCopy} leftIcon={() => <Clipboard />}>
                     {hasCopied ? 'Copied' : 'Copy'}
                   </UI.Button>
                 )}
@@ -208,8 +216,8 @@ const ShareDialogue = ({ dialogueName, shareUrl }: ShareDialogueDropdownProps) =
 
           </UI.Flex>
         </UI.Div>
-      </>
-    </>
+      </UI.CardBody>
+    </UI.Card>
   );
 };
 
@@ -225,7 +233,7 @@ const DialogueView = () => {
     compareStatisticStartDate: sub(new Date(), { weeks: 2 }),
     dateLabel: 'last_week',
   });
-  const { dialogueSlug, customerSlug, getDialoguesPath } = useNavigator();
+  const { dialogueSlug, customerSlug } = useNavigator();
   const history = useHistory();
   const { t } = useTranslation();
 
@@ -256,6 +264,7 @@ const DialogueView = () => {
       setCachedDialogueCustomer(data?.customer);
     }
   }, [data, loading]);
+  const [isShareDialogueOpen, setIsShareDialogueOpen] = useState(false);
 
   if (!cachedDialogueCustomer) return <UI.Loader />;
   const { dialogue } = cachedDialogueCustomer;
@@ -279,23 +288,40 @@ const DialogueView = () => {
   };
 
   return (
-    <>
-      <UI.ViewHead renderBreadCrumb={<UI.Breadcrumb to={getDialoguesPath()}>{t('go_to_dialogues')}</UI.Breadcrumb>}>
+    <View documentTitle="haas | Dialogue">
+      <UI.ViewHead>
         <UI.Flex alignItems="center" justifyContent="space-between" width="100%">
-          <UI.Flex alignItems="center">
-            <UI.ViewTitle leftIcon={<ChartbarIcon />}>
-              {t('views:dialogue_view')}
-            </UI.ViewTitle>
-            <Popover.Base>
-              <Popover.Trigger>
-                <UI.Button variantColor="teal" leftIcon={QRIcon} ml={4} size="sm">
+          <UI.Flex alignItems="flex-end">
+            <UI.Div mr={4}>
+              <UI.ViewTitle>
+                {t('views:dialogue_view')}
+              </UI.ViewTitle>
+              <UI.ViewSubTitle>
+                {dialogue?.title}
+              </UI.ViewSubTitle>
+            </UI.Div>
+            <Popover.Root open={isShareDialogueOpen} onOpenChange={setIsShareDialogueOpen}>
+              <Popover.Trigger asChild>
+                <UI.Button leftIcon={() => <QRIcon />} ml={4} size="sm">
                   {t('share')}
                 </UI.Button>
               </Popover.Trigger>
-              <Popover.Body hasArrow>
-                <ShareDialogue dialogueName={dialogueSlug} shareUrl={shareUrl} />
-              </Popover.Body>
-            </Popover.Base>
+              <AnimatePresence>
+                {isShareDialogueOpen && (
+                  <Content
+                    align="start"
+                    asChild
+                    forceMount
+                    forwardedAs={motion.div}
+                    {...slideUpFadeMotion}
+                  >
+                    <motion.div style={{ background: 'white' }}>
+                      <ShareDialogue dialogueName={dialogueSlug} shareUrl={shareUrl} />
+                    </motion.div>
+                  </Content>
+                )}
+              </AnimatePresence>
+            </Popover.Root>
           </UI.Flex>
 
           <UI.Flex justifyContent="space-between" flexWrap="wrap">
@@ -332,7 +358,6 @@ const DialogueView = () => {
               </UI.Skeleton>
 
               <UI.Skeleton {...fetchStatus}>
-
                 <SummaryModule
                   heading={t('dialogue:average_score')}
                   renderIcon={Award}
@@ -380,12 +405,12 @@ const DialogueView = () => {
                     <>
                       {dialogue?.statistics?.mostPopularPath?.basicSentiment === 'positive' ? (
                         <Tag size="sm" variantColor="green">
-                          <TagIcon icon={ThumbsUp} size="10px" color="green.600" />
+                          <TagIcon icon={() => <ThumbsUp />} size="10px" color="green.600" />
                           <TagLabel color="green.600">{dialogue?.statistics?.mostPopularPath?.quantity}</TagLabel>
                         </Tag>
                       ) : (
                         <Tag size="sm" variantColor="red">
-                          <TagIcon icon={ThumbsDown} size="10px" color="red.600" />
+                          <TagIcon icon={() => <ThumbsDown />} size="10px" color="red.600" />
                           <TagLabel color="red.600">{dialogue?.statistics?.mostPopularPath?.quantity}</TagLabel>
                         </Tag>
                       )}
@@ -452,7 +477,7 @@ const DialogueView = () => {
           </UI.Div>
         </UI.Grid>
       </UI.ViewBody>
-    </>
+    </View>
   );
 };
 

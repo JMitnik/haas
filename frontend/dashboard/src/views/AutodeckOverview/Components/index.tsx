@@ -1,9 +1,10 @@
-import React from 'react'
-import { format } from 'date-fns';
 import * as UI from '@haas/ui';
-import { CreateWorkspaceJobType, JobStatusType } from "types/generated-types";
-import { DeepPartial } from "types/customTypes";
 import { Clock } from 'react-feather';
+import { format } from 'date-fns';
+import React from 'react';
+
+import { CreateWorkspaceJobType, JobStatusType } from 'types/generated-types';
+import { DeepPartial } from 'types/customTypes';
 
 export const DateLabel = ({ dateString }: { dateString: string }) => {
   const date = new Date(parseInt(dateString, 10));
@@ -15,11 +16,11 @@ export const DateLabel = ({ dateString }: { dateString: string }) => {
       </UI.Icon>
       {format(date, 'MM/dd HH:mm')}
     </UI.Flex>
-  )
+  );
 };
 
 export const ProcessingStatus = ({ job }: { job: DeepPartial<CreateWorkspaceJobType> }) => {
-  const status = job.status;
+  const { status } = job;
 
   switch (status) {
     case JobStatusType.Completed: {
@@ -35,7 +36,7 @@ export const ProcessingStatus = ({ job }: { job: DeepPartial<CreateWorkspaceJobT
         <UI.Label variantColor="blue">
           {status}
         </UI.Label>
-      )
+      );
     }
 
     case JobStatusType.Failed: {
@@ -43,7 +44,7 @@ export const ProcessingStatus = ({ job }: { job: DeepPartial<CreateWorkspaceJobT
         <UI.Label variantColor="red">
           {status}
         </UI.Label>
-      )
+      );
     }
 
     case JobStatusType.InPhotoshopQueue: {
@@ -51,7 +52,7 @@ export const ProcessingStatus = ({ job }: { job: DeepPartial<CreateWorkspaceJobT
         <UI.Label variantColor="purple">
           {status}
         </UI.Label>
-      )
+      );
     }
 
     case JobStatusType.Processing: {
@@ -59,13 +60,13 @@ export const ProcessingStatus = ({ job }: { job: DeepPartial<CreateWorkspaceJobT
         <UI.Label variantColor="pink">
           {status}
         </UI.Label>
-      )
+      );
     }
 
     default: {
       return (
         <UI.Label variantColor="yellow">{status}</UI.Label>
-      )
+      );
     }
   }
-}
+};

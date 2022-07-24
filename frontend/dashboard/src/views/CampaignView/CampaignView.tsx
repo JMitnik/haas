@@ -1,14 +1,13 @@
 import * as UI from '@haas/ui';
 import { Calendar, Plus, Search, Settings, User } from 'react-feather';
-import { Route, Switch, useLocation } from 'react-router';
 import { endOfDay, startOfDay } from 'date-fns';
 import { union } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
 import * as Menu from 'components/Common/Menu';
+import * as Modal from 'components/Common/Modal';
 import * as Table from 'components/Common/Table';
-import { AnimatePresence, motion } from 'framer-motion';
 import { BooleanParam, DateTimeParam, NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
 import {
   DeliveryConnectionOrder, DeliveryFragmentFragment,
@@ -24,8 +23,9 @@ import { TabbedMenu } from 'components/Common/TabMenu';
 import { formatSimpleDate } from 'utils/dateUtils';
 import { useLogger } from 'hooks/useLogger';
 import { useMenu } from 'components/Common/Menu/useMenu';
+import { useRouteModal } from 'components/Common/Modal';
 import CreateCampaignForm, { CampaignFormProps } from 'views/CampaignsView/CreateCampaignForm';
-import Searchbar from 'components/SearchBar';
+import Searchbar from 'components/Common/SearchBar';
 
 import { CampaignType } from './CampaignViewTypes';
 import { DeliveryModalCard } from './DeliveryModalCard';
@@ -42,9 +42,9 @@ const campaignToForm = (campaign: CampaignType): CampaignFormProps => ({
     dialogue: { label: variant.dialogue.title, value: variant.dialogue.id },
     from: variant.from || '',
     label: variant.label,
-    type: variant.type,
+    type: variant.type!,
     weight: variant.weight,
-  })),
+  })) as any,
 });
 
 export const CampaignView = () => {
@@ -52,9 +52,8 @@ export const CampaignView = () => {
   const [isOpenSettingsModal, setIsOpenSettingsModal] = useState(false);
   const { t } = useTranslation();
   const logger = useLogger();
-  const location = useLocation();
 
-  const { customerSlug, campaignId, getCampaignsPath, goToCampaignView, goToDeliveryView } = useNavigator();
+  const { customerSlug, campaignId, getCampaignsPath } = useNavigator();
   const campaignsPath = getCampaignsPath();
 
   const [filter, setFilter] = useQueryParams({
@@ -178,6 +177,16 @@ export const CampaignView = () => {
 
   const { openMenu, closeMenu, menuProps, activeItem } = useMenu<DeliveryFragmentFragment>();
 
+  const [
+    openDeliveryModal,
+    closeDeliveryModal,
+    isOpenDeliveryModal,
+    params,
+  ] = useRouteModal<{ campaignId: string, deliveryId: string }>({
+    matchUrlKey: ROUTES.DELIVERY_VIEW,
+    exitUrl: `/dashboard/b/${customerSlug}/campaign/${campaignId}`,
+  });
+
   return (
     <>
       <UI.ViewHead>
@@ -185,9 +194,9 @@ export const CampaignView = () => {
           <UI.Stack>
             <UI.Breadcrumb to={campaignsPath}>{t('back_to_campaigns')}</UI.Breadcrumb>
             <UI.Stack isInline alignItems="center" spacing={4}>
-              <UI.ViewTitle>{campaign?.label}</UI.ViewTitle>
+              <UI.DeprecatedViewTitle>{campaign?.label}</UI.DeprecatedViewTitle>
               <UI.Button
-                leftIcon={Plus}
+                leftIcon={() => <Plus />}
                 onClick={() => setIsOpenImportModal(true)}
                 size="sm"
                 variantColor="teal"
@@ -198,7 +207,7 @@ export const CampaignView = () => {
           </UI.Stack>
 
           <UI.Button
-            leftIcon={Settings}
+            leftIcon={() => <Settings />}
             size="md"
             variant="outline"
             onClick={() => setIsOpenSettingsModal(true)}
@@ -211,7 +220,7 @@ export const CampaignView = () => {
       <UI.ViewBody>
         <UI.Div>
           <UI.Flex mb={2}>
-            <PickerButton arrowBg="gray.50" label={t('add_filter')} icon={(<Plus />)}>
+            <PickerButton label={t('add_filter')} icon={(<Plus />)}>
               {() => (
                 <TabbedMenu
                   menuHeader={t('add_filter')}
@@ -226,8 +235,8 @@ export const CampaignView = () => {
                       {t('filter_by_search')}
                     </UI.RadioHeader>
                     <Searchbar
-                      activeSearchTerm={filter.search}
-                      onSearchTermChange={handleSearchChange}
+                      search={filter.search}
+                      onSearchChange={handleSearchChange}
                     />
                   </UI.Div>
 
@@ -252,8 +261,8 @@ export const CampaignView = () => {
                           {t('filter_by_recipient_first_name')}
                         </UI.RadioHeader>
                         <Searchbar
-                          activeSearchTerm={filter.recipientFirstName}
-                          onSearchTermChange={handleRecipientFirstName}
+                          search={filter.recipientFirstName}
+                          onSearchChange={handleRecipientFirstName}
                         />
                       </UI.Div>
                       <UI.Div>
@@ -261,8 +270,8 @@ export const CampaignView = () => {
                           {t('filter_by_recipient_last_name')}
                         </UI.RadioHeader>
                         <Searchbar
-                          activeSearchTerm={filter.recipientLastName}
-                          onSearchTermChange={handleRecipientLastName}
+                          search={filter.recipientLastName}
+                          onSearchChange={handleRecipientLastName}
                         />
                       </UI.Div>
                       <UI.Div>
@@ -270,8 +279,8 @@ export const CampaignView = () => {
                           {t('filter_by_recipient_email')}
                         </UI.RadioHeader>
                         <Searchbar
-                          activeSearchTerm={filter.recipientEmail}
-                          onSearchTermChange={handleRecipientEmail}
+                          search={filter.recipientEmail}
+                          onSearchChange={handleRecipientEmail}
                         />
                       </UI.Div>
                       <UI.Div>
@@ -279,8 +288,8 @@ export const CampaignView = () => {
                           {t('filter_by_recipient_phone')}
                         </UI.RadioHeader>
                         <Searchbar
-                          activeSearchTerm={filter.recipientPhone}
-                          onSearchTermChange={handleRecipientPhone}
+                          search={filter.recipientPhone}
+                          onSearchChange={handleRecipientPhone}
                         />
                       </UI.Div>
                     </UI.Stack>
@@ -354,23 +363,29 @@ export const CampaignView = () => {
                 <Menu.Item
                   onClick={() => handleMultiDateFilterChange(undefined, new Date(activeItem?.updatedAt))}
                 >
-                  {t('before_day_of')}
-                  {' '}
-                  {formatSimpleDate(activeItem?.updatedAt)}
+                  <>
+                    {t('before_day_of')}
+                    {' '}
+                    {formatSimpleDate(activeItem?.updatedAt)}
+                  </>
                 </Menu.Item>
                 <Menu.Item
                   onClick={() => handleSingleDateFilterChange(activeItem?.updatedAt)}
                 >
-                  {t('on_day_of')}
-                  {' '}
-                  {formatSimpleDate(activeItem?.updatedAt)}
+                  <>
+                    {t('on_day_of')}
+                    {' '}
+                    {formatSimpleDate(activeItem?.updatedAt)}
+                  </>
                 </Menu.Item>
                 <Menu.Item
                   onClick={() => handleMultiDateFilterChange(new Date(activeItem?.updatedAt), undefined)}
                 >
-                  {t('after_day_of')}
-                  {' '}
-                  {formatSimpleDate(activeItem?.updatedAt)}
+                  <>
+                    {t('after_day_of')}
+                    {' '}
+                    {formatSimpleDate(activeItem?.updatedAt)}
+                  </>
                 </Menu.Item>
               </Menu.SubMenu>
               <Menu.SubMenu label={(
@@ -444,32 +459,32 @@ export const CampaignView = () => {
                 {t('last_update')}
               </Table.HeadingCell>
             </Table.HeadingRow>
-            {deliveryConnection?.deliveries.map((delivery) => (
+            {deliveryConnection?.deliveries?.map((delivery) => (
               <Table.Row
-                onClick={() => goToDeliveryView(campaignId, delivery.id)}
+                onClick={() => openDeliveryModal({ campaignId, deliveryId: delivery.id })}
                 isLoading={isLoading}
-                key={delivery.id}
+                key={delivery!.id!}
                 gridTemplateColumns={columns}
-                onContextMenu={(e) => openMenu(e, delivery)}
+                onContextMenu={(e) => openMenu(e, delivery!)}
               >
                 <Table.Cell>
-                  <DeliveryRecipient delivery={delivery} />
+                  <DeliveryRecipient delivery={delivery!} />
                 </Table.Cell>
                 <Table.Cell>
-                  <DeliveryRecipientAddress delivery={delivery} />
+                  <DeliveryRecipientAddress delivery={delivery!} />
                 </Table.Cell>
                 <Table.Cell>
                   <Table.InnerCell>
                     <UI.Helper>
-                      {delivery.campaignVariant?.label}
+                      {delivery!.campaignVariant?.label}
                     </UI.Helper>
                   </Table.InnerCell>
                 </Table.Cell>
                 <Table.Cell>
-                  <DeliveryStatus delivery={delivery} />
+                  <DeliveryStatus delivery={delivery!} />
                 </Table.Cell>
                 <Table.Cell>
-                  <FormatTimestamp timestamp={delivery.updatedAt} />
+                  <FormatTimestamp timestamp={delivery!.updatedAt} />
                 </Table.Cell>
               </Table.Row>
             ))}
@@ -486,59 +501,37 @@ export const CampaignView = () => {
           />
         </UI.Flex>
 
-        <UI.Modal isOpen={isOpenImportModal} onClose={() => setIsOpenImportModal(false)}>
-          <UI.ModalCard maxWidth={1200} onClose={() => setIsOpenImportModal(false)}>
-            <UI.ModalBody>
+        <Modal.Root open={isOpenImportModal} onClose={() => setIsOpenImportModal(false)}>
+          <UI.Card>
+            <UI.CardBody>
               <ImportDeliveriesForm
                 onComplete={() => refetch()}
                 onClose={() => setIsOpenImportModal(false)}
               />
-            </UI.ModalBody>
-          </UI.ModalCard>
-        </UI.Modal>
+            </UI.CardBody>
+          </UI.Card>
+        </Modal.Root>
 
-        {!!campaign && (
-          <UI.Modal isOpen={isOpenSettingsModal} onClose={() => setIsOpenSettingsModal(false)}>
-            <UI.ModalCard maxWidth={1200} onClose={() => setIsOpenSettingsModal(false)}>
-              <UI.ModalBody>
+        <Modal.Root open={isOpenSettingsModal} onClose={() => setIsOpenSettingsModal(false)}>
+          <UI.Card>
+            <UI.CardBody>
+              {campaign && (
                 <CreateCampaignForm
                   onClose={() => setIsOpenSettingsModal(false)}
-                  // @ts-ignore
+                      // @ts-ignore
                   campaign={campaignToForm(campaign)}
                   isReadOnly
                 />
-              </UI.ModalBody>
-            </UI.ModalCard>
-          </UI.Modal>
-        )}
-
-        <AnimatePresence>
-          <Switch
-            location={location}
-            key={location.pathname}
-          >
-            <Route
-              path={ROUTES.DELIVERY_VIEW}
-            >
-              {({ match }) => (
-                <motion.div
-                  key={location.pathname}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <UI.Modal isOpen onClose={() => goToCampaignView(campaignId)}>
-                    <DeliveryModalCard
-                      onClose={() => goToCampaignView(campaignId)}
-                      // @ts-ignore
-                      id={match?.params?.deliveryId}
-                    />
-                  </UI.Modal>
-                </motion.div>
               )}
-            </Route>
-          </Switch>
-        </AnimatePresence>
+            </UI.CardBody>
+          </UI.Card>
+        </Modal.Root>
+
+        <Modal.Root open={isOpenDeliveryModal} onClose={closeDeliveryModal}>
+          <DeliveryModalCard
+            id={params?.deliveryId}
+          />
+        </Modal.Root>
       </UI.ViewBody>
     </>
   );

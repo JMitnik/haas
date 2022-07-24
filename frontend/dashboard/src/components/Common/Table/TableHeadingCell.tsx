@@ -39,11 +39,15 @@ export const HeadingCell = ({ children, sorting, descending = true, onDescendCha
 
     {!!onDescendChange && (
       <UI.Icon ml={2} width="21px" display="block">
-        <IconSortUp onClick={() => onDescendChange?.(false)} className={sorting && !descending ? 'active' : ''} />
+        <IconSortUp
+          onClick={() => onDescendChange?.(false)}
+          className={sorting && !descending ? 'active' : ''}
+          style={{ cursor: 'pointer' }}
+        />
         <IconSortDown
           onClick={() => onDescendChange?.(true)}
           className={sorting && descending ? 'active' : ''}
-          style={{ marginTop: '-8px' }}
+          style={{ marginTop: '-8px', cursor: 'pointer' }}
         />
       </UI.Icon>
     )}

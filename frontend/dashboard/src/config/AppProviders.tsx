@@ -1,6 +1,7 @@
 import { ApolloProvider } from '@apollo/client';
-import { ErrorBoundary } from '@sentry/react';
+import { ErrorBoundary } from 'react-error-boundary';
 import { I18nextProvider } from 'react-i18next';
+import { ModalProvider } from 'react-modal-hook';
 import { QueryParamProvider } from 'use-query-params';
 import { Route, BrowserRouter as Router } from 'react-router-dom';
 import React from 'react';
@@ -8,6 +9,7 @@ import React from 'react';
 import { AppContainer } from 'styles/AppStyles';
 import { DefaultThemeProviders } from 'providers/ThemeProvider';
 import { GlobalErrorFallback } from 'components/Error/GlobalErrorFallback';
+import { ScrollToTop } from 'components/Utilities/ScrollToTop';
 import UserProvider from 'providers/UserProvider';
 
 import GlobalStyle from './global-styles';
@@ -20,18 +22,21 @@ import lang from './i18n-config';
 export const AppProviders = ({ children }: { children: React.ReactNode }) => (
   <I18nextProvider i18n={lang}>
     <Router>
-      <ErrorBoundary fallback={GlobalErrorFallback}>
+      <ScrollToTop />
+      <ErrorBoundary FallbackComponent={GlobalErrorFallback}>
         <ApolloProvider client={client}>
           <DefaultThemeProviders>
             <UserProvider>
-              <AppContainer>
-                <QueryParamProvider ReactRouterRoute={Route}>
-                  <ErrorBoundary fallback={GlobalErrorFallback}>
-                    {children}
-                  </ErrorBoundary>
-                </QueryParamProvider>
-              </AppContainer>
-              <GlobalStyle />
+              <ModalProvider>
+                <AppContainer>
+                  <QueryParamProvider ReactRouterRoute={Route}>
+                    <>
+                      {children}
+                    </>
+                  </QueryParamProvider>
+                </AppContainer>
+                <GlobalStyle />
+              </ModalProvider>
             </UserProvider>
           </DefaultThemeProviders>
         </ApolloProvider>

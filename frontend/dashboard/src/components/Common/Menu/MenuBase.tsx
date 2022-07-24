@@ -62,7 +62,7 @@ interface MenuBaseProps {
   state?: MenuState;
 }
 
-const MotionControlledMenu = motion.custom(ControlledMenu);
+const MotionControlledMenu = motion(ControlledMenu);
 
 export const Base = ({ children, ...menuProps }: MenuBaseProps) => (
   <MenuContainer>

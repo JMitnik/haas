@@ -1,12 +1,11 @@
-import { inputObjectType, mutationField, objectType, queryField, unionType } from '@nexus/schema';
+import { inputObjectType, mutationField, objectType, queryField } from 'nexus';
+import { ApolloError } from 'apollo-server-express';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
-import { ApolloError, AuthenticationError, UserInputError } from 'apollo-server-express';
-import { UserInput, UserType } from '../users/graphql/User';
+import { UserType } from '../users/graphql/User';
 import { mailService } from '../../services/mailings/MailService';
 import AuthService from './AuthService';
-import UserService from '../users/UserService';
 import makeSignInTemplate from '../../services/mailings/templates/makeSignInTemplate';
-import prisma from '../../config/prisma';
 import verifyAndDecodeToken from './verifyAndDecodeToken';
 import { APIContext } from '../../types/APIContext';
 
@@ -15,11 +14,11 @@ export const RegisterInput = inputObjectType({
   description: 'Registration credentials',
 
   definition(t) {
-    t.string('email', { required: true });
-    t.string('password', { required: true });
-    t.string('firstName', { required: true });
-    t.string('lastName', { required: true });
-    t.string('customerId', { required: true });
+    t.nonNull.string('email');
+    t.nonNull.string('password');
+    t.nonNull.string('firstName');
+    t.nonNull.string('lastName');
+    t.nonNull.string('customerId');
 
     t.string('roleId');
   },
@@ -35,13 +34,13 @@ export const AuthenticateLambdaInput = inputObjectType({
 
 export const AuthenticateLambda = mutationField('authenticateLambda', {
   type: 'String',
-  nullable: true,
   args: { input: AuthenticateLambdaInput },
   async resolve(parent, args, ctx) {
     const authorizationHeader = ctx.req.headers['lambda'];
-    if (!authorizationHeader) throw new Error('No authorization header available');
-    if (!args.input?.authenticateEmail) throw new Error('No authenticate email provided');
-    if (!args.input?.workspaceEmail) throw new Error('No workspace email provided');
+    if (!authorizationHeader) throw new GraphQLYogaError('No authorization header available');
+    if (!args.input?.authenticateEmail) throw new GraphQLYogaError('No authenticate email provided');
+    if (!args.input?.workspaceEmail) throw new GraphQLYogaError('No workspace email provided');
+
     const token = await ctx.services.authService.getWorkspaceAuthorizationToken(
       authorizationHeader,
       args.input.workspaceEmail
@@ -52,18 +51,16 @@ export const AuthenticateLambda = mutationField('authenticateLambda', {
 
 export const CreateAutomationToken = mutationField('createAutomationToken', {
   type: 'String',
-  nullable: true,
   args: { 'email': 'String' },
 
   async resolve(parent, args, ctx) {
-    if (!args.email) throw new ApolloError('No email address provided!');
+    if (!args.email) throw new GraphQLYogaError('No email address provided!');
     return ctx.services.authService.createAutomationToken(args.email, 262974);
   },
 });
 
 export const RegisterMutation = mutationField('register', {
   type: 'String',
-  nullable: true,
   args: { input: RegisterInput },
 
   async resolve(parent, args, ctx) {
@@ -81,7 +78,7 @@ export const LoginInput = inputObjectType({
   description: 'Login credential',
 
   definition(t) {
-    t.string('email', { required: true });
+    t.nonNull.string('email');
   },
 });
 
@@ -113,18 +110,19 @@ export const VerifyUserTokenMutation = mutationField('verifyUserToken', {
   args: { token: 'String' },
 
   async resolve(parent, args, ctx) {
-    if (!args.token) throw new UserInputError('No token could be found');
+    if (!args.token) throw new GraphQLYogaError('No token could be found');
+
     const decodedToken = verifyAndDecodeToken(args.token) as any;
     const validUsers = await ctx.services.userService.getValidUsers(args.token, decodedToken?.id)
 
     // Check edge cases
-    if (!validUsers.length) throw new ApolloError('No token has been found for this user');
-    if (validUsers.length > 1) throw new Error('Internal server error. Please try again later');
+    if (!validUsers.length) throw new GraphQLYogaError('No token has been found for this user');
+    if (validUsers.length > 1) throw new GraphQLYogaError('Internal server error. Please try again later');
 
     // Check whether expiration-date is still valid.
     const [validUser] = validUsers;
 
-    if (!decodedToken.exp) throw new ApolloError('Your token is invalid. Please request a new token.');
+    if (!decodedToken.exp) throw new GraphQLYogaError('Your token is invalid. Please request a new token.');
     if (new Date(decodedToken.exp) > new Date(Date.now())) throw new ApolloError('Your token has expired. Please request a new token.');
 
     const minutesInAMonth = 43000;
@@ -159,35 +157,34 @@ export const InviteUserOutput = objectType({
 export const InviteUserInput = inputObjectType({
   name: 'InviteUserInput',
   definition(t) {
-    t.string('roleId', { required: true });
-    t.string('email', { required: true });
-    t.string('customerId', { required: true });
+    t.nonNull.string('roleId');
+    t.nonNull.string('email');
+    t.nonNull.string('customerId');
   },
 });
 
 export const RequestInviteInput = inputObjectType({
   name: 'RequestInviteInput',
   definition(t) {
-    t.string('email', { required: true });
+    t.nonNull.string('email');
   },
 });
 
 export const RequestInviteOutput = objectType({
   name: 'RequestInviteOutput',
-
   definition(t) {
     t.boolean('didInvite');
     t.boolean('userExists');
+    t.string('loginToken');
   },
 });
 
 export const RequestInviteMutation = mutationField('requestInvite', {
   type: RequestInviteOutput,
   args: { input: RequestInviteInput },
-
+  nullable: true,
   async resolve(parent, args, ctx) {
-    if (!args?.input?.email) throw new UserInputError('No email provided');
-
+    if (!args?.input?.email) throw new GraphQLYogaError('No email provided');
     const user = await ctx.services.userService.getUserByEmail(args.input.email);
 
     if (!user) return { didInvite: false, userExists: false };
@@ -209,6 +206,7 @@ export const RequestInviteMutation = mutationField('requestInvite', {
     return {
       didInvite: true,
       userExists: true,
+      loginToken: loginToken,
     };
   },
 });
@@ -225,7 +223,7 @@ export const RefreshAccessTokenQuery = queryField('refreshAccessToken', {
   type: RefreshAccessTokenOutput,
 
   async resolve(parent, args, ctx) {
-    if (!ctx.session?.user?.id) throw new ApolloError('No verified user');
+    if (!ctx.session?.user?.id) throw new GraphQLYogaError('No verified user');
     const refreshTokenIsValid = await ctx.services.authService.verifyUserRefreshToken(ctx.session.user?.id);
 
     if (!refreshTokenIsValid) {
@@ -246,7 +244,7 @@ export const LogoutMutation = mutationField('logout', {
   type: 'String',
 
   async resolve(parent, args, ctx) {
-    if (!ctx.session?.user?.id) throw new ApolloError('No user found');
+    if (!ctx.session?.user?.id) throw new GraphQLYogaError('No user found');
     Promise.resolve(ctx.res.header('refresh_token', null))
       .catch((e) => console.log('Error removing refresh token: ', e));
     await ctx.services.userService.logout(ctx.session.user.id);
@@ -261,7 +259,7 @@ export const InviteUserMutation = mutationField('inviteUser', {
   args: { input: InviteUserInput },
 
   async resolve(parent, args, ctx: APIContext) {
-    if (!args.input) throw new UserInputError('No input provided');
+    if (!args.input) throw new GraphQLYogaError('No input provided');
     const { customerId, email, roleId } = args.input;
 
     // Check if email already has been created

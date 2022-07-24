@@ -1,15 +1,12 @@
-import { addDays, format } from 'date-fns';
-import { uniqueId } from 'lodash';
+import { format } from 'date-fns';
 import { UserInputError } from 'apollo-server-express';
 
 import prisma from '../../config/prisma';
-import AWS from '../../config/aws';
 import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
-import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
-import { CampaignVariantTypeEnum, Prisma, PrismaClient } from '@prisma/client';
+import { FindManyCallBackProps, PaginateProps, paginate } from '../Common/Pagination/pagination';
+import { Prisma, PrismaClient } from '@prisma/client';
 import { CampaignPrismaAdapter } from './CampaignPrismaAdapter';
 import { CampaignVariant, CampaignWithVariants, CSVDeliveryRow, DeliveryCSVProcessRecord, DeliveryInput, DeliveryOptionsProps, DeliveryUpdateItemProps, ErroredRecord, ValidateDeliveryRecordsResults } from './CampaignTypes';
-import { parseCsv } from '../../utils/parseCsv';
 import { nanoid } from 'nanoid';
 import { probability } from '../../utils/probability';
 import mustache from 'mustache';
@@ -111,7 +108,7 @@ export class CampaignService {
   }
 
   validateCampaignEdges = (input: NexusGenInputs['CreateCampaignInputType']) => {
-    const weights = input.variants?.map((variant) => variant.weight).filter(isPresent) || [];
+    const weights = input.variants?.map((variant) => variant?.weight).filter(isPresent) || [];
     const totalWeight = weights?.reduce((total, weight) => total + weight);
 
     // Since approximation, let's do it like this
@@ -135,7 +132,7 @@ export class CampaignService {
     return {
       deliveries,
       totalPages,
-      pageInfo
+      pageInfo,
     };
   };
 
@@ -155,7 +152,7 @@ export class CampaignService {
         campaignId,
         currentStatus: deliveryOptions?.status || undefined,
         campaignVariant: (!!deliveryOptions || undefined) && {
-          id: deliveryOptions?.variantId
+          id: deliveryOptions?.variantId,
         },
       },
     };
@@ -165,10 +162,10 @@ export class CampaignService {
       include: {
         events: {
           orderBy: {
-            createdAt: 'asc'
-          }
-        }
-      }
+            createdAt: 'asc',
+          },
+        },
+      },
     });
     const countDeliveriesCallback = async ({ props: countArgs }: FindManyCallBackProps) => this.prisma.delivery.count(countArgs);
 
@@ -181,10 +178,10 @@ export class CampaignService {
       },
       countArgs: {
         countCallBack: countDeliveriesCallback,
-        countWhereInput: deliveryFilterOptions
+        countWhereInput: deliveryFilterOptions,
       },
       paginationOpts: paginationOptions,
-      useSlice: false
+      useSlice: false,
     };
 
     return paginate<GenericModelType>(deliveryPaginationOptions);
@@ -201,7 +198,7 @@ export class CampaignService {
       nrTotal: deliveries.length,
       nrFinished: deliveries.filter(entry => entry.currentStatus === 'FINISHED').length,
       nrOpened: deliveries.filter(entry => entry.currentStatus === 'OPENED' || entry.currentStatus === 'FINISHED').length,
-      nrSent: deliveries.filter(entry => entry.currentStatus === 'DEPLOYED' || entry.currentStatus === 'SENT').length
+      nrSent: deliveries.filter(entry => entry.currentStatus === 'DEPLOYED' || entry.currentStatus === 'SENT').length,
     }
   }
 
@@ -264,22 +261,22 @@ export class CampaignService {
         {
           key: 'DeliveryDate',
           value: record.scheduleKey || '',
-          type: 'string'
+          type: 'string',
         },
         {
           key: 'DeliveryDate_DeliveryID',
           value: record.scheduleKeyId || '',
-          type: 'string'
+          type: 'string',
         },
         {
           key: 'DeliveryRecipient',
           type: 'string',
-          value: (record.variant?.type === 'EMAIL' ? record.email : record.phoneNumber) || ''
+          value: (record.variant?.type === 'EMAIL' ? record.email : record.phoneNumber) || '',
         },
         {
           key: 'DeliveryBody',
           type: 'string',
-          value: record.body || ''
+          value: record.body || '',
         },
         {
           key: 'DeliveryFrom',
@@ -294,19 +291,19 @@ export class CampaignService {
         {
           key: 'DeliveryType',
           type: 'string',
-          value: record.variant?.type || ''
+          value: record.variant?.type || '',
         },
         {
           key: 'callback',
           type: 'string',
-          value: callbackUrl || ''
+          value: callbackUrl || '',
         },
         {
           key: 'phoneNumber',
           type: 'string',
-          value: record.phoneNumber || ''
+          value: record.phoneNumber || '',
         },
-      ]
+      ],
     })), { tableName });
   };
 
@@ -321,15 +318,15 @@ export class CampaignService {
         where: { id },
         data: {
           currentStatus: delivery.newStatus,
-        }
+        },
       });
 
       const newEvent = prisma.deliveryEvents.create({
         data: {
           status: delivery.newStatus,
           Delivery: { connect: { id } },
-          failureMessage: delivery?.failureMessage || undefined
-        }
+          failureMessage: delivery?.failureMessage || undefined,
+        },
       });
 
       return [updateDelivery, newEvent];
@@ -375,7 +372,7 @@ export class CampaignService {
         lastName: record.lastName,
         phoneNumber: record.phone,
         prefix: record.prefix || '',
-        ...customVariables
+        ...customVariables,
       });
     });
 
@@ -423,7 +420,7 @@ export class CampaignService {
         dialogueUrl,
         dialogueName: variant?.dialogue?.title || '',
         workspaceName: variant?.workspace?.name || '',
-        ...customVariables
+        ...customVariables,
       });
 
       const from = variant.from;

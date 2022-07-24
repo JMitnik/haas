@@ -1,9 +1,12 @@
+/* eslint-disable react/destructuring-assignment */
+
 import * as UI from '@haas/ui';
 import { Plus } from 'react-feather';
 import { components } from 'react-select';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect, useState } from 'react';
 
+import * as Modal from 'components/Common/Modal';
 import {
   CreateCallToActionModalCard,
 } from 'views/DialogueBuilderView/components/QuestionEntryForm/CreateCallToActionModalCard';
@@ -64,6 +67,7 @@ interface NodeSelect extends Partial<QuestionNode> {
 }
 
 interface NodePickerProps {
+  // eslint-disable-next-line react/no-unused-prop-types
   questionId: string | number;
   onChange: (node: NodeSelect) => void;
   items: NodeSelect[];
@@ -82,8 +86,8 @@ export const NodePicker = ({ onChange, onClose, items, onModalOpen, onModalClose
     onChange({
       id: callToAction.id,
       type: callToAction.type,
-      label: callToAction.title,
-      value: callToAction.id,
+      label: callToAction.title!,
+      value: callToAction.id!,
     });
     setCreateModalIsOpen(false);
     onClose?.();
@@ -116,7 +120,7 @@ export const NodePicker = ({ onChange, onClose, items, onModalOpen, onModalClose
         <UI.ListHeader style={{ borderBottom: 0 }}>{t('call_to_action')}</UI.ListHeader>
 
         <UI.Button
-          leftIcon={Plus}
+          leftIcon={() => <Plus />}
           variantColor="teal"
           ml={0}
           size="xs"
@@ -188,14 +192,14 @@ export const NodePicker = ({ onChange, onClose, items, onModalOpen, onModalClose
         </UI.Div>
       </UI.ListItem>
 
-      <UI.Modal willCloseOnOutsideClick={false} isOpen={createModalIsOpen} onClose={() => setCreateModalIsOpen(false)}>
+      <Modal.Root open={createModalIsOpen} onClose={() => setCreateModalIsOpen(false)}>
         <CreateCallToActionModalCard
           onClose={() => setCreateModalIsOpen(false)}
           onSuccess={(callToAction: any) => {
             handleChange(callToAction);
           }}
         />
-      </UI.Modal>
+      </Modal.Root>
     </UI.List>
   );
 };
