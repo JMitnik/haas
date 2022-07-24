@@ -40,7 +40,6 @@ export const ImageContainer = styled(UI.Div)`
     max-height: 200px;
     object-fit: contain;
   }
-  
 `;
 
 interface RedirectButtonProps {
@@ -71,7 +70,7 @@ export const RedirectButton = styled.a<RedirectButtonProps>`
     }
 
     ${overrideBackgroundColor && css`
-      background: linear-gradient(45deg, ${Color(overrideBackgroundColor).lighten(0.3).hex()}, ${Color(overrideBackgroundColor).lighten(0.3).saturate(1).hex()}); 
+      background: linear-gradient(45deg, ${Color(overrideBackgroundColor).lighten(0.3).hex()}, ${Color(overrideBackgroundColor).lighten(0.3).saturate(1).hex()});
       font-family: 'Inter', sans-serif;
       color: ${Color(overrideBackgroundColor).isDark() ? Color(overrideBackgroundColor).mix(Color('white'), 0.8).saturate(1).hex() : Color(overrideBackgroundColor).mix(Color('black'), 0.5).saturate(1).hex()};
 
@@ -102,7 +101,7 @@ export const RedirectButton = styled.a<RedirectButtonProps>`
 
 export const ButtonIconContainer = styled(UI.Div) <RedirectButtonProps>`
    //TODO: Adjust color of custom icon using inverse CSS property (?)
-   ${({ theme, overrideBackgroundColor }) => css`    
+   ${({ theme, overrideBackgroundColor }) => css`
       img {
         color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.8).saturate(1).hex() : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
         width: 24px;
@@ -115,7 +114,7 @@ export const ButtonIconContainer = styled(UI.Div) <RedirectButtonProps>`
         height: auto;
       }
 
-      ${overrideBackgroundColor && css` 
+      ${overrideBackgroundColor && css`
         img {
           color: ${Color(overrideBackgroundColor).isDark() ? Color(overrideBackgroundColor).mix(Color('white'), 0.8).saturate(1).hex() : Color(overrideBackgroundColor).mix(Color('black'), 0.5).saturate(1).hex()};
           width: 24px;
