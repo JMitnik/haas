@@ -6,10 +6,6 @@ import ExpressPlugin from 'fastify-express';
 import MultiPartPlugin from 'fastify-multipart';
 import CookiePlugin from 'fastify-cookie';
 import { processRequest } from 'graphql-upload';
-import fs from 'fs';
-import https from 'https';
-import cookieParser from 'cookie-parser';
-import cors, { CorsOptions } from 'cors';
 import express from 'express';
 import { graphqlUploadExpress } from 'graphql-upload';
 
@@ -61,7 +57,7 @@ export const makeServer = async (port: number, prismaClient: PrismaClient) => {
   app.use(express.json());
   const apollo = await makeApollo(prismaClient, app);
   await apollo.start();
-  await app.register(apollo.createHandler({ cors: false }));
+  // await app.register(apollo.createHandler({ cors: false }));
   await app.listen(port);
   logger.logLifeCycle('Started the server!');
   // app.use('/graphql', apollo)
