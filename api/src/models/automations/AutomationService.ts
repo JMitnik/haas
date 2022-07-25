@@ -764,23 +764,24 @@ class AutomationService {
    * @returns a validated AutomationCondition input list
    * @throws UserInputError if not all information is required
    */
-  validateCreateAutomationConditionsInput = (input: NexusGenInputs['CreateAutomationInput']): Required<NexusGenInputs['CreateAutomationCondition'][]> => {
-    if (input.conditionBuilder?.conditions?.length === 0) throw new UserInputError('No conditions provided for automation');
+  // TODO: Re-implement later DONT REMOVE
+  // validateCreateAutomationConditionsInput = (input: NexusGenInputs['CreateAutomationInput']): Required<NexusGenInputs['CreateAutomationCondition'][]> => {
+  //   if (input.conditionBuilder?.conditions?.length === 0) throw new UserInputError('No conditions provided for automation');
 
-    input.conditionBuilder?.conditions?.forEach((condition) => {
-      if (!condition?.operator) {
-        throw new UserInputError('No operator type is provided for a condition');
-      }
-      if (condition.operands?.length === 0) throw new UserInputError('No match values provided for an automation condition!');
-      condition.operands?.forEach((operand) => {
-        if (!operand?.operandType) {
-          throw new UserInputError('No match value type was provided for a condition!');
-        }
-      });
-    });
+  //   input.conditionBuilder?.conditions?.forEach((condition) => {
+  //     if (!condition?.operator) {
+  //       throw new UserInputError('No operator type is provided for a condition');
+  //     }
+  //     if (condition.operands?.length === 0) throw new UserInputError('No match values provided for an automation condition!');
+  //     condition.operands?.forEach((operand) => {
+  //       if (!operand?.operandType) {
+  //         throw new UserInputError('No match value type was provided for a condition!');
+  //       }
+  //     });
+  //   });
 
-    return input.conditionBuilder?.conditions as Required<NexusGenInputs['CreateAutomationCondition'][]>;
-  }
+  //   return input.conditionBuilder?.conditions as Required<NexusGenInputs['CreateAutomationCondition'][]>;
+  // }
 
   constructBuilderRecursive = (input: NexusGenInputs['AutomationConditionBuilderInput']): CreateAutomationInput['conditionBuilder'] => {
     let mappedConditions: CreateAutomationConditionInput[] = [];
@@ -827,29 +828,30 @@ class AutomationService {
    * @returns a validated AutomationCondition input list where it is sure specific fields exist for all entries
    * @throws UserInputError if not all information is required
    */
-  constructCreateAutomationConditionsInput = (input: NexusGenInputs['CreateAutomationInput']): CreateAutomationInput['conditions'] => {
-    const validatedConditions = this.validateCreateAutomationConditionsInput(input) as Required<NexusGenInputs['CreateAutomationCondition'][]>;
+  // TODO: Reimplement later DONT REMOVE
+  // constructCreateAutomationConditionsInput = (input: NexusGenInputs['CreateAutomationInput']): CreateAutomationInput['conditions'] => {
+  //   const validatedConditions = this.validateCreateAutomationConditionsInput(input) as Required<NexusGenInputs['CreateAutomationCondition'][]>;
 
-    const mappedConditions: CreateAutomationInput['conditions'] = validatedConditions?.map((condition) => {
-      return {
-        ...condition,
-        operator: condition.operator as Required<AutomationConditionOperatorType>,
-        scope: this.constructCreateAutomationConditionScopeInput(condition),
-        operands: condition.operands?.map((operand) => {
-          const { dateTimeValue, operandType, numberValue, textValue } = operand!;
+  //   const mappedConditions: CreateAutomationInput['conditions'] = validatedConditions?.map((condition) => {
+  //     return {
+  //       ...condition,
+  //       operator: condition.operator as Required<AutomationConditionOperatorType>,
+  //       scope: this.constructCreateAutomationConditionScopeInput(condition),
+  //       operands: condition.operands?.map((operand) => {
+  //         const { dateTimeValue, operandType, numberValue, textValue } = operand!;
 
-          return {
-            dateTimeValue,
-            numberValue,
-            textValue,
-            type: operandType,
-          }
-        }) as Required<CreateConditionOperandInput[]> || [],
-      }
-    }) || [];
+  //         return {
+  //           dateTimeValue,
+  //           numberValue,
+  //           textValue,
+  //           type: operandType,
+  //         }
+  //       }) as Required<CreateConditionOperandInput[]> || [],
+  //     }
+  //   }) || [];
 
-    return mappedConditions;
-  }
+  //   return mappedConditions;
+  // }
 
   /**
    * Validates the AutomationEvent input object provided by checking the existence of fields which could be potentially be undefined or null
@@ -910,20 +912,18 @@ class AutomationService {
   constructCreateAutomationInput = (input: NexusGenInputs['CreateAutomationInput']): CreateAutomationInput => {
     const validatedInput = this.validateCreateAutomationInput(input);
 
-    const conditionBuilder = validatedInput.automationType === AutomationType.TRIGGER
-      ? this.constructBuilderRecursive(input.conditionBuilder as Required<NexusGenInputs['AutomationConditionBuilderInput']>)
-      : undefined;
+    // const conditionBuilder = validatedInput.automationType === AutomationType.TRIGGER
+    //   ? this.constructBuilderRecursive(input.conditionBuilder as Required<NexusGenInputs['AutomationConditionBuilderInput']>)
+    //   : undefined;
 
     return {
       label: validatedInput.label,
       workspaceId: validatedInput.workspaceId,
       automationType: validatedInput.automationType,
-      conditions: validatedInput.automationType === AutomationType.TRIGGER
-        ? this.constructCreateAutomationConditionsInput(input) : undefined,
       event: this.constructCreateAutomationEventInput(input),
       actions: this.constructAutomationActionsInput(input),
       description: input.description,
-      conditionBuilder,
+      conditionBuilder: undefined, // TODO: Re-implemented later
       schedule: this.buildSchedule(input),
     }
   }
@@ -936,7 +936,7 @@ class AutomationService {
    */
   constructUpdateAutomationInput = (input: NexusGenInputs['CreateAutomationInput']): UpdateAutomationInput => {
     if (!input.id) throw new UserInputError('No ID provided for automation that should be updated!');
-    if (input.automationType === AutomationType.TRIGGER && !input.conditionBuilder?.id) throw new UserInputError('No ID provided for the root condition builder');
+    // if (input.automationType === AutomationType.TRIGGER && !input.conditionBuilder?.id) throw new UserInputError('No ID provided for the root condition builder');
 
     return { ...this.constructCreateAutomationInput(input), id: input.id }
   }

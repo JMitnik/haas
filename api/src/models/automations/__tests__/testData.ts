@@ -193,61 +193,61 @@ export const constructValidUpdateAutomationInputData = (
       'questionId': question.id,
     },
     'actions': [{ id: sendSmsAction?.id, 'type': 'SEND_SMS', apiKey: 'API_KEY', endpoint: 'ENDPOINT', payload: { 'targets': ['+3167654321', '+12345675423'] } }, { id: generateReportAction?.id, 'type': 'WEEK_REPORT' }],
-    'conditionBuilder': {
-      'id': conditionBuilder.id,
-      'type': 'OR',
-      'conditions': [
-        {
-          'id': condition.id,
-          'scope': {
-            'type': 'QUESTION',
-            'questionScope': {
-              'id': condition?.questionScope?.id,
-              'aspect': 'NODE_VALUE',
-              'aggregate': {
-                'id': condition?.questionScope?.aggregate?.id,
-                'type': 'AVG',
-                'latest': 1,
-              },
-            },
-          },
-          'operator': 'SMALLER_OR_EQUAL_THAN',
-          'operands': [
-            {
-              'id': condition.operands?.[0]?.id,
-              'operandType': 'INT',
-              'numberValue': 7331,
-            },
-          ],
-          'questionId': question.id,
-        },
-      ],
-      'childConditionBuilder': {
-        'type': 'AND',
-        'conditions': [
-          {
-            'scope': {
-              'type': 'QUESTION',
-              'questionScope': {
-                'aspect': 'NODE_VALUE',
-                'aggregate': {
-                  'type': 'AVG',
-                  'latest': 1,
-                },
-              },
-            },
-            'operator': 'SMALLER_OR_EQUAL_THAN',
-            'operands': [
-              {
-                'operandType': 'INT',
-                'numberValue': 7331,
-              },
-            ],
-            'questionId': question.id,
-          },
-        ],
-      },
-    },
+    // 'conditionBuilder': {
+    //   'id': conditionBuilder.id,
+    //   'type': 'OR',
+    //   'conditions': [
+    //     {
+    //       'id': condition.id,
+    //       'scope': {
+    //         'type': 'QUESTION',
+    //         'questionScope': {
+    //           'id': condition?.questionScope?.id,
+    //           'aspect': 'NODE_VALUE',
+    //           'aggregate': {
+    //             'id': condition?.questionScope?.aggregate?.id,
+    //             'type': 'AVG',
+    //             'latest': 1,
+    //           },
+    //         },
+    //       },
+    //       'operator': 'SMALLER_OR_EQUAL_THAN',
+    //       'operands': [
+    //         {
+    //           'id': condition.operands?.[0]?.id,
+    //           'operandType': 'INT',
+    //           'numberValue': 7331,
+    //         },
+    //       ],
+    //       'questionId': question.id,
+    //     },
+    //   ],
+    //   'childConditionBuilder': {
+    //     'type': 'AND',
+    //     'conditions': [
+    //       {
+    //         'scope': {
+    //           'type': 'QUESTION',
+    //           'questionScope': {
+    //             'aspect': 'NODE_VALUE',
+    //             'aggregate': {
+    //               'type': 'AVG',
+    //               'latest': 1,
+    //             },
+    //           },
+    //         },
+    //         'operator': 'SMALLER_OR_EQUAL_THAN',
+    //         'operands': [
+    //           {
+    //             'operandType': 'INT',
+    //             'numberValue': 7331,
+    //           },
+    //         ],
+    //         'questionId': question.id,
+    //       },
+    //     ],
+    //   },
+    // },
   }
 }
 
@@ -361,30 +361,30 @@ export const constructValidCreateAutomationInputData = (
         'type': 'WEEK_REPORT',
       },
     ],
-    'conditionBuilder': {
-      'type': 'AND',
-      'conditions': [
-        {
-          'scope': {
-            'type': 'QUESTION',
-            'questionScope': {
-              'aspect': 'NODE_VALUE',
-              'aggregate': {
-                'type': 'AVG',
-                'latest': 5,
-              },
-            },
-          },
-          'operator': 'SMALLER_OR_EQUAL_THAN',
-          'operands': [
-            {
-              'operandType': 'INT',
-              'numberValue': 69,
-            },
-          ],
-          'questionId': question.id,
-        },
-      ],
-    },
+    // 'conditionBuilder': {
+    //   'type': 'AND',
+    //   'conditions': [
+    //     {
+    //       'scope': {
+    //         'type': 'QUESTION',
+    //         'questionScope': {
+    //           'aspect': 'NODE_VALUE',
+    //           'aggregate': {
+    //             'type': 'AVG',
+    //             'latest': 5,
+    //           },
+    //         },
+    //       },
+    //       'operator': 'SMALLER_OR_EQUAL_THAN',
+    //       'operands': [
+    //         {
+    //           'operandType': 'INT',
+    //           'numberValue': 69,
+    //         },
+    //       ],
+    //       'questionId': question.id,
+    //     },
+    //   ],
+    // },
   }
 }
