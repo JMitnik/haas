@@ -105,7 +105,7 @@ export class NodeService {
       links: input.links,
       share: input.share,
       title: input.title,
-      form: form,
+      form: form as any,
       type: input.type,
     });
 
@@ -128,7 +128,10 @@ export class NodeService {
     const communicationUser = input.fields?.find((field) => field.userIds?.length);
     const targetUsers = communicationUser?.userIds?.length
       ? await this.userOfCustomerPrismaAdapter.findTargetUsers(
-        workspaceSlug, { roleIds: communicationUser?.userIds, userIds: communicationUser?.userIds }
+        workspaceSlug, {
+        roleIds: communicationUser?.userIds.filter(isPresent),
+        userIds: communicationUser?.userIds.filter(isPresent),
+      }
       )
       : [];
     const allUserIds = targetUsers.map((user) => ({ id: user.userId }));
@@ -395,7 +398,9 @@ export class NodeService {
     const communicationUser = input.fields?.find((field) => field.userIds?.length);
     const targetUsers = communicationUser?.userIds?.length
       ? await this.userOfCustomerPrismaAdapter.findTargetUsers(
-        workspaceSlug, { roleIds: communicationUser?.userIds, userIds: communicationUser?.userIds }
+        workspaceSlug, {
+        roleIds: communicationUser?.userIds.filter(isPresent), userIds: communicationUser?.userIds.filter(isPresent),
+      }
       )
       : [];
     const allUserIds = targetUsers.map((user) => ({ id: user.userId }));

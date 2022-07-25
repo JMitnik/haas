@@ -191,8 +191,8 @@ export const mapToUserPickerEntries = (customer: Maybe<{
 
   customer?.roles?.forEach((role) => {
     userPickerEntries.push({
-      label: role.name,
-      value: role.id,
+      label: role.name!,
+      value: role.id!,
       type: TargetTypeEnum.Role,
     });
   });

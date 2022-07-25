@@ -68,8 +68,8 @@ const mapToUserPickerEntries = (customer: Maybe<{
 
   customer?.roles?.forEach((role) => {
     userPickerEntries.push({
-      label: role.name,
-      value: role.id,
+      label: role.name!,
+      value: role.id!,
       type: TargetTypeEnum.Role,
     });
   });
@@ -128,7 +128,7 @@ export const CreateActionModalCard = ({ onClose, onCreate, onUpdate, action }: N
     keyName: 'arrayKey',
   });
 
-  const userPickerEntries = mapToUserPickerEntries(data?.customer);
+  const userPickerEntries = mapToUserPickerEntries(data?.customer as any);
 
   return (
     <>

@@ -152,9 +152,9 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                             >
                               {field.contacts?.map((contact) => (
                                 <RadioGroup.Item
-                                  isActive={value === contact.email}
-                                  value={contact.email as string}
-                                  key={contact.id}
+                                  isActive={value === contact?.email}
+                                  value={contact?.email as string}
+                                  key={contact?.id}
                                   contentVariant="twoLine"
                                   variant="boxed"
                                 >

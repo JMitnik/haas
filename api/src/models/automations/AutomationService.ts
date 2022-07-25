@@ -995,6 +995,8 @@ class AutomationService {
   public createAutomation = async (input: NexusGenInputs['CreateAutomationInput']) => {
     // Test whether input data matches what's needed to create an automation
     const validatedInput = this.constructCreateAutomationInput(input);
+
+    console.log('Validated input: ', validatedInput);
     const createdAutomation = await this.automationPrismaAdapter.createAutomation(validatedInput);
 
     if (createdAutomation.type === AutomationType.SCHEDULED

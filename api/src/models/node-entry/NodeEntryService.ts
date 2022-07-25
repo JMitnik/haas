@@ -71,8 +71,8 @@ class NodeEntryService {
    * */
   handleNodeEntryAppend = async (sessionId: string, nodeEntryInput: NexusGenInputs['NodeEntryInput']): Promise<NodeEntry> => {
     const createNodeEntryFragment = NodeEntryService.constructCreateNodeEntryFragment(nodeEntryInput);
-    const emergencyContact = nodeEntryInput.data?.form?.values?.find((value) => value.contacts);
-    const emergencyComment = nodeEntryInput.data?.form?.values?.find((value) => value.longText);
+    const emergencyContact = nodeEntryInput.data?.form?.values?.find((value) => value?.contacts);
+    const emergencyComment = nodeEntryInput.data?.form?.values?.find((value) => value?.longText);
     const nodeEntry = await this.nodeEntryPrismaAdapter.create({
       session: { connect: { id: sessionId } },
       ...createNodeEntryFragment,

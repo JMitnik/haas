@@ -7,6 +7,7 @@ import React from 'react';
 import cuid from 'cuid';
 
 import {
+  AutomationActionType,
   AutomationConditionBuilderType,
   AutomationConditionOperatorType,
   AutomationConditionScopeType,
@@ -18,6 +19,7 @@ import {
   Maybe,
   OperandType,
   QuestionNode,
+  QuestionNodeTypeEnum,
   useGetAutomationQuery,
   useUpdateAutomationMutation,
 } from 'types/generated-types';
@@ -101,7 +103,7 @@ const mapConditionsToFormInput = (
     const scope = mapScope(condition);
     return {
       compareTo: compareTo?.numberValue as number,
-      operator: mapConditionOperator(condition.operator),
+      operator: mapConditionOperator(condition.operator as AutomationConditionOperatorType),
       condition: {
         activeDialogue: {
           label: activeDialogue?.title,
@@ -111,10 +113,10 @@ const mapConditionsToFormInput = (
         },
         activeQuestion: {
           label: event?.question?.title,
-          type: event?.question?.type,
+          type: event?.question?.type as QuestionNodeTypeEnum,
           value: event?.question?.id,
         },
-        scopeType: condition.scope,
+        scopeType: condition.scope as AutomationConditionScopeType,
         latest: scope?.latest,
         aggregate: scope?.aggregate,
         aspect: scope?.aspect,
@@ -130,32 +132,32 @@ const mapAutomation = (input: GetAutomationQuery['automation']): AutomationInput
   return {
     id: input?.id as string,
     label: input?.label as string,
-    automationType: input?.type,
+    automationType: input?.type as AutomationType,
     actions: input?.type === AutomationType.Trigger
       ? input?.automationTrigger?.actions?.map((action) => ({
         action: {
-          id: action.id,
-          type: action.type,
-          targets: action.payload?.targets || [],
+          id: action?.id as string,
+          type: action?.type as AutomationActionType,
+          targets: action?.payload?.targets || [],
         },
       })) || []
       : input?.automationScheduled?.actions?.map((action) => ({
         action: {
-          id: action.id,
-          type: action?.type,
-          targets: action.channels?.[0]?.payload?.targets || [],
-          channelId: action.channels?.[0]?.id,
+          id: action?.id as string,
+          type: action?.type as AutomationActionType,
+          targets: action?.channels?.[0]?.payload?.targets || [],
+          channelId: action?.channels?.[0]?.id,
         },
       })) || [],
     schedule: {
-      id: input?.automationScheduled?.id,
-      dayOfMonth: input?.automationScheduled?.dayOfMonth,
-      dayOfWeek: input?.automationScheduled?.dayOfWeek,
-      hours: input?.automationScheduled?.hours,
-      minutes: input?.automationScheduled?.minutes,
-      month: input?.automationScheduled?.month,
-      type: input?.automationScheduled?.type,
-      dayRange: input?.automationScheduled?.dayRange || [],
+      id: input?.automationScheduled?.id || undefined,
+      dayOfMonth: input?.automationScheduled?.dayOfMonth || undefined,
+      dayOfWeek: input?.automationScheduled?.dayOfWeek || undefined,
+      hours: input?.automationScheduled?.hours || undefined,
+      minutes: input?.automationScheduled?.minutes || undefined,
+      month: input?.automationScheduled?.month || undefined,
+      type: input?.automationScheduled?.type || undefined,
+      dayRange: input?.automationScheduled?.dayRange as any || [],
       frequency: input?.automationScheduled?.frequency || CustomRecurringType.YEARLY,
       time: input?.automationScheduled?.time || '0 8',
       activeDialogue: input?.automationScheduled?.activeDialogue?.id ? {
@@ -166,14 +168,14 @@ const mapAutomation = (input: GetAutomationQuery['automation']): AutomationInput
       } : null,
     },
     conditionBuilder: {
-      id: input?.automationTrigger?.conditionBuilder?.id,
+      id: input?.automationTrigger?.conditionBuilder?.id || undefined,
       logical: {
         label: input?.automationTrigger?.conditionBuilder?.type as AutomationConditionBuilderType,
         value: input?.automationTrigger?.conditionBuilder?.type as AutomationConditionBuilderType,
       },
       conditions: mapConditionsToFormInput(
         input?.automationTrigger?.event,
-        input?.automationTrigger?.conditionBuilder?.conditions,
+        input?.automationTrigger?.conditionBuilder?.conditions as any,
         input?.automationTrigger?.activeDialogue,
       ),
       childBuilder: {
@@ -186,7 +188,7 @@ const mapAutomation = (input: GetAutomationQuery['automation']): AutomationInput
         },
         conditions: mapConditionsToFormInput(
           input?.automationTrigger?.event,
-          input?.automationTrigger?.conditionBuilder?.childConditionBuilder?.conditions,
+          input?.automationTrigger?.conditionBuilder?.childConditionBuilder?.conditions as any,
           input?.automationTrigger?.activeDialogue,
         ),
       },

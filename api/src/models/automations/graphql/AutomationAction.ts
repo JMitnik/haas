@@ -18,15 +18,14 @@ export const AutomationActionModel = objectType({
     t.list.field('channels', {
       type: AutomationActionChannel,
       nullable: true,
-      resolve: async (parent, _, ctx) => {
-        // if (parent.channels) {
-        //   return parent.channels;
-        // }
+      resolve: async (parent: any, _, ctx) => {
+        if (parent.channels) {
+          return parent.channels;
+        }
 
-        // if (!parent.id) return [];
-        console.log('parent id: ', parent.id);
+        if (!parent.id) return [];
+
         const result = await ctx.services.automationActionService.findChannelsByActionId(parent.id);
-        console.log('channels: ', result);
         return result;
       },
     })

@@ -121,7 +121,7 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
   });
 
   const dialogueItems = dialoguesData?.customer?.dialogues?.map(
-    (dialogue) => ({ id: dialogue.id, value: dialogue.slug, label: dialogue.title, type: 'DIALOGUE' }),
+    (dialogue) => ({ id: dialogue?.id, value: dialogue?.slug, label: dialogue?.title, type: 'DIALOGUE' }),
   ) || [];
 
   const [getQuestions, { data: questionsData }] = useLazyQuery(getTopicBuilderQuery);
@@ -288,7 +288,7 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                                         renderOverlay={({ onClose: onDialoguePickerClose }) => (
                                           <DialogueNodePicker
                                             // Handle items (in this case dialogues)
-                                            items={dialogueItems}
+                                            items={dialogueItems as any}
                                             onClose={onDialoguePickerClose}
                                             onChange={onChange}
                                           />

@@ -81,7 +81,7 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
               {canCreateAutomations && (
                 <UI.Div>
                   <UI.NavButton
-                    leftIcon={Plus}
+                    leftIcon={() => <Plus />}
                     size="sm"
                     to={`/dashboard/b/${customerSlug}/automation/add`}
                   >
@@ -117,7 +117,7 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
           ))}
         </UI.Grid>
 
-        {!isLoading && filteredAutomations.length === 0 && (
+        {!isLoading && filteredAutomations?.length === 0 && (
           <UI.IllustrationCard
             boxShadow="sm"
             svg={<NoDataIll />}
