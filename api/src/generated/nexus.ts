@@ -184,7 +184,6 @@ export interface NexusGenInputs {
   CreateAutomationInput: { // input type
     actions?: Array<NexusGenInputs['AutomationActionInput'] | null> | null; // [AutomationActionInput]
     automationType?: NexusGenEnums['AutomationType'] | null; // AutomationType
-    conditionBuilder?: NexusGenInputs['AutomationConditionBuilderInput'] | null; // AutomationConditionBuilderInput
     description?: string | null; // String
     event?: NexusGenInputs['AutomationEventInput'] | null; // AutomationEventInput
     id?: string | null; // ID

@@ -438,7 +438,6 @@ input CreateAutomationCondition {
 input CreateAutomationInput {
   actions: [AutomationActionInput]
   automationType: AutomationType
-  conditionBuilder: AutomationConditionBuilderInput
   description: String
   event: AutomationEventInput
   id: ID

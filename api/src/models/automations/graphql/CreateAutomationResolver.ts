@@ -13,6 +13,7 @@ import { AutomationModel } from './AutomationModel';
 import { UserInputError } from 'apollo-server-express';
 import { AutomationConditionBuilderType } from './AutomationConditionBuilderType';
 import { RecurringPeriodType } from './RecurringPeriodType';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 export const CreateAutomationOperandInput = inputObjectType({
   name: 'CreateAutomationOperandInput',
@@ -169,7 +170,8 @@ export const CreateAutomationInput = inputObjectType({
     t.field('event', { type: AutomationEventInput });
 
     // Trigger: condition related fields
-    t.field('conditionBuilder', { type: AutomationConditionBuilderInput });
+    // FIXME: Uncommenting this field wrecks entire resolver 😬
+    // t.field('conditionBuilder', { type: AutomationConditionBuilderInput });
 
     t.field('schedule', { type: AutomationScheduleInput, nullable: true });
 
@@ -184,11 +186,9 @@ export const CreateAutomationResolver = mutationField('createAutomation', {
   description: 'Creates a new automation.',
   type: AutomationModel,
   args: { input: CreateAutomationInput },
-
   async resolve(parent, args, ctx) {
-    if (!args.input) throw new UserInputError('No input object provided for createAutomation Resolver');
+    if (!args.input) throw new GraphQLYogaError('No input object provided for createAutomation Resolver');
 
-    console.log('CREATE AUTOMATION INPUT: ', args.input);
     const automation = await ctx.services.automationService.createAutomation(args.input);
     return automation as any;
   },

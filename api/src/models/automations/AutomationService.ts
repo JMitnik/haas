@@ -16,8 +16,8 @@ import {
   User,
   UserOfCustomer,
   AutomationActionChannel,
-  AutomationActionChannelType,
 } from '@prisma/client';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 import { isPresent } from 'ts-is-present';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import * as AWS from 'aws-sdk';
@@ -44,7 +44,6 @@ import {
   UpdateAutomationInput,
 } from './AutomationTypes'
 import { AutomationActionService } from './AutomationActionService';
-import { GenerateReportPayload } from 'models/users/UserServiceTypes';
 import CustomerService from '../../models/customer/CustomerService';
 import { buildFrequencyCronString, findLambdaArnByActionType, findLambdaParamsByActionType, getDayRange } from './AutomationService.helpers';
 
@@ -875,11 +874,11 @@ class AutomationService {
    * @throws UserInputError if not all information is required
    */
   validateCreateAutomationInput = (input: NexusGenInputs['CreateAutomationInput']): CreateAutomationInput => {
-    if (!input) throw new UserInputError('No input provided create automation with!');
-    if (!input.label || typeof input.label === undefined || input.label === null) throw new UserInputError('No label provided for automation!');
+    if (!input) throw new GraphQLYogaError('No input provided create automation with!');
+    if (!input.label || typeof input.label === undefined || input.label === null) throw new GraphQLYogaError('No label provided for automation!');
 
-    if (!input.automationType) throw new UserInputError('No automation type provided for automation!');
-    if (!input.workspaceId) throw new UserInputError('No workspace Id provided for automation!');
+    if (!input.automationType) throw new GraphQLYogaError('No automation type provided for automation!');
+    if (!input.workspaceId) throw new GraphQLYogaError('No workspace Id provided for automation!');
     return input as Required<CreateAutomationInput>;
   }
 

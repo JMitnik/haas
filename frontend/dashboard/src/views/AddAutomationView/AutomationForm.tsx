@@ -16,7 +16,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import React from 'react';
 
 import {
-  AutomationConditionBuilderType,
   AutomationEventType, AutomationType,
   CreateAutomationInput,
   CreateAutomationMutation,
@@ -39,7 +38,7 @@ import { FutureScheduledDatesFragment } from './FutureScheduledDatesFragment';
 import { RecipientsFragment } from './RecipientsFragment';
 import { ScheduledAutomationActionFragment } from './ScheduledAutomationActionFragment';
 import { TriggerAutomationFragment } from './TriggerAutomationFragment';
-import { getDayOfMonth, getDayOfWeek, getMonth, mapConditions, mapToUserPickerEntries } from './AutomationForm.helpers';
+import { getDayOfMonth, getDayOfWeek, getMonth, mapToUserPickerEntries } from './AutomationForm.helpers';
 import useCronSchedule from './useCronSchedule';
 
 interface AutomationFormProps {
@@ -159,11 +158,11 @@ const AutomationForm = ({
         eventType: AutomationEventType.NewInteractionQuestion, // TODO: Make this dynamic
         questionId: formData.conditionBuilder?.conditions?.[0]?.condition.activeQuestion?.value,
       },
-      conditionBuilder: {
-        id: automation?.conditionBuilder?.id,
-        type: formData?.conditionBuilder?.logical?.value as AutomationConditionBuilderType,
-        conditions: mapConditions(formData, activeCustomer?.id || undefined),
-      },
+      // conditionBuilder: {
+      //   id: automation?.conditionBuilder?.id,
+      //   type: formData?.conditionBuilder?.logical?.value as AutomationConditionBuilderType,
+      //   conditions: mapConditions(formData, activeCustomer?.id || undefined),
+      // },
       actions: activeActions,
       schedule: formData.automationType === AutomationType.Scheduled ? {
         type: formData?.schedule?.type as RecurringPeriodType,
