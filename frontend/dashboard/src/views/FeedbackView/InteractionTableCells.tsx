@@ -20,12 +20,12 @@ interface ContactableUserCellProps {
 
 export const ContactableUserCell = ({ sessionId, followUpAction }: ContactableUserCellProps) => {
   const { t } = useTranslation();
-  const field = followUpAction?.values?.find((value) => value.shortText);
+  const field = followUpAction?.values?.find((value) => value.shortText || value.email);
   return (
     <UI.Flex alignItems="center">
       <UI.ColumnFlex>
         <UI.Span fontWeight={600} color="off.500">
-          {field?.shortText || t('anonymous')}
+          {field?.shortText || field?.email || t('anonymous')}
         </UI.Span>
         <UI.Span color="off.300" fontSize="0.7rem">
           {sessionId}

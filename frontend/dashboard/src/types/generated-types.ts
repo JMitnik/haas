@@ -2820,24 +2820,18 @@ export type GetDialogueTopicsQueryVariables = Exact<{
 
 export type GetDialogueTopicsQuery = (
   { __typename?: 'Query' }
-  & {
-    dialogue?: Maybe<(
-      { __typename?: 'Dialogue' }
-      & Pick<Dialogue, 'id'>
-      & {
-        topic: (
-          { __typename?: 'TopicType' }
-          & Pick<TopicType, 'name' | 'impactScore' | 'nrVotes'>
-          & {
-            subTopics?: Maybe<Array<(
-              { __typename?: 'TopicType' }
-              & Pick<TopicType, 'name' | 'impactScore' | 'nrVotes'>
-            )>>
-          }
-        )
-      }
-    )>
-  }
+  & { dialogue?: Maybe<(
+    { __typename?: 'Dialogue' }
+    & Pick<Dialogue, 'id'>
+    & { topic: (
+      { __typename?: 'TopicType' }
+      & Pick<TopicType, 'name' | 'impactScore' | 'nrVotes'>
+      & { subTopics?: Maybe<Array<(
+        { __typename?: 'TopicType' }
+        & Pick<TopicType, 'name' | 'impactScore' | 'nrVotes'>
+      )>> }
+    ) }
+  )> }
 );
 
 export type GetIssuesQueryVariables = Exact<{
@@ -2847,36 +2841,28 @@ export type GetIssuesQueryVariables = Exact<{
 
 export type GetIssuesQuery = (
   { __typename?: 'Query' }
-  & {
-    customer?: Maybe<(
-      { __typename?: 'Customer' }
-      & Pick<Customer, 'id'>
-      & {
-        issues?: Maybe<Array<(
-          { __typename?: 'Issue' }
-          & Pick<Issue, 'id' | 'topic' | 'rankScore' | 'followUpAction' | 'actionRequiredCount'>
-          & {
-            dialogue?: Maybe<(
-              { __typename?: 'Dialogue' }
-              & Pick<Dialogue, 'id' | 'title'>
-            )>, basicStats: (
-              { __typename?: 'BasicStatistics' }
-              & Pick<BasicStatistics, 'responseCount' | 'average'>
-            ), history: (
-              { __typename?: 'DateHistogram' }
-              & Pick<DateHistogram, 'id'>
-              & {
-                items: Array<(
-                  { __typename?: 'DateHistogramItem' }
-                  & Pick<DateHistogramItem, 'id' | 'date' | 'frequency'>
-                )>
-              }
-            )
-          }
-        )>>
-      }
-    )>
-  }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { issues?: Maybe<Array<(
+      { __typename?: 'Issue' }
+      & Pick<Issue, 'id' | 'topic' | 'rankScore' | 'followUpAction' | 'actionRequiredCount'>
+      & { dialogue?: Maybe<(
+        { __typename?: 'Dialogue' }
+        & Pick<Dialogue, 'id' | 'title'>
+      )>, basicStats: (
+        { __typename?: 'BasicStatistics' }
+        & Pick<BasicStatistics, 'responseCount' | 'average'>
+      ), history: (
+        { __typename?: 'DateHistogram' }
+        & Pick<DateHistogram, 'id'>
+        & { items: Array<(
+          { __typename?: 'DateHistogramItem' }
+          & Pick<DateHistogramItem, 'id' | 'date' | 'frequency'>
+        )> }
+      ) }
+    )>> }
+  )> }
 );
 
 export type GetSessionPathsQueryVariables = Exact<{
@@ -2886,24 +2872,18 @@ export type GetSessionPathsQueryVariables = Exact<{
 
 export type GetSessionPathsQuery = (
   { __typename?: 'Query' }
-  & {
-    dialogue?: Maybe<(
-      { __typename?: 'Dialogue' }
-      & Pick<Dialogue, 'id'>
-      & {
-        pathedSessionsConnection?: Maybe<(
-          { __typename?: 'PathedSessionsType' }
-          & Pick<PathedSessionsType, 'startDateTime' | 'endDateTime' | 'path'>
-          & {
-            pathedSessions: Array<(
-              { __typename?: 'Session' }
-              & Pick<Session, 'id' | 'mainScore' | 'createdAt' | 'score' | 'totalTimeInSec'>
-            )>
-          }
-        )>
-      }
-    )>
-  }
+  & { dialogue?: Maybe<(
+    { __typename?: 'Dialogue' }
+    & Pick<Dialogue, 'id'>
+    & { pathedSessionsConnection?: Maybe<(
+      { __typename?: 'PathedSessionsType' }
+      & Pick<PathedSessionsType, 'startDateTime' | 'endDateTime' | 'path'>
+      & { pathedSessions: Array<(
+        { __typename?: 'Session' }
+        & Pick<Session, 'id' | 'mainScore' | 'createdAt' | 'score' | 'totalTimeInSec'>
+      )> }
+    )> }
+  )> }
 );
 
 export type GetWorkspaceDialogueStatisticsQueryVariables = Exact<{
@@ -2914,37 +2894,27 @@ export type GetWorkspaceDialogueStatisticsQueryVariables = Exact<{
 
 export type GetWorkspaceDialogueStatisticsQuery = (
   { __typename?: 'Query' }
-  & {
-    customer?: Maybe<(
-      { __typename?: 'Customer' }
-      & {
-        organization?: Maybe<(
-          { __typename?: 'Organization' }
-          & Pick<Organization, 'id'>
-          & {
-            layers?: Maybe<Array<(
-              { __typename?: 'OrganizationLayer' }
-              & Pick<OrganizationLayer, 'id' | 'depth' | 'type'>
-            )>>
-          }
-        )>, statistics?: Maybe<(
-          { __typename?: 'WorkspaceStatistics' }
-          & {
-            workspaceStatisticsSummary?: Maybe<Array<(
-              { __typename?: 'DialogueStatisticsSummaryModel' }
-              & Pick<DialogueStatisticsSummaryModel, 'id' | 'nrVotes' | 'impactScore' | 'updatedAt' | 'title'>
-              & {
-                dialogue?: Maybe<(
-                  { __typename?: 'Dialogue' }
-                  & Pick<Dialogue, 'title' | 'id'>
-                )>
-              }
-            )>>
-          }
-        )>
-      }
-    )>
-  }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & { organization?: Maybe<(
+      { __typename?: 'Organization' }
+      & Pick<Organization, 'id'>
+      & { layers?: Maybe<Array<(
+        { __typename?: 'OrganizationLayer' }
+        & Pick<OrganizationLayer, 'id' | 'depth' | 'type'>
+      )>> }
+    )>, statistics?: Maybe<(
+      { __typename?: 'WorkspaceStatistics' }
+      & { workspaceStatisticsSummary?: Maybe<Array<(
+        { __typename?: 'DialogueStatisticsSummaryModel' }
+        & Pick<DialogueStatisticsSummaryModel, 'id' | 'nrVotes' | 'impactScore' | 'updatedAt' | 'title'>
+        & { dialogue?: Maybe<(
+          { __typename?: 'Dialogue' }
+          & Pick<Dialogue, 'title' | 'id'>
+        )> }
+      )>> }
+    )> }
+  )> }
 );
 
 export type ResetWorkspaceDataMutationVariables = Exact<{
@@ -2964,33 +2934,25 @@ export type GetWorkspaceSummaryDetailsQueryVariables = Exact<{
 
 export type GetWorkspaceSummaryDetailsQuery = (
   { __typename?: 'Query' }
-  & {
-    customer?: Maybe<(
-      { __typename?: 'Customer' }
-      & Pick<Customer, 'id' | 'isDemo'>
-      & {
-        statistics?: Maybe<(
-          { __typename?: 'WorkspaceStatistics' }
-          & Pick<WorkspaceStatistics, 'id'>
-          & {
-            health: (
-              { __typename?: 'HealthScore' }
-              & Pick<HealthScore, 'nrVotes' | 'negativeResponseCount' | 'score'>
-            ), rankedTopics: Array<(
-              { __typename?: 'TopicType' }
-              & Pick<TopicType, 'name'>
-              & {
-                basicStats?: Maybe<(
-                  { __typename?: 'BasicStatistics' }
-                  & Pick<BasicStatistics, 'average' | 'responseCount'>
-                )>
-              }
-            )>
-          }
-        )>
-      }
-    )>
-  }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id' | 'isDemo'>
+    & { statistics?: Maybe<(
+      { __typename?: 'WorkspaceStatistics' }
+      & Pick<WorkspaceStatistics, 'id'>
+      & { health: (
+        { __typename?: 'HealthScore' }
+        & Pick<HealthScore, 'nrVotes' | 'negativeResponseCount' | 'score'>
+      ), rankedTopics: Array<(
+        { __typename?: 'TopicType' }
+        & Pick<TopicType, 'name'>
+        & { basicStats?: Maybe<(
+          { __typename?: 'BasicStatistics' }
+          & Pick<BasicStatistics, 'average' | 'responseCount'>
+        )> }
+      )> }
+    )> }
+  )> }
 );
 
 export type DeliveryEventFragmentFragment = (
@@ -3001,75 +2963,59 @@ export type DeliveryEventFragmentFragment = (
 export type DeliveryFragmentFragment = (
   { __typename?: 'DeliveryType' }
   & Pick<DeliveryType, 'id' | 'deliveryRecipientFirstName' | 'deliveryRecipientLastName' | 'deliveryRecipientEmail' | 'deliveryRecipientPhone' | 'scheduledAt' | 'updatedAt' | 'createdAt' | 'currentStatus'>
-  & {
-    campaignVariant?: Maybe<(
-      { __typename?: 'CampaignVariantType' }
-      & Pick<CampaignVariantType, 'id' | 'label' | 'type'>
-      & {
-        campaign?: Maybe<(
-          { __typename?: 'CampaignType' }
-          & Pick<CampaignType, 'id' | 'label'>
-        )>
-      }
-    )>
-  }
+  & { campaignVariant?: Maybe<(
+    { __typename?: 'CampaignVariantType' }
+    & Pick<CampaignVariantType, 'id' | 'label' | 'type'>
+    & { campaign?: Maybe<(
+      { __typename?: 'CampaignType' }
+      & Pick<CampaignType, 'id' | 'label'>
+    )> }
+  )> }
 );
 
 export type NodeEntryFragmentFragment = (
   { __typename?: 'NodeEntry' }
   & Pick<NodeEntry, 'id' | 'depth'>
-  & {
-    relatedNode?: Maybe<(
-      { __typename?: 'QuestionNode' }
-      & Pick<QuestionNode, 'title' | 'type'>
-    )>, value?: Maybe<(
-      { __typename?: 'NodeEntryValue' }
-      & Pick<NodeEntryValue, 'sliderNodeEntry' | 'textboxNodeEntry' | 'registrationNodeEntry' | 'choiceNodeEntry' | 'videoNodeEntry' | 'linkNodeEntry'>
-      & {
-        formNodeEntry?: Maybe<(
-          { __typename?: 'FormNodeEntryType' }
-          & Pick<FormNodeEntryType, 'id'>
-          & {
-            values: Array<(
-              { __typename?: 'FormNodeEntryValueType' }
-              & Pick<FormNodeEntryValueType, 'email' | 'phoneNumber' | 'url' | 'shortText' | 'longText' | 'number'>
-              & {
-                relatedField: (
-                  { __typename?: 'FormNodeField' }
-                  & Pick<FormNodeField, 'id' | 'type'>
-                )
-              }
-            )>
-          }
-        )>
-      }
-    )>
-  }
+  & { relatedNode?: Maybe<(
+    { __typename?: 'QuestionNode' }
+    & Pick<QuestionNode, 'title' | 'type'>
+  )>, value?: Maybe<(
+    { __typename?: 'NodeEntryValue' }
+    & Pick<NodeEntryValue, 'sliderNodeEntry' | 'textboxNodeEntry' | 'registrationNodeEntry' | 'choiceNodeEntry' | 'videoNodeEntry' | 'linkNodeEntry'>
+    & { formNodeEntry?: Maybe<(
+      { __typename?: 'FormNodeEntryType' }
+      & Pick<FormNodeEntryType, 'id'>
+      & { values: Array<(
+        { __typename?: 'FormNodeEntryValueType' }
+        & Pick<FormNodeEntryValueType, 'email' | 'phoneNumber' | 'url' | 'shortText' | 'longText' | 'number'>
+        & { relatedField: (
+          { __typename?: 'FormNodeField' }
+          & Pick<FormNodeField, 'id' | 'type'>
+        ) }
+      )> }
+    )> }
+  )> }
 );
 
 export type SessionFragmentFragment = (
   { __typename?: 'Session' }
   & Pick<Session, 'id' | 'createdAt' | 'score' | 'originUrl' | 'totalTimeInSec' | 'device' | 'dialogueId'>
-  & {
-    nodeEntries: Array<(
-      { __typename?: 'NodeEntry' }
-      & NodeEntryFragmentFragment
-    )>, delivery?: Maybe<(
-      { __typename?: 'DeliveryType' }
-      & DeliveryFragmentFragment
-    )>, dialogue?: Maybe<(
-      { __typename?: 'Dialogue' }
-      & Pick<Dialogue, 'id' | 'title' | 'slug'>
-    )>, followUpAction?: Maybe<(
-      { __typename?: 'FormNodeEntryType' }
-      & {
-        values: Array<(
-          { __typename?: 'FormNodeEntryValueType' }
-          & Pick<FormNodeEntryValueType, 'shortText'>
-        )>
-      }
-    )>
-  }
+  & { nodeEntries: Array<(
+    { __typename?: 'NodeEntry' }
+    & NodeEntryFragmentFragment
+  )>, delivery?: Maybe<(
+    { __typename?: 'DeliveryType' }
+    & DeliveryFragmentFragment
+  )>, dialogue?: Maybe<(
+    { __typename?: 'Dialogue' }
+    & Pick<Dialogue, 'id' | 'title' | 'slug'>
+  )>, followUpAction?: Maybe<(
+    { __typename?: 'FormNodeEntryType' }
+    & { values: Array<(
+      { __typename?: 'FormNodeEntryValueType' }
+      & Pick<FormNodeEntryValueType, 'shortText' | 'email'>
+    )> }
+  )> }
 );
 
 export type GetWorkspaceLayoutDetailsQueryVariables = Exact<{
@@ -3079,24 +3025,18 @@ export type GetWorkspaceLayoutDetailsQueryVariables = Exact<{
 
 export type GetWorkspaceLayoutDetailsQuery = (
   { __typename?: 'Query' }
-  & {
-    customer?: Maybe<(
-      { __typename?: 'Customer' }
-      & Pick<Customer, 'id'>
-      & {
-        statistics?: Maybe<(
-          { __typename?: 'WorkspaceStatistics' }
-          & Pick<WorkspaceStatistics, 'id'>
-          & {
-            health: (
-              { __typename?: 'HealthScore' }
-              & Pick<HealthScore, 'nrVotes' | 'negativeResponseCount' | 'score'>
-            )
-          }
-        )>
-      }
-    )>
-  }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { statistics?: Maybe<(
+      { __typename?: 'WorkspaceStatistics' }
+      & Pick<WorkspaceStatistics, 'id'>
+      & { health: (
+        { __typename?: 'HealthScore' }
+        & Pick<HealthScore, 'nrVotes' | 'negativeResponseCount' | 'score'>
+      ) }
+    )> }
+  )> }
 );
 
 export type CreateCtaMutationVariables = Exact<{
@@ -3105,12 +3045,10 @@ export type CreateCtaMutationVariables = Exact<{
 
 export type CreateCtaMutation = (
   { __typename?: 'Mutation' }
-  & {
-    createCTA: (
-      { __typename?: 'QuestionNode' }
-      & Pick<QuestionNode, 'id' | 'type' | 'title'>
-    )
-  }
+  & { createCTA: (
+    { __typename?: 'QuestionNode' }
+    & Pick<QuestionNode, 'id' | 'type' | 'title'>
+  ) }
 );
 
 export type GetCustomerOfUserQueryVariables = Exact<{
@@ -3119,79 +3057,61 @@ export type GetCustomerOfUserQueryVariables = Exact<{
 
 export type GetCustomerOfUserQuery = (
   { __typename?: 'Query' }
-  & {
-    UserOfCustomer?: Maybe<(
-      { __typename?: 'UserCustomer' }
-      & {
-        customer: (
-          { __typename?: 'Customer' }
-          & Pick<Customer, 'id' | 'isDemo' | 'name' | 'slug'>
-          & {
-            settings?: Maybe<(
-              { __typename?: 'CustomerSettings' }
-              & Pick<CustomerSettings, 'id' | 'logoUrl'>
-              & {
-                colourSettings?: Maybe<(
-                  { __typename?: 'ColourSettings' }
-                  & Pick<ColourSettings, 'id' | 'primary'>
-                )>
-              }
-            )>, campaigns: Array<(
-              { __typename?: 'CampaignType' }
-              & Pick<CampaignType, 'id' | 'label'>
-            )>
-          }
-        ), role: (
-          { __typename?: 'RoleType' }
-          & Pick<RoleType, 'name' | 'permissions'>
-        ), user: (
-          { __typename?: 'UserType' }
-          & Pick<UserType, 'id'>
-          & {
-            assignedDialogues?: Maybe<(
-              { __typename?: 'AssignedDialogues' }
-              & {
-                privateWorkspaceDialogues: Array<(
-                  { __typename?: 'Dialogue' }
-                  & Pick<Dialogue, 'title' | 'slug' | 'id'>
-                )>, assignedDialogues: Array<(
-                  { __typename?: 'Dialogue' }
-                  & Pick<Dialogue, 'slug' | 'id'>
-                )>
-              }
-            )>
-          }
-        )
-      }
-    )>
-  }
+  & { UserOfCustomer?: Maybe<(
+    { __typename?: 'UserCustomer' }
+    & { customer: (
+      { __typename?: 'Customer' }
+      & Pick<Customer, 'id' | 'isDemo' | 'name' | 'slug'>
+      & { settings?: Maybe<(
+        { __typename?: 'CustomerSettings' }
+        & Pick<CustomerSettings, 'id' | 'logoUrl'>
+        & { colourSettings?: Maybe<(
+          { __typename?: 'ColourSettings' }
+          & Pick<ColourSettings, 'id' | 'primary'>
+        )> }
+      )>, campaigns: Array<(
+        { __typename?: 'CampaignType' }
+        & Pick<CampaignType, 'id' | 'label'>
+      )> }
+    ), role: (
+      { __typename?: 'RoleType' }
+      & Pick<RoleType, 'name' | 'permissions'>
+    ), user: (
+      { __typename?: 'UserType' }
+      & Pick<UserType, 'id'>
+      & { assignedDialogues?: Maybe<(
+        { __typename?: 'AssignedDialogues' }
+        & { privateWorkspaceDialogues: Array<(
+          { __typename?: 'Dialogue' }
+          & Pick<Dialogue, 'title' | 'slug' | 'id'>
+        )>, assignedDialogues: Array<(
+          { __typename?: 'Dialogue' }
+          & Pick<Dialogue, 'slug' | 'id'>
+        )> }
+      )> }
+    ) }
+  )> }
 );
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type MeQuery = (
   { __typename?: 'Query' }
-  & {
-    me: (
-      { __typename?: 'UserType' }
-      & Pick<UserType, 'id' | 'email' | 'firstName' | 'lastName' | 'phone' | 'globalPermissions'>
-      & {
-        userCustomers: Array<(
-          { __typename?: 'UserCustomer' }
-          & Pick<UserCustomer, 'isActive'>
-          & {
-            customer: (
-              { __typename?: 'Customer' }
-              & Pick<Customer, 'id' | 'name' | 'slug'>
-            ), role: (
-              { __typename?: 'RoleType' }
-              & Pick<RoleType, 'name' | 'permissions'>
-            )
-          }
-        )>
-      }
-    )
-  }
+  & { me: (
+    { __typename?: 'UserType' }
+    & Pick<UserType, 'id' | 'email' | 'firstName' | 'lastName' | 'phone' | 'globalPermissions'>
+    & { userCustomers: Array<(
+      { __typename?: 'UserCustomer' }
+      & Pick<UserCustomer, 'isActive'>
+      & { customer: (
+        { __typename?: 'Customer' }
+        & Pick<Customer, 'id' | 'name' | 'slug'>
+      ), role: (
+        { __typename?: 'RoleType' }
+        & Pick<RoleType, 'name' | 'permissions'>
+      ) }
+    )> }
+  ) }
 );
 
 export type UploadUpsellImageMutationVariables = Exact<{
@@ -3200,12 +3120,10 @@ export type UploadUpsellImageMutationVariables = Exact<{
 
 export type UploadUpsellImageMutation = (
   { __typename?: 'Mutation' }
-  & {
-    uploadUpsellImage?: Maybe<(
-      { __typename?: 'ImageType' }
-      & Pick<ImageType, 'url'>
-    )>
-  }
+  & { uploadUpsellImage?: Maybe<(
+    { __typename?: 'ImageType' }
+    & Pick<ImageType, 'url'>
+  )> }
 );
 
 export type ConfirmWorkspaceJobMutationVariables = Exact<{
@@ -3214,12 +3132,10 @@ export type ConfirmWorkspaceJobMutationVariables = Exact<{
 
 export type ConfirmWorkspaceJobMutation = (
   { __typename?: 'Mutation' }
-  & {
-    confirmCreateWorkspaceJob?: Maybe<(
-      { __typename?: 'CreateWorkspaceJobType' }
-      & Pick<CreateWorkspaceJobType, 'id' | 'name' | 'status'>
-    )>
-  }
+  & { confirmCreateWorkspaceJob?: Maybe<(
+    { __typename?: 'CreateWorkspaceJobType' }
+    & Pick<CreateWorkspaceJobType, 'id' | 'name' | 'status'>
+  )> }
 );
 
 export type CreateWorkspaceJobMutationVariables = Exact<{
@@ -3228,12 +3144,10 @@ export type CreateWorkspaceJobMutationVariables = Exact<{
 
 export type CreateWorkspaceJobMutation = (
   { __typename?: 'Mutation' }
-  & {
-    generateAutodeck?: Maybe<(
-      { __typename?: 'CreateWorkspaceJobType' }
-      & Pick<CreateWorkspaceJobType, 'id' | 'name' | 'status'>
-    )>
-  }
+  & { generateAutodeck?: Maybe<(
+    { __typename?: 'CreateWorkspaceJobType' }
+    & Pick<CreateWorkspaceJobType, 'id' | 'name' | 'status'>
+  )> }
 );
 
 export type GetAutodeckJobsQueryVariables = Exact<{
@@ -3242,32 +3156,24 @@ export type GetAutodeckJobsQueryVariables = Exact<{
 
 export type GetAutodeckJobsQuery = (
   { __typename?: 'Query' }
-  & {
-    getAutodeckJobs: (
-      { __typename?: 'AutodeckConnectionType' }
-      & {
-        jobs: Array<(
-          { __typename?: 'CreateWorkspaceJobType' }
-          & Pick<CreateWorkspaceJobType, 'id' | 'name' | 'createdAt' | 'updatedAt' | 'referenceId' | 'errorMessage' | 'message' | 'status' | 'resourcesUrl' | 'referenceType' | 'requiresColorExtraction' | 'requiresRembg' | 'requiresScreenshot'>
-          & {
-            processLocation: (
-              { __typename?: 'JobProcessLocation' }
-              & Pick<JobProcessLocation, 'id' | 'name' | 'path' | 'type'>
-              & {
-                customFields?: Maybe<Array<(
-                  { __typename?: 'CustomFieldType' }
-                  & Pick<CustomFieldType, 'id' | 'key' | 'value'>
-                )>>
-              }
-            )
-          }
-        )>, pageInfo: (
-          { __typename?: 'DeprecatedPaginationPageInfo' }
-          & Pick<DeprecatedPaginationPageInfo, 'nrPages' | 'pageIndex'>
-        )
-      }
-    )
-  }
+  & { getAutodeckJobs: (
+    { __typename?: 'AutodeckConnectionType' }
+    & { jobs: Array<(
+      { __typename?: 'CreateWorkspaceJobType' }
+      & Pick<CreateWorkspaceJobType, 'id' | 'name' | 'createdAt' | 'updatedAt' | 'referenceId' | 'errorMessage' | 'message' | 'status' | 'resourcesUrl' | 'referenceType' | 'requiresColorExtraction' | 'requiresRembg' | 'requiresScreenshot'>
+      & { processLocation: (
+        { __typename?: 'JobProcessLocation' }
+        & Pick<JobProcessLocation, 'id' | 'name' | 'path' | 'type'>
+        & { customFields?: Maybe<Array<(
+          { __typename?: 'CustomFieldType' }
+          & Pick<CustomFieldType, 'id' | 'key' | 'value'>
+        )>> }
+      ) }
+    )>, pageInfo: (
+      { __typename?: 'DeprecatedPaginationPageInfo' }
+      & Pick<DeprecatedPaginationPageInfo, 'nrPages' | 'pageIndex'>
+    ) }
+  ) }
 );
 
 export type UploadJobImageMutationVariables = Exact<{
@@ -3279,12 +3185,10 @@ export type UploadJobImageMutationVariables = Exact<{
 
 export type UploadJobImageMutation = (
   { __typename?: 'Mutation' }
-  & {
-    uploadJobImage?: Maybe<(
-      { __typename?: 'AWSImageType' }
-      & Pick<AwsImageType, 'url'>
-    )>
-  }
+  & { uploadJobImage?: Maybe<(
+    { __typename?: 'AWSImageType' }
+    & Pick<AwsImageType, 'url'>
+  )> }
 );
 
 export type RetryAutodeckJobMutationVariables = Exact<{
@@ -3293,12 +3197,10 @@ export type RetryAutodeckJobMutationVariables = Exact<{
 
 export type RetryAutodeckJobMutation = (
   { __typename?: 'Mutation' }
-  & {
-    retryAutodeckJob?: Maybe<(
-      { __typename?: 'CreateWorkspaceJobType' }
-      & Pick<CreateWorkspaceJobType, 'id' | 'name' | 'status'>
-    )>
-  }
+  & { retryAutodeckJob?: Maybe<(
+    { __typename?: 'CreateWorkspaceJobType' }
+    & Pick<CreateWorkspaceJobType, 'id' | 'name' | 'status'>
+  )> }
 );
 
 export type GetAdjustedLogoQueryVariables = Exact<{
@@ -3307,35 +3209,27 @@ export type GetAdjustedLogoQueryVariables = Exact<{
 
 export type GetAdjustedLogoQuery = (
   { __typename?: 'Query' }
-  & {
-    getAdjustedLogo?: Maybe<(
-      { __typename?: 'AWSImageType' }
-      & Pick<AwsImageType, 'url'>
-    )>
-  }
+  & { getAdjustedLogo?: Maybe<(
+    { __typename?: 'AWSImageType' }
+    & Pick<AwsImageType, 'url'>
+  )> }
 );
 
 export type GetJobProcessLocationsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetJobProcessLocationsQuery = (
   { __typename?: 'Query' }
-  & {
-    getJobProcessLocations: (
-      { __typename?: 'JobProcessLocations' }
-      & {
-        jobProcessLocations: Array<(
-          { __typename?: 'JobProcessLocation' }
-          & Pick<JobProcessLocation, 'id' | 'name' | 'path' | 'type'>
-          & {
-            customFields?: Maybe<Array<(
-              { __typename?: 'CustomFieldType' }
-              & Pick<CustomFieldType, 'id' | 'key' | 'value'>
-            )>>
-          }
-        )>
-      }
-    )
-  }
+  & { getJobProcessLocations: (
+    { __typename?: 'JobProcessLocations' }
+    & { jobProcessLocations: Array<(
+      { __typename?: 'JobProcessLocation' }
+      & Pick<JobProcessLocation, 'id' | 'name' | 'path' | 'type'>
+      & { customFields?: Maybe<Array<(
+        { __typename?: 'CustomFieldType' }
+        & Pick<CustomFieldType, 'id' | 'key' | 'value'>
+      )>> }
+    )> }
+  ) }
 );
 
 export type GetPreviewDataQueryVariables = Exact<{
@@ -3344,12 +3238,10 @@ export type GetPreviewDataQueryVariables = Exact<{
 
 export type GetPreviewDataQuery = (
   { __typename?: 'Query' }
-  & {
-    getPreviewData?: Maybe<(
-      { __typename?: 'PreviewDataType' }
-      & Pick<PreviewDataType, 'colors' | 'rembgLogoUrl' | 'websiteScreenshotUrl'>
-    )>
-  }
+  & { getPreviewData?: Maybe<(
+    { __typename?: 'PreviewDataType' }
+    & Pick<PreviewDataType, 'colors' | 'rembgLogoUrl' | 'websiteScreenshotUrl'>
+  )> }
 );
 
 export type RemovePixelRangeMutationVariables = Exact<{
@@ -3358,12 +3250,10 @@ export type RemovePixelRangeMutationVariables = Exact<{
 
 export type RemovePixelRangeMutation = (
   { __typename?: 'Mutation' }
-  & {
-    removePixelRange?: Maybe<(
-      { __typename?: 'AWSImageType' }
-      & Pick<AwsImageType, 'url'>
-    )>
-  }
+  & { removePixelRange?: Maybe<(
+    { __typename?: 'AWSImageType' }
+    & Pick<AwsImageType, 'url'>
+  )> }
 );
 
 export type WhitifyImageMutationVariables = Exact<{
@@ -3372,12 +3262,10 @@ export type WhitifyImageMutationVariables = Exact<{
 
 export type WhitifyImageMutation = (
   { __typename?: 'Mutation' }
-  & {
-    whitifyImage?: Maybe<(
-      { __typename?: 'AWSImageType' }
-      & Pick<AwsImageType, 'url'>
-    )>
-  }
+  & { whitifyImage?: Maybe<(
+    { __typename?: 'AWSImageType' }
+    & Pick<AwsImageType, 'url'>
+  )> }
 );
 
 export type CreateBatchDeliveriesMutationVariables = Exact<{
@@ -3386,18 +3274,14 @@ export type CreateBatchDeliveriesMutationVariables = Exact<{
 
 export type CreateBatchDeliveriesMutation = (
   { __typename?: 'Mutation' }
-  & {
-    createBatchDeliveries: (
-      { __typename?: 'CreateBatchDeliveriesOutputType' }
-      & Pick<CreateBatchDeliveriesOutputType, 'nrDeliveries'>
-      & {
-        failedDeliveries: Array<(
-          { __typename?: 'FailedDeliveryModel' }
-          & Pick<FailedDeliveryModel, 'record' | 'error'>
-        )>
-      }
-    )
-  }
+  & { createBatchDeliveries: (
+    { __typename?: 'CreateBatchDeliveriesOutputType' }
+    & Pick<CreateBatchDeliveriesOutputType, 'nrDeliveries'>
+    & { failedDeliveries: Array<(
+      { __typename?: 'FailedDeliveryModel' }
+      & Pick<FailedDeliveryModel, 'record' | 'error'>
+    )> }
+  ) }
 );
 
 export type GetDeliveryQueryVariables = Exact<{
@@ -3406,18 +3290,14 @@ export type GetDeliveryQueryVariables = Exact<{
 
 export type GetDeliveryQuery = (
   { __typename?: 'Query' }
-  & {
-    delivery?: Maybe<(
-      { __typename?: 'DeliveryType' }
-      & {
-        events?: Maybe<Array<(
-          { __typename?: 'DeliveryEventType' }
-          & DeliveryEventFragmentFragment
-        )>>
-      }
-      & DeliveryFragmentFragment
-    )>
-  }
+  & { delivery?: Maybe<(
+    { __typename?: 'DeliveryType' }
+    & { events?: Maybe<Array<(
+      { __typename?: 'DeliveryEventType' }
+      & DeliveryEventFragmentFragment
+    )>> }
+    & DeliveryFragmentFragment
+  )> }
 );
 
 export type GetWorkspaceCampaignQueryVariables = Exact<{
@@ -3428,57 +3308,45 @@ export type GetWorkspaceCampaignQueryVariables = Exact<{
 
 export type GetWorkspaceCampaignQuery = (
   { __typename?: 'Query' }
-  & {
-    customer?: Maybe<(
-      { __typename?: 'Customer' }
-      & Pick<Customer, 'id'>
-      & {
-        campaign?: Maybe<(
-          { __typename?: 'CampaignType' }
-          & Pick<CampaignType, 'id' | 'label'>
-          & {
-            deliveryConnection?: Maybe<(
-              { __typename?: 'DeliveryConnectionType' }
-              & Pick<DeliveryConnectionType, 'totalPages'>
-              & {
-                deliveries: Array<(
-                  { __typename?: 'DeliveryType' }
-                  & Pick<DeliveryType, 'id' | 'deliveryRecipientFirstName' | 'deliveryRecipientLastName' | 'deliveryRecipientEmail' | 'deliveryRecipientPhone' | 'scheduledAt' | 'updatedAt' | 'currentStatus'>
-                  & {
-                    campaignVariant?: Maybe<(
-                      { __typename?: 'CampaignVariantType' }
-                      & Pick<CampaignVariantType, 'id' | 'label' | 'type'>
-                    )>, events?: Maybe<Array<(
-                      { __typename?: 'DeliveryEventType' }
-                      & Pick<DeliveryEventType, 'id' | 'createdAt' | 'status' | 'failureMessage'>
-                    )>>
-                  }
-                )>, pageInfo: (
-                  { __typename?: 'PaginationPageInfo' }
-                  & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'prevPageOffset' | 'nextPageOffset' | 'pageIndex'>
-                )
-              }
-            )>, variants?: Maybe<Array<(
-              { __typename?: 'CampaignVariantType' }
-              & Pick<CampaignVariantType, 'id' | 'label' | 'from' | 'type' | 'weight' | 'body'>
-              & {
-                customVariables?: Maybe<Array<(
-                  { __typename?: 'CampaignVariantCustomVariableType' }
-                  & Pick<CampaignVariantCustomVariableType, 'id' | 'key'>
-                )>>, dialogue?: Maybe<(
-                  { __typename?: 'Dialogue' }
-                  & Pick<Dialogue, 'id' | 'title'>
-                )>, workspace?: Maybe<(
-                  { __typename?: 'Customer' }
-                  & Pick<Customer, 'id'>
-                )>
-              }
-            )>>
-          }
-        )>
-      }
-    )>
-  }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { campaign?: Maybe<(
+      { __typename?: 'CampaignType' }
+      & Pick<CampaignType, 'id' | 'label'>
+      & { deliveryConnection?: Maybe<(
+        { __typename?: 'DeliveryConnectionType' }
+        & Pick<DeliveryConnectionType, 'totalPages'>
+        & { deliveries: Array<(
+          { __typename?: 'DeliveryType' }
+          & Pick<DeliveryType, 'id' | 'deliveryRecipientFirstName' | 'deliveryRecipientLastName' | 'deliveryRecipientEmail' | 'deliveryRecipientPhone' | 'scheduledAt' | 'updatedAt' | 'currentStatus'>
+          & { campaignVariant?: Maybe<(
+            { __typename?: 'CampaignVariantType' }
+            & Pick<CampaignVariantType, 'id' | 'label' | 'type'>
+          )>, events?: Maybe<Array<(
+            { __typename?: 'DeliveryEventType' }
+            & Pick<DeliveryEventType, 'id' | 'createdAt' | 'status' | 'failureMessage'>
+          )>> }
+        )>, pageInfo: (
+          { __typename?: 'PaginationPageInfo' }
+          & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'prevPageOffset' | 'nextPageOffset' | 'pageIndex'>
+        ) }
+      )>, variants?: Maybe<Array<(
+        { __typename?: 'CampaignVariantType' }
+        & Pick<CampaignVariantType, 'id' | 'label' | 'from' | 'type' | 'weight' | 'body'>
+        & { customVariables?: Maybe<Array<(
+          { __typename?: 'CampaignVariantCustomVariableType' }
+          & Pick<CampaignVariantCustomVariableType, 'id' | 'key'>
+        )>>, dialogue?: Maybe<(
+          { __typename?: 'Dialogue' }
+          & Pick<Dialogue, 'id' | 'title'>
+        )>, workspace?: Maybe<(
+          { __typename?: 'Customer' }
+          & Pick<Customer, 'id'>
+        )> }
+      )>> }
+    )> }
+  )> }
 );
 
 export type CreateCampaignMutationVariables = Exact<{
@@ -3487,12 +3355,10 @@ export type CreateCampaignMutationVariables = Exact<{
 
 export type CreateCampaignMutation = (
   { __typename?: 'Mutation' }
-  & {
-    createCampaign: (
-      { __typename?: 'CampaignType' }
-      & Pick<CampaignType, 'id'>
-    )
-  }
+  & { createCampaign: (
+    { __typename?: 'CampaignType' }
+    & Pick<CampaignType, 'id'>
+  ) }
 );
 
 export type GetWorkspaceCampaignsQueryVariables = Exact<{
@@ -3501,24 +3367,18 @@ export type GetWorkspaceCampaignsQueryVariables = Exact<{
 
 export type GetWorkspaceCampaignsQuery = (
   { __typename?: 'Query' }
-  & {
-    customer?: Maybe<(
-      { __typename?: 'Customer' }
-      & Pick<Customer, 'id'>
-      & {
-        campaigns: Array<(
-          { __typename?: 'CampaignType' }
-          & Pick<CampaignType, 'id' | 'label'>
-          & {
-            variants?: Maybe<Array<(
-              { __typename?: 'CampaignVariantType' }
-              & Pick<CampaignVariantType, 'id' | 'label'>
-            )>>
-          }
-        )>
-      }
-    )>
-  }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { campaigns: Array<(
+      { __typename?: 'CampaignType' }
+      & Pick<CampaignType, 'id' | 'label'>
+      & { variants?: Maybe<Array<(
+        { __typename?: 'CampaignVariantType' }
+        & Pick<CampaignVariantType, 'id' | 'label'>
+      )>> }
+    )> }
+  )> }
 );
 
 export type GetWorkspaceDialoguesQueryVariables = Exact<{
@@ -3528,27 +3388,21 @@ export type GetWorkspaceDialoguesQueryVariables = Exact<{
 
 export type GetWorkspaceDialoguesQuery = (
   { __typename?: 'Query' }
-  & {
-    customer?: Maybe<(
-      { __typename?: 'Customer' }
-      & Pick<Customer, 'id'>
-      & {
-        dialogues?: Maybe<Array<(
-          { __typename?: 'Dialogue' }
-          & Pick<Dialogue, 'id' | 'title' | 'slug' | 'publicTitle' | 'creationDate' | 'updatedAt' | 'customerId' | 'averageScore'>
-          & {
-            customer?: Maybe<(
-              { __typename?: 'Customer' }
-              & Pick<Customer, 'slug'>
-            )>, tags?: Maybe<Array<(
-              { __typename?: 'Tag' }
-              & Pick<Tag, 'id' | 'type' | 'name'>
-            )>>
-          }
-        )>>
-      }
-    )>
-  }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { dialogues?: Maybe<Array<(
+      { __typename?: 'Dialogue' }
+      & Pick<Dialogue, 'id' | 'title' | 'slug' | 'publicTitle' | 'creationDate' | 'updatedAt' | 'customerId' | 'averageScore'>
+      & { customer?: Maybe<(
+        { __typename?: 'Customer' }
+        & Pick<Customer, 'slug'>
+      )>, tags?: Maybe<Array<(
+        { __typename?: 'Tag' }
+        & Pick<Tag, 'id' | 'type' | 'name'>
+      )>> }
+    )>> }
+  )> }
 );
 
 export type DuplicateQuestionMutationVariables = Exact<{
@@ -3557,12 +3411,10 @@ export type DuplicateQuestionMutationVariables = Exact<{
 
 export type DuplicateQuestionMutation = (
   { __typename?: 'Mutation' }
-  & {
-    duplicateQuestion?: Maybe<(
-      { __typename?: 'QuestionNode' }
-      & Pick<QuestionNode, 'id'>
-    )>
-  }
+  & { duplicateQuestion?: Maybe<(
+    { __typename?: 'QuestionNode' }
+    & Pick<QuestionNode, 'id'>
+  )> }
 );
 
 export type GetDialogueLinksQueryVariables = Exact<{
@@ -3572,21 +3424,17 @@ export type GetDialogueLinksQueryVariables = Exact<{
 
 export type GetDialogueLinksQuery = (
   { __typename?: 'Query' }
-  & {
-    dialogueLinks?: Maybe<(
-      { __typename?: 'PublicDialogueConnection' }
-      & Pick<PublicDialogueConnection, 'totalPages'>
-      & {
-        dialogues: Array<(
-          { __typename?: 'PublicDialogueInfo' }
-          & Pick<PublicDialogueInfo, 'title' | 'slug' | 'description' | 'url'>
-        )>, pageInfo: (
-          { __typename?: 'PaginationPageInfo' }
-          & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'prevPageOffset' | 'nextPageOffset' | 'pageIndex'>
-        )
-      }
-    )>
-  }
+  & { dialogueLinks?: Maybe<(
+    { __typename?: 'PublicDialogueConnection' }
+    & Pick<PublicDialogueConnection, 'totalPages'>
+    & { dialogues: Array<(
+      { __typename?: 'PublicDialogueInfo' }
+      & Pick<PublicDialogueInfo, 'title' | 'slug' | 'description' | 'url'>
+    )>, pageInfo: (
+      { __typename?: 'PaginationPageInfo' }
+      & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'prevPageOffset' | 'nextPageOffset' | 'pageIndex'>
+    ) }
+  )> }
 );
 
 export type DeleteDialogueMutationVariables = Exact<{
@@ -3595,12 +3443,10 @@ export type DeleteDialogueMutationVariables = Exact<{
 
 export type DeleteDialogueMutation = (
   { __typename?: 'Mutation' }
-  & {
-    deleteDialogue: (
-      { __typename?: 'Dialogue' }
-      & Pick<Dialogue, 'id' | 'slug'>
-    )
-  }
+  & { deleteDialogue: (
+    { __typename?: 'Dialogue' }
+    & Pick<Dialogue, 'id' | 'slug'>
+  ) }
 );
 
 export type DialogueConnectionQueryVariables = Exact<{
@@ -3610,36 +3456,28 @@ export type DialogueConnectionQueryVariables = Exact<{
 
 export type DialogueConnectionQuery = (
   { __typename?: 'Query' }
-  & {
-    customer?: Maybe<(
-      { __typename?: 'Customer' }
-      & Pick<Customer, 'id' | 'slug'>
-      & {
-        dialogueConnection?: Maybe<(
-          { __typename?: 'DialogueConnection' }
-          & Pick<DialogueConnection, 'totalPages'>
-          & {
-            pageInfo: (
-              { __typename?: 'PaginationPageInfo' }
-              & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'prevPageOffset' | 'nextPageOffset' | 'pageIndex'>
-            ), dialogues: Array<(
-              { __typename?: 'Dialogue' }
-              & Pick<Dialogue, 'id' | 'title' | 'isPrivate' | 'language' | 'slug' | 'publicTitle' | 'creationDate' | 'updatedAt' | 'customerId' | 'averageScore'>
-              & {
-                customer?: Maybe<(
-                  { __typename?: 'Customer' }
-                  & Pick<Customer, 'slug'>
-                )>, tags?: Maybe<Array<(
-                  { __typename?: 'Tag' }
-                  & Pick<Tag, 'id' | 'type' | 'name'>
-                )>>
-              }
-            )>
-          }
-        )>
-      }
-    )>
-  }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id' | 'slug'>
+    & { dialogueConnection?: Maybe<(
+      { __typename?: 'DialogueConnection' }
+      & Pick<DialogueConnection, 'totalPages'>
+      & { pageInfo: (
+        { __typename?: 'PaginationPageInfo' }
+        & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'prevPageOffset' | 'nextPageOffset' | 'pageIndex'>
+      ), dialogues: Array<(
+        { __typename?: 'Dialogue' }
+        & Pick<Dialogue, 'id' | 'title' | 'isPrivate' | 'language' | 'slug' | 'publicTitle' | 'creationDate' | 'updatedAt' | 'customerId' | 'averageScore'>
+        & { customer?: Maybe<(
+          { __typename?: 'Customer' }
+          & Pick<Customer, 'slug'>
+        )>, tags?: Maybe<Array<(
+          { __typename?: 'Tag' }
+          & Pick<Tag, 'id' | 'type' | 'name'>
+        )>> }
+      )> }
+    )> }
+  )> }
 );
 
 export type SetDialoguePrivacyMutationVariables = Exact<{
@@ -3648,12 +3486,10 @@ export type SetDialoguePrivacyMutationVariables = Exact<{
 
 export type SetDialoguePrivacyMutation = (
   { __typename?: 'Mutation' }
-  & {
-    setDialoguePrivacy?: Maybe<(
-      { __typename?: 'Dialogue' }
-      & Pick<Dialogue, 'slug' | 'title' | 'isPrivate'>
-    )>
-  }
+  & { setDialoguePrivacy?: Maybe<(
+    { __typename?: 'Dialogue' }
+    & Pick<Dialogue, 'slug' | 'title' | 'isPrivate'>
+  )> }
 );
 
 export type GetDialogueStatisticsQueryVariables = Exact<{
@@ -3665,57 +3501,45 @@ export type GetDialogueStatisticsQueryVariables = Exact<{
 
 export type GetDialogueStatisticsQuery = (
   { __typename?: 'Query' }
-  & {
-    customer?: Maybe<(
-      { __typename?: 'Customer' }
-      & Pick<Customer, 'id'>
-      & {
-        dialogue?: Maybe<(
-          { __typename?: 'Dialogue' }
-          & Pick<Dialogue, 'id' | 'title'>
-          & { thisWeekAverageScore: Dialogue['averageScore'], previousScore: Dialogue['averageScore'] }
-          & {
-            sessions: Array<(
-              { __typename?: 'Session' }
-              & Pick<Session, 'id' | 'createdAt' | 'mainScore'>
-              & {
-                nodeEntries: Array<(
-                  { __typename?: 'NodeEntry' }
-                  & {
-                    relatedNode?: Maybe<(
-                      { __typename?: 'QuestionNode' }
-                      & Pick<QuestionNode, 'title' | 'type'>
-                    )>, value?: Maybe<(
-                      { __typename?: 'NodeEntryValue' }
-                      & Pick<NodeEntryValue, 'sliderNodeEntry' | 'textboxNodeEntry' | 'registrationNodeEntry' | 'choiceNodeEntry' | 'linkNodeEntry'>
-                    )>
-                  }
-                )>
-              }
-            )>, statistics?: Maybe<(
-              { __typename?: 'DialogueStatistics' }
-              & Pick<DialogueStatistics, 'nrInteractions'>
-              & {
-                topPositivePath?: Maybe<Array<(
-                  { __typename?: 'topPathType' }
-                  & Pick<TopPathType, 'answer' | 'quantity' | 'basicSentiment'>
-                )>>, mostPopularPath?: Maybe<(
-                  { __typename?: 'topPathType' }
-                  & Pick<TopPathType, 'answer' | 'quantity' | 'basicSentiment'>
-                )>, topNegativePath?: Maybe<Array<(
-                  { __typename?: 'topPathType' }
-                  & Pick<TopPathType, 'quantity' | 'answer' | 'basicSentiment'>
-                )>>, history?: Maybe<Array<(
-                  { __typename?: 'lineChartDataType' }
-                  & Pick<LineChartDataType, 'x' | 'y'>
-                )>>
-              }
-            )>
-          }
-        )>
-      }
-    )>
-  }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { dialogue?: Maybe<(
+      { __typename?: 'Dialogue' }
+      & Pick<Dialogue, 'id' | 'title'>
+      & { thisWeekAverageScore: Dialogue['averageScore'], previousScore: Dialogue['averageScore'] }
+      & { sessions: Array<(
+        { __typename?: 'Session' }
+        & Pick<Session, 'id' | 'createdAt' | 'mainScore'>
+        & { nodeEntries: Array<(
+          { __typename?: 'NodeEntry' }
+          & { relatedNode?: Maybe<(
+            { __typename?: 'QuestionNode' }
+            & Pick<QuestionNode, 'title' | 'type'>
+          )>, value?: Maybe<(
+            { __typename?: 'NodeEntryValue' }
+            & Pick<NodeEntryValue, 'sliderNodeEntry' | 'textboxNodeEntry' | 'registrationNodeEntry' | 'choiceNodeEntry' | 'linkNodeEntry'>
+          )> }
+        )> }
+      )>, statistics?: Maybe<(
+        { __typename?: 'DialogueStatistics' }
+        & Pick<DialogueStatistics, 'nrInteractions'>
+        & { topPositivePath?: Maybe<Array<(
+          { __typename?: 'topPathType' }
+          & Pick<TopPathType, 'answer' | 'quantity' | 'basicSentiment'>
+        )>>, mostPopularPath?: Maybe<(
+          { __typename?: 'topPathType' }
+          & Pick<TopPathType, 'answer' | 'quantity' | 'basicSentiment'>
+        )>, topNegativePath?: Maybe<Array<(
+          { __typename?: 'topPathType' }
+          & Pick<TopPathType, 'quantity' | 'answer' | 'basicSentiment'>
+        )>>, history?: Maybe<Array<(
+          { __typename?: 'lineChartDataType' }
+          & Pick<LineChartDataType, 'x' | 'y'>
+        )>> }
+      )> }
+    )> }
+  )> }
 );
 
 export type GetInteractionQueryVariables = Exact<{
@@ -3724,34 +3548,26 @@ export type GetInteractionQueryVariables = Exact<{
 
 export type GetInteractionQuery = (
   { __typename?: 'Query' }
-  & {
-    session?: Maybe<(
-      { __typename?: 'Session' }
-      & Pick<Session, 'id'>
-      & {
-        delivery?: Maybe<(
-          { __typename?: 'DeliveryType' }
-          & {
-            campaignVariant?: Maybe<(
-              { __typename?: 'CampaignVariantType' }
-              & Pick<CampaignVariantType, 'id'>
-              & {
-                campaign?: Maybe<(
-                  { __typename?: 'CampaignType' }
-                  & Pick<CampaignType, 'id'>
-                )>
-              }
-            )>, events?: Maybe<Array<(
-              { __typename?: 'DeliveryEventType' }
-              & DeliveryEventFragmentFragment
-            )>>
-          }
-          & DeliveryFragmentFragment
-        )>
-      }
-      & SessionFragmentFragment
-    )>
-  }
+  & { session?: Maybe<(
+    { __typename?: 'Session' }
+    & Pick<Session, 'id'>
+    & { delivery?: Maybe<(
+      { __typename?: 'DeliveryType' }
+      & { campaignVariant?: Maybe<(
+        { __typename?: 'CampaignVariantType' }
+        & Pick<CampaignVariantType, 'id'>
+        & { campaign?: Maybe<(
+          { __typename?: 'CampaignType' }
+          & Pick<CampaignType, 'id'>
+        )> }
+      )>, events?: Maybe<Array<(
+        { __typename?: 'DeliveryEventType' }
+        & DeliveryEventFragmentFragment
+      )>> }
+      & DeliveryFragmentFragment
+    )> }
+    & SessionFragmentFragment
+  )> }
 );
 
 export type GetWorkspaceSessionsQueryVariables = Exact<{
@@ -3761,27 +3577,21 @@ export type GetWorkspaceSessionsQueryVariables = Exact<{
 
 export type GetWorkspaceSessionsQuery = (
   { __typename?: 'Query' }
-  & {
-    customer?: Maybe<(
-      { __typename?: 'Customer' }
-      & Pick<Customer, 'id'>
-      & {
-        sessionConnection?: Maybe<(
-          { __typename?: 'SessionConnection' }
-          & Pick<SessionConnection, 'totalPages'>
-          & {
-            sessions: Array<(
-              { __typename?: 'Session' }
-              & SessionFragmentFragment
-            )>, pageInfo: (
-              { __typename?: 'PaginationPageInfo' }
-              & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'nextPageOffset' | 'prevPageOffset' | 'pageIndex'>
-            )
-          }
-        )>
-      }
-    )>
-  }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { sessionConnection?: Maybe<(
+      { __typename?: 'SessionConnection' }
+      & Pick<SessionConnection, 'totalPages'>
+      & { sessions: Array<(
+        { __typename?: 'Session' }
+        & SessionFragmentFragment
+      )>, pageInfo: (
+        { __typename?: 'PaginationPageInfo' }
+        & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'nextPageOffset' | 'prevPageOffset' | 'pageIndex'>
+      ) }
+    )> }
+  )> }
 );
 
 export type GenerateWorkspaceFromCsvMutationVariables = Exact<{
@@ -3790,12 +3600,10 @@ export type GenerateWorkspaceFromCsvMutationVariables = Exact<{
 
 export type GenerateWorkspaceFromCsvMutation = (
   { __typename?: 'Mutation' }
-  & {
-    generateWorkspaceFromCSV?: Maybe<(
-      { __typename?: 'Customer' }
-      & Pick<Customer, 'id' | 'slug'>
-    )>
-  }
+  & { generateWorkspaceFromCSV?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id' | 'slug'>
+  )> }
 );
 
 export type GetInteractionsQueryQueryVariables = Exact<{
@@ -3806,42 +3614,32 @@ export type GetInteractionsQueryQueryVariables = Exact<{
 
 export type GetInteractionsQueryQuery = (
   { __typename?: 'Query' }
-  & {
-    customer?: Maybe<(
-      { __typename?: 'Customer' }
-      & Pick<Customer, 'id'>
-      & {
-        dialogue?: Maybe<(
-          { __typename?: 'Dialogue' }
-          & Pick<Dialogue, 'id'>
-          & {
-            campaignVariants: Array<(
-              { __typename?: 'CampaignVariantType' }
-              & Pick<CampaignVariantType, 'id' | 'label'>
-              & {
-                campaign?: Maybe<(
-                  { __typename?: 'CampaignType' }
-                  & Pick<CampaignType, 'id' | 'label'>
-                )>
-              }
-            )>, sessionConnection?: Maybe<(
-              { __typename?: 'SessionConnection' }
-              & Pick<SessionConnection, 'totalPages'>
-              & {
-                sessions: Array<(
-                  { __typename?: 'Session' }
-                  & SessionFragmentFragment
-                )>, pageInfo: (
-                  { __typename?: 'PaginationPageInfo' }
-                  & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'pageIndex' | 'nextPageOffset' | 'prevPageOffset'>
-                )
-              }
-            )>
-          }
-        )>
-      }
-    )>
-  }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { dialogue?: Maybe<(
+      { __typename?: 'Dialogue' }
+      & Pick<Dialogue, 'id'>
+      & { campaignVariants: Array<(
+        { __typename?: 'CampaignVariantType' }
+        & Pick<CampaignVariantType, 'id' | 'label'>
+        & { campaign?: Maybe<(
+          { __typename?: 'CampaignType' }
+          & Pick<CampaignType, 'id' | 'label'>
+        )> }
+      )>, sessionConnection?: Maybe<(
+        { __typename?: 'SessionConnection' }
+        & Pick<SessionConnection, 'totalPages'>
+        & { sessions: Array<(
+          { __typename?: 'Session' }
+          & SessionFragmentFragment
+        )>, pageInfo: (
+          { __typename?: 'PaginationPageInfo' }
+          & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'pageIndex' | 'nextPageOffset' | 'prevPageOffset'>
+        ) }
+      )> }
+    )> }
+  )> }
 );
 
 export type RequestInviteMutationVariables = Exact<{
@@ -3850,12 +3648,10 @@ export type RequestInviteMutationVariables = Exact<{
 
 export type RequestInviteMutation = (
   { __typename?: 'Mutation' }
-  & {
-    requestInvite: (
-      { __typename?: 'RequestInviteOutput' }
-      & Pick<RequestInviteOutput, 'didInvite' | 'userExists'>
-    )
-  }
+  & { requestInvite: (
+    { __typename?: 'RequestInviteOutput' }
+    & Pick<RequestInviteOutput, 'didInvite' | 'userExists'>
+  ) }
 );
 
 export type AssignUserToDialoguesMutationVariables = Exact<{
@@ -3864,26 +3660,20 @@ export type AssignUserToDialoguesMutationVariables = Exact<{
 
 export type AssignUserToDialoguesMutation = (
   { __typename?: 'Mutation' }
-  & {
-    assignUserToDialogues?: Maybe<(
-      { __typename?: 'UserType' }
-      & Pick<UserType, 'email'>
-      & {
-        assignedDialogues?: Maybe<(
-          { __typename?: 'AssignedDialogues' }
-          & {
-            privateWorkspaceDialogues: Array<(
-              { __typename?: 'Dialogue' }
-              & Pick<Dialogue, 'title' | 'slug' | 'id'>
-            )>, assignedDialogues: Array<(
-              { __typename?: 'Dialogue' }
-              & Pick<Dialogue, 'slug' | 'id'>
-            )>
-          }
-        )>
-      }
-    )>
-  }
+  & { assignUserToDialogues?: Maybe<(
+    { __typename?: 'UserType' }
+    & Pick<UserType, 'email'>
+    & { assignedDialogues?: Maybe<(
+      { __typename?: 'AssignedDialogues' }
+      & { privateWorkspaceDialogues: Array<(
+        { __typename?: 'Dialogue' }
+        & Pick<Dialogue, 'title' | 'slug' | 'id'>
+      )>, assignedDialogues: Array<(
+        { __typename?: 'Dialogue' }
+        & Pick<Dialogue, 'slug' | 'id'>
+      )> }
+    )> }
+  )> }
 );
 
 export type DeleteUserMutationVariables = Exact<{
@@ -3892,12 +3682,10 @@ export type DeleteUserMutationVariables = Exact<{
 
 export type DeleteUserMutation = (
   { __typename?: 'Mutation' }
-  & {
-    deleteUser: (
-      { __typename?: 'DeleteUserOutput' }
-      & Pick<DeleteUserOutput, 'deletedUser'>
-    )
-  }
+  & { deleteUser: (
+    { __typename?: 'DeleteUserOutput' }
+    & Pick<DeleteUserOutput, 'deletedUser'>
+  ) }
 );
 
 export type GetPaginatedUsersQueryVariables = Exact<{
@@ -3907,36 +3695,28 @@ export type GetPaginatedUsersQueryVariables = Exact<{
 
 export type GetPaginatedUsersQuery = (
   { __typename?: 'Query' }
-  & {
-    customer?: Maybe<(
-      { __typename?: 'Customer' }
-      & Pick<Customer, 'id'>
-      & {
-        usersConnection?: Maybe<(
-          { __typename?: 'UserConnection' }
-          & Pick<UserConnection, 'totalPages'>
-          & {
-            userCustomers: Array<(
-              { __typename?: 'UserCustomer' }
-              & Pick<UserCustomer, 'createdAt' | 'isActive'>
-              & {
-                user: (
-                  { __typename?: 'UserType' }
-                  & Pick<UserType, 'lastLoggedIn' | 'lastActivity' | 'id' | 'email' | 'firstName' | 'lastName'>
-                ), role: (
-                  { __typename?: 'RoleType' }
-                  & Pick<RoleType, 'id' | 'name'>
-                )
-              }
-            )>, pageInfo: (
-              { __typename?: 'PaginationPageInfo' }
-              & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'prevPageOffset' | 'nextPageOffset' | 'pageIndex'>
-            )
-          }
-        )>
-      }
-    )>
-  }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { usersConnection?: Maybe<(
+      { __typename?: 'UserConnection' }
+      & Pick<UserConnection, 'totalPages'>
+      & { userCustomers: Array<(
+        { __typename?: 'UserCustomer' }
+        & Pick<UserCustomer, 'createdAt' | 'isActive'>
+        & { user: (
+          { __typename?: 'UserType' }
+          & Pick<UserType, 'lastLoggedIn' | 'lastActivity' | 'id' | 'email' | 'firstName' | 'lastName'>
+        ), role: (
+          { __typename?: 'RoleType' }
+          & Pick<RoleType, 'id' | 'name'>
+        ) }
+      )>, pageInfo: (
+        { __typename?: 'PaginationPageInfo' }
+        & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'prevPageOffset' | 'nextPageOffset' | 'pageIndex'>
+      ) }
+    )> }
+  )> }
 );
 
 export type FindRoleByIdQueryVariables = Exact<{
@@ -3945,12 +3725,10 @@ export type FindRoleByIdQueryVariables = Exact<{
 
 export type FindRoleByIdQuery = (
   { __typename?: 'Query' }
-  & {
-    role?: Maybe<(
-      { __typename?: 'RoleType' }
-      & Pick<RoleType, 'id' | 'name' | 'nrPermissions' | 'permissions' | 'allPermissions'>
-    )>
-  }
+  & { role?: Maybe<(
+    { __typename?: 'RoleType' }
+    & Pick<RoleType, 'id' | 'name' | 'nrPermissions' | 'permissions' | 'allPermissions'>
+  )> }
 );
 
 export type GetRolesQueryVariables = Exact<{
@@ -3959,18 +3737,14 @@ export type GetRolesQueryVariables = Exact<{
 
 export type GetRolesQuery = (
   { __typename?: 'Query' }
-  & {
-    customer?: Maybe<(
-      { __typename?: 'Customer' }
-      & Pick<Customer, 'id'>
-      & {
-        roles?: Maybe<Array<(
-          { __typename?: 'RoleType' }
-          & Pick<RoleType, 'id' | 'name'>
-        )>>
-      }
-    )>
-  }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { roles?: Maybe<Array<(
+      { __typename?: 'RoleType' }
+      & Pick<RoleType, 'id' | 'name'>
+    )>> }
+  )> }
 );
 
 export type GetUserCustomerFromCustomerQueryVariables = Exact<{
@@ -3981,40 +3755,30 @@ export type GetUserCustomerFromCustomerQueryVariables = Exact<{
 
 export type GetUserCustomerFromCustomerQuery = (
   { __typename?: 'Query' }
-  & {
-    customer?: Maybe<(
-      { __typename?: 'Customer' }
-      & Pick<Customer, 'id'>
-      & {
-        userCustomer?: Maybe<(
-          { __typename?: 'UserCustomer' }
-          & {
-            user: (
-              { __typename?: 'UserType' }
-              & Pick<UserType, 'id' | 'email' | 'phone' | 'firstName' | 'lastName'>
-              & {
-                assignedDialogues?: Maybe<(
-                  { __typename?: 'AssignedDialogues' }
-                  & {
-                    privateWorkspaceDialogues: Array<(
-                      { __typename?: 'Dialogue' }
-                      & Pick<Dialogue, 'title' | 'slug' | 'id' | 'description'>
-                    )>, assignedDialogues: Array<(
-                      { __typename?: 'Dialogue' }
-                      & Pick<Dialogue, 'slug' | 'id'>
-                    )>
-                  }
-                )>
-              }
-            ), role: (
-              { __typename?: 'RoleType' }
-              & Pick<RoleType, 'name' | 'id'>
-            )
-          }
-        )>
-      }
-    )>
-  }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { userCustomer?: Maybe<(
+      { __typename?: 'UserCustomer' }
+      & { user: (
+        { __typename?: 'UserType' }
+        & Pick<UserType, 'id' | 'email' | 'phone' | 'firstName' | 'lastName'>
+        & { assignedDialogues?: Maybe<(
+          { __typename?: 'AssignedDialogues' }
+          & { privateWorkspaceDialogues: Array<(
+            { __typename?: 'Dialogue' }
+            & Pick<Dialogue, 'title' | 'slug' | 'id' | 'description'>
+          )>, assignedDialogues: Array<(
+            { __typename?: 'Dialogue' }
+            & Pick<Dialogue, 'slug' | 'id'>
+          )> }
+        )> }
+      ), role: (
+        { __typename?: 'RoleType' }
+        & Pick<RoleType, 'name' | 'id'>
+      ) }
+    )> }
+  )> }
 );
 
 export type HandleUserStateInWorkspaceMutationVariables = Exact<{
@@ -4023,18 +3787,14 @@ export type HandleUserStateInWorkspaceMutationVariables = Exact<{
 
 export type HandleUserStateInWorkspaceMutation = (
   { __typename?: 'Mutation' }
-  & {
-    handleUserStateInWorkspace: (
-      { __typename?: 'UserCustomer' }
-      & Pick<UserCustomer, 'isActive'>
-      & {
-        user: (
-          { __typename?: 'UserType' }
-          & Pick<UserType, 'email'>
-        )
-      }
-    )
-  }
+  & { handleUserStateInWorkspace: (
+    { __typename?: 'UserCustomer' }
+    & Pick<UserCustomer, 'isActive'>
+    & { user: (
+      { __typename?: 'UserType' }
+      & Pick<UserType, 'email'>
+    ) }
+  ) }
 );
 
 export type UpdatePermissionsMutationVariables = Exact<{
@@ -4043,12 +3803,10 @@ export type UpdatePermissionsMutationVariables = Exact<{
 
 export type UpdatePermissionsMutation = (
   { __typename?: 'Mutation' }
-  & {
-    updatePermissions?: Maybe<(
-      { __typename?: 'RoleType' }
-      & Pick<RoleType, 'permissions'>
-    )>
-  }
+  & { updatePermissions?: Maybe<(
+    { __typename?: 'RoleType' }
+    & Pick<RoleType, 'permissions'>
+  )> }
 );
 
 export const DeliveryEventFragmentFragmentDoc = gql`
@@ -4137,6 +3895,7 @@ export const SessionFragmentFragmentDoc = gql`
   followUpAction {
     values {
       shortText
+      email
     }
   }
 }

@@ -10,7 +10,6 @@ import EdgePrismaAdapter, { CreateEdgeInput } from '../edge/EdgePrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import { CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType';
 import { CreateSliderNodeInput, UpdateQuestionInput } from './QuestionNodePrismaAdapterType';
-import templates from '../templates/index';
 
 export interface IdMapProps {
   [details: string]: string;

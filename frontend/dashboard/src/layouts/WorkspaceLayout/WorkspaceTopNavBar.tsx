@@ -33,6 +33,7 @@ export const WorkspaceTopNavBar = () => {
   const { dashboardPath, workspaceInteractionsPath } = useNavigator();
 
   const { data } = useGetWorkspaceLayoutDetailsQuery({
+    fetchPolicy: 'no-cache',
     variables: {
       workspaceId: activeCustomer?.id || '',
       healthInput: {
