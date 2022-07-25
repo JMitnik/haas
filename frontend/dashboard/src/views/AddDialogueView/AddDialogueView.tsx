@@ -367,7 +367,6 @@ const AddDialogueView = () => {
                             />
                           )}
                         />
-                        <FormErrorMessage>{form.formState.errors.dialogueOption}</FormErrorMessage>
                       </FormControl>
                     ))}
                   </InputGrid>
@@ -416,7 +415,7 @@ const AddDialogueView = () => {
                                 setTags(qOption, index);
                               }}
                             />
-                            <FormErrorMessage>{form.formState.errors.tags?.[index]}</FormErrorMessage>
+                            <FormErrorMessage>{form.formState.errors.tags?.[index]?.message}</FormErrorMessage>
                           </Div>
                           <Flex justifyContent="center" alignContent="center" flexGrow={1}>
                             <UI.Button
