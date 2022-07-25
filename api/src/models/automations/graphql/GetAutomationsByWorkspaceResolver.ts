@@ -1,4 +1,4 @@
-import { inputObjectType, queryField } from '@nexus/schema';
+import { inputObjectType, queryField } from 'nexus';
 import { UserInputError } from 'apollo-server-express';
 import { AutomationModel } from './AutomationModel';
 
@@ -17,5 +17,5 @@ export const GetAutomationsByWorkspaceQuery = queryField('automations', {
     if (!args?.where?.workspaceId) throw new UserInputError('No workspaceId provided to find automations with!');
 
     return ctx.services.automationService.findAutomationsByWorkspace(args.where.workspaceId);
-  }
+  },
 })

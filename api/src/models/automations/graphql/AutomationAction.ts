@@ -1,4 +1,5 @@
-import { objectType } from '@nexus/schema';
+import { objectType } from 'nexus';
+
 import { AutomationActionChannel } from './AutomationActionChannel';
 import { AutomationActionType } from './AutomationActionType';
 

@@ -77,7 +77,7 @@ const DialogueOverview = () => {
               {canDeleteDialogue && (
                 <UI.Flex>
                   <UI.NavButton
-                    leftIcon={Plus}
+                    leftIcon={() => <Plus />}
                     size="sm"
                     to={`/dashboard/b/${customerSlug}/dialogue/add`}
                   >
@@ -86,7 +86,7 @@ const DialogueOverview = () => {
 
                   <Popover.Root open={openShare} onOpenChange={setOpenShare}>
                     <Popover.Trigger asChild>
-                      <UI.Button ml={2} size="sm" variantColor="off" leftIcon={Share}>
+                      <UI.Button ml={2} size="sm" variantColor="off" leftIcon={() => <Share />}>
                         Share team links
                       </UI.Button>
                     </Popover.Trigger>

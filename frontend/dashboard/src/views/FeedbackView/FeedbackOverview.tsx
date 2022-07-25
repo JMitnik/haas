@@ -404,23 +404,29 @@ export const FeedbackOverview = () => {
                 <Menu.Item
                   onClick={() => handleMultiDateFilterChange(undefined, new Date(contextInteraction?.createdAt))}
                 >
-                  {t('before_day_of')}
-                  {' '}
-                  {formatSimpleDate(contextInteraction?.createdAt)}
+                  <>
+                    {t('before_day_of')}
+                    {' '}
+                    {formatSimpleDate(contextInteraction?.createdAt)}
+                  </>
                 </Menu.Item>
                 <Menu.Item
                   onClick={() => handleSingleDateFilterChange(contextInteraction?.createdAt)}
                 >
-                  {t('on_day_of')}
-                  {' '}
-                  {formatSimpleDate(contextInteraction?.createdAt)}
+                  <>
+                    {t('on_day_of')}
+                    {' '}
+                    {formatSimpleDate(contextInteraction?.createdAt)}
+                  </>
                 </Menu.Item>
                 <Menu.Item
                   onClick={() => handleMultiDateFilterChange(new Date(contextInteraction?.createdAt), undefined)}
                 >
-                  {t('after_day_of')}
-                  {' '}
-                  {formatSimpleDate(contextInteraction?.createdAt)}
+                  <>
+                    {t('after_day_of')}
+                    {' '}
+                    {formatSimpleDate(contextInteraction?.createdAt)}
+                  </>
                 </Menu.Item>
               </Menu.SubMenu>
             </Menu.Base>

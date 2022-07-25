@@ -1,6 +1,6 @@
 import { DialogueImpactScore, DialogueStatisticsSummaryCache, NodeEntry, PrismaClient, Session, SliderNodeEntry } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
-import { groupBy, maxBy, mean, meanBy, orderBy } from 'lodash';
+import { groupBy, mean, meanBy } from 'lodash';
 import { addDays, differenceInHours } from 'date-fns';
 
 import { CustomerService } from '../customer/CustomerService';
@@ -16,9 +16,6 @@ import { TopicFilterInput } from '../Topic/Topic.types';
 import { Topic } from './Dialogue.types';
 import { toUTC } from '../../utils/dateUtils';
 
-const THRESHOLD = 40;
-
-type UrgentPath = NexusGenFieldTypes['UrgentPath'];
 type BasicStatistic = NexusGenFieldTypes['BasicStatistics'];
 
 class DialogueStatisticsService {

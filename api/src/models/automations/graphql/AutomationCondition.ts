@@ -1,4 +1,4 @@
-import { objectType } from '@nexus/schema';
+import { objectType } from 'nexus';
 
 import { AutomationConditionScopeType } from './AutomationConditionScopeType';
 import { AutomationConditionOperatorType } from './AutomationConditionOperatorType';
@@ -29,27 +29,27 @@ export const AutomationConditionModel = objectType({
 
     t.field('questionScope', {
       type: QuestionConditionScope,
-      nullable: true,
+
     });
 
     t.field('dialogueScope', {
       type: DialogueConditionScopeModel,
-      nullable: true,
+
     });
 
     t.field('workspaceScope', {
       type: WorkspaceConditionScopeModel,
-      nullable: true,
+
     });
 
     t.field('question', {
       type: QuestionNodeType,
-      nullable: true,
+
     });
 
     t.field('dialogue', {
       type: DialogueType,
-      nullable: true,
+
     });
   },
 });

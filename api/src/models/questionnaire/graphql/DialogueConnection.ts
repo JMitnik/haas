@@ -1,4 +1,4 @@
-import { enumType, inputObjectType, objectType } from '@nexus/schema';
+import { enumType, inputObjectType, objectType } from 'nexus';
 import { ConnectionInterface } from '../../general/Pagination';
 
 import { DialogueType } from '../Dialogue';

@@ -1,4 +1,4 @@
-import { enumType, objectType } from '@nexus/schema';
+import { enumType, objectType } from 'nexus';
 import { DialogueType } from './Dialogue'
 
 export const DialogueImpactScoreType = enumType({
@@ -25,11 +25,9 @@ export const DialogueStatisticsSummaryModel = objectType({
     });
 
     t.string('title', {
-      resolve(parent) {
-        return parent.dialogue?.title as string;
-      },
+      resolve: (parent) => parent.dialogue?.title || '',
     });
 
-    t.field('dialogue', { type: DialogueType, nullable: true });
+    t.field('dialogue', { type: DialogueType });
   },
 });

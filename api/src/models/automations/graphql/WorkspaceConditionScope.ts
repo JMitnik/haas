@@ -1,4 +1,4 @@
-import { objectType } from "@nexus/schema";
+import { objectType } from "nexus";
 import { ConditionPropertyAggregate } from "./ConditionPropertyAggregate";
 import { WorkspaceAspectType } from "./WorkspaceAspectType";
 

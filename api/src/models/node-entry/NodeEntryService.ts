@@ -161,7 +161,7 @@ class NodeEntryService {
       create: {
         values: {
           create: nodeEntryInput?.data?.form?.values?.map((val) => ({
-            relatedField: { connect: { id: val.relatedFieldId || '-1' } },
+            relatedField: { connect: { id: val?.relatedFieldId || '-1' } },
             ...pickProperties(
               val,
               ['email', 'phoneNumber', 'url', 'shortText', 'longText', 'number', 'contacts'],

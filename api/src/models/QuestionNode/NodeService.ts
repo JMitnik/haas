@@ -1,4 +1,5 @@
 import { Prisma, Link, NodeType, QuestionCondition, QuestionNode, PrismaClient, Edge, QuestionOption, VideoEmbeddedNode } from '@prisma/client';
+import { isPresent } from 'ts-is-present';
 import cuid from 'cuid';
 
 import { NexusGenInputs } from '../../generated/nexus';
@@ -38,8 +39,8 @@ export class NodeService {
 
   /**
    * Creates a slider node and connects it to a question
-   * @param data 
-   * @returns 
+   * @param data
+   * @returns
    */
   createSliderNode = async (data: CreateSliderNodeInput) => {
     return this.questionNodePrismaAdapter.createSliderNode(data);
@@ -195,17 +196,17 @@ export class NodeService {
 
     // If we have links associated, remove "non-existing links"
     if (existingNode?.links && input?.links?.linkTypes?.length) {
-      await this.removeNonExistingLinks(existingNode?.links, input?.links?.linkTypes);
+      await this.removeNonExistingLinks(existingNode?.links, input?.links?.linkTypes as any);
     }
 
     // Upsert links in g eneral
     if (input?.links?.linkTypes?.length) {
-      await this.upsertLinks(input?.links?.linkTypes, input?.id);
+      await this.upsertLinks(input?.links?.linkTypes as any, input?.id);
     }
 
     // If form is passed
     if (input?.form && input.id) {
-      const removedFields = findDifference(existingNode?.form?.fields, input?.form?.fields);
+      const removedFields = findDifference(existingNode?.form?.fields, input?.form?.fields as any);
 
       if (removedFields.length) {
         const mappedFields = removedFields.map((field) => ({ id: field?.id?.toString() || '' }))
@@ -817,14 +818,14 @@ export class NodeService {
         await this.questionNodePrismaAdapter.updateSliderNode(updatedNode.sliderNodeId, {
           happyText: happyText || null,
           unhappyText: unhappyText || null,
-          markers: sliderNode?.markers,
+          markers: sliderNode?.markers?.filter(isPresent),
         });
       } else {
         await this.questionNodePrismaAdapter.createSliderNode({
           happyText: happyText || null,
           unhappyText: unhappyText || null,
           parentNodeId: questionId,
-          markers: sliderNode?.markers,
+          markers: sliderNode?.markers?.filter(isPresent),
         });
       };
     };

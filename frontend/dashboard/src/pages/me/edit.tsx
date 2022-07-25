@@ -1,5 +1,5 @@
 import * as UI from '@haas/ui';
-import { Button, ButtonGroup, useToast } from '@chakra-ui/core';
+import { ButtonGroup, useToast } from '@chakra-ui/core';
 import {
   Div, Form, FormContainer,
   FormControl, FormLabel, FormSection, H3, Hr,
@@ -163,15 +163,15 @@ const EditMeForm = () => {
         <Hr />
 
         <ButtonGroup mt={4}>
-          <Button
+          <UI.Button
             isLoading={isLoading}
             isDisabled={!form.formState.isValid}
             variantColor="teal"
             type="submit"
           >
             {t('save')}
-          </Button>
-          <Button variant="outline" onClick={() => history.goBack()}>{t('cancel')}</Button>
+          </UI.Button>
+          <UI.Button variant="outline" onClick={() => history.goBack()}>{t('cancel')}</UI.Button>
         </ButtonGroup>
       </Form>
     </FormContainer>

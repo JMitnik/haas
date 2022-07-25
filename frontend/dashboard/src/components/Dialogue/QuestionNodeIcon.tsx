@@ -14,7 +14,7 @@ const FormIcon = () => (
   </>
 );
 
-const MapQuestionNodeIcon: { [key in QuestionNodeTypeEnum]?: React.FC<{ color?: string }> } = {
+const MapQuestionNodeIcon: { [key in QuestionNodeTypeEnum]?: any } = {
   [QuestionNodeTypeEnum.Slider]: SliderIcon,
   [QuestionNodeTypeEnum.Choice]: MultiChoiceIcon,
   [QuestionNodeTypeEnum.Form]: FormIcon,

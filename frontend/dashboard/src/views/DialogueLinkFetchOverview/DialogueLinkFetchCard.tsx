@@ -51,7 +51,7 @@ const DialogueCard = ({ dialogue, loading }: DialogueCardProps) => {
     toast.success({ title: 'Dialogue url copied', description: 'Copied the url of the selected dialogue' });
   };
 
-  const urlBase = stripPrefixFromUrl(dialogue.url);
+  const urlBase = stripPrefixFromUrl(dialogue?.url || '');
 
   return (
     <DialogueCardContainer
@@ -66,7 +66,7 @@ const DialogueCard = ({ dialogue, loading }: DialogueCardProps) => {
             <UI.H4 color="off.600" fontWeight="700">
               {dialogue.title}
             </UI.H4>
-            <UI.ExtLink to={dialogue.url} color="off.300">
+            <UI.ExtLink to={dialogue?.url || ''} color="off.300">
               {urlBase}
             </UI.ExtLink>
           </UI.Div>

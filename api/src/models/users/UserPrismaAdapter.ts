@@ -106,7 +106,7 @@ class UserPrismaAdapter {
 
     const dbAssignedDialogues = user?.isAssignedTo.map((dialogue) => ({ id: dialogue.id })) || [];
     const disconnectedDialogues = reject(dbAssignedDialogues,
-      (dialogue) => input.assignedDialogueIds.includes(dialogue.id)) || [];
+      (dialogue) => input.assignedDialogueIds?.includes(dialogue.id) || false) || [];
 
     return this.prisma.user.update({
       where: {
@@ -115,7 +115,7 @@ class UserPrismaAdapter {
       data: {
         isAssignedTo: {
           disconnect: disconnectedDialogues,
-          connect: input?.assignedDialogueIds.map((dialogueId) => ({ id: dialogueId })) || [],
+          connect: input?.assignedDialogueIds?.map((dialogueId) => ({ id: dialogueId })) || [],
         },
       },
       include: {

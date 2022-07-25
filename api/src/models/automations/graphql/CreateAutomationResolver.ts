@@ -1,4 +1,4 @@
-import { inputObjectType, mutationField } from '@nexus/schema';
+import { inputObjectType, mutationField } from 'nexus';
 import { AutomationType } from './AutomationType'
 import { AutomationEventType } from './AutomationEventType';
 import { AutomationConditionScopeType } from './AutomationConditionScopeType';
@@ -17,21 +17,21 @@ import { RecurringPeriodType } from './RecurringPeriodType';
 export const CreateAutomationOperandInput = inputObjectType({
   name: 'CreateAutomationOperandInput',
   definition(t) {
-    t.id('id', { nullable: true });
+    t.id('id');
     t.field('operandType', { type: OperandType });
-    t.string('textValue', { nullable: true });
-    t.int('numberValue', { nullable: true });
-    t.string('dateTimeValue', { nullable: true });
+    t.string('textValue');
+    t.int('numberValue');
+    t.string('dateTimeValue');
   },
 });
 
 export const ConditionPropertyAggregateInput = inputObjectType({
   name: 'ConditionPropertyAggregateInput',
   definition(t) {
-    t.id('id', { nullable: true });
-    t.string('startDate', { nullable: true });
-    t.string('endDate', { nullable: true });
-    t.int('latest', { nullable: true });
+    t.id('id');
+    t.string('startDate');
+    t.string('endDate');
+    t.int('latest');
 
     t.field('type', { type: ConditionPropertyAggregateType });
   },
@@ -40,7 +40,7 @@ export const ConditionPropertyAggregateInput = inputObjectType({
 export const ConditionQuestionScopeInput = inputObjectType({
   name: 'ConditionQuestionScopeInput',
   definition(t) {
-    t.id('id', { nullable: true });
+    t.id('id');
     t.field('aspect', { type: QuestionAspectType });
     t.field('aggregate', { type: ConditionPropertyAggregateInput });
   },
@@ -49,7 +49,7 @@ export const ConditionQuestionScopeInput = inputObjectType({
 export const ConditionDialogueScopeInput = inputObjectType({
   name: 'ConditionDialogueScopeInput',
   definition(t) {
-    t.id('id', { nullable: true });
+    t.id('id');
     t.field('aspect', { type: DialogueAspectType });
     t.field('aggregate', { type: ConditionPropertyAggregateInput });
   },
@@ -58,7 +58,7 @@ export const ConditionDialogueScopeInput = inputObjectType({
 export const ConditionWorkspaceScopeInput = inputObjectType({
   name: 'ConditionWorkspaceScopeInput',
   definition(t) {
-    t.id('id', { nullable: true });
+    t.id('id');
     t.field('aspect', { type: WorkspaceAspectType });
     t.field('aggregate', { type: ConditionPropertyAggregateInput });
   },
@@ -67,26 +67,26 @@ export const ConditionWorkspaceScopeInput = inputObjectType({
 export const ConditionScopeInput = inputObjectType({
   name: 'ConditionScopeInput',
   definition(t) {
-    t.id('id', { nullable: true });
+    t.id('id');
     t.field('type', { type: AutomationConditionScopeType });
-    t.field('questionScope', { type: ConditionQuestionScopeInput, nullable: true });
-    t.field('dialogueScope', { type: ConditionDialogueScopeInput, nullable: true });
-    t.field('workspaceScope', { type: ConditionWorkspaceScopeInput, nullable: true });
+    t.field('questionScope', { type: ConditionQuestionScopeInput });
+    t.field('dialogueScope', { type: ConditionDialogueScopeInput });
+    t.field('workspaceScope', { type: ConditionWorkspaceScopeInput });
   },
 })
 
 export const CreateAutomationCondition = inputObjectType({
   name: 'CreateAutomationCondition',
   definition(t) {
-    t.id('id', { nullable: true });
+    t.id('id');
     t.field('scope', { type: ConditionScopeInput });
     t.field('operator', { type: AutomationConditionOperatorType });
 
     t.list.field('operands', { type: CreateAutomationOperandInput });
 
-    t.string('questionId', { nullable: true });
-    t.string('dialogueId', { nullable: true });
-    t.string('workspaceId', { nullable: true });
+    t.string('questionId');
+    t.string('dialogueId');
+    t.string('workspaceId');
   },
 });
 
@@ -101,7 +101,7 @@ export const AutomationActionChannelInput = inputObjectType({
 export const AutomationActionInput = inputObjectType({
   name: 'AutomationActionInput',
   definition(t) {
-    t.id('id', { nullable: true });
+    t.id('id');
     t.field('type', { type: AutomationActionType });
     t.string('apiKey');
     t.string('endpoint');
@@ -113,17 +113,17 @@ export const AutomationActionInput = inputObjectType({
 export const AutomationEventInput = inputObjectType({
   name: 'AutomationEventInput',
   definition(t) {
-    t.id('id', { nullable: true });
+    t.id('id');
     t.field('eventType', { type: AutomationEventType });
-    t.string('questionId', { nullable: true });
-    t.string('dialogueId', { nullable: true });
+    t.string('questionId');
+    t.string('dialogueId');
   },
 });
 
 export const AutomationConditionBuilderInput = inputObjectType({
   name: 'AutomationConditionBuilderInput',
   definition(t) {
-    t.id('id', { nullable: true });
+    t.id('id');
 
     t.field('type', {
       type: AutomationConditionBuilderType,
@@ -135,7 +135,6 @@ export const AutomationConditionBuilderInput = inputObjectType({
 
     t.field('childConditionBuilder', {
       type: AutomationConditionBuilderInput,
-      nullable: true,
     });
   },
 });
@@ -158,9 +157,9 @@ export const CreateAutomationInput = inputObjectType({
   name: 'CreateAutomationInput',
   definition(t) {
     // Generic info
-    t.id('id', { nullable: true });
+    t.id('id');
     t.string('label');
-    t.string('description', { nullable: true });
+    t.string('description');
     t.string('workspaceId');
 
     // Type of automation (e.g. Trigger, Campaign etc.)

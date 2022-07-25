@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
-import { Button, ButtonGroup, FormErrorMessage, Stack, useToast } from '@chakra-ui/core';
+import { ButtonGroup, FormErrorMessage, Stack, useToast } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
 import {
   Div, ErrorStyle, Flex, Form, FormContainer, FormControl, FormLabel,
@@ -386,12 +386,12 @@ const AddDialogueView = () => {
                 <Div>
                   <InputGrid gridTemplateColumns="1fr">
                     <Div>
-                      <Button
-                        leftIcon={Plus}
+                      <UI.Button
+                        leftIcon={() => <Plus />}
                         onClick={() => setActiveTags((prevTags) => [...prevTags, null])}
                       >
                         {t('add_tag')}
-                      </Button>
+                      </UI.Button>
                     </Div>
 
                     <Stack>
@@ -419,15 +419,15 @@ const AddDialogueView = () => {
                             <FormErrorMessage>{form.formState.errors.tags?.[index]}</FormErrorMessage>
                           </Div>
                           <Flex justifyContent="center" alignContent="center" flexGrow={1}>
-                            <Button
+                            <UI.Button
                               size="xs"
                               variantColor="red"
                               variant="outline"
-                              leftIcon={Minus}
+                              leftIcon={() => <Minus />}
                               onClick={() => deleteTag(index)}
                             >
                               {t('remove')}
-                            </Button>
+                            </UI.Button>
                           </Flex>
                         </Flex>
                       ))}
@@ -438,17 +438,17 @@ const AddDialogueView = () => {
               </FormSection>
 
               <ButtonGroup>
-                <Button
+                <UI.Button
                   isDisabled={!form.formState.isValid}
                   isLoading={isLoading}
                   variantColor="teal"
                   type="submit"
                 >
                   {t('create')}
-                </Button>
-                <Button variant="outline" onClick={() => history.push('/')}>
+                </UI.Button>
+                <UI.Button variant="outline" onClick={() => history.push('/')}>
                   {t('cancel')}
-                </Button>
+                </UI.Button>
               </ButtonGroup>
             </Form>
           </FormContainer>

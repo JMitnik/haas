@@ -213,26 +213,26 @@ export class CampaignPrismaAdapter {
         },
         variantsEdges: {
           create: input.variants?.map((variant) => ({
-            weight: variant.weight ?? 50,
+            weight: variant?.weight ?? 50,
             campaignVariant: {
               create: {
-                label: variant.label || '',
-                subject: variant.subject,
-                from: variant.from,
-                type: variant.type,
-                body: variant.body || '',
+                label: variant?.label || '',
+                subject: variant?.subject,
+                from: variant?.from,
+                type: variant?.type!,
+                body: variant?.body || '',
                 customVariables: {
                   createMany: {
-                    data: variant.customVariables?.map(variable => ({
-                      key: variable.key || '',
+                    data: variant?.customVariables?.map(variable => ({
+                      key: variable?.key || '',
                     })) || [],
                   },
                 },
                 dialogue: {
-                  connect: { id: variant.dialogueId },
+                  connect: { id: variant?.dialogueId },
                 },
                 workspace: {
-                  connect: { id: variant.workspaceId },
+                  connect: { id: variant?.workspaceId },
                 },
               },
             },

@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import {
-  Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
+  ButtonGroup, FormErrorMessage, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
   PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
 } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
@@ -203,9 +203,9 @@ const CTAForm = ({
         duration: 1500,
       });
       const CTA: MappedCTANode = {
-        value: data.createCTA.id,
-        label: data.createCTA.title,
-        type: data.createCTA.type,
+        value: data?.createCTA?.id || undefined,
+        label: data?.createCTA?.title || undefined,
+        type: data?.createCTA?.type || undefined,
       };
       if (onCTAIdFetch) onCTAIdFetch(CTA);
       onSuccess?.(data?.createCTA);
@@ -428,15 +428,14 @@ const CTAForm = ({
 
         <Flex justifyContent="space-between">
           <ButtonGroup>
-            <Button
+            <UI.Button
               isLoading={addLoading || updateLoading}
               isDisabled={!form.formState.isValid}
-              variantColor="teal"
               type="submit"
             >
               {t('save')}
-            </Button>
-            <Button variant="ghost" onClick={() => cancelCTA()}>Cancel</Button>
+            </UI.Button>
+            <UI.Button variant="ghost" onClick={() => cancelCTA()}>Cancel</UI.Button>
           </ButtonGroup>
           {id !== '-1' && (
             <Span onClick={(e) => e.stopPropagation()}>
@@ -446,13 +445,13 @@ const CTAForm = ({
                 {({ onClose }) => (
                   <>
                     <PopoverTrigger>
-                      <Button
+                      <UI.Button
                         variant="outline"
                         variantColor="red"
-                        leftIcon={Trash}
+                        leftIcon={() => <Trash />}
                       >
                         {t('delete')}
-                      </Button>
+                      </UI.Button>
                     </PopoverTrigger>
                     <PopoverContent zIndex={4}>
                       <PopoverArrow />
@@ -462,13 +461,13 @@ const CTAForm = ({
                         <Text>{t('delete_cta_popover')}</Text>
                       </PopoverBody>
                       <PopoverFooter>
-                        <Button
+                        <UI.Button
                           variant="outline"
                           variantColor="red"
                           onClick={() => onDeleteCTA && onDeleteCTA(onClose)}
                         >
                           {t('delete')}
-                        </Button>
+                        </UI.Button>
                       </PopoverFooter>
                     </PopoverContent>
                   </>

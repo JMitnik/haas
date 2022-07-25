@@ -129,7 +129,7 @@ export const AutodeckOverview = () => {
             </BackButtonContainer>
             <UI.DeprecatedViewTitle>Autodeck overview</UI.DeprecatedViewTitle>
             <UI.Button
-              leftIcon={Plus}
+              leftIcon={() => <Plus />}
               onClick={() => setIsOpenImportModal(true)}
               size="sm"
               variantColor="teal"
@@ -160,22 +160,22 @@ export const AutodeckOverview = () => {
               </UI.TableHeading>
 
               <UI.TableBody>
-                {data?.getAutodeckJobs?.jobs.map((job) => (
-                  <UI.TableRow hasHover key={job.id} onClick={() => handleActiveJob(job, job.status)}>
+                {data?.getAutodeckJobs?.jobs?.map((job) => (
+                  <UI.TableRow hasHover key={job!.id} onClick={() => handleActiveJob(job!, job!.status!)}>
                     <UI.TableCell>
                       {job?.name || ''}
                     </UI.TableCell>
                     <UI.TableCell>
-                      <DateLabel dateString={job.createdAt} />
+                      <DateLabel dateString={job!.createdAt!} />
                     </UI.TableCell>
                     <UI.TableCell>
-                      {job.updatedAt
-                        ? <DateLabel dateString={job.updatedAt} />
+                      {job!.updatedAt
+                        ? <DateLabel dateString={job!.updatedAt} />
                         : 'Not updated yet'}
                     </UI.TableCell>
                     <UI.TableCell>
                       <ProcessingStatus
-                        job={job}
+                        job={job!}
                       />
                     </UI.TableCell>
                   </UI.TableRow>
@@ -266,7 +266,7 @@ export const AutodeckOverview = () => {
                   {activeJob?.status !== JobStatusType.Failed
                     && (
                       <UI.Button
-                        leftIcon={Download}
+                        leftIcon={() => <Download />}
                         isDisabled={activeJob?.status !== JobStatusType.Completed || !activeJob.resourcesUrl}
                         size="sm"
                         variantColor="green"
@@ -294,7 +294,7 @@ export const AutodeckOverview = () => {
                             jobId: activeJob?.id,
                           },
                         })}
-                        leftIcon={RefreshCcw}
+                        leftIcon={() => <RefreshCcw />}
                         size="sm"
                         variantColor="red"
                       >

@@ -1,9 +1,8 @@
-import { objectType } from '@nexus/schema';
+import { objectType } from 'nexus';
 import { UserInputError } from 'apollo-server-express';
 import { DialogueImpactScore } from '@prisma/client';
 
 import { BasicStatistics } from './BasicStatistics';
-import { UrgentPath } from './UrgentPath';
 import {
   DialogueStatisticsSummaryFilterInput,
   MostChangedPath,
@@ -21,7 +20,7 @@ export const WorkspaceStatistics = objectType({
     // This ID is the same as the ID of the Customer / Workspace
     t.id('id');
 
-    t.list.field('workspaceStatisticsSummary', {
+    t.nonNull.list.nonNull.field('workspaceStatisticsSummary', {
       type: DialogueStatisticsSummaryModel,
       args: {
         input: DialogueStatisticsSummaryFilterInput,
@@ -42,7 +41,7 @@ export const WorkspaceStatistics = objectType({
         }
 
         return ctx.services.dialogueStatisticsService.findWorkspaceStatisticsSummary(
-          parent.id,
+          parent.id || '',
           DialogueImpactScore.AVERAGE,
           utcStartDateTime as Date,
           utcEndDateTime,
@@ -72,7 +71,7 @@ export const WorkspaceStatistics = objectType({
         }
 
         return ctx.services.dialogueStatisticsService.calculateWorkspaceBasicStatistics(
-          parent.id,
+          parent.id || '',
           DialogueImpactScore.AVERAGE,
           utcStartDateTime as Date,
           utcEndDateTime,
@@ -106,7 +105,7 @@ export const WorkspaceStatistics = objectType({
         const topicFilter = args.input.topicsFilter || undefined;
 
         return ctx.services.dialogueStatisticsService.rankTopics(
-          parent.id,
+          parent.id || '',
           utcStartDateTime as Date,
           utcEndDateTime as Date,
           topicFilter,
@@ -141,7 +140,7 @@ export const WorkspaceStatistics = objectType({
         const topicFilter = args.input.topicFilter || undefined;
 
         return ctx.services.dialogueStatisticsService.findWorkspaceHealthScore(
-          parent.id,
+          parent.id || '',
           utcStartDateTime as Date,
           utcEndDateTime,
           topicFilter,
@@ -178,7 +177,7 @@ export const WorkspaceStatistics = objectType({
         }
 
         return ctx.services.customerService.findNestedMostChangedPath(
-          parent.id,
+          parent.id || '',
           args.input.impactType,
           utcStartDateTime as Date,
           utcEndDateTime,
@@ -214,7 +213,7 @@ export const WorkspaceStatistics = objectType({
         }
 
         return ctx.services.customerService.findNestedMostTrendingTopic(
-          parent.id,
+          parent.id || '',
           args.input.impactType,
           utcStartDateTime as Date,
           utcEndDateTime,
@@ -249,7 +248,7 @@ export const WorkspaceStatistics = objectType({
         }
 
         return ctx.services.customerService.findNestedMostPopularPath(
-          parent.id,
+          parent.id || '',
           args.input.impactType,
           utcStartDateTime as Date,
           utcEndDateTime,

@@ -11,6 +11,7 @@ import {
   useGetJobProcessLocationsQuery,
   useGetPreviewDataLazyQuery,
 } from 'types/generated-types';
+import { isPresent } from 'ts-is-present';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useEffect, useState } from 'react';
@@ -42,7 +43,7 @@ const AutodeckForm = ({
   const form = useForm<FormDataProps>({
     defaultValues: {
       useCustomUrl: 0,
-      useCustomColour: boolToInt(job?.requiresColorExtraction) || 1,
+      useCustomColour: boolToInt(job?.requiresColorExtraction as any) || 1,
       useWebsiteUrl: isInEditing ? 0 : 1,
       useRembg: 1,
       name: job?.name || '',
@@ -147,22 +148,23 @@ const AutodeckForm = ({
 
   useEffect(() => {
     if (!previewData) return;
-    setValue('uploadLogo', previewData?.getPreviewData?.rembgLogoUrl);
+    setValue('uploadLogo', previewData?.getPreviewData?.rembgLogoUrl || undefined);
     setValue('uploadWebsite', previewData?.getPreviewData?.websiteScreenshotUrl);
-    setValue('primaryColour', previewData?.getPreviewData?.colors[0]);
+    setValue('primaryColour', previewData?.getPreviewData?.colors?.[0] as any);
   }, [previewData, setValue]);
 
-  const mappedJobLocations = jobProcessLocations?.getJobProcessLocations?.jobProcessLocations
-    .map((jobLocation) => ({ label: `${jobLocation.name} - ${jobLocation.path}`, value: jobLocation.id }));
+  const mappedJobLocations = jobProcessLocations?.getJobProcessLocations?.jobProcessLocations?.map(
+    (jobLocation: any) => ({ label: `${jobLocation.name} - ${jobLocation.path}`, value: jobLocation.id }),
+  ) as any;
 
   const activeJobLocation = isInEditing && job?.processLocation ? { label: `${job?.processLocation?.name} - ${job?.processLocation?.path}`, value: job?.processLocation?.id } : null;
 
   const handleJobLocationChange = (id: string) => {
-    const jobLocation = jobProcessLocations?.getJobProcessLocations?.jobProcessLocations.find(
-      (location) => location.id === id,
+    const jobLocation = jobProcessLocations?.getJobProcessLocations?.jobProcessLocations?.find(
+      (location) => location?.id === id,
     );
     form.setValue('customFields', jobLocation?.customFields as any[] || []);
-    return setActiveTemplateType(jobLocation?.type);
+    return setActiveTemplateType(jobLocation?.type || undefined);
   };
 
   return (
@@ -295,7 +297,7 @@ const AutodeckForm = ({
             <Hr />
             <InputGrid>
               <PrimaryColourFragment
-                palette={previewData?.getPreviewData?.colors || []}
+                palette={previewData?.getPreviewData?.colors?.filter(isPresent) || []}
                 isInEditing={isInEditing}
                 form={form}
               />

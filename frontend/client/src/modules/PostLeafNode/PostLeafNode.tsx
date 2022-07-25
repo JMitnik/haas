@@ -47,7 +47,7 @@ const PostLeafNode = () => {
         <SubHeader textAlign="center">
           {subHeader}
         </SubHeader>
-        <Text>{getCloseText(dialogue?.language)}</Text>
+        <Text>{getCloseText(dialogue?.language || undefined)}</Text>
       </UI.Div>
     </PostLeafNodeContainer>
   );

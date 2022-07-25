@@ -1,10 +1,10 @@
 import cloudinary, { UploadApiResponse } from 'cloudinary';
 
 interface UploadFile {
-  createReadStream: Function,
-  filename: string,
-  mimetype: string,
-  encoding: string
+  createReadStream: Function;
+  filename: string;
+  mimetype: string;
+  encoding: string;
 }
 
 /**
@@ -18,11 +18,11 @@ export const uploadCloudinary = async (file: UploadFile, folder: string) => {
       folder: folder,
       resource_type: 'auto',
     },
-      (error, result: UploadApiResponse | undefined) => {
-        if (result) return resolve(result);
+    (error, result: UploadApiResponse | undefined) => {
+      if (result) return resolve(result);
 
-        return reject(error);
-      });
+      return reject(error);
+    });
 
     return createReadStream().pipe(cld_upload_stream);
   });

@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { UserInputError } from 'apollo-server-express';
-import { inputObjectType, mutationField } from '@nexus/schema';
+import { inputObjectType, mutationField } from 'nexus';
 
 import { CTALinksInputType } from '../link/Link';
 import { FormNodeInputType, QuestionNodeType, ShareNodeInputType } from '.';

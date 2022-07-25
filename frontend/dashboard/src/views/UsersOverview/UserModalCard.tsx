@@ -42,7 +42,7 @@ export const UserModalCard = ({ id, onClose }: UserModalCardProps) => {
 
   const { user } = userOfCustomer;
 
-  const userName = user?.firstName ? `${userOfCustomer?.user.firstName} ${userOfCustomer?.user.lastName}` : user.email;
+  const userName = user?.firstName ? `${user?.firstName} ${user?.lastName}` : user?.email;
 
   return (
     <>
@@ -55,7 +55,7 @@ export const UserModalCard = ({ id, onClose }: UserModalCardProps) => {
               <UI.FieldLabel>{t('first_name')}</UI.FieldLabel>
             </UI.Div>
             <UI.Div>
-              {user.firstName || t('unknown')}
+              {user?.firstName || t('unknown')}
             </UI.Div>
 
             <UI.Div>
@@ -63,7 +63,7 @@ export const UserModalCard = ({ id, onClose }: UserModalCardProps) => {
             </UI.Div>
 
             <UI.Div>
-              {user.lastName || t('unknown')}
+              {user?.lastName || t('unknown')}
             </UI.Div>
 
             <UI.Div>
@@ -73,10 +73,10 @@ export const UserModalCard = ({ id, onClose }: UserModalCardProps) => {
             </UI.Div>
 
             <UI.Div>
-              {user.email}
+              {user?.email}
             </UI.Div>
 
-            {user.phone && (
+            {user?.phone && (
               <>
                 <UI.Div>
                   <UI.FieldLabel>{t('phone')}</UI.FieldLabel>
@@ -106,8 +106,8 @@ export const UserModalCard = ({ id, onClose }: UserModalCardProps) => {
           </UI.SectionHeader>
           <AssignDialoguePicker
             onClose={onClose}
-            assignedDialogues={userOfCustomer?.user.assignedDialogues?.assignedDialogues || []}
-            workspaceDialogues={userOfCustomer?.user.assignedDialogues?.privateWorkspaceDialogues || []}
+            assignedDialogues={userOfCustomer?.user?.assignedDialogues?.assignedDialogues || []}
+            workspaceDialogues={userOfCustomer?.user?.assignedDialogues?.privateWorkspaceDialogues || []}
             userId={id}
           />
         </UI.ModalBody>

@@ -78,7 +78,9 @@ export class IssueService {
     topicFilter?: TopicFilterInput
   ): Promise<TopicStatisticsByDialogueId> {
     const dialogueIds = (
-      await this.workspaceService.getDialogues(workspaceId, topicFilter?.dialogueStrings || undefined)
+      await this.workspaceService.getDialogues(
+        workspaceId, topicFilter?.dialogueStrings || undefined
+      )
     ).map(dialogue => dialogue.id);
 
     // Fetch all sessions for the dialogues.

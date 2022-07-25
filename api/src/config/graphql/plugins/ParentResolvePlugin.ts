@@ -1,9 +1,9 @@
-import { plugin } from '@nexus/schema';
+import { plugin } from 'nexus';
 
 export const ParentResolvePlugin = plugin({
   name: 'ParentResolvePlugin',
   description: 'Checks if the current field already has been resolved in parent: if enabled, will skip resolving the field',
-  fieldDefTypes: `useParentResolve?: boolean`,
+  fieldDefTypes: 'useParentResolve?: boolean',
   onCreateFieldResolver(test) {
     return async (root, args, ctx, info, next) => {
       const useParentResolve = test.fieldConfig.extensions?.nexus?.config?.useParentResolve;
@@ -14,5 +14,5 @@ export const ParentResolvePlugin = plugin({
 
       return await next(root, args, ctx, info);
     }
-  }
+  },
 });

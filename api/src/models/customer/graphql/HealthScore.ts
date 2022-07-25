@@ -1,4 +1,4 @@
-import { inputObjectType, objectType } from '@nexus/schema';
+import { inputObjectType, objectType } from 'nexus';
 import { TopicFilterInput } from '../../Topic/graphql';
 
 export const HealthScoreInput = inputObjectType({
@@ -15,9 +15,9 @@ export const HealthScoreInput = inputObjectType({
 export const HealthScore = objectType({
   name: 'HealthScore',
   definition(t) {
-    t.float('score');
-    t.int('negativeResponseCount');
-    t.int('nrVotes');
+    t.nonNull.float('score');
+    t.nonNull.int('negativeResponseCount');
+    t.nonNull.int('nrVotes');
   },
 });
 

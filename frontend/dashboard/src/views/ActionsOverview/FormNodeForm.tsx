@@ -14,7 +14,6 @@ import {
   Users,
 } from 'react-feather';
 import { AnimatePresence } from 'framer-motion';
-import { Button } from '@chakra-ui/core';
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { IllustrationCard } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
@@ -146,7 +145,7 @@ const FormNodePreview = ({ field, onMoveRight, onMoveLeft, onOpen, fieldIndex, n
             <UI.IconButton
               size="sm"
               aria-label="Move field left"
-              icon={ArrowLeft}
+              icon={() => <ArrowLeft />}
               type="button"
               isDisabled={fieldIndex === 0}
               onClick={(event) => {
@@ -160,7 +159,7 @@ const FormNodePreview = ({ field, onMoveRight, onMoveLeft, onOpen, fieldIndex, n
             <UI.IconButton
               size="sm"
               aria-label="Move field right"
-              icon={ArrowRight}
+              icon={() => <ArrowRight />}
               type="button"
               isDisabled={fieldIndex === nrFields - 1}
               onClick={(event) => {
@@ -412,10 +411,10 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
 
               {fields.length === 0 ? (
                 <UI.IllustrationCard svg={<FieldIll />} text={t('add_field_reminder')}>
-                  <Button type="button" onClick={() => handleNewField()}>{t('add_field')}</Button>
+                  <UI.Button type="button" onClick={() => handleNewField()}>{t('add_field')}</UI.Button>
                 </UI.IllustrationCard>
               ) : (
-                <Button mt={4} type="button" onClick={() => handleNewField()}>{t('add_field')}</Button>
+                <UI.Button mt={4} type="button" onClick={() => handleNewField()}>{t('add_field')}</UI.Button>
               )}
             </UI.Div>
           </UI.InputGrid>

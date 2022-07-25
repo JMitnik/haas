@@ -1,6 +1,7 @@
 import { Redirect, Route, RouteProps, generatePath, useParams } from 'react-router';
 import React from 'react';
 
+import { DashboardParams } from 'hooks/useNavigator';
 import { SystemPermission } from 'types/generated-types';
 import { useUser } from 'providers/UserProvider';
 import useAuth from 'hooks/useAuth';
@@ -44,7 +45,7 @@ export const BotRoute = ({ allowedPermission, redirectRoute, ...routeProps }: Gu
 const GuardedRoute = ({ allowedPermission, redirectRoute, ...routeProps }: GuardedRouteProps) => {
   const { isLoggedIn } = useUser();
   const { hasPermission, canAccessDialogue } = useAuth();
-  const params: { customerSlug: string, dialogueSlug: string } = useParams();
+  const params = useParams<DashboardParams>();
 
   if (!isLoggedIn) return <Redirect to="/logged_out" />;
 
@@ -53,14 +54,14 @@ const GuardedRoute = ({ allowedPermission, redirectRoute, ...routeProps }: Guard
   }
 
   if (params.dialogueSlug && !canAccessDialogue(params.dialogueSlug) && redirectRoute) {
-    return <Redirect to={generatePath(redirectRoute, params)} />;
+    return <Redirect to={generatePath(redirectRoute, params as any)} />;
   }
 
   if (allowedPermission && !hasPermission(allowedPermission)) {
     if (!redirectRoute) {
       return <Redirect to="unauthorized" />;
     }
-    return <Redirect to={generatePath(redirectRoute, params)} />;
+    return <Redirect to={generatePath(redirectRoute, params as any)} />;
   }
 
   return (

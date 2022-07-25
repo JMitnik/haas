@@ -20,13 +20,17 @@ export const makeRestServer = (prisma: PrismaClient) => {
 
     Object.assign(restContext, {
       serverInstance: serverInstance,
-      port
+      port,
     })
   });
 
   afterEach(async () => {
     serverInstance?.close();
   });
+
+  afterAll(async () => {
+    serverInstance?.close();
+  })
 
   return restContext;
 }

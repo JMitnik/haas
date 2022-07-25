@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { ReactComponent as ChatIcon } from 'assets/icons/icon-chat-group.svg';
 import { ReactComponent as CursorIcon } from 'assets/icons/icon-cursorclick.svg';
 import { ReactComponent as FormIcon } from 'assets/icons/icon-identification.svg';
@@ -12,7 +10,7 @@ import { ReactComponent as TextboxIcon } from 'assets/icons/icon-annotation.svg'
 import { ReactComponent as VideoIcon } from 'assets/icons/icon-youtube.svg';
 
 export interface MapNodeToPropertiesOutput {
-  icon: React.FC<React.SVGProps<SVGSVGElement>>;
+  icon: any;
   bg: string;
   color: string;
   stroke?: string;

@@ -1,4 +1,4 @@
-import { makeSchema, asNexusMethod } from '@nexus/schema';
+import { makeSchema, asNexusMethod, declarativeWrappingPlugin } from 'nexus';
 import path from 'path';
 import { JSONObjectResolver } from 'graphql-scalars'
 
@@ -14,24 +14,27 @@ const schema = makeSchema({
     jsonScalar,
   ],
   plugins: [
+    declarativeWrappingPlugin(),
     ParentResolvePlugin,
     TimeResolverPlugin,
     QueryCounterPlugin,
   ],
-  typegenAutoConfig: {
-    sources: [
+  sourceTypes: {
+    modules: [
       {
-        source: '@prisma/client',
+        module: '@prisma/client',
         alias: 'prisma',
       },
       {
-        source: path.join(__dirname, '../types/APIContext.ts'),
+        module: path.join(__dirname, '../types/APIContext.ts'),
         alias: 'APIContext',
       },
     ],
-    contextType: 'APIContext.APIContext',
   },
-
+  contextType: {
+    export: 'APIContext',
+    module: path.join(__dirname, '../types/APIContext.ts'),
+  },
   outputs: {
     schema: path.join(__dirname, '../generated/schema.graphql'),
     typegen: path.join(__dirname, '../generated/nexus.ts'),

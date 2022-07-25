@@ -31,7 +31,7 @@ export const ROUTES = {
   EDIT_AUTOMATION_VIEW: '/dashboard/b/:customerSlug/automation/:automationId/edit',
 };
 
-interface DashboardParams {
+export interface DashboardParams {
   customerSlug: string;
   dialogueSlug: string;
   campaignId: string;

@@ -5,7 +5,6 @@ import styled, { css } from 'styled-components';
 import { LogoContainer, LogoIconContainer } from 'components/Logo/Logo';
 
 import { TopbarContainer, WorkspaceTopbar } from './WorkspaceLayout/WorkspaceTopbar';
-import { UsernavContainer } from './WorkspaceLayout/UserNav';
 
 interface PreCustomerLayoutProps {
   children: React.ReactNode;
@@ -20,13 +19,6 @@ const PreCustomerLayoutContainer = styled(UI.Div)`
       max-width: 100%;
       background-color: ${theme.colors.app.sidebar};
       box-shadow: inset 2px 1px 4px 0px rgb(0 0 0 / 10%);
-    }
-
-    ${UsernavContainer} {
-      position: fixed;
-      z-index: 1200;
-      bottom: ${theme.gutter}px;
-      left: ${theme.gutter}px;
     }
 
     ${LogoIconContainer} svg path {

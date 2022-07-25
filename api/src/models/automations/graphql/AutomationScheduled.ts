@@ -1,4 +1,4 @@
-import { objectType } from '@nexus/schema';
+import { objectType } from 'nexus';
 import { AutomationActionModel } from './AutomationAction'
 import { DayRange } from './DayRange';
 import { RecurringPeriodType } from './RecurringPeriodType';

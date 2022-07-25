@@ -1,5 +1,5 @@
 import { UserInputError } from 'apollo-server';
-import { inputObjectType, mutationField } from '@nexus/schema';
+import { inputObjectType, mutationField } from 'nexus';
 
 import { CampaignModel } from './CampaignModel';
 import { CampaignVariantEnum } from './CampaignVariantModel';
@@ -53,7 +53,7 @@ export const CreateCampaignResolver = mutationField('createCampaign', {
       variants: campaign.variantsEdges.map(variantEdge => ({
         weight: variantEdge.weight,
         ...variantEdge.campaignVariant,
-      }))
+      })),
     };
   },
 });

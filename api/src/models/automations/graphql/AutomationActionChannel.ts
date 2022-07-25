@@ -1,4 +1,4 @@
-import { objectType } from '@nexus/schema';
+import { objectType } from 'nexus';
 import { AutomationActionChannelType } from './AutomationActionChannelType';
 
 export const AutomationActionChannel = objectType({

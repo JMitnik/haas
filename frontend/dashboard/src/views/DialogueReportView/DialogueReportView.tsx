@@ -178,12 +178,12 @@ export const DialogueReportView = ({ compareStatisticStartDate, dateLabel, start
                     <>
                       {dialogue?.statistics?.mostPopularPath?.basicSentiment === 'positive' ? (
                         <Tag size="sm" variantColor="green">
-                          <TagIcon icon={ThumbsUp} size="10px" color="green.600" />
+                          <TagIcon icon={() => <ThumbsUp />} size="10px" color="green.600" />
                           <TagLabel color="green.600">{dialogue?.statistics?.mostPopularPath?.quantity}</TagLabel>
                         </Tag>
                       ) : (
                         <Tag size="sm" variantColor="red">
-                          <TagIcon icon={ThumbsDown} size="10px" color="red.600" />
+                          <TagIcon icon={() => <ThumbsDown />} size="10px" color="red.600" />
                           <TagLabel color="red.600">{dialogue?.statistics?.mostPopularPath?.quantity}</TagLabel>
                         </Tag>
                       )}
