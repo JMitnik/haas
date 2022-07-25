@@ -253,8 +253,6 @@ const CTAForm = ({
       },
     );
 
-    console.log('formFields: ', formFields);
-
     if (id === '-1') {
       const mappedLinks = {
         linkTypes: formData.links,
@@ -378,7 +376,7 @@ const CTAForm = ({
                       defaultValue={share?.title}
                       {...form.register('share.title', { required: true })}
                     />
-                    <FormErrorMessage>{form.formState.errors.share?.title}</FormErrorMessage>
+                    <FormErrorMessage><UI.Div>{form.formState.errors.share?.title?.message}</UI.Div></FormErrorMessage>
                   </FormControl>
 
                   {/* TODO: Change default value and error */}
@@ -392,7 +390,7 @@ const CTAForm = ({
                       defaultValue={share?.url}
                       {...form.register('share.url', { required: true })}
                     />
-                    <FormErrorMessage>{form.formState.errors.share?.url}</FormErrorMessage>
+                    <FormErrorMessage>{form.formState.errors.share?.url?.message}</FormErrorMessage>
                   </FormControl>
 
                   <FormControl isRequired>
@@ -404,7 +402,7 @@ const CTAForm = ({
                       defaultValue={share?.tooltip}
                       {...form.register('share.tooltip', { required: true })}
                     />
-                    <FormErrorMessage>{form.formState.errors.share?.tooltip}</FormErrorMessage>
+                    <FormErrorMessage>{form.formState.errors.share?.tooltip?.message}</FormErrorMessage>
                   </FormControl>
                 </UI.InputGrid>
               </FormSection>
