@@ -36,7 +36,7 @@ const cardItemAnimation: Variants = {
   },
 };
 
-const MotionGrid = motion.custom(UI.Grid);
+const MotionGrid = motion(UI.Grid);
 
 export const WorkspaceOverview = ({ customers, isLoading }: { customers: any[]; isLoading: boolean }) => {
   const { t } = useTranslation();
@@ -60,7 +60,7 @@ export const WorkspaceOverview = ({ customers, isLoading }: { customers: any[]; 
 
               <UI.Div ml={4}>
                 {canGenerateWorkspaceFromCsv && (
-                  <UI.Button size="sm" onClick={() => goToGenerateWorkspaceOverview()} leftIcon={Plus}>
+                  <UI.Button size="sm" onClick={() => goToGenerateWorkspaceOverview()} leftIcon={() => <Plus />}>
                     {t('generate_workspace')}
                   </UI.Button>
                 )}
@@ -100,9 +100,11 @@ export const WorkspaceOverview = ({ customers, isLoading }: { customers: any[]; 
                     key={index}
                     variants={cardItemAnimation}
                   >
-                    <ErrorBoundary key={index} FallbackComponent={() => <></>}>
+                    <ErrorBoundary FallbackComponent={() => <div />}>
                       <WorkspaceCard key={index} customer={customer} />
                     </ErrorBoundary>
+                    {/* <ErrorBoundary key={index} FallbackComponent={() => <></>}> */}
+                    {/* </ErrorBoundary> */}
                   </motion.div>
                 ))}
               </MotionGrid>

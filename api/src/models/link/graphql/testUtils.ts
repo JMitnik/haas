@@ -8,7 +8,7 @@ export const clearDatabase = async (prisma: PrismaClient) => {
   // const delUserRoles = prisma.role.deleteMany({});
   // const delUserOfCustomer = prisma.userOfCustomer.deleteMany({});
 
-  await prisma.$transaction([
+  return prisma.$transaction([
     prisma.sliderNodeEntry.deleteMany({}),
     prisma.choiceNodeEntry.deleteMany({}),
     prisma.nodeEntry.deleteMany({}),

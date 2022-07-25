@@ -1,4 +1,4 @@
-import { objectType } from '@nexus/schema';
+import { objectType } from 'nexus';
 
 import { BasicStatistics } from './BasicStatistics';
 import { Path } from '../../questionnaire/graphql/Path';
@@ -17,7 +17,7 @@ export const UrgentPath = objectType({
 
     t.field('path', { type: Path });
 
-    t.string('dialogueId');
+    t.nonNull.string('dialogueId');
 
     t.field('dialogue', {
       type: 'Dialogue',

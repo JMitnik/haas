@@ -1,4 +1,4 @@
-import { inputObjectType, mutationField } from "@nexus/schema";
+import { inputObjectType, mutationField } from "nexus";
 import { NodeType } from "@prisma/client";
 import { UserInputError } from "apollo-server";
 import { NexusGenInputs } from "../../generated/nexus";

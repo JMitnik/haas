@@ -1,4 +1,4 @@
-import { mutationField, objectType } from '@nexus/schema';
+import { mutationField, objectType } from 'nexus';
 import prisma from '../../config/prisma';
 
 import { CampaignService } from '../Campaigns/CampaignService';
@@ -23,10 +23,10 @@ export const DebugMutation = mutationField('debugMutation', {
   async resolve() {
     const deliveries = await prisma.delivery.findMany({
       orderBy: {
-        scheduledAt: "desc",
+        scheduledAt: 'desc',
       },
       take: 10,
-      skip: 10
+      skip: 10,
     })
 
     console.log(deliveries)

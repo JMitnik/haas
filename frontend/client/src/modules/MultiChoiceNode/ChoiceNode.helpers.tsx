@@ -9,7 +9,7 @@ import { Choice, Edge } from 'types/core-types';
 export const findChoiceChildEdge = (choice: Choice, edges: Edge[]): Edge => {
   const releventEdges = edges.filter((edge) => {
     const relevantEdges = edge?.conditions?.filter((condition) => {
-      if (choice.value === condition.matchValue) {
+      if (choice.value === condition?.matchValue) {
         return true;
       }
 

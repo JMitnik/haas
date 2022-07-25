@@ -40,7 +40,7 @@ const multiChoiceItemAnimation: Variants = {
 
 export const VideoEmbeddedNode = ({ node, onRunAction }: MultiChoiceNodeProps) => {
   const handleSubmit = async (multiChoiceOption: any) => {
-    const childEdge = findChoiceChildEdge(multiChoiceOption, node.children);
+    const childEdge = findChoiceChildEdge(multiChoiceOption, node?.children || []);
     const childNode = childEdge?.childNode?.id;
 
     onRunAction({
@@ -53,7 +53,7 @@ export const VideoEmbeddedNode = ({ node, onRunAction }: MultiChoiceNodeProps) =
       },
       reward: {
         overrideCallToActionId: multiChoiceOption.overrideLeaf?.id || node.overrideLeaf?.id,
-        toEdge: childEdge?.id,
+        toEdge: childEdge?.id || undefined,
         toNode: childNode,
       },
     });
@@ -86,7 +86,7 @@ export const VideoEmbeddedNode = ({ node, onRunAction }: MultiChoiceNodeProps) =
                   type="button"
                   onClick={() => handleSubmit(multiChoiceOption)}
                   key={index}
-                  leftIcon={SpeechIcon}
+                  leftIcon={() => <SpeechIcon />}
                 >
                   <ButtonBody>
                     <H5>

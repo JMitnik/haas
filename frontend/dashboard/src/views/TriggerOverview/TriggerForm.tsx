@@ -678,7 +678,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
             {!activeDialogue ? (
               <UI.IllustrationCard svg={<PaperIll />} text={t('trigger:select_dialogue_placeholder')}>
                 <Button
-                  leftIcon={MousePointer}
+                  leftIcon={() => <MousePointer />}
                   onClick={() => questionSelectRef.current.focus()}
                   size="sm"
                   variant="outline"
@@ -691,8 +691,8 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
               <>
                 {fields.length === 0 ? (
                   <UI.IllustrationCard svg={<EmptyIll />} text={t('trigger:condition_placeholder')}>
-                    <Button
-                      leftIcon={PlusCircle}
+                    <UI.Button
+                      leftIcon={() => <PlusCircle />}
                       onClick={addCondition}
                       isDisabled={!activeDialogue}
                       size="sm"
@@ -700,12 +700,12 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                       variantColor="teal"
                     >
                       {t('trigger:add_condition')}
-                    </Button>
+                    </UI.Button>
                   </UI.IllustrationCard>
                 ) : (
                   <UI.Div>
-                    <Button
-                      leftIcon={PlusCircle}
+                    <UI.Button
+                      leftIcon={() => <PlusCircle />}
                       onClick={addCondition}
                       isDisabled={!activeDialogue}
                       size="sm"
@@ -713,14 +713,12 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                       variantColor="teal"
                     >
                       {t('trigger:add_condition')}
-                    </Button>
+                    </UI.Button>
                   </UI.Div>
                 )}
               </>
             )}
-
           </InputGrid>
-
         </Div>
       </FormSection>
 
@@ -785,7 +783,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 size="sm"
                 variant="outline"
                 variantColor="teal"
-                leftIcon={UserPlus}
+                leftIcon={() => <UserPlus />}
               >
                 {t('add_recipient')}
               </Button>
@@ -797,7 +795,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 size="sm"
                 variant="outline"
                 variantColor="teal"
-                leftIcon={UserPlus}
+                leftIcon={() => <UserPlus />}
               >
                 {t('add_recipient')}
               </Button>

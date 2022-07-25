@@ -26,7 +26,7 @@ const CustomersPage = () => {
   // Redirect to single customer
   if (user?.userCustomers?.length === 1 && !canAccessAdmin) {
     const [userCustomer] = user.userCustomers;
-    const redirectSlug = userCustomer.customer.slug;
+    const redirectSlug = userCustomer?.customer?.slug;
 
     return <Redirect to={`/dashboard/b/${redirectSlug}`} />;
   }

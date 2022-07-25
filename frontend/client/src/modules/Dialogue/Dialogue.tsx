@@ -147,7 +147,7 @@ export const Dialogue = () => {
   if (!SelectedQuestionNode) return null;
 
   return (
-    <DialogueTreeLayout isAtLeaf={currentNode.isLeaf} node={currentNode}>
+    <DialogueTreeLayout isAtLeaf={currentNode.isLeaf || false} node={currentNode}>
       <IllegalBackModal
         onRestart={handleRestart}
         open={isUploadDisabled}

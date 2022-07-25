@@ -5,18 +5,23 @@ import React from 'react';
 import { Link } from 'types/core-types';
 
 import * as LS from './UpsellNodeStyles';
+import { getHeaderImage } from './UpsellNode.helpers';
 
 interface UpsellNodeProps {
   link: Link;
 }
 
+const ImageHeader = ({ link }: UpsellNodeProps) => (
+  <LS.ImageContainer>
+    <img src={getHeaderImage(link)} alt="product" />
+  </LS.ImageContainer>
+);
+
 const UpsellNode = ({ link }: UpsellNodeProps) => (
   <UI.Flex justifyContent="center">
     <LS.DrawerContainer>
 
-      <LS.ImageContainer>
-        <img src={link.imageUrl || ''} alt="product" />
-      </LS.ImageContainer>
+      <ImageHeader link={link} />
 
       <UI.Div pb={2}>
         <LS.HeaderContainer>

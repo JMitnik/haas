@@ -2,7 +2,7 @@ import { AnimatePresence } from 'framer-motion';
 import { Switch, useLocation } from 'react-router';
 import React from 'react';
 
-const AnimatedRoutes = ({ children }: { children: React.ReactNode }) => {
+const AnimatedRoutes = ({ children }: { children: any }) => {
   const location = useLocation();
 
   return (

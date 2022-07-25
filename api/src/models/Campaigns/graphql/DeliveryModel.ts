@@ -1,4 +1,4 @@
-import { queryField, objectType } from '@nexus/schema';
+import { queryField, objectType } from 'nexus';
 import { UserInputError } from 'apollo-server';
 
 import { CampaignVariantModel } from './CampaignVariantModel';
@@ -9,7 +9,7 @@ export const DeliveryModel = objectType({
   name: 'DeliveryType',
   description: 'Delivery',
   definition(t) {
-    t.id('id');
+    t.nonNull.id('id');
     t.string('deliveryRecipientFirstName', { nullable: true });
     t.string('deliveryRecipientLastName', { nullable: true });
     t.string('deliveryRecipientEmail', { nullable: true });
@@ -24,9 +24,10 @@ export const DeliveryModel = objectType({
       resolve: (parent, _, ctx) => {
         // @ts-ignore
         if (parent.campaignVariant) return parent.campaignVariant;
+        if (!parent.id) return null;
 
         return ctx.services.campaignService.findCampaignVariantOfDelivery(parent.id);
-      }
+      },
     });
 
     t.field('currentStatus', { type: DeliveryStatusEnum });
@@ -37,9 +38,10 @@ export const DeliveryModel = objectType({
       resolve: (parent, _, ctx) => {
         // @ts-ignore
         if (parent.events) return parent.events;
+        if (!parent.id) return null;
 
         return ctx.services.campaignService.findDeliveryEventsOfDelivery(parent.id) || [];
-      }
+      },
     });
   },
 });
@@ -52,5 +54,5 @@ export const GetDelivery = queryField('delivery', {
   resolve: (parent, args, ctx, info) => {
     if (!args.deliveryId) throw new UserInputError('You forgot the delivery id');
     return ctx.services.campaignService.findDelivery(args.deliveryId);
-  }
+  },
 });

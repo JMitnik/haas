@@ -40,11 +40,11 @@ it('dialogue is finished on a positive flow', () => {
   cy.wait('@gqlcreateSessionMutation').then((req) => {
     const input = req.request.body.variables?.input as SessionInput;
     expect(input.entries).to.length(2);
-    expect(input.entries?.[0].depth).to.be.equal(0);
-    expect(input.entries?.[0].data?.slider?.value).to.be.equal(80);
+    expect(input.entries?.[0]?.depth).to.be.equal(0);
+    expect(input.entries?.[0]?.data?.slider?.value).to.be.equal(80);
 
-    expect(input.entries?.[1].depth).to.be.equal(1);
-    expect(input.entries?.[1].data?.choice?.value).to.be.equal('Coaching');
+    expect(input.entries?.[1]?.depth).to.be.equal(1);
+    expect(input.entries?.[1]?.data?.choice?.value).to.be.equal('Coaching');
   });
 
   // Should finish the dialogue
@@ -100,11 +100,11 @@ it('dialogue follows negative flow, share details', () => {
     const input = req.request.body.variables?.input as SessionInput;
 
     expect(input.entries).to.length(2);
-    expect(input.entries?.[0].depth).to.be.equal(0);
-    expect(input.entries?.[0].data?.slider?.value).to.be.equal(20);
+    expect(input.entries?.[0]?.depth).to.be.equal(0);
+    expect(input.entries?.[0]?.data?.slider?.value).to.be.equal(20);
 
-    expect(input.entries?.[1].depth).to.be.equal(1);
-    expect(input.entries?.[1].data?.choice?.value).to.be.equal('Coaching');
+    expect(input.entries?.[1]?.depth).to.be.equal(1);
+    expect(input.entries?.[1]?.data?.choice?.value).to.be.equal('Coaching');
   });
 
   // Should arrive at a form screen
@@ -123,9 +123,9 @@ it('dialogue follows negative flow, share details', () => {
     const input = req.request.body.variables?.input as AppendToInteractionInput;
     expect(input.sessionId).to.be.equal('TEST_SESSION_1');
     expect(input.data?.form?.values).length(3);
-    expect(input.data?.form?.values?.[0].shortText).to.be.equal('John');
-    expect(input.data?.form?.values?.[1].shortText).to.be.equal('Doe');
-    expect(input.data?.form?.values?.[2].email).to.be.equal('johndoe@gmail.com');
+    expect(input.data?.form?.values?.[0]?.shortText).to.be.equal('John');
+    expect(input.data?.form?.values?.[1]?.shortText).to.be.equal('Doe');
+    expect(input.data?.form?.values?.[2]?.email).to.be.equal('johndoe@gmail.com');
   });
 
   // Should finish the dialogue
@@ -179,11 +179,11 @@ it('dialogue follows negative flow, not share details, and goes back', () => {
     const input = req.request.body.variables?.input as SessionInput;
 
     expect(input.entries).to.length(2);
-    expect(input.entries?.[0].depth).to.be.equal(0);
-    expect(input.entries?.[0].data?.slider?.value).to.be.equal(20);
+    expect(input.entries?.[0]?.depth).to.be.equal(0);
+    expect(input.entries?.[0]?.data?.slider?.value).to.be.equal(20);
 
-    expect(input.entries?.[1].depth).to.be.equal(1);
-    expect(input.entries?.[1].data?.choice?.value).to.be.equal('Coaching');
+    expect(input.entries?.[1]?.depth).to.be.equal(1);
+    expect(input.entries?.[1]?.data?.choice?.value).to.be.equal('Coaching');
   });
 
   // Should arrive at a form screen
@@ -197,9 +197,9 @@ it('dialogue follows negative flow, not share details, and goes back', () => {
     const input = req.request.body.variables?.input as AppendToInteractionInput;
     expect(input.sessionId).to.be.equal('TEST_SESSION_1');
     expect(input.data?.form?.values).length(3);
-    expect(input.data?.form?.values?.[0].shortText).to.be.equal(undefined);
-    expect(input.data?.form?.values?.[1].shortText).to.be.equal(undefined);
-    expect(input.data?.form?.values?.[2].email).to.be.equal(undefined);
+    expect(input.data?.form?.values?.[0]?.shortText).to.be.equal(undefined);
+    expect(input.data?.form?.values?.[1]?.shortText).to.be.equal(undefined);
+    expect(input.data?.form?.values?.[2]?.email).to.be.equal(undefined);
   });
 
   // Should finish the dialogue

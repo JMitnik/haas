@@ -9,16 +9,25 @@ import {
 import styled, { css } from 'styled-components';
 
 
-export interface ButtonProps extends ChakraButtonProps { };
+export interface ButtonProps extends ChakraButtonProps {
+  iconOnly?: boolean;
+};
 
-const ButtonContainer = styled.div`
-  svg {
-    width: 1rem;
-  }
+const ButtonContainer = styled.div<{ iconOnly?: boolean; }>`
+  ${({ theme, iconOnly }) => css`
+    svg {
+      width: 1rem;
+      margin-right: ${theme.gutter / 4}px;
+
+      ${iconOnly && css`
+        margin-right: 0;
+      `}
+    }
+  `}
 `;
 
-export const Button = React.forwardRef((props: ButtonProps, ref) => (
-  <ButtonContainer>
+export const Button = React.forwardRef(({ iconOnly = false, ...props}: ButtonProps, ref) => (
+  <ButtonContainer iconOnly={iconOnly}>
     <ChakraButton borderRadius={10} variantColor="main" {...props} ref={ref} />
   </ButtonContainer>
 ));

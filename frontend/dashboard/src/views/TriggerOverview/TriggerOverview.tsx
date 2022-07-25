@@ -141,7 +141,7 @@ const TriggersOverview = () => {
             </UI.ViewTitle>
             <UI.Button
               onClick={handleAddUser}
-              leftIcon={Plus}
+              leftIcon={() => <Plus />}
               size="sm"
               ml={4}
             >

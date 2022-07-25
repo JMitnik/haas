@@ -1,4 +1,4 @@
-import { extendType, inputObjectType, objectType } from '@nexus/schema';
+import { extendType, inputObjectType, objectType } from 'nexus';
 import { UserInputError } from 'apollo-server';
 
 import { CampaignVariantModel } from './CampaignVariantModel';
@@ -21,13 +21,15 @@ export const CampaignModel = objectType({
       args: { filter: DeliveryConnectionFilterInput },
 
       resolve: async (parent, args, ctx) => {
+        if (!parent.id) return null;
+
         const deliveryConnection = await ctx.services.campaignService.getDeliveryConnection(
           parent.id,
           args.filter
         );
 
         return deliveryConnection || null;
-      }
+      },
     });
   },
 });
@@ -66,11 +68,11 @@ export const GetCampaignOfWorkspace = extendType({
               weight: variantEdge.weight,
               dialogue: variantEdge.campaignVariant.dialogue,
               workspace: variantEdge.campaignVariant.workspace,
-            }))
-          ]
+            })),
+          ],
         };
-      }
+      },
     })
-  }
+  },
 });
 

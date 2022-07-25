@@ -1,10 +1,10 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import { Activity, Minus, Plus, Type } from 'react-feather';
-import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, Stack } from '@chakra-ui/core';
+import { ButtonGroup, FormErrorMessage, RadioButtonGroup, Stack } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
 import {
-  DeprecatedViewTitle, Div, Flex, Form, FormContainer, FormControl, FormLabel,
+  Div, Flex, Form, FormContainer, FormControl, FormLabel,
   FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, RadioButton, Textarea,
 } from '@haas/ui';
 import { gql, useMutation, useQuery } from '@apollo/client';
@@ -89,36 +89,6 @@ const schema = yup.object().shape({
   isWithoutGenData: yup.boolean(),
 });
 
-const EditDialogueView = () => {
-  const { customerSlug, dialogueSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
-  const editDialogueData = useQuery(getEditDialogueQuery, {
-    variables: {
-      customerSlug,
-      dialogueSlug,
-    },
-    fetchPolicy: 'network-only',
-  });
-
-  const { data: tagsData, loading: tagsLoading } = useQuery(getTagsQuery, { variables: { customerSlug } });
-
-  if (editDialogueData.loading || tagsLoading) return null;
-
-  const tagOptions: Array<{ label: string, value: string }> = tagsData?.tags && tagsData?.tags?.map((tag: any) => (
-    { label: tag?.name, value: tag?.id }));
-
-  const currentTags = editDialogueData.data?.customer?.dialogue?.tags
-    && editDialogueData.data?.customer?.dialogue?.tags?.map((tag: any) => (
-      { label: tag?.name, value: tag?.id }));
-
-  return (
-    <EditDialogueForm
-      dialogue={editDialogueData.data?.customer?.dialogue}
-      currentTags={currentTags}
-      tagOptions={tagOptions}
-    />
-  );
-};
-
 const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFormProps) => {
   const history = useHistory();
   const language = LANGUAGE_OPTIONS.find((option) => option.value === dialogue?.language);
@@ -149,9 +119,6 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
         customerSlug,
       },
     }],
-    onError: (serverError: any) => {
-      console.log(serverError);
-    },
   });
 
   const [activeTags, setActiveTags] = useState<Array<null | { label: string, value: string }>>(currentTags);
@@ -159,7 +126,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
   const onSubmit = (formData: FormDataProps) => {
     const tagIds = formData.tags?.map((tag) => tag?.value) || [];
     const tagEntries = { entries: tagIds };
-    const language = formData.languageOption.value;
+    const lang = formData.languageOption.value;
 
     // TODO: Ensure we can edit the dialogue slug (uneditable atm)
     editDialogue({
@@ -171,7 +138,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
         description: formData.description,
         tags: tagEntries,
         isWithoutGenData: intToBool(formData.isWithoutGenData),
-        language,
+        language: lang,
         dialogueFinisherHeading: formData.postLeafHeading,
         dialogueFinisherSubheading: formData.postLeafSubheading,
       },
@@ -336,12 +303,12 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
                 <Div>
                   <InputGrid gridTemplateColumns="1fr">
                     <Div>
-                      <Button
-                        leftIcon={Plus}
+                      <UI.Button
+                        leftIcon={() => <Plus />}
                         onClick={() => setActiveTags((prevTags) => [...prevTags, null])}
                       >
                         {t('add_tag')}
-                      </Button>
+                      </UI.Button>
                     </Div>
 
                     <Stack>
@@ -361,15 +328,15 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
                             <FormErrorMessage>{form.errors.tags?.[index]?.value?.message}</FormErrorMessage>
                           </Div>
                           <Flex justifyContent="center" alignContent="center" flexGrow={1}>
-                            <Button
+                            <UI.Button
                               size="xs"
                               variantColor="red"
                               variant="outline"
-                              leftIcon={Minus}
+                              leftIcon={() => <Minus />}
                               onClick={() => deleteTag(index)}
                             >
                               {t('remove')}
-                            </Button>
+                            </UI.Button>
                           </Flex>
                         </Flex>
                       ))}
@@ -423,21 +390,51 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
               )}
 
               <ButtonGroup>
-                <Button
+                <UI.Button
                   isLoading={isLoading}
                   isDisabled={!form.formState.isValid}
                   variantColor="teal"
                   type="submit"
                 >
                   {t('save')}
-                </Button>
-                <Button variant="outline" onClick={() => history.goBack()}>{t('cancel')}</Button>
+                </UI.Button>
+                <UI.Button variant="outline" onClick={() => history.goBack()}>{t('cancel')}</UI.Button>
               </ButtonGroup>
             </Form>
           </FormContainer>
         </motion.div>
       </UI.ViewBody>
     </>
+  );
+};
+
+const EditDialogueView = () => {
+  const { customerSlug, dialogueSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
+  const editDialogueData = useQuery(getEditDialogueQuery, {
+    variables: {
+      customerSlug,
+      dialogueSlug,
+    },
+    fetchPolicy: 'network-only',
+  });
+
+  const { data: tagsData, loading: tagsLoading } = useQuery(getTagsQuery, { variables: { customerSlug } });
+
+  if (editDialogueData.loading || tagsLoading) return null;
+
+  const tagOptions: Array<{ label: string, value: string }> = tagsData?.tags && tagsData?.tags?.map((tag: any) => (
+    { label: tag?.name, value: tag?.id }));
+
+  const currentTags = editDialogueData.data?.customer?.dialogue?.tags
+    && editDialogueData.data?.customer?.dialogue?.tags?.map((tag: any) => (
+      { label: tag?.name, value: tag?.id }));
+
+  return (
+    <EditDialogueForm
+      dialogue={editDialogueData.data?.customer?.dialogue}
+      currentTags={currentTags}
+      tagOptions={tagOptions}
+    />
   );
 };
 

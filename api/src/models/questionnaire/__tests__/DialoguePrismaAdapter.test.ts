@@ -1,11 +1,10 @@
-import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import DialoguePrismaAdapter from '../DialoguePrismaAdapter';
 import { clearDialogueDatabase } from './testUtils';
 import { Prisma } from '@prisma/client';
 import cuid from 'cuid';
 import { CreateDialogueInput } from '../DialoguePrismaAdapterType';
+import { prisma } from '../../../test/setup/singletonDeps';
 
-const prisma = makeTestPrisma();
 const dialoguePrismaAdapter = new DialoguePrismaAdapter(prisma);
 
 const defaultDialogueCreateInput: Prisma.DialogueCreateInput = {
@@ -32,10 +31,20 @@ const defaultCreateDialogueInput: CreateDialogueInput = {
 }
 
 describe('DialoguePrismaAdapter', () => {
+  beforeEach(async () => {
+    await clearDialogueDatabase(prisma);
+  });
+
   afterEach(async () => {
     await clearDialogueDatabase(prisma);
     await prisma.$disconnect();
   });
+
+  afterAll(async () => {
+    await clearDialogueDatabase(prisma);
+    await prisma.$disconnect();
+  });
+
 
   test('Creates a dialogue', async () => {
     const dialogue = await dialoguePrismaAdapter.createTemplate(defaultCreateDialogueInput);
@@ -245,7 +254,10 @@ describe('DialoguePrismaAdapter', () => {
     const dialogueNotFoundIncorrectDialogueSlug = await dialoguePrismaAdapter.getDialogueBySlug(targetDialogueOne.customerId, '-1');
     expect(dialogueNotFoundIncorrectDialogueSlug).toBeNull();
 
-    const foundDialogue = await dialoguePrismaAdapter.getDialogueBySlug(targetDialogueOne.customerId, targetDialogueOne.slug);
+    const foundDialogue = await dialoguePrismaAdapter.getDialogueBySlug(
+      targetDialogueOne.customerId,
+      targetDialogueOne.slug
+    );
     expect(foundDialogue).not.toBeNull();
     expect(foundDialogue?.title).toBe(targetDialogueOne.title);
   });
@@ -278,7 +290,10 @@ describe('DialoguePrismaAdapter', () => {
     expect(notFoundDialogueIncorrectCustomerSlug).toBeNull();
 
     // correct customer slug, correct dialogue slug
-    const foundDialogue = await dialoguePrismaAdapter.getDialogueBySlugs(targetDialogueOne.customer.slug, targetDialogueOne.slug);
+    const foundDialogue = await dialoguePrismaAdapter.getDialogueBySlugs(
+      targetDialogueOne.customer.slug,
+      targetDialogueOne.slug
+    );
     expect(foundDialogue).not.toBeNull();
     expect(foundDialogue?.title).toBe(targetDialogueOne.title);
   });

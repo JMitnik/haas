@@ -4,7 +4,7 @@ import { DateHistogramItem } from './Analytics.types';
  * Convers a list of dates to a grouped histogram (grouped by day).
  * @param dates
  * @returns Histogram items
- * 
+ *
  * Precondition: dates should already be sorted.
  */
 export const convertDatesToHistogramItems = (dates: Date[]): DateHistogramItem[] => {
@@ -27,7 +27,7 @@ export const convertDatesToHistogramItems = (dates: Date[]): DateHistogramItem[]
 
     keyedHistogram[key] = {
       ...keyedHistogram[key],
-      frequency: keyedHistogram[key].frequency + 1,
+      frequency: (keyedHistogram[key] as DateHistogramItem).frequency as number + 1,
     };
   });
 

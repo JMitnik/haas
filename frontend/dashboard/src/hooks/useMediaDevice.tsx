@@ -5,6 +5,7 @@ import { useContext, useEffect, useState } from 'react';
  * Tracks device sizes
  */
 const useMediaDevice = () => {
+  // @ts-ignore
   const { mediaSizes } = useContext(ThemeContext);
   const [dimensions, setDimensions] = useState([
     document.body.clientWidth,

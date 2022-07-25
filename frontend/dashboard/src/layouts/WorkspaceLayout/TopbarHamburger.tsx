@@ -29,7 +29,7 @@ export const TopbarHamburger = () => {
     <HamburgerContainer className="hamburger" px={4}>
       <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
         <Popover.Trigger asChild>
-          <UI.Button variant="outline">
+          <UI.Button iconOnly variant="outline">
             <UI.Icon>
               <HamburgerIcon />
             </UI.Icon>

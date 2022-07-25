@@ -13,6 +13,7 @@ import {
   RadioGroup,
 } from '@chakra-ui/core';
 import { endOfDay, format, startOfDay } from 'date-fns';
+import { isPresent } from 'ts-is-present';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
@@ -194,11 +195,11 @@ export const InteractionsOverview = () => {
     errorPolicy: 'ignore',
     onCompleted: (fetchedData) => {
       setCampaignVariants(
-        fetchedData?.customer?.dialogue?.campaignVariants || [],
+        fetchedData?.customer?.dialogue?.campaignVariants?.filter(isPresent) as any || [],
       );
 
       setSessions(
-        fetchedData?.customer?.dialogue?.sessionConnection?.sessions || [],
+        fetchedData?.customer?.dialogue?.sessionConnection?.sessions as any || [],
       );
 
       setTotalPages(fetchedData.customer?.dialogue?.sessionConnection?.totalPages || 0);
@@ -423,23 +424,29 @@ export const InteractionsOverview = () => {
                 <Menu.Item
                   onClick={() => handleMultiDateFilterChange(undefined, new Date(contextInteraction?.createdAt))}
                 >
-                  {t('before_day_of')}
-                  {' '}
-                  {formatSimpleDate(contextInteraction?.createdAt)}
+                  <>
+                    {t('before_day_of')}
+                    {' '}
+                    {formatSimpleDate(contextInteraction?.createdAt)}
+                  </>
                 </Menu.Item>
                 <Menu.Item
                   onClick={() => handleSingleDateFilterChange(contextInteraction?.createdAt)}
                 >
-                  {t('on_day_of')}
-                  {' '}
-                  {formatSimpleDate(contextInteraction?.createdAt)}
+                  <>
+                    {t('on_day_of')}
+                    {' '}
+                    {formatSimpleDate(contextInteraction?.createdAt)}
+                  </>
                 </Menu.Item>
                 <Menu.Item
                   onClick={() => handleMultiDateFilterChange(new Date(contextInteraction?.createdAt), undefined)}
                 >
-                  {t('after_day_of')}
-                  {' '}
-                  {formatSimpleDate(contextInteraction?.createdAt)}
+                  <>
+                    {t('after_day_of')}
+                    {' '}
+                    {formatSimpleDate(contextInteraction?.createdAt)}
+                  </>
                 </Menu.Item>
               </Menu.SubMenu>
               {contextInteraction?.delivery && (
@@ -458,21 +465,25 @@ export const InteractionsOverview = () => {
                         `${contextInteraction?.delivery?.deliveryRecipientFirstName} ${contextInteraction?.delivery?.deliveryRecipientLastName}` || '',
                       )}
                     >
-                      {t('more_from')}
-                      {' '}
-                      {contextInteraction?.delivery?.deliveryRecipientFirstName}
-                      {' '}
-                      {contextInteraction?.delivery?.deliveryRecipientLastName}
+                      <>
+                        {t('more_from')}
+                        {' '}
+                        {contextInteraction?.delivery?.deliveryRecipientFirstName}
+                        {' '}
+                        {contextInteraction?.delivery?.deliveryRecipientLastName}
+                      </>
                     </Menu.Item>
                     <Menu.Item onClick={() => handleCampaignVariantFilterChange({
                       filterCampaignVariant: contextInteraction?.delivery?.campaignVariant?.id,
                     })}
                     >
-                      {t('more_from')}
-                      {' '}
-                      {t('campaign_variant')}
-                      {' '}
-                      {contextInteraction?.delivery?.campaignVariant?.label}
+                      <>
+                        {t('more_from')}
+                        {' '}
+                        {t('campaign_variant')}
+                        {' '}
+                        {contextInteraction?.delivery?.campaignVariant?.label}
+                      </>
                     </Menu.Item>
                   </Menu.SubMenu>
                 </>
