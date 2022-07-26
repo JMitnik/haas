@@ -1,3 +1,26 @@
+export enum DateFormat {
+  /** Example: 02-12-2021 */
+  DayFormat = 'dd-MM-yyyy',
+  DayTimeFormat = 'dd-MM-yyyy HH:mm',
+  /** Example: Monday, June 16th */
+  HumanGlobalWeekDayFormat = 'EEEE, MMMM do',
+
+  /** Example: Monday 16 July, 20:00 */
+  HumanDateTime = 'EEEE do, HH:mm',
+
+  /** Example: Monday 16 of July, 20:00 (GMT+1) */
+  HumanMonthDateTimeUTC = 'EEEE do \'of\' LLLL, \'at\' HH:mm \'(\'zzzz\')\'',
+
+  /** Example: Monday 16 of July, 20:00 */
+  HumanMonthDateTime = 'EEEE do \'of\' LLLL, \'at\' HH:mm',
+
+  /** Example: Monday 16 of July */
+  MonthDate = 'EEEE do \'of\' LLLL',
+
+  /** Example: 13:37 */
+  Time = 'HH:mm',
+}
+
 export type DayType = 'SUN' | 'MON' | 'TUE' | 'WED' | 'THU' | 'FRI' | 'SAT';
 
 export enum CustomRecurringType {

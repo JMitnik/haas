@@ -59,4 +59,5 @@ export const useDate = () => ({
   }),
   toUTC: (date: Date): Date => zonedTimeToUtc(date, 'UTC'),
   toZonedTime: (date: Date, timeZone: string): Date => utcToZonedTime(date, timeZone),
+  toDayFormat: (date: Date) => dateFormat(date, DateFormat.DayFormat),
 });
