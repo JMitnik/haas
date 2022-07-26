@@ -2079,6 +2079,14 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   automation: {
+    recipients: {
+      en: 'Recipients',
+      de: 'Empfänger',
+    },
+    recipients_helper: {
+      en: 'Determine who will receive the results of this action and what channel will be used',
+      de: 'Legen Sie fest, wer die Ergebnisse dieser Aktion erhält und welcher Kanal verwendet wird',
+    },
     no_future_dates_available: {
       en: 'No future dates available.',
       de: 'Keine zukünftigen Daten verfügbar.',

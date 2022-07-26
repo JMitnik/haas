@@ -533,6 +533,7 @@ export class CustomerService {
         create: {
           email: `${workspaceSlug}@haas.live`,
           firstName: 'bot',
+          lastName: workspaceSlug,
         },
       },
     })

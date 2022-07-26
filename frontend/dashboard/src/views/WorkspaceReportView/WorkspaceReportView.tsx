@@ -24,56 +24,58 @@ interface ReportViewInput {
   dateLabel: ActiveDateType;
 }
 
-const useOffset = (type: PeriodType, startDate: Date, compareStatisticStartDate: Date) => {
+const useOffset = (type: PeriodType) => {
+  const now = new Date();
   switch (type) {
     case 'daily':
       return {
-        startDate: addDays(startDate, 1).toLocaleDateString(),
-        compareStatisticStartDate: addDays(compareStatisticStartDate, 1).toLocaleDateString(),
+        startDate: sub(now, { days: 1 }),
+        compareStatisticStartDate: sub(now, { days: 2 }),
+        offsetStartDate: now.toLocaleDateString(),
+        offsetCompareStatisticStartDate: sub(now, { days: 1 }).toLocaleDateString(),
       };
     case 'monthly':
       return {
-        startDate: addMonths(startDate, 1).toLocaleDateString(),
-        compareStatisticStartDate: addMonths(compareStatisticStartDate, 1).toLocaleDateString(),
+        startDate: sub(now, { months: 1 }),
+        compareStatisticStartDate: sub(now, { months: 2 }),
+        offsetStartDate: now.toLocaleDateString(),
+        offsetCompareStatisticStartDate: sub(now, { months: 1 }).toLocaleDateString(),
       };
     case 'yearly':
       return {
-        startDate: addYears(startDate, 1).toLocaleDateString(),
-        compareStatisticStartDate: addYears(compareStatisticStartDate, 1).toLocaleDateString(),
+        startDate: sub(now, { years: 1 }),
+        compareStatisticStartDate: sub(now, { years: 2 }),
+        offsetStartDate: now.toLocaleDateString(),
+        offsetCompareStatisticStartDate: sub(now, { years: 1 }).toLocaleDateString(),
       };
     case 'weekly':
     default:
       return {
-        startDate: addWeeks(startDate, 1).toLocaleDateString(),
-        compareStatisticStartDate: addWeeks(compareStatisticStartDate, 1).toLocaleDateString(),
+        startDate: sub(now, { weeks: 1 }),
+        compareStatisticStartDate: sub(now, { weeks: 2 }),
+        offsetStartDate: now.toLocaleDateString(),
+        offsetCompareStatisticStartDate: sub(now, { weeks: 1 }).toLocaleDateString(),
       };
   }
 };
 
-export const WorkspaceReportView = ({ compareStatisticStartDate, dateLabel, startDate }: ReportViewInput) => {
+export const WorkspaceReportView = ({ dateLabel }: ReportViewInput) => {
   const { customerSlug } = useNavigator();
   const { t } = useTranslation();
   const { activeCustomer } = useCustomer();
-  const { parse: parseDate, toDayFormat } = useDate();
 
   const [filter] = useQueryParams({
     type: withDefault(StringParam, 'weekly'),
-    startDate: StringParam,
-    compareStatisticStartDate: StringParam,
   });
 
   const queryInput = {
     workspaceId: activeCustomer?.id as string,
-    startDate: filter.startDate,
-    compareStatisticStartDate: filter.compareStatisticStartDate,
   };
 
   console.log('Input for potential query: ', queryInput);
 
   const offsetDates = useOffset(
     filter.type as PeriodType,
-    parseDate(filter.startDate || toDayFormat(sub(new Date(), { weeks: 1 })), DateFormat.DayFormat),
-    parseDate(filter.compareStatisticStartDate || toDayFormat(sub(new Date(), { weeks: 2 })), DateFormat.DayFormat),
   );
 
   return (
@@ -82,7 +84,7 @@ export const WorkspaceReportView = ({ compareStatisticStartDate, dateLabel, star
         <UI.Flex alignItems="center" justifyContent="space-between" width="100%">
           <UI.Flex alignItems="center">
             <UI.ViewTitle>
-              {`${t('report:name')}: ${customerSlug} (${offsetDates.compareStatisticStartDate} - ${offsetDates.startDate})`}
+              {`${filter.type.charAt(0).toUpperCase() + filter.type.slice(1)} ${t('report:name')}: ${customerSlug} (${offsetDates.offsetCompareStatisticStartDate} - ${offsetDates.offsetStartDate})`}
             </UI.ViewTitle>
           </UI.Flex>
         </UI.Flex>

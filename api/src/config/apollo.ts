@@ -68,7 +68,7 @@ export const makeApollo = async (prisma: PrismaClient) => {
       useGraphQlJit(),
       useValidationCache(),
       useParserCache(),
-      useSentry(),
+      // useSentry(),
       // useResponseCache({
       //   includeExtensionMetadata: true,
       //   idFields: [

@@ -21,32 +21,19 @@ export const findReportQueryParamsByCron = (frequency: CustomRecurringType) => {
     case CustomRecurringType.DAILY:
       return {
         type: 'daily',
-        startDate: toDayFormat(sub(new Date(), { days: 1 })),
-        compareStatisticStartDate: toDayFormat(sub(new Date(), { days: 2 })),
-      }
-    case CustomRecurringType.WEEKLY:
-      return {
-        type: 'weekly',
-        startDate: toDayFormat(sub(new Date(), { weeks: 1 })),
-        compareStatisticStartDate: toDayFormat(sub(new Date(), { weeks: 2 })),
       }
     case CustomRecurringType.MONTHLY:
       return {
         type: 'monthly',
-        startDate: toDayFormat(sub(new Date(), { months: 1 })),
-        compareStatisticStartDate: toDayFormat(sub(new Date(), { months: 2 })),
       }
     case CustomRecurringType.YEARLY:
       return {
         type: 'yearly',
-        startDate: toDayFormat(sub(new Date(), { years: 1 })),
-        compareStatisticStartDate: toDayFormat(sub(new Date(), { years: 2 })),
       }
+    case CustomRecurringType.WEEKLY:
     default:
       return {
         type: 'weekly',
-        startDate: toDayFormat(sub(new Date(), { weeks: 1 })),
-        compareStatisticStartDate: toDayFormat(sub(new Date(), { weeks: 2 })),
       }
   }
 }
@@ -385,7 +372,7 @@ export const buildSchedule = (input: NexusGenInputs['CreateAutomationInput']): C
       month: input.schedule.month,
       type: input.schedule.type,
       id: input.schedule?.id || undefined,
-      dialogueScope: input.schedule.dialogueId ? {
+      dialogueScope: input.schedule?.dialogueId ? {
         connect: {
           id: input.schedule.dialogueId,
         },

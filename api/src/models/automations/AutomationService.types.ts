@@ -1,3 +1,13 @@
+import { Prisma } from '@prisma/client';
+
+const workspace = Prisma.validator<Prisma.CustomerArgs>()({
+  include: {
+    roles: true,
+  },
+});
+
+export type WorkspaceWithRoles = Prisma.CustomerGetPayload<typeof workspace>;
+
 export enum DateFormat {
   /** Example: 02-12-2021 */
   DayFormat = 'dd-MM-yyyy',

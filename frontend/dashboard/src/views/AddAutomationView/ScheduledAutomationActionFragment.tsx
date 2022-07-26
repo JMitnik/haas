@@ -1,14 +1,10 @@
 import * as UI from '@haas/ui';
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
-import { PlusCircle } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
 import * as RadioGroup from 'components/Common/RadioGroup';
 import { AutomationActionType } from 'types/generated-types';
-import { DialogueNodePicker } from 'components/NodePicker/DialogueNodePicker';
-import { NodeCell } from 'components/NodeCell';
-import Dropdown from 'components/Dropdown';
 
 import { ACTION_OPTIONS } from './AutomationForm.constants';
 import { getCronByActionType, getTypeByActionType } from './AutomationForm.helpers';
@@ -77,7 +73,7 @@ export const ScheduledAutomationActionFragment = ({ dialogueItems }: ScheduledAu
           )}
         />
       </UI.FormControl>
-      <UI.FormControl isRequired isInvalid={!!form.formState.errors.schedule?.activeDialogue}>
+      {/* <UI.FormControl isRequired isInvalid={!!form.formState.errors.schedule?.activeDialogue}>
         <UI.FormLabel htmlFor="activeDialogue">
           {t('dialogue')}
         </UI.FormLabel>
@@ -86,7 +82,6 @@ export const ScheduledAutomationActionFragment = ({ dialogueItems }: ScheduledAu
         </UI.InputHelper>
         <UI.Div>
           <UI.Flex>
-            {/* TODO: Make a theme out of it */}
             <UI.Div
               width="100%"
               backgroundColor="#fbfcff"
@@ -156,7 +151,7 @@ export const ScheduledAutomationActionFragment = ({ dialogueItems }: ScheduledAu
             </UI.Div>
           </UI.Flex>
         </UI.Div>
-      </UI.FormControl>
+      </UI.FormControl> */}
     </>
   );
 };

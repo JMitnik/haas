@@ -227,6 +227,9 @@ class GenerateWorkspaceService {
       isDemo: isDemo,
     }, template);
 
+    // create bot role
+    await this.customerService.createBotUser(workspace.id, workspace.slug, workspace.roles);
+
     try {
       if (input.generateDemoData) return this.generateDemoData(type, workspace, userId);
 

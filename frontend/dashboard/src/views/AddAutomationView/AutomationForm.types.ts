@@ -175,10 +175,10 @@ export const schema = yup.object({
         }),
       ),
       activeDialogue: yup.object().shape({
-        type: yup.string().required(),
-        label: yup.string().required(),
-        id: yup.string().required(),
-      }).required(),
+        type: yup.string(),
+        label: yup.string(),
+        id: yup.string(),
+      }),
     }).required(),
   }),
   actions: yup.array().of(
@@ -187,7 +187,7 @@ export const schema = yup.object({
         channelId: yup.string(),
         id: yup.string(),
         type: yup.mixed<AutomationActionType>().oneOf(Object.values(AutomationActionType)),
-        targets: yup.array().of(
+        targets: yup.array().required().of(
           yup.object().shape({
             label: yup.string(),
             type: yup.string(),

@@ -4,10 +4,10 @@ import { PlusCircle } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
-import { ContactsCell } from 'views/ActionsOverview/ContactsCell';
 import { UserNodePicker } from 'components/NodePicker/UserNodePicker';
 import Dropdown from 'components/Dropdown';
 
+import { RecipientsCell } from './RecipientsCell';
 import { TargetEntry } from './CreateActionModalCard';
 
 interface RecipientFragmentProps {
@@ -69,7 +69,7 @@ export const RecipientsFragment = ({ recipientEntries }: RecipientFragmentProps)
                       alignItems="center"
                     >
                       {value?.length ? (
-                        <ContactsCell
+                        <RecipientsCell
                           onRemove={() => {
                             onChange(null);
                           }}

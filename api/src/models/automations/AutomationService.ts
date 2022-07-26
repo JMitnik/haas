@@ -49,6 +49,9 @@ import {
   constructUpdateAutomationInput,
   constructCreateAutomationInput,
 } from './AutomationService.helpers';
+import e from 'express';
+import { GraphQLYogaError } from '@graphql-yoga/node';
+import { WorkspaceWithRoles } from './AutomationService.types';
 
 class AutomationService {
   automationPrismaAdapter: AutomationPrismaAdapter;
@@ -93,20 +96,14 @@ class AutomationService {
       case AutomationActionType.WEEK_REPORT:
         return {
           type: 'weekly',
-          startDate: toDayFormat(sub(new Date(), { weeks: 1 })),
-          compareStatisticStartDate: toDayFormat(sub(new Date(), { weeks: 1 })),
         }
       case AutomationActionType.MONTH_REPORT:
         return {
           type: 'monthly',
-          startDate: toDayFormat(sub(new Date(), { months: 1 })),
-          compareStatisticStartDate: toDayFormat(sub(new Date(), { months: 2 })),
         }
       case AutomationActionType.YEAR_REPORT:
         return {
           type: 'yearly',
-          startDate: toDayFormat(sub(new Date(), { years: 1 })),
-          compareStatisticStartDate: toDayFormat(sub(new Date(), { years: 2 })),
         }
       default: // Customizeable Report
         const scheduledAutomation = await this.findScheduledAutomationById(automationAction.automationScheduledId!);
@@ -140,14 +137,13 @@ class AutomationService {
   ): Promise<AWS.EventBridge.TargetList> => {
     return Promise.all(actions.map(async (action, index) => {
       const lambdaTargetArn = findLambdaArnByActionType(action.type);
-
+      if (!lambdaTargetArn) throw new GraphQLYogaError('No lambda target arn found in env file');
       const dashboardUrl = config.dashboardUrl;
 
-      // TODO: Create a workspace scoped url instead dialogue scoped url when no dialogueSlug provided
       const queryParams = await this.findReportQueryParamsByActionType(action);
       const reportUrl = dialogueSlug
         ? `${dashboardUrl}/dashboard/b/${workspaceSlug}/d/${dialogueSlug}/_reports/weekly`
-        : `${dashboardUrl}/dashboard/b/${workspaceSlug}/_reports?type=${queryParams.type}&startDate=${queryParams.startDate}&compareStatisticStartDate=${queryParams.compareStatisticStartDate}`;
+        : `${dashboardUrl}/dashboard/b/${workspaceSlug}/_reports?type=${queryParams.type}`;
 
       const extraGenerateParams = {
         USER_ID: botUser.id,
@@ -204,33 +200,45 @@ class AutomationService {
     // Find the state of the automation and adjust event bridge rule to that
     const state = parentAutomation?.isActive ? 'ENABLED' : 'DISABLED';
 
-    const workspace = await this.customerService.findWorkspaceById(workspaceId) as Customer;
+    const workspace = await this.customerService.findWorkspaceById(workspaceId) as WorkspaceWithRoles;
     const dialogue = dialogueId ? await this.dialogueService.getDialogueById(dialogueId) : undefined;
 
-    const user = await this.userService.findBotByWorkspaceName(workspace.slug);
+    let user = await this.userService.findBotByWorkspaceName(workspace.slug);
 
-    await this.eventBridge.putRule({
-      Name: automationScheduled.id,
-      ScheduleExpression: scheduledExpression,
-      State: state,
-      RoleArn: process.env.EVENT_BRIDGE_RUN_ALL_LAMBDAS_ROLE_ARN,
-    }).promise().catch((e) => {
-      console.log(`upserting a event bridge rule for automation schedule: ${automationScheduled.id} with error ${e}`)
-      throw new ApolloError(`upserting a event bridge rule for automation schedule: ${automationScheduled.id} with error ${e}`)
-    });
+    // If no bot user exists in the workspace => Create one
+    if (!user) {
+      await this.customerService.createBotUser(workspace.id, workspace.slug, workspace.roles);
+      user = await this.userService.findBotByWorkspaceName(workspace.slug);
+    };
 
-    await this.eventBridge.putTargets({
-      Rule: automationScheduled.id,
-      Targets: await this.mapActionsToRuleTargets(
-        automationScheduled.id,
-        parentAutomation.automationScheduled?.actions || [],
-        user!,
-        workspace.slug,
-        dialogue?.slug,
-      ),
-    }).promise().catch((e) => {
-      throw new ApolloError(`upserting targets automation schedule: ${automationScheduled.id} with error ${e}`)
-    });
+    const ruleTargets = await this.mapActionsToRuleTargets(
+      automationScheduled.id,
+      parentAutomation.automationScheduled?.actions || [],
+      user!,
+      workspace.slug,
+      dialogue?.slug,
+    );
+
+    if (config.env !== 'local') {
+      await this.eventBridge.putRule({
+        Name: automationScheduled.id,
+        ScheduleExpression: scheduledExpression,
+        State: state,
+        RoleArn: process.env.EVENT_BRIDGE_RUN_ALL_LAMBDAS_ROLE_ARN,
+      }).promise().catch((e) => {
+        console.log(`upserting a event bridge rule for automation schedule: ${automationScheduled.id} with error ${e}`)
+        throw new ApolloError(`upserting a event bridge rule for automation schedule: ${automationScheduled.id} with error ${e}`)
+      });
+
+      await this.eventBridge.putTargets({
+        Rule: automationScheduled.id,
+        Targets: ruleTargets,
+      }).promise().catch((e) => {
+        throw new ApolloError(`upserting targets automation schedule: ${automationScheduled.id} with error ${e}`)
+      });
+    } else {
+      console.info('Rule targets in staging/prod would be: ', ruleTargets);
+    }
   }
 
   /**
@@ -716,7 +724,6 @@ class AutomationService {
 
     if (updatedAutomation.type === AutomationType.SCHEDULED
       && updatedAutomation.automationScheduled
-      && config.env !== 'local'
     ) {
       await this.upsertEventBridge(
         input.workspaceId as string,
@@ -743,7 +750,6 @@ class AutomationService {
 
     if (createdAutomation.type === AutomationType.SCHEDULED
       && createdAutomation.automationScheduled
-      && config.env !== 'local'
     ) {
       await this.upsertEventBridge(
         input.workspaceId as string,

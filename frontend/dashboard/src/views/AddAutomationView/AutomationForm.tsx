@@ -172,7 +172,7 @@ const AutomationForm = ({
         hours,
         minutes,
         id: automation?.schedule?.id,
-        dialogueId: formData.schedule?.activeDialogue?.id,
+        dialogueId: formData.schedule?.activeDialogue?.id || null,
       } : undefined,
     };
 
