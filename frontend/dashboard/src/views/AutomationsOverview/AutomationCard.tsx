@@ -190,7 +190,7 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
                 )}
 
               {(automation.type === AutomationType.Scheduled
-                || automation.automationScheduled?.activeDialogue?.slug) && (
+                && automation.automationScheduled?.activeDialogue?.slug) && (
                   <UI.Div mb={1}>
                     <UI.Label size="sm">
                       <UI.Flex alignItems="center">
