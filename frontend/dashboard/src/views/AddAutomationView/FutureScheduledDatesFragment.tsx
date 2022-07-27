@@ -39,7 +39,7 @@ export const FutureScheduledDatesFragment = ({ futureDates }: FutureScheduledDat
         </UI.Flex>
       </UI.Flex>
       {futureDates?.map((entry, index) => (
-        <UI.Flex alignItems="center" pb={1}>
+        <UI.Flex key={entry.toString()} alignItems="center" pb={1}>
           <UI.Div padding="1em" mr={1} paddingLeft="0" position="relative">
             <UI.Icon color="main.500">
               <Clock width="1.5em" />

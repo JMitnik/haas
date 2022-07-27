@@ -175,7 +175,7 @@ export const TimePickerContent = ({ onChange, value }: TimePickerSelectProps) =>
             />
             <RadixSelect.SelectGroup>
               {filteredItems.map((item) => (
-                <RadixSelect.SelectItem value={item.value}>
+                <RadixSelect.SelectItem key={item.value} value={item.value}>
                   <RadixSelect.SelectItemText>{item.label}</RadixSelect.SelectItemText>
                   <RadixSelect.SelectItemIndicator>
                     <CheckIcon />
