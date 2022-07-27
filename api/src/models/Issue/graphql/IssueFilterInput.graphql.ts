@@ -1,4 +1,4 @@
-import { inputObjectType } from '@nexus/schema';
+import { inputObjectType } from 'nexus';
 
 export const IssueFilterInput = inputObjectType({
   name: 'IssueFilterInput',
@@ -9,9 +9,9 @@ export const IssueFilterInput = inputObjectType({
     t.string('endDate');
 
     /** Fragments of the dialogue which should constitute the relevant filter */
-    t.list.string('dialogueStrings');
+    t.list.nonNull.string('dialogueStrings');
 
     /** Fragments of the topic which should constitute the relevant filter */
-    t.list.string('topicStrings');
+    t.list.nonNull.string('topicStrings');
   },
 });

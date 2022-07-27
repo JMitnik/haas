@@ -1,4 +1,3 @@
-import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { automationTriggerInput, choiceQuestionCompareDataInput, conditionInput, sliderQuestionCompareDataInput } from './testData';
 import { clearDatabase } from './testUtils';
 import AutomationService from '../AutomationService';
@@ -7,7 +6,8 @@ import { AutomationConditionBuilderType, AutomationConditionOperatorType, Automa
 import { sample } from 'lodash';
 import { cloneDeep } from 'lodash';
 
-const prisma = makeTestPrisma();
+import { prisma } from '../../../test/setup/singletonDeps';
+
 const automationService = new AutomationService(prisma);
 
 export const seedWorkspace = async (prisma: PrismaClient) => {
@@ -93,7 +93,8 @@ export const seedSession = async (
   return session;
 }
 
-export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, dialogueId: string, questionId: string, type: AutomationType) => {
+export const seedAutomation = async (
+  prisma: PrismaClient, workspaceId: string, dialogueId: string, questionId: string, type: AutomationType) => {
   return prisma.automation.create({
     data: {
       label: 'Automation',
@@ -154,7 +155,7 @@ export const seedAutomation = async (prisma: PrismaClient, workspaceId: string, 
           },
           actions: {
             create: [
-              { type: 'GENERATE_REPORT' },
+              { type: 'WEEK_REPORT' },
             ],
           },
         },
@@ -179,6 +180,12 @@ describe('AutomationService', () => {
     await clearDatabase(prisma);
     await prisma.$disconnect();
   });
+
+  afterAll(async () => {
+    await clearDatabase(prisma);
+    await prisma.$disconnect();
+  });
+
 
   test('Sets up compare data for slider-related node', async () => {
     const setupData = await automationService.setupSliderCompareData(sliderQuestionCompareDataInput);

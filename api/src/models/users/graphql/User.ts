@@ -1,5 +1,5 @@
 import { ApolloError, UserInputError } from 'apollo-server-express';
-import { extendType, inputObjectType, mutationField, objectType, queryField, scalarType } from '@nexus/schema';
+import { extendType, inputObjectType, mutationField, objectType, queryField, scalarType } from 'nexus';
 import { Prisma } from '@prisma/client';
 import { Kind } from 'graphql';
 
@@ -51,10 +51,10 @@ export const DateScalar = scalarType({
   name: 'Date',
   asNexusMethod: 'date',
   description: 'Date custom scalar type',
-  parseValue(value) {
+  parseValue(value: any) {
     return new Date(value);
   },
-  serialize(value) {
+  serialize(value: any) {
     return value.getTime();
   },
   parseLiteral(ast) {
@@ -70,9 +70,11 @@ export const AssignedDialogues = objectType({
   definition(t) {
     t.list.field('privateWorkspaceDialogues', {
       type: 'Dialogue',
+      required: true,
     });
     t.list.field('assignedDialogues', {
       type: 'Dialogue',
+      required: true,
     });
   },
 })
@@ -80,7 +82,7 @@ export const AssignedDialogues = objectType({
 export const UserType = objectType({
   name: 'UserType',
   definition(t) {
-    t.id('id');
+    t.nonNull.id('id');
     t.string('email');
     t.string('phone', { nullable: true });
     t.string('firstName', { nullable: true });
@@ -109,6 +111,8 @@ export const UserType = objectType({
       type: SystemPermission,
 
       async resolve(parent, args, ctx) {
+        if (!parent.id) return null;
+
         return ctx.services.userService.getGlobalPermissions(parent.id);
       },
     });
@@ -117,6 +121,8 @@ export const UserType = objectType({
       type: UserCustomerType,
 
       async resolve(parent, args, ctx) {
+        if (!parent.id) return null;
+
         return ctx.services.userService.getUserCustomers(parent.id);
       },
     });
@@ -125,6 +131,8 @@ export const UserType = objectType({
       type: 'Customer',
 
       async resolve(parent, args, ctx) {
+        if (!parent.id) return null;
+
         return ctx.services.userService.findActiveWorkspacesOfUser(parent.id);
       },
     });
@@ -135,7 +143,8 @@ export const UserType = objectType({
       nullable: true,
 
       async resolve(parent, args, ctx, info) {
-        return ctx.services.userService.getRoleOfWorkspaceUser(parent.id, info.variableValues.customerSlug);
+        if (!parent.id) return null;
+        return ctx.services.userService.getRoleOfWorkspaceUser(parent.id, info.variableValues.customerSlug as string);
       },
     });
   },

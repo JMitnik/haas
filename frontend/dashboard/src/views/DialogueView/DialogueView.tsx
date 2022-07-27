@@ -4,7 +4,7 @@ import {
   Activity, Award, Clipboard, Download, MessageCircle,
   ThumbsDown, ThumbsUp, TrendingDown, TrendingUp,
 } from 'react-feather';
-import { Button, Tag, TagIcon, TagLabel, useClipboard } from '@chakra-ui/core';
+import { Tag, TagIcon, TagLabel, useClipboard } from '@chakra-ui/core';
 import { sub } from 'date-fns';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -143,6 +143,7 @@ interface ShareDialogueDropdownProps {
 }
 
 const ShareDialogue = ({ dialogueName, shareUrl }: ShareDialogueDropdownProps) => {
+  // @ts-ignore
   const themeContext = useContext(ThemeContext);
 
   const qrColor = themeContext.colors.primary || '#FFFFFF';
@@ -179,9 +180,10 @@ const ShareDialogue = ({ dialogueName, shareUrl }: ShareDialogueDropdownProps) =
             </UI.Div>
             <UI.ColumnFlex alignItems="center">
               <UI.Div ref={qrContainerRef}>
+                {/* @ts-ignore */}
                 <QRCode fgColor={qrColor} value={`${shareUrl}?origin=qrc`} />
               </UI.Div>
-              <Button
+              <UI.Button
                 margin="0 auto"
                 onClick={handleDownload}
                 as="a"
@@ -191,7 +193,7 @@ const ShareDialogue = ({ dialogueName, shareUrl }: ShareDialogueDropdownProps) =
                 leftIcon={() => <Download size={12} />}
               >
                 <UI.Text ml={1}>Download</UI.Text>
-              </Button>
+              </UI.Button>
             </UI.ColumnFlex>
           </UI.Grid>
         </UI.Div>
@@ -203,7 +205,7 @@ const ShareDialogue = ({ dialogueName, shareUrl }: ShareDialogueDropdownProps) =
             <UI.Div flexGrow={1} pt={2}>
               <UI.Input
                 rightEl={(
-                  <UI.Button width="auto" size="sm" onClick={onCopy} leftIcon={Clipboard}>
+                  <UI.Button width="auto" size="sm" onClick={onCopy} leftIcon={() => <Clipboard />}>
                     {hasCopied ? 'Copied' : 'Copy'}
                   </UI.Button>
                 )}
@@ -300,7 +302,7 @@ const DialogueView = () => {
             </UI.Div>
             <Popover.Root open={isShareDialogueOpen} onOpenChange={setIsShareDialogueOpen}>
               <Popover.Trigger asChild>
-                <UI.Button leftIcon={QRIcon} ml={4} size="sm">
+                <UI.Button leftIcon={() => <QRIcon />} ml={4} size="sm">
                   {t('share')}
                 </UI.Button>
               </Popover.Trigger>
@@ -403,12 +405,12 @@ const DialogueView = () => {
                     <>
                       {dialogue?.statistics?.mostPopularPath?.basicSentiment === 'positive' ? (
                         <Tag size="sm" variantColor="green">
-                          <TagIcon icon={ThumbsUp} size="10px" color="green.600" />
+                          <TagIcon icon={() => <ThumbsUp />} size="10px" color="green.600" />
                           <TagLabel color="green.600">{dialogue?.statistics?.mostPopularPath?.quantity}</TagLabel>
                         </Tag>
                       ) : (
                         <Tag size="sm" variantColor="red">
-                          <TagIcon icon={ThumbsDown} size="10px" color="red.600" />
+                          <TagIcon icon={() => <ThumbsDown />} size="10px" color="red.600" />
                           <TagLabel color="red.600">{dialogue?.statistics?.mostPopularPath?.quantity}</TagLabel>
                         </Tag>
                       )}

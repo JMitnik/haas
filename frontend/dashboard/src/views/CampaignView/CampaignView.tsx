@@ -42,9 +42,9 @@ const campaignToForm = (campaign: CampaignType): CampaignFormProps => ({
     dialogue: { label: variant.dialogue.title, value: variant.dialogue.id },
     from: variant.from || '',
     label: variant.label,
-    type: variant.type,
+    type: variant.type!,
     weight: variant.weight,
-  })),
+  })) as any,
 });
 
 export const CampaignView = () => {
@@ -196,7 +196,7 @@ export const CampaignView = () => {
             <UI.Stack isInline alignItems="center" spacing={4}>
               <UI.DeprecatedViewTitle>{campaign?.label}</UI.DeprecatedViewTitle>
               <UI.Button
-                leftIcon={Plus}
+                leftIcon={() => <Plus />}
                 onClick={() => setIsOpenImportModal(true)}
                 size="sm"
                 variantColor="teal"
@@ -207,7 +207,7 @@ export const CampaignView = () => {
           </UI.Stack>
 
           <UI.Button
-            leftIcon={Settings}
+            leftIcon={() => <Settings />}
             size="md"
             variant="outline"
             onClick={() => setIsOpenSettingsModal(true)}
@@ -363,23 +363,29 @@ export const CampaignView = () => {
                 <Menu.Item
                   onClick={() => handleMultiDateFilterChange(undefined, new Date(activeItem?.updatedAt))}
                 >
-                  {t('before_day_of')}
-                  {' '}
-                  {formatSimpleDate(activeItem?.updatedAt)}
+                  <>
+                    {t('before_day_of')}
+                    {' '}
+                    {formatSimpleDate(activeItem?.updatedAt)}
+                  </>
                 </Menu.Item>
                 <Menu.Item
                   onClick={() => handleSingleDateFilterChange(activeItem?.updatedAt)}
                 >
-                  {t('on_day_of')}
-                  {' '}
-                  {formatSimpleDate(activeItem?.updatedAt)}
+                  <>
+                    {t('on_day_of')}
+                    {' '}
+                    {formatSimpleDate(activeItem?.updatedAt)}
+                  </>
                 </Menu.Item>
                 <Menu.Item
                   onClick={() => handleMultiDateFilterChange(new Date(activeItem?.updatedAt), undefined)}
                 >
-                  {t('after_day_of')}
-                  {' '}
-                  {formatSimpleDate(activeItem?.updatedAt)}
+                  <>
+                    {t('after_day_of')}
+                    {' '}
+                    {formatSimpleDate(activeItem?.updatedAt)}
+                  </>
                 </Menu.Item>
               </Menu.SubMenu>
               <Menu.SubMenu label={(
@@ -453,32 +459,32 @@ export const CampaignView = () => {
                 {t('last_update')}
               </Table.HeadingCell>
             </Table.HeadingRow>
-            {deliveryConnection?.deliveries.map((delivery) => (
+            {deliveryConnection?.deliveries?.map((delivery) => (
               <Table.Row
                 onClick={() => openDeliveryModal({ campaignId, deliveryId: delivery.id })}
                 isLoading={isLoading}
-                key={delivery.id}
+                key={delivery!.id!}
                 gridTemplateColumns={columns}
-                onContextMenu={(e) => openMenu(e, delivery)}
+                onContextMenu={(e) => openMenu(e, delivery!)}
               >
                 <Table.Cell>
-                  <DeliveryRecipient delivery={delivery} />
+                  <DeliveryRecipient delivery={delivery!} />
                 </Table.Cell>
                 <Table.Cell>
-                  <DeliveryRecipientAddress delivery={delivery} />
+                  <DeliveryRecipientAddress delivery={delivery!} />
                 </Table.Cell>
                 <Table.Cell>
                   <Table.InnerCell>
                     <UI.Helper>
-                      {delivery.campaignVariant?.label}
+                      {delivery!.campaignVariant?.label}
                     </UI.Helper>
                   </Table.InnerCell>
                 </Table.Cell>
                 <Table.Cell>
-                  <DeliveryStatus delivery={delivery} />
+                  <DeliveryStatus delivery={delivery!} />
                 </Table.Cell>
                 <Table.Cell>
-                  <FormatTimestamp timestamp={delivery.updatedAt} />
+                  <FormatTimestamp timestamp={delivery!.updatedAt} />
                 </Table.Cell>
               </Table.Row>
             ))}

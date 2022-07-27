@@ -42,6 +42,8 @@ export interface TargetEntry {
 }
 
 export interface ActionEntry {
+  id?: string;
+  channelId?: string;
   type: AutomationActionType;
   targets?: {
     target?: TargetEntry;
@@ -66,8 +68,8 @@ const mapToUserPickerEntries = (customer: Maybe<{
 
   customer?.roles?.forEach((role) => {
     userPickerEntries.push({
-      label: role.name,
-      value: role.id,
+      label: role.name!,
+      value: role.id!,
       type: TargetTypeEnum.Role,
     });
   });
@@ -92,7 +94,7 @@ export const CreateActionModalCard = ({ onClose, onCreate, onUpdate, action }: N
     mode: 'onChange',
     shouldUnregister: false,
     defaultValues: {
-      type: activeAction?.type || AutomationActionType.GenerateReport,
+      type: activeAction?.type || AutomationActionType.WeekReport,
       targets: activeAction?.targets || [{}],
     },
   });
@@ -126,7 +128,7 @@ export const CreateActionModalCard = ({ onClose, onCreate, onUpdate, action }: N
     keyName: 'arrayKey',
   });
 
-  const userPickerEntries = mapToUserPickerEntries(data?.customer);
+  const userPickerEntries = mapToUserPickerEntries(data?.customer as any);
 
   return (
     <>
@@ -149,7 +151,7 @@ export const CreateActionModalCard = ({ onClose, onCreate, onUpdate, action }: N
                         render={({ field: { onBlur, onChange, value } }) => (
                           <UI.RadioButtons onBlur={onBlur} onChange={onChange} value={value}>
                             <UI.RadioButton
-                              value={AutomationActionType.GenerateReport}
+                              value={AutomationActionType.WeekReport}
                               mr={2}
                               text={(t('automation:generate_report'))}
                               description={t('automation:generate_report_helper')}

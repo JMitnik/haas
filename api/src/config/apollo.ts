@@ -1,7 +1,14 @@
-import { ApolloServer, UserInputError } from 'apollo-server-express';
+import { UserInputError } from 'apollo-server-express';
 import { applyMiddleware } from 'graphql-middleware';
 import { GraphQLError } from 'graphql';
 import { PrismaClient } from '@prisma/client';
+import { createServer } from '@graphql-yoga/node'
+import { useApolloServerErrors } from '@envelop/apollo-server-errors'
+import { useResponseCache } from '@envelop/response-cache'
+import { useSentry } from '@envelop/sentry';
+import { useParserCache } from '@envelop/parser-cache';
+import { useValidationCache } from '@envelop/validation-cache';
+import { useGraphQlJit } from '@envelop/graphql-jit';
 
 import { APIContext } from '../types/APIContext';
 import Sentry from './sentry';
@@ -45,27 +52,37 @@ const handleError = (ctx: any, error: GraphQLError) => {
 
 
 export const makeApollo = async (prisma: PrismaClient) => {
-  const apollo: ApolloServer = new ApolloServer({
-    uploads: false,
+  const apollo = createServer({
+    cors: true,
+    logging: true,
+    maskedErrors: false,
+    // uploads: false,
     schema: applyMiddleware(schema, authShield),
-    context: async (ctx): Promise<APIContext> => ({
+    context: async (ctx: any): Promise<APIContext> => ({
       ...ctx,
       session: await new ContextSessionService(ctx, prisma).constructContextSession(),
       prisma,
       services: bootstrapServices(prisma),
     }),
-    plugins: [
-      {
-        requestDidStart: () => ({
-          didEncounterErrors: (ctx) => {
-            if (!ctx.operation) return;
-
-            ctx.errors.forEach((error) => {
-              handleError(ctx, error);
-            });
-          },
-        }),
-      },
+    plugins: process.env.NODE_ENV === 'test' ? [] : [
+      useGraphQlJit(),
+      useValidationCache(),
+      useParserCache(),
+      // useSentry(),
+      // useResponseCache({
+      //   includeExtensionMetadata: true,
+      //   idFields: [
+      //     'id',
+      //     'userId',
+      //     'customerId',
+      //     'roleId',
+      //     'questionId',
+      //     'dialogueId',
+      //   ],
+      // }),
+      useApolloServerErrors({
+        debug: true,
+      }),
     ],
   });
 

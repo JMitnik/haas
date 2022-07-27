@@ -1,5 +1,5 @@
 import { ApolloProvider } from '@apollo/client';
-import { ErrorBoundary } from '@sentry/react';
+import { ErrorBoundary } from 'react-error-boundary';
 import { I18nextProvider } from 'react-i18next';
 import { ModalProvider } from 'react-modal-hook';
 import { QueryParamProvider } from 'use-query-params';
@@ -23,16 +23,16 @@ export const AppProviders = ({ children }: { children: React.ReactNode }) => (
   <I18nextProvider i18n={lang}>
     <Router>
       <ScrollToTop />
-      <ErrorBoundary fallback={GlobalErrorFallback}>
+      <ErrorBoundary FallbackComponent={GlobalErrorFallback}>
         <ApolloProvider client={client}>
           <DefaultThemeProviders>
             <UserProvider>
               <ModalProvider>
                 <AppContainer>
                   <QueryParamProvider ReactRouterRoute={Route}>
-                    <ErrorBoundary fallback={GlobalErrorFallback}>
+                    <>
                       {children}
-                    </ErrorBoundary>
+                    </>
                   </QueryParamProvider>
                 </AppContainer>
                 <GlobalStyle />

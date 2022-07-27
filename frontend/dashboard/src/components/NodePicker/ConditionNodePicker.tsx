@@ -124,7 +124,7 @@ export const ConditionNodePicker = ({ onChange,
         <UI.ListHeader style={{ borderBottom: 0 }}>{t('conditions')}</UI.ListHeader>
 
         <UI.Button
-          leftIcon={Plus}
+          leftIcon={() => <Plus />}
           variantColor="teal"
           ml={0}
           size="xs"

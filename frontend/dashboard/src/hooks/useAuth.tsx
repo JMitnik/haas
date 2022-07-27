@@ -6,6 +6,7 @@ interface UseAuthProps {
   canCreateAutomations: boolean;
   canUpdateAutomations: boolean;
   canViewAutomations: boolean;
+  canResetWorkspaceData: boolean;
   canGenerateWorkspaceFromCsv: boolean;
   canAssignUsersToDialogue: boolean;
   canCreateCustomers: boolean;
@@ -83,6 +84,7 @@ const useAuth = (): UseAuthProps => {
     canCreateAutomations: hasPermission(SystemPermission.CanCreateAutomations),
     canUpdateAutomations: hasPermission(SystemPermission.CanUpdateAutomations),
     canViewAutomations: hasPermission(SystemPermission.CanViewAutomations),
+    canResetWorkspaceData: hasPermission(SystemPermission.CanResetWorkspaceData),
     canGenerateWorkspaceFromCsv: hasPermission(SystemPermission.CanGenerateWorkspaceFromCsv),
     canAssignUsersToDialogue: hasPermission(SystemPermission.CanAssignUsersToDialogue),
     canDeleteDialogue: hasPermission(SystemPermission.CanDeleteDialogue),

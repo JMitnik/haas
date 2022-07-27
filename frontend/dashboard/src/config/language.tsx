@@ -11,6 +11,34 @@ const language = {
     },
   },
   general: {
+    monday: {
+      en: 'Monday',
+      de: 'Montag',
+    },
+    tuesday: {
+      en: 'Tuesday',
+      de: 'Dienstag',
+    },
+    wednesday: {
+      en: 'Wednesday',
+      de: 'Mittwoch',
+    },
+    thursday: {
+      en: 'Thursday',
+      de: 'Donnerstag',
+    },
+    friday: {
+      en: 'Friday',
+      de: 'Freitag',
+    },
+    saturday: {
+      en: 'Saturday',
+      de: 'Samstag',
+    },
+    sunday: {
+      en: 'Sunday',
+      de: 'Sonntag',
+    },
     day_of_week: {
       en: 'Day of the week',
       de: 'Wochentag',
@@ -103,6 +131,10 @@ const language = {
       en: 'We could not find any automations with the current filters.',
       de: 'We could not find any automations with the current filters.',
     },
+    reset_data: {
+      en: 'Reset data',
+      de: 'Daten zurücksetzen',
+    },
     is_topic: {
       en: 'Is a topic',
       de: 'Ist ein Thema',
@@ -166,6 +198,14 @@ const language = {
     groups: {
       en: 'Groups',
       de: 'Groups',
+    },
+    make_demo_workspace: {
+      en: 'Make demo workspace',
+      de: 'Erstellen Sie einen Demo-Arbeitsbereich',
+    },
+    make_demo_workspace_helper: {
+      en: 'Marks a workspace as a demo workspace. Toggling this allows an admin to reset the data to a baseline dataset.',
+      de: 'Markiert einen Arbeitsbereich als Demo-Arbeitsbereich. Wenn Sie dies umschalten, kann ein Administrator die Daten auf einen Basisdatensatz zurücksetzen',
     },
     create_demo_data: {
       en: 'Generate prefilled data',
@@ -2039,6 +2079,66 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     },
   },
   automation: {
+    recipients: {
+      en: 'Recipients',
+      de: 'Empfänger',
+    },
+    recipients_helper: {
+      en: 'Determine who will receive the results of this action and what channel will be used',
+      de: 'Legen Sie fest, wer die Ergebnisse dieser Aktion erhält und welcher Kanal verwendet wird',
+    },
+    no_future_dates_available: {
+      en: 'No future dates available.',
+      de: 'Keine zukünftigen Daten verfügbar.',
+    },
+    show_local_time: {
+      en: 'Show local time',
+      de: 'Ortszeit anzeigen',
+    },
+    future_dates: {
+      en: 'Future dates',
+      de: 'Zukünftige Termine',
+    },
+    days: {
+      en: 'Days',
+      de: 'Tage',
+    },
+    days_helper: {
+      en: 'Determine on which days (Monday-Sunday) this automation should run',
+      de: 'Legen Sie fest, an welchen Tagen (Montag-Sonntag) diese Automatisierung ausgeführt werden soll',
+    },
+    yearly: {
+      en: 'Every year',
+      de: 'Jedes Jahr',
+    },
+    monthly: {
+      en: 'Every month',
+      de: 'Jeden Monat',
+    },
+    weekly: {
+      en: 'Every week',
+      de: 'Jede Woche',
+    },
+    daily: {
+      en: 'Every day',
+      de: 'Jeden Tag',
+    },
+    time: {
+      en: 'Time',
+      de: 'Zeit',
+    },
+    time_helper: {
+      en: 'Determine at what time this automation should run',
+      de: 'Legen Sie fest, zu welcher Uhrzeit diese Automatisierung ausgeführt werden soll',
+    },
+    frequency: {
+      en: 'Schedule frequency',
+      de: 'Häufigkeit einplanen',
+    },
+    frequency_helper: {
+      en: 'Determine how frequent this automation should run',
+      de: 'Legen Sie fest, wie häufig diese Automatisierung ausgeführt werden soll',
+    },
     compare_to: {
       en: 'Compare value',
       de: 'Wert vergleichen',
@@ -2055,7 +2155,7 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
       en: 'Action',
       de: 'Aktion',
     },
-    target_helper_GENERATE_REPORT: {
+    target_helper_WEEK_REPORT: {
       en: 'Who are the people the report should be sent so?',
       de: 'Wer sind die Personen, denen der Bericht gesendet werden soll?',
     },

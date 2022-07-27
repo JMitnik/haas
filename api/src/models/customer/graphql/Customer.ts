@@ -1,7 +1,7 @@
 import { ColourSettings, Customer, CustomerSettings } from '@prisma/client';
 import { GraphQLError } from 'graphql';
-import { ApolloError, GraphQLUpload, UserInputError } from 'apollo-server-express';
-import { extendType, inputObjectType, mutationField, objectType, scalarType } from '@nexus/schema';
+import { ApolloError, UserInputError } from 'apollo-server-express';
+import { arg, extendType, inputObjectType, mutationField, nonNull, objectType, scalarType } from 'nexus';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
 
 import { WorkspaceStatistics } from './WorkspaceStatistics';
@@ -17,9 +17,11 @@ import { isValidDateTime } from '../../../utils/isValidDate';
 import { DialogueStatisticsSummaryFilterInput, DialogueStatisticsSummaryModel, MostTrendingTopic } from '../../questionnaire';
 import { DialogueConnection, DialogueConnectionFilterInput } from '../../questionnaire';
 import { HealthScore, HealthScoreInput } from './HealthScore';
+import { Organization } from '../../Organization/graphql/Organization';
 import { Issue, IssueFilterInput } from '../../Issue/graphql';
 import { IssueValidator } from '../../Issue/IssueValidator';
-import { SessionConnectionFilterInput, SessionConnection } from '../../../models/session/graphql';
+import { SessionConnectionFilterInput } from '../../../models/session/graphql';
+import { SessionConnection } from '../../session/graphql/Session.graphql'
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -33,8 +35,17 @@ export const CustomerType = objectType({
   name: 'Customer',
   definition(t) {
     t.id('id');
-    t.string('slug');
-    t.string('name');
+    t.nonNull.string('slug');
+    t.nonNull.string('name');
+
+    t.boolean('isDemo');
+    t.field('organization', {
+      type: Organization,
+      nullable: true,
+      resolve() {
+        return {};
+      },
+    });
 
     t.field('settings', {
       type: CustomerSettingsType,
@@ -424,15 +435,6 @@ export const ImageType = objectType({
   },
 });
 
-export const Upload = GraphQLUpload && scalarType({
-  name: GraphQLUpload.name,
-  asNexusMethod: 'upload', // We set this to be used as a method later as `t.upload()` if needed
-  description: GraphQLUpload.description,
-  serialize: GraphQLUpload.serialize,
-  parseValue: GraphQLUpload.parseValue,
-  parseLiteral: GraphQLUpload.parseLiteral,
-});
-
 const EditWorkspaceInput = inputObjectType({
   name: 'EditWorkspaceInput',
   description: 'Edit a workspace',
@@ -464,25 +466,31 @@ const CreateWorkspaceInput = inputObjectType({
     // Creation specific data
     t.boolean('isSeed', { default: false, required: false });
     t.boolean('willGenerateFakeData', { default: false });
+    t.boolean('isDemo', { default: false });
   },
 });
 
-export const WorkspaceMutations = Upload && extendType({
+export const UploadScalar = scalarType({
+  name: 'Upload',
+  asNexusMethod: 'upload',
+  description: 'The `Upload` scalar type represents a file upload.',
+  // sourceType: 'File',
+})
+
+export const WorkspaceMutations = extendType({
   type: 'Mutation',
 
   definition(t) {
     t.field('singleUpload', {
       type: ImageType,
       args: {
-        file: Upload,
+        file: nonNull(arg({ type: 'Upload' })),
       },
       async resolve(parent, args) {
         const { file } = args;
 
-        const waitedFile = await file;
         const { createReadStream, filename, mimetype, encoding }:
-          { createReadStream: any; filename: string; mimetype: string; encoding: string } = waitedFile.file;
-
+          { createReadStream: any; filename: string; mimetype: string; encoding: string } = await file.file;
 
         const stream = new Promise<UploadApiResponse>((resolve, reject) => {
           const cld_upload_stream = cloudinary.v2.uploader.upload_stream({
@@ -497,6 +505,7 @@ export const WorkspaceMutations = Upload && extendType({
 
         const result = await stream;
         const { secure_url } = result;
+
         return { filename, mimetype, encoding, url: secure_url };
       },
     });

@@ -50,7 +50,7 @@ const CampaignsView = () => {
                 size="sm"
                 onClick={() => setIsOpenedModal(true)}
                 variantColor="main"
-                leftIcon={Plus}
+                leftIcon={() => <Plus />}
               >
                 {t('create_campaign')}
               </UI.Button>
@@ -68,7 +68,7 @@ const CampaignsView = () => {
             <UI.Button
               size="sm"
               onClick={() => setIsOpenedModal(true)}
-              leftIcon={Plus}
+              leftIcon={() => <Plus />}
             >
               {t('create_campaign')}
             </UI.Button>

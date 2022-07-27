@@ -18,6 +18,7 @@ import prisma from '../../config/prisma';
 import Sentry from '../../config/sentry';
 import SessionPrismaAdapter from './SessionPrismaAdapter';
 import AutomationService from '../automations/AutomationService';
+
 import { CreateSessionInput } from './SessionPrismaAdapterType';
 import { CustomerService } from '../customer/CustomerService';
 import { logger } from '../../config/logger';

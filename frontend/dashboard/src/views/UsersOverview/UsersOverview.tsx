@@ -230,11 +230,11 @@ const UsersOverview = () => {
   };
 
   const tableData = activePaginatedUsersResult?.customer?.usersConnection?.userCustomers?.map((userCustomer) => ({
-    ...userCustomer.user,
-    isActive: userCustomer.isActive,
-    createdAt: userCustomer.createdAt,
-    userId: userCustomer.user.id,
-    role: userCustomer.role,
+    ...userCustomer!.user,
+    isActive: userCustomer!.isActive,
+    createdAt: userCustomer!.createdAt,
+    userId: userCustomer!.user!.id,
+    role: userCustomer!.role,
   })) || [];
 
   const pageCount = activePaginatedUsersResult?.customer?.usersConnection?.totalPages || 0;
@@ -493,7 +493,7 @@ const UsersOverview = () => {
           </Menu.Base>
           {tableData.map((user) => (
             <Table.Row
-              onContextMenu={(e) => openMenu(e, { userId: user.userId })}
+              onContextMenu={(e) => openMenu(e, { userId: user.userId! })}
               isDisabled={!user.isActive}
               onClick={() => openUserModal({ userId: user.userId })}
               isLoading={isLoading}
@@ -521,7 +521,7 @@ const UsersOverview = () => {
                 <Table.InnerCell isDisabled={!canAccessAdmin && !canEditUsers}>
                   <UI.Div onClick={(e) => {
                     e.stopPropagation();
-                    openRoleModal({ roleId: user.role.id, userId: user.id });
+                    openRoleModal({ roleId: user.role?.id || '', userId: user.id || '' });
                   }}
                   >
                     <UI.Helper>
@@ -543,7 +543,7 @@ const UsersOverview = () => {
               <Table.Cell onClick={(e) => e.stopPropagation()}>
                 <UI.Toggle
                   size="lg"
-                  isChecked={user.isActive}
+                  isChecked={user.isActive!}
                   color="teal"
                   isDisabled={!canAccessAdmin && !canEditUsers}
                   onChange={() => {

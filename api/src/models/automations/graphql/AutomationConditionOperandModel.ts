@@ -1,4 +1,4 @@
-import { objectType } from '@nexus/schema';
+import { objectType } from 'nexus';
 import { OperandType } from './OperandType'
 
 export const AutomationConditionOperandModel = objectType({
@@ -12,8 +12,8 @@ export const AutomationConditionOperandModel = objectType({
 
     t.field('type', { type: OperandType });
 
-    t.int('numberValue', { nullable: true });
-    t.string('textValue', { nullable: true }); // TODO: Reference an actual choice option instead of raw text here eventually
-    t.string('dateTimeValue', { nullable: true });
+    t.nullable.int('numberValue');
+    t.nullable.string('textValue'); // TODO: Reference an actual choice option instead of raw text here eventually
+    t.nullable.string('dateTimeValue');
   },
 });

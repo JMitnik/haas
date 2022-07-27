@@ -21,6 +21,12 @@ query getAutomation($input: GetAutomationInput) {
       dayOfMonth
       dayOfWeek
       month
+      frequency
+      time
+      dayRange {
+        label
+        index
+      }
       activeDialogue {
         id
         slug
@@ -28,8 +34,13 @@ query getAutomation($input: GetAutomationInput) {
       }
       actions {
         id
-        payload
+        # payload
         type
+        channels {
+          id
+          type
+          payload
+        }
       }
     }
     automationTrigger {

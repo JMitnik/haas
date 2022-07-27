@@ -618,6 +618,7 @@ class DialoguePrismaAdapter {
         language: input.language,
         isPrivate: input.isPrivate,
         description: input.description,
+        template: input.template,
         postLeafNode: {
           create: {
             header: input.postLeafText?.header || '',

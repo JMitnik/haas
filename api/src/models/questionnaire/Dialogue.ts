@@ -1,6 +1,6 @@
 import { UserInputError } from 'apollo-server-express';
 import { subDays } from 'date-fns';
-import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
+import { enumType, extendType, inputObjectType, objectType } from 'nexus';
 
 import { DialogueStatistics } from './graphql/DialogueStatistics';
 import { CustomerType } from '../customer/graphql/Customer';
@@ -46,10 +46,10 @@ export const DialogueFinisherType = objectType({
 export const DialogueType = objectType({
   name: 'Dialogue',
   definition(t) {
-    t.id('id');
-    t.string('title');
-    t.string('slug');
-    t.string('description');
+    t.nonNull.id('id');
+    t.nonNull.string('title');
+    t.nonNull.string('slug');
+    t.nonNull.string('description');
 
     // Placeholder data related properties
     t.boolean('isWithoutGenData');
@@ -347,7 +347,7 @@ export const DialogueType = objectType({
           endDate,
         })
 
-        return average;
+        return average || 0;
       },
     });
 
@@ -458,7 +458,7 @@ export const DialogueType = objectType({
       },
     });
 
-    t.list.field('questions', {
+    t.list.nonNull.field('questions', {
       type: QuestionNodeType,
 
       async resolve(parent, args, ctx) {
@@ -467,7 +467,7 @@ export const DialogueType = objectType({
       },
     });
 
-    t.list.field('leafs', {
+    t.list.nonNull.field('leafs', {
       type: QuestionNodeType,
       args: {
         searchTerm: 'String',
@@ -477,7 +477,7 @@ export const DialogueType = objectType({
       },
     });
 
-    t.list.field('campaignVariants', {
+    t.list.nonNull.field('campaignVariants', {
       type: 'CampaignVariantType',
       // @ts-ignore
       resolve: (parent, args, ctx) => {

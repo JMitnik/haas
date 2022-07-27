@@ -1,4 +1,4 @@
-import { inputObjectType, objectType } from '@nexus/schema';
+import { inputObjectType, objectType } from 'nexus';
 
 import { FormNodeField, QuestionNodeType } from '../QuestionNode/QuestionNode';
 

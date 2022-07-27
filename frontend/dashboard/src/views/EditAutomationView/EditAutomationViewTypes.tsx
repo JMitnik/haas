@@ -40,6 +40,8 @@ export interface ConditionInput {
 }
 
 export interface ActionInput {
+  id: string;
+  channelId?: string;
   type: AutomationActionType;
   targets: {
     label: string;
@@ -60,6 +62,9 @@ export interface AutomationInput {
     dayOfMonth?: string,
     month?: string,
     dayOfWeek?: string,
+    frequency: string,
+    time: string,
+    dayRange: { label: string, index: number }[],
     activeDialogue: {
       id?: string;
       label?: string;

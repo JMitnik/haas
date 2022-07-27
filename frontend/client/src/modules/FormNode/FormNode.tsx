@@ -69,14 +69,14 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
 
   const { isValid } = formState;
 
-  const fields = node?.form?.fields;
+  const fields = node?.form?.fields || [];
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>, ignoreFields = false) => {
     event.preventDefault();
     const formEntry = getValues();
 
     const formFieldValues = formEntry.fields?.map((fieldEntry, index) => ({
-      relatedFieldId: fields?.[index].id,
+      relatedFieldId: fields?.[index]?.id,
       [fields?.[index]?.type || '']: !ignoreFields ? getFieldValue(fieldEntry, fields?.[index]) : undefined,
     }));
 
@@ -123,15 +123,15 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                     gridColumn={field.type === 'longText'
                       || field.type === FormNodeFieldTypeEnum.Contacts ? 'span 2' : '1fr'}
                   >
-                    <UI.FormControl isRequired={field.isRequired}>
+                    <UI.FormControl isRequired={field.isRequired || false}>
                       <UI.FormLabel htmlFor={`fields.${index}.value`}>{field.label}</UI.FormLabel>
                       {field.type === 'longText' && (
                         <UI.Textarea
                           key={`longText-${index}`}
                           id={`fields[${index}].value`}
                           variant="outline"
-                          name={`fields.${index}.value`}
-                          ref={register({ required: field.isRequired })}
+                          // name={`fields.${index}.value`}
+                          {...register(`fields.${index}.value`) as any}
                           minHeight="40px"
                           placeholder={field.placeholder || undefined}
                         />
@@ -142,7 +142,7 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                           name={`fields.${index}.value`}
                           control={control}
                           defaultValue={undefined}
-                          rules={{ required: field.isRequired }}
+                          rules={{ required: field.isRequired || false }}
                           render={({ value, onChange, onBlur }) => (
                             <RadioGroup.Root
                               defaultValue={value}
@@ -152,9 +152,9 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                             >
                               {field.contacts?.map((contact) => (
                                 <RadioGroup.Item
-                                  isActive={value === contact.email}
-                                  value={contact.email}
-                                  key={contact.id}
+                                  isActive={value === contact?.email}
+                                  value={contact?.email as string}
+                                  key={contact?.id}
                                   contentVariant="twoLine"
                                   variant="boxed"
                                 >
@@ -180,8 +180,7 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                           variant="outline"
                           leftEl={mapIcon[field?.type] || <Type />}
                           type={mapFieldType[field?.type] || 'text'}
-                          name={`fields.${index}.value`}
-                          ref={register({ required: field.isRequired })}
+                          {...register(`fields.${index}.value`, { required: field.isRequired || false }) as any}
                           placeholder={field.placeholder || undefined}
                           maxWidth={mapFieldType[field?.type] === 'number' ? '100px' : 'auto'}
                         />

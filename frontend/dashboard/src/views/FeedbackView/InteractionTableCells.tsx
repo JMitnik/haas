@@ -20,7 +20,7 @@ interface ContactableUserCellProps {
 
 export const ContactableUserCell = ({ sessionId, followUpAction }: ContactableUserCellProps) => {
   const { t } = useTranslation();
-  const field = followUpAction?.values?.find((value) => value.shortText);
+  const field = followUpAction?.values?.find((value) => value?.shortText || '');
   return (
     <UI.Flex alignItems="center">
       <UI.ColumnFlex>

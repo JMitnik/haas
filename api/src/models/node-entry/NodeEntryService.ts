@@ -1,9 +1,8 @@
 import {
-  NodeEntry, //NodeEntryCreateWithoutSessionInput, NodeEntryWhereInput
+  NodeEntry,
   PrismaClient,
   Prisma,
 } from '@prisma/client';
-import { isPresent } from 'ts-is-present';
 import _ from 'lodash';
 
 import { NexusGenInputs } from '../../generated/nexus';
@@ -72,8 +71,8 @@ class NodeEntryService {
    * */
   handleNodeEntryAppend = async (sessionId: string, nodeEntryInput: NexusGenInputs['NodeEntryInput']): Promise<NodeEntry> => {
     const createNodeEntryFragment = NodeEntryService.constructCreateNodeEntryFragment(nodeEntryInput);
-    const emergencyContact = nodeEntryInput.data?.form?.values?.find((value) => value.contacts);
-    const emergencyComment = nodeEntryInput.data?.form?.values?.find((value) => value.longText);
+    const emergencyContact = nodeEntryInput.data?.form?.values?.find((value) => value?.contacts);
+    const emergencyComment = nodeEntryInput.data?.form?.values?.find((value) => value?.longText);
     const nodeEntry = await this.nodeEntryPrismaAdapter.create({
       session: { connect: { id: sessionId } },
       ...createNodeEntryFragment,
@@ -162,7 +161,7 @@ class NodeEntryService {
       create: {
         values: {
           create: nodeEntryInput?.data?.form?.values?.map((val) => ({
-            relatedField: { connect: { id: val.relatedFieldId || '-1' } },
+            relatedField: { connect: { id: val?.relatedFieldId || '-1' } },
             ...pickProperties(
               val,
               ['email', 'phoneNumber', 'url', 'shortText', 'longText', 'number', 'contacts'],

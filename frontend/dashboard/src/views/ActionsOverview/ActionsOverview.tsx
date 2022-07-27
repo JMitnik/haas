@@ -149,7 +149,7 @@ const ActionOverview = () => {
             </UI.ViewTitle>
 
             <UI.Button
-              leftIcon={Plus}
+              leftIcon={() => <Plus />}
               ml={4}
               size="sm"
               onClick={() => handleAddCTA()}

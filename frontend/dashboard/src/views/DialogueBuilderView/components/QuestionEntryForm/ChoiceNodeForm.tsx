@@ -212,7 +212,7 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                     <Controller
                       control={form.control}
                       name={`optionsFull[${index}].isTopic`}
-                      defaultValue={choice.isTopic}
+                      defaultValue={(choice as any)?.isTopic}
                       render={({ field: { onChange, value } }) => (
                         <UI.Checkbox
                           size="lg"

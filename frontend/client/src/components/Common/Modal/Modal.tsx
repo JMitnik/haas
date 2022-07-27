@@ -1,6 +1,6 @@
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import * as UI from '@haas/ui';
-import { AnimatePresence, motion } from 'framer-motion/dist/framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 
 import { slideUpFadeMotion } from 'modules/animation/config';
 import React from 'react';
@@ -36,6 +36,8 @@ const Overlay = styled(DialogPrimitive.DialogOverlay)`
   z-index: 10000;
 `;
 
+const CustomDiv = motion(styled.div``);
+
 export const Root = ({ children, open, onClose, minWidth = 600, ...props }: RootProps) => (
   <RootContainer
     open={open}
@@ -59,7 +61,7 @@ export const Root = ({ children, open, onClose, minWidth = 600, ...props }: Root
               <ContentContainer
                 forceMount
                 asChild
-                forwardedAs={motion.div}
+                forwardedAs={CustomDiv}
                 {...props}
               >
                 <motion.div

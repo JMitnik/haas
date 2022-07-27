@@ -1,4 +1,3 @@
-import { AuthenticationError } from 'apollo-server-express';
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
@@ -9,6 +8,7 @@ import readBearerToken from './readBearerToken';
 import { fetchTunnelUrl } from '../../utils/fetchTunnelUrl';
 import CustomerService from '../customer/CustomerService';
 import UserService from '../users/UserService';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 class ContextSessionService {
   customerService: CustomerService;
@@ -26,8 +26,7 @@ class ContextSessionService {
    * @returns A workspace
    */
   getWorkSpaceFromReq = async () => {
-    const vars = this.context.req.body.variables;
-
+    const vars = this.context?.req?.body?.variables;
     if (vars?.customerSlug || vars?.input?.customerSlug) {
       const customerSlug = vars?.customerSlug || vars?.input?.customerSlug;
       const customer = await this.customerService.findWorkspaceBySlug(customerSlug);
@@ -35,7 +34,10 @@ class ContextSessionService {
     };
 
     if (vars?.customerId || vars?.input?.customerId || vars?.workspaceId || vars?.input?.workspaceId) {
-      const customerId = vars?.customerId || vars?.input?.customerId || vars?.workspaceId || vars?.input?.workspaceId;
+      const customerId = vars?.customerId
+        || vars?.input?.customerId
+        || vars?.workspaceId
+        || vars?.input?.workspaceId
       const customer = await this.customerService.findWorkspaceById(customerId);
       return customer;
     };
@@ -57,15 +59,15 @@ class ContextSessionService {
 
     // Prefer cookie-token over bearer-token
     const authToken = cookieToken || bearerToken || null;
-
     if (!authToken) return null;
 
     let isValid = null;
     try {
       isValid = jwt.verify(authToken, config.jwtSecret);
     } catch (e) {
+      console.log('Error: ', e);
       this.context.res.cookie('access_token', '');
-      throw new AuthenticationError('UNAUTHENTICATED');
+      throw new GraphQLYogaError('UNAUTHENTICATED');
     }
 
     if (!isValid) return null;
@@ -90,8 +92,7 @@ class ContextSessionService {
     const activeWorkspace = customersAndPermissions?.find((userCustomer) => userCustomer.id === workspace?.id) || null;
 
     const baseUrl = process.env.ENVIRONMENT === 'local' ? await fetchTunnelUrl() : config.baseUrl;
-
-    return {
+    const session = {
       user,
       baseUrl,
       customersAndPermissions,
@@ -100,6 +101,8 @@ class ContextSessionService {
       token: authToken,
       activeWorkspace,
     };
+
+    return session;
   };
 
 }

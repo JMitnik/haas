@@ -3,7 +3,7 @@
 /* eslint-disable radix */
 import '@szhsin/react-menu/dist/index.css';
 import * as UI from '@haas/ui';
-import { AlertTriangle, AlignLeft, BarChart2, Calendar, Filter, Plus, Search, User } from 'react-feather';
+import { AlignLeft, BarChart2, Calendar, Filter, Plus, Search, User } from 'react-feather';
 import {
   ArrayParam,
   BooleanParam,
@@ -30,7 +30,7 @@ import {
 import { TabbedMenu } from 'components/Common/TabMenu';
 import { View } from 'layouts/View';
 import { formatSimpleDate } from 'utils/dateUtils';
-import { getChoiceNodeValues, getMainTopicValue } from 'components/Session/Session.helpers';
+import { getMainTopicValue } from 'components/Session/Session.helpers';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useFormatter } from 'hooks/useFormatter';
 import { useMenu } from 'components/Common/Menu/useMenu';
@@ -38,22 +38,6 @@ import SearchBar from 'components/Common/SearchBar/SearchBar';
 
 import { ContactableUserCell } from './InteractionTableCells';
 import { InteractionModalCard } from '../InteractionsOverview/InteractionModalCard';
-
-const AnonymousCell = ({ sessionId }: { sessionId: string }) => {
-  const { t } = useTranslation();
-  return (
-    <UI.Flex alignItems="center">
-      <UI.ColumnFlex>
-        <UI.Span fontWeight={600} color="off.500">
-          {t('anonymous')}
-        </UI.Span>
-        <UI.Span color="off.400" fontSize="0.7rem">
-          {sessionId}
-        </UI.Span>
-      </UI.ColumnFlex>
-    </UI.Flex>
-  );
-};
 
 const DateCell = ({ timestamp }: { timestamp: string }) => {
   const date = new Date(parseInt(timestamp, 10));
@@ -110,7 +94,7 @@ export const FeedbackOverview = () => {
   const { loading: isLoading } = useGetWorkspaceSessionsQuery({
     fetchPolicy: 'cache-and-network',
     variables: {
-      id: activeCustomer?.id as string,
+      workspaceId: activeCustomer?.id as string,
       filter: {
         offset: filter.pageIndex * filter.perPage,
         startDate: filter.startDate ? filter.startDate : undefined,
@@ -420,23 +404,29 @@ export const FeedbackOverview = () => {
                 <Menu.Item
                   onClick={() => handleMultiDateFilterChange(undefined, new Date(contextInteraction?.createdAt))}
                 >
-                  {t('before_day_of')}
-                  {' '}
-                  {formatSimpleDate(contextInteraction?.createdAt)}
+                  <>
+                    {t('before_day_of')}
+                    {' '}
+                    {formatSimpleDate(contextInteraction?.createdAt)}
+                  </>
                 </Menu.Item>
                 <Menu.Item
                   onClick={() => handleSingleDateFilterChange(contextInteraction?.createdAt)}
                 >
-                  {t('on_day_of')}
-                  {' '}
-                  {formatSimpleDate(contextInteraction?.createdAt)}
+                  <>
+                    {t('on_day_of')}
+                    {' '}
+                    {formatSimpleDate(contextInteraction?.createdAt)}
+                  </>
                 </Menu.Item>
                 <Menu.Item
                   onClick={() => handleMultiDateFilterChange(new Date(contextInteraction?.createdAt), undefined)}
                 >
-                  {t('after_day_of')}
-                  {' '}
-                  {formatSimpleDate(contextInteraction?.createdAt)}
+                  <>
+                    {t('after_day_of')}
+                    {' '}
+                    {formatSimpleDate(contextInteraction?.createdAt)}
+                  </>
                 </Menu.Item>
               </Menu.SubMenu>
             </Menu.Base>

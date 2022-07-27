@@ -1,6 +1,4 @@
-import { enumType, inputObjectType, mutationField, objectType } from '@nexus/schema';
-import cloudinary, { UploadApiResponse } from 'cloudinary';
-import { ImageType, Upload } from '../customer';
+import { enumType, inputObjectType, objectType } from 'nexus';
 
 import { QuestionNodeType } from '../QuestionNode/QuestionNode';
 
@@ -46,10 +44,10 @@ export const CTALinksInputType = inputObjectType({
 export const LinkType = objectType({
   name: 'LinkType',
   definition(t) {
-    t.string('id');
-    t.string('url');
+    t.nonNull.string('id');
+    t.nonNull.string('url');
     t.string('questionNodeId', { nullable: true });
-    t.string('type');
+    t.nonNull.string('type');
 
     t.string('title', { nullable: true });
     t.string('iconUrl', { nullable: true });
@@ -62,6 +60,8 @@ export const LinkType = objectType({
     t.field('questionNode', {
       type: QuestionNodeType,
       async resolve(parent, args, ctx) {
+        if (!parent.id) return null;
+
         const questionNode = await ctx.services.nodeService.findNodeByLinkId(parent.id);
 
         if (!questionNode) throw new Error('Unable to find related node');

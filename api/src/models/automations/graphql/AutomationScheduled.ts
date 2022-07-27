@@ -1,5 +1,6 @@
-import { objectType } from '@nexus/schema';
+import { objectType } from 'nexus';
 import { AutomationActionModel } from './AutomationAction'
+import { DayRange } from './DayRange';
 import { RecurringPeriodType } from './RecurringPeriodType';
 
 export const AutomationScheduledModel = objectType({
@@ -17,6 +18,13 @@ export const AutomationScheduledModel = objectType({
     t.string('month');
     t.string('dayOfWeek');
     t.string('dialogueId');
+
+    t.string('frequency');
+    t.string('time');
+    t.list.field('dayRange', {
+      type: DayRange,
+      nullable: true,
+    });
 
     t.list.field('actions', {
       type: AutomationActionModel,

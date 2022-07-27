@@ -8,7 +8,5 @@ try {
     secretAccessKey: config.awsSecretAccessKey,
   });
 } catch (e) {
-  console.log('Unable to set AWS, wont use AWS services');
 }
-
 export default AWS;

@@ -79,7 +79,7 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
   const handleDeleteAutomation = async (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
     const input: DeleteAutomationInput = {
-      automationId: automation.id,
+      automationId: automation.id as string,
       workspaceId: activeCustomer?.id as string,
     };
 
@@ -92,14 +92,14 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
 
   const goToEditAutomation = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
-    goToEditAutomationView(automation.id);
+    goToEditAutomationView(automation.id as string);
   };
 
   const handleEnableChange = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
 
     const input: EnableAutomationInput = {
-      automationId: automation.id,
+      automationId: automation.id as string,
       workspaceId: activeCustomer?.id as string,
       state: !automation.isActive,
     };
@@ -122,7 +122,7 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
     }
   };
 
-  const automationTypeColour = renderAutomationTypeColor(automation.type);
+  const automationTypeColour = renderAutomationTypeColor(automation.type as AutomationType);
   const lastUpdated = automation.updatedAt ? new Date(Number.parseInt(automation.updatedAt, 10)) : null;
 
   return (
@@ -151,7 +151,7 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
             </TypeBadge>
             <Switch
               isDisabled={!canUpdateAutomations && !canAccessAdmin}
-              isChecked={automation.isActive}
+              isChecked={automation.isActive || false}
               onClick={(e) => {
                 if (canUpdateAutomations || canAccessAdmin) {
                   handleEnableChange(e);
@@ -190,7 +190,7 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
                 )}
 
               {(automation.type === AutomationType.Scheduled
-                || automation.automationScheduled?.activeDialogue?.slug) && (
+                && automation.automationScheduled?.activeDialogue?.slug) && (
                   <UI.Div mb={1}>
                     <UI.Label size="sm">
                       <UI.Flex alignItems="center">
@@ -217,7 +217,7 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
                         </UI.Icon>
                         <UI.Span ml={1}>
                           <UI.Helper>
-                            {action.type?.replaceAll('_', ' ')}
+                            {action?.type?.replaceAll('_', ' ')}
                           </UI.Helper>
                         </UI.Span>
                       </UI.Flex>
@@ -235,7 +235,7 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
                         </UI.Icon>
                         <UI.Span ml={1}>
                           <UI.Helper>
-                            {action.type?.replaceAll('_', ' ')}
+                            {action?.type?.replaceAll('_', ' ')}
                           </UI.Helper>
                         </UI.Span>
                       </UI.Flex>

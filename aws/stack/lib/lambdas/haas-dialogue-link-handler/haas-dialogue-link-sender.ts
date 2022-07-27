@@ -48,7 +48,7 @@ const verifyToken = async (apiUrl: string, token: string) => {
   return res;
 }
 
-const sendAutomationDialogueLink = async (apiUrl: string, accessToken: string, automationScheduleId: string, workspaceSlug: string) => {
+const sendAutomationDialogueLink = async (apiUrl: string, accessToken: string, automationActionId: string, workspaceSlug: string) => {
   const res = await fetch(apiUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer:${accessToken}` },
@@ -60,7 +60,7 @@ const sendAutomationDialogueLink = async (apiUrl: string, accessToken: string, a
       operationName: "sendAutomationDialogueLink",
       variables: {
         input: {
-          automationScheduleId,
+          automationActionId,
           workspaceSlug,
         }
       }
@@ -75,15 +75,15 @@ exports.main = async function (event: any, context: any) {
   const authenticateEmail: string = message.AUTHENTICATE_EMAIL;
   const workspaceEmail: string = message.WORKSPACE_EMAIL;
   const workspaceSlug: string = message.WORKSPACE_SLUG;
-  const automationScheduleId: string = message.AUTOMATION_SCHEDULE_ID;
   const authorizationKey = process.env.AUTOMATION_API_KEY;
+  const automationActionId: string = message.AUTOMATION_ACTION_ID;
 
   if (!apiUrl) throw new JSONInputError('apiUrl');
   if (!authenticateEmail) throw new JSONInputError('authenticateEmail');
   if (!workspaceEmail) throw new JSONInputError('workspaceEmail');
   if (!workspaceSlug) throw new JSONInputError('workspaceSlug');
   if (!authorizationKey) throw new JSONInputError('authorizationKey')
-  if (!automationScheduleId) throw new JSONInputError('automationScheduleId');
+  if (!automationActionId) throw new JSONInputError('automationActionId');
 
   const result = await authenticateLambda(apiUrl, authenticateEmail, workspaceEmail, authorizationKey);
   console.log('result: ', result);
@@ -91,7 +91,7 @@ exports.main = async function (event: any, context: any) {
   const verifyTokenMutation = await verifyToken(apiUrl, token);
   const accessToken = verifyTokenMutation?.data?.verifyUserToken?.accessToken;
   console.log('Access token: ', accessToken);
-  const resultTwo = await sendAutomationDialogueLink(apiUrl, accessToken, automationScheduleId, workspaceSlug);
+  const resultTwo = await sendAutomationDialogueLink(apiUrl, accessToken, automationActionId, workspaceSlug);
   console.log('Result two: ', resultTwo);
   return accessToken;
 }

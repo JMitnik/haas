@@ -1,0 +1,1 @@
+export { WorkspaceReportView } from './WorkspaceReportView';

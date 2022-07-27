@@ -31,6 +31,7 @@ const ThemeProviders = ({ children }: ThemeProvidersProps) => {
   if (workspaceTheme) {
     return (
       <ThemeProvider theme={dialogueTheme}>
+        {/* @ts-ignore */}
         <ChakraThemeProvider theme={dialogueTheme}>
           <CSSReset />
 

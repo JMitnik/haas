@@ -109,6 +109,7 @@ export class CustomerPrismaAdapter {
     return this.prisma.customer.findUnique({
       where: { id: id },
       include: {
+        roles: true,
         settings: {
           include: {
             colourSettings: true,
@@ -246,6 +247,7 @@ export class CustomerPrismaAdapter {
       data: {
         name: input.name,
         slug: input.slug,
+        isDemo: input.isDemo || undefined,
         tags: { create: template.tags },
         settings: {
           create: {

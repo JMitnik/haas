@@ -1,6 +1,6 @@
-import { objectType } from "@nexus/schema";
-import { ConditionPropertyAggregate } from "./ConditionPropertyAggregate";
-import { DialogueAspectType } from "./DialogueAspectType";
+import { objectType } from 'nexus';
+import { ConditionPropertyAggregate } from './ConditionPropertyAggregate';
+import { DialogueAspectType } from './DialogueAspectType';
 
 export const DialogueConditionScopeModel = objectType({
   name: 'DialogueConditionScopeModel',
@@ -16,7 +16,6 @@ export const DialogueConditionScopeModel = objectType({
 
     t.field('aggregate', {
       type: ConditionPropertyAggregate,
-      nullable: true,
     });
   },
 });

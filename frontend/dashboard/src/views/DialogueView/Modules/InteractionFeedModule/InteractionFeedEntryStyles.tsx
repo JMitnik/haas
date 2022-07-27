@@ -19,7 +19,7 @@ export const InteractionFeedEntryContainer = styled.div`
   `}
 `;
 
-export const InteractionFeedEntryValueContainer = styled.div<{value: number}>`
+export const InteractionFeedEntryValueContainer = styled.div<{ value: number }>`
   ${({ value }) => css`
     border-radius: 10px;
     display: flex;

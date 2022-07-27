@@ -11,7 +11,6 @@ const dialogue = Prisma.validator<Prisma.DialogueArgs>()({
 
 export type DialogueWithCustomer = Prisma.DialogueGetPayload<typeof dialogue>;
 
-
 export interface SessionWithEntries extends Session {
   nodeEntries: NodeEntryWithTypes[];
 }

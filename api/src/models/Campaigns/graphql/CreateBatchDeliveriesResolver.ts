@@ -1,5 +1,5 @@
 import { UserInputError } from 'apollo-server';
-import { inputObjectType, mutationField, objectType } from '@nexus/schema';
+import { inputObjectType, mutationField, objectType } from 'nexus';
 
 import { parseCsv } from '../../../utils/parseCsv';
 

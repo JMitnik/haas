@@ -6,7 +6,8 @@ import { CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType'
 export interface CreateCTAInput {
   title: string;
   type?: 'GENERIC' | 'SLIDER' | 'FORM' | 'CHOICE' | 'REGISTRATION' | 'TEXTBOX' | 'LINK' | 'SHARE' | 'VIDEO_EMBEDDED' | undefined;
-  form?: Prisma.FormNodeCreateInput | undefined; // FormNodeInputType
+  form?: NexusGenInputs['FormNodeInputType'] | null; // FormNodeInputType
+  // form?: Prisma.FormNodeCreateInput | undefined; // FormNodeInputType
   links: {
     id: string | undefined;
     backgroundColor: string | undefined;

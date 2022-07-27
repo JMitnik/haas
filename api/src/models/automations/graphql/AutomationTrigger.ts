@@ -1,4 +1,4 @@
-import { objectType } from '@nexus/schema';
+import { objectType } from 'nexus';
 import { AutomationEventModel } from './AutomationEvent';
 import { AutomationActionModel } from './AutomationAction'
 import { AutomationConditionBuilderModel } from './AutomationConditionBuilder';
@@ -38,7 +38,7 @@ export const AutomationTriggerModel = objectType({
 
     t.field('conditionBuilder', {
       type: AutomationConditionBuilderModel,
-      nullable: true,
+
     });
 
     t.list.field('actions', {

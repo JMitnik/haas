@@ -18,6 +18,7 @@ const schema = yup.object({
   workspaceSlug: yup.string().required(),
   dialogueType: yup.string().required(),
   generateDemoData: yup.number().required(),
+  isDemo: yup.number().required(),
 }).required();
 
 type FormProps = yup.InferType<typeof schema>;
@@ -84,6 +85,12 @@ export const GenerateWorkspaceView = () => {
     defaultValue: 0,
   });
 
+  const isDemoWatch = useWatch({
+    control: form.control,
+    name: 'isDemo',
+    defaultValue: 0,
+  });
+
   const handleManagerCancel = () => {
     setActiveManagerCSV(null);
   };
@@ -107,8 +114,9 @@ export const GenerateWorkspaceView = () => {
   };
 
   const handleSubmit = (formData: FormProps) => {
-    const { workspaceTitle, workspaceSlug, dialogueType, generateDemoData } = formData;
+    const { workspaceTitle, workspaceSlug, dialogueType, generateDemoData, isDemo } = formData;
     const generateDemoDataCheck = intToBool(generateDemoData);
+    const isDemoCheck = intToBool(isDemo);
 
     importWorkspaceCSV({
       variables: {
@@ -119,6 +127,7 @@ export const GenerateWorkspaceView = () => {
           managerCsv: activeManagerCSV,
           type: dialogueType as DialogueTemplateType,
           generateDemoData: generateDemoDataCheck,
+          isDemo: isDemoCheck,
         },
       },
     });
@@ -191,6 +200,38 @@ export const GenerateWorkspaceView = () => {
             <UI.FormControl>
               <UI.Flex alignItems="center">
                 <UI.Div>
+                  <UI.FormLabel>{t('make_demo_workspace')}</UI.FormLabel>
+                  <UI.InputHelper>{t('make_demo_workspace_helper')}</UI.InputHelper>
+                </UI.Div>
+
+                <UI.Div ml={120}>
+                  <Controller
+                    control={form.control}
+                    name="isDemo"
+                    defaultValue={0}
+                    render={({ field: { onChange, value, onBlur } }) => (
+                      <UI.Toggle
+                        size="lg"
+                        onChange={() => {
+                          if (value === 1) {
+                            form.setValue('generateDemoData', 0);
+                          }
+                          return (value === 1 ? onChange(0) : onChange(1));
+                        }}
+                        value={value}
+                        onBlur={onBlur}
+                      />
+                    )}
+                  />
+                </UI.Div>
+
+              </UI.Flex>
+
+            </UI.FormControl>
+
+            <UI.FormControl>
+              <UI.Flex alignItems="center">
+                <UI.Div>
                   <UI.FormLabel>{t('create_demo_data')}</UI.FormLabel>
                   <UI.InputHelper>{t('create_demo_data_helper')}</UI.InputHelper>
                 </UI.Div>
@@ -202,6 +243,8 @@ export const GenerateWorkspaceView = () => {
                     defaultValue={0}
                     render={({ field: { onChange, value, onBlur } }) => (
                       <UI.Toggle
+                        isDisabled={isDemoWatch !== 1}
+                        isChecked={value === 1}
                         size="lg"
                         onChange={() => (value === 1 ? onChange(0) : onChange(1))}
                         value={value}

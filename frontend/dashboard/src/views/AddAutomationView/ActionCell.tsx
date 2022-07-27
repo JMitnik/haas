@@ -30,7 +30,7 @@ export const ActionCell = ({ action, onClick, onRemove }: NodeCellProps) => {
       )}
       <UI.Flex width="100%">
         <UI.Div>
-          {action?.type === AutomationActionType.GenerateReport && (
+          {action?.type === AutomationActionType.WeekReport && (
             <UI.Text paddingRight={2}>
               Sending a
               {' '}
