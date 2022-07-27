@@ -22,7 +22,9 @@ export const AutomationConditionBuilderModel = objectType({
       type: AutomationConditionBuilderModel,
       resolve(parent, args, ctx) {
         if (!parent.childConditionBuilderId) return null;
-        return ctx.services.automationService.findAutomationConditionBuilder(parent.childConditionBuilderId) as any;
+        return ctx.services.triggerAutomationService.findAutomationConditionBuilder(
+          parent.childConditionBuilderId
+        ) as any;
       },
     });
   },

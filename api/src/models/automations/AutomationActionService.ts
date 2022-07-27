@@ -1,4 +1,4 @@
-import { AutomationActionChannel, AutomationActionChannelType, PrismaClient, UserOfCustomer } from '@prisma/client';
+import { AutomationAction, AutomationActionChannel, AutomationActionChannelType, AutomationActionType, PrismaClient, UserOfCustomer } from '@prisma/client';
 import { ApolloError } from 'apollo-server-express';
 import { uniqBy } from 'lodash';
 
@@ -28,6 +28,48 @@ export class AutomationActionService {
     this.automationPrismaAdapter = new AutomationPrismaAdapter(prisma);
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prisma);
     this.userPrismaAdapter = new UserPrismaAdapter(prisma);
+  }
+
+  /**
+   * Runs an action lambda based on the specified AutomationActionType
+   * @param automationAction an Prisma AutomationAction object
+   * @param workspaceSlug the slug of the workspace the automation belongs to
+   * @param dialogueSlug the slug of the pertaining dialogue (OPTIONAL)
+   * @returns the succesfull running of a SNS related to the action
+   */
+  public handleAutomationAction = async (
+    automationAction: AutomationAction & { channels: AutomationActionChannel[] },
+    workspaceSlug: string,
+    dialogueSlug?: string
+  ) => {
+    switch (automationAction.type) {
+      case AutomationActionType.SEND_DIALOGUE_LINK:
+        return this.sendDialogueLink(
+          automationAction.automationScheduledId as string, workspaceSlug
+        );
+      case AutomationActionType.WEEK_REPORT:
+        return this.generateReport(
+          automationAction.id,
+          workspaceSlug,
+          dialogueSlug,
+        );
+      case AutomationActionType.MONTH_REPORT:
+        return this.generateReport(
+          automationAction.id,
+          workspaceSlug,
+          dialogueSlug,
+        );
+      case AutomationActionType.YEAR_REPORT:
+        return this.generateReport(
+          automationAction.id,
+          workspaceSlug,
+          dialogueSlug,
+        );
+
+      default: {
+        return new Promise((resolve) => resolve(''));
+      }
+    };
   }
 
   /**

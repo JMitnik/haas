@@ -30,6 +30,8 @@ import GenerateWorkspaceService from '../models/generate-workspace/GenerateWorks
 import { OrganizationService } from '../models/Organization/OrganizationService';
 import TemplateService from '../models/templates/TemplateService'
 import { TopicService } from '../models/Topic/TopicService'
+import ScheduledAutomationService from '../models/automations/ScheduledAutomationService';
+import TriggerAutomationService from '../models/automations/TriggerAutomationService';
 
 export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOptions, never>): APIServiceContainer => {
   const loginService = new LoginService(mailService);
@@ -60,8 +62,12 @@ export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOption
   const issueService = new IssueService(prisma);
   const redisService = new RedisService(redis);
   const organizationService = new OrganizationService(prisma);
+  const scheduledAutomationService = new ScheduledAutomationService(prisma);
+  const triggerAutomationService = new TriggerAutomationService(prisma);
 
   return {
+    triggerAutomationService,
+    scheduledAutomationService,
     automationActionService,
     organizationService,
     redisService,

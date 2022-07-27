@@ -29,8 +29,12 @@ import GenerateWorkspaceService from '../models/generate-workspace/GenerateWorks
 import TemplateService from '../models/templates/TemplateService';
 import { AutomationActionService } from '../models/automations/AutomationActionService';
 import { IssueService } from '../models/Issue/IssueService';
+import ScheduledAutomationService from '../models/automations/ScheduledAutomationService';
+import TriggerAutomationService from '../models/automations/TriggerAutomationService';
 
 export interface APIServiceContainer {
+  triggerAutomationService: TriggerAutomationService;
+  scheduledAutomationService: ScheduledAutomationService;
   automationActionService: AutomationActionService;
   organizationService: OrganizationService;
   issueService: IssueService;
