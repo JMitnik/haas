@@ -19,7 +19,6 @@ import {
 import { isPresent } from 'ts-is-present';
 import { ApolloError } from 'apollo-server-express';
 import * as AWS from 'aws-sdk';
-import { sub } from 'date-fns';
 
 import config from '../../config/config';
 import { offsetPaginate } from '../general/PaginationHelpers';
@@ -45,7 +44,6 @@ import {
   findLambdaParamsByActionType,
   findReportQueryParamsByCron,
   getDayRange,
-  toDayFormat,
   constructUpdateAutomationInput,
   constructCreateAutomationInput,
 } from './AutomationService.helpers';
@@ -158,6 +156,7 @@ class AutomationService {
 
       const sendDialogueLinkParams = {
         AUTOMATION_SCHEDULE_ID: automationScheduledId,
+        AUTOMATION_ACTION_ID: action.id,
         AUTHENTICATE_EMAIL: 'automations@haas.live',
         API_URL: `${config.baseUrl}/graphql`,
         WORKSPACE_EMAIL: botUser.email,
@@ -195,8 +194,7 @@ class AutomationService {
     const { minutes, hours, dayOfMonth, dayOfWeek, month } = automationScheduled;
 
     // Transform the CRON expression to one supported by AWS (? indicator is not part of cron-validator)
-    const scheduledExpression = `cron(${minutes} ${hours} ${dayOfMonth === '*' ? '?' : dayOfMonth} ${month} ${dayOfWeek} *)`
-
+    const scheduledExpression = `cron(${minutes} ${hours} ${dayOfMonth === '*' ? '?' : dayOfMonth} ${month} ${dayOfMonth === '1' ? '?' : dayOfWeek} *)`
     // Find the state of the automation and adjust event bridge rule to that
     const state = parentAutomation?.isActive ? 'ENABLED' : 'DISABLED';
 
@@ -219,26 +217,21 @@ class AutomationService {
       dialogue?.slug,
     );
 
-    if (config.env !== 'local') {
-      await this.eventBridge.putRule({
-        Name: automationScheduled.id,
-        ScheduleExpression: scheduledExpression,
-        State: state,
-        RoleArn: process.env.EVENT_BRIDGE_RUN_ALL_LAMBDAS_ROLE_ARN,
-      }).promise().catch((e) => {
-        console.log(`upserting a event bridge rule for automation schedule: ${automationScheduled.id} with error ${e}`)
-        throw new ApolloError(`upserting a event bridge rule for automation schedule: ${automationScheduled.id} with error ${e}`)
-      });
+    await this.eventBridge.putRule({
+      Name: automationScheduled.id,
+      ScheduleExpression: scheduledExpression,
+      State: state,
+    }).promise().catch((e) => {
+      console.log(`upserting a event bridge rule for automation schedule: ${automationScheduled.id} with error ${e}`)
+      throw new ApolloError(`upserting a event bridge rule for automation schedule: ${automationScheduled.id} with error ${e}`)
+    });
 
-      await this.eventBridge.putTargets({
-        Rule: automationScheduled.id,
-        Targets: ruleTargets,
-      }).promise().catch((e) => {
-        throw new ApolloError(`upserting targets automation schedule: ${automationScheduled.id} with error ${e}`)
-      });
-    } else {
-      console.info('Rule targets in staging/prod would be: ', ruleTargets);
-    }
+    await this.eventBridge.putTargets({
+      Rule: automationScheduled.id,
+      Targets: ruleTargets,
+    }).promise().catch((e) => {
+      throw new ApolloError(`upserting targets automation schedule: ${automationScheduled.id} with error ${e}`)
+    });
   }
 
   /**
