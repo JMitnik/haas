@@ -5,7 +5,7 @@ export const SendAutomationDialogueLinkInput = inputObjectType({
   name: 'SendAutomationDialogueLinkInput',
   definition(t) {
     t.string('workspaceSlug', { required: true });
-    t.string('automationScheduleId', { required: true });
+    t.string('automationActionId', { required: true });
   },
 });
 
@@ -19,9 +19,11 @@ export const SendAutomationDialogueLinkResolver = mutationField('sendAutomationD
 
     if (!args.input) throw new UserInputError('No input object provided for createAutomation Resolver');
 
-    const { automationScheduleId, workspaceSlug } = args.input;
+    const { workspaceSlug, automationActionId } = args.input;
 
-    return ctx.services.automationActionService.sendDialogueLink(automationScheduleId, workspaceSlug);
+    return ctx.services.automationActionService.sendDialogueLink(
+      workspaceSlug, automationActionId
+    );
   },
 });
 

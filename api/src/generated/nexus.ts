@@ -603,7 +603,7 @@ export interface NexusGenInputs {
     value?: number | null; // Int
   }
   SendAutomationDialogueLinkInput: { // input type
-    automationScheduleId: string; // String!
+    automationActionId: string; // String!
     workspaceSlug: string; // String!
   }
   SendAutomationReportInput: { // input type

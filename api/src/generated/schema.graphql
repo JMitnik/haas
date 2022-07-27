@@ -1799,7 +1799,7 @@ input SandboxInput {
 }
 
 input SendAutomationDialogueLinkInput {
-  automationScheduleId: String!
+  automationActionId: String!
   workspaceSlug: String!
 }
 

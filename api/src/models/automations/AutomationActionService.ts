@@ -1,4 +1,4 @@
-import { AutomationActionChannel, AutomationActionChannelType, AutomationActionType, PrismaClient, UserOfCustomer } from '@prisma/client';
+import { AutomationActionChannel, AutomationActionChannelType, PrismaClient, UserOfCustomer } from '@prisma/client';
 import { ApolloError } from 'apollo-server-express';
 import { uniqBy } from 'lodash';
 
@@ -45,23 +45,15 @@ export class AutomationActionService {
    * @param workspaceSlug
    * @returns a boolean indicating whether the call was a succes or not
    */
-  sendDialogueLink = async (automationScheduleId: string, workspaceSlug: string): Promise<boolean> => {
-    const scheduledAutomation = await this.automationPrismaAdapter.findScheduledAutomationById(automationScheduleId);
-    const sendEmailActions = scheduledAutomation?.actions.filter(
-      (action) => action.type === AutomationActionType.SEND_DIALOGUE_LINK
-    ) || [];
+  sendDialogueLink = async (
+    workspaceSlug: string,
+    automationActionId: string
+  ): Promise<boolean> => {
+    const channels = await this.findChannelsByActionId(automationActionId);
 
-    if (!sendEmailActions.length) {
-      console.log('No email actions available for: ', automationScheduleId, '. Abort.');
-      return false;
-    };
-
-    // Get all recipients for the SEND EMAIL actions
-    const actionIds = sendEmailActions.map((action) => action.id);
-    const recipients = await this.findActionsRecipients(actionIds, workspaceSlug);
-
-    await this.dispatchMailsToRecipients(recipients, workspaceSlug);
-
+    for (const channel of channels) {
+      await this.handleSendDialogueChannel(channel, workspaceSlug)
+    }
     return true;
   }
 
@@ -135,7 +127,13 @@ export class AutomationActionService {
     return users;
   };
 
-  handleEmailChannel = async (
+  /**
+   * Sends an email containing a report to all recipients in the channel's payload
+   * @param channel 
+   * @param workspaceSlug 
+   * @param reportUrl url to the downloadable report PDF (S3)
+   */
+  handleReportEmailChannel = async (
     channel: AutomationActionChannel,
     workspaceSlug: string,
     reportUrl: string
@@ -159,14 +157,32 @@ export class AutomationActionService {
     })
   };
 
-  handleChannel = async (
+  /**
+   * Sends an email containing a dialogue client link to all recipients in the channel's payload
+   * @param channel 
+   * @param workspaceSlug 
+   */
+  handleSendDialogueEmailChannel = async (
     channel: AutomationActionChannel,
     workspaceSlug: string,
-    reportUrl: string
+  ) => {
+    const payload = (channel.payload as unknown) as GenerateReportPayload;
+    const recipients = await this.userService.findTargetUsers(workspaceSlug, payload);
+    await this.dispatchMailsToRecipients(recipients, workspaceSlug);
+  }
+
+  /**
+   * Sends an client dialogue link to all recipients in the channel's payload based on the channel's type (e.g. EMAIL, SLACK etc.)
+   * @param channel 
+   * @param workspaceSlug 
+   */
+  handleSendDialogueChannel = async (
+    channel: AutomationActionChannel,
+    workspaceSlug: string,
   ) => {
     switch (channel.type) {
       case AutomationActionChannelType.EMAIL:
-        await this.handleEmailChannel(channel, workspaceSlug, reportUrl);
+        await this.handleSendDialogueEmailChannel(channel, workspaceSlug);
         break;
       case AutomationActionChannelType.SMS:
         // TODO: Implement
@@ -175,7 +191,28 @@ export class AutomationActionService {
         // TODO: Implement
         break;
       default:
-        await this.handleEmailChannel(channel, workspaceSlug, reportUrl);
+        await this.handleSendDialogueEmailChannel(channel, workspaceSlug);
+        break;
+    }
+  }
+
+  handleReportChannel = async (
+    channel: AutomationActionChannel,
+    workspaceSlug: string,
+    reportUrl: string
+  ) => {
+    switch (channel.type) {
+      case AutomationActionChannelType.EMAIL:
+        await this.handleReportEmailChannel(channel, workspaceSlug, reportUrl);
+        break;
+      case AutomationActionChannelType.SMS:
+        // TODO: Implement
+        break;
+      case AutomationActionChannelType.SLACK:
+        // TODO: Implement
+        break;
+      default:
+        await this.handleReportEmailChannel(channel, workspaceSlug, reportUrl);
         break;
     }
   }
@@ -200,7 +237,7 @@ export class AutomationActionService {
     if (!automationAction) throw new ApolloError('No automation action found for ID!');
 
     for (const channel of automationAction.channels) {
-      await this.handleChannel(channel, workspaceSlug, reportUrl);
+      await this.handleReportChannel(channel, workspaceSlug, reportUrl);
     }
 
     return true;
