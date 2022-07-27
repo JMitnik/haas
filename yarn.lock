@@ -18277,7 +18277,7 @@ jest-pnp-resolver@^1.2.1, jest-pnp-resolver@^1.2.2:
   resolved "https://registry.yarnpkg.com/jest-pnp-resolver/-/jest-pnp-resolver-1.2.2.tgz#b704ac0ae028a89108a4d040b3f919dfddc8e33c"
   integrity sha512-olV41bKSMm8BdnuMsewT4jqlZ8+3TCARAXjZGT9jcoSnrfUnRCqnMoF9XEeoWjbzObpqF9dRhHQj0Xb9QdF6/w==
 
-jest-preview@^0.2.5:
+jest-preview@^0.2.8:
   version "0.2.8"
   resolved "https://registry.yarnpkg.com/jest-preview/-/jest-preview-0.2.8.tgz#4815a5643980681dd05bdfcb7852d0ee082c34ad"
   integrity sha512-BxH1BISz090q+cs10MKI9OYI3UHraWOvtQVJaEDWQ70vGBey+/8u8WKAVBC3Wd8sm+4EYNWHN2vfCZ1DNaSsUQ==

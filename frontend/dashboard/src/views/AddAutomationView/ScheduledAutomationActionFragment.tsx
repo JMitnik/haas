@@ -33,7 +33,7 @@ export const ScheduledAutomationActionFragment = ({ dialogueItems }: ScheduledAu
       <input type="hidden" {...form.register(`actions.${0}.action.id`)} />
       <input type="hidden" {...form.register(`actions.${0}.action.channelId`)} />
       <UI.FormControl>
-        <UI.FormLabel htmlFor="automationType">{t('automation:action_type')}</UI.FormLabel>
+        <UI.FormLabel htmlFor="actionType">{t('automation:action_type')}</UI.FormLabel>
         <UI.InputHelper>{t('automation:action_type_helper')}</UI.InputHelper>
         <Controller
           name={`actions.${0}.action.type`}

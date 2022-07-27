@@ -54,7 +54,7 @@ interface AutomationFormProps {
   mappedConditions?: ConditionEntry[];
 }
 
-const AutomationForm = ({
+export const AutomationForm = ({
   onCreateAutomation,
   onUpdateAutomation,
   isLoading,
@@ -215,6 +215,7 @@ const AutomationForm = ({
                   <FormLabel htmlFor="title">{t('title')}</FormLabel>
                   <InputHelper>{t('automation:title_helper')}</InputHelper>
                   <Input
+                    id="title"
                     placeholder={t('automation:title_placeholder')}
                     leftEl={<Type />}
                     {...form.register('title', { required: 'Error title' })}
