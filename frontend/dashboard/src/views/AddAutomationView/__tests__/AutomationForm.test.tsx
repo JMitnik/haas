@@ -17,7 +17,7 @@ test('render form and validate state of create button', async () => {
   expect(await screen.findByText('Create')).toBeDisabled();
 
   // Fill in value in title field
-  const automationTitleInput = await screen.findByLabelText(/title*/i);
+  const automationTitleInput = await screen.findByLabelText((content) => content.includes('Title'));
   userEvent.type(automationTitleInput, 'New Automation');
   expect(automationTitleInput).toHaveValue('New Automation');
 
