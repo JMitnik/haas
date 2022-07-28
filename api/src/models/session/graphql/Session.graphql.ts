@@ -169,7 +169,6 @@ export const CreateSessionMutation = mutationField('createSession', {
       throw new Error('No valid new session data provided');
     }
 
-
     try {
       const session = await ctx.services.sessionService.createSession(args.input);
       await ctx.services.redisService.set(`session:${session.id}`, session.mainScore);
