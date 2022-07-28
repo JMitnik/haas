@@ -195,7 +195,7 @@ export const HexagonGrid = ({
 
         <Tooltip.Root delayDuration={300} open={openZoomOutTooltip} onOpenChange={setOpenZoomOutTooltip}>
           <Tooltip.Trigger asChild>
-            <LS.ControlButton onClick={() => zoom.scale({ scaleX: 0.8, scaleY: 0.8 })}>
+            <LS.ControlButton iconOnly onClick={() => zoom.scale({ scaleX: 0.8, scaleY: 0.8 })}>
               <UI.Icon>
                 <Minus />
               </UI.Icon>
@@ -212,7 +212,7 @@ export const HexagonGrid = ({
 
         <Tooltip.Root delayDuration={300} open={openZoomInTooltip} onOpenChange={setOpenZoomInTooltip}>
           <Tooltip.Trigger asChild>
-            <LS.ControlButton mt={2} onClick={() => zoom.scale({ scaleX: 1.2, scaleY: 1.2 })}>
+            <LS.ControlButton iconOnly mt={2} onClick={() => zoom.scale({ scaleX: 1.2, scaleY: 1.2 })}>
               <UI.Icon>
                 <Plus />
               </UI.Icon>
@@ -229,7 +229,7 @@ export const HexagonGrid = ({
 
         <Tooltip.Root delayDuration={300} open={openCenterHexagonTooltip} onOpenChange={setOpenCenterHexagonTooltip}>
           <Tooltip.Trigger asChild>
-            <LS.ControlButton onClick={() => zoom.reset()} mt={2}>
+            <LS.ControlButton iconOnly onClick={() => zoom.reset()} mt={2}>
               <UI.Icon>
                 <MapPin />
               </UI.Icon>
