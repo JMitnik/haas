@@ -321,11 +321,12 @@ class SessionService {
       logger.error('Something went wrong while handling sms triggers', error);
     };
 
-    try {
-      await this.automationService.handleTriggerAutomations(dialogueId);
-    } catch (error) {
-      logger.error('Something went wrong checking automation triggers', error);
-    }
+    // TODO: Set back?
+    // try {
+    //   await this.automationService.handleTriggerAutomations(dialogueId);
+    // } catch (error) {
+    //   logger.error('Something went wrong checking automation triggers', error);
+    // }
 
     return session;
   }
