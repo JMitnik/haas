@@ -77,7 +77,7 @@ class GenerateWorkspaceService {
    * @param sessionsPerDay 
    * @param generateData 
    */
-  private async generateDialoguesByTemplateLayers(
+  async generateDialoguesByTemplateLayers(
     workspace: Workspace,
     templateType: string,
     sessionsPerDay: number = 1,
