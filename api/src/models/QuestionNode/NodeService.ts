@@ -32,27 +32,12 @@ export class NodeService {
   }
 
   /**
-   * Finds the slidernode by its parent question ID 
-   * @param parentQuestionNodeId 
-   * @returns 
+   * Finds the slidernode by its parent question ID
+   * @param parentQuestionNodeId
+   * @returns
    */
-  findSliderNodeByParentId = (parentQuestionNodeId: string) => {
-    return this.prisma.sliderNode.findFirst({
-      where: {
-        QuestionNode: {
-          every: {
-            id: parentQuestionNodeId,
-          },
-        },
-      },
-      include: {
-        markers: {
-          include: {
-            range: true,
-          },
-        },
-      },
-    })
+  public findSliderNodeByParentId(parentQuestionNodeId: string) {
+    return this.questionNodePrismaAdapter.findSliderNodeByParentId(parentQuestionNodeId);
   }
 
   /**
@@ -69,7 +54,7 @@ export class NodeService {
    * @param dialogueId
    * @returns question node
    */
-  findRootNode = async (dialogueId: string) => {
+  public async findRootNode(dialogueId: string) {
     return this.questionNodePrismaAdapter.findRootNodeByDialogueId(dialogueId);
   }
 
