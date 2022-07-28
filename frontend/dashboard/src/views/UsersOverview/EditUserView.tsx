@@ -219,7 +219,7 @@ const EditUserForm = ({ userCustomer }: { userCustomer: any }) => {
                 </Div>
               </FormSection>
 
-              <ButtonGroup>
+              <ButtonGroup display="flex">
                 <UI.Button
                   isLoading={isLoading}
                   isDisabled={!form.formState.isValid}

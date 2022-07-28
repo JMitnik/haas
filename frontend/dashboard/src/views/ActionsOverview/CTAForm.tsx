@@ -425,7 +425,7 @@ const CTAForm = ({
         </Div>
 
         <Flex justifyContent="space-between">
-          <ButtonGroup>
+          <ButtonGroup display="flex">
             <UI.Button
               isLoading={addLoading || updateLoading}
               isDisabled={!form.formState.isValid}

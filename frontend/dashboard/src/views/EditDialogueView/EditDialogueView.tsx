@@ -390,7 +390,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
                 </>
               )}
 
-              <ButtonGroup>
+              <ButtonGroup display="flex">
                 <UI.Button
                   isLoading={isLoading}
                   isDisabled={!form.formState.isValid}

@@ -436,7 +436,7 @@ const AddDialogueView = () => {
                 </Div>
               </FormSection>
 
-              <ButtonGroup>
+              <ButtonGroup display="flex">
                 <UI.Button
                   isDisabled={!form.formState.isValid}
                   isLoading={isLoading}
@@ -445,7 +445,7 @@ const AddDialogueView = () => {
                 >
                   {t('create')}
                 </UI.Button>
-                <UI.Button variant="outline" onClick={() => history.push('/')}>
+                <UI.Button variant="outline" onClick={() => history.goBack()}>
                   {t('cancel')}
                 </UI.Button>
               </ButtonGroup>

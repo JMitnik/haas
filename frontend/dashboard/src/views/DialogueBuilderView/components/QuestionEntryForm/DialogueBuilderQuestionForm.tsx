@@ -758,7 +758,7 @@ const DialogueBuilderQuestionForm = ({
         </UI.Div>
 
         <UI.Flex justifyContent="space-between">
-          <ButtonGroup>
+          <ButtonGroup display="flex">
             <UI.Button
               isLoading={createLoading || updateLoading}
               isDisabled={!form.formState.isValid}

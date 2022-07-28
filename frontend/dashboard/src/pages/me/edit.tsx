@@ -162,7 +162,7 @@ const EditMeForm = () => {
 
         <Hr />
 
-        <ButtonGroup mt={4}>
+        <ButtonGroup display="flex" mt={4}>
           <UI.Button
             isLoading={isLoading}
             isDisabled={!form.formState.isValid}
