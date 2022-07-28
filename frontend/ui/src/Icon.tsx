@@ -3,7 +3,8 @@ import {
   layout, LayoutProps,
   typography, TypographyProps,
   color, ColorProps,
-  space, SpaceProps } from 'styled-system';
+  space, SpaceProps
+} from 'styled-system';
 import { Span } from './Span';
 
 interface IconProps extends LayoutProps, TypographyProps, ColorProps, SpaceProps {
