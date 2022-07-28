@@ -50,7 +50,6 @@ const handleError = (ctx: any, error: GraphQLError) => {
   });
 }
 
-
 export const makeApollo = async (prisma: PrismaClient) => {
   const apollo = createServer({
     cors: true,

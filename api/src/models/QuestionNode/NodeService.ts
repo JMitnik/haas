@@ -32,6 +32,15 @@ export class NodeService {
   }
 
   /**
+   * Finds the slidernode by its parent question ID
+   * @param parentQuestionNodeId
+   * @returns
+   */
+  public findSliderNodeByParentId(parentQuestionNodeId: string) {
+    return this.questionNodePrismaAdapter.findSliderNodeByParentId(parentQuestionNodeId);
+  }
+
+  /**
    * Creates a slider node and connects it to a question
    * @param data
    * @returns
@@ -41,12 +50,12 @@ export class NodeService {
   };
 
   /**
-   * Finds the slider node of a dialogue
+   * Finds the root node of a dialogue
    * @param dialogueId
    * @returns question node
    */
-  findSliderNode = async (dialogueId: string) => {
-    return this.questionNodePrismaAdapter.findSliderNodeByDialogueId(dialogueId);
+  public async findRootNode(dialogueId: string) {
+    return this.questionNodePrismaAdapter.findRootNodeByDialogueId(dialogueId);
   }
 
 
