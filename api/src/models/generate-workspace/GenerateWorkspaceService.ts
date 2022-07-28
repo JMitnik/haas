@@ -10,7 +10,7 @@ import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import { CreateDialogueInput } from '../questionnaire/DialoguePrismaAdapterType';
 import NodeService from '../QuestionNode/NodeService';
 import UserOfCustomerPrismaAdapter from '../users/UserOfCustomerPrismaAdapter';
-import { cartesian } from './DemoHelpers';
+import { cartesian, generateCreateDialogueDataByTemplateLayers, getTemplate } from './GenerateWorkspaceService.helpers';
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import DialogueService from '../questionnaire/DialogueService';
 import { DemoWorkspaceTemplate } from '../templates/TemplateTypes';
@@ -71,46 +71,6 @@ class GenerateWorkspaceService {
   }
 
   /**
-   * Finds the correct template based a provided type
-   * @param templateType
-   * @returns
-   */
-  getTemplate(templateType: string): DemoWorkspaceTemplate {
-    switch (templateType) {
-      case DialogueTemplateType.BUSINESS_ENG:
-        return templates.business;
-      case DialogueTemplateType.SPORT_ENG:
-        return templates.sportEng;
-      case DialogueTemplateType.SPORT_NL:
-        return templates.sportNl;
-      case DialogueTemplateType.DEFAULT:
-        return templates.default;
-      default:
-        return templates.default;
-    }
-  }
-
-  /**
-   * Creates an array of unique dialogue slugs + title pairs based on a template type
-   * @param templateType 
-   * @returns 
-   */
-  private generateCreateDialogueDataByTemplateLayers(templateType: string) {
-    const template = this.getTemplate(templateType);
-    const uniqueDialogues: string[][] = cartesian(template.rootLayer, template.subLayer, template.subSubLayer);
-
-    const mappedDialogueInputData = uniqueDialogues.map(
-      (dialogue: string[]) => {
-        if (dialogue?.[0].length && dialogue?.[1].length) {
-          return { slug: dialogue.join('-'), title: dialogue.join(' - ') };
-        }
-        return { slug: dialogue[0], title: dialogue[0] };
-      });
-
-    return mappedDialogueInputData;
-  }
-
-  /**
    * Generates dialogues based on the layers (rootLayer + subLayer) of a template
    * @param workspace 
    * @param templateType 
@@ -123,7 +83,7 @@ class GenerateWorkspaceService {
     sessionsPerDay: number = 1,
     generateData: boolean = false,
   ) {
-    const mappedDialogueInputData = this.generateCreateDialogueDataByTemplateLayers(templateType);
+    const mappedDialogueInputData = generateCreateDialogueDataByTemplateLayers(templateType);
 
     for (let i = 0; i < mappedDialogueInputData.length; i++) {
       const { slug, title } = mappedDialogueInputData[i];
@@ -299,7 +259,7 @@ class GenerateWorkspaceService {
   async generateWorkspace(input: GenerateWorkspaceCSVInput, userId?: string) {
     const { uploadedCsv, workspaceSlug, workspaceTitle, type, managerCsv, isDemo } = input;
 
-    const template = this.getTemplate(type);
+    const template = getTemplate(type);
     const workspace = await this.customerPrismaAdapter.createWorkspace({
       name: workspaceTitle,
       primaryColour: '',
@@ -309,8 +269,6 @@ class GenerateWorkspaceService {
     }, template);
 
     try {
-      console.log('Generate Demo data: ', input.generateDemoData);
-
       const adminRole = workspace.roles.find((role) => role.type === RoleTypeEnum.ADMIN) as Role;
       await this.userOfCustomerPrismaAdapter.connectUserToWorkspace(
         workspace.id,
@@ -341,7 +299,6 @@ class GenerateWorkspaceService {
       await this.customerService.deleteWorkspace(workspace.id);
       throw new ApolloError('Something went wrong generating generating workspace. All changes have been reverted');
     }
-
   };
 
 };
