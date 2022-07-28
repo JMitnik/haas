@@ -1,6 +1,6 @@
 import { DialogueTemplateType } from '@prisma/client';
-import templates from 'models/templates';
-import { DemoWorkspaceTemplate } from 'models/templates/TemplateTypes';
+import templates from '../../models/templates';
+import { DemoWorkspaceTemplate } from '../../models/templates/TemplateTypes';
 
 export function cartesian(...args: any) {
   var r: any = [], max = args.length - 1;
