@@ -64,7 +64,11 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
   const { t } = useTranslation();
   const { register, getValues, formState, control } = useForm<FormNodeFormProps>({
     mode: 'onChange',
-    reValidateMode: 'onChange',
+    defaultValues: {
+      fields: node?.form?.fields?.map(() => ({
+        value: '',
+      })) || [],
+    },
   });
 
   const { isValid } = formState;
@@ -130,8 +134,7 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                           key={`longText-${index}`}
                           id={`fields[${index}].value`}
                           variant="outline"
-                          // name={`fields.${index}.value`}
-                          {...register(`fields.${index}.value`) as any}
+                          {...register(`fields.${index}.value`)}
                           minHeight="40px"
                           placeholder={field.placeholder || undefined}
                         />
@@ -143,9 +146,9 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                           control={control}
                           defaultValue={undefined}
                           rules={{ required: field.isRequired || false }}
-                          render={({ value, onChange, onBlur }) => (
+                          render={({ field: { value, onBlur, onChange } }) => (
                             <RadioGroup.Root
-                              defaultValue={value}
+                              defaultValue={value as string}
                               onValueChange={onChange}
                               onBlur={onBlur}
                               variant="tight"
@@ -168,21 +171,20 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
 
                                 </RadioGroup.Item>
                               ))}
-
                             </RadioGroup.Root>
                           )}
                         />
                       )}
                       {field.type !== 'longText' && field.type !== 'contacts' && (
                         <UI.Input
-                          key={`input-${index}`}
+                          key={fields[index].id}
                           id={`fields[${index}].value`}
                           variant="outline"
                           leftEl={mapIcon[field?.type] || <Type />}
                           type={mapFieldType[field?.type] || 'text'}
-                          {...register(`fields.${index}.value`, { required: field.isRequired || false }) as any}
                           placeholder={field.placeholder || undefined}
                           maxWidth={mapFieldType[field?.type] === 'number' ? '100px' : 'auto'}
+                          {...register(`fields.${index}.value`, { required: field.isRequired || false })}
                         />
                       )}
                     </UI.FormControl>
