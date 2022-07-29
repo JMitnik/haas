@@ -34,7 +34,36 @@ class QuestionNodePrismaAdapter {
     return questionOptions
   }
 
-  public async findSliderNodeByDialogueId(dialogueId: string) {
+  /**
+   * Finds the slidernode by its parent question ID
+   * @param parentQuestionNodeId
+   * @returns
+   */
+  public findSliderNodeByParentId(parentQuestionNodeId: string) {
+    return this.prisma.sliderNode.findFirst({
+      where: {
+        QuestionNode: {
+          every: {
+            id: parentQuestionNodeId,
+          },
+        },
+      },
+      include: {
+        markers: {
+          include: {
+            range: true,
+          },
+        },
+      },
+    })
+  }
+
+  /**
+   * Finds a root node
+   * @param dialogueId
+   * @returns
+   */
+  public async findRootNodeByDialogueId(dialogueId: string) {
     return this.prisma.questionNode.findFirst({
       where: {
         questionDialogueId: dialogueId,

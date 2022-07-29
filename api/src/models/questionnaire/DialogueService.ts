@@ -511,7 +511,7 @@ class DialogueService {
   ) => {
     const endDateTimeSet = !endDateTime ? addDays(startDateTime, 7) : endDateTime;
 
-    const rootNode = await this.nodeService.findSliderNode(dialogueId);
+    const rootNode = await this.nodeService.findRootNode(dialogueId);
 
     if (!rootNode?.id) return { name: '', nrVotes: 0, impactScore: 0, subTopics: [] };
 

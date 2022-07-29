@@ -3269,7 +3269,7 @@ export type SessionFragmentFragment = (
     { __typename?: 'FormNodeEntryType' }
     & { values?: Maybe<Array<Maybe<(
       { __typename?: 'FormNodeEntryValueType' }
-      & Pick<FormNodeEntryValueType, 'shortText'>
+      & Pick<FormNodeEntryValueType, 'shortText' | 'email'>
     )>>> }
   )> }
 );
@@ -4415,6 +4415,7 @@ export const SessionFragmentFragmentDoc = gql`
   followUpAction {
     values {
       shortText
+      email
     }
   }
 }

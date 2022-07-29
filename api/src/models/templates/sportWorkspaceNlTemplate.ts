@@ -44,27 +44,27 @@ const sportWorkspaceTemplate: DemoWorkspaceTemplate = {
     markers: [
       {
         label: 'Goed!',
-        subLabel: 'Het gaat goed.',
+        subLabel: 'Ik voel me goed.',
         range: { start: 6, end: 9.5 },
       },
       {
         label: 'Geweldig!',
-        subLabel: 'Het gaat geweldig.',
+        subLabel: 'Ik voel me geweldig.',
         range: { start: 9.5 },
       },
       {
         label: 'Neutraal!',
-        subLabel: 'Het kan beter.',
+        subLabel: 'Ik voel me okee.',
         range: { start: 5, end: 6 },
       },
       {
         label: 'Slecht',
-        subLabel: 'Het gaat slecht.',
+        subLabel: 'Ik voel me slecht.',
         range: { start: 3, end: 5 },
       },
       {
         label: 'Heel slecht',
-        subLabel: 'Het gaat heel slecht.',
+        subLabel: 'Ik voel me heel slecht.',
         range: { end: 3 },
       },
     ],
