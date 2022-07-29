@@ -1,14 +1,14 @@
 import { automationTriggerInput, choiceQuestionCompareDataInput, conditionInput, sliderQuestionCompareDataInput } from './testData';
 import { clearDatabase } from './testUtils';
-import AutomationService from '../AutomationService';
 import { AutomationCondition, AutomationTrigger } from '../AutomationTypes';
 import { AutomationConditionBuilderType, AutomationConditionOperatorType, AutomationType, NodeType, PrismaClient } from '@prisma/client';
 import { sample } from 'lodash';
 import { cloneDeep } from 'lodash';
 
 import { prisma } from '../../../test/setup/singletonDeps';
+import TriggerAutomationService from '../TriggerAutomationService';
 
-const automationService = new AutomationService(prisma);
+const automationService = new TriggerAutomationService(prisma);
 
 export const seedWorkspace = async (prisma: PrismaClient) => {
   const workspace = await prisma.customer.create({

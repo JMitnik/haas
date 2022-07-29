@@ -9,18 +9,17 @@ import {
   UpdateAutomationInput,
   CreateAutomationInput,
 } from './AutomationTypes';
-import { TriggerAutomationPrismaAdapter } from './TriggerAutomationPrismaAdapter';
 import { ScheduledAutomationPrismaAdapter } from './ScheduledAutomationPrismaAdapter';
+import { TriggerAutomationPrismaAdapter } from './TriggerAutomationPrismaAdapter';
 
 export class AutomationPrismaAdapter {
   prisma: PrismaClient;
-  triggerAutomationPrismaAdapter: TriggerAutomationPrismaAdapter;
   scheduledAutomationPrismaAdapter: ScheduledAutomationPrismaAdapter;
-
+  triggerAutomationPrismaAdapter: TriggerAutomationPrismaAdapter;
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
-    this.triggerAutomationPrismaAdapter = new TriggerAutomationPrismaAdapter(prisma);
     this.scheduledAutomationPrismaAdapter = new ScheduledAutomationPrismaAdapter(prisma);
+    this.triggerAutomationPrismaAdapter = new TriggerAutomationPrismaAdapter(prisma);
   }
 
   /**
