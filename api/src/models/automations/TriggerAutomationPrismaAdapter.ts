@@ -21,6 +21,8 @@ export class TriggerAutomationPrismaAdapter {
     this.prisma = prisma;
   }
 
+  // Make available to merge
+
   /**
    * Finds an AutomationConditionBuilder by its ID
    * @param builderId id of a condition builder

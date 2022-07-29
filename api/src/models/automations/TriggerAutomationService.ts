@@ -24,8 +24,10 @@ import {
 } from './AutomationTypes'
 import { AutomationActionService } from './AutomationActionService';
 import CustomerService from '../../models/customer/CustomerService';
+import { TriggerAutomationPrismaAdapter } from './TriggerAutomationPrismaAdapter';
 
 class TriggerAutomationService {
+  triggerAutomationPrismaAdapter: TriggerAutomationPrismaAdapter;
   automationPrismaAdapter: AutomationPrismaAdapter;
   dialogueService: DialogueService;
   userService: UserService;
@@ -37,6 +39,7 @@ class TriggerAutomationService {
   iam: AWS.IAM;
 
   constructor(prisma: PrismaClient) {
+    this.triggerAutomationPrismaAdapter = new TriggerAutomationPrismaAdapter(prisma);
     this.automationPrismaAdapter = new AutomationPrismaAdapter(prisma);
     this.dialogueService = new DialogueService(prisma);
     this.automationActionService = new AutomationActionService(prisma);
@@ -49,13 +52,15 @@ class TriggerAutomationService {
     this.lambda = new AWS.Lambda();
   }
 
+  // Make available to merge
+
   /**
    * Finds automation condition by its ID
    * @param automationConditionId the ID of an automation condition
    * @returns an automation condition
    */
   findAutomationConditionById = (automationConditionId: string) => {
-    return this.automationPrismaAdapter.findAutomationConditionById(automationConditionId);
+    return this.triggerAutomationPrismaAdapter.findAutomationConditionById(automationConditionId);
   };
 
   /**
@@ -64,7 +69,7 @@ class TriggerAutomationService {
    * @returns a condition builder
    */
   findAutomationConditionBuilder = (builderId: string) => {
-    return this.automationPrismaAdapter.findAutomationConditionBuilderById(builderId);
+    return this.triggerAutomationPrismaAdapter.findAutomationConditionBuilderById(builderId);
   };
 
   /**
@@ -73,7 +78,7 @@ class TriggerAutomationService {
    * @returns a boolean indicating whether conditions have passed or not
    */
   validateConditionBuilder = async (builderId: string): Promise<boolean> => {
-    const conditionBuilder = await this.automationPrismaAdapter.findAutomationConditionBuilderById(builderId);
+    const conditionBuilder = await this.triggerAutomationPrismaAdapter.findAutomationConditionBuilderById(builderId);
     const destructedData = await this.destructureBuilder(conditionBuilder as BuilderEntry);
     const validatedObjects = await this.validateConditions(destructedData, {});
 
@@ -169,7 +174,7 @@ class TriggerAutomationService {
     input: SetupQuestionCompareDataInput
   ): Promise<SetupQuestionCompareDataOutput | undefined> => {
     const { questionId, aspect, aggregate, operands } = input;
-    const scopedSliderNodeEntries = await this.automationPrismaAdapter.aggregateScopedSliderNodeEntries(
+    const scopedSliderNodeEntries = await this.triggerAutomationPrismaAdapter.aggregateScopedSliderNodeEntries(
       questionId,
       aspect,
       aggregate
@@ -197,7 +202,7 @@ class TriggerAutomationService {
   ): Promise<SetupQuestionCompareDataOutput | undefined> => {
     let compareValue: number | null = null;
     const { questionId, aspect, aggregate, operands } = input;
-    const scopedChoiceNodeEntries = await this.automationPrismaAdapter.aggregateScopedChoiceNodeEntries(
+    const scopedChoiceNodeEntries = await this.triggerAutomationPrismaAdapter.aggregateScopedChoiceNodeEntries(
       questionId,
       aspect,
       aggregate
@@ -369,7 +374,7 @@ class TriggerAutomationService {
   getCandidateTriggers = async (dialogueId: string) => {
     const questions = await this.dialogueService.getQuestionsByDialogueId(dialogueId);
     const questionIds = questions.map((question) => question.id).filter(isPresent);
-    const candidateAutomations = await this.automationPrismaAdapter.findCandidateAutomations(
+    const candidateAutomations = await this.triggerAutomationPrismaAdapter.findCandidateAutomations(
       dialogueId,
       questionIds
     );

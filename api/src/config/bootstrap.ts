@@ -61,9 +61,9 @@ export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOption
   const topicService = new TopicService(prisma);
   const issueService = new IssueService(prisma);
   const redisService = new RedisService(redis);
-  const organizationService = new OrganizationService(prisma);
   const scheduledAutomationService = new ScheduledAutomationService(prisma);
   const triggerAutomationService = new TriggerAutomationService(prisma);
+  const organizationService = new OrganizationService(prisma);
 
   return {
     triggerAutomationService,

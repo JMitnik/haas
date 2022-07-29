@@ -783,7 +783,7 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
-  AutomationActionChannelType: "EMAIL" | "SLACK" | "SMS"
+  AutomationActionChannelType: prisma.AutomationActionChannelType
   AutomationActionType: prisma.AutomationActionType
   AutomationConditionBuilderType: prisma.AutomationConditionBuilderType
   AutomationConditionOperatorType: prisma.AutomationConditionOperatorType
@@ -859,13 +859,7 @@ export interface NexusGenObjects {
     pageInfo?: NexusGenRootTypes['DeprecatedPaginationPageInfo'] | null; // DeprecatedPaginationPageInfo
     startDate?: string | null; // String
   }
-  AutomationActionChannel: { // root type
-    createdAt?: NexusGenScalars['Date'] | null; // Date
-    id?: string | null; // ID
-    payload?: NexusGenScalars['JSONObject'] | null; // JSONObject
-    type?: NexusGenEnums['AutomationActionChannelType'] | null; // AutomationActionChannelType
-    updatedAt?: NexusGenScalars['Date'] | null; // Date
-  }
+  AutomationActionChannel: prisma.AutomationActionChannel;
   AutomationActionModel: { // root type
     createdAt?: NexusGenScalars['Date'] | null; // Date
     id?: string | null; // ID

@@ -33,8 +33,6 @@ import ScheduledAutomationService from '../models/automations/ScheduledAutomatio
 import TriggerAutomationService from '../models/automations/TriggerAutomationService';
 
 export interface APIServiceContainer {
-  triggerAutomationService: TriggerAutomationService;
-  scheduledAutomationService: ScheduledAutomationService;
   automationActionService: AutomationActionService;
   organizationService: OrganizationService;
   issueService: IssueService;
@@ -62,6 +60,8 @@ export interface APIServiceContainer {
   redisService: RedisService;
   dialogueStatisticsService: DialogueStatisticsService;
   questionStatisticsService: QuestionStatisticsService;
+  triggerAutomationService: TriggerAutomationService;
+  scheduledAutomationService: ScheduledAutomationService;
 }
 
 export interface APIContext extends ExpressContext {

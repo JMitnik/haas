@@ -22,6 +22,7 @@ export const AutomationConditionBuilderModel = objectType({
       type: AutomationConditionBuilderModel,
       resolve(parent, args, ctx) {
         if (!parent.childConditionBuilderId) return null;
+        // Show up in merge
         return ctx.services.triggerAutomationService.findAutomationConditionBuilder(
           parent.childConditionBuilderId
         ) as any;
