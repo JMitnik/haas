@@ -16,6 +16,7 @@ export class AutomationPrismaAdapter {
   prisma: PrismaClient;
   scheduledAutomationPrismaAdapter: ScheduledAutomationPrismaAdapter;
   triggerAutomationPrismaAdapter: TriggerAutomationPrismaAdapter;
+
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
     this.scheduledAutomationPrismaAdapter = new ScheduledAutomationPrismaAdapter(prisma);
