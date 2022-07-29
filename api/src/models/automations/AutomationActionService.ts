@@ -12,6 +12,7 @@ import { mailService } from '../../services/mailings/MailService';
 import { AutomationPrismaAdapter } from './AutomationPrismaAdapter';
 import { CustomerPrismaAdapter } from '../../models/customer/CustomerPrismaAdapter';
 import UserPrismaAdapter from '../../models/users/UserPrismaAdapter';
+import { ScheduledAutomationPrismaAdapter } from './ScheduledAutomationPrismaAdapter';
 
 export class AutomationActionService {
   private prisma: PrismaClient;
@@ -20,6 +21,7 @@ export class AutomationActionService {
   automationPrismaAdapter: AutomationPrismaAdapter;
   customerPrismaAdapter: CustomerPrismaAdapter;
   userPrismaAdapter: UserPrismaAdapter;
+  scheduledAutomationPrismaAdapter: ScheduledAutomationPrismaAdapter;
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
@@ -28,6 +30,7 @@ export class AutomationActionService {
     this.automationPrismaAdapter = new AutomationPrismaAdapter(prisma);
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prisma);
     this.userPrismaAdapter = new UserPrismaAdapter(prisma);
+    this.scheduledAutomationPrismaAdapter = new ScheduledAutomationPrismaAdapter(prisma);
   }
 
   /**
@@ -78,7 +81,7 @@ export class AutomationActionService {
    * @returns 
    */
   findChannelsByActionId = (automationActionId: string) => {
-    return this.automationPrismaAdapter.findChannelsByAutomationActionId(automationActionId);
+    return this.scheduledAutomationPrismaAdapter.findChannelsByAutomationActionId(automationActionId);
   }
 
   /**

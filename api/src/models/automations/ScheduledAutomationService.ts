@@ -22,8 +22,10 @@ import {
   findReportQueryParamsByCron,
 } from './AutomationService.helpers';
 import { GraphQLYogaError } from '@graphql-yoga/node';
+import { ScheduledAutomationPrismaAdapter } from './ScheduledAutomationPrismaAdapter';
 
 class ScheduledAutomationService {
+  scheduledAutomationPrismaAdapter: ScheduledAutomationPrismaAdapter;
   automationPrismaAdapter: AutomationPrismaAdapter;
   dialogueService: DialogueService;
   userService: UserService;
@@ -35,6 +37,7 @@ class ScheduledAutomationService {
   iam: AWS.IAM;
 
   constructor(prisma: PrismaClient) {
+    this.scheduledAutomationPrismaAdapter = new ScheduledAutomationPrismaAdapter(prisma);
     this.automationPrismaAdapter = new AutomationPrismaAdapter(prisma);
     this.dialogueService = new DialogueService(prisma);
     this.automationActionService = new AutomationActionService(prisma);
@@ -53,7 +56,7 @@ class ScheduledAutomationService {
    * @returns An AutomationScheduled entry with all its actions and respective channels
    */
   findScheduledAutomationById = (scheduledAutomationId: string) => {
-    return this.automationPrismaAdapter.findScheduledAutomationById(scheduledAutomationId);
+    return this.scheduledAutomationPrismaAdapter.findScheduledAutomationById(scheduledAutomationId);
   }
 
   /**
