@@ -1,5 +1,7 @@
 import { plugin } from 'nexus';
 
+import { logger } from '../../logger';
+
 export const TimeResolverPlugin = plugin({
   name: 'TimeResolvePlugin',
   description: 'Measures the time it takes before the field is finished',
@@ -14,7 +16,7 @@ export const TimeResolverPlugin = plugin({
       const endTimeMs = new Date().valueOf()
 
       if (!isTest && useTimeResolve) {
-        console.log(`Operation ${info.operation.name?.value} took ${endTimeMs - startTimeMs} ms`);
+        logger.logMetric(`Operation ${info.operation.name?.value} took ${endTimeMs - startTimeMs} ms`);
       }
 
       return value;

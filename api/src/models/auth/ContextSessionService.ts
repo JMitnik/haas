@@ -1,7 +1,5 @@
-import { AuthenticationError } from 'apollo-server-express';
-import { FastifyContext } from 'apollo-server-fastify';
-import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 import jwt from 'jsonwebtoken';
+import { FastifyReply, FastifyRequest } from 'fastify';
 import { PrismaClient } from '@prisma/client';
 
 import { ContextSessionType } from './ContextSessionType';
@@ -10,14 +8,24 @@ import readBearerToken from './readBearerToken';
 import { fetchTunnelUrl } from '../../utils/fetchTunnelUrl';
 import CustomerService from '../customer/CustomerService';
 import UserService from '../users/UserService';
+import { logger } from '../../config/logger';
 import { GraphQLYogaError } from '@graphql-yoga/node';
+
+interface GraphQLBody {
+  variables?: any;
+}
+
+interface IncomingContext {
+  request: FastifyRequest<any>;
+  reply: FastifyReply;
+}
 
 class ContextSessionService {
   customerService: CustomerService;
   userService: UserService;
-  context: FastifyContext;
+  context: IncomingContext;
 
-  constructor(context: FastifyContext, prismaClient: PrismaClient) {
+  constructor(context: IncomingContext, prismaClient: PrismaClient) {
     this.customerService = new CustomerService(prismaClient);
     this.userService = new UserService(prismaClient);
     this.context = context;
@@ -28,8 +36,9 @@ class ContextSessionService {
    * @returns A workspace
    */
   getWorkSpaceFromReq = async () => {
-    const body = this.context.request.body as any
-    const vars = body.variables;
+    const body = this.context.request.body as GraphQLBody;
+    const vars = body?.variables;
+
     if (vars?.customerSlug || vars?.input?.customerSlug) {
       const customerSlug = vars?.customerSlug || vars?.input?.customerSlug;
       const customer = await this.customerService.findWorkspaceBySlug(customerSlug);
@@ -56,31 +65,29 @@ class ContextSessionService {
     // Support auth use-case if a token is supported using cookie (should be HTTP-only)
     const request = this.context.request as any;
     const cookieToken: string | null = request.cookies?.access_token;
-    // Support auth-use case if a token is submitted using a Bearer token
-    const authHeader = this.context.request.headers.authorization || '';
 
+    // Support auth-use case if a token is submitted using a Bearer token
+    const authHeader = this.context.request.headers.get('authorization') || '';
     const bearerToken = readBearerToken(authHeader);
 
     // Prefer cookie-token over bearer-token
     const authToken = cookieToken || bearerToken || null;
     if (!authToken) return null;
     let isValid = null;
+
     try {
       isValid = jwt.verify(authToken, config.jwtSecret);
     } catch (e) {
-      console.log('Error: ', e);
-      Promise.resolve(this.context.reply.cookie('access_token', ''))
-        .catch(() => { return });
-      throw new AuthenticationError('UNAUTHENTICATED');
+      logger.error('Error parsing JWT Token', e);
+      Promise.resolve(this.context.reply.cookie('access_token', '')).catch(() => { return });
+
       throw new GraphQLYogaError('UNAUTHENTICATED');
     }
 
     if (!isValid) return null;
 
-    const decodedUser = jwt.decode(authToken);
-    // @ts-ignore
+    const decodedUser = jwt.decode(authToken) as any;
     const decodedUserId = decodedUser?.id;
-    // @ts-ignore
     const decodedExpAt = decodedUser?.iat;
 
     if (!decodedUserId) return null;

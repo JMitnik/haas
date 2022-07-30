@@ -1,4 +1,7 @@
 import { plugin } from 'nexus';
+
+import { logger } from '../../logger';
+
 declare global {
   namespace NodeJS {
     interface Global { }
@@ -29,9 +32,9 @@ export const QueryCounterPlugin = plugin({
       global.nrQueries = 0;
       if (!isTest && useQueryCounter && global && global.nrQueries !== undefined) {
         if (test.parentTypeConfig.name === 'Mutation') {
-          console.log(`Nr Queries ran for operation ${info.operation.name?.value} : ${nrQueriesEnd - nrQueriesStart}`);
+          logger.logMetric(`Nr Queries ran for operation ${info.operation.name?.value} : ${nrQueriesEnd - nrQueriesStart}`);
         } else {
-          console.log(`Nr Queries ran for field ${info.fieldName} : ${nrQueriesEnd - nrQueriesStart}`);
+          logger.logMetric(`Nr Queries ran for field ${info.fieldName} : ${nrQueriesEnd - nrQueriesStart}`);
         }
       }
 

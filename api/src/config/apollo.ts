@@ -2,13 +2,10 @@ import { applyMiddleware } from 'graphql-middleware';
 import { GraphQLError } from 'graphql';
 import { PrismaClient } from '@prisma/client';
 import { UserInputError } from 'apollo-server-fastify';
-import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 import { ApolloServerPlugin } from 'apollo-server-plugin-base';
 import { FastifyInstance } from 'fastify';
 import { createServer } from '@graphql-yoga/node'
 import { useSentry } from '@envelop/sentry';
-import { useParserCache } from '@envelop/parser-cache';
-import { useValidationCache } from '@envelop/validation-cache';
 import { useGraphQlJit } from '@envelop/graphql-jit';
 
 import { APIContext } from '../types/APIContext';
@@ -64,7 +61,7 @@ const handleError = (ctx: any, error: GraphQLError) => {
 }
 
 const SentryPlugin: ApolloServerPlugin = {
-  async requestDidStart(requestContext) {
+  async requestDidStart() {
     return {
       async didEncounterErrors(ctx) {
         if (!ctx.operation) return;
@@ -82,38 +79,20 @@ export const makeApollo = async (prisma: PrismaClient, app: FastifyInstance) => 
     cors: true,
     logging: true,
     maskedErrors: false,
-    // uploads: false,
     schema: applyMiddleware(schema, authShield),
     context: async (ctx: any): Promise<APIContext> => ({
+      ...ctx,
       req: ctx.request,
       res: ctx.reply,
-      ...ctx,
       session: await new ContextSessionService(ctx, prisma).constructContextSession(),
       prisma,
       services: bootstrapServices(prisma),
     }),
     plugins: process.env.NODE_ENV === 'test' ? [] : [
-      ApolloServerPluginDrainHttpServer({ httpServer: app.server }),
       SentryPlugin,
       fastifyAppClosePlugin(app),
       useGraphQlJit(),
-      useValidationCache(),
-      useParserCache(),
       useSentry(),
-      // useResponseCache({
-      //   includeExtensionMetadata: true,
-      //   idFields: [
-      //     'id',
-      //     'userId',
-      //     'customerId',
-      //     'roleId',
-      //     'questionId',
-      //     'dialogueId',
-      //   ],
-      // }),
-      // useApolloServerErrors({
-      //   debug: true,
-      // }),
     ],
   });
 
