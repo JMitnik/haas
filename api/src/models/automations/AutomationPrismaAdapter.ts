@@ -10,14 +10,17 @@ import {
   CreateAutomationInput,
 } from './AutomationTypes';
 import { ScheduledAutomationPrismaAdapter } from './ScheduledAutomationPrismaAdapter';
+import { TriggerAutomationPrismaAdapter } from './TriggerAutomationPrismaAdapter';
 
 export class AutomationPrismaAdapter {
   prisma: PrismaClient;
   scheduledAutomationPrismaAdapter: ScheduledAutomationPrismaAdapter;
+  triggerAutomationPrismaAdapter: TriggerAutomationPrismaAdapter;
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
     this.scheduledAutomationPrismaAdapter = new ScheduledAutomationPrismaAdapter(prisma);
+    this.triggerAutomationPrismaAdapter = new TriggerAutomationPrismaAdapter(prisma);
   }
 
   /**
@@ -343,9 +346,9 @@ export class AutomationPrismaAdapter {
   updateAutomation = async (input: UpdateAutomationInput) => {
     const { description, label, automationType } = input;
     const automation = await this.findAutomationById(input.id);
-    // const automationTriggerUpdateArgs = automationType === AutomationType.TRIGGER
-    //   ? await this.triggerAutomationPrismaAdapter.buildUpdateAutomationTriggerData(input)
-    //   : undefined;
+    const automationTriggerUpdateArgs = automationType === AutomationType.TRIGGER
+      ? await this.triggerAutomationPrismaAdapter.buildUpdateAutomationTriggerData(input)
+      : undefined;
 
     const automationScheduledUpdateArgs = automationType === AutomationType.SCHEDULED
       ? this.scheduledAutomationPrismaAdapter.buildUpdateAutomationScheduledData(input)
@@ -360,12 +363,12 @@ export class AutomationPrismaAdapter {
         type: automationType,
         description,
         // TODO: Upgrade this when campaignAutomation is introduced (delete other automation entry on swap)
-        // automationTrigger: automationTriggerUpdateArgs && automation ? {
-        //   upsert: {
-        //     create: this.triggerAutomationPrismaAdapter.buildCreateAutomationTriggerData(input),
-        //     update: automationTriggerUpdateArgs,
-        //   },
-        // } : undefined,
+        automationTrigger: automationTriggerUpdateArgs && automation ? {
+          upsert: {
+            create: this.triggerAutomationPrismaAdapter.buildCreateAutomationTriggerData(input),
+            update: automationTriggerUpdateArgs,
+          },
+        } : undefined,
         automationScheduled: automationScheduledUpdateArgs && automation ? {
           upsert: {
             create: this.scheduledAutomationPrismaAdapter.buildCreateAutomationScheduleData(
@@ -397,9 +400,9 @@ export class AutomationPrismaAdapter {
         label: label,
         type: automationType,
         description,
-        // automationTrigger: automationType === AutomationType.TRIGGER ? {
-        //   create: this.triggerAutomationPrismaAdapter.buildCreateAutomationTriggerData(input),
-        // } : undefined,
+        automationTrigger: automationType === AutomationType.TRIGGER ? {
+          create: this.triggerAutomationPrismaAdapter.buildCreateAutomationTriggerData(input),
+        } : undefined,
         automationScheduled: automationType === AutomationType.SCHEDULED ? {
           create: this.scheduledAutomationPrismaAdapter.buildCreateAutomationScheduleData(input),
         } : undefined,

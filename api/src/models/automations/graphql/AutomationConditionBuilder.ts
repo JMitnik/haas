@@ -18,14 +18,15 @@ export const AutomationConditionBuilderModel = objectType({
       type: AutomationConditionModel,
     });
 
-    // t.field('childConditionBuilder', {
-    //   type: AutomationConditionBuilderModel,
-    //   resolve(parent, args, ctx) {
-    //     if (!parent.childConditionBuilderId) return null;
-    //     return ctx.services.triggerAutomationService.findAutomationConditionBuilder(
-    //       parent.childConditionBuilderId
-    //     ) as any;
-    //   },
-    // });
+    t.field('childConditionBuilder', {
+      type: AutomationConditionBuilderModel,
+      resolve(parent, args, ctx) {
+        if (!parent.childConditionBuilderId) return null;
+        // Show up in merge
+        return ctx.services.triggerAutomationService.findAutomationConditionBuilder(
+          parent.childConditionBuilderId
+        ) as any;
+      },
+    });
   },
 });

@@ -109,6 +109,7 @@ input AutomationConditionBuilderInput {
 
 """AutomationConditionBuilder"""
 type AutomationConditionBuilderModel {
+  childConditionBuilder: AutomationConditionBuilderModel
   childConditionBuilderId: String
   conditions: [AutomationConditionModel]
   id: ID

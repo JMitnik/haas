@@ -1469,6 +1469,7 @@ export interface NexusGenFieldTypes {
     updatedAt: NexusGenScalars['Date'] | null; // Date
   }
   AutomationConditionBuilderModel: { // field return type
+    childConditionBuilder: NexusGenRootTypes['AutomationConditionBuilderModel'] | null; // AutomationConditionBuilderModel
     childConditionBuilderId: string | null; // String
     conditions: Array<NexusGenRootTypes['AutomationConditionModel'] | null> | null; // [AutomationConditionModel]
     id: string | null; // ID
@@ -2359,6 +2360,7 @@ export interface NexusGenFieldTypeNames {
     updatedAt: 'Date'
   }
   AutomationConditionBuilderModel: { // field return type name
+    childConditionBuilder: 'AutomationConditionBuilderModel'
     childConditionBuilderId: 'String'
     conditions: 'AutomationConditionModel'
     id: 'ID'

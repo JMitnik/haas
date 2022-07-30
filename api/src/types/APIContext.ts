@@ -30,9 +30,9 @@ import TemplateService from '../models/templates/TemplateService';
 import { AutomationActionService } from '../models/automations/AutomationActionService';
 import { IssueService } from '../models/Issue/IssueService';
 import ScheduledAutomationService from '../models/automations/ScheduledAutomationService';
+import TriggerAutomationService from '../models/automations/TriggerAutomationService';
 
 export interface APIServiceContainer {
-  scheduledAutomationService: ScheduledAutomationService;
   automationActionService: AutomationActionService;
   organizationService: OrganizationService;
   issueService: IssueService;
@@ -60,6 +60,8 @@ export interface APIServiceContainer {
   redisService: RedisService;
   dialogueStatisticsService: DialogueStatisticsService;
   questionStatisticsService: QuestionStatisticsService;
+  triggerAutomationService: TriggerAutomationService;
+  scheduledAutomationService: ScheduledAutomationService;
 }
 
 export interface APIContext extends ExpressContext {
