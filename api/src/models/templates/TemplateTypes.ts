@@ -43,7 +43,7 @@ export const defaultSportTextFieldForm: NexusGenInputs['FormNodeInputType'] = {
     {
       type: 'email',
       isRequired: true,
-      label: 'Leave your email and a senior leader will contact you ⇣',
+      label: 'Leave your email address and a senior leader will contact you ⇣',
     },
   ],
 }
@@ -53,7 +53,7 @@ export const defaultBusinessTextFieldForm: NexusGenInputs['FormNodeInputType'] =
     {
       type: 'email',
       isRequired: true,
-      label: 'Leave your email and a senior leader will contact you ⇣',
+      label: 'Leave your email address and a senior leader will contact you ⇣',
     },
   ],
 }
