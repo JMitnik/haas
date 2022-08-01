@@ -28,7 +28,7 @@ const argv = yargs
     default: 10,
   })
   .help()
-  .alias('help', 'h').argv;
+  .alias('help', 'h').argv as any;
 
 export const generateArtilleryUsersPayload = async () => {
   const minutesInAMonth = 43000;
@@ -48,7 +48,7 @@ export const generateArtilleryUsersPayload = async () => {
     refresh: string | null;
     workspace: string;
   }[] = [];
-  // Not enough active users found, generate new ones 
+  // Not enough active users found, generate new ones
   if (slicedUsers.length < argv.amount && argv._.includes('generate')) {
     const amtAdditionalUsers = argv.amount - slicedUsers.length;
     const existingWorkspaceIds = slicedUsers.map((user) => user.customerId).filter(isPresent);

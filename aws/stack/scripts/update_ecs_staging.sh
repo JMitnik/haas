@@ -1,3 +1,5 @@
+set -e
+
 read -p "This will build an image from your LOCAL environment, push it to ECR, and update the ECS cluster. Are you sure you wish to continue? (yes/no) "
 if [ "$REPLY" != "yes" ]; then
   echo "Understandable, have a good day."
