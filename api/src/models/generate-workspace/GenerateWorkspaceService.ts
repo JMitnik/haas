@@ -249,6 +249,20 @@ class GenerateWorkspaceService {
 
       void this.userService.sendInvitationMail(invitedUser);
     };
+  };
+
+  /**
+   * Creates a bot user for a workspace
+   * @param workspace 
+   */
+  private async createBotUser(workspace: Workspace) {
+    const botUser = await this.userService.upsertUserByEmail({
+      email: `${workspace.slug}@haas.live`,
+      firstName: workspace.slug,
+      lastName: 'Bot',
+    });
+    const botRole = workspace.roles.find((role) => role.type === RoleTypeEnum.BOT) as Role;
+    await this.userOfCustomerPrismaAdapter.upsertUserOfCustomer(workspace.id, botUser.id, botRole.id);
   }
 
   /**
@@ -293,6 +307,12 @@ class GenerateWorkspaceService {
       }
 
       if (managerCsv) await this.addManagersFromCSV(managerCsv, workspace);
+
+      try {
+        await this.createBotUser(workspace);
+      } catch (error) {
+        throw new ApolloError('Something went wrong creating bot account.');
+      }
 
       return workspace;
     } catch {
