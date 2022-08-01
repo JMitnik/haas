@@ -58,7 +58,7 @@ test('render form and validate state of create button', async () => {
   const addTargetButton = await screen.findByText('Add target');
   userEvent.click(addTargetButton);
 
-  const userPickerEntry = await screen.findByText(/Daan Helsloot*/i);
+  const userPickerEntry = await screen.findByText(/ADMIN User*/i);
   userEvent.click(userPickerEntry);
 
   // Verify that the create button is enabled now

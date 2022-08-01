@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, RoleTypeEnum } from '@prisma/client';
 import cuid from 'cuid';
 import * as yargs from 'yargs';
 
@@ -6,12 +6,15 @@ import { CustomerPrismaAdapter } from '../models/customer/CustomerPrismaAdapter'
 import UserService from '../models/users/UserService';
 import GenerateWorkspaceService from '../models/generate-workspace/GenerateWorkspaceService';
 import { DialogueTemplateType } from '../models/QuestionNode/NodeServiceType';
+import { Workspace } from '../models/generate-workspace/GenerateWorkspace.types';
+import UserOfCustomerPrismaAdapter from '../models/users/UserOfCustomerPrismaAdapter';
 
 const prisma = new PrismaClient();
 
 const generateWorkspaceService = new GenerateWorkspaceService(prisma);
 const customerPrismaAdapter = new CustomerPrismaAdapter(prisma);
 const userService = new UserService(prisma);
+const userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prisma);
 
 const argv = yargs
   .option('email', {
@@ -48,6 +51,21 @@ const argv = yargs
   .help()
   .alias('help', 'h').argv;
 
+const addUser = async (workspaceWithRoles: Workspace, type: RoleTypeEnum) => {
+  const role = workspaceWithRoles.roles.find((role) => role.type === type);
+  const user = await userService.upsertUserByEmail({
+    email: `${workspaceWithRoles.slug}-${type.toLowerCase()}`,
+    firstName: type,
+    lastName: 'User',
+  });
+
+  await userOfCustomerPrismaAdapter.connectUserToWorkspace(
+    workspaceWithRoles.id,
+    role?.id as string,
+    user.id as string
+  );
+}
+
 export const seedBusinessTemplate = async () => {
   const amtSessions = argv.sessions;
   const ownEmail = argv.email;
@@ -71,6 +89,10 @@ export const seedBusinessTemplate = async () => {
     logo: '',
     slug: `${templateType.toLowerCase()}-${cuid.slug()}`,
   }, template);
+
+  await addUser(workspace, RoleTypeEnum.ADMIN);
+  await addUser(workspace, RoleTypeEnum.MANAGER);
+  await addUser(workspace, RoleTypeEnum.USER);
 
   return generateWorkspaceService.generateDemoData(templateType, workspace, user.id, amtSessions, generateData);
 };
