@@ -49,7 +49,7 @@ const argv = yargs
     default: 1,
   })
   .help()
-  .alias('help', 'h').argv;
+  .alias('help', 'h').argv as any;
 
 export const seedBusinessTemplate = async () => {
   const amtSessions = argv.sessions;
