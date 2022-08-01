@@ -1,5 +1,5 @@
 import { extendType, inputObjectType, objectType } from 'nexus';
-import { UserInputError } from 'apollo-server';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 import { CampaignVariantModel } from './CampaignVariantModel';
 import { DeliveryConnectionModel } from './DeliveryConnectionModel';
@@ -53,7 +53,7 @@ export const GetCampaignOfWorkspace = extendType({
       args: { campaignId: 'String' },
       nullable: true,
       resolve: async (parent, args, ctx) => {
-        if (!args.campaignId) throw new UserInputError('Missing campaign id');
+        if (!args.campaignId) throw new GraphQLYogaError('Missing campaign id');
 
         const workspaceWithCampaign = await ctx.services.campaignService.findCampaign(args.campaignId);
 

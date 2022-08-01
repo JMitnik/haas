@@ -1,7 +1,7 @@
 import { addDays, differenceInHours, subDays } from 'date-fns';
 import _, { clone, groupBy, maxBy, meanBy, orderBy, sample, uniq } from 'lodash';
 import cuid from 'cuid';
-import { ApolloError, UserInputError } from 'apollo-server-express';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 import { isPresent } from 'ts-is-present';
 import { Prisma, Dialogue, LanguageEnum, NodeType, PostLeafNode, Tag, PrismaClient, Edge, NodeEntry, SliderNodeEntry, ChoiceNodeEntry, DialogueImpactScore, Session } from '@prisma/client';
 
@@ -1172,7 +1172,7 @@ class DialogueService {
     } catch (error) {
       // @ts-ignore
       if (error.code === 'P2002') {
-        throw new UserInputError('dialogue:existing_slug');
+        throw new GraphQLYogaError('dialogue:existing_slug');
       }
 
       return null;
@@ -1401,7 +1401,7 @@ class DialogueService {
       input.language,
     );
 
-    if (!dialogue) throw new ApolloError('customer:unable_to_create');
+    if (!dialogue) throw new GraphQLYogaError('customer:unable_to_create');
 
     // TODO: "Include "
     void this.dialoguePrismaAdapter.update(dialogue.id, {

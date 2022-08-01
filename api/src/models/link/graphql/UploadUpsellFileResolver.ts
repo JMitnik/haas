@@ -1,5 +1,5 @@
 import { inputObjectType, mutationField } from 'nexus';
-import { UserInputError } from 'apollo-server-express';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 import { ImageType } from '../../customer';
 
 export const UploadSellImageInputType = inputObjectType({
@@ -21,7 +21,7 @@ export const UploadSellImageResolver = mutationField('uploadUpsellImage', {
     const waitedFile = await args.input?.file;
     const readyFile = waitedFile.file;
 
-    if (!args?.input?.workspaceId) throw new UserInputError('No workspace ID provided, cannot upload file');
+    if (!args?.input?.workspaceId) throw new GraphQLYogaError('No workspace ID provided, cannot upload file');
     const uploadImage = await ctx.services.linkService.uploadImage(readyFile);
     return uploadImage;
   },

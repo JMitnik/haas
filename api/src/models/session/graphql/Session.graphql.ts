@@ -1,5 +1,5 @@
 import { extendType, inputObjectType, mutationField, objectType } from 'nexus';
-import { UserInputError } from 'apollo-server-express';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 import { FormNodeEntryType, NodeEntryDataInput, NodeEntryInput, NodeEntryType } from '../../node-entry/NodeEntry';
 import { ConnectionInterface } from '../../general/Pagination';
@@ -137,7 +137,7 @@ export const SessionQuery = extendType({
       nullable: true,
 
       async resolve(parent, args, ctx) {
-        if (!args?.id) throw new UserInputError('No id provided as input');
+        if (!args?.id) throw new GraphQLYogaError('No id provided as input');
         return ctx.services.sessionService.findSessionById(args.id);
       },
     });
@@ -199,8 +199,8 @@ export const AppendToInteractionMutation = mutationField('appendToInteraction', 
   args: { input: AppendToInteractionInput },
 
   async resolve(parent, args, ctx) {
-    if (!args?.input) throw new UserInputError('No valid new interaction data provided');
-    if (!args?.input.sessionId) throw new UserInputError('No valid existing interaction found');
+    if (!args?.input) throw new GraphQLYogaError('No valid new interaction data provided');
+    if (!args?.input.sessionId) throw new GraphQLYogaError('No valid existing interaction found');
 
     const updatedInteraction = await ctx.services.nodeEntryService.createNodeEntry(args.input.sessionId, args.input);
 

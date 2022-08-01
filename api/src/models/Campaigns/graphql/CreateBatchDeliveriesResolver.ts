@@ -1,4 +1,4 @@
-import { UserInputError } from 'apollo-server';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 import { inputObjectType, mutationField, objectType } from 'nexus';
 
 import { parseCsv } from '../../../utils/parseCsv';
@@ -34,10 +34,10 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
   args: { input: CreateBatchDeliveriesInputType },
 
   async resolve(parent, args, ctx) {
-    if (!args.input) throw new UserInputError('Empty input!');
-    if (!args.input.uploadedCsv) throw new UserInputError('No CSV uploaded!');
-    if (!args.input.campaignId) throw new UserInputError('No related campaign provided!');
-    if (!args.input.batchScheduledAt) throw new UserInputError('No scheduled date provided!');
+    if (!args.input) throw new GraphQLYogaError('Empty input!');
+    if (!args.input.uploadedCsv) throw new GraphQLYogaError('No CSV uploaded!');
+    if (!args.input.campaignId) throw new GraphQLYogaError('No related campaign provided!');
+    if (!args.input.batchScheduledAt) throw new GraphQLYogaError('No scheduled date provided!');
 
     const callbackUrl = `${ctx.session?.baseUrl}/webhooks/delivery`;
     const records = await parseCsv(await args.input.uploadedCsv);

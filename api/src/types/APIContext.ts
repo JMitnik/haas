@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client';
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { FastifyContext } from 'apollo-server-fastify'
 import { RouteGenericInterface } from 'fastify/types/route';
 
 
@@ -61,7 +60,7 @@ export interface APIServiceContainer {
   questionStatisticsService: QuestionStatisticsService;
 }
 
-export interface APIContext extends FastifyContext {
+export interface APIContext {
   req: FastifyRequest<RouteGenericInterface, any, any, unknown>;
   res: FastifyReply<any, any, any, RouteGenericInterface, unknown>;
   prisma: PrismaClient;

@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { ApolloError } from 'apollo-server';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 import { clearDatabase } from './testUtils';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
@@ -106,7 +106,7 @@ describe('SessionResolver', () => {
     }));
   });
 
-  test('user has no permissions to access interactions', async () => {
+  test.only('user has no permissions to access interactions', async () => {
     const { workspace, dialogue } = await prepEnvironment(prisma);
     const { user } = await seedUser(prisma, workspace.id, {
       name: 'Guest',
@@ -115,7 +115,7 @@ describe('SessionResolver', () => {
     const token = AuthService.createUserToken(user.id, 22);
 
     try {
-      await ctx.client.request(getSessionConnectionQuery,
+      const res = await ctx.client.request(getSessionConnectionQuery,
         {
           customerSlug: workspace.slug,
           dialogueSlug: dialogue.slug,
@@ -124,8 +124,12 @@ describe('SessionResolver', () => {
           'Authorization': `Bearer ${token}`,
         }
       );
+
+      console.log(res);
     } catch (error) {
-      if (error instanceof ApolloError) {
+      console.log(error);
+      if (error instanceof GraphQLYogaError) {
+        console.log(error);
         expect(error.response.errors).toHaveLength(1);
         expectUnauthorizedErrorOnResolver(error.response.errors[0], 'sessionConnection');
       }

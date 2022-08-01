@@ -1,11 +1,11 @@
 import { NexusGenInputs } from '../../generated/nexus';
 import { DateValidator } from '../Common/Validators/DateValidator';
-import { MissingFieldError } from '../Common/Errors/MissingFieldError';
 import { IssueFilterInput } from './Issue.types';
+import { UserInputError } from '../Common/Errors/UserInputError';
 
 export const IssueValidator = {
   resolveFilter: (filter?: NexusGenInputs['IssueFilterInput'] | null): IssueFilterInput => {
-    if (!filter) throw new MissingFieldError('Filter is required.');
+    if (!filter) throw new UserInputError('Filter is required.');
 
     return {
       ...filter,

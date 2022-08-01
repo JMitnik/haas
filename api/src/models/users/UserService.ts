@@ -1,5 +1,5 @@
 import { UserOfCustomer, PrismaClient, Customer, Prisma, User, CustomerSettings } from '@prisma/client';
-import { UserInputError } from 'apollo-server';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 import _ from 'lodash';
 
 import { mailService } from '../../services/mailings/MailService';
@@ -125,9 +125,9 @@ class UserService {
   ) {
     const emailExists = await this.userPrismaAdapter.emailExists(email, userId);
 
-    if (emailExists) throw new UserInputError('Email is already taken');
+    if (emailExists) throw new GraphQLYogaError('Email is already taken');
 
-    if (!email) throw new UserInputError('No valid email provided');
+    if (!email) throw new GraphQLYogaError('No valid email provided');
 
     if (customerId) {
       await this.userOfCustomerPrismaAdapter.updateWorkspaceUserRole(userId, customerId, roleId);

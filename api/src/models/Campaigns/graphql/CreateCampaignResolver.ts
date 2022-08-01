@@ -1,4 +1,4 @@
-import { UserInputError } from 'apollo-server';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 import { inputObjectType, mutationField } from 'nexus';
 
 import { CampaignModel } from './CampaignModel';
@@ -44,7 +44,7 @@ export const CreateCampaignResolver = mutationField('createCampaign', {
   args: { input: CreateCampaignInputType },
 
   async resolve(parent, args, ctx) {
-    if (!args.input) throw new UserInputError('Empty input!');
+    if (!args.input) throw new GraphQLYogaError('Empty input!');
     const campaign = await ctx.services.campaignService.createCampaign(args.input);
 
     return {

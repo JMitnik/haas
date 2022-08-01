@@ -1,21 +1,22 @@
 import { applyMiddleware } from 'graphql-middleware';
 import { GraphQLError } from 'graphql';
 import { PrismaClient } from '@prisma/client';
-import { UserInputError } from 'apollo-server-fastify';
-import { ApolloServerPlugin } from 'apollo-server-plugin-base';
 import { FastifyInstance } from 'fastify';
 import { createServer } from '@graphql-yoga/node'
 import { useSentry } from '@envelop/sentry';
 import { useGraphQlJit } from '@envelop/graphql-jit';
 
 import { APIContext } from '../types/APIContext';
+import { UserInputError } from '../models/Common/Errors/UserInputError';
 import Sentry from './sentry';
 import authShield from './auth';
 import ContextSessionService from '../models/auth/ContextSessionService';
 import schema from './schema';
 import { bootstrapServices } from './bootstrap';
+import { UnauthenticatedError } from '../models/Common/Errors/UnauthenticatedError';
+import { UnauthorizedError } from '../models/Common/Errors/UnauthorizedError';
 
-function fastifyAppClosePlugin(app: FastifyInstance): ApolloServerPlugin {
+function fastifyAppClosePlugin(app: FastifyInstance): any {
   return {
     async serverWillStart() {
       return {
@@ -28,8 +29,12 @@ function fastifyAppClosePlugin(app: FastifyInstance): ApolloServerPlugin {
 }
 
 const handleError = (ctx: any, error: GraphQLError) => {
-  // Filter out user-input-errors (not interesting)
-  if (error.originalError instanceof UserInputError) {
+  // Filter out certain client-facing errors (not interesting)
+  if (
+    error.originalError instanceof UserInputError
+    || error.originalError instanceof UnauthenticatedError
+    || error.originalError instanceof UnauthorizedError
+  ) {
     return;
   }
 
@@ -60,13 +65,13 @@ const handleError = (ctx: any, error: GraphQLError) => {
   });
 }
 
-const SentryPlugin: ApolloServerPlugin = {
+const SentryPlugin: any = {
   async requestDidStart() {
     return {
-      async didEncounterErrors(ctx) {
+      async didEncounterErrors(ctx: any) {
         if (!ctx.operation) return;
 
-        ctx.errors.forEach((error) => {
+        ctx.errors.forEach((error: any) => {
           handleError(ctx, error);
         });
       },

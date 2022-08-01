@@ -1,5 +1,5 @@
 import { queryField, objectType } from 'nexus';
-import { UserInputError } from 'apollo-server';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 import { CampaignVariantModel } from './CampaignVariantModel';
 import { DeliveryStatusEnum } from './DeliveryStatusEnum';
@@ -52,7 +52,7 @@ export const GetDelivery = queryField('delivery', {
   nullable: true,
   args: { deliveryId: 'String' },
   resolve: (parent, args, ctx, info) => {
-    if (!args.deliveryId) throw new UserInputError('You forgot the delivery id');
+    if (!args.deliveryId) throw new GraphQLYogaError('You forgot the delivery id');
     return ctx.services.campaignService.findDelivery(args.deliveryId);
   },
 });

@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import { UserInputError } from 'apollo-server-express';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 import prisma from '../../config/prisma';
 import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
@@ -113,7 +113,7 @@ export class CampaignService {
 
     // Since approximation, let's do it like this
     if (totalWeight !== 100) {
-      throw new UserInputError('Weights do not sum up to 100%');
+      throw new GraphQLYogaError('Weights do not sum up to 100%');
     }
   }
 
@@ -219,7 +219,7 @@ export class CampaignService {
     callbackUrl: string
   ): Promise<NexusGenFieldTypes['CreateBatchDeliveriesOutputType']> => {
     const campaign = await this.findCampaign(campaignId);
-    if (!campaign) throw new UserInputError('Related campaign does not exist');
+    if (!campaign) throw new GraphQLYogaError('Related campaign does not exist');
 
     // Pick out correct rows, and preprocess them in the corresponding format.
     const { successRecords, erroredRecords } = this.validateDeliveryRows(

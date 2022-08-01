@@ -1,6 +1,6 @@
 import { inputObjectType, mutationField } from "nexus";
 import { NodeType } from "@prisma/client";
-import { UserInputError } from "apollo-server";
+import { GraphQLYogaError } from '@graphql-yoga/node';
 import { NexusGenInputs } from "../../generated/nexus";
 
 import { EdgeConditionInputType, OptionsInputType, QuestionNodeType, SliderNodeInputType } from "./QuestionNode";
@@ -28,9 +28,9 @@ export const UpdateQuestionNodeInputType = inputObjectType({
 });
 
 export const validateUpdateQuestion = (input: NexusGenInputs['UpdateQuestionNodeInputType'] | undefined | null) => {
-  if (!input?.id) throw new UserInputError('No ID provided');
-  if (!input?.title) throw new UserInputError('No title provided');
-  if (!input?.type) throw new UserInputError('Type is invalid or not given');
+  if (!input?.id) throw new GraphQLYogaError('No ID provided');
+  if (!input?.title) throw new GraphQLYogaError('No title provided');
+  if (!input?.type) throw new GraphQLYogaError('Type is invalid or not given');
 };
 
 export const UpdateQuestionNode = mutationField('updateQuestion', {
@@ -38,7 +38,7 @@ export const UpdateQuestionNode = mutationField('updateQuestion', {
   args: { input: UpdateQuestionNodeInputType },
 
   resolve(parent, args, ctx) {
-    if (!args?.input) throw new UserInputError('No input provided');
+    if (!args?.input) throw new GraphQLYogaError('No input provided');
     validateUpdateQuestion(args.input);
 
     return ctx.services.nodeService.updateQuestionFromBuilder(

@@ -9,14 +9,14 @@ import { fetchTunnelUrl } from '../../utils/fetchTunnelUrl';
 import CustomerService from '../customer/CustomerService';
 import UserService from '../users/UserService';
 import { logger } from '../../config/logger';
-import { GraphQLYogaError } from '@graphql-yoga/node';
+import { UnauthenticatedError } from '../Common/Errors/UnauthenticatedError';
 
 interface GraphQLBody {
   variables?: any;
 }
 
 interface IncomingContext {
-  request: FastifyRequest<any>;
+  req: FastifyRequest<any>;
   reply: FastifyReply;
 }
 
@@ -36,7 +36,7 @@ class ContextSessionService {
    * @returns A workspace
    */
   getWorkSpaceFromReq = async () => {
-    const body = this.context.request.body as GraphQLBody;
+    const body = this.context.req.body as GraphQLBody;
     const vars = body?.variables;
 
     if (vars?.customerSlug || vars?.input?.customerSlug) {
@@ -63,11 +63,11 @@ class ContextSessionService {
    */
   constructContextSession = async (): Promise<ContextSessionType | null> => {
     // Support auth use-case if a token is supported using cookie (should be HTTP-only)
-    const request = this.context.request as any;
+    const request = this.context.req as any;
     const cookieToken: string | null = request.cookies?.access_token;
 
     // Support auth-use case if a token is submitted using a Bearer token
-    const authHeader = this.context.request.headers.get('authorization') || '';
+    const authHeader = this.context.req.headers['authorization'];
     const bearerToken = readBearerToken(authHeader);
 
     // Prefer cookie-token over bearer-token
@@ -81,7 +81,7 @@ class ContextSessionService {
       logger.error('Error parsing JWT Token', e);
       Promise.resolve(this.context.reply.cookie('access_token', '')).catch(() => { return });
 
-      throw new GraphQLYogaError('UNAUTHENTICATED');
+      throw new UnauthenticatedError();
     }
 
     if (!isValid) return null;

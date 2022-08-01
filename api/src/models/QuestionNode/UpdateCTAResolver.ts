@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { UserInputError } from 'apollo-server-express';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 import { inputObjectType, mutationField } from 'nexus';
 
 import { CTALinksInputType } from '../link/Link';
@@ -25,7 +25,7 @@ export const UpdateCTAResolver = mutationField('updateCTA', {
   args: { input: UpdateCTAInputType },
 
   async resolve(parent, args, ctx) {
-    if (!args.input?.id) throw new UserInputError('No ID Found');
+    if (!args.input?.id) throw new GraphQLYogaError('No ID Found');
     return ctx.services.nodeService.updateCTA(args.input);
   }
 });

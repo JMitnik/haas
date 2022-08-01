@@ -10,7 +10,7 @@ import {
   AutomationConditionBuilderType,
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
-import { UserInputError } from 'apollo-server-express';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 
 import { offsetPaginate } from '../general/PaginationHelpers';
@@ -66,8 +66,8 @@ class AutomationService {
 
   /**
    * Restructures conditions in builder (and its nested builders) in a format more easily looped over when validating conditions
-   * e.g. 
-   * { 
+   * e.g.
+   * {
    *  AND: [
    *    condition1,
    *    {
@@ -456,37 +456,37 @@ class AutomationService {
    * Validates the condition scope input object provided by checking the existence of fields which could be potentially be undefined or null
    * @param condition input object for an AutomationConditionScope
    * @returns a validated AutomationConditionScope input object where it is sure specific fields exist
-   * @throws UserInputError if not all information is required
+   * @throws GraphQLYogaError if not all information is required
    */
   validateCreateAutomationConditionScopeInput = (condition: NexusGenInputs['CreateAutomationCondition']): Required<NexusGenInputs['CreateAutomationCondition']> => {
-    if (!condition.scope) throw new UserInputError('One of the automation conditions has no scope object provided!');
+    if (!condition.scope) throw new GraphQLYogaError('One of the automation conditions has no scope object provided!');
     const { type, dialogueScope, workspaceScope, questionScope } = condition.scope;
-    if (!type) throw new UserInputError('One of the automation conditions has no scope type provided!');
+    if (!type) throw new GraphQLYogaError('One of the automation conditions has no scope type provided!');
 
     switch (condition.scope.type) {
       case AutomationConditionScopeType.QUESTION: {
         if (!questionScope?.aspect) {
-          throw new UserInputError('Condition scope is question but no aspect is provided!');
+          throw new GraphQLYogaError('Condition scope is question but no aspect is provided!');
         }
         if (!questionScope?.aggregate?.type) {
-          throw new UserInputError('Condition scope is question but no aggregate type is provided!');
+          throw new GraphQLYogaError('Condition scope is question but no aggregate type is provided!');
         }
 
         break;
       }
 
       case AutomationConditionScopeType.DIALOGUE: {
-        if (!dialogueScope?.aspect) throw new UserInputError('Condition scope is dialogue but no aspect is provided!');
+        if (!dialogueScope?.aspect) throw new GraphQLYogaError('Condition scope is dialogue but no aspect is provided!');
 
-        if (!dialogueScope?.aggregate?.type) throw new UserInputError('Condition scope is dialogue but no aggregate type is provided!');
+        if (!dialogueScope?.aggregate?.type) throw new GraphQLYogaError('Condition scope is dialogue but no aggregate type is provided!');
 
         break;
       };
 
       case AutomationConditionScopeType.WORKSPACE: {
-        if (!workspaceScope?.aspect) throw new UserInputError('Condition scope is workspace but no aspect is provided!');
+        if (!workspaceScope?.aspect) throw new GraphQLYogaError('Condition scope is workspace but no aspect is provided!');
 
-        if (!workspaceScope?.aggregate?.type) throw new UserInputError('Condition scope is workspace but no aggregate type is provided!');
+        if (!workspaceScope?.aggregate?.type) throw new GraphQLYogaError('Condition scope is workspace but no aggregate type is provided!');
 
         break;
       }
@@ -525,7 +525,7 @@ class AutomationService {
    * @returns validated CREATE prisma automation actions data list
    */
   validateAutomationActionsInput = (input: NexusGenInputs['CreateAutomationInput']): CreateAutomationInput['actions'] => {
-    if (input?.actions?.length === 0) throw new UserInputError('No actions provided for automation!');
+    if (input?.actions?.length === 0) throw new GraphQLYogaError('No actions provided for automation!');
 
     input.actions?.forEach((action) => {
       const hasNoTarget = action?.payload ? (Object.entries(action.payload).length === 0
@@ -534,20 +534,20 @@ class AutomationService {
 
       switch (action?.type) {
         case undefined: {
-          throw new UserInputError('No action type provided for automation action!');
+          throw new GraphQLYogaError('No action type provided for automation action!');
         }
 
         case null: {
-          throw new UserInputError('No action type provided for automation action!');
+          throw new GraphQLYogaError('No action type provided for automation action!');
         }
 
         case AutomationActionType.SEND_EMAIL: {
-          if (hasNoTarget) throw new UserInputError('No target email addresses provided for "SEND_EMAIL"!');
+          if (hasNoTarget) throw new GraphQLYogaError('No target email addresses provided for "SEND_EMAIL"!');
           return;
         }
 
         case AutomationActionType.SEND_SMS: {
-          if (hasNoTarget) throw new UserInputError('No target phone numbers provided for "SEND_SMS"!');
+          if (hasNoTarget) throw new GraphQLYogaError('No target phone numbers provided for "SEND_SMS"!');
           return;
         }
 
@@ -564,7 +564,7 @@ class AutomationService {
    * Validates the AutomationAction input list provided by checking the existence of fields which could be potentially be undefined or null
    * @param input object containing a list with AutomationAction input entries
    * @returns a validated AutomationAction input list where it is sure specific fields exist for all entries
-   * @throws UserInputError if not all information is required
+   * @throws GraphQLYogaError if not all information is required
    */
   constructAutomationActionsInput = (input: NexusGenInputs['CreateAutomationInput']): CreateAutomationInput['actions'] => {
     const validatedActions = this.validateAutomationActionsInput(input);
@@ -575,19 +575,19 @@ class AutomationService {
    * Validates the AutomationCondition input list provided by checking the existence of fields could be potentially undefined or null
    * @param input object containing a list with AutomationCondition input entries
    * @returns a validated AutomationCondition input list
-   * @throws UserInputError if not all information is required
+   * @throws GraphQLYogaError if not all information is required
    */
   validateCreateAutomationConditionsInput = (input: NexusGenInputs['CreateAutomationInput']): Required<NexusGenInputs['CreateAutomationCondition'][]> => {
-    if (input.conditionBuilder?.conditions?.length === 0) throw new UserInputError('No conditions provided for automation');
+    if (input.conditionBuilder?.conditions?.length === 0) throw new GraphQLYogaError('No conditions provided for automation');
 
     input.conditionBuilder?.conditions?.forEach((condition) => {
       if (!condition?.operator) {
-        throw new UserInputError('No operator type is provided for a condition');
+        throw new GraphQLYogaError('No operator type is provided for a condition');
       }
-      if (condition.operands?.length === 0) throw new UserInputError('No match values provided for an automation condition!');
+      if (condition.operands?.length === 0) throw new GraphQLYogaError('No match values provided for an automation condition!');
       condition.operands?.forEach((operand) => {
         if (!operand?.operandType) {
-          throw new UserInputError('No match value type was provided for a condition!');
+          throw new GraphQLYogaError('No match value type was provided for a condition!');
         }
       });
     });
@@ -638,7 +638,7 @@ class AutomationService {
    * Validates the AutomationCondition input list provided by checking the existence of fields which could be potentially be undefined or null
    * @param input object containing a list with AutomationCondition input entries
    * @returns a validated AutomationCondition input list where it is sure specific fields exist for all entries
-   * @throws UserInputError if not all information is required
+   * @throws GraphQLYogaError if not all information is required
    */
   constructCreateAutomationConditionsInput = (input: NexusGenInputs['CreateAutomationInput']): CreateAutomationInput['conditions'] => {
     const validatedConditions = this.validateCreateAutomationConditionsInput(input) as Required<NexusGenInputs['CreateAutomationCondition'][]>;
@@ -668,11 +668,11 @@ class AutomationService {
    * Validates the AutomationEvent input object provided by checking the existence of fields which could be potentially be undefined or null
    * @param input object containing a AutomationEvent input entry
    * @returns a validated AutomationEvent input object where it is sure specific fields exist for all entries
-   * @throws UserInputError if not all information is required
+   * @throws GraphQLYogaError if not all information is required
    */
   constructCreateAutomationEventInput = (input: NexusGenInputs['CreateAutomationInput']): CreateAutomationInput['event'] => {
-    if (!input.event) throw new UserInputError('No event provided for automation!');
-    if (!input.event?.eventType || typeof input.event?.eventType === undefined || input.event?.eventType === null) throw new UserInputError('No event type provided for automation event!');
+    if (!input.event) throw new GraphQLYogaError('No event provided for automation!');
+    if (!input.event?.eventType || typeof input.event?.eventType === undefined || input.event?.eventType === null) throw new GraphQLYogaError('No event type provided for automation event!');
 
     return {
       ...input.event,
@@ -684,14 +684,14 @@ class AutomationService {
     Validates the Automation input object for CREATING of an automation by checking the existence of fields which could be potentially be undefined or null
    * @param input object containing all information needed to create an automation
    * @returns a validated Automation input object where it is sure specific fields exist for all entries
-   * @throws UserInputError if not all information is required
+   * @throws GraphQLYogaError if not all information is required
    */
   validateCreateAutomationInput = (input: NexusGenInputs['CreateAutomationInput']): CreateAutomationInput => {
-    if (!input) throw new UserInputError('No input provided create automation with!');
-    if (!input.label || typeof input.label === undefined || input.label === null) throw new UserInputError('No label provided for automation!');
+    if (!input) throw new GraphQLYogaError('No input provided create automation with!');
+    if (!input.label || typeof input.label === undefined || input.label === null) throw new GraphQLYogaError('No label provided for automation!');
 
-    if (!input.automationType) throw new UserInputError('No automation type provided for automation!');
-    if (!input.workspaceId) throw new UserInputError('No workspace Id provided for automation!');
+    if (!input.automationType) throw new GraphQLYogaError('No automation type provided for automation!');
+    if (!input.workspaceId) throw new GraphQLYogaError('No workspace Id provided for automation!');
     return input as Required<CreateAutomationInput>;
   }
 
@@ -699,7 +699,7 @@ class AutomationService {
    * Constructs the Automation prisma data object for CREATING of an automation by checking the existence of fields which could be potentially be undefined or null
    * @param input object containing all information needed to create an automation
    * @returns a validated Automation prisma data object
-   * @throws UserInputError if not all information is required
+   * @throws GraphQLYogaError if not all information is required
    */
   constructCreateAutomationInput = (input: NexusGenInputs['CreateAutomationInput']): CreateAutomationInput => {
     const validatedInput = this.validateCreateAutomationInput(input);
@@ -730,11 +730,11 @@ class AutomationService {
    * Validates the Automation input object for UPDATING of an automation by checking the existence of fields which could be potentially be undefined or null
    * @param input object containing all information needed to update an automation
    * @returns a validated Automation input object containing all information necessary to update an Automation
-   * @throws UserInputError if not all information is required
+   * @throws GraphQLYogaError if not all information is required
    */
   constructUpdateAutomationInput = (input: NexusGenInputs['CreateAutomationInput']): UpdateAutomationInput => {
-    if (!input.id) throw new UserInputError('No ID provided for automation that should be updated!');
-    if (!input.conditionBuilder?.id) throw new UserInputError('No ID provided for the root condition builder');
+    if (!input.id) throw new GraphQLYogaError('No ID provided for automation that should be updated!');
+    if (!input.conditionBuilder?.id) throw new GraphQLYogaError('No ID provided for the root condition builder');
 
     const id: UpdateAutomationInput['id'] = input.id;
     const createInput = this.constructCreateAutomationInput(input);
@@ -745,7 +745,7 @@ class AutomationService {
    * Updates an automation with the provided data after validating all
    * @param input object containing all information needed to update an automation
    * @returns updated Automation (without relationship fields)
-   * @throws UserInputError if not all information is required
+   * @throws GraphQLYogaError if not all information is required
    */
   public updateAutomation = (input: NexusGenInputs['CreateAutomationInput']) => {
     // Test whether input data matches what's needed to update an automation
@@ -757,7 +757,7 @@ class AutomationService {
    * Creates an automation with the provided data after validating all
    * @param input object containing all information needed to create an automation
    * @returns created Automation (without relationship fields)
-   * @throws UserInputError if not all information is required
+   * @throws GraphQLYogaError if not all information is required
    */
   public createAutomation = (input: NexusGenInputs['CreateAutomationInput']) => {
     // Test whether input data matches what's needed to create an automation

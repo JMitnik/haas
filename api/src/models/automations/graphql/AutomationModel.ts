@@ -2,7 +2,7 @@ import { inputObjectType, objectType, queryField } from 'nexus';
 import { AutomationType } from './AutomationType';
 import { AutomationTriggerModel } from './AutomationTrigger'
 import { CustomerType } from '../../customer/index'
-import { UserInputError } from 'apollo-server-express';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 export const AutomationModel = objectType({
   name: 'AutomationModel',
@@ -47,7 +47,7 @@ export const GetAutomationQuery = queryField('automation', {
     where: GetAutomationInput,
   },
   async resolve(parent, args, ctx) {
-    if (!args.where?.id) throw new UserInputError('No ID available to find automation with!');
+    if (!args.where?.id) throw new GraphQLYogaError('No ID available to find automation with!');
 
     const automation = await ctx.services.automationService.findAutomationById(args.where.id);
 

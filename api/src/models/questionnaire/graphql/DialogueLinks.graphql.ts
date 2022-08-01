@@ -1,5 +1,5 @@
 import { objectType, queryField } from 'nexus';
-import { UserInputError } from 'apollo-server-express';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 import { ConnectionInterface } from '../../general/Pagination';
 import { DialogueConnectionFilterInput } from './DialogueConnection';
@@ -21,7 +21,7 @@ export const DialogueLinksQuery = queryField('dialogueLinks', {
   },
   nullable: true,
   async resolve(parent, args, ctx) {
-    if (!args.workspaceId) throw new UserInputError('No workspace ID provided!');
+    if (!args.workspaceId) throw new GraphQLYogaError('No workspace ID provided!');
 
     const result = await ctx.services.dialogueService.findDialogueUrlsByWorkspaceId(args.workspaceId, args.filter);
     return result;

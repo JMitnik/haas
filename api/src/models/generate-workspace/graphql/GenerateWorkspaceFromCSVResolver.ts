@@ -1,5 +1,5 @@
 import { enumType, inputObjectType, mutationField } from 'nexus';
-import { UserInputError } from 'apollo-server-express';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 import { CustomerType } from '../../customer/graphql/Customer'
 
 export const DialogueTemplateType = enumType({
@@ -25,7 +25,7 @@ export const GenerateWorkspaceFromCSVMutation = mutationField('generateWorkspace
   nullable: true,
   args: { input: GenerateWorkspaceCSVInputType },
   async resolve(parent, args, ctx) {
-    if (!args.input) throw new UserInputError('No input object provided');
+    if (!args.input) throw new GraphQLYogaError('No input object provided');
 
     return ctx.services.generateWorkspaceService.generateWorkspaceFromCSV(args.input, ctx.session?.user?.id);
   },

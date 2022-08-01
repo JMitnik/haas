@@ -1,5 +1,5 @@
 import { enumType, extendType, inputObjectType, mutationField, objectType, queryField } from 'nexus';
-import { UserInputError } from 'apollo-server-express';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 import { PaginationWhereInput } from '../../general/Pagination';
 import { SystemPermissions } from '../Permissions';
@@ -73,12 +73,12 @@ export const RoleQueries = extendType({
       nullable: true,
       args: { input: FindRoleInput },
       async resolve(parent, args, ctx) {
-        if (!args.input?.roleId) throw new UserInputError('No RoleId provided!');
-        if (!args.input?.userId) throw new UserInputError('No UserId provided!');
+        if (!args.input?.roleId) throw new GraphQLYogaError('No RoleId provided!');
+        if (!args.input?.userId) throw new GraphQLYogaError('No UserId provided!');
 
         const role = await ctx.services.roleService.findRoleById(args.input.roleId, args.input.userId);
 
-        if (!role) throw new UserInputError('Role not found!');
+        if (!role) throw new GraphQLYogaError('Role not found!');
 
         return role as any;
       },
@@ -135,7 +135,7 @@ export const UpdatePermissionsMutationResolver = mutationField('updatePermission
   nullable: true,
   args: { input: UpdatePermissionsInput },
   resolve(parent, args, ctx) {
-    if (!args.input?.roleId) throw new UserInputError('No RoleId provided to update permissions for!');
+    if (!args.input?.roleId) throw new GraphQLYogaError('No RoleId provided to update permissions for!');
 
     return ctx.services.roleService.updatePermissions(args.input.roleId, args.input.permissions as any || []);
   },
