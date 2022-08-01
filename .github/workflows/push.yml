@@ -2,6 +2,7 @@ name: CI_PR
 on: [push]
 jobs:
   build:
+    timeout-minutes: 30
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -15,13 +16,13 @@ jobs:
         uses: cypress-io/github-action@v4
         with:
           browser: chrome
-          start: yarn start
+          start: yarn serve
           wait-on: 'http://localhost:3000'
           working-directory: ./frontend/client
         env:
           SKIP_PREFLIGHT_CHECK: true
       - name: Start Testing Containers
-        run: yarn dock:test:start-db
+        run: yarn dock:up:test
       - name: Generate required artifacts
         run: yarn gen:api:prisma
         env:

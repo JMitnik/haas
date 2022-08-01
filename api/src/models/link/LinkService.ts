@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import uploadCloudinary from '../../utils/upload/uploadCloudinary';
+import uploadCloudinary from '../Common/Upload/Cloudinary/uploadCloudinary';
 
 class LinkService {
   prisma: PrismaClient;

@@ -86,7 +86,7 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
         data: omit(event.action, ['type']),
         edgeId: event.state?.edgeId,
         nodeId: event.state?.nodeId,
-        sessionId: interactionData?.createSession.id,
+        sessionId: interactionData?.createSession?.id,
       },
     },
   }), [interactionData, appendToInteraction]);
@@ -121,7 +121,7 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
     }
   }, uploadQueue.length > 0 ? 300 : null);
 
-  const session = interactionData?.createSession;
+  const session = interactionData?.createSession || undefined;
 
   return (
     <UploadQueueContext.Provider value={{

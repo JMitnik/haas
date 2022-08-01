@@ -64,27 +64,27 @@ const defaultWorkspaceTemplate: DemoWorkspaceTemplate = {
     markers: [
       {
         label: 'Good!',
-        subLabel: 'This is good.',
+        subLabel: 'I\'m feeling good.',
         range: { start: 6, end: 9.5 },
       },
       {
         label: 'Amazing!',
-        subLabel: 'This is excellent.',
+        subLabel: 'I\'m feeling amazing.',
         range: { start: 9.5 },
       },
       {
         label: 'Neutral!',
-        subLabel: 'Something is not great.',
+        subLabel: 'I could feel better.',
         range: { start: 5, end: 6 },
       },
       {
         label: 'Bad',
-        subLabel: 'This is bad.',
+        subLabel: 'I\'m feeling bad.',
         range: { start: 3, end: 5 },
       },
       {
         label: 'Terrible',
-        subLabel: 'This is terrible',
+        subLabel: 'I\'m feeling terrible.',
         range: { end: 3 },
       },
     ],

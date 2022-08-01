@@ -11,7 +11,7 @@ import { isPresent } from 'ts-is-present';
 import _ from 'lodash';
 
 import { NexusGenInputs } from '../../generated/nexus';
-import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
+import { FindManyCallBackProps, PaginateProps, paginate } from '../Common/Pagination/pagination';
 import { SessionWithEntries } from '../session/Session.types';
 import { mailService } from '../../services/mailings/MailService';
 import { smsService } from '../../services/sms/SmsService';

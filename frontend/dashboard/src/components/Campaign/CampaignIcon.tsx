@@ -1,9 +1,9 @@
-import { AlertCircle, Clock, Eye, Flag, HelpCircle, Mail, UserCheck } from 'react-feather';
+import { AlertCircle, Clock, Eye, Flag, HelpCircle, Icon, Mail, UserCheck } from 'react-feather';
 import React from 'react';
 
 import { DeliveryStatusEnum } from 'types/generated-types';
 
-const MapCampaignIcon: { [key in DeliveryStatusEnum]?: React.FC } = {
+const MapCampaignIcon: { [key in DeliveryStatusEnum]?: Icon } = {
   [DeliveryStatusEnum.Deployed]: Mail,
   [DeliveryStatusEnum.Failed]: AlertCircle,
   [DeliveryStatusEnum.Finished]: Flag,

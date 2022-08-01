@@ -1,4 +1,4 @@
-import { enumType, inputObjectType, interfaceType, objectType } from '@nexus/schema';
+import { enumType, inputObjectType, interfaceType, objectType } from 'nexus';
 
 const PaginationSortByEnum = enumType({
   name: 'PaginationSortByEnum',
@@ -8,7 +8,7 @@ const PaginationSortByEnum = enumType({
     'score', 'id', 'createdAt', 'email',
     'name', 'firstName', 'lastName', 'role',
     'medium', 'type', 'paths', 'user', 'when',
-    'scheduledAt', 'updatedAt'
+    'scheduledAt', 'updatedAt',
   ],
 });
 
@@ -58,10 +58,8 @@ export const PaginationPageInfo = objectType({
 export const DeprecatedConnectionInterface = interfaceType({
   name: 'DeprecatedConnectionInterface',
   description: 'Interface all pagination-based models should implement',
-
+  resolveType: () => null,
   definition(t) {
-    t.resolveType(() => null);
-
     // TODO: Replace by cursor
     t.string('cursor', { nullable: true });
     t.int('offset', { nullable: true });
@@ -77,9 +75,8 @@ export const DeprecatedConnectionInterface = interfaceType({
 export const ConnectionInterface = interfaceType({
   name: 'ConnectionInterface',
   description: 'Interface all pagination-based models should implement',
-
+  resolveType: () => null,
   definition(t) {
-    t.resolveType(() => null);
     t.int('totalPages', { nullable: true });
 
     t.field('pageInfo', { type: PaginationPageInfo });

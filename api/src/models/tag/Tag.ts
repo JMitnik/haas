@@ -1,6 +1,7 @@
 import { TagEnum } from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
-import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
+import { enumType, extendType, inputObjectType, objectType } from 'nexus';
+import { isPresent } from 'ts-is-present';
 
 import { DialogueType } from '../questionnaire/Dialogue';
 
@@ -69,7 +70,7 @@ export const TagMutations = extendType({
       },
       resolve(parent, args, ctx) {
         if (!args.dialogueId) throw new UserInputError('No dialogue provided to assign to tags');
-        return ctx.services.dialogueService.updateTags(args.dialogueId, args.tags?.entries);
+        return ctx.services.dialogueService.updateTags(args.dialogueId, args.tags?.entries?.filter(isPresent));
       },
     });
 

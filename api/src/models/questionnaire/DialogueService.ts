@@ -503,7 +503,7 @@ class DialogueService {
   ) => {
     const endDateTimeSet = !endDateTime ? addDays(startDateTime, 7) : endDateTime;
 
-    const rootNode = await this.nodeService.findSliderNode(dialogueId);
+    const rootNode = await this.nodeService.findRootNode(dialogueId);
 
     if (!rootNode?.id) return { name: '', nrVotes: 0, impactScore: 0, subTopics: [] };
 
@@ -1333,7 +1333,7 @@ class DialogueService {
   };
 
   createDialogue = async (input: NexusGenInputs['CreateDialogueInputType']): Promise<Dialogue> => {
-    const dialogueTags = input.tags?.entries?.map((tag: string) => ({ id: tag })) || [];
+    const dialogueTags = input.tags?.entries?.map((tag) => ({ id: tag || '' })) || [];
 
     const customers = await this.customerPrismaAdapter.getAllCustomersBySlug(input.customerSlug);
 
@@ -1382,7 +1382,7 @@ class DialogueService {
         customerSlug: customer.slug,
         description: input.description,
         dialogueSlug: input.dialogueSlug,
-        dialogueTags: input.tags,
+        dialogueTags: input.tags as any,
         publicTitle: input.publicTitle || '',
         templateId: input.templateDialogueId,
         title: input.title,

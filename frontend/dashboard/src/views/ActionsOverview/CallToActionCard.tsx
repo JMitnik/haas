@@ -140,7 +140,7 @@ const CallToActionCard = ({
                 variant="outline"
                 variantColor="teal"
                 size="sm"
-                leftIcon={Edit3}
+                leftIcon={() => <Edit3 />}
                 isDisabled={(activeCTA && activeCTA !== id) || false}
                 onClick={() => onActiveCTAChange(id)}
               >

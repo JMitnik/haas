@@ -40,7 +40,7 @@ const LoginView = () => {
 
   const [requestInvite, { loading: isRequestingInvite }] = useRequestInviteMutation({
     onCompleted: (data) => {
-      if (data.requestInvite.didInvite) {
+      if (data?.requestInvite?.didInvite) {
         toast.success({
           title: 'Invite has been sent in case the mail matches!',
           description: 'Check your email for your invitation',

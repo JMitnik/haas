@@ -18,7 +18,7 @@ export const FilterEnabledLabel = ({ onResetFilter }: FilterEnabledLabelProps) =
       <Tooltip.Root delayDuration={300} open={isOpen} onOpenChange={setIsOpen}>
         <Dropdown.Trigger asChild>
           <Tooltip.Trigger asChild>
-            <UI.Button size="sm" bg="gray.500" variant="solid">
+            <UI.Button iconOnly size="sm" bg="gray.500" variant="solid">
               <UI.Icon>
                 <Filter />
               </UI.Icon>

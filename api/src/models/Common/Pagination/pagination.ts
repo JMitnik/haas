@@ -1,5 +1,4 @@
-import prisma from '../../config/prisma';
-import { NexusGenEnums, NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
+import { NexusGenEnums, NexusGenInputs, NexusGenRootTypes } from '../../../generated/nexus';
 
 export interface FindManyProps {
   findArgs: any;
@@ -12,9 +11,9 @@ export interface ConstructFindManyProps extends FindManyProps {
 }
 
 export interface FindManyCallBackProps {
-  props: findManyInput,
-  paginationOpts?: NexusGenInputs['PaginationWhereInput'],
-  rest?: any
+  props: findManyInput;
+  paginationOpts?: NexusGenInputs['PaginationWhereInput'];
+  rest?: any;
 }
 
 export interface FindManyArgsProps {
@@ -40,13 +39,13 @@ export interface PaginateProps {
   useSlice?: boolean;
 }
 
-export type findManyInput = {
-  where: any,
-  take?: number | undefined,
-  skip?: number | undefined,
-  orderBy?: any,
-  include?: any,
-};
+export interface findManyInput {
+  where: any;
+  take?: number | undefined;
+  skip?: number | undefined;
+  orderBy?: any;
+  include?: any;
+}
 
 export const slice = (
   entries: Array<any>,
@@ -93,7 +92,7 @@ export const constructSortInput = (
   const sortObject = orderByArray.filter((orderOption) => {
     return orderFields.includes(orderOption?.by);
   }).map(orderOption => ({
-    [orderOption?.by]: orderOption.desc ? 'desc' : 'asc'
+    [orderOption?.by]: orderOption.desc ? 'desc' : 'asc',
   }));
 
   return sortObject;
@@ -104,7 +103,7 @@ export const constructFindManyInput = (
 ): findManyInput => {
   const { findArgs, orderFields, searchFields, paginationOpts } = findManyArgs;
   const where = findArgs?.where ? constructWhereInput(findArgs?.where, paginationOpts, searchFields) : null;
-  const orderBy = constructSortInput(orderFields, paginationOpts.orderBy || undefined);
+  const orderBy = constructSortInput(orderFields, paginationOpts.orderBy as any || undefined);
 
   return {
     orderBy,
@@ -119,11 +118,12 @@ export const paginate = async <GenericModelType>({
   findManyArgs,
   paginationOpts = {},
   countArgs,
-  useSlice = true
+  useSlice = true,
 }: PaginateProps,
 ) => {
   const { offset, limit, pageIndex } = paginationOpts;
   const { countCallBack, countWhereInput, ...countRest } = countArgs;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { findArgs, findManyCallBack, orderFields, searchFields, ...rest } = findManyArgs;
   // Find entries logic
   const findManyInput = constructFindManyInput({ ...findManyArgs, paginationOpts });

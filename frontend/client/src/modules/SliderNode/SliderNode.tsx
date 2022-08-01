@@ -26,7 +26,7 @@ export const SliderNode = ({ node, onRunAction }: SliderNodeProps) => {
     const value = form.getValues().slider;
     const sliderValue = parseInt(value as unknown as string, 10);
 
-    const childEdge = findSliderChildEdge(value, node.children);
+    const childEdge = findSliderChildEdge(value, node.children || []);
     const childNode = childEdge?.childNode?.id;
 
     onRunAction({
@@ -37,7 +37,7 @@ export const SliderNode = ({ node, onRunAction }: SliderNodeProps) => {
       },
       reward: {
         toNode: childNode,
-        toEdge: childEdge?.id,
+        toEdge: childEdge?.id || undefined,
         overrideCallToActionId: node.overrideLeaf?.id,
       },
     });

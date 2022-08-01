@@ -1,4 +1,4 @@
-import { objectType } from '@nexus/schema';
+import { objectType } from 'nexus';
 
 export const DateHistogramItem = objectType({
   name: 'DateHistogramItem',
@@ -7,7 +7,7 @@ export const DateHistogramItem = objectType({
   definition(t) {
     t.id('id');
     t.date('date');
-    t.int('frequency');
+    t.nonNull.int('frequency');
   },
 });
 
@@ -18,6 +18,6 @@ export const DateHistogram = objectType({
   definition(t) {
     t.id('id');
 
-    t.list.field('items', { type: DateHistogramItem });
+    t.nonNull.list.nonNull.field('items', { type: DateHistogramItem });
   },
 })

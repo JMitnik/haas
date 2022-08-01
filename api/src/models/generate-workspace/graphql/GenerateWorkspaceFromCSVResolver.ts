@@ -1,4 +1,4 @@
-import { enumType, inputObjectType, mutationField } from '@nexus/schema';
+import { enumType, inputObjectType, mutationField } from 'nexus';
 import { UserInputError } from 'apollo-server-express';
 import { CustomerType } from '../../customer/graphql/Customer'
 
@@ -27,6 +27,6 @@ export const GenerateWorkspaceFromCSVMutation = mutationField('generateWorkspace
   async resolve(parent, args, ctx) {
     if (!args.input) throw new UserInputError('No input object provided');
 
-    return ctx.services.generateWorkspaceService.generateWorkspaceFromCSV(args.input, ctx.session?.user?.id);
+    return ctx.services.generateWorkspaceService.generateWorkspace(args.input, ctx.session?.user?.id);
   },
 });

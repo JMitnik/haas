@@ -9,7 +9,7 @@ import { ensureDarkColor, generateDefaultGradient, generatePalette, isDarkColor 
 import { useCustomer } from './CustomerProvider';
 
 interface ThemeProvidersProps {
-  children?: React.ReactNode;
+  children?: any;
 }
 
 const makeBrandTheme = (settings: any) => {
@@ -31,6 +31,7 @@ const makeBrandTheme = (settings: any) => {
 };
 
 export const DefaultThemeProviders = ({ children }: ThemeProvidersProps) => (
+  // @ts-ignore
   <ChakraThemeProvider theme={chakraDefaultTheme}>
     <CSSReset />
     <ThemeProvider theme={defaultTheme}>
@@ -39,7 +40,7 @@ export const DefaultThemeProviders = ({ children }: ThemeProvidersProps) => (
   </ChakraThemeProvider>
 );
 
-export const CustomThemeProviders = ({ children }: { children: React.ReactNode }) => {
+export const CustomThemeProviders = ({ children }: { children: any }) => {
   const [customTheme, setCustomTheme] = useState({});
   const { activeCustomer } = useCustomer();
 

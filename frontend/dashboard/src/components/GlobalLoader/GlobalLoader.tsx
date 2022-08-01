@@ -1,8 +1,9 @@
-import { HAASRun } from 'assets/animations';
 import { motion } from 'framer-motion';
 import Lottie from 'react-lottie';
 import React from 'react';
 import styled, { css } from 'styled-components';
+
+import HAASRun from 'assets/animations/lottie-rabbit-run.json';
 
 const GlobalLoaderContainer = styled.div`
   ${({ theme }) => css`

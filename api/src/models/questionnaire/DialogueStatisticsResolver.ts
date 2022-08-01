@@ -1,4 +1,5 @@
-import { inputObjectType, objectType } from '@nexus/schema';
+import { inputObjectType, objectType } from 'nexus';
+
 import { TopicFilterInput } from '../Topic/graphql/TopicFilterInput';
 import { SessionType } from '../session/graphql';
 import { DialogueImpactScoreType } from './DialogueStatisticsSummary';
@@ -22,7 +23,7 @@ export const DialogueStatisticsSummaryFilterInput = inputObjectType({
 export const TopicType = objectType({
   name: 'TopicType',
   definition(t) {
-    t.string('name');
+    t.nonNull.string('name');
     t.float('impactScore');
     t.int('nrVotes');
 
@@ -46,7 +47,7 @@ export const PathedSessionsType = objectType({
     t.string('endDateTime');
 
     t.list.string('path');
-    t.list.field('pathedSessions', {
+    t.list.nonNull.field('pathedSessions', {
       type: SessionType,
     });
   },

@@ -156,10 +156,10 @@ class TemplateService {
         form: {
           helperText: '',
           fields: leaf?.form?.fields?.length ? leaf.form?.fields.map((field) => ({
-            label: field.label || '',
-            position: field.position || -1,
-            isRequired: field.isRequired || false,
-            type: field.type || 'shortText',
+            label: field?.label || '',
+            position: field?.position || -1,
+            isRequired: field?.isRequired || false,
+            type: field?.type || 'shortText',
           })) : [],
         },
       })
@@ -755,20 +755,20 @@ class TemplateService {
 
     await this.edgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout,
       whatWouldYouLikeToTalkAboutToProduct, {
-        conditionType: 'match',
-        matchValue: 'Product/Services',
-        renderMin: null,
-        renderMax: null,
-      }
+      conditionType: 'match',
+      matchValue: 'Product/Services',
+      renderMin: null,
+      renderMax: null,
+    }
     );
 
     await this.edgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout,
       whatWouldYouLikeToTalkAboutToCustomerSupport, {
-        conditionType: 'match',
-        matchValue: 'Customer Support',
-        renderMin: null,
-        renderMax: null,
-      }
+      conditionType: 'match',
+      matchValue: 'Customer Support',
+      renderMin: null,
+      renderMax: null,
+    }
     );
 
     // Negative edges
@@ -791,11 +791,11 @@ class TemplateService {
 
     await this.edgeService.createEdge(rootToWeAreSorryToHearThat,
       weAreSorryToHearThatToCustomerSupport, {
-        conditionType: 'match',
-        matchValue: 'Customer Support',
-        renderMax: null,
-        renderMin: null,
-      }
+      conditionType: 'match',
+      matchValue: 'Customer Support',
+      renderMax: null,
+      renderMin: null,
+    }
     );
   };
 

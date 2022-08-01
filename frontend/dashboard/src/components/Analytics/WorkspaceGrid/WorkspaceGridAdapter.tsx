@@ -107,15 +107,12 @@ export const WorkspaceGridAdapter = ({
   return (
     <LS.WorkspaceGridAdapterContainer>
       <WorkspaceGrid
-        isServerLoading={isServerLoading}
         dateRange={dateRange}
         setDateRange={setDateRange}
         backgroundColor={backgroundColor}
         initialViewMode={initialViewMode}
         initialData={initialData}
         onLoadData={handleLoadData}
-        height={height}
-        width={width}
       />
     </LS.WorkspaceGridAdapterContainer>
   );

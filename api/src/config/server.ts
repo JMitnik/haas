@@ -38,11 +38,12 @@ export const makeServer = async (port: number, prismaClient: PrismaClient) => {
 
   app.use(cookieParser());
   app.use(cors(corsOptions));
+  app.use(express.json());
 
   // Add /graphql and graphqlUploadExpress
   const apollo = await makeApollo(prismaClient);
   app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }));
-  apollo.applyMiddleware({ app, cors: false });
+  app.use('/graphql', apollo)
 
   if (config.useSSL) {
     const key: any = process.env.HTTPS_SERVER_KEY_PATH;

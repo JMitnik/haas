@@ -29,7 +29,7 @@ const InviteUserButton = ({ children }: InviteButtonProps) => {
           isDisabled={!canInviteUsers}
           size="sm"
           ml={4}
-          leftIcon={Plus}
+          leftIcon={() => <Plus />}
         >
           {t('invite_user')}
         </UI.Button>

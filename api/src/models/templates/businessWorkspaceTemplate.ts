@@ -49,27 +49,27 @@ const businessWorkspaceTemplate: DemoWorkspaceTemplate = {
     markers: [
       {
         label: 'Good!',
-        subLabel: 'It\'s going well.',
+        subLabel: 'I\'m feeling good.',
         range: { start: 6, end: 9.5 },
       },
       {
         label: 'Amazing!',
-        subLabel: 'It\'s going amazing.',
+        subLabel: 'I\'m feeling amazing.',
         range: { start: 9.5 },
       },
       {
         label: 'Neutral!',
-        subLabel: 'It could be better.',
+        subLabel: 'I could feel better.',
         range: { start: 5, end: 6 },
       },
       {
         label: 'Bad',
-        subLabel: 'It\'s going bad.',
+        subLabel: 'I\'m feeling bad.',
         range: { start: 3, end: 5 },
       },
       {
         label: 'Terrible',
-        subLabel: 'It\'s going terrible.',
+        subLabel: 'I\'m feeling terrible.',
         range: { end: 3 },
       },
     ],

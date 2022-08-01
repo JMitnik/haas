@@ -1,5 +1,5 @@
 import * as UI from '@haas/ui';
-import { AnimatePresence, AnimateSharedLayout, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Group } from '@visx/group';
 import { MapPin, Minus, Plus } from 'react-feather';
 import { ProvidedZoom } from '@visx/zoom/lib/types';
@@ -192,7 +192,6 @@ export const HexagonGrid = ({
       {children}
 
       <UI.Div display="flex" flexDirection="column" position="absolute" right={24} bottom={24}>
-
         <Tooltip.Root delayDuration={300} open={openZoomOutTooltip} onOpenChange={setOpenZoomOutTooltip}>
           <Tooltip.Trigger asChild>
             <LS.ControlButton onClick={() => zoom.scale({ scaleX: 0.8, scaleY: 0.8 })}>
@@ -246,28 +245,24 @@ export const HexagonGrid = ({
 
       </UI.Div>
 
-      <AnimateSharedLayout>
-        <AnimatePresence>
-          {tooltipOpen && (
-            <LS.Tooltip
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              initial={{ opacity: 0, scale: 0.95 }}
-              layoutId="tooltip"
-            >
-              <TooltipWithBounds
-                key={Math.random()}
-                top={tooltipTop}
-                left={tooltipLeft}
+      {tooltipOpen && (
+        <LS.Tooltip>
+          <TooltipWithBounds
+            top={tooltipTop}
+            left={tooltipLeft}
+          >
+            {tooltipData && (
+              <motion.div
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                initial={{ opacity: 0, scale: 0.95 }}
               >
-                {tooltipData && (
-                  <TooltipBody node={tooltipData} />
-                )}
-              </TooltipWithBounds>
-            </LS.Tooltip>
-          )}
-        </AnimatePresence>
-      </AnimateSharedLayout>
+                <TooltipBody node={tooltipData} />
+              </motion.div>
+            )}
+          </TooltipWithBounds>
+        </LS.Tooltip>
+      )}
     </UI.Div>
   );
 };

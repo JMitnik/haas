@@ -68,7 +68,7 @@ const DialogueTreeLayout = ({ children, node, isAtLeaf }: DialogueTreeLayoutProp
           <title>
             {headName}
           </title>
-          <meta name="description" content={workspace.name} />
+          <meta name="description" content={workspace.name || 'haas'} />
         </Helmet>
       )}
 

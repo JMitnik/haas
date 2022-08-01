@@ -1,16 +1,21 @@
 import { createReadStream } from 'fs';
 
-import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
 import { clearDatabase, prepDefaultCreateData } from './testUtils';
 import AuthService from '../../auth/AuthService';
+import { prisma } from '../../../test/setup/singletonDeps';
 
 jest.setTimeout(30000);
 
-const prisma = makeTestPrisma();
 const ctx = makeTestContext(prisma);
 
+
 afterEach(async () => {
+  await clearDatabase(prisma);
+  await prisma.$disconnect();
+});
+
+afterAll(async () => {
   await clearDatabase(prisma);
   await prisma.$disconnect();
 });
@@ -38,16 +43,16 @@ it('Group generation using CSV', async () => {
       }
     }
   `,
-      {
-        input: {
-          uploadedCsv: file,
-          workspaceSlug: 'newWorkspaceSlug',
-          workspaceTitle: 'newWorkspaceTitle',
-        },
+    {
+      input: {
+        uploadedCsv: file,
+        workspaceSlug: 'newWorkspaceSlug',
+        workspaceTitle: 'newWorkspaceTitle',
       },
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
 
     expect(res).toMatchObject({

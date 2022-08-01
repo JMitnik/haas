@@ -84,14 +84,14 @@ export const useDialogueState = create<DialogueState>((set, get) => ({
    * - Sets the state.
    */
   initialize: (dialogue: Dialogue, workspace: Workspace, metadata: Metadata) => {
-    const idToNode = makeNodeMap([...dialogue.questions, ...dialogue.leafs]);
+    const idToNode = makeNodeMap([...(dialogue.questions || []), ...(dialogue.leafs || [])]);
 
     const initialEvent: SessionEvent = {
       startTimestamp: new Date(Date.now()),
       state: {
         depth: 0,
         stateType: DialogueStateType.ROOT,
-        nodeId: dialogue.rootQuestion.id,
+        nodeId: dialogue.rootQuestion?.id,
         activeCallToActionId: undefined,
       },
       action: undefined,
@@ -259,7 +259,7 @@ export const useDialogueState = create<DialogueState>((set, get) => ({
       state: {
         depth: 0,
         stateType: DialogueStateType.ROOT,
-        nodeId: dialogue.rootQuestion.id,
+        nodeId: dialogue?.rootQuestion?.id,
         activeCallToActionId: undefined,
       },
       action: undefined,

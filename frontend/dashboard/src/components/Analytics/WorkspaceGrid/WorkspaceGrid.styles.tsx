@@ -86,7 +86,7 @@ export const IconButton = styled(Button)`
   border-radius: 100% !important;
 `;
 
-export const DetailsPane = motion.custom(styled(UI.Div)`
+export const DetailsPane = motion(styled(UI.Div)`
   ${({ theme }) => css`
     padding: ${theme.gutter}px;
     background: white;
@@ -250,7 +250,7 @@ export const TooltipBody = styled(UI.Div)`
   margin-bottom: 6px;
 `;
 
-export const Tooltip = motion.custom(styled.div`
+export const Tooltip = motion(styled.div`
   ${({ theme }) => css`
     box-shadow: ${theme.boxShadows.md} !important;
 
