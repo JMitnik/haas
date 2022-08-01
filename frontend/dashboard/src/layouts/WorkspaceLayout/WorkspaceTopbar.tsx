@@ -20,6 +20,8 @@ export const TopbarContainer = styled(UI.Div)<TopbarContainerProps>`
     padding: 0;
     background: ${theme.colors.app.topbar};
     border-bottom: 1px solid ${theme.colors.gray[100]};
+    z-index: 100;
+    position: relative;
     width: 100%;
 
     ${maxHeight && css`
