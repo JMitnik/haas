@@ -1,5 +1,4 @@
-import { Dialogue, Edge, PrismaClient, QuestionCondition, QuestionNode, SystemPermissionEnum } from '@prisma/client';
-import { SystemPermission } from 'models/role';
+import { Dialogue, Edge, PrismaClient, QuestionCondition, QuestionNode } from '@prisma/client';
 
 export const clearDatabase = async (prisma: PrismaClient) => {
   await prisma.$transaction([

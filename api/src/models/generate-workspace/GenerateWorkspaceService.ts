@@ -1,7 +1,6 @@
-import { Customer, PrismaClient, Role, RoleTypeEnum } from '@prisma/client';
+import { PrismaClient, Role, RoleTypeEnum } from '@prisma/client';
 import { ApolloError } from 'apollo-server-express';
 
-import templates from '../templates';
 import TemplateService from '../templates/TemplateService';
 import { NexusGenEnums } from '../../generated/nexus';
 import { parseCsv } from '../../utils/parseCsv';
@@ -10,7 +9,7 @@ import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import { CreateDialogueInput } from '../questionnaire/DialoguePrismaAdapterType';
 import NodeService from '../QuestionNode/NodeService';
 import UserOfCustomerPrismaAdapter from '../users/UserOfCustomerPrismaAdapter';
-import { cartesian, generateCreateDialogueDataByTemplateLayers, getTemplate } from './GenerateWorkspaceService.helpers';
+import { generateCreateDialogueDataByTemplateLayers, getTemplate } from './GenerateWorkspaceService.helpers';
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import DialogueService from '../questionnaire/DialogueService';
 import { DemoWorkspaceTemplate } from '../templates/TemplateTypes';
@@ -44,8 +43,8 @@ class GenerateWorkspaceService {
 
   /**
    * Resets data (removes and re-creates) of a demo workspace
-   * @param workspaceId 
-   * @returns 
+   * @param workspaceId
+   * @returns
    */
   resetWorkspaceData = async (workspaceId: string) => {
     const workspace = await this.customerService.findWorkspaceById(workspaceId);
@@ -72,10 +71,10 @@ class GenerateWorkspaceService {
 
   /**
    * Generates dialogues based on the layers (rootLayer + subLayer) of a template
-   * @param workspace 
-   * @param templateType 
-   * @param sessionsPerDay 
-   * @param generateData 
+   * @param workspace
+   * @param templateType
+   * @param sessionsPerDay
+   * @param generateData
    */
   async generateDialoguesByTemplateLayers(
     workspace: Workspace,
@@ -124,8 +123,8 @@ class GenerateWorkspaceService {
 
   /**
    * Based on a top down user csv, upsert available users and assign all existing private dialogues to them
-   * @param managerCsv 
-   * @param workspace 
+   * @param managerCsv
+   * @param workspace
    */
   addManagersFromCSV = async (managerCsv: any, workspace: Workspace) => {
     let records = await parseCsv(await managerCsv, { delimiter: ';' });
@@ -168,12 +167,12 @@ class GenerateWorkspaceService {
 
   /**
    * Generates Dialogues based on CSV records
-   * @param workspace 
-   * @param type 
-   * @param template 
-   * @param records 
-   * @param userId 
-   * @param generateData 
+   * @param workspace
+   * @param type
+   * @param template
+   * @param records
+   * @param userId
+   * @param generateData
    */
   private async generateDialoguesByCSVRecords(
     workspace: Workspace,
@@ -253,7 +252,7 @@ class GenerateWorkspaceService {
 
   /**
    * Creates a bot user for a workspace
-   * @param workspace 
+   * @param workspace
    */
   private async createBotUser(workspace: Workspace) {
     const botUser = await this.userService.upsertUserByEmail({

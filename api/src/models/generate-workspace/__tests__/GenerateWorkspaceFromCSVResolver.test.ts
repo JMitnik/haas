@@ -8,20 +8,20 @@ import { DialogueTemplateType, RoleTypeEnum } from '@prisma/client';
 import businessWorkspaceTemplate from '../../../models/templates/businessWorkspaceTemplate';
 import englishSportWorkspaceTemplate from '../../../models/templates/sportWorkspaceEngTemplate';
 import dutchSportWorkspaceTemplate from '../../../models/templates/sportWorkspaceNlTemplate';
-import { cartesian, generateCreateDialogueDataByTemplateLayers } from '../GenerateWorkspaceService.helpers';
+import { generateCreateDialogueDataByTemplateLayers } from '../GenerateWorkspaceService.helpers';
 
 jest.setTimeout(30000);
 
 const ctx = makeTestContext(prisma);
 
 const Mutation = `
-mutation GenerateWorkspaceFromCSV($input: GenerateWorkspaceCSVInputType) {
-  generateWorkspaceFromCSV(input: $input) {
-    id
-    slug
-    isDemo
+  mutation GenerateWorkspaceFromCSV($input: GenerateWorkspaceCSVInputType) {
+    generateWorkspaceFromCSV(input: $input) {
+      id
+      slug
+      isDemo
+    }
   }
-}
 `;
 
 describe('GenerateWorkspaceFromCSV resolver', () => {
@@ -332,8 +332,6 @@ describe('GenerateWorkspaceFromCSV resolver', () => {
       expect(managers).toHaveLength(3);
       // Check that the account who generates workspace is not set manager but remains part of the workspace as an admin
       expect(admins).toHaveLength(1);
-
     });
   });
-
 })
