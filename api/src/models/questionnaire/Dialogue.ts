@@ -18,6 +18,9 @@ import { DialogueStatisticsSummaryModel } from './DialogueStatisticsSummary';
 import { UserType } from '../users/graphql/User';
 import { PathedSessionsType, PathedSessionsInput, TopicType, TopicInputType, MostPopularPath, DialogueStatisticsSummaryFilterInput, MostChangedPath, MostTrendingTopic } from './DialogueStatisticsResolver';
 import { HealthScore, HealthScoreInput } from '../customer/graphql/HealthScore';
+import { Issue } from '../../models/Issue/graphql/Issue.graphql';
+import { IssueFilterInput } from '../../models/Issue/graphql/IssueFilterInput.graphql';
+import { IssueValidator } from '../../models/Issue/IssueValidator';
 
 export const TEXT_NODES = [
   'TEXTBOX',
@@ -80,6 +83,17 @@ export const DialogueType = objectType({
             id: parent.postLeafNodeId,
           },
         });
+      },
+    });
+
+    t.field('issues', {
+      type: Issue,
+      nullable: true,
+      args: { filter: IssueFilterInput },
+
+      resolve: async (parent, args, { services }) => {
+        const filter = IssueValidator.resolveFilter(args.filter);
+        return await services.issueService.getProblemsByDialogue(parent.id, filter);
       },
     });
 

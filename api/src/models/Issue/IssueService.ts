@@ -24,12 +24,24 @@ export class IssueService {
     this.sessionService = new SessionService(prisma);
   }
 
+  public async getProblemsByDialogue(dialogueId: string, filter: IssueFilterInput) {
+    const dialogueStatistics = await this.countNegativeDialogueInteractions(
+      dialogueId,
+      filter.startDate,
+      filter.endDate,
+      filter
+    );
+    const issues = this.calculateDialogueIssueScore(dialogueStatistics);
+    console.log('Issues: ', issues);
+    return issues[0];
+  }
+
   /**
    * Retrieves all workspace issues. This can be filtered, based on the required filter (startDate, endDate).
    * @param workspaceId Workspace ID
    */
   public async getProblemDialoguesByWorkspace(workspaceId: string, filter: IssueFilterInput): Promise<Issue[]> {
-    const dialogues = await this.countNegativeInteractionsPerDialogue(
+    const dialogues = await this.countNegativeWorkspaceInteractions(
       workspaceId, filter.startDate, filter.endDate, filter
     );
     const issues = orderBy(this.calculateDialogueIssueScore(dialogues), (topic) => topic.rankScore, 'desc');
@@ -71,18 +83,12 @@ export class IssueService {
   /**
    * Count negative interactions and their frequencies per dialogue within a workspace.
    */
-  async countNegativeInteractionsPerDialogue(
-    workspaceId: string,
+  async countNegativeSessions(
+    dialogueIds: string[],
     startDate: Date,
     endDate: Date,
     topicFilter?: TopicFilterInput
   ): Promise<TopicStatisticsByDialogueId> {
-    const dialogueIds = (
-      await this.workspaceService.getDialogues(
-        workspaceId, topicFilter?.dialogueStrings || undefined
-      )
-    ).map(dialogue => dialogue.id);
-
     // Fetch all sessions for the dialogues.
     const sessions = await this.sessionService.findSessionsForDialogues(
       dialogueIds,
@@ -103,6 +109,39 @@ export class IssueService {
 
     return dialogueStatistics;
   }
+
+  /**
+   * Count negative interactions and their frequencies per dialogue within a workspace.
+   */
+  async countNegativeWorkspaceInteractions(
+    workspaceId: string,
+    startDate: Date,
+    endDate: Date,
+    topicFilter?: TopicFilterInput
+  ): Promise<TopicStatisticsByDialogueId> {
+    const dialogueIds = (
+      await this.workspaceService.getDialogues(
+        workspaceId, topicFilter?.dialogueStrings || undefined
+      )
+    ).map(dialogue => dialogue.id);
+
+    // Fetch all sessions for the dialogues.
+    return this.countNegativeSessions(dialogueIds, startDate, endDate, topicFilter);
+  };
+
+  /**
+   * Count negative interactions and their frequencies for a single dialogue.
+   */
+  async countNegativeDialogueInteractions(
+    dialogueId: string,
+    startDate: Date,
+    endDate: Date,
+    topicFilter?: TopicFilterInput
+  ): Promise<TopicStatisticsByDialogueId> {
+
+    // Fetch all sessions for the dialogues.
+    return this.countNegativeSessions([dialogueId], startDate, endDate, topicFilter);
+  };
 
   /**
    * Calculate part of the issue score from actions.

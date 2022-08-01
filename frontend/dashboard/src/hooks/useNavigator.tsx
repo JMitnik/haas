@@ -36,6 +36,7 @@ export const useNavigator = () => {
   const { customerSlug, dialogueSlug, campaignId } = useParams<DashboardParams>();
 
   const dashboardScopeMatch = useRouteMatch<{ customerSlug: string }>({ path: ROUTES.DASHBOARD_VIEW });
+  const dialogueScopeMatch = useRouteMatch<{ dialogueSlug: string }>({ path: ROUTES.DIALOGUE_ROOT, exact: true });
   const dialogueMatch = useRouteMatch<{ dialogueSlug: string }>({ path: ROUTES.DIALOGUE_ROOT });
   const userOverviewMatch = useRouteMatch<{ dialogueSlug: string }>({ path: ROUTES.USERS_OVERVIEW });
   const dialoguesMatch = useRouteMatch({ path: ROUTES.DIALOGUES_VIEW });
@@ -193,6 +194,7 @@ export const useNavigator = () => {
     dialoguesMatch,
     dialogueMatch,
     dashboardScopeMatch,
+    dialogueScopeMatch,
     customerSlug,
     dialogueSlug,
     campaignId,

@@ -42,7 +42,7 @@ const ScoreGraphModule = ({ chartData }: { chartData: SessionHistory[] }) => {
           axisRight={null}
           enableArea
           axisBottom={null}
-          colors={{ scheme: 'spectral' }}
+          colors={['#3d57cc']}
           pointSize={10}
           pointBorderWidth={2}
           pointBorderColor={{ from: 'serieColor' }}

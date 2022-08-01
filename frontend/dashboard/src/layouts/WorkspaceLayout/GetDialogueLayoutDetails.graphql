@@ -1,0 +1,13 @@
+query GetDialogueLayoutDetails($workspaceId: ID!, $dialogueId: ID!, $healthInput: HealthScoreInput!) {
+  customer(id: $workspaceId) {
+    id
+    dialogue(where: { id: $dialogueId }) {
+      id
+      healthScore(input: $healthInput) {
+         nrVotes
+        negativeResponseCount
+        score
+      }
+    }
+  }
+}

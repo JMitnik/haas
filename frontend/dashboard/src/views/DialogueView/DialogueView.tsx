@@ -1,32 +1,42 @@
+import * as Popover from '@radix-ui/react-popover';
 import * as UI from '@haas/ui';
 import * as qs from 'qs';
 import {
-  Activity, Award, Clipboard, Download, MessageCircle,
-  ThumbsDown, ThumbsUp, TrendingDown, TrendingUp,
+  AlertTriangle, Award, Clipboard, Download, MessageCircle,
+  ThumbsDown, ThumbsUp, TrendingDown, TrendingUp, User,
 } from 'react-feather';
+import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { Tag, TagIcon, TagLabel, useClipboard } from '@chakra-ui/core';
-import { sub } from 'date-fns';
+import { Zoom } from '@visx/zoom';
+import { endOfDay, sub } from 'date-fns';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import QRCode from 'qrcode.react';
-import React, { useContext, useEffect, useReducer, useRef, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import styled, { ThemeContext } from 'styled-components';
 
-import * as Popover from '@radix-ui/react-popover';
-import { GetDialogueStatisticsQuery, useGetDialogueStatisticsQuery } from 'types/generated-types';
-import { ReactComponent as PathsIcon } from 'assets/icons/icon-launch.svg';
-import { ReactComponent as QRIcon } from 'assets/icons/icon-qr.svg';
-import { ReactComponent as TrendingIcon } from 'assets/icons/icon-trending-up.svg';
-import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
-
+import * as Modal from 'components/Common/Modal';
 import { AnimatePresence, motion } from 'framer-motion';
+import { DatePicker } from 'components/Common/DatePicker';
+import {
+  GetDialogueStatisticsQuery, useGetDialogueStatisticsQuery, useGetSessionPathsQuery,
+} from 'types/generated-types';
+import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModalCard';
+import { ReactComponent as QRIcon } from 'assets/icons/icon-qr.svg';
 
+import { DateFormat, useDate } from 'hooks/useDate';
+import { GradientLightgreenGreen, GradientOrangeRed, GradientPinkRed, GradientSteelPurple, LinearGradient } from '@visx/gradient';
+import { HexagonGrid } from 'components/Analytics/WorkspaceGrid/HexagonGrid';
+import { HexagonNode, HexagonNodeType, HexagonSessionNode } from 'components/Analytics/WorkspaceGrid/WorkspaceGrid.types';
+import { PatternCircles } from '@visx/pattern';
+import { Statistic } from 'components/Analytics/WorkspaceGrid/Statistic';
 import { View } from 'layouts/View';
+import { createGrid } from 'components/Analytics/WorkspaceGrid/WorkspaceGrid.helpers';
 import { slideUpFadeMotion } from 'components/animation/config';
+import { useDialogue } from 'providers/DialogueProvider';
 import { useNavigator } from 'hooks/useNavigator';
+import useMeasure from 'react-use-measure';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
-import NegativePathsModule from './Modules/NegativePathsModule/index.tsx';
-import PositivePathsModule from './Modules/PositivePathsModule/PositivePathsModule';
 import ScoreGraphModule from './Modules/ScoreGraphModule';
 import SummaryModule from './Modules/SummaryModules/SummaryModule';
 
@@ -228,6 +238,10 @@ const calcScoreIncrease = (currentScore: number, prevScore: number) => {
 };
 
 const DialogueView = () => {
+  const [ref, bounds] = useMeasure();
+  const initialRef = React.useRef<HTMLDivElement>();
+  const width = bounds.width || 600;
+  const height = Math.max(bounds.height, 500);
   const [activeDateState, dispatch] = useReducer(dateReducer, {
     startDate: sub(new Date(), { weeks: 1 }),
     compareStatisticStartDate: sub(new Date(), { weeks: 2 }),
@@ -236,6 +250,13 @@ const DialogueView = () => {
   const { dialogueSlug, customerSlug } = useNavigator();
   const history = useHistory();
   const { t } = useTranslation();
+  const { format, getOneWeekAgo, getEndOfToday } = useDate();
+  const { activeDialogue } = useDialogue();
+
+  console.log('Active dialogue: ', activeDialogue);
+
+  // Session-id if currently being tracked.
+  const [sessionId, setSessionId] = useState<string | undefined>(undefined);
 
   /**
    * Cache dialogue statistics data when switching between date filters.
@@ -245,10 +266,27 @@ const DialogueView = () => {
     setCachedDialogueCustomer,
   ] = useState<GetDialogueStatisticsQuery['customer'] | undefined>(undefined);
 
+  const [dateRange, setDateRange] = useState<[Date, Date]>(() => {
+    const startDate = getOneWeekAgo();
+    const endDate = getEndOfToday();
+
+    return [startDate, endDate];
+  });
+
+  const [selectedStartDate, selectedEndDate] = dateRange;
+
+  console.log('Date range: ', dateRange);
+
   const { data, loading } = useGetDialogueStatisticsQuery({
     variables: {
       dialogueSlug,
       customerSlug,
+      startDateTime: format(selectedStartDate, DateFormat.DayTimeFormat),
+      endDateTime: format(endOfDay(selectedEndDate), DateFormat.DayTimeFormat),
+      issueFilter: {
+        startDate: format(selectedStartDate, DateFormat.DayTimeFormat),
+        endDate: format(endOfDay(selectedEndDate), DateFormat.DayTimeFormat),
+      },
       statisticsDateFilter: {
         startDate: activeDateState.startDate.toISOString(),
       },
@@ -256,8 +294,53 @@ const DialogueView = () => {
         endDate: activeDateState.compareStatisticStartDate.toISOString(),
       },
     },
-    pollInterval: 5000,
+    // pollInterval: 5000,
   });
+
+  const { data: sessionData } = useGetSessionPathsQuery({
+    variables: {
+      dialogueId: activeDialogue?.id as string,
+      input: {
+        startDateTime: format(selectedStartDate, DateFormat.DayTimeFormat),
+        endDateTime: format(endOfDay(selectedEndDate), DateFormat.DayTimeFormat),
+        path: [],
+        issueOnly: false,
+        refresh: true,
+      },
+    },
+  });
+
+  const pathedSessions: HexagonNode[] = sessionData?.dialogue?.pathedSessionsConnection?.pathedSessions?.map(
+    (session) => ({
+      id: session.id,
+      label: session.id,
+      type: HexagonNodeType.Session,
+      score: session.score,
+      session,
+    }),
+  ) || [];
+
+  /**
+   * Generates an array of Hexagon SVG coordinates according to the desired shape.
+   *
+   * The entries in the array correspond to `currentState.childNodes`, and can be accessed by the indices.
+   */
+  const gridItems = useMemo(() => (
+    createGrid(
+      pathedSessions.length || 0,
+      initialRef.current?.clientHeight || 495,
+      initialRef.current?.clientWidth || 495,
+    )
+  ), [pathedSessions]);
+
+  /**
+   * Adds the generated SVG coordinates to the hexagon nodes.
+   */
+  const hexagonNodes = pathedSessions.map((node, index) => ({
+    ...node,
+    id: node.id,
+    points: gridItems.points[index],
+  })) || [];
 
   useEffect(() => {
     if (data && !loading) {
@@ -287,196 +370,216 @@ const DialogueView = () => {
     isLoading: loading,
   };
 
+  const handleHexClick = (currentZoomHelper: ProvidedZoom<SVGElement>, clickedNode: HexagonNode) => {
+    setSessionId((clickedNode as HexagonSessionNode).session.id || undefined);
+  };
+
   return (
     <View documentTitle="haas | Dialogue">
       <UI.ViewHead>
-        <UI.Flex alignItems="center" justifyContent="space-between" width="100%">
-          <UI.Flex alignItems="flex-end">
-            <UI.Div mr={4}>
-              <UI.ViewTitle>
-                {t('views:dialogue_view')}
-              </UI.ViewTitle>
-              <UI.ViewSubTitle>
-                {dialogue?.title}
-              </UI.ViewSubTitle>
+        <UI.Div pb={4} position="relative" zIndex={10000}>
+          <UI.Flex alignItems="center" justifyContent="space-between">
+            <UI.Div>
+              <UI.H4 fontSize="1.1rem" color="off.500">
+                {t('overview')}
+              </UI.H4>
+              <UI.Span color="off.400" fontWeight={500}>
+                {t('workspace_overview_description')}
+              </UI.Span>
             </UI.Div>
-            <Popover.Root open={isShareDialogueOpen} onOpenChange={setIsShareDialogueOpen}>
-              <Popover.Trigger asChild>
-                <UI.Button leftIcon={() => <QRIcon />} ml={4} size="sm">
-                  {t('share')}
-                </UI.Button>
-              </Popover.Trigger>
-              <AnimatePresence>
-                {isShareDialogueOpen && (
-                  <Content
-                    align="start"
-                    asChild
-                    forceMount
-                    forwardedAs={motion.div}
-                    {...slideUpFadeMotion}
-                  >
-                    <motion.div style={{ background: 'white' }}>
-                      <ShareDialogue dialogueName={dialogueSlug} shareUrl={shareUrl} />
-                    </motion.div>
-                  </Content>
-                )}
-              </AnimatePresence>
-            </Popover.Root>
-          </UI.Flex>
 
-          <UI.Flex justifyContent="space-between" flexWrap="wrap">
-            <DatePickerExpanded activeLabel={activeDateState.dateLabel} dispatch={dispatch} />
+            <UI.Div>
+              <UI.Helper>Filters</UI.Helper>
+              <UI.Flex mt={1}>
+                <>
+                  <DatePicker
+                    type="range"
+                    startDate={selectedStartDate}
+                    endDate={selectedEndDate}
+                    onChange={setDateRange}
+                  />
+                </>
+              </UI.Flex>
+            </UI.Div>
           </UI.Flex>
-        </UI.Flex>
+        </UI.Div>
       </UI.ViewHead>
       <UI.ViewBody>
-        <UI.Grid gridTemplateColumns={['1fr', '1fr', '1fr 1fr 1fr']}>
-          <UI.Div gridColumn="1 / 4">
-            <UI.H4 color="default.darker" mb={4}>
-              <UI.Flex>
-                <UI.Div width="20px">
-                  <TrendingIcon fill="currentColor" />
-                </UI.Div>
-                <UI.Span ml={2}>
-                  {t(`dialogue:${activeDateState.dateLabel}_summary`)}
-                </UI.Span>
-              </UI.Flex>
-            </UI.H4>
-
-            <UI.Grid gridTemplateColumns="repeat(auto-fit, minmax(275px, 1fr))" minHeight="100px">
-              <UI.Skeleton {...fetchStatus}>
-                <SummaryModule
-                  heading={t('interactions')}
-                  renderIcon={Activity}
-                  onClick={() => (
-                    history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions`)
-                  )}
-                  isInFallback={dialogue?.statistics?.nrInteractions === 0}
-                  fallbackMetric={t('dialogue:fallback_no_interactions')}
-                  renderMetric={`${dialogue?.statistics?.nrInteractions} ${dialogue?.statistics?.nrInteractions || 0 > 1 ? t('interactions') : t('interaction')}`}
+        <UI.Grid gridTemplateColumns={['1fr', '1fr', '1fr', '1fr', '2fr 1fr']}>
+          <UI.Div>
+            <>
+              <UI.Grid gridTemplateColumns="1fr 1fr 1fr">
+                <Statistic
+                  icon={<User height={40} width={40} />}
+                  themeBg="green.500"
+                  themeColor="white"
+                  name="Responses"
+                  value={dialogue?.dialogueStatisticsSummary?.nrVotes || 0}
+                  onNavigate={() => null
+                    //   goToWorkspaceFeedbackOverview(
+                    //   findDialoguesInGroup([currentState.currentNode as HexagonNode]),
+                    //   format(startOfDay(startDate), DateFormat.DayTimeFormat),
+                    //   format(endOfDay(endDate), DateFormat.DayTimeFormat),
+                    // )
+                  }
                 />
-              </UI.Skeleton>
-
-              <UI.Skeleton {...fetchStatus}>
-                <SummaryModule
-                  heading={t('dialogue:average_score')}
-                  renderIcon={Award}
-                  isInFallback={dialogue?.thisWeekAverageScore === 0}
-                  fallbackMetric={t('dialogue:fallback_no_score')}
-                  renderMetric={`${(dialogue?.thisWeekAverageScore || 0 / 10).toFixed(2)} ${t('score')}`}
-                  renderCornerMetric={(
-                    <UI.Flex color="red">
-                      {increaseInAverageScore > 0 ? (
-                        <>
-                          <UI.Icon size="22px" as={TrendingUp} color="green.200" />
-                          <UI.Text fontWeight={600} fontSize="0.9rem" ml={1} color="green.400">
-                            {increaseInAverageScore.toFixed(2)}
-                            {' '}
-                            %
-                          </UI.Text>
-                        </>
-                      ) : (
-                        <>
-                          <UI.Icon size="22px" as={TrendingDown} color="red.200" />
-                          <UI.Text fontWeight={600} fontSize="0.9rem" ml={1} color="red.400">
-                            {increaseInAverageScore.toFixed(2)}
-                            {' '}
-                            %
-                          </UI.Text>
-                        </>
-                      )}
-                    </UI.Flex>
-                  )}
+                <Statistic
+                  icon={<AlertTriangle height={40} width={40} />}
+                  themeBg="red.500"
+                  themeColor="white"
+                  name="Problems"
+                  value={dialogue?.issues?.basicStats.responseCount || 0}
+                  onNavigate={() => null
+                    //   goToWorkspaceFeedbackOverview(
+                    //   findDialoguesInGroup([currentState.currentNode as HexagonNode]),
+                    //   format(startOfDay(startDate), DateFormat.DayTimeFormat),
+                    //   format(endOfDay(endDate), DateFormat.DayTimeFormat),
+                    //   55,
+                    // )
+                  }
                 />
-              </UI.Skeleton>
-
-              <UI.Skeleton {...fetchStatus}>
-                <SummaryModule
-                  heading={t('dialogue:frequently_mentioned')}
-                  renderIcon={MessageCircle}
-                  renderFooterText={t('dialogue:view_all_mentions')}
-                  isInFallback={!dialogue?.statistics?.mostPopularPath}
-                  onClick={() => (
-                    history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions?${makeSearchUrl()}`)
-                  )}
-                  fallbackMetric={t('dialogue:fallback_no_keywords')}
-                  renderMetric={dialogue?.statistics?.mostPopularPath?.answer}
-                  renderCornerMetric={(
-                    <>
-                      {dialogue?.statistics?.mostPopularPath?.basicSentiment === 'positive' ? (
-                        <Tag size="sm" variantColor="green">
-                          <TagIcon icon={() => <ThumbsUp />} size="10px" color="green.600" />
-                          <TagLabel color="green.600">{dialogue?.statistics?.mostPopularPath?.quantity}</TagLabel>
-                        </Tag>
-                      ) : (
-                        <Tag size="sm" variantColor="red">
-                          <TagIcon icon={() => <ThumbsDown />} size="10px" color="red.600" />
-                          <TagLabel color="red.600">{dialogue?.statistics?.mostPopularPath?.quantity}</TagLabel>
-                        </Tag>
-                      )}
-                    </>
-                  )}
+                <Statistic
+                  icon={<MessageCircle height={40} width={40} />}
+                  themeBg="main.500"
+                  themeColor="white"
+                  name="Action Requests"
+                  value={dialogue?.issues?.actionRequiredCount || 0}
+                  onNavigate={() => null
+                    //   goToWorkspaceFeedbackOverview(
+                    //   findDialoguesInGroup([currentState.currentNode as HexagonNode]),
+                    //   format(startOfDay(startDate), DateFormat.DayTimeFormat),
+                    //   format(endOfDay(endDate), DateFormat.DayTimeFormat),
+                    //   undefined,
+                    //   true,
+                    // )
+                  }
                 />
-              </UI.Skeleton>
-            </UI.Grid>
-          </UI.Div>
-
-          <UI.Div mt={2} gridColumn="1 / 4">
-            <UI.H4 color="default.darker" mb={4}>
-              <UI.Flex>
-                <UI.Div width="20px">
-                  <PathsIcon fill="currentColor" />
-                </UI.Div>
-                <UI.Span ml={2}>
-                  {t(`dialogue:notable_paths_of_${activeDateState.dateLabel}`)}
-                </UI.Span>
-              </UI.Flex>
-            </UI.H4>
-            <UI.Grid gridTemplateColumns="1fr 1fr">
-              <UI.Skeleton {...fetchStatus}>
-                <PositivePathsModule positivePaths={dialogue?.statistics?.topPositivePath} />
-              </UI.Skeleton>
-
-              <UI.Skeleton {...fetchStatus}>
-                <NegativePathsModule negativePaths={dialogue?.statistics?.topNegativePath} />
-              </UI.Skeleton>
-            </UI.Grid>
-          </UI.Div>
-
-          <UI.Div gridColumn="span 3">
-            <UI.H4 color="default.darker">
-              <UI.Flex>
-                <UI.Div width="20px">
-                  <TrophyIcon fill="currentColor" />
-                </UI.Div>
-                <UI.Span ml={2}>
-                  {t('dialogue:latest_data')}
-                </UI.Span>
-              </UI.Flex>
-            </UI.H4>
-          </UI.Div>
-
-          <UI.Div gridColumn="span 3">
-            <UI.Grid gridTemplateColumns={['1fr', '1fr', '1fr', '1fr', '2fr 1fr']}>
-              <UI.Div>
-                {dialogue?.statistics?.history ? (
+              </UI.Grid>
+              <UI.Grid gridTemplateColumns="repeat(auto-fill, minmax(250px, 1fr))" mt={4}>
+                <UI.Skeleton {...fetchStatus}>
+                  <SummaryModule
+                    heading={t('dialogue:average_score')}
+                    renderIcon={Award}
+                    isInFallback={dialogue?.thisWeekAverageScore === 0}
+                    fallbackMetric={t('dialogue:fallback_no_score')}
+                    renderMetric={`${(dialogue?.thisWeekAverageScore || 0 / 10).toFixed(2)} ${t('score')}`}
+                    renderCornerMetric={(
+                      <UI.Flex color="red">
+                        {increaseInAverageScore > 0 ? (
+                          <>
+                            <UI.Icon size="22px" as={TrendingUp} color="green.200" />
+                            <UI.Text fontWeight={600} fontSize="0.9rem" ml={1} color="green.400">
+                              {increaseInAverageScore.toFixed(2)}
+                              {' '}
+                              %
+                            </UI.Text>
+                          </>
+                        ) : (
+                          <>
+                            <UI.Icon size="22px" as={TrendingDown} color="red.200" />
+                            <UI.Text fontWeight={600} fontSize="0.9rem" ml={1} color="red.400">
+                              {increaseInAverageScore.toFixed(2)}
+                              {' '}
+                              %
+                            </UI.Text>
+                          </>
+                        )}
+                      </UI.Flex>
+                    )}
+                  />
+                </UI.Skeleton>
+                <UI.Skeleton {...fetchStatus}>
+                  <SummaryModule
+                    heading={t('dialogue:frequently_mentioned')}
+                    renderIcon={MessageCircle}
+                    renderFooterText={t('dialogue:view_all_mentions')}
+                    isInFallback={!dialogue?.statistics?.mostPopularPath}
+                    onClick={() => (
+                      history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions?${makeSearchUrl()}`)
+                    )}
+                    fallbackMetric={t('dialogue:fallback_no_keywords')}
+                    renderMetric={dialogue?.statistics?.mostPopularPath?.answer}
+                    renderCornerMetric={(
+                      <>
+                        {dialogue?.statistics?.mostPopularPath?.basicSentiment === 'positive' ? (
+                          <Tag size="sm" variantColor="green">
+                            <TagIcon icon={() => <ThumbsUp />} size="10px" color="green.600" />
+                            <TagLabel color="green.600">{dialogue?.statistics?.mostPopularPath?.quantity}</TagLabel>
+                          </Tag>
+                        ) : (
+                          <Tag size="sm" variantColor="red">
+                            <TagIcon icon={() => <ThumbsDown />} size="10px" color="red.600" />
+                            <TagLabel color="red.600">{dialogue?.statistics?.mostPopularPath?.quantity}</TagLabel>
+                          </Tag>
+                        )}
+                      </>
+                    )}
+                  />
+                </UI.Skeleton>
+                <UI.Div gridColumn="1 / -1">
                   <UI.Skeleton {...fetchStatus}>
                     {/* @ts-ignore */}
-                    <ScoreGraphModule chartData={dialogue?.statistics?.history || []} />
+                    <InteractionFeedModule interactions={dialogue?.sessions || []} />
                   </UI.Skeleton>
-                ) : (
-                  <UI.Div>{t('no_data')}</UI.Div>
-                )}
-              </UI.Div>
+                </UI.Div>
 
+              </UI.Grid>
+            </>
+
+          </UI.Div>
+          <UI.Div width="100%" ref={ref} position="relative">
+            <Zoom<SVGElement>
+              width={width}
+              height={height}
+              scaleYMax={1.5}
+              scaleYMin={0.5}
+            >
+              {(zoom) => (
+                <HexagonGrid
+                  key={`${selectedStartDate.toISOString()} - ${selectedEndDate.toISOString()}`}
+                  width={width}
+                  height={height}
+                  backgroundColor="#ebf0ff"
+                  nodes={hexagonNodes}
+                  onHexClick={handleHexClick}
+                  stateKey={dialogue?.id || ''}
+                  zoom={zoom}
+                  useBackgroundPattern
+                >
+                  <svg height={0}>
+                    <PatternCircles id="circles" height={6} width={6} stroke="black" strokeWidth={1} />
+                    <GradientOrangeRed id="dots-orange" />
+                    <GradientPinkRed id="dots-pink" />
+                    <GradientSteelPurple id="dots-gray" />
+                    <LinearGradient id="grays" from="#757F9A" to="#939bb1" />
+                    <GradientLightgreenGreen id="dots-green" />
+                  </svg>
+                </HexagonGrid>
+              )}
+            </Zoom>
+          </UI.Div>
+        </UI.Grid>
+        <UI.Grid mt={4} gridTemplateColumns={['1fr']}>
+          <UI.Div gridColumn="span 3">
+
+            {dialogue?.statistics?.history ? (
               <UI.Skeleton {...fetchStatus}>
                 {/* @ts-ignore */}
-                <InteractionFeedModule interactions={dialogue?.sessions || []} />
+                <ScoreGraphModule chartData={dialogue?.statistics?.history || []} />
               </UI.Skeleton>
-            </UI.Grid>
+            ) : (
+              <UI.Div>{t('no_data')}</UI.Div>
+            )}
+
           </UI.Div>
         </UI.Grid>
       </UI.ViewBody>
+
+      <Modal.Root open={!!sessionId} onClose={() => setSessionId(undefined)}>
+        <InteractionModalCard
+          sessionId={sessionId || ''}
+        />
+      </Modal.Root>
     </View>
   );
 };

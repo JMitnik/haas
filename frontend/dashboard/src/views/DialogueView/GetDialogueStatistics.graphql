@@ -1,4 +1,12 @@
-query GetDialogueStatistics($customerSlug: String!, $dialogueSlug: String!, $prevDateFilter: DialogueFilterInputType, $statisticsDateFilter: DialogueFilterInputType) {
+query GetDialogueStatistics(
+  $customerSlug: String!, 
+  $dialogueSlug: String!, 
+  $prevDateFilter: DialogueFilterInputType, 
+  $statisticsDateFilter: DialogueFilterInputType,
+  $startDateTime: String!,
+  $endDateTime: String,
+  $issueFilter: IssueFilterInput
+  ) {
   customer(slug: $customerSlug) {
     id
     dialogue(where: { slug: $dialogueSlug }) {
@@ -24,6 +32,41 @@ query GetDialogueStatistics($customerSlug: String!, $dialogueSlug: String!, $pre
           }
         }
       }
+      issues(filter: $issueFilter) {
+        id
+        topic
+        rankScore
+        followUpAction
+        actionRequiredCount
+        dialogue {
+          id
+          title
+        }
+        basicStats {
+          responseCount
+          average
+        }
+        history {
+          id
+          items {
+            id
+            date
+            frequency
+          }
+        }
+		  }
+      dialogueStatisticsSummary (input: { startDateTime: $startDateTime, endDateTime: $endDateTime, impactType: AVERAGE, refresh: true 
+			}) {
+				id
+				nrVotes
+				impactScore
+				updatedAt
+        title
+				dialogue {
+					title
+					id
+				}
+			}
       statistics(input: $statisticsDateFilter) {
         nrInteractions
         topPositivePath {

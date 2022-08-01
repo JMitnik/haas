@@ -704,6 +704,7 @@ type Dialogue {
   id: ID!
   isPrivate: Boolean
   isWithoutGenData: Boolean
+  issues(filter: IssueFilterInput): Issue
   language: LanguageEnumType
   leafs(searchTerm: String): [QuestionNode!]
   mostChangedPath(input: DialogueStatisticsSummaryFilterInput): MostChangedPath

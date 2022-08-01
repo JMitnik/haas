@@ -1615,6 +1615,7 @@ export interface NexusGenFieldTypes {
     id: string; // ID!
     isPrivate: boolean | null; // Boolean
     isWithoutGenData: boolean | null; // Boolean
+    issues: NexusGenRootTypes['Issue'] | null; // Issue
     language: NexusGenEnums['LanguageEnumType'] | null; // LanguageEnumType
     leafs: NexusGenRootTypes['QuestionNode'][] | null; // [QuestionNode!]
     mostChangedPath: NexusGenRootTypes['MostChangedPath'] | null; // MostChangedPath
@@ -2469,6 +2470,7 @@ export interface NexusGenFieldTypeNames {
     id: 'ID'
     isPrivate: 'Boolean'
     isWithoutGenData: 'Boolean'
+    issues: 'Issue'
     language: 'LanguageEnumType'
     leafs: 'QuestionNode'
     mostChangedPath: 'MostChangedPath'
@@ -3137,6 +3139,9 @@ export interface NexusGenArgTypes {
     }
     healthScore: { // args
       input?: NexusGenInputs['HealthScoreInput'] | null; // HealthScoreInput
+    }
+    issues: { // args
+      filter?: NexusGenInputs['IssueFilterInput'] | null; // IssueFilterInput
     }
     leafs: { // args
       searchTerm?: string | null; // String
