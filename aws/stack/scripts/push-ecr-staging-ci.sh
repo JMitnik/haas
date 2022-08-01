@@ -1,3 +1,5 @@
+set -e
+
 # TODO: Check IAM permissions
 # TODO: Chcek environment, this should not be possible in prod (unless the Master account is used)
 echo "This will deploy the latest Docker container to the ECR."
@@ -14,7 +16,7 @@ REMOTE_REPO_TAG="latest"
 
 # Region is a variable
 # aws_account_id is a variable
-docker build -t $LOCAL_REPO_NAME:$LOCAL_TAG api
+docker build -t $LOCAL_REPO_NAME:$LOCAL_TAG api || exit 1
 
 # # Authenticate our docker client with the aws ECR
 aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com
