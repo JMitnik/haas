@@ -260,21 +260,19 @@ export const GenerateWorkspaceView = () => {
 
             </UI.FormControl>
 
-            <UI.FormControl opacity={usesGeneratedData ? 0.5 : 1}>
+            <UI.FormControl>
               <UI.FormLabel>{t('upload_user_csv')}</UI.FormLabel>
               <UI.FormLabelHelper>{t('upload_user_csv_helper')}</UI.FormLabelHelper>
               <FileDropInput
-                isDisabled={!!usesGeneratedData}
                 onDrop={handleManagerDrop}
                 onCancel={handleManagerCancel}
               />
             </UI.FormControl>
 
-            <UI.FormControl isRequired={usesGeneratedData === 0} opacity={usesGeneratedData ? 0.5 : 1}>
+            <UI.FormControl>
               <UI.FormLabel>{t('upload_workspace_csv')}</UI.FormLabel>
               <UI.FormLabelHelper>{t('upload_workspace_csv_helper')}</UI.FormLabelHelper>
               <FileDropInput
-                isDisabled={!!usesGeneratedData}
                 onDrop={handleDrop}
                 onCancel={handleGroupsCancel}
               />
@@ -285,7 +283,7 @@ export const GenerateWorkspaceView = () => {
               mt={4}
               variantColor="main"
               type="submit"
-              isDisabled={!form.formState.isValid || (usesGeneratedData === 0 && !activeCSV)}
+              isDisabled={!form.formState.isValid}
               isLoading={loading}
             >
               {t('save')}
