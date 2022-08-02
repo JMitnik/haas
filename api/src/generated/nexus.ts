@@ -314,9 +314,9 @@ export interface NexusGenInputs {
     desc: boolean | null; // Boolean
   }
   DialogueFilterInputType: { // input type
-    endDate?: string | null; // String
+    endDateTime?: string | null; // String
     searchTerm?: string | null; // String
-    startDate?: string | null; // String
+    startDateTime?: string | null; // String
   }
   DialogueStatisticsSummaryFilterInput: { // input type
     cutoff?: number | null; // Int
@@ -3168,7 +3168,7 @@ export interface NexusGenArgTypes {
       take?: number | null; // Int
     }
     statistics: { // args
-      input?: NexusGenInputs['DialogueFilterInputType'] | null; // DialogueFilterInputType
+      input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
     }
     topic: { // args
       input?: NexusGenInputs['TopicInputType'] | null; // TopicInputType

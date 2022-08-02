@@ -718,7 +718,7 @@ type Dialogue {
   sessionConnection(filter: SessionConnectionFilterInput): SessionConnection
   sessions(take: Int): [Session]
   slug: String!
-  statistics(input: DialogueFilterInputType): DialogueStatistics
+  statistics(input: DialogueStatisticsSummaryFilterInput): DialogueStatistics
   tags: [Tag]
   title: String!
   topic(input: TopicInputType): TopicType
@@ -769,9 +769,9 @@ input DialogueConnectionOrderByInput {
 }
 
 input DialogueFilterInputType {
-  endDate: String
+  endDateTime: String
   searchTerm: String
-  startDate: String
+  startDateTime: String
 }
 
 type DialogueFinisherObjectType {

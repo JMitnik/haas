@@ -1,20 +1,23 @@
 query GetDialogueStatistics(
   $customerSlug: String!, 
   $dialogueSlug: String!, 
-  $prevDateFilter: DialogueFilterInputType, 
-  $statisticsDateFilter: DialogueFilterInputType,
   $startDateTime: String!,
   $endDateTime: String,
-  $issueFilter: IssueFilterInput
+  $issueFilter: IssueFilterInput,
+  $healthInput: HealthScoreInput,
   ) {
   customer(slug: $customerSlug) {
     id
     dialogue(where: { slug: $dialogueSlug }) {
       id
       title
-      thisWeekAverageScore: averageScore(input: $statisticsDateFilter)
-      previousScore: averageScore(input: $prevDateFilter)
-      statistics(input: $statisticsDateFilter) {
+      healthScore(input: $healthInput) {
+        nrVotes
+        negativeResponseCount
+        score
+        average
+      }
+      statistics(input: { startDateTime: $startDateTime, endDateTime: $endDateTime, impactType: AVERAGE, refresh: true }) {
         nrInteractions
         topPositivePath {
           answer

@@ -32,8 +32,8 @@ export const DialogueFilterInputType = inputObjectType({
 
   definition(t) {
     t.string('searchTerm', { nullable: true });
-    t.string('startDate', { nullable: true });
-    t.string('endDate', { nullable: true });
+    t.string('startDateTime', { nullable: true });
+    t.string('endDateTime', { nullable: true });
   },
 });
 
@@ -353,12 +353,23 @@ export const DialogueType = objectType({
           return 0;
         }
 
-        const startDate = args.input?.startDate ? isADate(args.input.startDate) : undefined;
-        const endDate = args.input?.endDate ? isADate(args.input.endDate) : undefined
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE');
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        // const startDate = args.input?.startDate ? isADate(args.input.startDate) : undefined;
+        // const endDate = args.input?.endDate ? isADate(args.input.endDate) : undefined
 
         const average = await ctx.services.dialogueService.calculateAverageScore(parent.id, {
-          startDate,
-          endDate,
+          startDate: utcStartDateTime as Date,
+          endDate: utcEndDateTime,
         })
 
         return average || 0;
@@ -381,19 +392,31 @@ export const DialogueType = objectType({
 
     t.field('statistics', {
       type: DialogueStatistics,
-      args: { input: DialogueFilterInputType },
+      args: { input: DialogueStatisticsSummaryFilterInput },
       nullable: true,
       useQueryCounter: true,
       useTimeResolve: true,
       async resolve(parent, args) {
-        const startDate = args.input?.startDate ? formatDate(args.input.startDate) : subDays(new Date(), 7);
-        const endDate = args.input?.endDate ? formatDate(args.input.endDate) : null;
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE');
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        console.log('UTC DATES: ', utcStartDateTime, utcEndDateTime);
 
         const statistics = await DialogueService.getStatistics(
           parent.id,
-          startDate,
-          endDate,
+          utcStartDateTime,
+          utcEndDateTime,
         );
+
+        console.log('Statistics: ', statistics);
 
         if (!statistics) {
           return {

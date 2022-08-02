@@ -32,7 +32,6 @@ export class IssueService {
       filter
     );
     const issues = this.calculateDialogueIssueScore(dialogueStatistics);
-    console.log('Issues: ', issues);
     return issues[0];
   }
 

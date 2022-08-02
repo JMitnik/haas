@@ -7,7 +7,7 @@ import {
 import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { Tag, TagIcon, TagLabel } from '@chakra-ui/core';
 import { Zoom } from '@visx/zoom';
-import { endOfDay, startOfDay, sub } from 'date-fns';
+import { differenceInDays, endOfDay, startOfDay, sub } from 'date-fns';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect, useMemo, useReducer, useState } from 'react';
@@ -104,11 +104,6 @@ const DialogueView = () => {
   const initialRef = React.useRef<HTMLDivElement>();
   const width = bounds.width || 600;
   const height = Math.max(bounds.height, 500);
-  const [activeDateState, dispatch] = useReducer(dateReducer, {
-    startDate: sub(new Date(), { weeks: 1 }),
-    compareStatisticStartDate: sub(new Date(), { weeks: 2 }),
-    dateLabel: 'last_week',
-  });
   const { dialogueSlug, customerSlug, goToDialogueFeedbackOverview } = useNavigator();
   const { t } = useTranslation();
   const { format, getOneWeekAgo, getEndOfToday } = useDate();
@@ -145,11 +140,9 @@ const DialogueView = () => {
         startDate: format(selectedStartDate, DateFormat.DayTimeFormat),
         endDate: format(endOfDay(selectedEndDate), DateFormat.DayTimeFormat),
       },
-      statisticsDateFilter: {
-        startDate: activeDateState.startDate.toISOString(),
-      },
-      prevDateFilter: {
-        endDate: activeDateState.compareStatisticStartDate.toISOString(),
+      healthInput: {
+        startDateTime: format(selectedStartDate, DateFormat.DayTimeFormat),
+        endDateTime: format(endOfDay(selectedEndDate), DateFormat.DayTimeFormat),
       },
     },
   });
@@ -209,11 +202,6 @@ const DialogueView = () => {
   if (!cachedDialogueCustomer) return <UI.Loader />;
   const { dialogue } = cachedDialogueCustomer;
 
-  const increaseInAverageScore = calcScoreIncrease(
-    dialogue?.thisWeekAverageScore || 0,
-    dialogue?.previousScore || 0,
-  );
-
   const makeSearchUrl = () => {
     if (!dialogue?.statistics?.mostPopularPath?.answer) return '';
 
@@ -228,6 +216,8 @@ const DialogueView = () => {
   const handleHexClick = (currentZoomHelper: ProvidedZoom<SVGElement>, clickedNode: HexagonNode) => {
     setSessionId((clickedNode as HexagonSessionNode).session.id || undefined);
   };
+
+  const health = data?.customer?.dialogue?.healthScore;
 
   return (
     <View documentTitle="haas | Dialogue">
@@ -312,37 +302,14 @@ const DialogueView = () => {
                   <SummaryModule
                     heading={t('dialogue:average_score')}
                     renderIcon={Award}
-                    isInFallback={dialogue?.thisWeekAverageScore === 0}
+                    isInFallback={health?.average === 0}
                     fallbackMetric={t('dialogue:fallback_no_score')}
-                    renderMetric={`${(dialogue?.thisWeekAverageScore || 0 / 10).toFixed(2)} ${t('score')}`}
+                    renderMetric={`${(health?.average ? health?.average / 10 : 0).toFixed(1)} ${t('score')}`}
                     onClick={() => goToDialogueFeedbackOverview(
                       dialogueSlug,
                       [activeDialogue?.id as string],
                       format(startOfDay(selectedStartDate), DateFormat.DayTimeFormat),
                       format(endOfDay(selectedEndDate), DateFormat.DayTimeFormat),
-                    )}
-                    renderCornerMetric={(
-                      <UI.Flex color="red">
-                        {increaseInAverageScore > 0 ? (
-                          <>
-                            <UI.Icon size="22px" as={TrendingUp} color="green.200" />
-                            <UI.Text fontWeight={600} fontSize="0.9rem" ml={1} color="green.400">
-                              {increaseInAverageScore.toFixed(2)}
-                              {' '}
-                              %
-                            </UI.Text>
-                          </>
-                        ) : (
-                          <>
-                            <UI.Icon size="22px" as={TrendingDown} color="red.200" />
-                            <UI.Text fontWeight={600} fontSize="0.9rem" ml={1} color="red.400">
-                              {increaseInAverageScore.toFixed(2)}
-                              {' '}
-                              %
-                            </UI.Text>
-                          </>
-                        )}
-                      </UI.Flex>
                     )}
                   />
                 </UI.Skeleton>
@@ -384,6 +351,7 @@ const DialogueView = () => {
                   <UI.Skeleton {...fetchStatus}>
                     {/* @ts-ignore */}
                     <InteractionFeedModule
+                      onSessionIdChange={setSessionId}
                       interactions={
                         orderBy(
                           dialogue?.sessions,
