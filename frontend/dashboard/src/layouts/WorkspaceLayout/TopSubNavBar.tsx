@@ -6,10 +6,10 @@ import { DialogueTopNavBar } from './DialogueTopNavBar';
 import { WorkspaceTopNavBar } from './WorkspaceTopNavBar';
 
 export const TopSubNavBar = () => {
-  const { dashboardScopeMatch, dialogueScopeMatch } = useNavigator();
+  const { dashboardScopeMatch, dialogueScopeMatch, dialogueScopeFeedbackMatch } = useNavigator();
 
   if (dashboardScopeMatch) return <WorkspaceTopNavBar />;
-  if (dialogueScopeMatch) return <DialogueTopNavBar />;
+  if (dialogueScopeMatch || dialogueScopeFeedbackMatch) return <DialogueTopNavBar />;
 
   return null;
 };

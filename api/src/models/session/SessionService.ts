@@ -462,8 +462,12 @@ class SessionService {
     dialogueId: string,
     paginationOpts?: Nullable<PaginationProps>,
     take?: number | null,
+    showMostRecent?: boolean,
   ) {
     const sessions = await prisma.session.findMany({
+      orderBy: showMostRecent ? {
+        createdAt: 'desc',
+      } : undefined,
       take: take || undefined,
       where: {
         dialogueId,

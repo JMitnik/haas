@@ -14,6 +14,31 @@ query GetDialogueStatistics(
       title
       thisWeekAverageScore: averageScore(input: $statisticsDateFilter)
       previousScore: averageScore(input: $prevDateFilter)
+      statistics(input: $statisticsDateFilter) {
+        nrInteractions
+        topPositivePath {
+          answer
+          quantity
+          basicSentiment
+        }
+
+        mostPopularPath {
+          answer
+          quantity
+          basicSentiment
+        }
+
+        topNegativePath {
+          quantity
+          answer
+          basicSentiment
+        }
+
+        history {
+          x
+          y
+        }
+      }
       sessions(take: 3) {
         id
         createdAt
@@ -67,31 +92,6 @@ query GetDialogueStatistics(
 					id
 				}
 			}
-      statistics(input: $statisticsDateFilter) {
-        nrInteractions
-        topPositivePath {
-          answer
-          quantity
-          basicSentiment
-        }
-
-        mostPopularPath {
-          answer
-          quantity
-          basicSentiment
-        }
-
-        topNegativePath {
-          quantity
-          answer
-          basicSentiment
-        }
-
-        history {
-          x
-          y
-        }
-      }
     }
   }
 }

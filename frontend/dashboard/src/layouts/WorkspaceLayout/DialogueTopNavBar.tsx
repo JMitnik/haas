@@ -158,7 +158,7 @@ export const DialogueTopNavBar = () => {
               </UI.Span>
 
               <UI.Span>
-                <NavLink to={workspaceInteractionsPath}>
+                <NavLink to={`/dashboard/b/${customerSlug}/d/${activeDialogue?.slug}/feedback?dialogueIds=${activeDialogue?.id}`}>
                   {t('interactions')}
                 </NavLink>
               </UI.Span>

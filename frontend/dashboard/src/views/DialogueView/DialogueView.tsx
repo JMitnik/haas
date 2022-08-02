@@ -1,48 +1,43 @@
-import * as Popover from '@radix-ui/react-popover';
 import * as UI from '@haas/ui';
 import * as qs from 'qs';
 import {
-  AlertTriangle, Award, Clipboard, Download, MessageCircle,
+  AlertTriangle, Award, MessageCircle,
   ThumbsDown, ThumbsUp, TrendingDown, TrendingUp, User,
 } from 'react-feather';
 import { ProvidedZoom } from '@visx/zoom/lib/types';
-import { Tag, TagIcon, TagLabel, useClipboard } from '@chakra-ui/core';
+import { Tag, TagIcon, TagLabel } from '@chakra-ui/core';
 import { Zoom } from '@visx/zoom';
-import { endOfDay, sub } from 'date-fns';
+import { endOfDay, startOfDay, sub } from 'date-fns';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import QRCode from 'qrcode.react';
-import React, { useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
-import styled, { ThemeContext } from 'styled-components';
+import React, { useEffect, useMemo, useReducer, useState } from 'react';
+import useMeasure from 'react-use-measure';
 
 import * as Modal from 'components/Common/Modal';
-import { AnimatePresence, motion } from 'framer-motion';
+import { DateFormat, useDate } from 'hooks/useDate';
 import { DatePicker } from 'components/Common/DatePicker';
 import {
-  GetDialogueStatisticsQuery, useGetDialogueStatisticsQuery, useGetSessionPathsQuery,
+  GetDialogueStatisticsQuery, Session, useGetDialogueStatisticsQuery, useGetSessionPathsQuery,
 } from 'types/generated-types';
-import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModalCard';
-import { ReactComponent as QRIcon } from 'assets/icons/icon-qr.svg';
-
-import { DateFormat, useDate } from 'hooks/useDate';
-import { GradientLightgreenGreen, GradientOrangeRed, GradientPinkRed, GradientSteelPurple, LinearGradient } from '@visx/gradient';
+import {
+  GradientLightgreenGreen, GradientOrangeRed, GradientPinkRed, GradientSteelPurple, LinearGradient,
+} from '@visx/gradient';
 import { HexagonGrid } from 'components/Analytics/WorkspaceGrid/HexagonGrid';
-import { HexagonNode, HexagonNodeType, HexagonSessionNode } from 'components/Analytics/WorkspaceGrid/WorkspaceGrid.types';
+import {
+  HexagonNode, HexagonNodeType, HexagonSessionNode,
+} from 'components/Analytics/WorkspaceGrid/WorkspaceGrid.types';
+import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModalCard';
 import { PatternCircles } from '@visx/pattern';
 import { Statistic } from 'components/Analytics/WorkspaceGrid/Statistic';
 import { View } from 'layouts/View';
 import { createGrid } from 'components/Analytics/WorkspaceGrid/WorkspaceGrid.helpers';
-import { slideUpFadeMotion } from 'components/animation/config';
+import { isPresent } from 'ts-is-present';
+import { orderBy } from 'lodash';
 import { useDialogue } from 'providers/DialogueProvider';
 import { useNavigator } from 'hooks/useNavigator';
-import useMeasure from 'react-use-measure';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
 import ScoreGraphModule from './Modules/ScoreGraphModule';
 import SummaryModule from './Modules/SummaryModules/SummaryModule';
-
-const Content = styled(Popover.Content)`
-  transformOrigin: var(--radix-popover-content-transform-origin);
-`;
 
 type ActiveDateType = 'last_hour' | 'last_day' | 'last_week' | 'last_month' | 'last_year';
 
@@ -55,55 +50,6 @@ interface ActiveDateState {
 interface ActiveDateAction {
   type: ActiveDateType;
 }
-
-interface DatePickerProps {
-  activeLabel: ActiveDateType;
-  dispatch: React.Dispatch<ActiveDateAction>;
-}
-
-const DatePickerExpanded = ({ activeLabel, dispatch }: DatePickerProps) => {
-  const { t } = useTranslation();
-
-  return (
-    <UI.Div>
-      <UI.Flex>
-        <UI.Button
-          size="sm"
-          isActive={activeLabel === 'last_hour'}
-          onClick={() => dispatch({ type: 'last_hour' })}
-        >
-          {t('dialogue:last_hour')}
-        </UI.Button>
-        <UI.Button
-          ml={1}
-          size="sm"
-          isActive={activeLabel === 'last_day'}
-          onClick={() => dispatch({ type: 'last_day' })}
-        >
-          {t('dialogue:last_day')}
-        </UI.Button>
-        <UI.Button
-          ml={1}
-          size="sm"
-          isActive={activeLabel === 'last_week'}
-          onClick={() => dispatch({ type: 'last_week' })}
-        >
-          {t('dialogue:last_week')}
-
-        </UI.Button>
-        <UI.Button
-          size="sm"
-          ml={1}
-          isActive={activeLabel === 'last_month'}
-          onClick={() => dispatch({ type: 'last_month' })}
-        >
-          {t('dialogue:last_month')}
-
-        </UI.Button>
-      </UI.Flex>
-    </UI.Div>
-  );
-};
 
 const dateReducer = (state: ActiveDateState, action: ActiveDateAction): ActiveDateState => {
   switch (action.type) {
@@ -147,90 +93,6 @@ const dateReducer = (state: ActiveDateState, action: ActiveDateAction): ActiveDa
   }
 };
 
-interface ShareDialogueDropdownProps {
-  dialogueName: string;
-  shareUrl: string;
-}
-
-const ShareDialogue = ({ dialogueName, shareUrl }: ShareDialogueDropdownProps) => {
-  // @ts-ignore
-  const themeContext = useContext(ThemeContext);
-
-  const qrColor = themeContext.colors.primary || '#FFFFFF';
-  const qrContainerRef = useRef<HTMLDivElement>(null);
-
-  const { onCopy, hasCopied } = useClipboard(shareUrl);
-
-  const handleDownload = (): void => {
-    if (!qrContainerRef.current) return;
-
-    const canvas = qrContainerRef.current.querySelector('canvas');
-    if (!canvas) return;
-
-    const img = canvas.toDataURL('image/png');
-    const anchor = document.createElement('a');
-    anchor.href = img;
-    anchor.download = `QRCode-${dialogueName}.png`;
-    anchor.click();
-  };
-
-  const { t } = useTranslation();
-
-  return (
-    <UI.Card maxWidth={500}>
-      <UI.CardBody>
-        <UI.Div mb={4}>
-          <UI.Text fontWeight={600} fontSize="1.3rem" color="gray.700">{t('dialogue:share_qr')}</UI.Text>
-          <UI.Hr />
-          <UI.Grid pt={2} gridTemplateColumns="1fr 1fr">
-            <UI.Div>
-              <UI.Text color="gray.500" fontSize="0.8rem">
-                {t('dialogue:qr_download_helper')}
-              </UI.Text>
-            </UI.Div>
-            <UI.ColumnFlex alignItems="center">
-              <UI.Div ref={qrContainerRef}>
-                {/* @ts-ignore */}
-                <QRCode fgColor={qrColor} value={`${shareUrl}?origin=qrc`} />
-              </UI.Div>
-              <UI.Button
-                margin="0 auto"
-                onClick={handleDownload}
-                as="a"
-                variantColor="teal"
-                mt={1}
-                size="xs"
-                leftIcon={() => <Download size={12} />}
-              >
-                <UI.Text ml={1}>Download</UI.Text>
-              </UI.Button>
-            </UI.ColumnFlex>
-          </UI.Grid>
-        </UI.Div>
-        <UI.Div mb={4}>
-          <UI.Text fontWeight={600} fontSize="1.3rem" color="gray.700">{t('dialogue:share_link')}</UI.Text>
-          <UI.Hr />
-
-          <UI.Flex>
-            <UI.Div flexGrow={1} pt={2}>
-              <UI.Input
-                rightEl={(
-                  <UI.Button width="auto" size="sm" onClick={onCopy} leftIcon={() => <Clipboard />}>
-                    {hasCopied ? 'Copied' : 'Copy'}
-                  </UI.Button>
-                )}
-                value={shareUrl}
-                isReadOnly
-              />
-            </UI.Div>
-
-          </UI.Flex>
-        </UI.Div>
-      </UI.CardBody>
-    </UI.Card>
-  );
-};
-
 const calcScoreIncrease = (currentScore: number, prevScore: number) => {
   if (!prevScore) return 100;
 
@@ -247,13 +109,10 @@ const DialogueView = () => {
     compareStatisticStartDate: sub(new Date(), { weeks: 2 }),
     dateLabel: 'last_week',
   });
-  const { dialogueSlug, customerSlug } = useNavigator();
-  const history = useHistory();
+  const { dialogueSlug, customerSlug, goToDialogueFeedbackOverview } = useNavigator();
   const { t } = useTranslation();
   const { format, getOneWeekAgo, getEndOfToday } = useDate();
   const { activeDialogue } = useDialogue();
-
-  console.log('Active dialogue: ', activeDialogue);
 
   // Session-id if currently being tracked.
   const [sessionId, setSessionId] = useState<string | undefined>(undefined);
@@ -275,9 +134,8 @@ const DialogueView = () => {
 
   const [selectedStartDate, selectedEndDate] = dateRange;
 
-  console.log('Date range: ', dateRange);
-
   const { data, loading } = useGetDialogueStatisticsQuery({
+    fetchPolicy: 'no-cache',
     variables: {
       dialogueSlug,
       customerSlug,
@@ -294,10 +152,10 @@ const DialogueView = () => {
         endDate: activeDateState.compareStatisticStartDate.toISOString(),
       },
     },
-    // pollInterval: 5000,
   });
 
   const { data: sessionData } = useGetSessionPathsQuery({
+    fetchPolicy: 'no-cache',
     variables: {
       dialogueId: activeDialogue?.id as string,
       input: {
@@ -347,7 +205,6 @@ const DialogueView = () => {
       setCachedDialogueCustomer(data?.customer);
     }
   }, [data, loading]);
-  const [isShareDialogueOpen, setIsShareDialogueOpen] = useState(false);
 
   if (!cachedDialogueCustomer) return <UI.Loader />;
   const { dialogue } = cachedDialogueCustomer;
@@ -362,8 +219,6 @@ const DialogueView = () => {
 
     return qs.stringify({ search: dialogue?.statistics?.mostPopularPath?.answer });
   };
-
-  const shareUrl = `https://client.haas.live/${customerSlug}/${dialogueSlug}`;
 
   const fetchStatus = {
     isRefreshing: loading && !!dialogue,
@@ -415,13 +270,12 @@ const DialogueView = () => {
                   themeColor="white"
                   name="Responses"
                   value={dialogue?.dialogueStatisticsSummary?.nrVotes || 0}
-                  onNavigate={() => null
-                    //   goToWorkspaceFeedbackOverview(
-                    //   findDialoguesInGroup([currentState.currentNode as HexagonNode]),
-                    //   format(startOfDay(startDate), DateFormat.DayTimeFormat),
-                    //   format(endOfDay(endDate), DateFormat.DayTimeFormat),
-                    // )
-                  }
+                  onNavigate={() => goToDialogueFeedbackOverview(
+                    dialogueSlug,
+                    [activeDialogue?.id as string],
+                    format(startOfDay(selectedStartDate), DateFormat.DayTimeFormat),
+                    format(endOfDay(selectedEndDate), DateFormat.DayTimeFormat),
+                  )}
                 />
                 <Statistic
                   icon={<AlertTriangle height={40} width={40} />}
@@ -429,14 +283,13 @@ const DialogueView = () => {
                   themeColor="white"
                   name="Problems"
                   value={dialogue?.issues?.basicStats.responseCount || 0}
-                  onNavigate={() => null
-                    //   goToWorkspaceFeedbackOverview(
-                    //   findDialoguesInGroup([currentState.currentNode as HexagonNode]),
-                    //   format(startOfDay(startDate), DateFormat.DayTimeFormat),
-                    //   format(endOfDay(endDate), DateFormat.DayTimeFormat),
-                    //   55,
-                    // )
-                  }
+                  onNavigate={() => goToDialogueFeedbackOverview(
+                    dialogueSlug,
+                    [activeDialogue?.id as string],
+                    format(startOfDay(selectedStartDate), DateFormat.DayTimeFormat),
+                    format(endOfDay(selectedEndDate), DateFormat.DayTimeFormat),
+                    55,
+                  )}
                 />
                 <Statistic
                   icon={<MessageCircle height={40} width={40} />}
@@ -444,18 +297,17 @@ const DialogueView = () => {
                   themeColor="white"
                   name="Action Requests"
                   value={dialogue?.issues?.actionRequiredCount || 0}
-                  onNavigate={() => null
-                    //   goToWorkspaceFeedbackOverview(
-                    //   findDialoguesInGroup([currentState.currentNode as HexagonNode]),
-                    //   format(startOfDay(startDate), DateFormat.DayTimeFormat),
-                    //   format(endOfDay(endDate), DateFormat.DayTimeFormat),
-                    //   undefined,
-                    //   true,
-                    // )
-                  }
+                  onNavigate={() => goToDialogueFeedbackOverview(
+                    dialogueSlug,
+                    [activeDialogue?.id as string],
+                    format(startOfDay(selectedStartDate), DateFormat.DayTimeFormat),
+                    format(endOfDay(selectedEndDate), DateFormat.DayTimeFormat),
+                    undefined,
+                    true,
+                  )}
                 />
               </UI.Grid>
-              <UI.Grid gridTemplateColumns="repeat(auto-fill, minmax(250px, 1fr))" mt={4}>
+              <UI.Grid gridTemplateColumns="1fr 1fr" mt={4}>
                 <UI.Skeleton {...fetchStatus}>
                   <SummaryModule
                     heading={t('dialogue:average_score')}
@@ -463,6 +315,12 @@ const DialogueView = () => {
                     isInFallback={dialogue?.thisWeekAverageScore === 0}
                     fallbackMetric={t('dialogue:fallback_no_score')}
                     renderMetric={`${(dialogue?.thisWeekAverageScore || 0 / 10).toFixed(2)} ${t('score')}`}
+                    onClick={() => goToDialogueFeedbackOverview(
+                      dialogueSlug,
+                      [activeDialogue?.id as string],
+                      format(startOfDay(selectedStartDate), DateFormat.DayTimeFormat),
+                      format(endOfDay(selectedEndDate), DateFormat.DayTimeFormat),
+                    )}
                     renderCornerMetric={(
                       <UI.Flex color="red">
                         {increaseInAverageScore > 0 ? (
@@ -494,8 +352,14 @@ const DialogueView = () => {
                     renderIcon={MessageCircle}
                     renderFooterText={t('dialogue:view_all_mentions')}
                     isInFallback={!dialogue?.statistics?.mostPopularPath}
-                    onClick={() => (
-                      history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions?${makeSearchUrl()}`)
+                    onClick={() => goToDialogueFeedbackOverview(
+                      dialogueSlug,
+                      [activeDialogue?.id as string],
+                      format(startOfDay(selectedStartDate), DateFormat.DayTimeFormat),
+                      format(endOfDay(selectedEndDate), DateFormat.DayTimeFormat),
+                      undefined,
+                      false,
+                      makeSearchUrl(),
                     )}
                     fallbackMetric={t('dialogue:fallback_no_keywords')}
                     renderMetric={dialogue?.statistics?.mostPopularPath?.answer}
@@ -519,7 +383,16 @@ const DialogueView = () => {
                 <UI.Div gridColumn="1 / -1">
                   <UI.Skeleton {...fetchStatus}>
                     {/* @ts-ignore */}
-                    <InteractionFeedModule interactions={dialogue?.sessions || []} />
+                    <InteractionFeedModule
+                      interactions={
+                        orderBy(
+                          dialogue?.sessions,
+                          (session) => session?.createdAt, 'desc',
+                        )
+                          .filter(isPresent) as Session[]
+                        || []
+                      }
+                    />
                   </UI.Skeleton>
                 </UI.Div>
 
