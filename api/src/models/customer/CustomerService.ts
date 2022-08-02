@@ -154,7 +154,7 @@ export class CustomerService {
           return previousValue;
         }
       }, {
-        prevData: [] as ({
+      prevData: [] as ({
         sessionId: string;
         dialogueId: string;
         mainScore: number;
@@ -171,7 +171,7 @@ export class CustomerService {
         }) | undefined;
         prev: boolean;
       })[],
-      });
+    });
 
     const prevDataGroupedOptions = groupBy(splittedSessions.prevData, (session) => {
       return `${session.dialogueId}_${session.entry?.choiceNodeEntry?.value}`;
@@ -602,9 +602,16 @@ export class CustomerService {
     const deletionOfRoles = prisma.role.deleteMany({ where: { customerId } });
     const deletionOfCustomer = this.customerPrismaAdapter.delete(customerId);
 
+    const deletionOfUserOfCustomer = prisma.userOfCustomer.deleteMany({
+      where: {
+        customerId,
+      },
+    })
+
     await prisma.$transaction([
       deletionOfTriggers,
       deletionOfPermissions,
+      deletionOfUserOfCustomer,
       deletionOfUserCustomerRoles,
       deletionOfRoles,
       deletionOfCustomer,

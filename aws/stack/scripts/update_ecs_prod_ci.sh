@@ -1,3 +1,5 @@
+set -e
+
 echo "This will build an image from your LOCAL environment, push it to ECR, and update the ECS cluster."
 DIR="$(dirname "$(realpath "$0")")"
 push_file="$DIR/push-ecr-prod-ci.sh"

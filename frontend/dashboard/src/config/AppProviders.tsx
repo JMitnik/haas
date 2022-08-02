@@ -13,7 +13,7 @@ import { ScrollToTop } from 'components/Utilities/ScrollToTop';
 import UserProvider from 'providers/UserProvider';
 
 import GlobalStyle from './global-styles';
-import client from './apollo';
+import client from './server/apollo';
 import lang from './i18n-config';
 
 /**

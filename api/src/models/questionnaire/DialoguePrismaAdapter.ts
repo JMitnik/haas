@@ -11,7 +11,6 @@ import { CreateDialogueInput, CreateQuestionsInput, UpsertDialogueStatisticsInpu
 import { NexusGenInputs } from '../../generated/nexus';
 import { DialogueConnectionFilterInput } from './Dialogue.types';
 
-
 class DialoguePrismaAdapter {
   prisma: PrismaClient;
 

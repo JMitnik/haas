@@ -65,9 +65,8 @@ class ContextSessionService {
     try {
       isValid = jwt.verify(authToken, config.jwtSecret);
     } catch (e) {
-      console.log('Error: ', e);
       this.context.res.cookie('access_token', '');
-      throw new GraphQLYogaError('UNAUTHENTICATED');
+      throw new GraphQLYogaError('UNAUTHENTICATED', { code: 'UNAUTHENTICATED' });
     }
 
     if (!isValid) return null;

@@ -35,7 +35,7 @@ const argv = yargs
     default: 5,
   })
   .help()
-  .alias('help', 'h').argv;
+  .alias('help', 'h').argv as any;
 
 export const generateArtillerySeed = async () => {
   console.log(argv);

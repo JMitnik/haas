@@ -308,10 +308,10 @@ export const QuestionNodeType = objectType({
       description: 'Slidernode resolver',
       type: SliderNodeType,
       nullable: true,
-      resolve: (parent: any, _, ctx) => {
+      resolve: async (parent: any, _, ctx) => {
         if (parent.type === 'SLIDER') {
           return (parent.sliderNode
-            || ctx.services.nodeService.findSliderNodeByParentId(parent.id)
+            || await ctx.services.nodeService.findSliderNodeByParentId(parent.id)
             || { markers: SliderNode.DEFAULT_MARKERS });
         }
 
