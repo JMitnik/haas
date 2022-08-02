@@ -1,5 +1,4 @@
 import { UserInputError } from 'apollo-server-express';
-import { subDays } from 'date-fns';
 import { enumType, extendType, inputObjectType, objectType } from 'nexus';
 
 import { DialogueStatistics } from './graphql/DialogueStatistics';
@@ -10,8 +9,7 @@ import { SessionConnection, SessionType } from '../session/graphql/Session.graph
 import { TagType, TagsInputType } from '../tag/Tag';
 import DialogueService from './DialogueService';
 import SessionService from '../session/SessionService';
-import formatDate from '../../utils/formatDate';
-import { isADate, isValidDateTime } from '../../utils/isValidDate';
+import { isValidDateTime } from '../../utils/isValidDate';
 import { CopyDialogueInputType } from './Dialogue.types';
 import { SessionConnectionFilterInput } from '../session/graphql';
 import { DialogueStatisticsSummaryModel } from './DialogueStatisticsSummary';
@@ -364,9 +362,6 @@ export const DialogueType = objectType({
           utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
         }
 
-        // const startDate = args.input?.startDate ? isADate(args.input.startDate) : undefined;
-        // const endDate = args.input?.endDate ? isADate(args.input.endDate) : undefined
-
         const average = await ctx.services.dialogueService.calculateAverageScore(parent.id, {
           startDate: utcStartDateTime as Date,
           endDate: utcEndDateTime,
@@ -408,15 +403,11 @@ export const DialogueType = objectType({
           utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
         }
 
-        console.log('UTC DATES: ', utcStartDateTime, utcEndDateTime);
-
         const statistics = await DialogueService.getStatistics(
           parent.id,
           utcStartDateTime,
           utcEndDateTime,
         );
-
-        console.log('Statistics: ', statistics);
 
         if (!statistics) {
           return {

@@ -43,7 +43,7 @@ export const DialogueTopNavBar = () => {
   const { getNWeekAgo, format, getTomorrow } = useDate();
   const [isShareDialogueOpen, setIsShareDialogueOpen] = useState(false);
 
-  const { workspaceInteractionsPath, customerSlug } = useNavigator();
+  const { customerSlug, getDialogueViewPath, getDialogueFeedbackOverviewPath } = useNavigator();
 
   const { data } = useGetDialogueLayoutDetailsQuery({
     fetchPolicy: 'no-cache',
@@ -63,6 +63,8 @@ export const DialogueTopNavBar = () => {
   const positive = total - (health?.negativeResponseCount || 0);
 
   const shareUrl = `https://client.haas.live/${customerSlug}/${activeDialogue?.slug}`;
+  const overviewPath = getDialogueViewPath(customerSlug, activeDialogue?.slug as string) || '';
+  const feedbackOverviewPath = getDialogueFeedbackOverviewPath(customerSlug, activeDialogue?.slug as string) || '';
 
   return (
     <TopSubNavBarContainer>
@@ -152,13 +154,13 @@ export const DialogueTopNavBar = () => {
 
             <UI.Div pt={4}>
               <UI.Span>
-                <NavLink exact to={`/dashboard/b/${customerSlug}/d/${activeDialogue?.slug}`}>
+                <NavLink exact to={overviewPath}>
                   {t('overview')}
                 </NavLink>
               </UI.Span>
 
               <UI.Span>
-                <NavLink to={`/dashboard/b/${customerSlug}/d/${activeDialogue?.slug}/feedback?dialogueIds=${activeDialogue?.id}`}>
+                <NavLink to={`${feedbackOverviewPath}?dialogueIds=${activeDialogue?.id}`}>
                   {t('interactions')}
                 </NavLink>
               </UI.Span>

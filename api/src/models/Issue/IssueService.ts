@@ -24,6 +24,12 @@ export class IssueService {
     this.sessionService = new SessionService(prisma);
   }
 
+  /**
+   * Finds all issues of a dialogue based on filter input
+   * @param dialogueId 
+   * @param filter 
+   * @returns 
+   */
   public async getProblemsByDialogue(dialogueId: string, filter: IssueFilterInput) {
     const dialogueStatistics = await this.countNegativeDialogueInteractions(
       dialogueId,

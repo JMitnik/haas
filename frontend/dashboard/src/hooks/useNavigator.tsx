@@ -189,6 +189,16 @@ export const useNavigator = () => {
   const getUsersPath = () => generatePath(ROUTES.USERS_OVERVIEW, { customerSlug });
   const getDialoguesPath = () => generatePath(ROUTES.DIALOGUES_VIEW, { customerSlug });
   const getAlertsPath = () => generatePath(ROUTES.ALERTS_OVERVIEW, { customerSlug });
+  const getDialogueViewPath = (currCustomerSlug: string, currDialogueSlug: string) => currDialogueSlug
+    && currCustomerSlug
+    && generatePath(
+      ROUTES.DIALOGUE_ROOT, { customerSlug: currCustomerSlug, dialogueSlug: currDialogueSlug },
+    );
+  const getDialogueFeedbackOverviewPath = (currCustomerSlug: string, currDialogueSlug: string) => currDialogueSlug
+    && currCustomerSlug
+    && generatePath(
+      ROUTES.DIALOGUE_FEEDBACK_OVERVIEW, { customerSlug: currCustomerSlug, dialogueSlug: currDialogueSlug },
+    );
 
   const dialoguePath = () => dialogueSlug && customerSlug && generatePath(
     ROUTES.DIALOGUE_ROOT, { customerSlug, dialogueSlug },
@@ -205,6 +215,8 @@ export const useNavigator = () => {
   const goTo = (path: string) => history.push(path);
 
   return {
+    getDialogueFeedbackOverviewPath,
+    getDialogueViewPath,
     goToDialogueFeedbackOverview,
     goTo,
     dashboardPath,

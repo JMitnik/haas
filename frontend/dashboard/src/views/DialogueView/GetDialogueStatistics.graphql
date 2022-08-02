@@ -1,11 +1,11 @@
 query GetDialogueStatistics(
-  $customerSlug: String!, 
-  $dialogueSlug: String!, 
-  $startDateTime: String!,
-  $endDateTime: String,
-  $issueFilter: IssueFilterInput,
-  $healthInput: HealthScoreInput,
-  ) {
+  $customerSlug: String!
+  $dialogueSlug: String!
+  $startDateTime: String!
+  $endDateTime: String
+  $issueFilter: IssueFilterInput
+  $healthInput: HealthScoreInput
+) {
   customer(slug: $customerSlug) {
     id
     dialogue(where: { slug: $dialogueSlug }) {
@@ -17,7 +17,14 @@ query GetDialogueStatistics(
         score
         average
       }
-      statistics(input: { startDateTime: $startDateTime, endDateTime: $endDateTime, impactType: AVERAGE, refresh: true }) {
+      statistics(
+        input: {
+          startDateTime: $startDateTime
+          endDateTime: $endDateTime
+          impactType: AVERAGE
+          refresh: true
+        }
+      ) {
         nrInteractions
         topPositivePath {
           answer
@@ -82,19 +89,25 @@ query GetDialogueStatistics(
             frequency
           }
         }
-		  }
-      dialogueStatisticsSummary (input: { startDateTime: $startDateTime, endDateTime: $endDateTime, impactType: AVERAGE, refresh: true 
-			}) {
-				id
-				nrVotes
-				impactScore
-				updatedAt
+      }
+      dialogueStatisticsSummary(
+        input: {
+          startDateTime: $startDateTime
+          endDateTime: $endDateTime
+          impactType: AVERAGE
+          refresh: true
+        }
+      ) {
+        id
+        nrVotes
+        impactScore
+        updatedAt
         title
-				dialogue {
-					title
-					id
-				}
-			}
+        dialogue {
+          title
+          id
+        }
+      }
     }
   }
 }
