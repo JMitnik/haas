@@ -13,6 +13,6 @@ test('render layers', async () => {
   mockGetCustomersOfUser((res) => ({ ...res }));
   mockGetWorkspaceSessionsResponse((res) => ({ ...res }));
   renderComponent();
-  expect(await screen.findByText(/Interactions/i)).toBeVisible();
+  expect(await screen.findByText(/Interactions/i)).not.toBeNull();
   preview.debug();
 });
