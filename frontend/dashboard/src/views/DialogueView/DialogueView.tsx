@@ -2,15 +2,14 @@ import * as UI from '@haas/ui';
 import * as qs from 'qs';
 import {
   AlertTriangle, Award, MessageCircle,
-  ThumbsDown, ThumbsUp, TrendingDown, TrendingUp, User,
+  ThumbsDown, ThumbsUp, User,
 } from 'react-feather';
 import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { Tag, TagIcon, TagLabel } from '@chakra-ui/core';
 import { Zoom } from '@visx/zoom';
-import { differenceInDays, endOfDay, startOfDay, sub } from 'date-fns';
-import { useHistory } from 'react-router-dom';
+import { endOfDay, startOfDay } from 'date-fns';
 import { useTranslation } from 'react-i18next';
-import React, { useEffect, useMemo, useReducer, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import useMeasure from 'react-use-measure';
 
 import * as Modal from 'components/Common/Modal';
@@ -38,66 +37,6 @@ import { useNavigator } from 'hooks/useNavigator';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
 import ScoreGraphModule from './Modules/ScoreGraphModule';
 import SummaryModule from './Modules/SummaryModules/SummaryModule';
-
-type ActiveDateType = 'last_hour' | 'last_day' | 'last_week' | 'last_month' | 'last_year';
-
-interface ActiveDateState {
-  dateLabel: ActiveDateType;
-  startDate: Date;
-  compareStatisticStartDate: Date;
-}
-
-interface ActiveDateAction {
-  type: ActiveDateType;
-}
-
-const dateReducer = (state: ActiveDateState, action: ActiveDateAction): ActiveDateState => {
-  switch (action.type) {
-    case 'last_hour':
-      return {
-        startDate: sub(new Date(), { hours: 1 }),
-        compareStatisticStartDate: sub(new Date(), { hours: 2 }),
-        dateLabel: 'last_hour',
-      };
-
-    case 'last_day':
-      return {
-        startDate: sub(new Date(), { hours: 24 }),
-        compareStatisticStartDate: sub(new Date(), { days: 2 }),
-        dateLabel: 'last_day',
-      };
-    case 'last_month':
-      return {
-        startDate: sub(new Date(), { months: 1 }),
-        compareStatisticStartDate: sub(new Date(), { months: 2 }),
-        dateLabel: 'last_month',
-      };
-    case 'last_week':
-      return {
-        startDate: sub(new Date(), { weeks: 1 }),
-        compareStatisticStartDate: sub(new Date(), { weeks: 2 }),
-        dateLabel: 'last_week',
-      };
-    case 'last_year':
-      return {
-        startDate: sub(new Date(), { years: 1 }),
-        compareStatisticStartDate: sub(new Date(), { years: 2 }),
-        dateLabel: 'last_year',
-      };
-    default:
-      return {
-        startDate: sub(new Date(), { weeks: 1 }),
-        compareStatisticStartDate: sub(new Date(), { weeks: 2 }),
-        dateLabel: 'last_month',
-      };
-  }
-};
-
-const calcScoreIncrease = (currentScore: number, prevScore: number) => {
-  if (!prevScore) return 100;
-
-  return currentScore / prevScore || 0;
-};
 
 const DialogueView = () => {
   const [ref, bounds] = useMeasure();
