@@ -1047,6 +1047,7 @@ export interface NexusGenObjects {
     id?: string | null; // String
   }
   HealthScore: { // root type
+    average: number; // Float!
     negativeResponseCount: number; // Int!
     nrVotes: number; // Int!
     score: number; // Float!
@@ -1723,6 +1724,7 @@ export interface NexusGenFieldTypes {
     id: string | null; // String
   }
   HealthScore: { // field return type
+    average: number; // Float!
     negativeResponseCount: number; // Int!
     nrVotes: number; // Int!
     score: number; // Float!
@@ -2578,6 +2580,7 @@ export interface NexusGenFieldTypeNames {
     id: 'String'
   }
   HealthScore: { // field return type name
+    average: 'Float'
     negativeResponseCount: 'Int'
     nrVotes: 'Int'
     score: 'Float'

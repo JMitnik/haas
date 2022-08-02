@@ -1,4 +1,4 @@
-import { dialogueStatistics_customer_dialogue as Dialogue } from 'views/DialogueView/__generated__/dialogueStatistics';
+import { Dialogue } from 'types/generated-types';
 import React, { useContext, useState } from 'react';
 
 const DialogueContext = React.createContext({} as DialogueContextProps);

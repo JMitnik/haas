@@ -18,6 +18,7 @@ export const HealthScore = objectType({
     t.nonNull.float('score');
     t.nonNull.int('negativeResponseCount');
     t.nonNull.int('nrVotes');
+    t.nonNull.float('average');
   },
 });
 

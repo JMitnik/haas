@@ -43,9 +43,7 @@ export const DialogueTopNavBar = () => {
   const { getNWeekAgo, format, getTomorrow } = useDate();
   const [isShareDialogueOpen, setIsShareDialogueOpen] = useState(false);
 
-  const { dashboardPath, workspaceInteractionsPath, customerSlug, dialogueSlug } = useNavigator();
-
-  console.log('Active dialogue top nav bar: ', activeDialogue);
+  const { workspaceInteractionsPath, customerSlug } = useNavigator();
 
   const { data } = useGetDialogueLayoutDetailsQuery({
     fetchPolicy: 'no-cache',
@@ -121,7 +119,7 @@ export const DialogueTopNavBar = () => {
                             {...slideUpFadeMotion}
                           >
                             <motion.div style={{ background: 'white' }}>
-                              <ShareDialogue dialogueName={activeDialogue?.slug} shareUrl={shareUrl} />
+                              <ShareDialogue dialogueName={activeDialogue?.slug as string} shareUrl={shareUrl} />
                             </motion.div>
                           </Content>
                         )}
@@ -138,7 +136,10 @@ export const DialogueTopNavBar = () => {
                     {' '}
                     {total}
                     {' '}
-                    respondents are happy
+                    respondents are happy,
+                    average score:
+                    {' '}
+                    {health?.average ? (health?.average / 10).toFixed(1) : 'N/A'}
                   </UI.ViewSubTitle>
                 ) : (
                   <UI.ViewSubTitle>
@@ -151,7 +152,7 @@ export const DialogueTopNavBar = () => {
 
             <UI.Div pt={4}>
               <UI.Span>
-                <NavLink exact to={dashboardPath}>
+                <NavLink exact to={`/dashboard/b/${customerSlug}/d/${activeDialogue?.slug}`}>
                   {t('overview')}
                 </NavLink>
               </UI.Span>

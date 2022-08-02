@@ -163,9 +163,14 @@ export const useNavigator = () => {
   const getDialoguesPath = () => generatePath(ROUTES.DIALOGUES_VIEW, { customerSlug });
   const getAlertsPath = () => generatePath(ROUTES.ALERTS_OVERVIEW, { customerSlug });
 
+  const dialoguePath = () => dialogueSlug && customerSlug && generatePath(
+    ROUTES.DIALOGUE_ROOT, { customerSlug, dialogueSlug },
+  );
+
   const dashboardPath = useMemo(() => customerSlug && generatePath(
     ROUTES.DASHBOARD_VIEW, { customerSlug },
   ), [customerSlug]);
+
   const workspaceInteractionsPath = useMemo(() => customerSlug && generatePath(
     ROUTES.WORKSPACE_INTERACTIONS_VIEW, { customerSlug },
   ), [customerSlug]);
@@ -175,6 +180,7 @@ export const useNavigator = () => {
   return {
     goTo,
     dashboardPath,
+    dialoguePath,
     workspaceInteractionsPath,
     goToWorkspaceFeedbackOverview,
     goToGenerateWorkspaceOverview,

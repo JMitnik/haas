@@ -92,7 +92,10 @@ export const WorkspaceTopNavBar = () => {
                     {' '}
                     {total}
                     {' '}
-                    respondents are happy
+                    respondents are happy,
+                    average score:
+                    {' '}
+                    {health?.average ? (health?.average / 10).toFixed(1) : 'N/A'}
                   </UI.ViewSubTitle>
                 ) : (
                   <UI.ViewSubTitle>

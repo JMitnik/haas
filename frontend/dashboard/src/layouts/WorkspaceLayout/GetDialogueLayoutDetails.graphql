@@ -1,12 +1,14 @@
-query GetDialogueLayoutDetails($workspaceId: ID!, $dialogueId: ID!, $healthInput: HealthScoreInput!) {
+query GetDialogueLayoutDetails($workspaceId: ID!, $dialogueId: ID!, $healthInput: HealthScoreInput!, $filter: DialogueFilterInputType) {
   customer(id: $workspaceId) {
     id
     dialogue(where: { id: $dialogueId }) {
       id
+      averageScore(input: $filter)
       healthScore(input: $healthInput) {
-         nrVotes
+        nrVotes
         negativeResponseCount
         score
+        average
       }
     }
   }
