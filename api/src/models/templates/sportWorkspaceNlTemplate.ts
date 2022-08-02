@@ -54,7 +54,7 @@ const sportWorkspaceTemplate: DemoWorkspaceTemplate = {
       },
       {
         label: 'Neutraal!',
-        subLabel: 'Ik voel me okee.',
+        subLabel: 'Ik voel me oke.',
         range: { start: 5, end: 6 },
       },
       {
