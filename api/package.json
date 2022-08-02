@@ -100,6 +100,7 @@
     "get-port": "^5.1.1",
     "graphql": "^15.7.2",
     "graphql-middleware": "^4.0.2",
+    "graphql-request": "^3.3.0",
     "graphql-scalars": "^1.14.1",
     "graphql-shield": "^7.3.5",
     "graphql-upload": "^11.0.0",

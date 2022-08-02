@@ -1,12 +1,12 @@
 import { Customer, PrismaClient } from '@prisma/client';
+import { ClientError } from 'graphql-request';
+import { range } from 'lodash';
 
 import { clearDatabase } from './testUtils';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
 import { expectUnauthorizedErrorOnResolver } from '../../../test/utils/expects';
 import { seedDialogue, seedUser, seedWorkspace } from '../../../test/utils/seedTestData';
 import AuthService from '../../auth/AuthService';
-import { range } from 'lodash';
-import { GraphQLYogaError } from '@graphql-yoga/node';
 import { prisma } from '../../../test/setup/singletonDeps';
 
 
@@ -118,10 +118,9 @@ describe('UserConnection resolvers', () => {
         customerSlug: workspace.slug,
       }, { 'Authorization': `Bearer ${token}` });
     } catch (error) {
-      if (error instanceof GraphQLYogaError) {
-        expect(error.response.errors).toHaveLength(1);
-        expectUnauthorizedErrorOnResolver(error.response.errors[0], 'usersConnection');
-      }
+      if (!(error instanceof ClientError)) throw new Error();
+      expect(error.response.errors).toHaveLength(1);
+      expectUnauthorizedErrorOnResolver(error.response.errors?.[0], 'usersConnection');
     }
   });
 

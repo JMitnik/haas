@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { GraphQLYogaError } from '@graphql-yoga/node';
+import { ClientError } from 'graphql-request';
 
 import { clearDatabase } from './testUtils';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
@@ -124,15 +124,10 @@ describe('SessionResolver', () => {
           'Authorization': `Bearer ${token}`,
         }
       );
-
-      console.log(res);
     } catch (error) {
-      console.log(error);
-      if (error instanceof GraphQLYogaError) {
-        console.log(error);
-        expect(error.response.errors).toHaveLength(1);
-        expectUnauthorizedErrorOnResolver(error.response.errors[0], 'sessionConnection');
-      }
+      if (!(error instanceof ClientError)) throw new Error();
+      expect(error.response.errors).toHaveLength(1);
+      expectUnauthorizedErrorOnResolver(error.response.errors?.[0], 'sessionConnection');
     }
   });
 
@@ -196,5 +191,4 @@ describe('SessionResolver', () => {
     expect(nextConnection.pageInfo.nextPageOffset).toEqual(10);
     expect(nextConnection.pageInfo.prevPageOffset).toEqual(0);
   });
-
 });

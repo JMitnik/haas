@@ -35,11 +35,11 @@ export const UserOfCustomerQuery = queryField('UserOfCustomer', {
   args: { input: UserOfCustomerInput },
   nullable: true,
 
-  async resolve(parent, args, ctx) {
+  async resolve(parent, args, { services }) {
     if (!args.input?.userId) throw new GraphQLYogaError('User not provided');
     if (!args.input?.customerId && !args.input?.customerSlug) throw new GraphQLYogaError('Neither slug nor id of Customer was provided');
 
-    return ctx.services.userService.getUserOfCustomer(args.input.customerId, args.input.customerSlug, args.input.userId);
+    return services.userService.getUserOfCustomer(args.input.customerId, args.input.customerSlug, args.input.userId);
   },
 });
 
@@ -208,7 +208,7 @@ export const RootUserQueries = extendType({
 
         const user = await ctx.services.userService.findUserContext(userId);
 
-        if (!user) throw new GraphQLYogaError('There is something wrong in our records. Please contact an admin.', 'UNAUTHENTIC');
+        if (!user) throw new GraphQLYogaError('There is something wrong in our records. Please contact an admin.');
 
         return {
           email: user?.email,
