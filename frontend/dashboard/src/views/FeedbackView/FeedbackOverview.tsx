@@ -15,7 +15,7 @@ import {
 import { endOfDay, format, startOfDay } from 'date-fns';
 import { isPresent } from 'ts-is-present';
 import { useTranslation } from 'react-i18next';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import * as Menu from 'components/Common/Menu';
 import * as Modal from 'components/Common/Modal';
@@ -81,6 +81,8 @@ export const FeedbackOverview = () => {
   const { activeCustomer } = useCustomer();
   const { formatScore } = useFormatter();
   const { activeDialogue } = useDialogue();
+  const [searchVal, setSearchVal] = useState('');
+  // console.log('Active dialogue: ', activeDialogue);
 
   const [modalIsOpen, setModalIsOpen] = useState({ isOpen: false, sessionId: '' });
   const [sessions, setSessions] = useState<SessionFragmentFragment[]>(() => []);
@@ -98,7 +100,12 @@ export const FeedbackOverview = () => {
     maxScore: withDefault(NumberParam, 100),
     withFollowUpAction: withDefault(BooleanParam, false),
   });
+
   const [totalPages, setTotalPages] = useState<number>(0);
+
+  useEffect(() => {
+    console.log('Filter: ', filter);
+  }, [filter]);
 
   const { loading: isLoading } = useGetWorkspaceSessionsQuery({
     fetchPolicy: 'cache-and-network',
@@ -123,7 +130,11 @@ export const FeedbackOverview = () => {
       },
     },
     errorPolicy: 'ignore',
+    onError: (e) => {
+      console.log('Error', e);
+    },
     onCompleted: (fetchedData) => {
+      console.log('fetchedData', fetchedData);
       setSessions(
         fetchedData?.customer?.sessionConnection?.sessions || [],
       );
@@ -131,6 +142,8 @@ export const FeedbackOverview = () => {
       setTotalPages(fetchedData?.customer?.sessionConnection?.totalPages || 0);
     },
   });
+
+  console.log({ isLoading });
 
   const handleDateChange = (dates: Date[] | null) => {
     if (dates) {
@@ -170,6 +183,7 @@ export const FeedbackOverview = () => {
   };
 
   const handleSearchTermChange = (search: string) => {
+    // setSearchVal(search);
     setFilter((prevValues) => ({
       ...prevValues,
       search,

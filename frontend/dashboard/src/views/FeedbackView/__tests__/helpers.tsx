@@ -6,14 +6,16 @@ import {
   DialogueConnectionQueryVariables,
   GetCustomerOfUserQuery,
   GetCustomerOfUserQueryVariables,
+  GetInteractionQuery,
+  GetInteractionQueryVariables,
   GetWorkspaceDialogueStatisticsQuery,
   GetWorkspaceDialogueStatisticsQueryVariables,
+  GetWorkspaceLayoutDetailsQuery,
+  GetWorkspaceLayoutDetailsQueryVariables,
   GetWorkspaceSessionsQuery,
   GetWorkspaceSessionsQueryVariables,
   SystemPermission,
 } from 'types/generated-types';
-
-import { Dialogue } from '../WorkspaceGrid.types';
 
 export const getCustomerOfUserResponse: GetCustomerOfUserQuery = {
   UserOfCustomer: {
@@ -120,6 +122,34 @@ export const mockGetWorkspaceSessionsResponse = (
     graphql.query<GetWorkspaceSessionsQuery, GetWorkspaceSessionsQueryVariables>(
       'GetWorkspaceSessions',
       (req, res, ctx) => res(ctx.data(createResponse(getWorkspaceSessionsResponse))),
+    ),
+  )
+);
+
+// eslint-disable-next-line @typescript-eslint/quotes, max-len
+export const getWorkspaceLayoutDetailsResponse: GetWorkspaceLayoutDetailsQuery = JSON.parse('{"customer":{"id":"cl6c5wuic0011ceoikhazc11k","statistics":{"id":"cl6c5wuic0011ceoikhazc11k","health":{"nrVotes":48,"negativeResponseCount":0,"score":100,"__typename":"HealthScore"},"__typename":"WorkspaceStatistics"},"__typename":"Customer"}}');
+
+export const mockGetWorkspaceLayoutDetailsResponse = (
+  createResponse: (res: GetWorkspaceLayoutDetailsQuery) => GetWorkspaceLayoutDetailsQuery,
+) => (
+  server.use(
+    graphql.query<GetWorkspaceLayoutDetailsQuery, GetWorkspaceLayoutDetailsQueryVariables>(
+      'GetWorkspaceLayoutDetails',
+      (req, res, ctx) => res(ctx.data(createResponse(getWorkspaceLayoutDetailsResponse))),
+    ),
+  )
+);
+
+// eslint-disable-next-line @typescript-eslint/quotes
+export const getInteractionResponse: GetInteractionQuery = JSON.parse(`{"session":{"id":"cl6c5x1g119301ceoi3je44n76","createdAt":1659443673724,"score":75,"originUrl":"","totalTimeInSec":18,"device":null,"dialogueId":"cl6c5x15n18509ceoib482289w","nodeEntries":[{"id":"cl6c5x1g119302ceoi85o7gacu","depth":0,"relatedNode":{"title":"How are you feeling?","type":"SLIDER","__typename":"QuestionNode"},"value":{"sliderNodeEntry":75,"textboxNodeEntry":null,"registrationNodeEntry":null,"choiceNodeEntry":null,"videoNodeEntry":null,"linkNodeEntry":null,"formNodeEntry":null,"__typename":"NodeEntryValue"},"__typename":"NodeEntry"},{"id":"cl6c5x1g219303ceoij92v9o6i","depth":1,"relatedNode":{"title":"What's going well?","type":"CHOICE","__typename":"QuestionNode"},"value":{"sliderNodeEntry":null,"textboxNodeEntry":null,"registrationNodeEntry":null,"choiceNodeEntry":"School","videoNodeEntry":null,"linkNodeEntry":null,"formNodeEntry":null,"__typename":"NodeEntryValue"},"__typename":"NodeEntry"}],"delivery":null,"dialogue":{"id":"cl6c5x15n18509ceoib482289w","title":"Female - U18 - Team2","slug":"Female-U18-Team2","__typename":"Dialogue"},"followUpAction":null,"__typename":"Session"}}`);
+
+export const mockGetInteractionResponse = (
+  createResponse: (res: GetInteractionQuery) => GetInteractionQuery,
+) => (
+  server.use(
+    graphql.query<GetInteractionQuery, GetInteractionQueryVariables>(
+      'GetInteraction',
+      (req, res, ctx) => res(ctx.data(createResponse(getInteractionResponse))),
     ),
   )
 );
