@@ -96,7 +96,7 @@ const SummaryModule = ({
               {renderCornerMetric}
             </CornerMetricContainer>
           </UI.CardBody>
-          <UI.CardFooter bg="gray.100">
+          <UI.CardFooter style={{ cursor: 'pointer' }} bg="gray.100">
             <UI.Text color="gray.500">
               {renderFooterText || t('view_all')}
             </UI.Text>

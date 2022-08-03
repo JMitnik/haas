@@ -59,38 +59,45 @@ const CustomerRoutes = () => (
               path="/dashboard/b/:customerSlug/d/:dialogueSlug"
               render={() => (
                 <DialogueLayout>
-                  <Switch>
-                    <GuardedRoute
-                      allowedPermission={SystemPermission.CanBuildDialogue}
-                      path="/dashboard/b/:customerSlug/d/:dialogueSlug/builder"
-                      render={() => <DialogueBuilderPage />}
-                    />
+                  <ViewContainer>
+                    <Switch>
+                      <GuardedRoute
+                        allowedPermission={SystemPermission.CanBuildDialogue}
+                        path="/dashboard/b/:customerSlug/d/:dialogueSlug/builder"
+                        render={() => <DialogueBuilderPage />}
+                      />
 
-                    <GuardedRoute
-                      allowedPermission={SystemPermission.CanEditDialogue}
-                      path="/dashboard/b/:customerSlug/d/:dialogueSlug/edit"
-                      render={() => <EditDialogueView />}
-                    />
+                      <GuardedRoute
+                        allowedPermission={SystemPermission.CanEditDialogue}
+                        path="/dashboard/b/:customerSlug/d/:dialogueSlug/edit"
+                        render={() => <EditDialogueView />}
+                      />
 
-                    <GuardedRoute
-                      path="/dashboard/b/:customerSlug/d/:dialogueSlug/interactions"
-                      render={() => <InteractionsOverview />}
-                    />
+                      <GuardedRoute
+                        path="/dashboard/b/:customerSlug/d/:dialogueSlug/interactions"
+                        render={() => <InteractionsOverview />}
+                      />
 
-                    <GuardedRoute
-                      allowedPermission={SystemPermission.CanBuildDialogue}
-                      path="/dashboard/b/:customerSlug/d/:dialogueSlug/actions"
-                      render={() => <ActionsPage />}
-                    />
+                      <GuardedRoute
+                        allowedPermission={SystemPermission.CanBuildDialogue}
+                        path="/dashboard/b/:customerSlug/d/:dialogueSlug/actions"
+                        render={() => <ActionsPage />}
+                      />
 
-                    <GuardedRoute
-                      allowedPermission={SystemPermission.CanViewDialogueAnalytics}
-                      redirectRoute="/dashboard/b/:customerSlug/d/:dialogueSlug/interactions"
-                      path="/dashboard/b/:customerSlug/d/:dialogueSlug"
-                      render={() => <DialoguePage />}
-                    />
+                      <GuardedRoute
+                        path="/dashboard/b/:customerSlug/d/:dialogueSlug/feedback"
+                        render={() => <FeedbackOverview />}
+                      />
 
-                  </Switch>
+                      <GuardedRoute
+                        allowedPermission={SystemPermission.CanViewDialogueAnalytics}
+                        redirectRoute="/dashboard/b/:customerSlug/d/:dialogueSlug/interactions"
+                        path="/dashboard/b/:customerSlug/d/:dialogueSlug"
+                        render={() => <DialoguePage />}
+                      />
+
+                    </Switch>
+                  </ViewContainer>
                 </DialogueLayout>
               )}
             />

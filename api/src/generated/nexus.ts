@@ -314,9 +314,9 @@ export interface NexusGenInputs {
     desc: boolean | null; // Boolean
   }
   DialogueFilterInputType: { // input type
-    endDate?: string | null; // String
+    endDateTime?: string | null; // String
     searchTerm?: string | null; // String
-    startDate?: string | null; // String
+    startDateTime?: string | null; // String
   }
   DialogueStatisticsSummaryFilterInput: { // input type
     cutoff?: number | null; // Int
@@ -1047,6 +1047,7 @@ export interface NexusGenObjects {
     id?: string | null; // String
   }
   HealthScore: { // root type
+    average: number; // Float!
     negativeResponseCount: number; // Int!
     nrVotes: number; // Int!
     score: number; // Float!
@@ -1615,6 +1616,7 @@ export interface NexusGenFieldTypes {
     id: string; // ID!
     isPrivate: boolean | null; // Boolean
     isWithoutGenData: boolean | null; // Boolean
+    issues: NexusGenRootTypes['Issue'] | null; // Issue
     language: NexusGenEnums['LanguageEnumType'] | null; // LanguageEnumType
     leafs: NexusGenRootTypes['QuestionNode'][] | null; // [QuestionNode!]
     mostChangedPath: NexusGenRootTypes['MostChangedPath'] | null; // MostChangedPath
@@ -1722,6 +1724,7 @@ export interface NexusGenFieldTypes {
     id: string | null; // String
   }
   HealthScore: { // field return type
+    average: number; // Float!
     negativeResponseCount: number; // Int!
     nrVotes: number; // Int!
     score: number; // Float!
@@ -2469,6 +2472,7 @@ export interface NexusGenFieldTypeNames {
     id: 'ID'
     isPrivate: 'Boolean'
     isWithoutGenData: 'Boolean'
+    issues: 'Issue'
     language: 'LanguageEnumType'
     leafs: 'QuestionNode'
     mostChangedPath: 'MostChangedPath'
@@ -2576,6 +2580,7 @@ export interface NexusGenFieldTypeNames {
     id: 'String'
   }
   HealthScore: { // field return type name
+    average: 'Float'
     negativeResponseCount: 'Int'
     nrVotes: 'Int'
     score: 'Float'
@@ -3138,6 +3143,9 @@ export interface NexusGenArgTypes {
     healthScore: { // args
       input?: NexusGenInputs['HealthScoreInput'] | null; // HealthScoreInput
     }
+    issues: { // args
+      filter?: NexusGenInputs['IssueFilterInput'] | null; // IssueFilterInput
+    }
     leafs: { // args
       searchTerm?: string | null; // String
     }
@@ -3160,7 +3168,7 @@ export interface NexusGenArgTypes {
       take?: number | null; // Int
     }
     statistics: { // args
-      input?: NexusGenInputs['DialogueFilterInputType'] | null; // DialogueFilterInputType
+      input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
     }
     topic: { // args
       input?: NexusGenInputs['TopicInputType'] | null; // TopicInputType

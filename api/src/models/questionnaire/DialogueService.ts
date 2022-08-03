@@ -1059,7 +1059,11 @@ class DialogueService {
   };
 
   // TODO: Offload all this work to redis for much better performance + Cache
-  static getStatistics = async (dialogueId: string, startDate?: Date | null, endDate?: Date | null): Promise<StatisticsProps> => {
+  static getStatistics = async (
+    dialogueId: string,
+    startDate?: Date | null,
+    endDate?: Date | null
+  ): Promise<StatisticsProps> => {
     // Fetch all relevant sessions
     const sessions = await SessionService.fetchSessionsByDialogue(dialogueId, { startDate, endDate });
     if (!sessions) { throw new Error('No sessions present'); }

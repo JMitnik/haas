@@ -1,4 +1,6 @@
+import * as Popover from '@radix-ui/react-popover';
 import * as UI from '@haas/ui';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   GradientLightgreenGreen,
   GradientOrangeRed,
@@ -9,33 +11,45 @@ import {
 import { NavLink } from 'react-router-dom';
 import { PatternCircles } from '@visx/pattern';
 import { useTranslation } from 'react-i18next';
-import React from 'react';
+import React, { useState } from 'react';
+import styled from 'styled-components';
 
 import { DateFormat, useDate } from 'hooks/useDate';
 import { ProgressCircle } from 'components/Analytics/WorkspaceGrid/SummaryPane/ProgressCircle';
+import { ReactComponent as QRIcon } from 'assets/icons/icon-qr.svg';
 import {
   getColorScoreBrandVariable,
   getHexagonSVGFill,
 } from 'components/Analytics/WorkspaceGrid/WorkspaceGrid.helpers';
+import { slideUpFadeMotion } from 'components/animation/config';
 import { useCustomer } from 'providers/CustomerProvider';
+import { useDialogue } from 'providers/DialogueProvider';
 import { useFormatter } from 'hooks/useFormatter';
-import { useGetWorkspaceLayoutDetailsQuery } from 'types/generated-types';
+import { useGetDialogueLayoutDetailsQuery } from 'types/generated-types';
 import { useNavigator } from 'hooks/useNavigator';
 
+import { ShareDialogue } from './ShareDialogue';
 import { TopSubNavBarContainer } from './TopSubNavBar.styles';
 
-export const WorkspaceTopNavBar = () => {
+const Content = styled(Popover.Content)`
+  transform-origin: var(--radix-popover-content-transform-origin);
+`;
+
+export const DialogueTopNavBar = () => {
   const { t } = useTranslation();
   const { activeCustomer } = useCustomer();
+  const { activeDialogue } = useDialogue();
   const { formatFractionToPercentage } = useFormatter();
   const { getNWeekAgo, format, getTomorrow } = useDate();
+  const [isShareDialogueOpen, setIsShareDialogueOpen] = useState(false);
 
-  const { dashboardPath, workspaceInteractionsPath } = useNavigator();
+  const { customerSlug, getDialogueViewPath, getDialogueFeedbackOverviewPath } = useNavigator();
 
-  const { data } = useGetWorkspaceLayoutDetailsQuery({
+  const { data } = useGetDialogueLayoutDetailsQuery({
     fetchPolicy: 'no-cache',
     variables: {
       workspaceId: activeCustomer?.id || '',
+      dialogueId: activeDialogue?.id as string,
       healthInput: {
         startDateTime: format(getNWeekAgo(1), DateFormat.DayFormat),
         endDateTime: format(getTomorrow(), DateFormat.DayFormat),
@@ -43,10 +57,14 @@ export const WorkspaceTopNavBar = () => {
     },
   });
 
-  const health = data?.customer?.statistics?.health;
+  const health = data?.customer?.dialogue?.healthScore;
   const score = health?.score;
   const total = health?.nrVotes || 0;
   const positive = total - (health?.negativeResponseCount || 0);
+
+  const shareUrl = `https://client.haas.live/${customerSlug}/${activeDialogue?.slug}`;
+  const overviewPath = getDialogueViewPath(customerSlug, activeDialogue?.slug as string) || '';
+  const feedbackOverviewPath = getDialogueFeedbackOverviewPath(customerSlug, activeDialogue?.slug as string) || '';
 
   return (
     <TopSubNavBarContainer>
@@ -82,7 +100,35 @@ export const WorkspaceTopNavBar = () => {
               </UI.Div>
               <UI.Div>
                 <UI.ViewTitle>
-                  {activeCustomer?.name}
+                  <UI.Flex>
+                    <UI.Div>
+                      {' '}
+                      {activeDialogue?.title}
+                    </UI.Div>
+                    <Popover.Root open={isShareDialogueOpen} onOpenChange={setIsShareDialogueOpen}>
+                      <Popover.Trigger asChild>
+                        <UI.Button leftIcon={() => <QRIcon />} ml={4} size="sm">
+                          {t('share')}
+                        </UI.Button>
+                      </Popover.Trigger>
+                      <AnimatePresence>
+                        {isShareDialogueOpen && (
+                          <Content
+                            align="start"
+                            asChild
+                            forceMount
+                            forwardedAs={motion.div}
+                            {...slideUpFadeMotion}
+                          >
+                            <motion.div style={{ background: 'white' }}>
+                              <ShareDialogue dialogueName={activeDialogue?.slug as string} shareUrl={shareUrl} />
+                            </motion.div>
+                          </Content>
+                        )}
+                      </AnimatePresence>
+                    </Popover.Root>
+                  </UI.Flex>
+
                 </UI.ViewTitle>
                 {total > 0 ? (
                   <UI.ViewSubTitle>
@@ -108,13 +154,13 @@ export const WorkspaceTopNavBar = () => {
 
             <UI.Div pt={4}>
               <UI.Span>
-                <NavLink exact to={dashboardPath}>
+                <NavLink exact to={overviewPath}>
                   {t('overview')}
                 </NavLink>
               </UI.Span>
 
               <UI.Span>
-                <NavLink to={workspaceInteractionsPath}>
+                <NavLink to={`${feedbackOverviewPath}?dialogueIds=${activeDialogue?.id}`}>
                   {t('interactions')}
                 </NavLink>
               </UI.Span>
