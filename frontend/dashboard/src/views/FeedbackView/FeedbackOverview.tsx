@@ -183,7 +183,7 @@ export const FeedbackOverview = () => {
   };
 
   const handleSearchTermChange = (search: string) => {
-    // setSearchVal(search);
+    setSearchVal(search);
     setFilter((prevValues) => ({
       ...prevValues,
       search,

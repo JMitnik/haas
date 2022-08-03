@@ -1,15 +1,24 @@
+import { ApolloProvider } from '@apollo/client';
+import { I18nextProvider } from 'react-i18next';
 import { QueryParamProvider } from 'use-query-params';
 import { Route } from 'react-router-dom';
 import { Router } from 'react-router';
 import { act } from 'react-dom/test-utils';
-import { cleanup } from '@testing-library/react';
+import { cleanup, render } from '@testing-library/react';
 import { createMemoryHistory } from 'history';
-import { fireEvent, render, screen, waitFor } from 'test';
+import { fireEvent, waitFor } from 'test';
 import { isPresent } from 'ts-is-present';
 import { parse } from 'query-string';
 import React from 'react';
 import preview from 'jest-preview';
 import userEvent from '@testing-library/user-event';
+
+import CustomerProvider from 'providers/CustomerProvider';
+import ThemeProvider from 'providers/ThemeProvider';
+import UserProvider from 'providers/UserProvider';
+import WorkspaceLayout from 'layouts/WorkspaceLayout/WorkspaceLayout';
+import client from 'config/server/apollo';
+import lang from 'config/i18n-config';
 
 import { FeedbackOverview } from '../FeedbackOverview';
 import {
@@ -27,16 +36,26 @@ test('render layers', async () => {
   mockGetWorkspaceLayoutDetailsResponse((res) => ({ ...res }));
   mockGetInteractionResponse((res) => ({ ...res }));
 
-  console.log(window.location);
-
   // renderComponent();
 
-  const history = createMemoryHistory({ initialEntries: [{ search: '?minScore=0&maxScore=100&search=Hoi' }] });
+  const history = createMemoryHistory({ initialEntries: [{ search: '?minScore=0&maxScore=100' }] });
 
-  render(
+  const screen = render(
     <Router history={history}>
       <QueryParamProvider ReactRouterRoute={Route}>
-        <FeedbackOverview />
+        <ApolloProvider client={client}>
+          <UserProvider>
+            <CustomerProvider workspaceOverrideSlug="workspace_1" __test__>
+              <I18nextProvider i18n={lang}>
+                <ThemeProvider>
+                  <WorkspaceLayout>
+                    <FeedbackOverview />
+                  </WorkspaceLayout>
+                </ThemeProvider>
+              </I18nextProvider>
+            </CustomerProvider>
+          </UserProvider>
+        </ApolloProvider>
       </QueryParamProvider>
     </Router>,
   );
@@ -73,7 +92,7 @@ test('render layers', async () => {
           ...res.customer?.sessionConnection,
           pageInfo: 223,
           totalPages: res.customer?.sessionConnection?.totalPages,
-          sessions: [],
+          sessions: newSessions,
         },
       },
     };
@@ -81,11 +100,16 @@ test('render layers', async () => {
 
   userEvent.type(searchBar, 'School');
 
-  console.log(history.location.search);
-  expect(parse(history.location.search)).toEqual({ search: 'School' });
+  // await new Promise((r) => setTimeout(r, 5000));
 
-  // preview.debug();
-  await new Promise((r) => setTimeout(r, 5000));
+  await waitFor(async () => {
+    expect(parse(history.location.search)).toMatchObject({ search: 'School' });
+  });
+
+  console.log(history.location.search);
+
+  preview.debug();
+
   // expect(await screen.findByText('Schoolss')).toBeInTheDocument();
 
   // act(() => {
