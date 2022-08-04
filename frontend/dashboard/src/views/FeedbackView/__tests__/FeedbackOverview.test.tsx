@@ -297,7 +297,7 @@ describe('FeedbackOverview', () => {
           ],
         },
       },
-    }));
+    }) as any);
 
     const history = createMemoryHistory({ initialEntries: [{ search: '?minScore=0&maxScore=100' }] });
 
