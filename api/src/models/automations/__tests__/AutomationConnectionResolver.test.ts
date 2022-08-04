@@ -5,6 +5,7 @@ import { clearDatabase, prepDefaultCreateData, seedAutomation } from './testUtil
 import { makeTestContext } from '../../../test/utils/makeTestContext';
 import { prisma } from '../../../test/setup/singletonDeps';
 import AuthService from '../../auth/AuthService';
+import { assertGraphQLError } from '../../../test/utils/expects';
 
 jest.setTimeout(30000);
 
@@ -79,9 +80,8 @@ describe('AutomationConnection resolvers', () => {
         customerSlug: workspace.slug,
       }, { 'Authorization': `Bearer ${token}` });
     } catch (error) {
-      if (error instanceof Error) {
-        expect(error.message).toContain('Unauthorized');
-      } else { throw new Error(); }
+      assertGraphQLError(error);
+      expect(error.message).toContain('Unauthorized');
     }
   });
 

@@ -5,7 +5,7 @@ import { clearDatabase } from './testUtils';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
 import { seedDialogue, seedSessions, seedUser, seedWorkspace } from '../../../test/utils/seedTestData';
 import AuthService from '../../auth/AuthService';
-import { expectUnauthorizedErrorOnResolver } from '../../../test/utils/expects';
+import { assertGraphQLError, expectUnauthorizedErrorOnResolver } from '../../../test/utils/expects';
 import { defaultAdminRole, defaultManagerRole, defaultUserRole } from '../../templates/TemplateTypes';
 import { prisma } from '../../../test/setup/singletonDeps';
 
@@ -125,7 +125,7 @@ describe('SessionResolver', () => {
         }
       );
     } catch (error) {
-      if (!(error instanceof ClientError)) throw new Error();
+      assertGraphQLError(error);
       expect(error.response.errors).toHaveLength(1);
       expectUnauthorizedErrorOnResolver(error.response.errors?.[0], 'sessionConnection');
     }

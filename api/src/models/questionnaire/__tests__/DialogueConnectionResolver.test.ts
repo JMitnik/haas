@@ -2,6 +2,7 @@ import { clearDialogueDatabase, prepDefaultCreateData, seedDialogue, assignUserT
 import { makeTestContext } from '../../../test/utils/makeTestContext';
 import AuthService from '../../auth/AuthService';
 import { prisma } from '../../../test/setup/singletonDeps';
+import { assertGraphQLError } from '../../../test/utils/expects';
 
 jest.setTimeout(30000);
 
@@ -59,9 +60,8 @@ describe('DialogueConnection resolver', () => {
         customerSlug: workspace.slug,
       }, { 'Authorization': `Bearer ${token}` });
     } catch (error) {
-      if (error instanceof Error) {
-        expect(error.message).toContain('Unauthorized');
-      } else { throw new Error(); }
+      assertGraphQLError(error);
+      expect(error.message).toContain('Unauthorized');
     }
   });
 
@@ -168,6 +168,4 @@ describe('DialogueConnection resolver', () => {
 
     expect(res.customer.dialogueConnection.dialogues).toHaveLength(3)
   });
-
-
 });

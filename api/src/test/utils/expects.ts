@@ -1,4 +1,4 @@
-import { GraphQLError } from 'graphql-request/dist/types';
+import { ClientError, GraphQLError } from 'graphql-request/dist/types';
 
 /**
  * Expect that a GraphQL error represents an Unauthorized access to a resolver.
@@ -9,4 +9,8 @@ export const expectUnauthorizedErrorOnResolver = (error: GraphQLError | undefine
   if (!error) throw new Error('undefined error');
   expect(error.message).toContain('Unauthorized');
   expect(error?.path?.[error?.path?.length - 1]).toEqual(resolverName);
+}
+
+export function assertGraphQLError(error: unknown): asserts error is NonNullable<ClientError> {
+  if (!(error instanceof ClientError)) throw new Error();
 }
