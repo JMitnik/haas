@@ -375,7 +375,7 @@ export const WorkspaceGrid = ({
                     onChange={setDateRange}
                   />
                   {data?.customer?.isDemo && canResetWorkspaceData && (
-                    <ControlButton onClick={() => resetWorkspaceData()} ml={2}>
+                    <ControlButton  height="100%" onClick={() => resetWorkspaceData()} ml={2}>
                       <UI.Flex alignItems="center">
                         <UI.Div mr={1}>
                           {resetLoading && (

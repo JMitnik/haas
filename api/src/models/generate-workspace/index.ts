@@ -1,3 +1,3 @@
 export * from './graphql/GenerateWorkspaceFromCSVResolver';
 export * from './graphql/ResetWorkspaceDataResolver';
-export * from './DemoHelpers';
+export * from './GenerateWorkspaceService.helpers';

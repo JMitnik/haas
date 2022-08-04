@@ -80,7 +80,6 @@ class ContextSessionService {
     } catch (e) {
       logger.error('Error parsing JWT Token', e);
       Promise.resolve(this.context.reply.cookie('access_token', '')).catch(() => { return });
-
       throw new UnauthenticatedError();
     }
 

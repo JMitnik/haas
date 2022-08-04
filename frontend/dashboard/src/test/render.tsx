@@ -12,7 +12,7 @@ import CustomerProvider from 'providers/CustomerProvider';
 import ThemeProvider from 'providers/ThemeProvider';
 import UserProvider from 'providers/UserProvider';
 import WorkspaceLayout from 'layouts/WorkspaceLayout/WorkspaceLayout';
-import client from 'config/apollo';
+import client from 'config/server/apollo';
 import lang from 'config/i18n-config';
 
 interface TestProvidersProps {

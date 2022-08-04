@@ -27,6 +27,6 @@ export const GenerateWorkspaceFromCSVMutation = mutationField('generateWorkspace
   async resolve(parent, args, ctx) {
     if (!args.input) throw new GraphQLYogaError('No input object provided');
 
-    return ctx.services.generateWorkspaceService.generateWorkspaceFromCSV(args.input, ctx.session?.user?.id);
+    return ctx.services.generateWorkspaceService.generateWorkspace(args.input, ctx.session?.user?.id);
   },
 });

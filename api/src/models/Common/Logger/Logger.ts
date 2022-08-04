@@ -29,13 +29,11 @@ export class Logger {
    */
   public logLifeCycle(val: string, type: LifeCycleType = LifeCycleType.GENERIC) {
     if (this.environment === 'test' && !this.verbose) return;
-
     console.log(`⚙️    ${MapLifeCycle[type]}  App Lifecycle: ${val}`);
   }
 
   public logMetric(val: string) {
     console.log(`⏱️\t${val}`);
-
   }
 
   public debug(val: string) {
