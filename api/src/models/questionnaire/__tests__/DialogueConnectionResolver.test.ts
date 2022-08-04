@@ -60,7 +60,7 @@ describe('DialogueConnection resolver', () => {
       }, { 'Authorization': `Bearer ${token}` });
     } catch (error) {
       if (error instanceof Error) {
-        expect(error.message).toContain('Not Authorised!');
+        expect(error.message).toContain('Unauthorized');
       } else { throw new Error(); }
     }
   });

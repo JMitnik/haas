@@ -112,7 +112,7 @@ it('unable to create automations unauthorized', async () => {
     );
   } catch (error) {
     if (error instanceof Error) {
-      expect(error.message).toContain('Not Authorised!');
+      expect(error.message).toContain('Unauthorized');
     } else { throw new Error(); }
   }
 });

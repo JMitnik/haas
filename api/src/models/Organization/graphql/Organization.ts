@@ -1,7 +1,7 @@
 import { objectType } from 'nexus';
-import { UserInputError } from 'apollo-server-express';
 
 import { OrganizationLayer } from './OrganizationLayer';
+import { UserInputError } from '../../Common/Errors/UserInputError';
 
 export const Organization = objectType({
   name: 'Organization',
