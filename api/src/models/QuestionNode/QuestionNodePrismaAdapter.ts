@@ -40,22 +40,22 @@ class QuestionNodePrismaAdapter {
    * @returns
    */
   public findSliderNodeByParentId(parentQuestionNodeId: string) {
-    return this.prisma.sliderNode.findFirst({
+    return this.prisma.questionNode.findFirst({
       where: {
-        QuestionNode: {
-          every: {
-            id: parentQuestionNodeId,
-          },
-        },
+        id: parentQuestionNodeId,
       },
       include: {
-        markers: {
+        sliderNode: {
           include: {
-            range: true,
-          },
-        },
+            markers: {
+              include: {
+                range: true,
+              }
+            }
+          }
+        }
       },
-    })
+    });
   }
 
   /**

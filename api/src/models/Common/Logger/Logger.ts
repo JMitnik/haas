@@ -19,7 +19,7 @@ export class Logger {
   public logLifeCycle(val: string) {
     if (this.environment === 'test' && !this.verbose) return;
 
-    console.log('App Lifecycle: ' + val);
+    console.log('⚙️\tApp Lifecycle stage: ' + val);
   }
 
   public debug(val: string) {

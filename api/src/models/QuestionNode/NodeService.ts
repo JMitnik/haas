@@ -42,8 +42,8 @@ export class NodeService {
    * @param parentQuestionNodeId
    * @returns
    */
-  public findSliderNodeByParentId(parentQuestionNodeId: string) {
-    return this.questionNodePrismaAdapter.findSliderNodeByParentId(parentQuestionNodeId);
+  public async findSliderNodeByParentId(parentQuestionNodeId: string) {
+    return (await this.questionNodePrismaAdapter.findSliderNodeByParentId(parentQuestionNodeId))?.sliderNode;
   }
 
   /**

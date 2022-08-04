@@ -1,4 +1,4 @@
-import { PrismaClient, RoleTypeEnum } from '@prisma/client';
+import { PrismaClient, Role, RoleTypeEnum } from '@prisma/client';
 import cuid from 'cuid';
 import * as yargs from 'yargs';
 
@@ -6,8 +6,8 @@ import { CustomerPrismaAdapter } from '../models/customer/CustomerPrismaAdapter'
 import UserService from '../models/users/UserService';
 import GenerateWorkspaceService from '../models/generate-workspace/GenerateWorkspaceService';
 import { DialogueTemplateType } from '../models/QuestionNode/NodeServiceType';
-import { Workspace } from '../models/generate-workspace/GenerateWorkspace.types';
-import UserOfCustomerPrismaAdapter from '../models/users/UserOfCustomerPrismaAdapter';
+import { getTemplate } from 'models/generate-workspace/GenerateWorkspaceService.helpers';
+import UserOfCustomerPrismaAdapter from 'models/users/UserOfCustomerPrismaAdapter';
 
 const prisma = new PrismaClient();
 
@@ -49,22 +49,22 @@ const argv = yargs
     default: 1,
   })
   .help()
-  .alias('help', 'h').argv;
+  .alias('help', 'h').argv as any;
 
-const addUser = async (workspaceWithRoles: Workspace, type: RoleTypeEnum) => {
-  const role = workspaceWithRoles.roles.find((role) => role.type === type);
-  const user = await userService.upsertUserByEmail({
-    email: `${workspaceWithRoles.slug}-${type.toLowerCase()}`,
-    firstName: type,
-    lastName: 'User',
-  });
+// const addUser = async (workspaceWithRoles: Workspace, type: RoleTypeEnum) => {
+//   const role = workspaceWithRoles.roles.find((role) => role.type === type);
+//   const user = await userService.upsertUserByEmail({
+//     email: `${workspaceWithRoles.slug}-${type.toLowerCase()}`,
+//     firstName: type,
+//     lastName: 'User',
+//   });
 
-  await userOfCustomerPrismaAdapter.connectUserToWorkspace(
-    workspaceWithRoles.id,
-    role?.id as string,
-    user.id as string
-  );
-}
+//   await userOfCustomerPrismaAdapter.connectUserToWorkspace(
+//     workspaceWithRoles.id,
+//     role?.id as string,
+//     user.id as string
+//   );
+// }
 
 export const seedBusinessTemplate = async () => {
   const amtSessions = argv.sessions;
@@ -82,7 +82,7 @@ export const seedBusinessTemplate = async () => {
     });
   }
 
-  const template = generateWorkspaceService.getTemplate(templateType);
+  const template = getTemplate(templateType);
   const workspace = await customerPrismaAdapter.createWorkspace({
     name: `${templateType} Workspace`,
     primaryColour: '',
@@ -90,11 +90,16 @@ export const seedBusinessTemplate = async () => {
     slug: `${templateType.toLowerCase()}-${cuid.slug()}`,
   }, template);
 
-  await addUser(workspace, RoleTypeEnum.ADMIN);
-  await addUser(workspace, RoleTypeEnum.MANAGER);
-  await addUser(workspace, RoleTypeEnum.USER);
+  const adminRole = workspace.roles.find((role) => role.type === RoleTypeEnum.ADMIN) as Role;
+  await userOfCustomerPrismaAdapter.connectUserToWorkspace(
+    workspace.id,
+    adminRole?.id as string,
+    user.id,
+  );
 
-  return generateWorkspaceService.generateDemoData(templateType, workspace, user.id, amtSessions, generateData);
+  return generateWorkspaceService.generateDialoguesByTemplateLayers(
+    workspace, templateType, amtSessions, generateData
+  );
 };
 
 seedBusinessTemplate().then(() => { })

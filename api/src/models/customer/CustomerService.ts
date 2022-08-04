@@ -637,9 +637,16 @@ export class CustomerService {
     const deletionOfRoles = prisma.role.deleteMany({ where: { customerId } });
     const deletionOfCustomer = this.customerPrismaAdapter.delete(customerId);
 
+    const deletionOfUserOfCustomer = prisma.userOfCustomer.deleteMany({
+      where: {
+        customerId,
+      },
+    })
+
     await prisma.$transaction([
       deletionOfTriggers,
       deletionOfPermissions,
+      deletionOfUserOfCustomer,
       deletionOfUserCustomerRoles,
       deletionOfRoles,
       deletionOfCustomer,
