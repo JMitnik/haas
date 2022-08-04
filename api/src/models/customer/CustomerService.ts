@@ -1,5 +1,4 @@
 import { Customer, PrismaClient, CustomerSettings, DialogueImpactScore, ChoiceNodeEntry, NodeEntry } from '@prisma/client';
-import { UserInputError } from 'apollo-server-express';
 import { clone, groupBy, maxBy, meanBy, orderBy, uniq } from 'lodash';
 import cuid from 'cuid';
 import { addDays, subDays } from 'date-fns';
@@ -14,6 +13,8 @@ import prisma from '../../config/prisma';
 import { CustomerPrismaAdapter } from './CustomerPrismaAdapter';
 import TagPrismaAdapter from '../tag/TagPrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
+import { FailedProcessError }  from '../Common/Errors/FailedProcessError';
+import { ExistingResourceError }  from '../Common/Errors/ExistingResourceError';
 import UserOfCustomerPrismaAdapter from '../users/UserOfCustomerPrismaAdapter';
 import { CreateDialogueInput } from '../questionnaire/DialoguePrismaAdapterType';
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
@@ -335,7 +336,7 @@ export class CustomerService {
 
       const dialogue = await this.dialoguePrismaAdapter.createTemplate(dialogueInput);
 
-      if (!dialogue) throw 'ERROR: No dialogue created!'
+      if (!dialogue) throw new FailedProcessError('No dialogue created!');
       // Step 2: Make the leafs
       const leafs = await this.templateService.createTemplateLeafNodes(DialogueTemplateType.MASS_SEED, dialogue.id);
 
@@ -476,7 +477,7 @@ export class CustomerService {
     const dialogueInput: CreateDialogueInput = { slug: template.slug, title: template.title, description: template.description, customer: { id: customer.id, create: false } };
     const dialogue = await this.dialoguePrismaAdapter.createTemplate(dialogueInput);
 
-    if (!dialogue) throw 'ERROR: No dialogue created!'
+    if (!dialogue) throw new FailedProcessError('No dialogue created!');
     // Step 2: Make the leafs
     const leafs = await this.templateService.createTemplateLeafNodes(DialogueTemplateType.DEFAULT, dialogue.id);
 
@@ -531,7 +532,7 @@ export class CustomerService {
     } catch (error) {
       // @ts-ignore
       if (error.code === 'P2002') {
-        throw new UserInputError('customer:existing_slug');
+        throw new ExistingResourceError('customer:existing_slug');
       }
 
       return null;

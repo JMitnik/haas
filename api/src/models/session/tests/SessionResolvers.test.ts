@@ -1,11 +1,11 @@
 import { PrismaClient } from '@prisma/client';
-import { ApolloError } from 'apollo-server';
+import { ClientError } from 'graphql-request';
 
 import { clearDatabase } from './testUtils';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
 import { seedDialogue, seedSessions, seedUser, seedWorkspace } from '../../../test/utils/seedTestData';
 import AuthService from '../../auth/AuthService';
-import { expectUnauthorizedErrorOnResolver } from '../../../test/utils/expects';
+import { assertGraphQLError, expectUnauthorizedErrorOnResolver } from '../../../test/utils/expects';
 import { defaultAdminRole, defaultManagerRole, defaultUserRole } from '../../templates/TemplateTypes';
 import { prisma } from '../../../test/setup/singletonDeps';
 
@@ -106,7 +106,7 @@ describe('SessionResolver', () => {
     }));
   });
 
-  test('user has no permissions to access interactions', async () => {
+  test.only('user has no permissions to access interactions', async () => {
     const { workspace, dialogue } = await prepEnvironment(prisma);
     const { user } = await seedUser(prisma, workspace.id, {
       name: 'Guest',
@@ -115,7 +115,7 @@ describe('SessionResolver', () => {
     const token = AuthService.createUserToken(user.id, 22);
 
     try {
-      await ctx.client.request(getSessionConnectionQuery,
+      const res = await ctx.client.request(getSessionConnectionQuery,
         {
           customerSlug: workspace.slug,
           dialogueSlug: dialogue.slug,
@@ -125,10 +125,9 @@ describe('SessionResolver', () => {
         }
       );
     } catch (error) {
-      if (error instanceof ApolloError) {
-        expect(error.response.errors).toHaveLength(1);
-        expectUnauthorizedErrorOnResolver(error.response.errors[0], 'sessionConnection');
-      }
+      assertGraphQLError(error);
+      expect(error.response.errors).toHaveLength(1);
+      expectUnauthorizedErrorOnResolver(error.response.errors?.[0], 'sessionConnection');
     }
   });
 
@@ -192,5 +191,4 @@ describe('SessionResolver', () => {
     expect(nextConnection.pageInfo.nextPageOffset).toEqual(10);
     expect(nextConnection.pageInfo.prevPageOffset).toEqual(0);
   });
-
 });

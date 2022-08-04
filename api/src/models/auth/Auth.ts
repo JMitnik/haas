@@ -1,5 +1,4 @@
 import { inputObjectType, mutationField, objectType, queryField } from 'nexus';
-import { ApolloError } from 'apollo-server-express';
 import { GraphQLYogaError } from '@graphql-yoga/node';
 
 import { UserType } from '../users/graphql/User';
@@ -8,6 +7,8 @@ import AuthService from './AuthService';
 import makeSignInTemplate from '../../services/mailings/templates/makeSignInTemplate';
 import verifyAndDecodeToken from './verifyAndDecodeToken';
 import { APIContext } from '../../types/APIContext';
+import { UserInputError } from '../Common/Errors/UserInputError';
+import { UnauthenticatedError } from '../Common/Errors/UnauthenticatedError';
 
 export const RegisterInput = inputObjectType({
   name: 'RegisterInput',
@@ -36,11 +37,15 @@ export const AuthenticateLambda = mutationField('authenticateLambda', {
   type: 'String',
   args: { input: AuthenticateLambdaInput },
   async resolve(parent, args, ctx) {
-    const authorizationHeader = ctx.req.header('lambda');
+    const authorizationHeader = ctx.req.headers['lambda'];
     if (!authorizationHeader) throw new GraphQLYogaError('No authorization header available');
     if (!args.input?.authenticateEmail) throw new GraphQLYogaError('No authenticate email provided');
     if (!args.input?.workspaceEmail) throw new GraphQLYogaError('No workspace email provided');
-    const token = await ctx.services.authService.getWorkspaceAuthorizationToken(authorizationHeader, args.input.workspaceEmail);
+
+    const token = await ctx.services.authService.getWorkspaceAuthorizationToken(
+      authorizationHeader,
+      args.input.workspaceEmail
+    );
     return token || null;
   },
 })
@@ -50,7 +55,7 @@ export const CreateAutomationToken = mutationField('createAutomationToken', {
   args: { 'email': 'String' },
 
   async resolve(parent, args, ctx) {
-    if (!args.email) throw new GraphQLYogaError('No email address provided!');
+    if (!args.email) throw new UserInputError('No email address provided!');
     return ctx.services.authService.createAutomationToken(args.email, 262974);
   },
 });
@@ -60,8 +65,8 @@ export const RegisterMutation = mutationField('register', {
   args: { input: RegisterInput },
 
   async resolve(parent, args, ctx) {
-    if (!args.input) throw new ApolloError('Input information required');
-    const user = await ctx.services.authService.registerUser(args.input);
+    if (!args.input) throw new UserInputError('Input information required');
+    await ctx.services.authService.registerUser(args.input);
 
     return {
 
@@ -119,7 +124,7 @@ export const VerifyUserTokenMutation = mutationField('verifyUserToken', {
     const [validUser] = validUsers;
 
     if (!decodedToken.exp) throw new GraphQLYogaError('Your token is invalid. Please request a new token.');
-    if (new Date(decodedToken.exp) > new Date(Date.now())) throw new ApolloError('Your token has expired. Please request a new token.');
+    if (new Date(decodedToken.exp) > new Date(Date.now())) throw new GraphQLYogaError('Your token has expired. Please request a new token.');
 
     const minutesInAMonth = 43000;
     const refreshToken = AuthService.createUserToken(validUser.id, minutesInAMonth);
@@ -128,10 +133,7 @@ export const VerifyUserTokenMutation = mutationField('verifyUserToken', {
 
     // It seems all is good now. We can remove the token from the database, and set a refresh token on the user
     await ctx.services.userService.login(validUser.id, refreshToken);
-
-    ctx.res.cookie('refresh_token', refreshToken, {
-      httpOnly: true,
-    });
+    void Promise.resolve(ctx.res.cookie('refresh_token', refreshToken, { httpOnly: true }));
 
     return {
       userData: {
@@ -181,12 +183,12 @@ export const RequestInviteMutation = mutationField('requestInvite', {
   args: { input: RequestInviteInput },
   nullable: true,
   async resolve(parent, args, ctx) {
-    if (!args?.input?.email) throw new GraphQLYogaError('No email provided');
+    if (!args?.input?.email) throw new UserInputError('No email provided');
     const user = await ctx.services.userService.getUserByEmail(args.input.email);
 
     if (!user) return { didInvite: false, userExists: false };
 
-    const loginToken = AuthService.createUserToken(user.id);
+    const loginToken = AuthService.createUserToken(user.id, 60);
     await ctx.services.userService.setLoginToken(user.id, loginToken);
 
     const loginBody = makeSignInTemplate({
@@ -220,11 +222,11 @@ export const RefreshAccessTokenQuery = queryField('refreshAccessToken', {
   type: RefreshAccessTokenOutput,
 
   async resolve(parent, args, ctx) {
-    if (!ctx.session?.user?.id) throw new GraphQLYogaError('No verified user');
+    if (!ctx.session?.user?.id) throw new UnauthenticatedError('No verified user');
     const refreshTokenIsValid = await ctx.services.authService.verifyUserRefreshToken(ctx.session.user?.id);
 
     if (!refreshTokenIsValid) {
-      throw new ApolloError('Unauthenticated', 'UNAUTHENTICATED');
+      throw new UnauthenticatedError();
     }
 
     const newToken = AuthService.createUserToken(ctx.session?.user?.id);
@@ -241,8 +243,8 @@ export const LogoutMutation = mutationField('logout', {
   type: 'String',
 
   async resolve(parent, args, ctx) {
-    if (!ctx.session?.user?.id) throw new GraphQLYogaError('No user found');
-    ctx.res.cookie('refresh_token', null);
+    if (!ctx.session?.user?.id) throw new UserInputError('No user found');
+    void Promise.resolve(ctx.res.header('refresh_token', null));
     await ctx.services.userService.logout(ctx.session.user.id);
 
     return 'Logged out';
@@ -255,7 +257,7 @@ export const InviteUserMutation = mutationField('inviteUser', {
   args: { input: InviteUserInput },
 
   async resolve(parent, args, ctx: APIContext) {
-    if (!args.input) throw new GraphQLYogaError('No input provided');
+    if (!args.input) throw new UserInputError('No input provided');
     const { customerId, email, roleId } = args.input;
 
     // Check if email already has been created

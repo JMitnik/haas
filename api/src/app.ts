@@ -15,8 +15,8 @@ process.on('SIGTERM', async () => {
   process.exit(0);
 });
 
-try {
-  makeServer(config.port, prisma);
-} catch (e: unknown) {
-  logger.error('Error in lifecycle', e);
-}
+makeServer(
+  config.port, prisma
+).then(
+  () => { return; },
+).catch((e) => logger.error('Init error', e));

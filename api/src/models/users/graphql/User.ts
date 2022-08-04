@@ -1,4 +1,4 @@
-import { ApolloError, UserInputError } from 'apollo-server-express';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 import { extendType, inputObjectType, mutationField, objectType, queryField, scalarType } from 'nexus';
 import { Prisma } from '@prisma/client';
 import { Kind } from 'graphql';
@@ -35,11 +35,11 @@ export const UserOfCustomerQuery = queryField('UserOfCustomer', {
   args: { input: UserOfCustomerInput },
   nullable: true,
 
-  async resolve(parent, args, ctx) {
-    if (!args.input?.userId) throw new UserInputError('User not provided');
-    if (!args.input?.customerId && !args.input?.customerSlug) throw new UserInputError('Neither slug nor id of Customer was provided');
+  async resolve(parent, args, { services }) {
+    if (!args.input?.userId) throw new GraphQLYogaError('User not provided');
+    if (!args.input?.customerId && !args.input?.customerSlug) throw new GraphQLYogaError('Neither slug nor id of Customer was provided');
 
-    return ctx.services.userService.getUserOfCustomer(args.input.customerId, args.input.customerSlug, args.input.userId);
+    return services.userService.getUserOfCustomer(args.input.customerId, args.input.customerSlug, args.input.userId);
   },
 });
 
@@ -203,12 +203,12 @@ export const RootUserQueries = extendType({
     t.field('me', {
       type: UserType,
       async resolve(parent, args, ctx) {
-        if (!ctx.session?.user?.id) throw new ApolloError('No valid user');
+        if (!ctx.session?.user?.id) throw new GraphQLYogaError('No valid user');
         const userId = ctx.session?.user?.id;
 
         const user = await ctx.services.userService.findUserContext(userId);
 
-        if (!user) throw new ApolloError('There is something wrong in our records. Please contact an admin.', 'UNAUTHENTIC');
+        if (!user) throw new GraphQLYogaError('There is something wrong in our records. Please contact an admin.');
 
         return {
           email: user?.email,
@@ -225,7 +225,7 @@ export const RootUserQueries = extendType({
       args: { customerSlug: 'String' },
 
       resolve(parent, args, ctx) {
-        if (!args.customerSlug) throw new UserInputError('No business provided');
+        if (!args.customerSlug) throw new GraphQLYogaError('No business provided');
         return ctx.services.userService.getAllUsersByCustomerSlug(args.customerSlug);
       },
     });
@@ -236,11 +236,11 @@ export const RootUserQueries = extendType({
       nullable: true,
 
       async resolve(parent, args, ctx) {
-        if (!args.userId) throw new UserInputError('No valid user id provided');
+        if (!args.userId) throw new GraphQLYogaError('No valid user id provided');
 
         const user = await ctx.services.userService.findUserContext(args.userId);
 
-        if (!user) throw new UserInputError('Cant find user with this ID');
+        if (!user) throw new GraphQLYogaError('Cant find user with this ID');
         return user || null;
       },
     });
@@ -260,9 +260,9 @@ export const HandleUserStateInWorkspace = mutationField('handleUserStateInWorksp
   type: UserCustomerType,
   args: { input: HandleUserStateInWorkspaceInput },
   async resolve(parent, args, ctx) {
-    if (!args?.input?.userId) throw new UserInputError('No valid user provided to edit');
-    if (args?.input?.isActive === undefined || args?.input?.isActive === null || typeof args?.input?.isActive === undefined) throw new UserInputError('No activity state provided');
-    if (!args?.input?.workspaceId) throw new UserInputError('No workspace Id provided');
+    if (!args?.input?.userId) throw new GraphQLYogaError('No valid user provided to edit');
+    if (args?.input?.isActive === undefined || args?.input?.isActive === null || typeof args?.input?.isActive === undefined) throw new GraphQLYogaError('No activity state provided');
+    if (!args?.input?.workspaceId) throw new GraphQLYogaError('No workspace Id provided');
 
     const input = { userId: args.input.userId, isActive: args.input.isActive, workspaceId: args.input.workspaceId }
     return ctx.services.userService.setUserStateInWorkspace(input);
@@ -277,8 +277,8 @@ export const UserMutations = extendType({
       args: { userId: 'String', input: EditUserInput },
 
       async resolve(parent, args, ctx) {
-        if (!args.userId) throw new UserInputError('No valid user provided to edit');
-        if (!args.input) throw new UserInputError('No input provided');
+        if (!args.userId) throw new GraphQLYogaError('No valid user provided to edit');
+        if (!args.input) throw new GraphQLYogaError('No input provided');
         const { firstName, lastName, email, phone, roleId } = args.input;
         const userUpdateInput: Prisma.UserUpdateInput = { firstName, lastName, phone, email };
 
@@ -290,8 +290,8 @@ export const UserMutations = extendType({
       type: DeleteUserOuput,
       args: { input: DeleteUserInput },
       async resolve(parent, args, ctx) {
-        if (!args.input?.customerId) throw new UserInputError('No workspace provided');
-        if (!args.input?.userId) throw new UserInputError('No user provided');
+        if (!args.input?.customerId) throw new GraphQLYogaError('No workspace provided');
+        if (!args.input?.userId) throw new GraphQLYogaError('No user provided');
 
         return ctx.services.userService.deleteUser(args.input.userId, args.input.customerId);
       },

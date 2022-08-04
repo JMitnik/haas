@@ -1,6 +1,6 @@
 import { PrismaClient, NodeType } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType, queryField } from 'nexus';
-import { ApolloError, UserInputError } from 'apollo-server-express';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 import { CTALinksInputType, LinkType } from '../link/Link';
 import { DialogueType } from '../questionnaire/Dialogue';
@@ -240,9 +240,9 @@ export const QuestionNodeType = objectType({
         input: QuestionStatisticsSummaryFilterInput,
       },
       async resolve(parent, args, ctx) {
-        if (!parent.questionDialogueId) throw new ApolloError('No dialogue Id available for question!');
-        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
-        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+        if (!parent.questionDialogueId) throw new GraphQLYogaError('No dialogue Id available for question!');
+        if (!args.input) throw new GraphQLYogaError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new GraphQLYogaError('No impact type provided dialogue statistics summary!');
 
         let utcStartDateTime: Date | undefined;
         let utcEndDateTime: Date | undefined;
@@ -275,9 +275,9 @@ export const QuestionNodeType = objectType({
       },
       useTimeResolve: true,
       resolve(parent, args, ctx) {
-        if (!parent.questionDialogueId) throw new ApolloError('No dialogue Id available for question!');
-        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
-        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+        if (!parent.questionDialogueId) throw new GraphQLYogaError('No dialogue Id available for question!');
+        if (!args.input) throw new GraphQLYogaError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new GraphQLYogaError('No impact type provided dialogue statistics summary!');
 
         let utcStartDateTime: Date | undefined;
         let utcEndDateTime: Date | undefined;
@@ -563,7 +563,7 @@ export const QuestionQuery = queryField('question', {
   },
   nullable: true,
   async resolve(parent, args, ctx) {
-    if (!args.where?.id) throw new UserInputError('No question id provided');
+    if (!args.where?.id) throw new GraphQLYogaError('No question id provided');
     return ctx.services.nodeService.findNodeById(args.where?.id);
   },
 })
@@ -578,7 +578,7 @@ export const QuestionNodeMutations = extendType({
 
       async resolve(parent, args, ctx) {
         if (!args.questionId) {
-          throw new UserInputError('Question id is missing!');
+          throw new GraphQLYogaError('Question id is missing!');
         }
 
         await ctx.services.nodeService.duplicateBranch(args.questionId);
@@ -660,7 +660,7 @@ export const QuestionNodeMutations = extendType({
           || (args.input.type === NodeType.LINK && links?.linkTypes?.length === 0)
           || (args.input.type === NodeType.SHARE && !args.input?.share?.title)
           || (args.input.type === NodeType.FORM && args.input.form?.fields?.length === 0))
-          throw new UserInputError(`Input data is unsufficient: ${args.input}`);
+          throw new GraphQLYogaError(`Input data is unsufficient: ${args.input}`);
 
 
         const share = args.input?.share?.title ? {

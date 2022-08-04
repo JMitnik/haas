@@ -1,5 +1,5 @@
 import { PrismaClient, Role, RoleTypeEnum } from '@prisma/client';
-import { ApolloError } from 'apollo-server-express';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 import TemplateService from '../templates/TemplateService';
 import { NexusGenEnums } from '../../generated/nexus';
@@ -50,7 +50,7 @@ class GenerateWorkspaceService {
     const workspace = await this.customerService.findWorkspaceById(workspaceId);
 
     if (!workspace?.isDemo) {
-      throw new ApolloError('Workpace is not a demo workspace! Abort reset.');
+      throw new GraphQLYogaError('Workpace is not a demo workspace! Abort reset.');
     };
 
     // Find all sessions
@@ -104,7 +104,7 @@ class GenerateWorkspaceService {
       // Create initial dialogue
       const dialogue = await this.dialoguePrismaAdapter.createTemplate(dialogueInput);
 
-      if (!dialogue) throw new ApolloError('ERROR: No dialogue created! aborting...');
+      if (!dialogue) throw new GraphQLYogaError('ERROR: No dialogue created! aborting...');
       // Make post leaf node if data specified in template
       await this.templateService.createTemplatePostLeafNode(templateType as NexusGenEnums['DialogueTemplateType'], dialogue.id);
 
@@ -217,7 +217,7 @@ class GenerateWorkspaceService {
       // Create initial dialogue
       const dialogue = await this.dialoguePrismaAdapter.createTemplate(dialogueInput);
 
-      if (!dialogue) throw new ApolloError('ERROR: No dialogue created! aborting...');
+      if (!dialogue) throw new GraphQLYogaError('ERROR: No dialogue created! aborting...');
       // Make the leafs
       const leafs = await this.templateService.createTemplateLeafNodes(type as NexusGenEnums['DialogueTemplateType'], dialogue.id);
 
@@ -310,13 +310,13 @@ class GenerateWorkspaceService {
       try {
         await this.createBotUser(workspace);
       } catch (error) {
-        throw new ApolloError('Something went wrong creating bot account.');
+        throw new GraphQLYogaError('Something went wrong creating bot account.');
       }
 
       return workspace;
     } catch {
       await this.customerService.deleteWorkspace(workspace.id);
-      throw new ApolloError('Something went wrong generating generating workspace. All changes have been reverted');
+      throw new GraphQLYogaError('Something went wrong generating generating workspace. All changes have been reverted');
     }
   };
 

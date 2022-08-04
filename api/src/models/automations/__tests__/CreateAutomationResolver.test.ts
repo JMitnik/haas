@@ -4,6 +4,7 @@ import AuthService from '../../auth/AuthService';
 import { constructValidCreateAutomationInputData } from './testData';
 
 import { prisma } from '../../../test/setup/singletonDeps';
+import { assertGraphQLError } from '../../../test/utils/expects';
 const ctx = makeTestContext(prisma);
 
 
@@ -72,9 +73,8 @@ it('unable to create automation when no workspace id is provided', async () => {
     }
     );
   } catch (error) {
-    if (error instanceof Error) {
-      expect(error.message).toContain('Not Authorised!');
-    }
+    assertGraphQLError(error);
+    expect(error.message).toContain('Unauthorized');
   }
 });
 
@@ -104,9 +104,8 @@ it('unable to create automation when no automation label is provided', async () 
     }
     );
   } catch (error) {
-    if (error instanceof Error) {
-      expect(error.message).toContain('No label provided');
-    } else { throw new Error(); }
+    assertGraphQLError(error);
+    expect(error.message).toContain('No label provided');
   }
 });
 
@@ -136,9 +135,8 @@ it('unable to create automation when no automation type is provided', async () =
     }
     );
   } catch (error) {
-    if (error instanceof Error) {
-      expect(error.message).toContain('No automation type');
-    } else { throw new Error(); }
+    assertGraphQLError(error);
+    expect(error.message).toContain('No automation type');
   }
 });
 
@@ -168,9 +166,8 @@ it('unable to create automation when no actions are provided', async () => {
     }
     );
   } catch (error) {
-    if (error instanceof Error) {
-      expect(error.message).toContain('No actions provided');
-    } else { throw new Error(); }
+    assertGraphQLError(error);
+    expect(error.message).toContain('No actions provided');
   }
 });
 
@@ -200,9 +197,8 @@ it('unable to create automation when no action type is provided for an action', 
     }
     );
   } catch (error) {
-    if (error instanceof Error) {
-      expect(error.message).toContain('No action type provided');
-    } else { throw new Error(); }
+    assertGraphQLError(error);
+    expect(error.message).toContain('No action type provided');
   }
 });
 
@@ -232,9 +228,8 @@ it('unable to create automation when no event type is provided for a condition',
     }
     );
   } catch (error) {
-    if (error instanceof Error) {
-      expect(error.message).toContain('No event type provided');
-    } else { throw new Error(); }
+    assertGraphQLError(error);
+    expect(error.message).toContain('No event type provided');
   }
 });
 
@@ -264,9 +259,8 @@ it('unable to create automation when no event type is provided for a condition',
     }
     );
   } catch (error) {
-    if (error instanceof Error) {
-      expect(error.message).toContain('No event type provided');
-    } else { throw new Error(); }
+    assertGraphQLError(error);
+    expect(error.message).toContain('No event type provided');
   }
 });
 
@@ -297,9 +291,8 @@ it('unable to create automation when no targets are provided for a SEND_SMS acti
     }
     );
   } catch (error) {
-    if (error instanceof Error) {
-      expect(error.message).toContain('No target phone numbers provided');
-    } else { throw new Error(); }
+    assertGraphQLError(error);
+    expect(error.message).toContain('No target phone numbers provided');
   }
 });
 
@@ -335,8 +328,7 @@ it('unable to create automations unauthorized', async () => {
     }
     );
   } catch (error) {
-    if (error instanceof Error) {
-      expect(error.message).toContain('Not Authorised!');
-    } else { throw new Error(); }
+    assertGraphQLError(error);
+    expect(error.message).toContain('Unauthorized');
   }
 });

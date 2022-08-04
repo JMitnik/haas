@@ -1,5 +1,5 @@
 import { inputObjectType, mutationField } from 'nexus';
-import { UserInputError } from 'apollo-server-express';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 import { UserType } from './User';
 
@@ -17,7 +17,7 @@ export const AssignUserToDialogues = mutationField('assignUserToDialogues', {
   args: { input: AssignUserToDialoguesInput },
   nullable: true,
   async resolve(parent, args, ctx) {
-    if (!args.input) throw new UserInputError('No input provided!');
+    if (!args.input) throw new GraphQLYogaError('No input provided!');
 
     // TODO: Probably want to check if set dialogues belong to specified workspace
     return ctx.services.userService.assignUserToPrivateDialogues(args.input)

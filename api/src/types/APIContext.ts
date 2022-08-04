@@ -1,5 +1,7 @@
-import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 import { PrismaClient } from '@prisma/client';
+import { FastifyReply, FastifyRequest } from 'fastify';
+import { RouteGenericInterface } from 'fastify/types/route';
+
 
 import { OrganizationService } from '../models/Organization/OrganizationService';
 import { ContextSessionType } from '../models/auth/ContextSessionType';
@@ -58,7 +60,9 @@ export interface APIServiceContainer {
   questionStatisticsService: QuestionStatisticsService;
 }
 
-export interface APIContext extends ExpressContext {
+export interface APIContext {
+  req: FastifyRequest<RouteGenericInterface, any, any, unknown>;
+  res: FastifyReply<any, any, any, RouteGenericInterface, unknown>;
   prisma: PrismaClient;
   session: ContextSessionType | null;
   services: APIServiceContainer;

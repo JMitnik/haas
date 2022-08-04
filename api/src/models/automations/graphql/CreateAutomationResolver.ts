@@ -10,7 +10,7 @@ import { WorkspaceAspectType } from './WorkspaceAspectType';
 import { ConditionPropertyAggregateType } from './ConditionPropertyAggregateType';
 import { AutomationActionType } from './AutomationActionType';
 import { AutomationModel } from './AutomationModel';
-import { UserInputError } from 'apollo-server-express';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 import { AutomationConditionBuilderType } from './AutomationConditionBuilderType';
 
 export const CreateAutomationOperandInput = inputObjectType({
@@ -161,7 +161,7 @@ export const CreateAutomationResolver = mutationField('createAutomation', {
   args: { input: CreateAutomationInput },
 
   async resolve(parent, args, ctx) {
-    if (!args.input) throw new UserInputError('No input object provided for createAutomation Resolver');
+    if (!args.input) throw new GraphQLYogaError('No input object provided for createAutomation Resolver');
 
     const automation = await ctx.services.automationService.createAutomation(args.input);
     return automation;

@@ -1,25 +1,40 @@
-import { UserInputError } from 'apollo-server-express';
 import { applyMiddleware } from 'graphql-middleware';
 import { GraphQLError } from 'graphql';
 import { PrismaClient } from '@prisma/client';
+import { FastifyInstance } from 'fastify';
 import { createServer } from '@graphql-yoga/node'
-import { useApolloServerErrors } from '@envelop/apollo-server-errors'
-import { useResponseCache } from '@envelop/response-cache'
 import { useSentry } from '@envelop/sentry';
-import { useParserCache } from '@envelop/parser-cache';
-import { useValidationCache } from '@envelop/validation-cache';
 import { useGraphQlJit } from '@envelop/graphql-jit';
 
 import { APIContext } from '../types/APIContext';
+import { UserInputError } from '../models/Common/Errors/UserInputError';
 import Sentry from './sentry';
 import authShield from './auth';
 import ContextSessionService from '../models/auth/ContextSessionService';
 import schema from './schema';
 import { bootstrapServices } from './bootstrap';
+import { UnauthenticatedError } from '../models/Common/Errors/UnauthenticatedError';
+import { UnauthorizedError } from '../models/Common/Errors/UnauthorizedError';
+
+function fastifyAppClosePlugin(app: FastifyInstance): any {
+  return {
+    async serverWillStart() {
+      return {
+        async drainServer() {
+          await app.close();
+        },
+      };
+    },
+  };
+}
 
 const handleError = (ctx: any, error: GraphQLError) => {
-  // Filter out user-input-errors (not interesting)
-  if (error.originalError instanceof UserInputError) {
+  // Filter out certain client-facing errors (not interesting)
+  if (
+    error.originalError instanceof UserInputError
+    || error.originalError instanceof UnauthenticatedError
+    || error.originalError instanceof UnauthorizedError
+  ) {
     return;
   }
 
@@ -50,38 +65,39 @@ const handleError = (ctx: any, error: GraphQLError) => {
   });
 }
 
-export const makeApollo = async (prisma: PrismaClient) => {
+const SentryPlugin: any = {
+  async requestDidStart() {
+    return {
+      async didEncounterErrors(ctx: any) {
+        if (!ctx.operation) return;
+
+        ctx.errors.forEach((error: any) => {
+          handleError(ctx, error);
+        });
+      },
+    };
+  },
+};
+
+export const makeApollo = async (prisma: PrismaClient, app: FastifyInstance) => {
   const apollo = createServer({
     cors: true,
     logging: true,
     maskedErrors: false,
-    // uploads: false,
     schema: applyMiddleware(schema, authShield),
     context: async (ctx: any): Promise<APIContext> => ({
       ...ctx,
+      req: ctx.request,
+      res: ctx.reply,
       session: await new ContextSessionService(ctx, prisma).constructContextSession(),
       prisma,
       services: bootstrapServices(prisma),
     }),
     plugins: process.env.NODE_ENV === 'test' ? [] : [
+      SentryPlugin,
+      fastifyAppClosePlugin(app),
       useGraphQlJit(),
-      useValidationCache(),
-      useParserCache(),
       useSentry(),
-      // useResponseCache({
-      //   includeExtensionMetadata: true,
-      //   idFields: [
-      //     'id',
-      //     'userId',
-      //     'customerId',
-      //     'roleId',
-      //     'questionId',
-      //     'dialogueId',
-      //   ],
-      // }),
-      useApolloServerErrors({
-        debug: true,
-      }),
     ],
   });
 

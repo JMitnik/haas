@@ -1,6 +1,17 @@
 /* eslint-disable no-console */
 export type Environment = 'test' | 'development' | 'production';
 
+export enum LifeCycleType {
+  START,
+  END,
+  GENERIC,
+}
+
+const MapLifeCycle = {
+  [LifeCycleType.START]: '🏳️',
+  [LifeCycleType.END]: '🏁',
+  [LifeCycleType.GENERIC]: '🟢',
+}
 
 export class Logger {
   environment: Environment;
@@ -16,10 +27,13 @@ export class Logger {
    * @param val
    * @returns
    */
-  public logLifeCycle(val: string) {
+  public logLifeCycle(val: string, type: LifeCycleType = LifeCycleType.GENERIC) {
     if (this.environment === 'test' && !this.verbose) return;
+    console.log(`⚙️    ${MapLifeCycle[type]}  App Lifecycle: ${val}`);
+  }
 
-    console.log('⚙️\tApp Lifecycle stage: ' + val);
+  public logMetric(val: string) {
+    console.log(`⏱️\t${val}`);
   }
 
   public debug(val: string) {
@@ -33,7 +47,7 @@ export class Logger {
   public error(val: string, error: unknown) {
     // TODO: Send to Sentry
     if (error instanceof Error) {
-      console.error(`Error: ${val} \n\n\n Message: ${error.message}`);
+      console.error(`⚠️\tError: ${val} \n\n\n Message: ${error.message}`);
     } else {
       console.log(val, error);
     }

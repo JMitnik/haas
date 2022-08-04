@@ -1,5 +1,4 @@
-import { ApolloError, UserInputError } from 'apollo-server-express';
-import bcrypt from 'bcrypt';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import { PrismaClientOptions } from '@prisma/client/runtime';
@@ -8,9 +7,11 @@ import { NexusGenInputs } from '../../generated/nexus';
 import RoleService from '../role/RoleService';
 import config from '../../config/config';
 import { RegisterUserInput } from '../users/UserPrismaAdapterType';
+import { MissingResourceError } from '../Common/Errors/MissingResourceError';
 import UserPrismaAdapter from '../users/UserPrismaAdapter';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import UserService from '../users/UserService';
+import { UserInputError } from '../Common/Errors/UserInputError';
 
 
 class AuthService {
@@ -29,30 +30,27 @@ class AuthService {
   }
 
   /**
-   * 
+   *
    * @param userInput the details of a user needed to register him/her/it
    * @returns the registered user
    */
   async registerUser(userInput: NexusGenInputs['RegisterInput']) {
     const customerExists = await this.customerPrismaAdapter.exists(userInput.customerId);
 
-    if (!customerExists) throw new UserInputError('Customer does not exist');
+    if (!customerExists) throw new MissingResourceError('Workspace does not exist');
 
     const userExists = await this.userPrismaAdapter.existsWithinWorkspace(userInput.email, userInput.customerId);
-
     if (userExists) throw new UserInputError('User already exists');
 
-    const hashedPassword = await AuthService.generatePassword(userInput.password);
-
     if (!userInput.roleId) {
-      this.roleService.fetchDefaultRoleForCustomer(userInput.customerId);
+      await this.roleService.fetchDefaultRoleForCustomer(userInput.customerId);
     }
 
     const registerUserInput: RegisterUserInput = {
       email: userInput.email,
       firstName: userInput.firstName,
       lastName: userInput.lastName,
-      password: hashedPassword,
+      password: '',
       workspaceId: userInput.customerId,
     }
 
@@ -64,13 +62,13 @@ class AuthService {
   }
 
   /**
-   * Verifies the header sent by a Automation Action lambda 
+   * Verifies the header sent by a Automation Action lambda
    * @param authorizationHeader the header send by an automation action lambda to verify itself as being authentic
    * @returns true if lambda is authentic, false if not
    */
   async verifyLambdaAuthentication(authorizationHeader: string) {
     try {
-      const verified = jwt.verify(authorizationHeader, config.apiSecret);
+      jwt.verify(authorizationHeader, config.apiSecret);
       return true;
     } catch (e) {
       return false;
@@ -94,7 +92,7 @@ class AuthService {
   }
 
   /**
-   * 
+   *
    * @param userId the id of the target user
    * @returns a boolean indicating whether the user is verified or not
    */
@@ -127,7 +125,7 @@ class AuthService {
   }
 
   /**
-   * 
+   *
    * @param userId The id of the target user
    * @param duration the amount of time the token is valid for in minutes
    * @returns a JWT token
@@ -141,31 +139,15 @@ class AuthService {
   }
 
   /**
-   * 
+   *
    * @param token a JWT token
    * @returns the amount of time until the JWT token is expired
    */
   static getExpiryTimeFromToken(token: string): number {
     const decoded = jwt.decode(token) as any;
 
-    if (!decoded?.exp) throw new ApolloError('Decoded expiry is missing');
+    if (!decoded?.exp) throw new GraphQLYogaError('Decoded expiry is missing');
     return decoded.exp;
-  }
-
-  /**
-   * 
-   * @param passwordInput A password in string format
-   * @returns A hashed password
-   */
-  static async generatePassword(passwordInput: string) {
-    const hashedPassword: string = await new Promise((resolve, reject) => {
-      bcrypt.hash(passwordInput, 12, (err, hash) => {
-        if (err) reject(err);
-        resolve(hash);
-      });
-    });
-
-    return hashedPassword;
   }
 }
 

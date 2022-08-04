@@ -38,7 +38,7 @@ describe('UploadUpsellFileResolver', () => {
       'Authorization': `Bearer ${token}`,
     }
     )
-      .catch((reason) => expect(reason.message).toContain('Not Authorised!'));
+      .catch((reason) => expect(reason.message).toContain('Unauthorized'));
   });
 
 });

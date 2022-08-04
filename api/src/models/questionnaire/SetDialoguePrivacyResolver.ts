@@ -1,5 +1,5 @@
 import { inputObjectType, mutationField } from 'nexus';
-import { UserInputError } from 'apollo-server-express';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 export const SetDialoguePrivacyInput = inputObjectType({
   name: 'SetDialoguePrivacyInput',
@@ -15,7 +15,7 @@ export const SetDialoguePrivacyMutation = mutationField('setDialoguePrivacy', {
   args: { input: SetDialoguePrivacyInput },
   nullable: true,
   async resolve(parent, args, ctx) {
-    if (!args.input) throw new UserInputError('No input object provided!');
+    if (!args.input) throw new GraphQLYogaError('No input object provided!');
     return ctx.services.dialogueService.setDialoguePrivacy(args.input);
   },
 })

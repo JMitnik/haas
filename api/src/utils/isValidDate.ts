@@ -1,4 +1,4 @@
-import { UserInputError } from 'apollo-server-express';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 import { endOfDay, parse, startOfDay } from 'date-fns';
 import { zonedTimeToUtc } from 'date-fns-tz';
 
@@ -13,7 +13,7 @@ const isValidDate = (dateString: string): boolean => {
 export const isADate = (dateString: string) => {
   const date = new Date(dateString);
   if (!(date instanceof Date && !Number.isNaN(date.getSeconds()))) {
-    throw new UserInputError('Date invalid');
+    throw new GraphQLYogaError('Date invalid');
   }
 
   return date;
@@ -41,7 +41,7 @@ export const isValidDateTime = (dateString: string, type: dateType) => {
   let utcDate = zonedTimeToUtc(dateObject, 'UTC');
 
   if (!(utcDate instanceof Date) || Number.isNaN(utcDate.getSeconds())) {
-    throw new UserInputError(isStartDate ? 'Start date invalid' : 'End date invalid');
+    throw new GraphQLYogaError(isStartDate ? 'Start date invalid' : 'End date invalid');
   }
 
 

@@ -1,6 +1,6 @@
-import { ApolloError } from 'apollo-server-express';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
-class AuthorizationError extends ApolloError {
+class AuthorizationError extends GraphQLYogaError {
   constructor(message: string, code: string = 'Unauthorized') {
     super(message, code);
   }

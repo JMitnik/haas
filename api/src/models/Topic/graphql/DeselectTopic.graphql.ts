@@ -1,5 +1,5 @@
 import { inputObjectType, mutationField } from 'nexus';
-import { UserInputError } from 'apollo-server-express';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 export const DeselectTopicInput = inputObjectType({
   name: 'DeselectTopicInput',
@@ -19,7 +19,7 @@ export const DeselectTopicMutation = mutationField('deselectTopic', {
   `,
 
   async resolve(parent, args, ctx) {
-    if (!args.input) throw new UserInputError('No input object!');
+    if (!args.input) throw new GraphQLYogaError('No input object!');
     return ctx.services.topicService.hideTopic(args.input) || null;
   },
 });

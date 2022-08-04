@@ -1,5 +1,5 @@
 import { mutationField } from 'nexus';
-import { UserInputError } from 'apollo-server';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 import prisma from '../../../config/prisma';
 
@@ -12,8 +12,8 @@ export const UpdateDeliveryStatusResolver = mutationField('updateDeliveryStatus'
   args: { deliveryId: 'String', status: 'DeliveryStatusEnum' },
 
   async resolve(parent, args, ctx) {
-    if (!args.deliveryId) throw new UserInputError('No delivery ID provided');
-    if (!args.status) throw new UserInputError('No status provided');
+    if (!args.deliveryId) throw new GraphQLYogaError('No delivery ID provided');
+    if (!args.status) throw new GraphQLYogaError('No status provided');
 
     const currentDelivery = await ctx.prisma.delivery.findUnique({ where: { id: args.deliveryId } });
 

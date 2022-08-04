@@ -1,5 +1,5 @@
 import { TagEnum } from '@prisma/client';
-import { UserInputError } from 'apollo-server-express';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 import { enumType, extendType, inputObjectType, objectType } from 'nexus';
 import { isPresent } from 'ts-is-present';
 
@@ -46,7 +46,7 @@ export const TagQueries = extendType({
           return tags || [];
         }
 
-        throw new UserInputError('Provide a dialogue id or customer slug to find tags');
+        throw new GraphQLYogaError('Provide a dialogue id or customer slug to find tags');
       },
     });
   },
@@ -69,7 +69,7 @@ export const TagMutations = extendType({
         tags: TagsInputType,
       },
       resolve(parent, args, ctx) {
-        if (!args.dialogueId) throw new UserInputError('No dialogue provided to assign to tags');
+        if (!args.dialogueId) throw new GraphQLYogaError('No dialogue provided to assign to tags');
         return ctx.services.dialogueService.updateTags(args.dialogueId, args.tags?.entries?.filter(isPresent));
       },
     });
@@ -83,7 +83,7 @@ export const TagMutations = extendType({
       },
       async resolve(parent, args, ctx) {
         const validatedType = Object.values(TagEnum).find((tagType) => tagType === args.type);
-        if (!args.customerSlug || !args.name || !validatedType) throw new UserInputError('Not enough inpt data to create tag!');
+        if (!args.customerSlug || !args.name || !validatedType) throw new GraphQLYogaError('Not enough inpt data to create tag!');
         return ctx.services.tagService.createTag(args.customerSlug, args.name, validatedType);
       },
     });
@@ -94,7 +94,7 @@ export const TagMutations = extendType({
         tagId: 'String',
       },
       resolve(parent, args, ctx) {
-        if (!args.tagId) throw new UserInputError('No valid tag id provided');
+        if (!args.tagId) throw new GraphQLYogaError('No valid tag id provided');
 
         return ctx.services.tagService.deleteTag(args.tagId);
       },

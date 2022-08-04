@@ -12,7 +12,7 @@ const authorizeLink = new ApolloLink((operation, forward) => {
   if (localToken) {
     operation.setContext({
       headers: {
-        Authorization: `Bearer:${localToken}`,
+        Authorization: `Bearer ${localToken}`,
       },
     });
   }

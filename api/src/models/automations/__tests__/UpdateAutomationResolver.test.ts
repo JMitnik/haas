@@ -3,6 +3,7 @@ import { clearDatabase, prepDefaultCreateData, prepDefaultUpdateData } from './t
 import AuthService from '../../auth/AuthService';
 import { constructValidUpdateAutomationInputData } from './testData';
 import { prisma } from '../../../test/setup/singletonDeps';
+import { assertGraphQLError } from '../../../test/utils/expects';
 
 jest.setTimeout(30000);
 
@@ -72,9 +73,8 @@ it('unable to update automation when no automation id is provided', async () => 
     }
     );
   } catch (error) {
-    if (error instanceof Error) {
-      expect(error.message).toContain('No ID provided for automation');
-    } else { throw new Error(); }
+    assertGraphQLError(error);
+    expect(error.message).toContain('No ID provided for automation');
   }
 });
 
@@ -111,9 +111,8 @@ it('unable to create automations unauthorized', async () => {
     }
     );
   } catch (error) {
-    if (error instanceof Error) {
-      expect(error.message).toContain('Not Authorised!');
-    } else { throw new Error(); }
+    assertGraphQLError(error);
+    expect(error.message).toContain('Unauthorized');
   }
 });
 

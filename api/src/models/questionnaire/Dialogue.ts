@@ -1,4 +1,4 @@
-import { UserInputError } from 'apollo-server-express';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 import { subDays } from 'date-fns';
 import { enumType, extendType, inputObjectType, objectType } from 'nexus';
 
@@ -90,7 +90,7 @@ export const DialogueType = objectType({
         input: HealthScoreInput,
       },
       async resolve(parent, args, ctx) {
-        if (!args.input) throw new UserInputError('Not input object!');
+        if (!args.input) throw new GraphQLYogaError('Not input object!');
         const { startDateTime, endDateTime, threshold } = args.input;
         let utcStartDateTime: Date | undefined;
         let utcEndDateTime: Date | undefined;
@@ -122,7 +122,7 @@ export const DialogueType = objectType({
       useQueryCounter: true,
       async resolve(parent, args, ctx) {
         if (!parent.id) return null;
-        if (!args.input) throw new UserInputError('No input provided!');
+        if (!args.input) throw new GraphQLYogaError('No input provided!');
 
         let utcStartDateTime: Date | undefined;
         let utcEndDateTime: Date | undefined;
@@ -160,7 +160,7 @@ export const DialogueType = objectType({
       useTimeResolve: true,
       async resolve(parent, args, ctx) {
         if (!parent.id) return null;
-        if (!args.input) throw new UserInputError('No input provided!');
+        if (!args.input) throw new GraphQLYogaError('No input provided!');
 
         let utcStartDateTime: Date | undefined;
         let utcEndDateTime: Date | undefined;
@@ -203,8 +203,8 @@ export const DialogueType = objectType({
         input: DialogueStatisticsSummaryFilterInput,
       },
       async resolve(parent, args, ctx) {
-        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
-        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+        if (!args.input) throw new GraphQLYogaError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new GraphQLYogaError('No impact type provided dialogue statistics summary!');
 
         let utcStartDateTime: Date | undefined;
         let utcEndDateTime: Date | undefined;
@@ -235,9 +235,9 @@ export const DialogueType = objectType({
         input: DialogueStatisticsSummaryFilterInput,
       },
       async resolve(parent, args, ctx) {
-        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
-        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
-        if (args?.input?.cutoff && args.input.cutoff < 1) throw new UserInputError('Cutoff cannot be a negative number!');
+        if (!args.input) throw new GraphQLYogaError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new GraphQLYogaError('No impact type provided dialogue statistics summary!');
+        if (args?.input?.cutoff && args.input.cutoff < 1) throw new GraphQLYogaError('Cutoff cannot be a negative number!');
 
         let utcStartDateTime: Date | undefined;
         let utcEndDateTime: Date | undefined;
@@ -269,8 +269,8 @@ export const DialogueType = objectType({
         input: DialogueStatisticsSummaryFilterInput,
       },
       async resolve(parent, args, ctx) {
-        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
-        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+        if (!args.input) throw new GraphQLYogaError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new GraphQLYogaError('No impact type provided dialogue statistics summary!');
 
         let utcStartDateTime: Date | undefined;
         let utcEndDateTime: Date | undefined;
@@ -304,8 +304,8 @@ export const DialogueType = objectType({
       // useQueryCounter: true,
       useTimeResolve: true,
       resolve(parent, args, ctx) {
-        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
-        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+        if (!args.input) throw new GraphQLYogaError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new GraphQLYogaError('No impact type provided dialogue statistics summary!');
 
         let utcStartDateTime: Date | undefined;
         let utcEndDateTime: Date | undefined;

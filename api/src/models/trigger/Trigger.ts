@@ -3,7 +3,7 @@ import {
   TriggerEnum,
 } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from 'nexus';
-import { UserInputError } from 'apollo-server-express';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 import { isPresent } from 'ts-is-present';
 
 import { DialogueType } from '../questionnaire/Dialogue';
@@ -192,9 +192,9 @@ const TriggerMutations = extendType({
       },
       async resolve(parent, args, ctx) {
         if (!args.input?.customerSlug) throw new Error('No provided customer found');
-        if (!args.input.trigger?.name) throw new UserInputError('No trigger name provided');
-        if (!args.input.trigger?.medium) throw new UserInputError('No trigger medium provided');
-        if (!args.input.trigger?.type) throw new UserInputError('No trigger type provided');
+        if (!args.input.trigger?.name) throw new GraphQLYogaError('No trigger name provided');
+        if (!args.input.trigger?.medium) throw new GraphQLYogaError('No trigger medium provided');
+        if (!args.input.trigger?.type) throw new GraphQLYogaError('No trigger type provided');
 
         const createArgs: CreateTriggerInput = {
           name: args.input.trigger?.name,

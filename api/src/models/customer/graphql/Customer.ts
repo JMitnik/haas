@@ -1,6 +1,6 @@
 import { ColourSettings, Customer, CustomerSettings } from '@prisma/client';
 import { GraphQLError } from 'graphql';
-import { ApolloError, UserInputError } from 'apollo-server-express';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 import { arg, extendType, inputObjectType, mutationField, nonNull, objectType, scalarType } from 'nexus';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
 
@@ -108,7 +108,7 @@ export const CustomerType = objectType({
       args: { filter: DialogueConnectionFilterInput },
       nullable: true,
       async resolve(parent, args, ctx) {
-        if (!ctx.session?.user?.id) throw new ApolloError('No user in session found!');
+        if (!ctx.session?.user?.id) throw new GraphQLYogaError('No user in session found!');
 
         let dialogues = await ctx.services.dialogueService.paginatedDialogues(
           parent.slug,
@@ -158,7 +158,7 @@ export const CustomerType = objectType({
         input: HealthScoreInput,
       },
       async resolve(parent, args, ctx) {
-        if (!args.input) throw new UserInputError('Not input object!');
+        if (!args.input) throw new GraphQLYogaError('Not input object!');
         const { startDateTime, endDateTime, threshold } = args.input;
         let utcStartDateTime: Date | undefined;
         let utcEndDateTime: Date | undefined;
@@ -188,8 +188,8 @@ export const CustomerType = objectType({
         input: DialogueStatisticsSummaryFilterInput,
       },
       async resolve(parent, args, ctx) {
-        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
-        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+        if (!args.input) throw new GraphQLYogaError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new GraphQLYogaError('No impact type provided dialogue statistics summary!');
 
         let utcStartDateTime: Date | undefined;
         let utcEndDateTime: Date | undefined;
@@ -221,9 +221,9 @@ export const CustomerType = objectType({
       useParentResolve: true,
       useTimeResolve: true,
       async resolve(parent, args, ctx) {
-        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
-        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
-        if (args?.input?.cutoff && args.input.cutoff < 1) throw new UserInputError('Cutoff cannot be a negative number!');
+        if (!args.input) throw new GraphQLYogaError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new GraphQLYogaError('No impact type provided dialogue statistics summary!');
+        if (args?.input?.cutoff && args.input.cutoff < 1) throw new GraphQLYogaError('Cutoff cannot be a negative number!');
 
         let utcStartDateTime: Date | undefined;
         let utcEndDateTime: Date | undefined;
@@ -256,8 +256,8 @@ export const CustomerType = objectType({
       useParentResolve: true,
       useTimeResolve: true,
       async resolve(parent, args, ctx) {
-        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
-        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+        if (!args.input) throw new GraphQLYogaError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new GraphQLYogaError('No impact type provided dialogue statistics summary!');
 
         let utcStartDateTime: Date | undefined;
         let utcEndDateTime: Date | undefined;
@@ -372,7 +372,7 @@ export const CustomerType = objectType({
       type: CampaignModel,
       resolve: async (parent, args, ctx) => {
         const workspaceWithCampaigns = await ctx.services.campaignService.findCampaignsOfWorkspace(parent.id);
-        if (!workspaceWithCampaigns) throw new UserInputError('Can\'t find workspace!');
+        if (!workspaceWithCampaigns) throw new GraphQLYogaError('Can\'t find workspace!');
 
         return workspaceWithCampaigns.campaigns.map(campaign => ({
           ...campaign,
@@ -495,7 +495,7 @@ export const WorkspaceMutations = extendType({
       args: { input: CreateWorkspaceInput },
 
       async resolve(parent, args, ctx) {
-        if (!args.input) throw new UserInputError('No input provided');
+        if (!args.input) throw new GraphQLYogaError('No input provided');
         const primaryColor = args?.input?.primaryColour;
 
         if (primaryColor) {
@@ -517,7 +517,7 @@ export const WorkspaceMutations = extendType({
       args: { input: EditWorkspaceInput },
 
       resolve(parent, args, ctx) {
-        if (!args.input) throw new UserInputError('No input provided');
+        if (!args.input) throw new GraphQLYogaError('No input provided');
         const primaryColor = args?.input?.primaryColour;
 
         if (primaryColor) {
@@ -549,7 +549,7 @@ export const MassSeedMutation = mutationField('massSeed', {
   nullable: true,
   args: { input: MassSeedInput },
   async resolve(parent, args, ctx) {
-    if (!args.input) throw new UserInputError('No input object!');
+    if (!args.input) throw new GraphQLYogaError('No input object!');
     return ctx.services.customerService.massSeed(args.input);
   },
 });
@@ -607,7 +607,7 @@ export const CustomerQuery = extendType({
           return customer;
         }
 
-        throw new UserInputError('Provide workspace Slug or Id');
+        throw new GraphQLYogaError('Provide workspace Slug or Id');
       },
     });
   },

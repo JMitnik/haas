@@ -1,15 +1,15 @@
 /* eslint-disable max-len */
-import { allow, deny, or, rule, shield } from 'graphql-shield';
+import { allow, or, rule, shield } from 'graphql-shield';
 
-import { ApolloError } from 'apollo-server-express';
 import { SystemPermissionEnum } from '@prisma/client';
-
+import { UnauthenticatedError } from '../models/Common/Errors/UnauthenticatedError';
+import { UnauthorizedError } from '../models/Common/Errors/UnauthorizedError';
 import { APIContext } from '../types/APIContext';
 import config from './config';
 
 const isSuperAdmin = rule({ cache: 'no_cache' })(
   async (parent, args, ctx: APIContext) => {
-    if (!ctx.session?.user?.id) return new ApolloError('Unauthenticated', 'UNAUTHENTICATED');
+    if (!ctx.session?.user?.id) return new UnauthenticatedError();
 
     return ctx.session?.globalPermissions?.includes('CAN_ACCESS_ADMIN_PANEL');
   },
@@ -17,7 +17,7 @@ const isSuperAdmin = rule({ cache: 'no_cache' })(
 
 const isSelf = rule({ cache: 'no_cache' })(
   async (parent, args, ctx: APIContext) => {
-    if (!ctx.session?.user?.id || !args.userId) return new ApolloError('Unauthenticated', 'UNAUTHENTICATED');
+    if (!ctx.session?.user?.id || !args.userId) return new UnauthenticatedError();
     if (args.userId === ctx.session?.user?.id) return true;
 
     return false;
@@ -29,9 +29,10 @@ const isFromClient = rule({ cache: 'contextual' })(
     // console.log(ctx.req.get('origin'));
     if (config.env === 'local') return true;
 
-    if (ctx.req.get('origin') === config.clientUrl) {
-      return true;
-    }
+    // TODO: Create fix for fastify but since all condition are returning true I will wait for now
+    // if (ctx.req.get('origin') === config.clientUrl) {
+    //     return true;
+    //   }
 
     return true;
   },
@@ -39,7 +40,7 @@ const isFromClient = rule({ cache: 'contextual' })(
 
 const belongsToWorkspace = rule({ cache: 'no_cache' })(
   async (parent, args, ctx: APIContext) => {
-    if (!ctx.session?.user?.id) return new ApolloError('Unauthorized', 'UNAUTHORIZED');
+    if (!ctx.session?.user?.id) return new UnauthenticatedError();
     if (!ctx.session?.activeWorkspace) return false;
 
     if (ctx.session.user.customers.find(workspace => workspace.customerId === ctx.session?.activeWorkspace?.id)) {
@@ -70,7 +71,10 @@ const containsWorkspacePermission = (guardedPermission: SystemPermissionEnum) =>
       ...workspacePermissions,
     ];
 
-    if (!ctx.session?.user?.id) return new ApolloError('Unauthorized', 'UNAUTHORIZED');
+    // console.log(ctx.session);
+
+
+    if (!ctx.session?.user?.id) return new UnauthenticatedError();
 
     if (!ctx.session?.activeWorkspace) return false;
     if (!allRelevantPermissions?.includes(guardedPermission)) return false;
@@ -144,6 +148,6 @@ const authShield = shield({
     editTrigger: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_TRIGGERS)),
     createTrigger: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_TRIGGERS)),
   },
-}, { fallbackRule: allow, allowExternalErrors: true });
+}, { fallbackRule: allow, allowExternalErrors: true, fallbackError: new UnauthorizedError() });
 
 export default authShield;
