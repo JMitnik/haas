@@ -98,6 +98,7 @@ export const FeedbackOverview = () => {
     maxScore: withDefault(NumberParam, 100),
     withFollowUpAction: withDefault(BooleanParam, false),
   });
+
   const [totalPages, setTotalPages] = useState<number>(0);
 
   const { loading: isLoading } = useGetWorkspaceSessionsQuery({
@@ -123,6 +124,9 @@ export const FeedbackOverview = () => {
       },
     },
     errorPolicy: 'ignore',
+    onError: (e) => {
+      console.log('Error', e);
+    },
     onCompleted: (fetchedData) => {
       setSessions(
         fetchedData?.customer?.sessionConnection?.sessions || [],

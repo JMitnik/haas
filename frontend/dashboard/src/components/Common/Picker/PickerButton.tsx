@@ -54,7 +54,7 @@ export const PickerButton = ({ children, label, icon }: PickerButtonProps) => {
       onOpenChange={setIsOpen}
     >
       <Popover.Trigger asChild>
-        <PickerButtonContainer as="button">
+        <PickerButtonContainer data-testid="picker" as="button">
           {icon && (
             <UI.Icon>
               {icon}
