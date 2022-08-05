@@ -774,9 +774,22 @@ class DialoguePrismaAdapter {
     });
   };
 
-  async findDialoguesByCustomerId(customerId: string, searchTerm?: string) {
+  async findDialoguesByCustomerId(customerId: string, userId: string, searchTerm?: string) {
     const whereInput: Prisma.DialogueWhereInput = {
       customerId,
+      OR: [
+        {
+          isPrivate: true,
+          assignees: {
+            some: {
+              id: userId,
+            },
+          },
+        },
+        {
+          isPrivate: false,
+        },
+      ],
     }
 
     if (searchTerm) {

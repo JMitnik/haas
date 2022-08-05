@@ -2,6 +2,7 @@ import { objectType } from 'nexus';
 import { UserInputError } from 'apollo-server-express';
 
 import { OrganizationLayer } from './OrganizationLayer';
+import { assertNonNullish } from '../../../utils/assertNonNullish';
 
 export const Organization = objectType({
   name: 'Organization',
@@ -20,7 +21,12 @@ export const Organization = objectType({
       async resolve(parent, args, ctx, info) {
         if (!info.variableValues.workspaceId) throw new UserInputError('No workspaceId provided to get organization layers');
 
-        return ctx.services.organizationService.getOrganizationLayers(info.variableValues.workspaceId);
+        assertNonNullish(ctx.session?.user?.id, 'No user ID provided!');
+
+        return ctx.services.organizationService.getOrganizationLayers(
+          info.variableValues.workspaceId,
+          ctx.session.user.id
+        );
       },
     });
   },

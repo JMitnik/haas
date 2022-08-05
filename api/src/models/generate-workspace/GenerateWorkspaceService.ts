@@ -46,7 +46,7 @@ class GenerateWorkspaceService {
    * @param workspaceId
    * @returns
    */
-  resetWorkspaceData = async (workspaceId: string) => {
+  resetWorkspaceData = async (workspaceId: string, userId: string) => {
     const workspace = await this.customerService.findWorkspaceById(workspaceId);
 
     if (!workspace?.isDemo) {

@@ -1,5 +1,5 @@
 import { ColourSettings, Customer, CustomerSettings } from '@prisma/client';
-import { GraphQLError } from 'graphql';
+import { assertNonNullType, GraphQLError } from 'graphql';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import { arg, extendType, inputObjectType, mutationField, nonNull, objectType, scalarType } from 'nexus';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
@@ -22,6 +22,7 @@ import { Issue, IssueFilterInput } from '../../Issue/graphql';
 import { IssueValidator } from '../../Issue/IssueValidator';
 import { SessionConnectionFilterInput } from '../../../models/session/graphql';
 import { SessionConnection } from '../../session/graphql/Session.graphql'
+import { assertNonNullish } from '../../../utils/assertNonNullish';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -65,8 +66,10 @@ export const CustomerType = objectType({
       async resolve(parent, args, ctx) {
         if (!parent.id) return null;
 
+        assertNonNullish(ctx.session?.user?.id, 'No user Id provided!');
         const sessionConnection = await ctx.services.sessionService.getWorkspaceSessionConnection(
           parent.id,
+          ctx.session.user.id,
           args.filter
         );
 
@@ -96,9 +99,11 @@ export const CustomerType = objectType({
       nullable: true,
       args: { filter: IssueFilterInput },
 
-      resolve: async (parent, args, { services }) => {
+      resolve: async (parent, args, { services, session }) => {
         const filter = IssueValidator.resolveFilter(args.filter);
-        return await services.issueService.getProblemDialoguesByWorkspace(parent.id, filter);
+        assertNonNullish(session?.user?.id, 'No user ID provided!');
+
+        return await services.issueService.getProblemDialoguesByWorkspace(parent.id, filter, session.user.id);
       },
     });
 

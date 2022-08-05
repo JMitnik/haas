@@ -71,55 +71,55 @@ export class TopicService {
   }
 
   /**
-   * Count topics and their frequencies for a given topic.
-   */
-  async countWorkspaceTopics(
-    workspaceId: string,
-    startDate: Date,
-    endDate: Date,
-    topicFilter?: TopicFilterInput
-  ): Promise<TopicByString> {
-    const dialogueIds = (
-      await this.workspaceService.getDialogues(workspaceId, topicFilter?.dialogueStrings || undefined)
-    ).map(dialogue => dialogue.id);
+ * Count topics and their frequencies for a given topic.
+ */
+  //   async countWorkspaceTopics(
+  //     workspaceId: string,
+  //     startDate: Date,
+  //     endDate: Date,
+  //     topicFilter?: TopicFilterInput
+  //   ): Promise<TopicByString> {
+  //     const dialogueIds = (
+  //       await this.workspaceService.getDialogues(workspaceId, topicFilter?.dialogueStrings || undefined)
+  //     ).map(dialogue => dialogue.id);
 
-    // Fetch all sessions for the dialogues.
-    const sessions = await this.sessionService.findSessionsForDialogues(
-      dialogueIds,
-      startDate,
-      endDate,
-      this.buildSessionFilter(topicFilter),
-      {
-        nodeEntries: {
-          include: {
-            choiceNodeEntry: true,
-            formNodeEntry: {
-              include: {
-                values: {
-                  include: {
-                    relatedField: true,
-                  },
-                },
-              },
-            },
-            relatedNode: {
-              select: {
-                options: {
-                  select: {
-                    value: true,
-                    isTopic: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      }
-    ) as unknown as SessionWithEntries[];
+  //     // Fetch all sessions for the dialogues.
+  //     const sessions = await this.sessionService.findSessionsForDialogues(
+  //       dialogueIds,
+  //       startDate,
+  //       endDate,
+  //       this.buildSessionFilter(topicFilter),
+  //       {
+  //         nodeEntries: {
+  //           include: {
+  //             choiceNodeEntry: true,
+  //             formNodeEntry: {
+  //               include: {
+  //                 values: {
+  //                   include: {
+  //                     relatedField: true,
+  //                   },
+  //                 },
+  //               },
+  //             },
+  //             relatedNode: {
+  //               select: {
+  //                 options: {
+  //                   select: {
+  //                     value: true,
+  //                     isTopic: true,
+  //                   },
+  //                 },
+  //               },
+  //             },
+  //           },
+  //         },
+  //       }
+  //     ) as unknown as SessionWithEntries[];
 
-    // Calculate all the candidate topic-counts.
-    const topicByStatistics = this.sessionService.extractTopics(sessions);
+  //     // Calculate all the candidate topic-counts.
+  //     const topicByStatistics = this.sessionService.extractTopics(sessions);
 
-    return topicByStatistics;
-  }
+  //     return topicByStatistics;
+  //   }
 }

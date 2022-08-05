@@ -12,6 +12,7 @@ import {
 import { isValidDateTime } from '../../../utils/isValidDate';
 import { HealthScore, HealthScoreInput } from './HealthScore';
 import { DialogueStatisticsSummaryModel } from '../../../models/questionnaire';
+import { assertNonNullish } from '../../../utils/assertNonNullish';
 
 export const WorkspaceStatistics = objectType({
   name: 'WorkspaceStatistics',
@@ -40,10 +41,14 @@ export const WorkspaceStatistics = objectType({
           utcEndDateTime = isValidDateTime(endDateTime, 'END_DATE');
         }
 
+        assertNonNullish(utcStartDateTime, 'Provided date range is invalid');
+        assertNonNullish(ctx.session?.user?.id, 'No user ID provided');
+
         return ctx.services.dialogueStatisticsService.findWorkspaceStatisticsSummary(
           parent.id || '',
+          ctx.session.user.id,
           DialogueImpactScore.AVERAGE,
-          utcStartDateTime as Date,
+          utcStartDateTime,
           utcEndDateTime,
         );
       },
@@ -139,8 +144,11 @@ export const WorkspaceStatistics = objectType({
 
         const topicFilter = args.input.topicFilter || undefined;
 
+        assertNonNullish(ctx.session?.user?.id, 'No user ID provided!');
+
         return ctx.services.dialogueStatisticsService.findWorkspaceHealthScore(
           parent.id || '',
+          ctx.session.user.id,
           utcStartDateTime as Date,
           utcEndDateTime,
           topicFilter,
