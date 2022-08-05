@@ -5,24 +5,27 @@ import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import React, { useRef, useState } from 'react';
 
-import { ReactComponent as DEFlag } from 'assets/icons/flags/flag-de.svg';
-import { ReactComponent as GBFlag } from 'assets/icons/flags/flag-gb.svg';
-import { ReactComponent as NLFlag } from 'assets/icons/flags/flag-nl.svg';
-import { ShowMoreButton } from 'components/Common/ShowMoreButton';
-
+import * as Menu from 'components/Common/Menu';
 import { Avatar } from 'components/Common/Avatar';
-import { useCustomer } from 'providers/CustomerProvider';
+import { ReactComponent as DEFlag } from 'assets/icons/flags/flag-de.svg';
 import {
+  Dialogue,
   useDeleteDialogueMutation,
   useSetDialoguePrivacyMutation,
 } from 'types/generated-types';
+import { Filter, User } from 'react-feather';
+import { ReactComponent as GBFlag } from 'assets/icons/flags/flag-gb.svg';
+import { ReactComponent as NLFlag } from 'assets/icons/flags/flag-nl.svg';
+import { ShowMoreButton } from 'components/Common/ShowMoreButton';
+import { useCustomer } from 'providers/CustomerProvider';
+import { useMenu } from 'components/Common/Menu/useMenu';
 import { useNavigator } from 'hooks/useNavigator';
 import { useToast } from 'hooks/useToast';
 import { useUser } from 'providers/UserProvider';
 import getLocale from 'utils/getLocale';
 import useAuth from 'hooks/useAuth';
 
-const DialogueCard = ({ dialogue }: { dialogue: any }) => {
+const DialogueCard = ({ dialogue }: { dialogue: Dialogue }) => {
   const history = useHistory();
   const { user } = useUser();
   const { activeCustomer } = useCustomer();
@@ -31,6 +34,7 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
   const ref = useRef(null);
   const { t } = useTranslation();
   const toast = useToast();
+  const { menuProps, openMenu, closeMenu, activeItem: contextInteraction } = useMenu<Dialogue>();
 
   const [setDialoguePrivacy] = useSetDialoguePrivacyMutation({
     variables: {
@@ -100,6 +104,7 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
       hasHover
       bg="white"
       onClick={() => history.push(`/dashboard/b/${customerSlug}/d/${dialogue.slug}`)}
+      onContextMenu={(e) => openMenu(e, dialogue)}
     >
       <UI.CardBody height="100%" flex="100%">
         <UI.ColumnFlex justifyContent="space-between" height="100%">
@@ -109,8 +114,8 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
                 <UI.H4 color="off.600" fontWeight="700">
                   {dialogue.title}
                 </UI.H4>
-                <UI.ExtLink to={`https://client.haas.live/${dialogue.customer.slug}/${dialogue.slug}`} color="off.300">
-                  {`${dialogue.customer.slug}/${dialogue.slug}`}
+                <UI.ExtLink to={`https://client.haas.live/${dialogue?.customer?.slug}/${dialogue.slug}`} color="off.300">
+                  {`${dialogue.customer?.slug}/${dialogue.slug}`}
                 </UI.ExtLink>
               </UI.Div>
 
@@ -129,7 +134,10 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
 
                       <UI.Hr />
 
-                      <Dropdown.CheckedItem isChecked={dialogue.isPrivate} onClick={() => setDialoguePrivacy()}>
+                      <Dropdown.CheckedItem
+                        isChecked={dialogue?.isPrivate || false}
+                        onClick={() => setDialoguePrivacy()}
+                      >
                         {t('set_private')}
                       </Dropdown.CheckedItem>
 
@@ -190,6 +198,79 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
           </UI.Flex>
         </UI.ColumnFlex>
       </UI.CardBody>
+      <Menu.Base
+        {...menuProps}
+        onClose={closeMenu}
+      >
+        <Menu.Header>
+          <UI.Icon>
+            <Filter />
+          </UI.Icon>
+          {t('dialogue')}
+        </Menu.Header>
+        <Menu.Item
+          onClick={
+            () => null
+          }
+        >
+          {t('edit')}
+        </Menu.Item>
+        <Menu.Item
+          onClick={
+            () => null
+          }
+        >
+          {t('delete')}
+        </Menu.Item>
+        <Menu.SubMenu label={(
+          <UI.Flex>
+            <UI.Icon mr={1} width={10}>
+              <User />
+            </UI.Icon>
+            {t('Accessibility')}
+          </UI.Flex>
+        )}
+        >
+          <Menu.Item
+            onClick={
+              () => null
+            }
+          >
+            {t('set_private')}
+          </Menu.Item>
+          <Menu.SubMenu label={(
+            <UI.Flex>
+              <UI.Icon mr={1} width={10}>
+                <User />
+              </UI.Icon>
+              {t('assign_to')}
+            </UI.Flex>
+          )}
+          >
+            <Menu.Item
+              onClick={
+                () => null
+              }
+            >
+              Persoon 1
+            </Menu.Item>
+            <Menu.Item
+              onClick={
+                () => null
+              }
+            >
+              Persoon 2
+            </Menu.Item>
+          </Menu.SubMenu>
+          <Menu.Item
+            onClick={
+              () => null
+            }
+          >
+            Show all from this team
+          </Menu.Item>
+        </Menu.SubMenu>
+      </Menu.Base>
     </UI.Card>
   );
 };

@@ -10,6 +10,6 @@ export const ResetWorkspaceDataMutation = mutationField('resetWorkspaceData', {
 
     assertNonNullish(ctx.session?.user?.id, 'No User ID provided!');
 
-    return ctx.services.generateWorkspaceService.resetWorkspaceData(args.workspaceId, ctx.session.user.id);
+    return ctx.services.generateWorkspaceService.resetWorkspaceData(args.workspaceId);
   },
 });
