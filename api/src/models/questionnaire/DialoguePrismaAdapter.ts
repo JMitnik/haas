@@ -854,6 +854,23 @@ class DialoguePrismaAdapter {
   * @param filter a filter containing information in regard to used search queries, date ranges and order based on column
   */
   buildFindDialoguesQuery = (workspaceSlug: string, userId: string, filter?: NexusGenInputs['DialogueConnectionFilterInput'] | null): Prisma.DialogueWhereInput => {
+    const searchQueries: Prisma.DialogueWhereInput = {
+      OR: [
+        { title: { contains: filter?.searchTerm!, mode: 'insensitive' } },
+        { description: { contains: filter?.searchTerm!, mode: 'insensitive' } },
+        {
+          tags: {
+            some: {
+              name: {
+                contains: filter?.searchTerm!,
+                mode: 'insensitive',
+              },
+            },
+          },
+        },
+      ],
+    }
+
     let dialogueWhereInput: Prisma.DialogueWhereInput = {
       customer: {
         slug: workspaceSlug,
@@ -866,32 +883,34 @@ class DialoguePrismaAdapter {
               id: userId,
             },
           },
+          AND: filter?.searchTerm ? searchQueries : undefined,
         },
         {
           isPrivate: false,
+          AND: filter?.searchTerm ? searchQueries : undefined,
         },
       ],
     }
 
-    if (filter?.searchTerm) {
-      dialogueWhereInput = {
-        ...cloneDeep(dialogueWhereInput),
-        OR: [
-          { title: { contains: filter.searchTerm, mode: 'insensitive' } },
-          { description: { contains: filter.searchTerm, mode: 'insensitive' } },
-          {
-            tags: {
-              some: {
-                name: {
-                  contains: filter.searchTerm,
-                  mode: 'insensitive',
-                },
-              },
-            },
-          },
-        ],
-      }
-    }
+    // if (filter?.searchTerm) {
+    //   dialogueWhereInput = {
+    //     ...cloneDeep(dialogueWhereInput),
+    //     OR: [
+    //       { title: { contains: filter.searchTerm, mode: 'insensitive' } },
+    //       { description: { contains: filter.searchTerm, mode: 'insensitive' } },
+    //       {
+    //         tags: {
+    //           some: {
+    //             name: {
+    //               contains: filter.searchTerm,
+    //               mode: 'insensitive',
+    //             },
+    //           },
+    //         },
+    //       },
+    //     ],
+    //   }
+    // }
 
     return dialogueWhereInput;
   }
@@ -906,7 +925,7 @@ class DialoguePrismaAdapter {
 
     if (filter?.orderBy?.by === 'createdAt') {
       orderByQuery.push({
-        updatedAt: filter.orderBy.desc ? 'desc' : 'asc',
+        creationDate: filter.orderBy.desc ? 'desc' : 'asc',
       });
     }
 

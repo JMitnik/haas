@@ -85,6 +85,17 @@ class UserService {
   }
 
   /**
+   * Adjusts the dialogue privacy settings of a dialogue for a user based on the input.
+   * @param input
+   * @returns
+   */
+  assignUserToDialogue = async (input: NexusGenInputs['AssignUserToDialogueInput']) => {
+    const updatedUser = await this.userPrismaAdapter.updateDialogueAssignmentOfUser(input);
+
+    return updatedUser;
+  };
+
+  /**
    * Adjusts the dialogue privacy settings of a user based on the input.
    * @param input
    * @returns
@@ -103,7 +114,7 @@ class UserService {
         privateWorkspaceDialogues: allPrivateDialoguesWorkspace?.dialogues || [],
       },
     }
-  }
+  };
 
   async deleteUser(userId: string, customerId: string): Promise<DeletedUserOutput> {
     const removedUser = await this.userOfCustomerPrismaAdapter.delete(userId, customerId);

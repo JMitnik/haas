@@ -8,7 +8,13 @@ import React, { useState } from 'react';
 import * as Popover from 'components/Common/Popover';
 import * as Table from 'components/Common/Table';
 import {
-  DialogueConnection, DialogueConnectionOrder, useDialogueConnectionQuery,
+  Dialogue,
+  DialogueConnection,
+  DialogueConnectionOrder,
+  UserType,
+  useDialogueConnectionQuery,
+  useGetUsersQuery,
+
 } from 'types/generated-types';
 import { ReactComponent as NoDataIll } from 'assets/images/undraw_no_data.svg';
 import { View } from 'layouts/View';
@@ -52,11 +58,13 @@ const DialogueOverview = () => {
     },
   });
 
-  // const { data: userRoleData } = useGetUsersAndRolesQuery({
-  //   variables: {
-  //     customerSlug: activeCustomer?.slug as string,
-  //   },
-  // });
+  const { data: userData } = useGetUsersQuery({
+    variables: {
+      customerSlug: activeCustomer?.slug as string,
+    },
+  });
+
+  console.log('Users: ', userData?.customer?.users);
 
   const { canDeleteDialogue } = useAuth();
 
@@ -156,8 +164,8 @@ const DialogueOverview = () => {
           gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(350px, 1fr))']}
           gridAutoRows="minmax(200px, 1fr)"
         >
-          {filteredDialogues.map((dialogue: any, index: any) => dialogue && (
-            <DialogueCard key={index} dialogue={dialogue} />
+          {filteredDialogues.map((dialogue: any) => dialogue && (
+            <DialogueCard key={dialogue.id} users={userData?.customer?.users as UserType[]} dialogue={dialogue} />
           ))}
         </UI.Grid>
 

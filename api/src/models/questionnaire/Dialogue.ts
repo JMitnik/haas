@@ -66,6 +66,21 @@ export const DialogueType = objectType({
     t.list.field('assignees', {
       nullable: true,
       type: UserType,
+      async resolve(parent, args, ctx) {
+        // @ts-ignore
+        if (parent.assignees) {
+          // @ts-ignore
+          return parent.assignees;
+        };
+
+        const assignees = await ctx.prisma.dialogue.findUnique({
+          where: {
+            id: parent.id,
+          },
+        }).assignees();
+
+        return assignees;
+      },
     })
 
     t.field('postLeafNode', {

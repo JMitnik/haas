@@ -24,6 +24,13 @@ input AppendToInteractionInput {
   sessionId: ID
 }
 
+input AssignUserToDialogueInput {
+  dialogueId: String!
+  state: Boolean!
+  userId: String!
+  workspaceId: String!
+}
+
 input AssignUserToDialoguesInput {
   assignedDialogueIds: [String!]
   userId: String!
@@ -1208,6 +1215,7 @@ type MostTrendingTopic {
 type Mutation {
   appendToInteraction(input: AppendToInteractionInput): Session
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue
+  assignUserToDialogue(input: AssignUserToDialogueInput): UserType
   assignUserToDialogues(input: AssignUserToDialoguesInput): UserType
   authenticateLambda(input: AuthenticateLambdaInput): String
   confirmCreateWorkspaceJob(input: GenerateAutodeckInput): CreateWorkspaceJobType
