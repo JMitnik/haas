@@ -7,7 +7,9 @@ import React, { useState } from 'react';
 
 import * as Popover from 'components/Common/Popover';
 import * as Table from 'components/Common/Table';
-import { DialogueConnection, DialogueConnectionOrder, useDialogueConnectionQuery } from 'types/generated-types';
+import {
+  DialogueConnection, DialogueConnectionOrder, useDialogueConnectionQuery,
+} from 'types/generated-types';
 import { ReactComponent as NoDataIll } from 'assets/images/undraw_no_data.svg';
 import { View } from 'layouts/View';
 import Searchbar from 'components/Common/SearchBar';
@@ -49,6 +51,12 @@ const DialogueOverview = () => {
       setDialogueConnection(fetchedData.customer?.dialogueConnection as DialogueConnection);
     },
   });
+
+  // const { data: userRoleData } = useGetUsersAndRolesQuery({
+  //   variables: {
+  //     customerSlug: activeCustomer?.slug as string,
+  //   },
+  // });
 
   const { canDeleteDialogue } = useAuth();
 
