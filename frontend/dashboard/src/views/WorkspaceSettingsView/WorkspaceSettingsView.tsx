@@ -3,7 +3,6 @@ import * as yup from 'yup';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
-
 import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers/yup';

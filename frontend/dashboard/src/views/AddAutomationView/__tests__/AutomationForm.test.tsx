@@ -63,6 +63,5 @@ test('render form and validate state of create button', async () => {
 
   // Verify that the create button is enabled now
   expect(await screen.findByText('Create')).toBeEnabled();
-  preview.debug();
 });
 

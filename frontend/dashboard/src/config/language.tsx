@@ -11,6 +11,10 @@ const language = {
     },
   },
   general: {
+    users_and_roles: {
+      en: 'Users and roles',
+      de: 'Benutzer und Rollen',
+    },
     monday: {
       en: 'Monday',
       de: 'Montag',

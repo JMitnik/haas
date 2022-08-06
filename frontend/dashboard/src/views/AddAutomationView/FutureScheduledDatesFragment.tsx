@@ -3,8 +3,8 @@ import { Clock } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
+import * as Switch from 'components/Common/Switch';
 import { DateFormat, useDate } from 'hooks/useDate';
-import { Switch, SwitchThumb } from 'components/Common/Switch';
 
 import { DEPTH_BACKGROUND_COLORS } from './AutomationForm.constants';
 
@@ -30,12 +30,12 @@ export const FutureScheduledDatesFragment = ({ futureDates }: FutureScheduledDat
         <UI.H4 color="default.text" fontWeight={500} pb={2}>{t('automation:future_dates')}</UI.H4>
         <UI.Flex>
           <UI.Text mr={2}>{t('automation:show_local_time')}</UI.Text>
-          <Switch
+          <Switch.Root
             isChecked={isLocalTime}
             onChange={() => setisLocalTime((prev) => !prev)}
           >
-            <SwitchThumb />
-          </Switch>
+            <Switch.Thumb />
+          </Switch.Root>
         </UI.Flex>
       </UI.Flex>
       {futureDates?.map((entry, index) => (

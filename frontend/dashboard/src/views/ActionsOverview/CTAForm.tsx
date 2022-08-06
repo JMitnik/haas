@@ -243,10 +243,10 @@ const CTAForm = ({
   const onSubmit = (formData: FormDataProps) => {
     const formFields = formData.formNode?.fields?.map(
       (field) => {
-        const { contact, type, ...rest } = field;
+        const { contact, type: fieldType, ...rest } = field;
         return ({
           ...rest,
-          type: type as FormNodeFieldTypeEnum,
+          type: fieldType as FormNodeFieldTypeEnum,
           userIds: contact?.contacts?.map((user) => user.value) || [],
           isRequired: intToBool(field.isRequired),
         });

@@ -105,7 +105,7 @@ export const UserNodePicker = ({
     <UI.List maxWidth={300}>
       <UI.CloseButton onClose={onClose} />
       <NodePickerHeader>
-        <UI.ListHeader style={{ borderBottom: 0 }}>{t('conditions')}</UI.ListHeader>
+        <UI.ListHeader style={{ borderBottom: 0 }}>{t('users_and_roles')}</UI.ListHeader>
       </NodePickerHeader>
 
       <UI.ListItem
