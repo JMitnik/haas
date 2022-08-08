@@ -1,5 +1,5 @@
 import { LanguageEnum, NodeType } from '@prisma/client';
-import { defaultAdminRole, defaultBotRole, defaultManagerRole, defaultSportTextFieldForm, defaultUserRole, DemoWorkspaceTemplate } from './TemplateTypes';
+import { defaultAdminRole, defaultBotRole, defaultManagerRole, defaultSportTextFieldForm, defaultTeacherTextFieldForm, defaultUserRole, DemoWorkspaceTemplate } from './TemplateTypes';
 
 const teacherWorkspaceTemplate: DemoWorkspaceTemplate = {
   title: 'How do you feel about us?',
@@ -76,7 +76,7 @@ const teacherWorkspaceTemplate: DemoWorkspaceTemplate = {
       title:
         'Your feedback will always remain anonymous, unless you want to talk to someone.',
       type: NodeType.FORM,
-      form: defaultSportTextFieldForm,
+      form: defaultTeacherTextFieldForm,
     },
   ],
 };
