@@ -19,7 +19,7 @@ export const mockQueryDialogueConnection = (
 ) => (
   server.use(
     graphql.query<DialogueConnectionQuery, DialogueConnectionQueryVariables>(
-      'DialogueConnectionQuery',
+      'dialogueConnection',
       (req, res, ctx) => res(ctx.data(createResponse(DialogueConnectionResponse))),
     ),
   )
