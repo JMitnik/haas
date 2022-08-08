@@ -709,7 +709,7 @@ class DialogueService {
   };
 
   findDialoguesByCustomerId(customerId: string, userId?: string, searchTerm?: string) {
-    return this.dialoguePrismaAdapter.findDialoguesByCustomerId(customerId, userId, searchTerm);
+    return this.dialoguePrismaAdapter.findDialoguesByCustomerId(customerId, userId as string, searchTerm);
   };
 
   async delete(dialogueId: string) {

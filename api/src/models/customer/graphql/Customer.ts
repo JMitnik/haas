@@ -178,6 +178,7 @@ export const CustomerType = objectType({
 
         return ctx.services.dialogueStatisticsService.findWorkspaceHealthScore(
           parent.id,
+          ctx.session?.user?.id as string,
           utcStartDateTime as Date,
           utcEndDateTime,
           undefined,
