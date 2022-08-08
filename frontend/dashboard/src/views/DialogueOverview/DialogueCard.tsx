@@ -313,7 +313,7 @@ const DialogueCard = ({ dialogue, users }: DialogueCardProps) => {
               </UI.Icon>
             </ContextMenuItemIndicator>
             <UI.Span>
-              Is private
+              Only assignees can access
             </UI.Span>
           </ContextMenuCheckboxItem>
           <ContextMenuSeparator />

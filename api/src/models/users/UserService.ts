@@ -12,8 +12,8 @@ import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import UserOfCustomerPrismaAdapter from './UserOfCustomerPrismaAdapter';
 import { DeletedUserOutput, UserWithWorkspaces } from './UserServiceTypes';
 import { offsetPaginate } from '../general/PaginationHelpers';
-import DialogueService from '../../models/questionnaire/DialogueService';
 import CustomerService from '../../models/customer/CustomerService';
+import { assertNonNullish } from '../../utils/assertNonNullish';
 
 class UserService {
   prisma: PrismaClient;
@@ -82,6 +82,24 @@ class UserService {
       assignedDialogues: user?.isAssignedTo || [],
       privateWorkspaceDialogues: allPrivateDialoguesWorkspace?.dialogues || [],
     }
+  }
+
+  /**
+   * Assigns user to all private dialogues within a workspace
+   * @param userId 
+   * @param workspaceId 
+   */
+  public async assignUserToAllPrivateDialogues(userId: string, workspaceId: string) {
+    const workspace = await this.customerService.findPrivateDialoguesOfWorkspace(workspaceId);
+    assertNonNullish(workspace?.dialogues, 'No private dialogues found for workspace');
+
+    const dialogueIds = workspace.dialogues.map((dialogue) => dialogue.id);
+
+    await this.userPrismaAdapter.updateUserPrivateDialogues({
+      userId,
+      workspaceId,
+      assignedDialogueIds: dialogueIds,
+    });
   }
 
   /**

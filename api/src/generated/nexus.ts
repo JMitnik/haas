@@ -420,6 +420,7 @@ export interface NexusGenInputs {
   GenerateWorkspaceCSVInputType: { // input type
     generateDemoData?: boolean | null; // Boolean
     isDemo: boolean; // Boolean!
+    makeDialoguesPrivate?: boolean | null; // Boolean
     managerCsv?: NexusGenScalars['Upload'] | null; // Upload
     type: string; // String!
     uploadedCsv?: NexusGenScalars['Upload'] | null; // Upload
