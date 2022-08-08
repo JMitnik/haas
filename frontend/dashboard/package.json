@@ -52,7 +52,7 @@
     "emotion-theming": "^10.0.27",
     "faker": "^4.1.0",
     "framer-motion": "6.5.1",
-    "history": "^5.1.0",
+    "history": "^4.10.1",
     "honeycomb-grid": "^4.0.0-alpha.5",
     "i18next": "^19.6.3",
     "js-cookie": "^2.2.1",
