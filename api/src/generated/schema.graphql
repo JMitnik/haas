@@ -997,6 +997,11 @@ type FormNodeEntryValueType {
 }
 
 type FormNodeField {
+  """
+  
+          List of possible contact points for a form-node.
+        
+  """
   contacts: [UserType]
   id: ID
   isRequired: Boolean
@@ -1549,12 +1554,6 @@ type PermssionType {
   description: String
   id: ID
   name: String
-}
-
-input PickerEntryInput {
-  label: String!
-  type: String!
-  value: String!
 }
 
 type PreviewDataType {

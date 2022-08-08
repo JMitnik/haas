@@ -1,13 +1,12 @@
 import { Prisma, LinkTypeEnum } from '@prisma/client'
 
-import { NexusGenInputs } from '../../generated/nexus'
 import { CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType'
+import { FormNodeInput } from './NodeServiceType';
 
 export interface CreateCTAInput {
   title: string;
   type?: 'GENERIC' | 'SLIDER' | 'FORM' | 'CHOICE' | 'REGISTRATION' | 'TEXTBOX' | 'LINK' | 'SHARE' | 'VIDEO_EMBEDDED' | undefined;
-  form?: NexusGenInputs['FormNodeInputType'] | null; // FormNodeInputType
-  // form?: Prisma.FormNodeCreateInput | undefined; // FormNodeInputType
+  form?: FormNodeInput | null; // FormNodeInputType
   links: {
     id: string | undefined;
     backgroundColor: string | undefined;

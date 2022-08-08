@@ -540,11 +540,6 @@ export interface NexusGenInputs {
     description?: string | null; // String
     name?: string | null; // String
   }
-  PickerEntryInput: { // input type
-    label: string; // String!
-    type: string; // String!
-    value: string; // String!
-  }
   QuestionNodeWhereInputType: { // input type
     id?: string | null; // ID
     isRoot?: boolean | null; // Boolean

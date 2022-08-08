@@ -1,5 +1,6 @@
+import { GraphQLYogaError } from '@graphql-yoga/node';
 import { inputObjectType, mutationField } from 'nexus';
-import { UserInputError } from 'apollo-server-express';
+
 import { AutomationModel } from './AutomationModel';
 
 export const EnableAutomationInput = inputObjectType({
@@ -18,8 +19,7 @@ export const EnableAutomationResolver = mutationField('enableAutomation', {
   },
   nullable: true,
   async resolve(parent, args, ctx) {
-
-    if (!args.input) throw new UserInputError('No input object provided for createAutomation Resolver');
+    if (!args.input) throw new GraphQLYogaError('No input object provided for createAutomation Resolver');
 
     return ctx.services.automationService.enableAutomation(args.input);
   },

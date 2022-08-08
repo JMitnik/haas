@@ -1,4 +1,6 @@
 import { inputObjectType, mutationField } from 'nexus';
+import { GraphQLYogaError } from '@graphql-yoga/node';
+
 import { AutomationType } from './AutomationType'
 import { AutomationEventType } from './AutomationEventType';
 import { AutomationConditionScopeType } from './AutomationConditionScopeType';
@@ -10,10 +12,8 @@ import { WorkspaceAspectType } from './WorkspaceAspectType';
 import { ConditionPropertyAggregateType } from './ConditionPropertyAggregateType';
 import { AutomationActionType } from './AutomationActionType';
 import { AutomationModel } from './AutomationModel';
-import { UserInputError } from 'apollo-server-express';
 import { AutomationConditionBuilderType } from './AutomationConditionBuilderType';
 import { RecurringPeriodType } from './RecurringPeriodType';
-import { GraphQLYogaError } from '@graphql-yoga/node';
 
 export const CreateAutomationOperandInput = inputObjectType({
   name: 'CreateAutomationOperandInput',

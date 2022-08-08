@@ -2,7 +2,6 @@ import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
 import { clearDatabase, prepDefaultCreateData, prepDefaultUpdateData } from './testUtils';
 import AuthService from '../../auth/AuthService';
-import { constructValidUpdateAutomationInputData } from './testData';
 
 jest.setTimeout(30000);
 
@@ -49,12 +48,12 @@ it('Enables/Disables automation', async () => {
       }
     }
   `,
-    {
-      input: input,
-    },
-    {
-      'Authorization': `Bearer ${token}`,
-    }
+  {
+    input: input,
+  },
+  {
+    'Authorization': `Bearer ${token}`,
+  }
   ).then((data) => data?.enableAutomation);
 
   expect(resStateFalse).toMatchObject({
@@ -75,12 +74,12 @@ it('Enables/Disables automation', async () => {
     }
   }
 `,
-    {
-      input: automationEnabledInput,
-    },
-    {
-      'Authorization': `Bearer ${token}`,
-    }
+  {
+    input: automationEnabledInput,
+  },
+  {
+    'Authorization': `Bearer ${token}`,
+  }
   ).then((data) => data?.enableAutomation);
 
   expect(resStateTrue).toMatchObject({
@@ -118,12 +117,12 @@ it('unable to enable/disable automations unauthorized', async () => {
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
     if (error instanceof Error) {

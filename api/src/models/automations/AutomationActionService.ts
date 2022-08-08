@@ -1,10 +1,9 @@
 import { AutomationAction, AutomationActionChannel, AutomationActionChannelType, AutomationActionType, PrismaClient, UserOfCustomer } from '@prisma/client';
-import { ApolloError } from 'apollo-server-express';
 import { uniqBy } from 'lodash';
 
 import UserService from '../users/UserService';
 import config from '../../config/config';
-import { ReportLambdaInput, ReportService } from '../../services/report/ReportService';
+import { ReportLambdaInput, ReportService } from './ReportService';
 import { GenerateReportPayload } from '../../models/users/UserServiceTypes';
 import makeDialogueLinkReminderTemplate from '../../services/mailings/templates/makeDialogueLinkReminderTemplate';
 import makeReportMailTemplate from '../../services/mailings/templates/makeReportTemplate';
@@ -13,6 +12,7 @@ import { AutomationPrismaAdapter } from './AutomationPrismaAdapter';
 import { CustomerPrismaAdapter } from '../../models/customer/CustomerPrismaAdapter';
 import UserPrismaAdapter from '../../models/users/UserPrismaAdapter';
 import { ScheduledAutomationPrismaAdapter } from './ScheduledAutomationPrismaAdapter';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 export class AutomationActionService {
   private prisma: PrismaClient;
@@ -34,36 +34,60 @@ export class AutomationActionService {
   }
 
   /**
+   * Send a report from an automation.
+   * This fetches the relevant action based on the given report automation, and then for each channel, dispatches this
+   * report.
+   */
+  public async sendReport(automationActionId: string, workspaceSlug: string, reportUrl: string) {
+    const automationAction = await this.prisma.automationAction.findUnique({
+      where: {
+        id: automationActionId,
+      },
+      include: {
+        channels: true,
+      },
+    });
+
+    if (!automationAction) throw new GraphQLYogaError('No automation action found for ID!');
+
+    for (const channel of automationAction.channels) {
+      await this.handleReportChannel(channel, workspaceSlug, reportUrl);
+    }
+
+    return true;
+  };
+
+  /**
    * Runs an action lambda based on the specified AutomationActionType
    * @param automationAction an Prisma AutomationAction object
    * @param workspaceSlug the slug of the workspace the automation belongs to
    * @param dialogueSlug the slug of the pertaining dialogue (OPTIONAL)
    * @returns the succesfull running of a SNS related to the action
    */
-  public handleAutomationAction = async (
+  public async handleAutomationAction(
     automationAction: AutomationAction & { channels: AutomationActionChannel[] },
     workspaceSlug: string,
     dialogueSlug?: string
-  ) => {
+  ) {
     switch (automationAction.type) {
       case AutomationActionType.SEND_DIALOGUE_LINK:
         return this.sendDialogueLink(
           automationAction.automationScheduledId as string, workspaceSlug
         );
       case AutomationActionType.WEEK_REPORT:
-        return this.generateReport(
+        return this.dispatchGenerateReportJob(
           automationAction.id,
           workspaceSlug,
           dialogueSlug,
         );
       case AutomationActionType.MONTH_REPORT:
-        return this.generateReport(
+        return this.dispatchGenerateReportJob(
           automationAction.id,
           workspaceSlug,
           dialogueSlug,
         );
       case AutomationActionType.YEAR_REPORT:
-        return this.generateReport(
+        return this.dispatchGenerateReportJob(
           automationAction.id,
           workspaceSlug,
           dialogueSlug,
@@ -77,10 +101,10 @@ export class AutomationActionService {
 
   /**
    * Finds all AutomationAction Channels by an automation action ID
-   * @param automationActionId 
-   * @returns 
+   * @param automationActionId
+   * @returns
    */
-  findChannelsByActionId = (automationActionId: string) => {
+  public async findChannelsByActionId (automationActionId: string) {
     return this.scheduledAutomationPrismaAdapter.findChannelsByAutomationActionId(automationActionId);
   }
 
@@ -90,10 +114,10 @@ export class AutomationActionService {
    * @param workspaceSlug
    * @returns a boolean indicating whether the call was a succes or not
    */
-  sendDialogueLink = async (
+  public async sendDialogueLink(
     workspaceSlug: string,
     automationActionId: string
-  ): Promise<boolean> => {
+  ): Promise<boolean> {
     const channels = await this.findChannelsByActionId(automationActionId);
 
     for (const channel of channels) {
@@ -107,17 +131,17 @@ export class AutomationActionService {
    * @param recipients List of users who receive the mail
    * @param workspaceSlug Workspace slug
    */
-  async dispatchMailsToRecipients(recipients: UserOfCustomer[], workspaceSlug: string): Promise<void[]> {
+  public async dispatchReminderMailJobs(
+    recipients: UserOfCustomer[],
+    workspaceSlug: string
+  ): Promise<void[]> {
     return await Promise.all(recipients.map(async (recipient) => {
       const user = await this.userPrismaAdapter.findPrivateDialogueOfUser(recipient.userId, workspaceSlug);
       if (!user) return;
 
       // TODO: Add support for multiple client URLs if a user is assinged to multipled dialogues
       const privateDialogues = user?.isAssignedTo;
-      if (!privateDialogues?.length) {
-        console.log('User ', user?.email, 'Is not assigned to a dialogue so cannot be sent dialogue url');
-        return;
-      };
+      if (!privateDialogues?.length) { return };
 
       const targetDialogue = privateDialogues[0];
 
@@ -133,12 +157,37 @@ export class AutomationActionService {
   }
 
   /**
+   * Sends an client dialogue link to all recipients in the channel's payload based on the channel's type (e.g. EMAIL, SLACK etc.)
+   * @param channel
+   * @param workspaceSlug
+   */
+  public async handleSendDialogueChannel(
+    channel: AutomationActionChannel,
+    workspaceSlug: string,
+  ) {
+    switch (channel.type) {
+      case AutomationActionChannelType.EMAIL:
+        await this.handleSendDialogueEmailChannel(channel, workspaceSlug);
+        break;
+      case AutomationActionChannelType.SMS:
+        // TODO: Implement
+        break;
+      case AutomationActionChannelType.SLACK:
+        // TODO: Implement
+        break;
+      default:
+        await this.handleSendDialogueEmailChannel(channel, workspaceSlug);
+        break;
+    }
+  }
+
+  /**
    * Find recipients of all actions.
    * @param actionIds
    * @param workspaceSlug
    * @returns
    */
-  async findActionsRecipients(actionIds: string[], workspaceSlug: string) {
+  public async findActionsRecipients(actionIds: string[], workspaceSlug: string) {
     const recipients = await Promise.all(actionIds.map(async (actionId) => {
       const actionRecipients = await this.findActionRecipients(actionId, workspaceSlug);
       return actionRecipients;
@@ -163,7 +212,7 @@ export class AutomationActionService {
       },
     });
 
-    if (!automationAction) throw new ApolloError('No automation action found for ID!');
+    if (!automationAction) throw new GraphQLYogaError('No automation action found for ID!');
 
     // FIXME: Handle all channels!
     const payload = (automationAction.channels[0].payload as unknown) as GenerateReportPayload;
@@ -174,15 +223,15 @@ export class AutomationActionService {
 
   /**
    * Sends an email containing a report to all recipients in the channel's payload
-   * @param channel 
-   * @param workspaceSlug 
+   * @param channel
+   * @param workspaceSlug
    * @param reportUrl url to the downloadable report PDF (S3)
    */
-  handleReportEmailChannel = async (
+  private async handleReportEmailChannel(
     channel: AutomationActionChannel,
     workspaceSlug: string,
     reportUrl: string
-  ) => {
+  ) {
     const payload = (channel.payload as unknown) as GenerateReportPayload;
     const recipients = await this.userService.findTargetUsers(workspaceSlug, payload);
 
@@ -204,48 +253,26 @@ export class AutomationActionService {
 
   /**
    * Sends an email containing a dialogue client link to all recipients in the channel's payload
-   * @param channel 
-   * @param workspaceSlug 
+   * @param channel
+   * @param workspaceSlug
    */
-  handleSendDialogueEmailChannel = async (
+  private async handleSendDialogueEmailChannel (
     channel: AutomationActionChannel,
     workspaceSlug: string,
-  ) => {
+  ) {
     const payload = (channel.payload as unknown) as GenerateReportPayload;
     const recipients = await this.userService.findTargetUsers(workspaceSlug, payload);
-    await this.dispatchMailsToRecipients(recipients, workspaceSlug);
+    await this.dispatchReminderMailJobs(recipients, workspaceSlug);
   }
 
   /**
-   * Sends an client dialogue link to all recipients in the channel's payload based on the channel's type (e.g. EMAIL, SLACK etc.)
-   * @param channel 
-   * @param workspaceSlug 
+   * Send a report via a given channel.
    */
-  handleSendDialogueChannel = async (
-    channel: AutomationActionChannel,
-    workspaceSlug: string,
-  ) => {
-    switch (channel.type) {
-      case AutomationActionChannelType.EMAIL:
-        await this.handleSendDialogueEmailChannel(channel, workspaceSlug);
-        break;
-      case AutomationActionChannelType.SMS:
-        // TODO: Implement
-        break;
-      case AutomationActionChannelType.SLACK:
-        // TODO: Implement
-        break;
-      default:
-        await this.handleSendDialogueEmailChannel(channel, workspaceSlug);
-        break;
-    }
-  }
-
-  handleReportChannel = async (
+  private async handleReportChannel(
     channel: AutomationActionChannel,
     workspaceSlug: string,
     reportUrl: string
-  ) => {
+  ) {
     switch (channel.type) {
       case AutomationActionChannelType.EMAIL:
         await this.handleReportEmailChannel(channel, workspaceSlug, reportUrl);
@@ -263,38 +290,11 @@ export class AutomationActionService {
   }
 
   /**
-   * Sends an email with a report to all users provided in an automation action
-   * @param automationActionId
-   * @param workspaceSlug
-   * @param reportUrl
-   * @returns
-   */
-  sendReport = async (automationActionId: string, workspaceSlug: string, reportUrl: string) => {
-    const automationAction = await this.prisma.automationAction.findUnique({
-      where: {
-        id: automationActionId,
-      },
-      include: {
-        channels: true,
-      },
-    });
-
-    if (!automationAction) throw new ApolloError('No automation action found for ID!');
-
-    for (const channel of automationAction.channels) {
-      await this.handleReportChannel(channel, workspaceSlug, reportUrl);
-    }
-
-    return true;
-  };
-
-  /**
    * Send a report by going to the dashboard's report.
-   * @param workspaceSlug
-   * @param dialogueSlug
-   * @returns
+   *
+   * This dispatches a lambda job to go to the dashboard and take a "screenshot" of a certain page.
    */
-  public async generateReport(
+  public async dispatchGenerateReportJob(
     automationActionId: string,
     workspaceSlug: string,
     dialogueSlug?: string
@@ -302,6 +302,7 @@ export class AutomationActionService {
     // Get bot user to create report with
     const botUser = await this.userService.findBotByWorkspaceName(workspaceSlug);
 
+    // Construct input parameters for the job service
     const dashboardUrl = config.dashboardUrl;
     const reportUrl = `${dashboardUrl}/dashboard/b/${workspaceSlug}/d/${dialogueSlug}/_reports/weekly`;
     const apiUrl = `${config.baseUrl}/graphql`;
@@ -319,6 +320,6 @@ export class AutomationActionService {
       AUTOMATION_ACTION_ID: automationActionId,
     }
 
-    return this.reportService.generateReport(reportInput);
+    return this.reportService.dispatchJob(reportInput);
   }
 }

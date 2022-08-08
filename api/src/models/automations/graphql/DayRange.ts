@@ -5,5 +5,5 @@ export const DayRange = objectType({
   definition(t) {
     t.string('label');
     t.int('index');
-  }
+  },
 })

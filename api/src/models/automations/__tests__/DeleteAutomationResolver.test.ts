@@ -2,7 +2,6 @@ import { makeTestPrisma } from '../../../test/utils/makeTestPrisma';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
 import { clearDatabase, prepDefaultCreateData, prepDefaultUpdateData } from './testUtils';
 import AuthService from '../../auth/AuthService';
-import { constructValidUpdateAutomationInputData } from './testData';
 
 jest.setTimeout(30000);
 
@@ -50,10 +49,10 @@ it('Deletes automation', async () => {
       }
     }
   `,
-    undefined,
-    {
-      'Authorization': `Bearer ${token}`,
-    }
+  undefined,
+  {
+    'Authorization': `Bearer ${token}`,
+  }
   ).then((data) => data?.customer?.automations);
 
   const automationIdsBeforeDeletion = automationsBeforeDeletion.map((automation) => automation.id);
@@ -72,12 +71,12 @@ it('Deletes automation', async () => {
       }
     }
   `,
-    {
-      input: input,
-    },
-    {
-      'Authorization': `Bearer ${token}`,
-    }
+  {
+    input: input,
+  },
+  {
+    'Authorization': `Bearer ${token}`,
+  }
   ).then((data) => data?.deleteAutomation);
 
   expect(res).toMatchObject({
@@ -94,10 +93,10 @@ it('Deletes automation', async () => {
       }
     }
   `,
-    undefined,
-    {
-      'Authorization': `Bearer ${token}`,
-    }
+  undefined,
+  {
+    'Authorization': `Bearer ${token}`,
+  }
   ).then((data) => data?.customer?.automations);
 
   const existingAutomationIds: string[] = automations.map((automation) => automation.id);
@@ -133,12 +132,12 @@ it('unable to delete automations unauthorized', async () => {
         }
       }
     `,
-      {
-        input: input,
-      },
-      {
-        'Authorization': `Bearer ${token}`,
-      }
+    {
+      input: input,
+    },
+    {
+      'Authorization': `Bearer ${token}`,
+    }
     );
   } catch (error) {
     if (error instanceof Error) {
@@ -146,6 +145,3 @@ it('unable to delete automations unauthorized', async () => {
     } else { throw new Error(); }
   }
 });
-
-
-

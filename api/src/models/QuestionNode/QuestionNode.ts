@@ -100,15 +100,6 @@ export const FormNodeFieldTypeEnum = enumType({
   members: ['email', 'phoneNumber', 'url', 'shortText', 'longText', 'number', 'contacts'],
 });
 
-export const PickerEntryInput = inputObjectType({
-  name: 'PickerEntryInput',
-  definition(t) {
-    t.string('label', { required: true });
-    t.string('value', { required: true });
-    t.string('type', { required: true });
-  },
-});
-
 export const FormNodeFieldInput = inputObjectType({
   name: 'FormNodeFieldInput',
 
@@ -149,8 +140,12 @@ export const FormNodeField = objectType({
         return root.placeholder;
       },
     });
+
     t.list.field('contacts', {
       type: 'UserType',
+      description: `
+        List of possible contact points for a form-node.
+      `,
       nullable: true,
     });
   },

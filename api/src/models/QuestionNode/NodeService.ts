@@ -4,14 +4,13 @@ import cuid from 'cuid';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import EdgeService from '../edge/EdgeService';
-import { QuestionOptionProps, CreateCTAInputProps, DialogueWithEdges } from './NodeServiceType';
+import { QuestionOptionProps, CreateCTAInputProps, DialogueWithEdges, FormNodeInput } from './NodeServiceType';
 import QuestionNodePrismaAdapter from './QuestionNodePrismaAdapter';
 import { findDifference } from '../../utils/findDifference';
 import EdgePrismaAdapter, { CreateEdgeInput } from '../edge/EdgePrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import { CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType';
 import { CreateSliderNodeInput, UpdateQuestionInput } from './QuestionNodePrismaAdapterType';
-import UserService from '../../models/users/UserService';
 import UserOfCustomerPrismaAdapter from '../../models/users/UserOfCustomerPrismaAdapter';
 
 export interface IdMapProps {
@@ -19,20 +18,18 @@ export interface IdMapProps {
 }
 
 export class NodeService {
-  prisma: PrismaClient;
-  questionNodePrismaAdapter: QuestionNodePrismaAdapter;
-  edgeService: EdgeService;
-  edgePrismaAdapter: EdgePrismaAdapter;
-  dialoguePrismaAdapter: DialoguePrismaAdapter;
-  userService: UserService;
-  userOfCustomerPrismaAdapter: UserOfCustomerPrismaAdapter;
+  private prisma: PrismaClient;
+  private questionNodePrismaAdapter: QuestionNodePrismaAdapter;
+  private edgeService: EdgeService;
+  private edgePrismaAdapter: EdgePrismaAdapter;
+  private dialoguePrismaAdapter: DialoguePrismaAdapter;
+  private userOfCustomerPrismaAdapter: UserOfCustomerPrismaAdapter;
 
   constructor(prismaClient: PrismaClient) {
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
     this.edgeService = new EdgeService(prismaClient);
     this.edgePrismaAdapter = new EdgePrismaAdapter(prismaClient);
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
-    this.userService = new UserService(prismaClient);
     this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
     this.prisma = prismaClient;
   }
@@ -107,7 +104,7 @@ export class NodeService {
     const dialogue = await this.dialoguePrismaAdapter.getDialogueBySlugs(input.customerSlug, input.dialogueSlug);
     if (!dialogue?.id) throw 'No Dialogue found to add CTA to!'
 
-    const form = input.form ? await this.saveCreateFormNodeInput(input.form, input.customerSlug) : undefined;
+    const form = input.form ? await this.createFormNodeInput(input.form, input.customerSlug) : undefined;
 
     const callToAction = await this.questionNodePrismaAdapter.createCallToAction({
       dialogueId: dialogue.id,
@@ -133,14 +130,17 @@ export class NodeService {
   /**
    * Converts FormNode to Prisma-friendly format.
    * */
-  saveEditFormNodeInput = async (input: NexusGenInputs['FormNodeInputType'], workspaceSlug: string): Promise<Prisma.FormNodeFieldUpsertArgs[] | undefined> => {
+  private async saveEditFormNodeInput(
+    input: FormNodeInput,
+    workspaceSlug: string
+  ): Promise<Prisma.FormNodeFieldUpsertArgs[] | undefined> {
     const communicationUser = input.fields?.find((field) => field.userIds?.length);
     const targetUsers = communicationUser?.userIds?.length
       ? await this.userOfCustomerPrismaAdapter.findTargetUsers(
         workspaceSlug, {
-        roleIds: communicationUser?.userIds.filter(isPresent),
-        userIds: communicationUser?.userIds.filter(isPresent),
-      }
+          roleIds: communicationUser?.userIds.filter(isPresent),
+          userIds: communicationUser?.userIds.filter(isPresent),
+        }
       )
       : [];
     const allUserIds = targetUsers.map((user) => ({ id: user.userId }));
@@ -233,7 +233,7 @@ export class NodeService {
           helperText: input.form.helperText || '',
         })
       } else {
-        const fields = await this.saveCreateFormNodeInput(input.form, input.customerSlug);
+        const fields = await this.createFormNodeInput(input.form, input.customerSlug);
         await this.questionNodePrismaAdapter.createFieldsOfForm({
           questionId: input.id,
           fields,
@@ -403,13 +403,16 @@ export class NodeService {
   /**
    * Save FormNodeInput when `creating`
    */
-  saveCreateFormNodeInput = async (input: NexusGenInputs['FormNodeInputType'], workspaceSlug: string): Promise<Prisma.FormNodeCreateInput> => {
+  private async createFormNodeInput(
+    input: FormNodeInput,
+    workspaceSlug: string
+  ): Promise<Prisma.FormNodeCreateInput> {
     const communicationUser = input.fields?.find((field) => field.userIds?.length);
     const targetUsers = communicationUser?.userIds?.length
       ? await this.userOfCustomerPrismaAdapter.findTargetUsers(
         workspaceSlug, {
-        roleIds: communicationUser?.userIds.filter(isPresent), userIds: communicationUser?.userIds.filter(isPresent),
-      }
+          roleIds: communicationUser?.userIds.filter(isPresent), userIds: communicationUser?.userIds.filter(isPresent),
+        }
       )
       : [];
     const allUserIds = targetUsers.map((user) => ({ id: user.userId }));

@@ -1,5 +1,5 @@
+import { GraphQLYogaError } from '@graphql-yoga/node';
 import { inputObjectType, mutationField } from 'nexus';
-import { UserInputError } from 'apollo-server-express';
 
 export const SendAutomationDialogueLinkInput = inputObjectType({
   name: 'SendAutomationDialogueLinkInput',
@@ -16,8 +16,7 @@ export const SendAutomationDialogueLinkResolver = mutationField('sendAutomationD
   },
   nullable: true,
   async resolve(parent, args, ctx) {
-
-    if (!args.input) throw new UserInputError('No input object provided for createAutomation Resolver');
+    if (!args.input) throw new GraphQLYogaError('No input object provided for createAutomation Resolver');
 
     const { workspaceSlug, automationActionId } = args.input;
 

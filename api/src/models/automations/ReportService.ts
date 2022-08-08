@@ -1,4 +1,4 @@
-import config from '../../config/config';
+import { logger } from '../../config/logger';
 import AWS from '../../config/aws';
 
 export interface ReportLambdaInput {
@@ -27,18 +27,19 @@ export class ReportService {
    * Calls the 'GenerateReport' SNS which triggers the corresponding lambda which generate a report
    * @param payload the input necessary for the generate report lambda to run
    */
-  generateReport = async (payload: ReportLambdaInput) => {
+  dispatchJob = async (payload: ReportLambdaInput) => {
     const stringifiedPayload = JSON.stringify(payload);
     const snsParams: AWS.SNS.PublishInput = {
       Message: stringifiedPayload,
       // TODO: Track this as dependency
       TopicArn: 'arn:aws:sns:eu-central-1:356797133903:haasApiReport',
     }
-    if (config.env === 'local') return console.log('payload for generating report: ', stringifiedPayload);
+
+    logger.debug(`payload for generating report: ${stringifiedPayload}`);
 
     return this.sns.publish(snsParams, (err, data) => {
-      if (err) return console.log('ERROR: ', err);
-      console.log('Succesfully published to haasApiReport SNS:', data);
+      if (err) return logger.error('Error in Publishing', err);
+      logger.log(`Deployed haas-api-report: ${data}`);
     }).promise();
   }
 }

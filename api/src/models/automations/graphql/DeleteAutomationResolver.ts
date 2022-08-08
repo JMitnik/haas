@@ -1,5 +1,6 @@
 import { inputObjectType, mutationField } from 'nexus';
-import { UserInputError } from 'apollo-server-express';
+import { GraphQLYogaError } from '@graphql-yoga/node';
+
 import { AutomationModel } from './AutomationModel';
 
 export const DeleteAutomationInput = inputObjectType({
@@ -17,8 +18,7 @@ export const DeleteAutomationResolver = mutationField('deleteAutomation', {
   },
   nullable: true,
   async resolve(parent, args, ctx) {
-
-    if (!args.input) throw new UserInputError('No input object provided for createAutomation Resolver');
+    if (!args.input) throw new GraphQLYogaError('No input object provided for createAutomation Resolver');
 
     return ctx.services.automationService.deleteAutomation(args.input);
   },
