@@ -21,7 +21,7 @@ export const AssigneeAvatar = ({ assignee, index }: AssigneeAvatarProps) => {
     >
       <Tooltip.Trigger asChild>
         <UI.Div style={{ transform: `translateX(${index * 8}px)` }}>
-          <Avatar brand="off" name={`${assignee?.firstName}`} />
+          <Avatar hasHover brand="off" name={`${assignee?.firstName}`} />
         </UI.Div>
       </Tooltip.Trigger>
       <Tooltip.Content isOpen={openTooltip}>
