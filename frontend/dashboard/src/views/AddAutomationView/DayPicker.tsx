@@ -1,21 +1,12 @@
 import * as Popover from '@radix-ui/react-popover';
 import * as UI from '@haas/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons';
+import { orderBy } from 'lodash';
 import { useTranslation } from 'react-i18next';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import * as RadixSelect from 'components/Common/Select';
-import { Avatar } from 'components/Common/Avatar';
-import { ReactComponent as SwitchIcon } from 'assets/icons/icon-switch.svg';
-import { orderBy } from 'lodash';
 import { slideUpFadeMotion } from 'components/animation/config';
-import { useCustomer } from 'providers/CustomerProvider';
-import { useUser } from 'providers/UserProvider';
-import SearchBar from 'components/Common/SearchBar';
-import Searchbar from 'components/Common/SearchBar';
-import endOfDay from 'date-fns/endOfDay';
 
 export const WorkspaceSwitcherContainer = styled(UI.Div)`
   ${({ theme }) => css`
@@ -88,7 +79,7 @@ ${({ isSelected, isWithinRange, theme }) => css`
   border-radius: 180px;
   border: 1px solid ${theme.colors.main['50']};
   box-shadow: ${theme.boxShadows.md};
-  
+
   color: auto;
 
   ${isWithinRange && css`

@@ -1,28 +1,38 @@
-/* eslint-disable arrow-body-style */
 import * as UI from '@haas/ui';
-import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
 import {
+  CreateAutomationInput,
   useCreateAutomationMutation,
 } from 'types/generated-types';
 import { useNavigator } from 'hooks/useNavigator';
+import { useToast } from 'hooks/useToast';
 
-import AutomationForm from './AutomationForm';
+import { AutomationForm } from './AutomationForm';
 
 const AddAutomationView = () => {
   const { goToAutomationOverview } = useNavigator();
   const { t } = useTranslation();
 
+  const toast = useToast();
+
   const [createAutomation, { loading }] = useCreateAutomationMutation({
     onCompleted: () => {
+      toast.success({
+        title: t('toast.general_success'),
+        description: t('toast.general_successgeneral_success_helper'),
+      });
       goToAutomationOverview();
     },
-    onError: (e) => {
-      console.log('Something went wrong: ', e.message);
+    onError: () => {
+      toast.templates.error();
     },
   });
+
+  const handleCreate = (input: CreateAutomationInput) => {
+    createAutomation({ variables: { input } });
+  };
 
   return (
     <>
@@ -31,9 +41,9 @@ const AddAutomationView = () => {
       </UI.ViewHead>
 
       <UI.ViewBody>
-        <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
-          <AutomationForm onCreateAutomation={createAutomation} isLoading={loading} />
-        </motion.div>
+        <UI.FadeIn>
+          <AutomationForm onCreate={handleCreate} isLoading={loading} />
+        </UI.FadeIn>
       </UI.ViewBody>
     </>
   );

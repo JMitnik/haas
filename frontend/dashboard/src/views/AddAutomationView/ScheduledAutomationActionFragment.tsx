@@ -22,7 +22,7 @@ export const ScheduledAutomationActionFragment = ({ dialogueItems }: ScheduledAu
   const { t } = useTranslation();
   const form = useFormContext();
 
-  const watchSchedule = useWatch({
+  const schedule = useWatch({
     name: 'schedule',
     control: form.control,
   });
@@ -47,7 +47,7 @@ export const ScheduledAutomationActionFragment = ({ dialogueItems }: ScheduledAu
                 const cron = getCronByActionType(e as AutomationActionType);
                 form.setValue('schedule', {
                   ...cron,
-                  activeDialogue: watchSchedule?.activeDialogue as any,
+                  activeDialogue: schedule?.activeDialogue as any,
                   type: getTypeByActionType(e as AutomationActionType),
                 });
                 return onChange(e);

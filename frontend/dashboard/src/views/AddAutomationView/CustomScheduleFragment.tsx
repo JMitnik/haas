@@ -4,7 +4,7 @@ import { Controller, useFormContext, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
-import * as RadixSelect from 'components/Common/Select';
+import * as Select from 'components/Common/Select';
 import { RecurringPeriodType } from 'types/generated-types';
 
 import { CustomRecurringType } from './AutomationForm.types';
@@ -37,61 +37,61 @@ export const CustomScheduleFragment = () => {
           control={form.control}
           render={({ field: { value, onChange } }) => (
             <UI.Div>
-              <RadixSelect.Root
+              <Select.Root
                 value={value}
                 onValueChange={onChange}
                 defaultValue={value}
               >
-                <RadixSelect.SelectTrigger
+                <Select.SelectTrigger
                   aria-label="schedule frequency"
                 >
-                  <RadixSelect.SelectValue />
-                  <RadixSelect.SelectIcon>
+                  <Select.SelectValue />
+                  <Select.SelectIcon>
                     <ChevronDownIcon />
-                  </RadixSelect.SelectIcon>
-                </RadixSelect.SelectTrigger>
-                <RadixSelect.SelectContent>
-                  <RadixSelect.SelectScrollUpButton>
+                  </Select.SelectIcon>
+                </Select.SelectTrigger>
+                <Select.SelectContent>
+                  <Select.SelectScrollUpButton>
                     <ChevronUpIcon />
-                  </RadixSelect.SelectScrollUpButton>
-                  <RadixSelect.SelectViewport>
-                    <RadixSelect.SelectGroup>
+                  </Select.SelectScrollUpButton>
+                  <Select.SelectViewport>
+                    <Select.SelectGroup>
 
-                      <RadixSelect.SelectItem value={CustomRecurringType.YEARLY}>
-                        <RadixSelect.SelectItemText>{t('automation:yearly')}</RadixSelect.SelectItemText>
-                        <RadixSelect.SelectItemIndicator>
+                      <Select.SelectItem value={CustomRecurringType.YEARLY}>
+                        <Select.SelectItemText>{t('automation:yearly')}</Select.SelectItemText>
+                        <Select.SelectItemIndicator>
                           <CheckIcon />
-                        </RadixSelect.SelectItemIndicator>
-                      </RadixSelect.SelectItem>
+                        </Select.SelectItemIndicator>
+                      </Select.SelectItem>
 
-                      <RadixSelect.SelectItem value={CustomRecurringType.MONTHLY}>
-                        <RadixSelect.SelectItemText>{t('automation:monthly')}</RadixSelect.SelectItemText>
-                        <RadixSelect.SelectItemIndicator>
+                      <Select.SelectItem value={CustomRecurringType.MONTHLY}>
+                        <Select.SelectItemText>{t('automation:monthly')}</Select.SelectItemText>
+                        <Select.SelectItemIndicator>
                           <CheckIcon />
-                        </RadixSelect.SelectItemIndicator>
-                      </RadixSelect.SelectItem>
+                        </Select.SelectItemIndicator>
+                      </Select.SelectItem>
 
-                      <RadixSelect.SelectItem value={CustomRecurringType.WEEKLY}>
-                        <RadixSelect.SelectItemText>{t('automation:weekly')}</RadixSelect.SelectItemText>
-                        <RadixSelect.SelectItemIndicator>
+                      <Select.SelectItem value={CustomRecurringType.WEEKLY}>
+                        <Select.SelectItemText>{t('automation:weekly')}</Select.SelectItemText>
+                        <Select.SelectItemIndicator>
                           <CheckIcon />
-                        </RadixSelect.SelectItemIndicator>
-                      </RadixSelect.SelectItem>
+                        </Select.SelectItemIndicator>
+                      </Select.SelectItem>
 
-                      <RadixSelect.SelectItem value={CustomRecurringType.DAILY}>
-                        <RadixSelect.SelectItemText>{t('automation:daily')}</RadixSelect.SelectItemText>
-                        <RadixSelect.SelectItemIndicator>
+                      <Select.SelectItem value={CustomRecurringType.DAILY}>
+                        <Select.SelectItemText>{t('automation:daily')}</Select.SelectItemText>
+                        <Select.SelectItemIndicator>
                           <CheckIcon />
-                        </RadixSelect.SelectItemIndicator>
-                      </RadixSelect.SelectItem>
+                        </Select.SelectItemIndicator>
+                      </Select.SelectItem>
 
-                    </RadixSelect.SelectGroup>
-                  </RadixSelect.SelectViewport>
-                  <RadixSelect.SelectScrollDownButton>
+                    </Select.SelectGroup>
+                  </Select.SelectViewport>
+                  <Select.SelectScrollDownButton>
                     <ChevronDownIcon />
-                  </RadixSelect.SelectScrollDownButton>
-                </RadixSelect.SelectContent>
-              </RadixSelect.Root>
+                  </Select.SelectScrollDownButton>
+                </Select.SelectContent>
+              </Select.Root>
             </UI.Div>
           )}
         />

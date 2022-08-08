@@ -17,10 +17,10 @@ import {
   useAutomationConnectionQuery,
 } from 'types/generated-types';
 import { ReactComponent as NoDataIll } from 'assets/images/undraw_no_data.svg';
+import { View } from 'layouts/View';
 import Searchbar from 'components/Common/SearchBar';
 import useAuth from 'hooks/useAuth';
 
-import { View } from 'layouts/View';
 import AutomationCard from './AutomationCard';
 
 interface AutomationOverviewProps {

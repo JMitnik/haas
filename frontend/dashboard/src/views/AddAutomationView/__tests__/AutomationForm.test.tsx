@@ -1,6 +1,5 @@
 import { render, screen, userEvent } from 'test';
 import React from 'react';
-import preview from 'jest-preview';
 
 import { AutomationForm } from '../AutomationForm';
 import { mockGetUsersAndRoles } from './helpers';

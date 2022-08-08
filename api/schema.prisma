@@ -162,6 +162,7 @@ model Dialogue {
   tags                        Tag[]
 
   AutomationScheduled AutomationScheduled[]
+
   @@unique([slug, customerId], map: "Dialogue.slug_customerId_unique")
 }
 
@@ -767,8 +768,14 @@ model AutomationAction {
   createdAt             DateTime                  @default(now())
   updatedAt             DateTime?                 @updatedAt
   type                  AutomationActionType
+
+  // TODO: What is APIKey for again?
   apiKey                String?
+
+  // TODO: What is endpoint again?
   endpoint              String?
+
+  // The channels defines the means of outputting the actions (slack, etc)
   channels              AutomationActionChannel[]
   automationTriggers    AutomationTrigger[]
   AutomationScheduled   AutomationScheduled?      @relation(fields: [automationScheduledId], references: [id])
@@ -792,6 +799,7 @@ model AutomationScheduled {
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
 
+  // Enum which defines the "rhythm" of the schedule
   type RecurringPeriodType @default(CUSTOM)
 
   minutes    String
@@ -800,10 +808,14 @@ model AutomationScheduled {
   month      String
   dayOfWeek  String
 
+  // Potential connected dialogue
   dialogueId    String?
   dialogueScope Dialogue? @relation(fields: [dialogueId], references: [id])
 
+  // Which automations use this scheduled automation-type
   automations Automation[]
+
+  // Which actions are related to this scheduled automation-type
   actions     AutomationAction[]
 }
 
@@ -815,15 +827,16 @@ model Automation {
   label       String
   description String?
   type        AutomationType
+  workspaceId String
+  workspace   Customer @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
+  // Type A: Trigger automation (if X happens, do Y)
   automationTriggerId String?
   automationTrigger   AutomationTrigger? @relation(fields: [automationTriggerId], references: [id], onDelete: SetNull)
 
+  // Type B: Scheduled automations (every X time-metric, do Y)
   automationScheduledId String?
   automationScheduled   AutomationScheduled? @relation(fields: [automationScheduledId], references: [id])
-
-  workspaceId String
-  workspace   Customer @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }
 
 enum DialogueTemplateType {

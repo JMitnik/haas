@@ -1,15 +1,6 @@
 import * as UI from '@haas/ui';
-import {
-  Bell,
-  Clock, Type,
-} from 'react-feather';
-import { Button, ButtonGroup } from '@chakra-ui/core';
+import { Bell, Clock, Type } from 'react-feather';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
-import {
-  Div, Form, FormControl, FormLabel,
-  FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted,
-} from '@haas/ui';
-import { FetchResult, MutationFunctionOptions } from '@apollo/client';
 import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -18,11 +9,7 @@ import React from 'react';
 import {
   AutomationEventType, AutomationType,
   CreateAutomationInput,
-  CreateAutomationMutation,
-  Exact,
-  Maybe,
   RecurringPeriodType,
-  UpdateAutomationMutation,
   useGetUsersAndRolesQuery,
   useGetWorkspaceDialoguesQuery,
 } from 'types/generated-types';
@@ -31,9 +18,8 @@ import { useCustomer } from 'providers/CustomerProvider';
 
 import { ActionEntry } from './CreateActionModalCard';
 import { ConditionEntry } from './CreateConditionModalCardTypes';
-import { FormDataProps, schema } from './AutomationForm.types';
-
 import { CustomScheduleFragment } from './CustomScheduleFragment';
+import { FormDataProps, schema } from './AutomationForm.types';
 import { FutureScheduledDatesFragment } from './FutureScheduledDatesFragment';
 import { RecipientsFragment } from './RecipientsFragment';
 import { ScheduledAutomationActionFragment } from './ScheduledAutomationActionFragment';
@@ -43,20 +29,16 @@ import useCronSchedule from './useCronSchedule';
 
 interface AutomationFormProps {
   isInEdit?: boolean;
-  onCreateAutomation?: (options?: MutationFunctionOptions<CreateAutomationMutation, Exact<{
-    input?: Maybe<CreateAutomationInput> | undefined;
-  }>> | undefined) => Promise<FetchResult<CreateAutomationMutation, Record<string, any>, Record<string, any>>>;
+  onCreate?: (input: CreateAutomationInput) => void;
+  onUpdate?: (input: CreateAutomationInput) => void;
   isLoading?: boolean;
-  onUpdateAutomation?: (options?: MutationFunctionOptions<UpdateAutomationMutation, Exact<{
-    input?: Maybe<CreateAutomationInput> | undefined;
-  }>> | undefined) => Promise<FetchResult<UpdateAutomationMutation, Record<string, any>, Record<string, any>>>;
   automation?: AutomationInput;
   mappedConditions?: ConditionEntry[];
 }
 
 export const AutomationForm = ({
-  onCreateAutomation,
-  onUpdateAutomation,
+  onCreate,
+  onUpdate,
   isLoading,
   automation,
   mappedConditions,
@@ -112,9 +94,12 @@ export const AutomationForm = ({
 
   const userPickerEntries = mapToUserPickerEntries(userRoleData?.customer as any);
 
-  const dialogueItems = dialoguesData?.customer?.dialogues?.map(
-    (dialogue) => ({ id: dialogue?.id, value: dialogue?.slug, label: dialogue?.title, type: 'DIALOGUE' }),
-  ) || [];
+  const dialogueItems = dialoguesData?.customer?.dialogues?.map((dialogue) => ({
+    id: dialogue?.id,
+    value: dialogue?.slug,
+    label: dialogue?.title,
+    type: 'DIALOGUE',
+  })) || [];
 
   const watchAutomationType = useWatch({
     name: 'automationType',
@@ -126,9 +111,12 @@ export const AutomationForm = ({
     control: form.control,
   });
 
+  /**
+   * Define future dates based on a parsed cron expression.
+   */
   const cronners = useCronSchedule(`${watchSchedule?.time || ''} ${watchSchedule?.frequency || ''} ${watchSchedule?.frequency === '* *' ? watchSchedule?.dayRange?.map((day) => day?.label).join('-') : ''}`);
 
-  const onSubmit = (formData: FormDataProps) => {
+  const handleSubmit = (formData: FormDataProps) => {
     // TODO: Create a field for event type
     // TODO: Create a picker for questionId/dialogueId for event
     // TODO: Add childbuilder
@@ -143,6 +131,7 @@ export const AutomationForm = ({
       };
     });
 
+    // TODO: In helper method
     const splittedTime = formData.schedule?.time?.split(' ');
     const minutes = splittedTime?.[0];
     const hours = splittedTime?.[1];
@@ -158,11 +147,6 @@ export const AutomationForm = ({
         eventType: AutomationEventType.NewInteractionQuestion, // TODO: Make this dynamic
         questionId: formData.conditionBuilder?.conditions?.[0]?.condition.activeQuestion?.value,
       },
-      // conditionBuilder: {
-      //   id: automation?.conditionBuilder?.id,
-      //   type: formData?.conditionBuilder?.logical?.value as AutomationConditionBuilderType,
-      //   conditions: mapConditions(formData, activeCustomer?.id || undefined),
-      // },
       actions: activeActions,
       schedule: formData.automationType === AutomationType.Scheduled ? {
         type: formData?.schedule?.type as RecurringPeriodType,
@@ -176,24 +160,14 @@ export const AutomationForm = ({
       } : undefined,
     };
 
-    console.log('Input: ', input);
-
-    if (!isInEdit && onCreateAutomation) {
-      onCreateAutomation({
-        variables: {
-          input,
-        },
-      });
+    if (!isInEdit && onCreate) {
+      onCreate(input);
     }
 
-    if (isInEdit && onUpdateAutomation) {
-      onUpdateAutomation({
-        variables: {
-          input: {
-            id: automation?.id,
-            ...input,
-          },
-        },
+    if (isInEdit && onUpdate) {
+      onUpdate({
+        id: automation?.id,
+        ...input,
       });
     }
   };
@@ -201,31 +175,31 @@ export const AutomationForm = ({
   return (
     <FormProvider {...form}>
       <UI.FormContainer>
-        <Form onSubmit={form.handleSubmit((formData) => onSubmit(formData as FormDataProps))}>
-          <FormSection id="general">
-            <Div>
-              <H3 color="default.text" fontWeight={500} pb={2}>{t('automation:about')}</H3>
-              <Muted color="gray.600">
+        <UI.Form onSubmit={form.handleSubmit((formData) => handleSubmit(formData as FormDataProps))}>
+          <UI.FormSection id="general">
+            <UI.Div>
+              <UI.H3 color="default.text" fontWeight={500} pb={2}>{t('automation:about')}</UI.H3>
+              <UI.Muted color="gray.600">
                 {t('automation:about_helper')}
-              </Muted>
-            </Div>
-            <Div>
-              <InputGrid>
-                <FormControl isRequired isInvalid={!!form.formState.errors.title}>
-                  <FormLabel htmlFor="title">{t('title')}</FormLabel>
-                  <InputHelper>{t('automation:title_helper')}</InputHelper>
-                  <Input
+              </UI.Muted>
+            </UI.Div>
+            <UI.Div>
+              <UI.InputGrid>
+                <UI.FormControl isRequired isInvalid={!!form.formState.errors.title}>
+                  <UI.FormLabel htmlFor="title">{t('title')}</UI.FormLabel>
+                  <UI.InputHelper>{t('automation:title_helper')}</UI.InputHelper>
+                  <UI.Input
                     id="title"
                     placeholder={t('automation:title_placeholder')}
                     leftEl={<Type />}
                     {...form.register('title', { required: 'Error title' })}
                   />
                   <UI.ErrorMessage>{t(form.formState.errors.title?.message || '')}</UI.ErrorMessage>
-                </FormControl>
+                </UI.FormControl>
 
                 <UI.FormControl style={{ display: 'none' }}>
                   <UI.FormLabel htmlFor="automationType">{t('automation:type')}</UI.FormLabel>
-                  <InputHelper>{t('automation:type_helper')}</InputHelper>
+                  <UI.InputHelper>{t('automation:type_helper')}</UI.InputHelper>
                   <Controller
                     control={form.control}
                     name="automationType"
@@ -256,49 +230,49 @@ export const AutomationForm = ({
                 {watchAutomationType === AutomationType.Scheduled && (
                   <ScheduledAutomationActionFragment dialogueItems={dialogueItems as any} />
                 )}
+              </UI.InputGrid>
+            </UI.Div>
+          </UI.FormSection>
 
-              </InputGrid>
-            </Div>
-          </FormSection>
+          <UI.Hr />
 
-          <Hr />
           {watchAutomationType === AutomationType.Trigger && (
             <TriggerAutomationFragment conditions={mappedConditions} />
           )}
 
           {watchAutomationType === AutomationType.Scheduled && (
             <UI.FormSection id="scheduled">
-              <Div>
-                <H3 color="default.text" fontWeight={500} pb={2}>{t('automation:schedule')}</H3>
-                <Muted color="gray.600">
+              <UI.Div>
+                <UI.H3 color="default.text" fontWeight={500} pb={2}>{t('automation:schedule')}</UI.H3>
+                <UI.Muted color="gray.600">
                   {t('automation:schedule_helper')}
-                </Muted>
-              </Div>
-              <InputGrid>
+                </UI.Muted>
+              </UI.Div>
+              <UI.InputGrid>
                 {watchSchedule?.type === RecurringPeriodType.Custom && (
                   <CustomScheduleFragment />
                 )}
                 <FutureScheduledDatesFragment futureDates={cronners} />
-              </InputGrid>
+              </UI.InputGrid>
             </UI.FormSection>
           )}
 
           <RecipientsFragment recipientEntries={userPickerEntries} />
 
-          <ButtonGroup>
-            <Button
+          <UI.Flex>
+            <UI.Button
               isDisabled={!form.formState.isValid}
               isLoading={isLoading}
-              variantColor="teal"
               type="submit"
+              mr={2}
             >
               {isInEdit ? t('update') : t('create')}
-            </Button>
-            <Button variant="outline" onClick={() => history.goBack()}>
+            </UI.Button>
+            <UI.Button variant="outline" onClick={() => history.goBack()}>
               {t('cancel')}
-            </Button>
-          </ButtonGroup>
-        </Form>
+            </UI.Button>
+          </UI.Flex>
+        </UI.Form>
       </UI.FormContainer>
     </FormProvider>
   );
