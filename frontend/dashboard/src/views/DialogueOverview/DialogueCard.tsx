@@ -5,6 +5,7 @@ import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import React, { useContext, useRef, useState } from 'react';
 
+import * as Tooltip from 'components/Common/Tooltip/Tooltip';
 import { Avatar } from 'components/Common/Avatar';
 import { Check, Edit } from 'react-feather';
 import { CheckIcon, ChevronRightIcon, Cross1Icon, LockClosedIcon, LockOpen2Icon, Pencil1Icon } from '@radix-ui/react-icons';
@@ -40,6 +41,7 @@ import { useToast } from 'hooks/useToast';
 import { useUser } from 'providers/UserProvider';
 import getLocale from 'utils/getLocale';
 import useAuth from 'hooks/useAuth';
+import { AssigneeAvatar } from './AssigneeAvatar';
 
 interface DialogueCardProps {
   dialogue: Dialogue;
@@ -238,11 +240,12 @@ const DialogueCard = ({ dialogue, users }: DialogueCardProps) => {
                     </UI.Flex>
                   </UI.Div>
 
-                  {dialogue.assignees?.find((assignee) => assignee?.id === user?.id) && (
-                    <UI.Div>
-                      <Avatar brand="off" name={`${user?.firstName} ${user?.lastName}`} />
-                    </UI.Div>
-                  )}
+                  <UI.Flex flexDirection="row-reverse">
+                    {dialogue.assignees?.map((assignee, index) => (
+                      <AssigneeAvatar assignee={assignee as UserType} index={index} />
+                    ))}
+                  </UI.Flex>
+
                 </UI.Flex>
               </UI.ColumnFlex>
             </UI.CardBody>
