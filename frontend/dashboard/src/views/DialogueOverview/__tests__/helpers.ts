@@ -16,11 +16,11 @@ export const DialogueConnectionResponse: DialogueConnectionQuery = JSON.parse('{
 
 export const mockQueryDialogueConnection = (
   createResponse: (res: DialogueConnectionQuery) => DialogueConnectionQuery,
-) => (D
+) => (
   server.use(
-  graphql.query<DialogueConnectionQuery, DialogueConnectionQueryVariables>(
-    'dialogueConnection',
-    (req, res, ctx) => res(ctx.data(createResponse(DialogueConnectionResponse))),
-  ),
-)
+    graphql.query<DialogueConnectionQuery, DialogueConnectionQueryVariables>(
+      'DialogueConnectionQuery',
+      (req, res, ctx) => res(ctx.data(createResponse(DialogueConnectionResponse))),
+    ),
+  )
 );
