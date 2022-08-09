@@ -3,6 +3,7 @@ import React from 'react';
 import 'whatwg-fetch';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import '@testing-library/jest-dom/extend-expect';
+import { configure } from '@testing-library/react';
 import { server } from './server';
 
 jest.setTimeout(10000);
@@ -44,6 +45,15 @@ afterAll(() => {
   // Reset resizeobserver (used to cancel out SVG resizes)
   window.ResizeObserver = ResizeObserver;
   jest.restoreAllMocks();
+});
+
+configure({
+  getElementError: (message) => {
+    const error = new Error(message || undefined);
+    error.name = 'TestingLibraryElementError';
+    error.stack = undefined;
+    return error;
+  },
 });
 
 export default {};

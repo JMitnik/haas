@@ -32,10 +32,12 @@ interface UseAuthProps {
 const useAuth = (): UseAuthProps => {
   const { user } = useUser();
 
+  console.log('User in useAUTH: ', user);
   // Technically this should not work in views without CustomerProvider <- Will return undefined thus
   const { activePermissions, assignedDialogues: privateDialogues } = useCustomer();
 
   const authPermissions = activePermissions || user?.globalPermissions;
+  console.log('Auth permissions: ', activePermissions);
   const isSuperAdmin = user?.globalPermissions?.includes(SystemPermission.CanAccessAdminPanel);
 
   const canAccessDialogue = (dialogueSlug: string) => {

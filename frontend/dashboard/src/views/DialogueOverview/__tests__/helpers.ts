@@ -4,6 +4,12 @@ import { server } from 'test';
 import {
   DialogueConnectionQuery,
   DialogueConnectionQueryVariables,
+  GetCustomerOfUserQuery,
+  GetCustomerOfUserQueryVariables,
+  GetUsersQuery,
+  GetUsersQueryVariables,
+  MeQuery,
+  MeQueryVariables,
 } from 'types/generated-types';
 
 /**
@@ -24,3 +30,46 @@ export const mockQueryDialogueConnection = (
     ),
   )
 );
+
+// eslint-disable-next-line
+export const UserOfCustomerResponse: GetCustomerOfUserQuery = JSON.parse('{"UserOfCustomer":{"customer":{"id":"cl6lv12mz0011ppoilkt27l8w","isDemo":false,"name":"SPORT_ENG Workspace","slug":"sport_eng-mw0pipz","settings":{"id":"1","logoUrl":"","colourSettings":{"id":"1","primary":"#667EEA","__typename":"ColourSettings"},"__typename":"CustomerSettings"},"campaigns":[],"__typename":"Customer"},"role":{"name":"Admin","permissions":["CAN_VIEW_USERS","CAN_ADD_USERS","CAN_BUILD_DIALOGUE","CAN_CREATE_TRIGGERS","CAN_DELETE_DIALOGUE","CAN_DELETE_TRIGGERS","CAN_EDIT_DIALOGUE","CAN_EDIT_USERS","CAN_DELETE_USERS","CAN_DELETE_WORKSPACE","CAN_EDIT_WORKSPACE","CAN_VIEW_DIALOGUE","CAN_VIEW_DIALOGUE_ANALYTICS","CAN_RESET_WORKSPACE_DATA","CAN_ASSIGN_USERS_TO_DIALOGUE","CAN_GENERATE_WORKSPACE_FROM_CSV"],"__typename":"RoleType"},"user":{"id":"cl6luytmn00008qoiqtzdp4g0","assignedDialogues":{"privateWorkspaceDialogues":[],"assignedDialogues":[],"__typename":"AssignedDialogues"},"__typename":"UserType"},"__typename":"UserCustomer"}}');
+
+export const mockCustomerOfUser = (
+  createResponse: (res: GetCustomerOfUserQuery) => GetCustomerOfUserQuery,
+) => (
+  server.use(
+    graphql.query<GetCustomerOfUserQuery, GetCustomerOfUserQueryVariables>(
+      'getCustomerOfUser',
+      (req, res, ctx) => res(ctx.data(createResponse(UserOfCustomerResponse))),
+    ),
+  )
+);
+
+// eslint-disable-next-line
+export const GetUsersReponse: GetUsersQuery = JSON.parse('{"customer":{"id":"cl6lv12mz0011ppoilkt27l8w","users":[{"id":"cl6luytmn00008qoiqtzdp4g0","firstName":"Daan","lastName":"Helsloot","role":{"id":"cl6lv12mz0018ppoivrfrj49o","name":"Admin","__typename":"RoleType"},"__typename":"UserType"}],"__typename":"Customer"}}')
+
+export const mockGetUsers = (
+  createResponse: (res: GetUsersQuery) => GetUsersQuery,
+) => (
+  server.use(
+    graphql.query<GetUsersQuery, GetUsersQueryVariables>(
+      'getUsers',
+      (req, res, ctx) => res(ctx.data(createResponse(GetUsersReponse))),
+    ),
+  )
+);
+
+// eslint-disable-next-line
+export const GetMeResponse: MeQuery = JSON.parse('{"me":{"id":"cl6luytmn00008qoiqtzdp4g0","email":"daan@haas.live","firstName":"Daan","lastName":"Helsloot","phone":null,"globalPermissions":[],"userCustomers":[{"isActive":true,"customer":{"id":"cl6lv12mz0011ppoilkt27l8w","name":"SPORT_ENG Workspace","slug":"sport_eng-mw0pipz","__typename":"Customer"},"role":{"name":"Admin","permissions":["CAN_VIEW_USERS","CAN_ADD_USERS","CAN_BUILD_DIALOGUE","CAN_CREATE_TRIGGERS","CAN_DELETE_DIALOGUE","CAN_DELETE_TRIGGERS","CAN_EDIT_DIALOGUE","CAN_EDIT_USERS","CAN_DELETE_USERS","CAN_DELETE_WORKSPACE","CAN_EDIT_WORKSPACE","CAN_VIEW_DIALOGUE","CAN_VIEW_DIALOGUE_ANALYTICS","CAN_RESET_WORKSPACE_DATA","CAN_ASSIGN_USERS_TO_DIALOGUE","CAN_GENERATE_WORKSPACE_FROM_CSV"],"__typename":"RoleType"},"__typename":"UserCustomer"}],"__typename":"UserType"}}')
+
+export const mockMe = (
+  createResponse: (res: MeQuery) => MeQuery,
+) => (
+  server.use(
+    graphql.query<MeQuery, MeQueryVariables>(
+      'me',
+      (req, res, ctx) => res(ctx.data(createResponse(GetMeResponse))),
+    ),
+  )
+);
+
