@@ -1,8 +1,6 @@
-import { createMemoryHistory } from 'history';
-import { debug } from 'jest-preview';
 import { fireEvent, render, waitFor } from 'test';
 import { parse } from 'query-string';
-import { screen, within } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 
@@ -139,7 +137,7 @@ describe('DialogueOverview', () => {
             ...res.customer?.dialogueConnection,
             dialogues: res.customer?.dialogueConnection?.dialogues,
           }
-        }
+        } as any,
       });
     });
 
@@ -185,7 +183,7 @@ describe('DialogueOverview', () => {
             ...res.customer?.dialogueConnection,
             dialogues: res.customer?.dialogueConnection?.dialogues,
           }
-        }
+        } as any,
       });
     });
 
@@ -226,7 +224,7 @@ describe('DialogueOverview', () => {
             ...res.customer?.dialogueConnection,
             dialogues: res.customer?.dialogueConnection?.dialogues,
           }
-        }
+        } as any,
       });
     });
 
