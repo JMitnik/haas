@@ -20,7 +20,7 @@ export const AssigneeAvatar = ({ assignee, index }: AssigneeAvatarProps) => {
       onOpenChange={setOpenTooltip}
     >
       <Tooltip.Trigger asChild>
-        <UI.Div style={{ transform: `translateX(${index * 8}px)` }}>
+        <UI.Div data-testid="assignee-avatar" style={{ transform: `translateX(${index * 8}px)` }}>
           <Avatar hasHover brand="off" name={`${assignee?.firstName}`} />
         </UI.Div>
       </Tooltip.Trigger>

@@ -64,11 +64,7 @@ const DialogueOverview = () => {
     },
   });
 
-  console.log('Users: ', userData?.customer?.users);
-
   const { canDeleteDialogue } = useAuth();
-
-  console.log('canDeleteDialogue: ', canDeleteDialogue);
 
   const filteredDialogues = activeDialogueConnection?.dialogues || [];
   const pageCount = activeDialogueConnection?.totalPages || 0;

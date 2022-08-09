@@ -75,11 +75,25 @@ export const seedBusinessTemplate = async () => {
     slug: `${templateType.toLowerCase()}-${cuid.slug()}`,
   }, template);
 
+  const managerUser = await userService.upsertUserByEmail({
+    email: `manager@${workspace.slug}.com`,
+    firstName: 'Manager',
+    lastName: 'Boy',
+  })
+
   const adminRole = workspace.roles.find((role) => role.type === RoleTypeEnum.ADMIN) as Role;
+  const managerRole = workspace.roles.find((role) => role.type === RoleTypeEnum.ADMIN) as Role;
+
   await userOfCustomerPrismaAdapter.connectUserToWorkspace(
     workspace.id,
     adminRole?.id as string,
     user.id,
+  );
+
+  await userOfCustomerPrismaAdapter.connectUserToWorkspace(
+    workspace.id,
+    managerRole?.id as string,
+    managerUser.id,
   );
 
   return generateWorkspaceService.generateDialoguesByTemplateLayers(

@@ -1,14 +1,18 @@
 import * as Dropdown from 'components/Common/Dropdown';
 import * as UI from '@haas/ui';
+import {
+  CheckIcon,
+  ChevronRightIcon,
+  Cross1Icon,
+  LockClosedIcon,
+  LockOpen2Icon,
+  Pencil1Icon
+} from '@radix-ui/react-icons';
 import { formatDistance } from 'date-fns';
 import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import React, { useContext, useRef, useState } from 'react';
 
-import * as Tooltip from 'components/Common/Tooltip/Tooltip';
-import { Avatar } from 'components/Common/Avatar';
-import { Check, Edit } from 'react-feather';
-import { CheckIcon, ChevronRightIcon, Cross1Icon, LockClosedIcon, LockOpen2Icon, Pencil1Icon } from '@radix-ui/react-icons';
 import {
   ContextMenu,
   ContextMenuCheckboxItem,
@@ -35,12 +39,12 @@ import { ReactComponent as NLFlag } from 'assets/icons/flags/flag-nl.svg';
 import { ShowMoreButton } from 'components/Common/ShowMoreButton';
 import { ThemeContext } from 'styled-components';
 import { useCustomer } from 'providers/CustomerProvider';
-import { useMenu } from 'components/Common/Menu/useMenu';
 import { useNavigator } from 'hooks/useNavigator';
 import { useToast } from 'hooks/useToast';
 import { useUser } from 'providers/UserProvider';
 import getLocale from 'utils/getLocale';
 import useAuth from 'hooks/useAuth';
+
 import { AssigneeAvatar } from './AssigneeAvatar';
 
 interface DialogueCardProps {
