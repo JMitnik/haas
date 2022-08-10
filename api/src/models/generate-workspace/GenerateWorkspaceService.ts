@@ -273,6 +273,7 @@ class GenerateWorkspaceService {
     const { uploadedCsv, workspaceSlug, workspaceTitle, type, managerCsv, isDemo } = input;
 
     const template = getTemplate(type);
+
     const workspace = await this.customerPrismaAdapter.createWorkspace({
       name: workspaceTitle,
       primaryColour: '',
