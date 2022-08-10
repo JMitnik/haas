@@ -12,7 +12,7 @@ import { NavLink } from 'react-router-dom';
 import { PatternCircles } from '@visx/pattern';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { DateFormat, useDate } from 'hooks/useDate';
 import { ProgressCircle } from 'components/Analytics/WorkspaceGrid/SummaryPane/ProgressCircle';
@@ -30,9 +30,20 @@ import { useNavigator } from 'hooks/useNavigator';
 
 import { ShareDialogue } from './ShareDialogue';
 import { TopSubNavBarContainer } from './TopSubNavBar.styles';
+import useAuth from 'hooks/useAuth';
 
 const Content = styled(Popover.Content)`
   transform-origin: var(--radix-popover-content-transform-origin);
+`;
+
+const ToggleableNavItem = styled(UI.Span) <{ isDisabled?: boolean }>`
+  ${({ isDisabled }) => css`
+    ${isDisabled && css`
+      opacity: 0.3;
+      pointer-events: none;
+      cursor: not-allowed;
+    `}
+  `}
 `;
 
 export const DialogueTopNavBar = () => {
@@ -42,8 +53,16 @@ export const DialogueTopNavBar = () => {
   const { formatFractionToPercentage } = useFormatter();
   const { getNWeekAgo, format, getTomorrow } = useDate();
   const [isShareDialogueOpen, setIsShareDialogueOpen] = useState(false);
+  const { canBuildDialogues, canEditDialogue } = useAuth();
 
-  const { customerSlug, getDialogueViewPath, getDialogueFeedbackOverviewPath } = useNavigator();
+  const {
+    customerSlug,
+    getDialogueViewPath,
+    getDialogueCTAOverviewPath,
+    getDialogueFeedbackOverviewPath,
+    getDialogueBuilderViewPath,
+    getDialogueConfigViewPath,
+  } = useNavigator();
 
   const { data } = useGetDialogueLayoutDetailsQuery({
     fetchPolicy: 'no-cache',
@@ -65,6 +84,9 @@ export const DialogueTopNavBar = () => {
   const shareUrl = `https://client.haas.live/${customerSlug}/${activeDialogue?.slug}`;
   const overviewPath = getDialogueViewPath(customerSlug, activeDialogue?.slug as string) || '';
   const feedbackOverviewPath = getDialogueFeedbackOverviewPath(customerSlug, activeDialogue?.slug as string) || '';
+  const ctaOverviewPath = getDialogueCTAOverviewPath(customerSlug, activeDialogue?.slug as string) || '';
+  const dialogueBuilderViewPath = getDialogueBuilderViewPath(customerSlug, activeDialogue?.slug as string) || '';
+  const dialogueConfigViewPath = getDialogueConfigViewPath(customerSlug, activeDialogue?.slug as string) || '';
 
   return (
     <TopSubNavBarContainer>
@@ -153,17 +175,36 @@ export const DialogueTopNavBar = () => {
             </UI.Flex>
 
             <UI.Div pt={4}>
-              <UI.Span>
+              <ToggleableNavItem>
                 <NavLink exact to={overviewPath}>
                   {t('overview')}
                 </NavLink>
-              </UI.Span>
+              </ToggleableNavItem>
 
-              <UI.Span>
+              <ToggleableNavItem>
                 <NavLink to={`${feedbackOverviewPath}?dialogueIds=${activeDialogue?.id}`}>
                   {t('interactions')}
                 </NavLink>
-              </UI.Span>
+              </ToggleableNavItem>
+
+              <ToggleableNavItem isDisabled={!canBuildDialogues}>
+                <NavLink exact to={ctaOverviewPath}>
+                  {t('views:cta_view')}
+                </NavLink>
+              </ToggleableNavItem>
+
+              <ToggleableNavItem isDisabled={!canBuildDialogues}>
+                <NavLink exact to={dialogueBuilderViewPath}>
+                  {t('views:builder_view')}
+                </NavLink>
+              </ToggleableNavItem>
+
+              <ToggleableNavItem isDisabled={!canEditDialogue}>
+                <NavLink exact to={dialogueConfigViewPath}>
+                  {t('views:configurations')}
+                </NavLink>
+              </ToggleableNavItem>
+
             </UI.Div>
           </UI.Div>
         </UI.Flex>

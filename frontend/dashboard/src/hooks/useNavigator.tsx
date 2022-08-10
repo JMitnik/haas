@@ -7,6 +7,8 @@ export const ROUTES = {
   DIALOGUES_VIEW: '/dashboard/b/:customerSlug/d',
   DIALOGUE_ROOT: '/dashboard/b/:customerSlug/d/:dialogueSlug',
   DIALOGUE_FEEDBACK_OVERVIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/feedback',
+  DIALOGUE_CTA_OVERVIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/actions',
+  DIALOGUE_CONFIG_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/edit',
   INTERACTIONS_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/interactions',
   DASHBOARD_VIEW: '/dashboard/b/:customerSlug/dashboard',
   INTERACTION_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/interactions/:interactionId',
@@ -37,7 +39,7 @@ export const useNavigator = () => {
   const { customerSlug, dialogueSlug, campaignId } = useParams<DashboardParams>();
 
   const dashboardScopeMatch = useRouteMatch<{ customerSlug: string }>({ path: ROUTES.DASHBOARD_VIEW });
-  const dialogueScopeMatch = useRouteMatch<{ dialogueSlug: string }>({ path: ROUTES.DIALOGUE_ROOT, exact: true });
+  const dialogueScopeMatch = useRouteMatch<{ dialogueSlug: string }>({ path: ROUTES.DIALOGUE_ROOT });
   const dialogueScopeFeedbackMatch = useRouteMatch<{ dialogueSlug: string }>(
     { path: ROUTES.DIALOGUE_FEEDBACK_OVERVIEW },
   );
@@ -200,6 +202,24 @@ export const useNavigator = () => {
       ROUTES.DIALOGUE_FEEDBACK_OVERVIEW, { customerSlug: currCustomerSlug, dialogueSlug: currDialogueSlug },
     );
 
+  const getDialogueCTAOverviewPath = (currCustomerSlug: string, currDialogueSlug: string) => currDialogueSlug
+    && currCustomerSlug
+    && generatePath(
+      ROUTES.DIALOGUE_CTA_OVERVIEW, { customerSlug: currCustomerSlug, dialogueSlug: currDialogueSlug },
+    );
+
+  const getDialogueBuilderViewPath = (currCustomerSlug: string, currDialogueSlug: string) => currDialogueSlug
+    && currCustomerSlug
+    && generatePath(
+      ROUTES.DIALOGUE_BUILDER_OVERVIEW, { customerSlug: currCustomerSlug, dialogueSlug: currDialogueSlug },
+    );
+
+  const getDialogueConfigViewPath = (currCustomerSlug: string, currDialogueSlug: string) => currDialogueSlug
+    && currCustomerSlug
+    && generatePath(
+      ROUTES.DIALOGUE_CONFIG_VIEW, { customerSlug: currCustomerSlug, dialogueSlug: currDialogueSlug },
+    );
+
   const dialoguePath = () => dialogueSlug && customerSlug && generatePath(
     ROUTES.DIALOGUE_ROOT, { customerSlug, dialogueSlug },
   );
@@ -215,6 +235,9 @@ export const useNavigator = () => {
   const goTo = (path: string) => history.push(path);
 
   return {
+    getDialogueConfigViewPath,
+    getDialogueBuilderViewPath,
+    getDialogueCTAOverviewPath,
     getDialogueFeedbackOverviewPath,
     getDialogueViewPath,
     goToDialogueFeedbackOverview,

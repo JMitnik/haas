@@ -45,8 +45,6 @@ export const WorkspaceNav = ({ customerSlug }: { customerSlug: string }) => {
     canEditCustomer,
     canCreateTriggers,
     canViewCampaigns,
-    canBuildDialogues,
-    canEditDialogue,
   } = useAuth();
   const { dialogueMatch } = useNavigator();
   const dialogueSlug = dialogueMatch?.params?.dialogueSlug;
@@ -64,50 +62,9 @@ export const WorkspaceNav = ({ customerSlug }: { customerSlug: string }) => {
           <NavItem
             isSubchildActive={!!dialogueSlug}
             to={`/dashboard/b/${customerSlug}/d`}
-            renderSibling={(
-              <>
-                {dialogueMatch && (
-                  <motion.div>
-                    <LS.SubNav>
-                      <LS.SubNavItem>
-                        <NavLink exact strict to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}`}>
-                          {t('views:dialogue_view')}
-                        </NavLink>
-                      </LS.SubNavItem>
-                      <LS.SubNavItem>
-                        <NavLink to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions`}>
-                          {t('views:interactions_view')}
-                        </NavLink>
-                      </LS.SubNavItem>
-                      <LS.SubNavItem isDisabled={!canBuildDialogues}>
-                        <NavLink to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/actions`}>
-                          {t('views:cta_view')}
-                        </NavLink>
-                      </LS.SubNavItem>
-                      <LS.SubNavItem isDisabled={!canBuildDialogues}>
-                        <NavLink to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/builder`}>
-                          {t('views:builder_view')}
-                        </NavLink>
-                      </LS.SubNavItem>
-                      <LS.SubNavItem isDisabled={!canEditDialogue}>
-                        <NavLink to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/edit`}>
-                          {t('views:configurations')}
-                        </NavLink>
-                      </LS.SubNavItem>
-                    </LS.SubNav>
-                  </motion.div>
-                )}
-              </>
-            )}
           >
             <SurveyIcon />
             {t('teams')}
-
-            {dialogueMatch && (
-              <UI.Icon ml={1}>
-                <ChevronDown className="chevron-down" fill="none" />
-              </UI.Icon>
-            )}
           </NavItem>
           <NavItem isDisabled={!canViewUsers} to={`/dashboard/b/${customerSlug}/users`}>
             <UsersIcon />
