@@ -796,7 +796,7 @@ export interface NexusGenEnums {
   DialogueImpactScoreType: "AVERAGE"
   DialogueTemplateType: prisma.DialogueTemplateType
   FormNodeFieldTypeEnum: "contacts" | "email" | "longText" | "number" | "phoneNumber" | "shortText" | "url"
-  FormNodePageType: prisma.FormNodePageType
+  FormNodePageType: "CONTACT_PICKER" | "INPUT_DATA"
   JobProcessLocationType: prisma.JobProcessLocationType
   JobStatusType: prisma.JobStatusType
   LanguageEnumType: "DUTCH" | "ENGLISH" | "GERMAN"
@@ -1101,7 +1101,15 @@ export interface NexusGenObjects {
     url?: string | null; // String
   }
   FormNodeField: prisma.FormNodeField;
-  FormNodePage: prisma.FormNodePage;
+  FormNodePage: { // root type
+    fields?: NexusGenRootTypes['FormNodeField'][] | null; // [FormNodeField!]
+    header?: string | null; // String
+    helper?: string | null; // String
+    id: string; // String!
+    position: number; // Int!
+    subHelper?: string | null; // String
+    type: NexusGenEnums['FormNodePageType']; // FormNodePageType!
+  }
   FormNodeType: { // root type
     fields?: NexusGenRootTypes['FormNodeField'][] | null; // [FormNodeField!]
     helperText?: string | null; // String

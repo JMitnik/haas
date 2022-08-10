@@ -153,7 +153,7 @@ export const FormNodeField = objectType({
 
 export const FormNodePageType = enumType({
   name: 'FormNodePageType',
-  members: ['INPUT_DATA', 'SUBMIT_OVERVIEW', 'CONTACT_PICKER'],
+  members: ['INPUT_DATA', 'CONTACT_PICKER'],
 })
 
 export const FormNodePage = objectType({

@@ -57,7 +57,7 @@ const mapLeafs = (leafs: any) => leafs?.map((leaf: any) => {
       type: 'FORM',
       icon: RegisterIcon,
       form: {
-        pages: leaf.form.pages,
+        pages: leaf.form.pages || [],
         fields: leaf.form.fields.map((field: any) => ({
           ...field,
           contact: {

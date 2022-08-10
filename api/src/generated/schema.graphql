@@ -1051,7 +1051,6 @@ type FormNodePage {
 enum FormNodePageType {
   CONTACT_PICKER
   INPUT_DATA
-  SUBMIT_OVERVIEW
 }
 
 type FormNodeType {

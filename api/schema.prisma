@@ -166,27 +166,26 @@ model Dialogue {
   @@unique([slug, customerId], map: "Dialogue.slug_customerId_unique")
 }
 
-enum FormNodePageType {
+enum FormNodeStepType {
   CONTACT_PICKER
-  INPUT_DATA
-  SUBMIT_OVERVIEW
+  GENERIC_FIELDS
 }
 
-model FormNodePage {
+model FormNodeStep {
   id        String           @id @default(cuid())
   createdAt DateTime?        @default(now())
   updatedAt DateTime?        @updatedAt
-  type      FormNodePageType @default(INPUT_DATA)
+  type      FormNodeStepType @default(GENERIC_FIELDS)
 
   header    String
   helper    String
   subHelper String
 
-  position   Int // Determines in which order pages are shown
+  position   Int // Determines in which order steps are shown
   formNodeId String
 
   fields   FormNodeField[]
-  FormNode FormNode        @relation(fields: [formNodeId], references: [id])
+  formNode FormNode        @relation(fields: [formNodeId], references: [id])
 }
 
 model FormNodeField {
@@ -200,15 +199,15 @@ model FormNodeField {
   formNodeId             String?
   FormNode               FormNode?                @relation(fields: [formNodeId], references: [id])
   FormNodeFieldEntryData FormNodeFieldEntryData[]
-  FormNodePage           FormNodePage?            @relation(fields: [formNodePageId], references: [id])
-  formNodePageId         String?
+  formNodeStep           FormNodeStep?            @relation(fields: [formNodeStepId], references: [id])
+  formNodeStepId         String?
 }
 
 model FormNode {
   id           String          @id @default(cuid())
   helperText   String?
   createdAt    DateTime        @default(now())
-  pages        FormNodePage[]
+  steps        FormNodeStep[]
   fields       FormNodeField[]
   QuestionNode QuestionNode[]
 }
