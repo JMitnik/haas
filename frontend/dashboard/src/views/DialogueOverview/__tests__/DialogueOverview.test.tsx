@@ -21,7 +21,7 @@ describe('DialogueOverview', () => {
   test('Add dialogue button not available when permission not available', async () => {
     mockCustomerOfUser((res) => {
       const permissions = res.UserOfCustomer?.role?.permissions?.filter(
-        (permission) => permission !== SystemPermission.CanDeleteDialogue
+        (permission) => permission !== SystemPermission.CanDeleteDialogue,
       ) as SystemPermission[];
       return ({
         ...res,
@@ -29,9 +29,9 @@ describe('DialogueOverview', () => {
           ...res.UserOfCustomer,
           role: {
             ...res.UserOfCustomer?.role,
-            permissions
-          }
-        }
+            permissions,
+          },
+        },
       });
     });
     mockQueryDialogueConnection((res) => ({ ...res }));
@@ -58,7 +58,7 @@ describe('DialogueOverview', () => {
 
     expect(screen.getByDisplayValue((text) => text.toLowerCase().includes('link-fetch'))).toBeInTheDocument();
     expect(screen.queryByDisplayValue(
-      (text) => text.toLowerCase().includes('link-fetch?workspaceId=undefined')
+      (text) => text.toLowerCase().includes('link-fetch?workspaceId=undefined'),
     )).not.toBeInTheDocument();
   });
 
@@ -123,9 +123,9 @@ describe('DialogueOverview', () => {
             id: 'cl6lz9jha0067gxoi5kk40mbd',
             firstName: 'Manager',
             lastName: 'Boy',
-            __typename: 'UserType'
-          }
-        ]
+            __typename: 'UserType',
+          },
+        ],
       };
 
       res.customer?.dialogueConnection?.dialogues?.splice(0, 1, adjustedDialogue as any);
@@ -136,7 +136,7 @@ describe('DialogueOverview', () => {
           dialogueConnection: {
             ...res.customer?.dialogueConnection,
             dialogues: res.customer?.dialogueConnection?.dialogues,
-          }
+          },
         } as any,
       });
     });
@@ -169,9 +169,9 @@ describe('DialogueOverview', () => {
             id: 'cl6lz9jha0067gxoi5kk40mbd',
             firstName: 'Manager',
             lastName: 'Boy',
-            __typename: 'UserType'
-          }
-        ]
+            __typename: 'UserType',
+          },
+        ],
       };
 
       res.customer?.dialogueConnection?.dialogues?.splice(0, 1, adjustedDialogue as any);
@@ -182,7 +182,7 @@ describe('DialogueOverview', () => {
           dialogueConnection: {
             ...res.customer?.dialogueConnection,
             dialogues: res.customer?.dialogueConnection?.dialogues,
-          }
+          },
         } as any,
       });
     });
@@ -198,7 +198,7 @@ describe('DialogueOverview', () => {
     expect(privateBadge).toBeInTheDocument();
   });
 
-  test('Can make dialogue only accessible for assignees', async () => {
+  test('Can delete dialogue from overview', async () => {
     mockCustomerOfUser((res) => ({ ...res }));
     mockQueryDialogueConnection((res) => {
       const adjustedDialogue = {
@@ -210,9 +210,9 @@ describe('DialogueOverview', () => {
             id: 'cl6lz9jha0067gxoi5kk40mbd',
             firstName: 'Manager',
             lastName: 'Boy',
-            __typename: 'UserType'
-          }
-        ]
+            __typename: 'UserType',
+          },
+        ],
       };
 
       res.customer?.dialogueConnection?.dialogues?.splice(0, 1, adjustedDialogue as any);
@@ -223,7 +223,7 @@ describe('DialogueOverview', () => {
           dialogueConnection: {
             ...res.customer?.dialogueConnection,
             dialogues: res.customer?.dialogueConnection?.dialogues,
-          }
+          },
         } as any,
       });
     });
@@ -242,8 +242,8 @@ describe('DialogueOverview', () => {
         dialogueConnection: {
           ...res.customer?.dialogueConnection,
           dialogues: res.customer?.dialogueConnection?.dialogues?.filter((dialogue) => dialogue?.title !== 'Available'),
-        }
-      }
+        },
+      },
     }) as any);
 
     const publicBadges = await screen.findAllByText((text) => text.toLowerCase().includes('public'));
