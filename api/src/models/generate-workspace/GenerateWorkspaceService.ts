@@ -83,7 +83,6 @@ class GenerateWorkspaceService {
     generateData: boolean = false,
   ) {
     const mappedDialogueInputData = generateCreateDialogueDataByTemplateLayers(templateType);
-    console.log('mappedDialogueInputData: ', mappedDialogueInputData);
 
     for (let i = 0; i < mappedDialogueInputData.length; i++) {
       const { slug, title } = mappedDialogueInputData[i];
