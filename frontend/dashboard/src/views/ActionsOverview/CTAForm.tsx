@@ -145,7 +145,7 @@ const CTAForm = ({
     customerSlug: string, dialogueSlug: string, questionId?: string
   }>();
 
-  console.log('Form node fields: ', formNode?.fields);
+  console.log('Form node pages: ', formNode?.pages);
 
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
@@ -158,6 +158,7 @@ const CTAForm = ({
       formNode: {
         id: formNode?.id,
         helperText: formNode?.helperText || '',
+        pages: formNode?.pages,
         fields: formNode?.fields?.map((field: any) => ({
           id: field.id,
           label: field.label,

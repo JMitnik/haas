@@ -796,6 +796,7 @@ export interface NexusGenEnums {
   DialogueImpactScoreType: "AVERAGE"
   DialogueTemplateType: prisma.DialogueTemplateType
   FormNodeFieldTypeEnum: "contacts" | "email" | "longText" | "number" | "phoneNumber" | "shortText" | "url"
+  FormNodePageType: prisma.FormNodePageType
   JobProcessLocationType: prisma.JobProcessLocationType
   JobStatusType: prisma.JobStatusType
   LanguageEnumType: "DUTCH" | "ENGLISH" | "GERMAN"
@@ -1100,10 +1101,12 @@ export interface NexusGenObjects {
     url?: string | null; // String
   }
   FormNodeField: prisma.FormNodeField;
+  FormNodePage: prisma.FormNodePage;
   FormNodeType: { // root type
     fields?: NexusGenRootTypes['FormNodeField'][] | null; // [FormNodeField!]
     helperText?: string | null; // String
     id?: string | null; // String
+    pages?: NexusGenRootTypes['FormNodePage'][] | null; // [FormNodePage!]
   }
   HealthScore: { // root type
     negativeResponseCount: number; // Int!
@@ -1807,10 +1810,20 @@ export interface NexusGenFieldTypes {
     position: number | null; // Int
     type: NexusGenEnums['FormNodeFieldTypeEnum']; // FormNodeFieldTypeEnum!
   }
+  FormNodePage: { // field return type
+    fields: NexusGenRootTypes['FormNodeField'][] | null; // [FormNodeField!]
+    header: string | null; // String
+    helper: string | null; // String
+    id: string; // String!
+    position: number; // Int!
+    subHelper: string | null; // String
+    type: NexusGenEnums['FormNodePageType']; // FormNodePageType!
+  }
   FormNodeType: { // field return type
     fields: NexusGenRootTypes['FormNodeField'][] | null; // [FormNodeField!]
     helperText: string | null; // String
     id: string | null; // String
+    pages: NexusGenRootTypes['FormNodePage'][] | null; // [FormNodePage!]
   }
   HealthScore: { // field return type
     negativeResponseCount: number; // Int!
@@ -2697,10 +2710,20 @@ export interface NexusGenFieldTypeNames {
     position: 'Int'
     type: 'FormNodeFieldTypeEnum'
   }
+  FormNodePage: { // field return type name
+    fields: 'FormNodeField'
+    header: 'String'
+    helper: 'String'
+    id: 'String'
+    position: 'Int'
+    subHelper: 'String'
+    type: 'FormNodePageType'
+  }
   FormNodeType: { // field return type name
     fields: 'FormNodeField'
     helperText: 'String'
     id: 'String'
+    pages: 'FormNodePage'
   }
   HealthScore: { // field return type name
     negativeResponseCount: 'Int'

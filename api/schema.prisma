@@ -166,6 +166,29 @@ model Dialogue {
   @@unique([slug, customerId], map: "Dialogue.slug_customerId_unique")
 }
 
+enum FormNodePageType {
+  CONTACT_PICKER
+  INPUT_DATA
+  SUBMIT_OVERVIEW
+}
+
+model FormNodePage {
+  id        String           @id @default(cuid())
+  createdAt DateTime?        @default(now())
+  updatedAt DateTime?        @updatedAt
+  type      FormNodePageType @default(INPUT_DATA)
+
+  header    String
+  helper    String
+  subHelper String
+
+  position   Int // Determines in which order pages are shown
+  formNodeId String
+
+  fields   FormNodeField[]
+  FormNode FormNode        @relation(fields: [formNodeId], references: [id])
+}
+
 model FormNodeField {
   id                     String                   @id @default(cuid())
   label                  String
@@ -177,12 +200,15 @@ model FormNodeField {
   formNodeId             String?
   FormNode               FormNode?                @relation(fields: [formNodeId], references: [id])
   FormNodeFieldEntryData FormNodeFieldEntryData[]
+  FormNodePage           FormNodePage?            @relation(fields: [formNodePageId], references: [id])
+  formNodePageId         String?
 }
 
 model FormNode {
   id           String          @id @default(cuid())
   helperText   String?
   createdAt    DateTime        @default(now())
+  pages        FormNodePage[]
   fields       FormNodeField[]
   QuestionNode QuestionNode[]
 }
@@ -764,16 +790,16 @@ model AutomationActionChannel {
 }
 
 model AutomationAction {
-  id                    String                    @id @default(cuid())
-  createdAt             DateTime                  @default(now())
-  updatedAt             DateTime?                 @updatedAt
-  type                  AutomationActionType
+  id        String               @id @default(cuid())
+  createdAt DateTime             @default(now())
+  updatedAt DateTime?            @updatedAt
+  type      AutomationActionType
 
   // TODO: What is APIKey for again?
-  apiKey                String?
+  apiKey String?
 
   // TODO: What is endpoint again?
-  endpoint              String?
+  endpoint String?
 
   // The channels defines the means of outputting the actions (slack, etc)
   channels              AutomationActionChannel[]
@@ -816,7 +842,7 @@ model AutomationScheduled {
   automations Automation[]
 
   // Which actions are related to this scheduled automation-type
-  actions     AutomationAction[]
+  actions AutomationAction[]
 }
 
 model Automation {
@@ -828,7 +854,7 @@ model Automation {
   description String?
   type        AutomationType
   workspaceId String
-  workspace   Customer @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspace   Customer       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   // Type A: Trigger automation (if X happens, do Y)
   automationTriggerId String?

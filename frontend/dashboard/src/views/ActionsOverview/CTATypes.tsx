@@ -38,6 +38,27 @@ export interface FormDataProps {
   formNode?: {
     id?: string;
     helperText?: string;
+    pages: {
+      header?: string;
+      helper?: string;
+      subHelper?: string;
+      type?: string;
+      fields: {
+        id?: string;
+        placeholder: string;
+        label: string;
+        type: string;
+        isRequired: boolean;
+        position: number;
+        contact?: {
+          contacts: {
+            label: string;
+            value: string;
+            type: string;
+          }[]
+        }
+      }[];
+    }[];
     fields: {
       id?: string;
       placeholder: string;

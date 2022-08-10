@@ -151,6 +151,26 @@ export const FormNodeField = objectType({
   },
 });
 
+export const FormNodePageType = enumType({
+  name: 'FormNodePageType',
+  members: ['INPUT_DATA', 'SUBMIT_OVERVIEW', 'CONTACT_PICKER'],
+})
+
+export const FormNodePage = objectType({
+  name: 'FormNodePage',
+  definition(t) {
+    t.nonNull.string('id');
+    t.nonNull.int('position');
+
+    t.string('header');
+    t.string('helper');
+    t.string('subHelper');
+
+    t.nonNull.field('type', { type: FormNodePageType });
+    t.list.nonNull.field('fields', { type: FormNodeField });
+  },
+})
+
 export const FormNodeType = objectType({
   name: 'FormNodeType',
 
@@ -159,6 +179,7 @@ export const FormNodeType = objectType({
     t.string('helperText', { nullable: true });
 
     t.list.nonNull.field('fields', { type: FormNodeField });
+    t.list.nonNull.field('pages', { type: FormNodePage });
   },
 });
 

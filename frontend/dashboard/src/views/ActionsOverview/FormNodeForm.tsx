@@ -334,6 +334,14 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
     keyName: 'fieldIndex',
   });
 
+  const pagesArray = useFieldArray({
+    control: form.control,
+    name: 'formNode.pages',
+    keyName: 'fieldIndex',
+  });
+
+  console.log('Pages array: ', pagesArray);
+
   const handleNewField = () => {
     append(appendNewField(fields.length + 1));
   };

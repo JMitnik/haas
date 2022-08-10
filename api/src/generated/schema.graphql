@@ -1038,10 +1038,27 @@ input FormNodeInputType {
   id: String
 }
 
+type FormNodePage {
+  fields: [FormNodeField!]
+  header: String
+  helper: String
+  id: String!
+  position: Int!
+  subHelper: String
+  type: FormNodePageType!
+}
+
+enum FormNodePageType {
+  CONTACT_PICKER
+  INPUT_DATA
+  SUBMIT_OVERVIEW
+}
+
 type FormNodeType {
   fields: [FormNodeField!]
   helperText: String
   id: String
+  pages: [FormNodePage!]
 }
 
 """Generate savales documents"""

@@ -143,7 +143,6 @@ export type AutomationConditionBuilderModel = {
   childConditionBuilderId?: Maybe<Scalars['String']>;
   type?: Maybe<AutomationConditionBuilderType>;
   conditions?: Maybe<Array<Maybe<AutomationConditionModel>>>;
-  childConditionBuilder?: Maybe<AutomationConditionBuilderModel>;
 };
 
 export enum AutomationConditionBuilderType {
@@ -1199,6 +1198,7 @@ export type FormNodeField = {
   isRequired?: Maybe<Scalars['Boolean']>;
   position?: Maybe<Scalars['Int']>;
   placeholder?: Maybe<Scalars['String']>;
+  /** List of possible contact points for a form-node. */
   contacts?: Maybe<Array<Maybe<UserType>>>;
 };
 
@@ -1229,11 +1229,29 @@ export type FormNodeInputType = {
   fields?: Maybe<Array<FormNodeFieldInput>>;
 };
 
+export type FormNodePage = {
+  __typename?: 'FormNodePage';
+  id: Scalars['String'];
+  position: Scalars['Int'];
+  header?: Maybe<Scalars['String']>;
+  helper?: Maybe<Scalars['String']>;
+  subHelper?: Maybe<Scalars['String']>;
+  type: FormNodePageType;
+  fields?: Maybe<Array<FormNodeField>>;
+};
+
+export enum FormNodePageType {
+  InputData = 'INPUT_DATA',
+  SubmitOverview = 'SUBMIT_OVERVIEW',
+  ContactPicker = 'CONTACT_PICKER'
+}
+
 export type FormNodeType = {
   __typename?: 'FormNodeType';
   id?: Maybe<Scalars['String']>;
   helperText?: Maybe<Scalars['String']>;
   fields?: Maybe<Array<FormNodeField>>;
+  pages?: Maybe<Array<FormNodePage>>;
 };
 
 /** Generate savales documents */
@@ -2077,12 +2095,6 @@ export type PermssionType = {
   name?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   customer?: Maybe<Customer>;
-};
-
-export type PickerEntryInput = {
-  label: Scalars['String'];
-  value: Scalars['String'];
-  type: Scalars['String'];
 };
 
 export type PreviewDataType = {
@@ -3981,56 +3993,6 @@ export type GetAutomationQuery = (
           { __typename?: 'QuestionNode' }
           & Pick<QuestionNode, 'id' | 'title' | 'type'>
         )> }
-      )>, conditionBuilder?: Maybe<(
-        { __typename?: 'AutomationConditionBuilderModel' }
-        & Pick<AutomationConditionBuilderModel, 'id' | 'type' | 'childConditionBuilderId'>
-        & { childConditionBuilder?: Maybe<(
-          { __typename?: 'AutomationConditionBuilderModel' }
-          & Pick<AutomationConditionBuilderModel, 'id' | 'type'>
-          & { conditions?: Maybe<Array<Maybe<(
-            { __typename?: 'AutomationConditionModel' }
-            & Pick<AutomationConditionModel, 'id' | 'scope' | 'operator'>
-            & { operands?: Maybe<Array<Maybe<(
-              { __typename?: 'AutomationConditionOperandModel' }
-              & Pick<AutomationConditionOperandModel, 'id' | 'type' | 'numberValue' | 'textValue'>
-            )>>>, dialogueScope?: Maybe<(
-              { __typename?: 'DialogueConditionScopeModel' }
-              & Pick<DialogueConditionScopeModel, 'id' | 'aspect'>
-              & { aggregate?: Maybe<(
-                { __typename?: 'ConditionPropertyAggregate' }
-                & Pick<ConditionPropertyAggregate, 'id' | 'type' | 'latest'>
-              )> }
-            )>, questionScope?: Maybe<(
-              { __typename?: 'QuestionConditionScopeModel' }
-              & Pick<QuestionConditionScopeModel, 'id' | 'aspect'>
-              & { aggregate?: Maybe<(
-                { __typename?: 'ConditionPropertyAggregate' }
-                & Pick<ConditionPropertyAggregate, 'id' | 'type' | 'latest'>
-              )> }
-            )> }
-          )>>> }
-        )>, conditions?: Maybe<Array<Maybe<(
-          { __typename?: 'AutomationConditionModel' }
-          & Pick<AutomationConditionModel, 'id' | 'scope' | 'operator'>
-          & { operands?: Maybe<Array<Maybe<(
-            { __typename?: 'AutomationConditionOperandModel' }
-            & Pick<AutomationConditionOperandModel, 'id' | 'type' | 'numberValue' | 'textValue'>
-          )>>>, dialogueScope?: Maybe<(
-            { __typename?: 'DialogueConditionScopeModel' }
-            & Pick<DialogueConditionScopeModel, 'id' | 'aspect'>
-            & { aggregate?: Maybe<(
-              { __typename?: 'ConditionPropertyAggregate' }
-              & Pick<ConditionPropertyAggregate, 'id' | 'type' | 'latest'>
-            )> }
-          )>, questionScope?: Maybe<(
-            { __typename?: 'QuestionConditionScopeModel' }
-            & Pick<QuestionConditionScopeModel, 'id' | 'aspect'>
-            & { aggregate?: Maybe<(
-              { __typename?: 'ConditionPropertyAggregate' }
-              & Pick<ConditionPropertyAggregate, 'id' | 'type' | 'latest'>
-            )> }
-          )> }
-        )>>> }
       )> }
     )> }
   )> }
@@ -6330,73 +6292,6 @@ export const GetAutomationDocument = gql`
           type
         }
       }
-      conditionBuilder {
-        id
-        type
-        childConditionBuilderId
-        childConditionBuilder {
-          id
-          type
-          conditions {
-            id
-            scope
-            operator
-            operands {
-              id
-              type
-              numberValue
-              textValue
-            }
-            dialogueScope {
-              id
-              aspect
-              aggregate {
-                id
-                type
-                latest
-              }
-            }
-            questionScope {
-              id
-              aspect
-              aggregate {
-                id
-                type
-                latest
-              }
-            }
-          }
-        }
-        conditions {
-          id
-          scope
-          operator
-          operands {
-            id
-            type
-            numberValue
-            textValue
-          }
-          dialogueScope {
-            id
-            aspect
-            aggregate {
-              id
-              type
-              latest
-            }
-          }
-          questionScope {
-            id
-            aspect
-            aggregate {
-              id
-              type
-              latest
-            }
-          }
-        }
-      }
     }
   }
 }
@@ -7462,20 +7357,6 @@ export namespace GetAutomation {
   export type Event = (NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['event']>);
   export type Dialogue = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['event']>)['dialogue']>);
   export type Question = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['event']>)['question']>);
-  export type ConditionBuilder = (NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>);
-  export type ChildConditionBuilder = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['childConditionBuilder']>);
-  export type Conditions = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['childConditionBuilder']>)['conditions']>)[number]>;
-  export type Operands = NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['childConditionBuilder']>)['conditions']>)[number]>['operands']>)[number]>;
-  export type DialogueScope = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['childConditionBuilder']>)['conditions']>)[number]>['dialogueScope']>);
-  export type Aggregate = (NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['childConditionBuilder']>)['conditions']>)[number]>['dialogueScope']>)['aggregate']>);
-  export type QuestionScope = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['childConditionBuilder']>)['conditions']>)[number]>['questionScope']>);
-  export type _Aggregate = (NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['childConditionBuilder']>)['conditions']>)[number]>['questionScope']>)['aggregate']>);
-  export type _Conditions = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['conditions']>)[number]>;
-  export type _Operands = NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['conditions']>)[number]>['operands']>)[number]>;
-  export type _DialogueScope = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['conditions']>)[number]>['dialogueScope']>);
-  export type __Aggregate = (NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['conditions']>)[number]>['dialogueScope']>)['aggregate']>);
-  export type _QuestionScope = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['conditions']>)[number]>['questionScope']>);
-  export type ___Aggregate = (NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['conditions']>)[number]>['questionScope']>)['aggregate']>);
   export const Document = GetAutomationDocument;
 }
 
