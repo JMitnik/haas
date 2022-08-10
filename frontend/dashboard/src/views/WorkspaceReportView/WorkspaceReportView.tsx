@@ -10,6 +10,7 @@ import React from 'react';
 
 import { DateFormat, useDate } from 'hooks/useDate';
 import { ReactComponent as TrendingIcon } from 'assets/icons/icon-trending-up.svg';
+import { View } from 'layouts/View';
 import { addDays } from 'date-fns/esm';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useNavigator } from 'hooks/useNavigator';
@@ -68,18 +69,12 @@ export const WorkspaceReportView = ({ dateLabel }: ReportViewInput) => {
     type: withDefault(StringParam, 'weekly'),
   });
 
-  const queryInput = {
-    workspaceId: activeCustomer?.id as string,
-  };
-
-  console.log('Input for potential query: ', queryInput);
-
   const offsetDates = useOffset(
     filter.type as PeriodType,
   );
 
   return (
-    <>
+    <View documentTitle="Reports">
       <UI.ViewHead>
         <UI.Flex alignItems="center" justifyContent="space-between" width="100%">
           <UI.Flex alignItems="center">
@@ -107,7 +102,7 @@ export const WorkspaceReportView = ({ dateLabel }: ReportViewInput) => {
 
         </UI.Grid>
       </UI.ViewBody>
-    </>
+    </View>
   );
 };
 
