@@ -1,3 +1,3 @@
-export * from './Organization';
+export * from './OrganizationType';
 export * from './OrganizationLayer';
 export * from './OrganizationLayerType';
