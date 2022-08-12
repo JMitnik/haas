@@ -3,6 +3,7 @@ import { NexusGenInputs } from '../../generated/nexus';
 import { QuestionConditionProps } from '../questionnaire/Dialogue.types';
 
 export type FormNodeInput = NexusGenInputs['FormNodeInputType'];
+export type FormNodeStepInput = NexusGenInputs['FormNodeStepInput'];
 
 export enum DialogueTemplateType {
   BUSINESS_ENG = 'BUSINESS_ENG',

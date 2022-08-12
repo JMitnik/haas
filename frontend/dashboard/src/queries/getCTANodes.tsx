@@ -33,10 +33,12 @@ const getCTANodesOfDialogue = gql`
           form {
             id
             helperText
-            pages {
+            steps {
+              id
               header
               helper
               subHelper
+              position
               type
               fields {
                 id

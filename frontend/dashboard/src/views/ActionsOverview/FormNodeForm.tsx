@@ -14,7 +14,7 @@ import {
   Users,
 } from 'react-feather';
 import { AnimatePresence } from 'framer-motion';
-import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
+import { Controller, useFieldArray, useForm, useFormContext, useWatch } from 'react-hook-form';
 import { IllustrationCard } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
 import React, { useRef, useState } from 'react';
@@ -24,13 +24,13 @@ import { ReactComponent as FieldIll } from 'assets/images/undraw_form.svg';
 import { ReactComponent as SelectIll } from 'assets/images/undraw_select.svg';
 import useOnClickOutside from 'hooks/useClickOnOutside';
 
-import { CTANodeFormProps } from './CTATypes';
+import { FormNodeFieldTypeEnum } from 'types/generated-types';
+import { FormStepPreview } from './FormStepPreview';
+import { StepFormNodeFormFragment } from './StepNodeFormFragment';
 import FormNodeContactsFragment from './FormNodeContactFragment';
 
-type FormNodeFormProps = CTANodeFormProps;
-
 // TODO: Remove and place this in API or so
-enum TempFieldType {
+export enum TempFieldType {
   EMAIL = 'email',
   PHONE_NUMBER = 'phoneNumber',
   URL = 'url',
@@ -38,6 +38,7 @@ enum TempFieldType {
   LONG_TEXT = 'longText',
   NUMBER = 'number',
   CONTACTS = 'contacts',
+  GENERIC_FIELDS = 'GENERIC_FIELDS',
 }
 
 interface FieldProps {
@@ -117,7 +118,9 @@ interface FormNodePreviewProps {
   nrFields: number;
 }
 
-const FormNodePreview = ({ field, onMoveRight, onMoveLeft, onOpen, fieldIndex, nrFields }: FormNodePreviewProps) => {
+export const FormNodePreview = (
+  { field, onMoveRight, onMoveLeft, onOpen, fieldIndex, nrFields }: FormNodePreviewProps,
+) => {
   const fieldCategory = fieldMap.find((fieldItem) => fieldItem?.type === field?.type);
 
   const FieldIcon = fieldCategory?.icon || Feather;
@@ -183,7 +186,7 @@ interface FormNodeFieldFragmentProps {
   onDelete: () => void;
 }
 
-const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeFieldFragmentProps) => {
+export const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete, fieldIndex }: FormNodeFieldFragmentProps) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const { t } = useTranslation();
 
@@ -242,18 +245,18 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeF
             <UI.InputGrid>
               <UI.FormControl>
                 <UI.FormLabel htmlFor="label">{t('label')}</UI.FormLabel>
-                <UI.Input {...subform.register('label')} key={field.fieldIndex} />
+                <UI.Input {...subform.register('label')} />
               </UI.FormControl>
               <UI.FormControl>
                 <UI.FormLabel htmlFor="placeholder">{t('placeholder')}</UI.FormLabel>
-                <UI.Input {...subform.register('placeholder')} key={field.fieldIndex} />
+                <UI.Input {...subform.register('placeholder')} />
               </UI.FormControl>
               <UI.FormControl>
                 <UI.FormLabel htmlFor="isRequired">{t('is_required')}</UI.FormLabel>
                 <Controller
                   control={subform.control}
                   name="isRequired"
-                  defaultValue={field.isRequired}
+                  defaultValue={field?.isRequired}
                   render={({ field: { onBlur, onChange, value } }) => (
                     <UI.RadioButtons onBlur={onBlur} onChange={onChange} value={value}>
                       <UI.RadioButton
@@ -307,46 +310,38 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeF
   );
 };
 
-interface TempFieldProps {
-  label: string | null;
+interface TempStepProps {
   position: number;
-  type: TempFieldType | null;
-  isRequired: number;
-  contact: { contacts: any[] };
+  header: string;
+  fields: any[];
+  type: TempFieldType;
 }
 
-const appendNewField = (index: number): TempFieldProps => ({
-  label: null,
+const appendNewField = (index: number): TempStepProps => ({
   position: index,
-  type: null,
-  isRequired: 0,
-  contact: { contacts: [] },
+  type: TempFieldType.GENERIC_FIELDS,
+  header: '',
+  fields: [],
 });
 
-const FormNodeForm = ({ form }: FormNodeFormProps) => {
+const FormNodeForm = () => {
+  const form = useFormContext();
   const { t } = useTranslation();
-
-  const [openedField, setOpenedField] = useState<number | null>(null);
+  const [openedStep, setOpenedStep] = useState<number | null>(null);
 
   const { fields, append, move, remove } = useFieldArray({
     control: form.control,
-    name: 'formNode.fields',
+    name: 'formNode.steps',
     keyName: 'fieldIndex',
   });
-
-  const pagesArray = useFieldArray({
-    control: form.control,
-    name: 'formNode.pages',
-    keyName: 'fieldIndex',
-  });
-
-  console.log('Pages array: ', pagesArray);
 
   const handleNewField = () => {
     append(appendNewField(fields.length + 1));
   };
 
-  const formNodeFields = form.watch('formNode.fields', []);
+  const stepsFields = form.watch('formNode.steps');
+
+  console.log('Steps: ', stepsFields);
 
   return (
     <UI.FormSection id="form-node-form">
@@ -364,67 +359,45 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
           </UI.FormControl>
         </UI.Div>
         <UI.Div>
-          <UI.InputHeader>{t('about_fields_header')}</UI.InputHeader>
-          <UI.InputHelper>{t('about_fields_helper')}</UI.InputHelper>
           <UI.InputGrid>
-            <UI.Div>
-              <UI.Grid gridTemplateColumns="1fr 1fr">
-                {fields.map((field, index) => (
-                  <UI.Div position="relative" key={field.fieldIndex}>
-                    <AnimatePresence>
-                      <Modal.Root
-                        open={openedField === index}
-                        onClose={() => setOpenedField(null)}
-                        style={{ maxWidth: 1000 }}
-                      >
-                        <FormNodeFieldFragment
-                          onSubmit={(subForm: any) => {
-                            form.setValue(
-                              `formNode.fields.${index}`,
-                              {
-                                ...subForm,
-                                contact: {
-                                  contacts: subForm.contact?.contacts
-                                    ? [...subForm.contact.contacts]
-                                    : [],
-                                },
-                              },
-                              { shouldValidate: true, shouldDirty: true },
-                            );
-                            form.trigger();
-                          }}
-                          form={form}
-                          onClose={() => setOpenedField(null)}
-                          onDelete={() => remove(index)}
-                          field={formNodeFields[index]} // formNodeFields[index]
-                          fieldIndex={index}
-                          key={field.fieldIndex}
-                        />
-                      </Modal.Root>
-                    </AnimatePresence>
-
-                    <FormNodePreview
-                      fieldIndex={index}
-                      nrFields={fields.length}
-                      field={formNodeFields[index]}
-                      onOpen={() => setOpenedField(index)}
-                      onMoveLeft={() => move(index, Math.max(index - 1, 0))}
-                      onMoveRight={() => {
-                        move(index, Math.min(index + 1, fields.length - 1));
-                      }}
+            {fields?.map((field, index) => (
+              <UI.Div position="relative" key={field.fieldIndex}>
+                <AnimatePresence>
+                  <Modal.Root
+                    open={openedStep === index}
+                    onClose={() => setOpenedStep(null)}
+                    style={{ maxWidth: 1000 }}
+                  >
+                    <StepFormNodeFormFragment
+                      key={field.fieldIndex}
+                      position={index}
+                      step={stepsFields[index]}
+                      onSubmit={(subForm) => form.setValue(`formNode.steps.${index}`, { ...subForm })}
                     />
-                  </UI.Div>
-                ))}
-              </UI.Grid>
+                  </Modal.Root>
+                </AnimatePresence>
 
-              {fields.length === 0 ? (
-                <UI.IllustrationCard svg={<FieldIll />} text={t('add_field_reminder')}>
-                  <UI.Button type="button" onClick={() => handleNewField()}>{t('add_field')}</UI.Button>
-                </UI.IllustrationCard>
-              ) : (
-                <UI.Button mt={4} type="button" onClick={() => handleNewField()}>{t('add_field')}</UI.Button>
-              )}
-            </UI.Div>
+                <FormStepPreview
+                  fieldIndex={index}
+                  nrFields={fields.length}
+                  field={stepsFields[index]}
+                  onOpen={() => setOpenedStep(index)}
+                  onMoveLeft={() => move(index, Math.max(index - 1, 0))}
+                  onMoveRight={() => {
+                    move(index, Math.min(index + 1, fields.length - 1));
+                  }}
+                />
+
+              </UI.Div>
+
+            ))}
+            {fields?.length === 0 ? (
+              <UI.IllustrationCard svg={<FieldIll />} text={t('add_field_reminder')}>
+                <UI.Button type="button" onClick={() => handleNewField()}>{t('add_field')}</UI.Button>
+              </UI.IllustrationCard>
+            ) : (
+              <UI.Button mt={4} type="button" onClick={() => handleNewField()}>{t('add_field')}</UI.Button>
+            )}
           </UI.InputGrid>
         </UI.Div>
       </UI.Div>

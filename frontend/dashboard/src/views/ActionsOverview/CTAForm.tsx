@@ -4,7 +4,7 @@ import {
   ButtonGroup, FormErrorMessage, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
   PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast,
 } from '@chakra-ui/core';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
 import {
   Div, Flex, Form, FormContainer,
   FormControl, FormLabel, FormSection, Input, InputGrid, InputHelper, Span, Text,
@@ -19,7 +19,7 @@ import Select from 'react-select';
 
 import { MappedCTANode } from 'views/DialogueBuilderView/DialogueBuilderInterfaces';
 // import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
-import { FormNodeFieldTypeEnum, useCreateCtaMutation } from 'types/generated-types';
+import { FormNodeFieldTypeEnum, FormNodeStepType, useCreateCtaMutation } from 'types/generated-types';
 import { useCustomer } from 'providers/CustomerProvider';
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
@@ -103,9 +103,14 @@ const schema = yup.object().shape({
     otherwise: yup.object().notRequired(),
   }),
   formNode: yup.object().shape({
-    fields: yup.array().of(yup.object().shape({
-      label: yup.string(),
-      type: yup.string(),
+    steps: yup.array().of(yup.object().shape({
+      header: yup.string(),
+      helper: yup.string(),
+      subHelper: yup.string(),
+      fields: yup.array().of(yup.object().shape({
+        label: yup.string(),
+        type: yup.string(),
+      })),
     })),
   }),
 });
@@ -145,8 +150,6 @@ const CTAForm = ({
     customerSlug: string, dialogueSlug: string, questionId?: string
   }>();
 
-  console.log('Form node pages: ', formNode?.pages);
-
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
     mode: 'onChange',
@@ -158,7 +161,7 @@ const CTAForm = ({
       formNode: {
         id: formNode?.id,
         helperText: formNode?.helperText || '',
-        pages: formNode?.pages,
+        steps: formNode?.steps || [],
         fields: formNode?.fields?.map((field: any) => ({
           id: field.id,
           label: field.label,
@@ -254,6 +257,24 @@ const CTAForm = ({
       },
     );
 
+    const stepFields = formData.formNode?.steps.map((step) => {
+      const fields = step.fields.map((field) => {
+        const { contact, type: fieldType, ...rest } = field;
+        return ({
+          ...rest,
+          contacts: undefined,
+          __typename: undefined,
+          type: fieldType as FormNodeFieldTypeEnum,
+          userIds: contact?.contacts?.map((user) => user.value) || [],
+          isRequired: intToBool(field.isRequired),
+        }
+        );
+      });
+      return { ...step, __typename: undefined, type: step.type as FormNodeStepType, fields };
+    });
+
+    console.log('Form data CTA Form: ', formData);
+
     if (id === '-1') {
       const mappedLinks = {
         linkTypes: formData.links,
@@ -271,7 +292,8 @@ const CTAForm = ({
             share: formData.share,
             form: {
               ...formData.formNode,
-              fields: formFields,
+              steps: stepFields,
+              fields: [],
             },
           },
         },
@@ -292,7 +314,8 @@ const CTAForm = ({
             share: formData.share,
             form: {
               ...formData.formNode,
-              fields: formFields,
+              steps: stepFields,
+              fields: [],
             },
           },
         },
@@ -310,174 +333,178 @@ const CTAForm = ({
   };
 
   return (
-    <FormContainer expandedForm>
-      <Form onSubmit={stopPropagate(form.handleSubmit(onSubmit))}>
-        <Div>
-          <FormSection id="general">
-            <Div>
-              <UI.FormSectionHeader>{t('about_call_to_action')}</UI.FormSectionHeader>
-              <UI.FormSectionHelper>{t('cta:information_header')}</UI.FormSectionHelper>
-            </Div>
-            <Div>
-              <InputGrid>
-                <FormControl gridColumn="1 / -1" isRequired isInvalid={!!form.formState.errors.title}>
-                  <FormLabel htmlFor="title">{t('title')}</FormLabel>
-                  <InputHelper>{t('cta:title_helper')}</InputHelper>
-                  <Controller
-                    name="title"
-                    control={form.control}
-                    defaultValue={title}
-                    render={({ field }) => (
-                      <UI.MarkdownEditor
-                        value={field.value}
-                        onChange={field.onChange}
+    <FormProvider {...form}>
+      <FormContainer expandedForm>
+        <Form onSubmit={stopPropagate(form.handleSubmit(onSubmit))}>
+          <Div>
+            <FormSection id="general">
+              <Div>
+                <UI.FormSectionHeader>{t('about_call_to_action')}</UI.FormSectionHeader>
+                <UI.FormSectionHelper>{t('cta:information_header')}</UI.FormSectionHelper>
+              </Div>
+              <Div>
+                <InputGrid>
+                  <FormControl gridColumn="1 / -1" isRequired isInvalid={!!form.formState.errors.title}>
+                    <FormLabel htmlFor="title">{t('title')}</FormLabel>
+                    <InputHelper>{t('cta:title_helper')}</InputHelper>
+                    <Controller
+                      name="title"
+                      control={form.control}
+                      defaultValue={title}
+                      render={({ field }) => (
+                        <UI.MarkdownEditor
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      )}
+                    />
+                    <FormErrorMessage>{form.formState.errors.title?.message}</FormErrorMessage>
+                  </FormControl>
+
+                  <FormControl isRequired>
+                    <FormLabel htmlFor="ctaType">{t('cta:type')}</FormLabel>
+                    <InputHelper>{t('cta:share_type_helper')}</InputHelper>
+
+                    <Controller
+                      name="ctaType"
+                      control={form.control}
+                      render={({ field }) => (
+                        <Select
+                          options={CTA_TYPES}
+                          value={field.value as any}
+                          onChange={field.onChange}
+                        />
+                      )}
+                    />
+
+                    <FormErrorMessage>{form.formState.errors.ctaType?.value?.message}</FormErrorMessage>
+                  </FormControl>
+                </InputGrid>
+              </Div>
+            </FormSection>
+
+            {watchType?.value === 'SHARE' && (
+              <>
+                <UI.Hr />
+                <FormSection>
+                  <UI.Div>
+                    <UI.FormSectionHeader>{t('cta:about_share')}</UI.FormSectionHeader>
+                    <UI.FormSectionHelper>{t('cta:about_share_helper')}</UI.FormSectionHelper>
+                  </UI.Div>
+                  <UI.InputGrid>
+                    <FormControl isRequired>
+                      <FormLabel htmlFor="share.title">{t('cta:text')}</FormLabel>
+                      <InputHelper>{t('cta:shared_item_text_helper')}</InputHelper>
+                      <Input
+                        placeholder="Get a discount..."
+                        leftEl={<Type />}
+                        defaultValue={share?.title}
+                        {...form.register('share.title', { required: true })}
                       />
-                    )}
-                  />
-                  <FormErrorMessage>{form.formState.errors.title?.message}</FormErrorMessage>
-                </FormControl>
+                      <FormErrorMessage>
+                        <UI.Div>{form.formState.errors.share?.title?.message}</UI.Div>
+                      </FormErrorMessage>
+                    </FormControl>
 
-                <FormControl isRequired>
-                  <FormLabel htmlFor="ctaType">{t('cta:type')}</FormLabel>
-                  <InputHelper>{t('cta:share_type_helper')}</InputHelper>
-
-                  <Controller
-                    name="ctaType"
-                    control={form.control}
-                    render={({ field }) => (
-                      <Select
-                        options={CTA_TYPES}
-                        value={field.value as any}
-                        onChange={field.onChange}
+                    {/* TODO: Change default value and error */}
+                    <FormControl isRequired>
+                      <FormLabel htmlFor="share.url">{t('url')}</FormLabel>
+                      <InputHelper>{t('cta:url_share_helper')}</InputHelper>
+                      <Input
+                        placeholder="https://share/url"
+                        // eslint-disable-next-line jsx-a11y/anchor-is-valid
+                        leftEl={<Link />}
+                        defaultValue={share?.url}
+                        {...form.register('share.url', { required: true })}
                       />
-                    )}
-                  />
+                      <FormErrorMessage>{form.formState.errors.share?.url?.message}</FormErrorMessage>
+                    </FormControl>
 
-                  <FormErrorMessage>{form.formState.errors.ctaType?.value?.message}</FormErrorMessage>
-                </FormControl>
-              </InputGrid>
-            </Div>
-          </FormSection>
+                    <FormControl isRequired>
+                      <FormLabel htmlFor="share.tooltip">{t('cta:button_text')}</FormLabel>
+                      <InputHelper>{t('cta:button_text_helper')}</InputHelper>
+                      <Input
+                        placeholder="Share..."
+                        leftEl={<Type />}
+                        defaultValue={share?.tooltip}
+                        {...form.register('share.tooltip', { required: true })}
+                      />
+                      <FormErrorMessage>{form.formState.errors.share?.tooltip?.message}</FormErrorMessage>
+                    </FormControl>
+                  </UI.InputGrid>
+                </FormSection>
+              </>
+            )}
 
-          {watchType?.value === 'SHARE' && (
-            <>
-              <UI.Hr />
-              <FormSection>
-                <UI.Div>
-                  <UI.FormSectionHeader>{t('cta:about_share')}</UI.FormSectionHeader>
-                  <UI.FormSectionHelper>{t('cta:about_share_helper')}</UI.FormSectionHelper>
-                </UI.Div>
-                <UI.InputGrid>
-                  <FormControl isRequired>
-                    <FormLabel htmlFor="share.title">{t('cta:text')}</FormLabel>
-                    <InputHelper>{t('cta:shared_item_text_helper')}</InputHelper>
-                    <Input
-                      placeholder="Get a discount..."
-                      leftEl={<Type />}
-                      defaultValue={share?.title}
-                      {...form.register('share.title', { required: true })}
-                    />
-                    <FormErrorMessage><UI.Div>{form.formState.errors.share?.title?.message}</UI.Div></FormErrorMessage>
-                  </FormControl>
+            {watchType?.value === 'LINK' && (
+              <>
+                <UI.Hr />
+                <LinksOverview form={form} />
+              </>
+            )}
 
-                  {/* TODO: Change default value and error */}
-                  <FormControl isRequired>
-                    <FormLabel htmlFor="share.url">{t('url')}</FormLabel>
-                    <InputHelper>{t('cta:url_share_helper')}</InputHelper>
-                    <Input
-                      placeholder="https://share/url"
-                      // eslint-disable-next-line jsx-a11y/anchor-is-valid
-                      leftEl={<Link />}
-                      defaultValue={share?.url}
-                      {...form.register('share.url', { required: true })}
-                    />
-                    <FormErrorMessage>{form.formState.errors.share?.url?.message}</FormErrorMessage>
-                  </FormControl>
+            {watchType.value === 'FORM' && (
+              <>
+                <UI.Hr />
+                <FormNodeForm />
+              </>
+            )}
+          </Div>
 
-                  <FormControl isRequired>
-                    <FormLabel htmlFor="share.tooltip">{t('cta:button_text')}</FormLabel>
-                    <InputHelper>{t('cta:button_text_helper')}</InputHelper>
-                    <Input
-                      placeholder="Share..."
-                      leftEl={<Type />}
-                      defaultValue={share?.tooltip}
-                      {...form.register('share.tooltip', { required: true })}
-                    />
-                    <FormErrorMessage>{form.formState.errors.share?.tooltip?.message}</FormErrorMessage>
-                  </FormControl>
-                </UI.InputGrid>
-              </FormSection>
-            </>
-          )}
-
-          {watchType?.value === 'LINK' && (
-            <>
-              <UI.Hr />
-              <LinksOverview form={form} />
-            </>
-          )}
-
-          {watchType.value === 'FORM' && (
-            <>
-              <UI.Hr />
-              <FormNodeForm form={form} />
-            </>
-          )}
-        </Div>
-
-        <Flex justifyContent="space-between">
-          <ButtonGroup display="flex">
-            <UI.Button
-              isLoading={addLoading || updateLoading}
-              isDisabled={!form.formState.isValid}
-              type="submit"
-            >
-              {t('save')}
-            </UI.Button>
-            <UI.Button variant="ghost" onClick={() => cancelCTA()}>Cancel</UI.Button>
-          </ButtonGroup>
-          {id !== '-1' && (
-            <Span onClick={(e) => e.stopPropagation()}>
-              <Popover
-                usePortal
+          <Flex justifyContent="space-between">
+            <ButtonGroup display="flex">
+              <UI.Button
+                isLoading={addLoading || updateLoading}
+                isDisabled={!form.formState.isValid}
+                type="submit"
               >
-                {({ onClose }) => (
-                  <>
-                    <PopoverTrigger>
-                      <UI.Button
-                        variant="outline"
-                        variantColor="red"
-                        leftIcon={() => <Trash />}
-                      >
-                        {t('delete')}
-                      </UI.Button>
-                    </PopoverTrigger>
-                    <PopoverContent zIndex={4}>
-                      <PopoverArrow />
-                      <PopoverHeader>{t('delete')}</PopoverHeader>
-                      <PopoverCloseButton />
-                      <PopoverBody>
-                        <Text>{t('delete_cta_popover')}</Text>
-                      </PopoverBody>
-                      <PopoverFooter>
+                {t('save')}
+              </UI.Button>
+              <UI.Button variant="ghost" onClick={() => cancelCTA()}>Cancel</UI.Button>
+            </ButtonGroup>
+            {id !== '-1' && (
+              <Span onClick={(e) => e.stopPropagation()}>
+                <Popover
+                  usePortal
+                >
+                  {({ onClose }) => (
+                    <>
+                      <PopoverTrigger>
                         <UI.Button
                           variant="outline"
                           variantColor="red"
-                          onClick={() => onDeleteCTA && onDeleteCTA(onClose)}
+                          leftIcon={() => <Trash />}
                         >
                           {t('delete')}
                         </UI.Button>
-                      </PopoverFooter>
-                    </PopoverContent>
-                  </>
-                )}
-              </Popover>
-            </Span>
-          )}
+                      </PopoverTrigger>
+                      <PopoverContent zIndex={4}>
+                        <PopoverArrow />
+                        <PopoverHeader>{t('delete')}</PopoverHeader>
+                        <PopoverCloseButton />
+                        <PopoverBody>
+                          <Text>{t('delete_cta_popover')}</Text>
+                        </PopoverBody>
+                        <PopoverFooter>
+                          <UI.Button
+                            variant="outline"
+                            variantColor="red"
+                            onClick={() => onDeleteCTA && onDeleteCTA(onClose)}
+                          >
+                            {t('delete')}
+                          </UI.Button>
+                        </PopoverFooter>
+                      </PopoverContent>
+                    </>
+                  )}
+                </Popover>
+              </Span>
+            )}
 
-        </Flex>
-      </Form>
-    </FormContainer>
+          </Flex>
+        </Form>
+      </FormContainer>
+    </FormProvider>
   );
 };
 

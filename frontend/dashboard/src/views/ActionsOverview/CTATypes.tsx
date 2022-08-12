@@ -38,7 +38,7 @@ export interface FormDataProps {
   formNode?: {
     id?: string;
     helperText?: string;
-    pages: {
+    steps: {
       header?: string;
       helper?: string;
       subHelper?: string;

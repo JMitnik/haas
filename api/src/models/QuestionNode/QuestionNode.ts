@@ -114,6 +114,25 @@ export const FormNodeFieldInput = inputObjectType({
   },
 });
 
+export const FormNodeStepType = enumType({
+  name: 'FormNodeStepType',
+  members: ['GENERIC_FIELDS', 'INPUT_DATA'],
+})
+
+export const FormNodeStepInput = inputObjectType({
+  name: 'FormNodeStepInput',
+
+  definition(t) {
+    t.id('id', { required: false });
+    t.nonNull.field('type', { type: FormNodeStepType });
+    t.nonNull.string('header');
+    t.nonNull.string('helper');
+    t.nonNull.string('subHelper')
+    t.nonNull.int('position');
+    t.list.nonNull.field('fields', { type: FormNodeFieldInput });
+  },
+});
+
 export const FormNodeInputType = inputObjectType({
   name: 'FormNodeInputType',
 
@@ -122,6 +141,7 @@ export const FormNodeInputType = inputObjectType({
     t.string('helperText', { nullable: true });
 
     t.list.nonNull.field('fields', { type: FormNodeFieldInput });
+    t.list.nonNull.field('steps', { type: FormNodeStepInput });
   },
 });
 
@@ -151,13 +171,8 @@ export const FormNodeField = objectType({
   },
 });
 
-export const FormNodePageType = enumType({
-  name: 'FormNodePageType',
-  members: ['INPUT_DATA', 'CONTACT_PICKER'],
-})
-
-export const FormNodePage = objectType({
-  name: 'FormNodePage',
+export const FormNodeStep = objectType({
+  name: 'FormNodeStep',
   definition(t) {
     t.nonNull.string('id');
     t.nonNull.int('position');
@@ -166,7 +181,7 @@ export const FormNodePage = objectType({
     t.string('helper');
     t.string('subHelper');
 
-    t.nonNull.field('type', { type: FormNodePageType });
+    t.nonNull.field('type', { type: FormNodeStepType });
     t.list.nonNull.field('fields', { type: FormNodeField });
   },
 })
@@ -179,7 +194,7 @@ export const FormNodeType = objectType({
     t.string('helperText', { nullable: true });
 
     t.list.nonNull.field('fields', { type: FormNodeField });
-    t.list.nonNull.field('pages', { type: FormNodePage });
+    t.list.nonNull.field('steps', { type: FormNodeStep });
   },
 });
 
@@ -724,6 +739,8 @@ export const QuestionNodeMutations = extendType({
           links: mappedLinks,
           questionId: args.input.questionId,
         }
+
+        console.dir(args.input.form, { depth: 10 });
 
         return ctx.services.nodeService.createCallToAction(createCTAInput);
       },

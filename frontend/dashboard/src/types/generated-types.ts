@@ -1227,23 +1227,33 @@ export type FormNodeInputType = {
   id?: Maybe<Scalars['String']>;
   helperText?: Maybe<Scalars['String']>;
   fields?: Maybe<Array<FormNodeFieldInput>>;
+  steps?: Maybe<Array<FormNodeStepInput>>;
 };
 
-export type FormNodePage = {
-  __typename?: 'FormNodePage';
+export type FormNodeStep = {
+  __typename?: 'FormNodeStep';
   id: Scalars['String'];
   position: Scalars['Int'];
   header?: Maybe<Scalars['String']>;
   helper?: Maybe<Scalars['String']>;
   subHelper?: Maybe<Scalars['String']>;
-  type: FormNodePageType;
+  type: FormNodeStepType;
   fields?: Maybe<Array<FormNodeField>>;
 };
 
-export enum FormNodePageType {
-  InputData = 'INPUT_DATA',
-  SubmitOverview = 'SUBMIT_OVERVIEW',
-  ContactPicker = 'CONTACT_PICKER'
+export type FormNodeStepInput = {
+  id?: Maybe<Scalars['ID']>;
+  type?: Maybe<FormNodeStepType>;
+  header?: Maybe<Scalars['String']>;
+  helper?: Maybe<Scalars['String']>;
+  subHelper?: Maybe<Scalars['String']>;
+  position?: Maybe<Scalars['Int']>;
+  fields?: Maybe<Array<FormNodeFieldInput>>;
+};
+
+export enum FormNodeStepType {
+  GenericFields = 'GENERIC_FIELDS',
+  InputData = 'INPUT_DATA'
 }
 
 export type FormNodeType = {
@@ -1251,7 +1261,7 @@ export type FormNodeType = {
   id?: Maybe<Scalars['String']>;
   helperText?: Maybe<Scalars['String']>;
   fields?: Maybe<Array<FormNodeField>>;
-  pages?: Maybe<Array<FormNodePage>>;
+  steps?: Maybe<Array<FormNodeStep>>;
 };
 
 /** Generate savales documents */

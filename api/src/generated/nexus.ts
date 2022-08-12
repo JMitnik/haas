@@ -407,6 +407,16 @@ export interface NexusGenInputs {
     fields?: NexusGenInputs['FormNodeFieldInput'][] | null; // [FormNodeFieldInput!]
     helperText?: string | null; // String
     id?: string | null; // String
+    steps?: NexusGenInputs['FormNodeStepInput'][] | null; // [FormNodeStepInput!]
+  }
+  FormNodeStepInput: { // input type
+    fields?: NexusGenInputs['FormNodeFieldInput'][] | null; // [FormNodeFieldInput!]
+    header: string; // String!
+    helper: string; // String!
+    id?: string | null; // ID
+    position: number; // Int!
+    subHelper: string; // String!
+    type: NexusGenEnums['FormNodeStepType']; // FormNodeStepType!
   }
   GenerateAutodeckInput: { // input type
     answer1?: string | null; // String
@@ -796,7 +806,7 @@ export interface NexusGenEnums {
   DialogueImpactScoreType: "AVERAGE"
   DialogueTemplateType: prisma.DialogueTemplateType
   FormNodeFieldTypeEnum: "contacts" | "email" | "longText" | "number" | "phoneNumber" | "shortText" | "url"
-  FormNodePageType: "CONTACT_PICKER" | "INPUT_DATA"
+  FormNodeStepType: prisma.FormNodeStepType
   JobProcessLocationType: prisma.JobProcessLocationType
   JobStatusType: prisma.JobStatusType
   LanguageEnumType: "DUTCH" | "ENGLISH" | "GERMAN"
@@ -1101,20 +1111,12 @@ export interface NexusGenObjects {
     url?: string | null; // String
   }
   FormNodeField: prisma.FormNodeField;
-  FormNodePage: { // root type
-    fields?: NexusGenRootTypes['FormNodeField'][] | null; // [FormNodeField!]
-    header?: string | null; // String
-    helper?: string | null; // String
-    id: string; // String!
-    position: number; // Int!
-    subHelper?: string | null; // String
-    type: NexusGenEnums['FormNodePageType']; // FormNodePageType!
-  }
+  FormNodeStep: prisma.FormNodeStep;
   FormNodeType: { // root type
     fields?: NexusGenRootTypes['FormNodeField'][] | null; // [FormNodeField!]
     helperText?: string | null; // String
     id?: string | null; // String
-    pages?: NexusGenRootTypes['FormNodePage'][] | null; // [FormNodePage!]
+    steps?: NexusGenRootTypes['FormNodeStep'][] | null; // [FormNodeStep!]
   }
   HealthScore: { // root type
     negativeResponseCount: number; // Int!
@@ -1818,20 +1820,20 @@ export interface NexusGenFieldTypes {
     position: number | null; // Int
     type: NexusGenEnums['FormNodeFieldTypeEnum']; // FormNodeFieldTypeEnum!
   }
-  FormNodePage: { // field return type
+  FormNodeStep: { // field return type
     fields: NexusGenRootTypes['FormNodeField'][] | null; // [FormNodeField!]
     header: string | null; // String
     helper: string | null; // String
     id: string; // String!
     position: number; // Int!
     subHelper: string | null; // String
-    type: NexusGenEnums['FormNodePageType']; // FormNodePageType!
+    type: NexusGenEnums['FormNodeStepType']; // FormNodeStepType!
   }
   FormNodeType: { // field return type
     fields: NexusGenRootTypes['FormNodeField'][] | null; // [FormNodeField!]
     helperText: string | null; // String
     id: string | null; // String
-    pages: NexusGenRootTypes['FormNodePage'][] | null; // [FormNodePage!]
+    steps: NexusGenRootTypes['FormNodeStep'][] | null; // [FormNodeStep!]
   }
   HealthScore: { // field return type
     negativeResponseCount: number; // Int!
@@ -2718,20 +2720,20 @@ export interface NexusGenFieldTypeNames {
     position: 'Int'
     type: 'FormNodeFieldTypeEnum'
   }
-  FormNodePage: { // field return type name
+  FormNodeStep: { // field return type name
     fields: 'FormNodeField'
     header: 'String'
     helper: 'String'
     id: 'String'
     position: 'Int'
     subHelper: 'String'
-    type: 'FormNodePageType'
+    type: 'FormNodeStepType'
   }
   FormNodeType: { // field return type name
     fields: 'FormNodeField'
     helperText: 'String'
     id: 'String'
-    pages: 'FormNodePage'
+    steps: 'FormNodeStep'
   }
   HealthScore: { // field return type name
     negativeResponseCount: 'Int'

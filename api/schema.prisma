@@ -182,10 +182,10 @@ model FormNodeStep {
   subHelper String
 
   position   Int // Determines in which order steps are shown
-  formNodeId String
+  formNodeId String?
 
   fields   FormNodeField[]
-  formNode FormNode        @relation(fields: [formNodeId], references: [id])
+  formNode FormNode?       @relation(fields: [formNodeId], references: [id])
 }
 
 model FormNodeField {

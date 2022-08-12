@@ -1036,20 +1036,31 @@ input FormNodeInputType {
   fields: [FormNodeFieldInput!]
   helperText: String
   id: String
+  steps: [FormNodeStepInput!]
 }
 
-type FormNodePage {
+type FormNodeStep {
   fields: [FormNodeField!]
   header: String
   helper: String
   id: String!
   position: Int!
   subHelper: String
-  type: FormNodePageType!
+  type: FormNodeStepType!
 }
 
-enum FormNodePageType {
-  CONTACT_PICKER
+input FormNodeStepInput {
+  fields: [FormNodeFieldInput!]
+  header: String!
+  helper: String!
+  id: ID
+  position: Int!
+  subHelper: String!
+  type: FormNodeStepType!
+}
+
+enum FormNodeStepType {
+  GENERIC_FIELDS
   INPUT_DATA
 }
 
@@ -1057,7 +1068,7 @@ type FormNodeType {
   fields: [FormNodeField!]
   helperText: String
   id: String
-  pages: [FormNodePage!]
+  steps: [FormNodeStep!]
 }
 
 """Generate savales documents"""

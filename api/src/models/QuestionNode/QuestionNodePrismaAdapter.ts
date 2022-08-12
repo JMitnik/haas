@@ -1,4 +1,5 @@
 import { Prisma, PrismaClient, Edge, QuestionNode, QuestionOption, VideoEmbeddedNode, NodeType, Link, Share } from '@prisma/client';
+import { NexusGenInputs } from 'generated/nexus';
 
 import { CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType';
 import NodeService from './NodeService';
@@ -50,10 +51,10 @@ class QuestionNodePrismaAdapter {
             markers: {
               include: {
                 range: true,
-              }
-            }
-          }
-        }
+              },
+            },
+          },
+        },
       },
     });
   }
@@ -331,6 +332,15 @@ class QuestionNodePrismaAdapter {
     })
   }
 
+  async upsertFormNodeField(input: Prisma.FormNodeFieldUpsertArgs) {
+    return this.prisma.formNodeField.upsert(input);
+  };
+
+  async upsertFormNodeStep(input: Prisma.FormNodeStepUpsertArgs) {
+    console.dir(input, { depth: 10 });
+    return this.prisma.formNodeStep.upsert(input);
+  }
+
   updateFieldsOfForm(input: UpdateFormFieldsInput) {
     return this.prisma.questionNode.update({
       where: {
@@ -340,9 +350,6 @@ class QuestionNodePrismaAdapter {
         form: {
           update: {
             helperText: input.helperText,
-            fields: {
-              upsert: input.fields,
-            },
           },
         },
       },
@@ -547,6 +554,11 @@ class QuestionNodePrismaAdapter {
         share: true,
         form: {
           include: {
+            steps: {
+              include: {
+                fields: true,
+              },
+            },
             fields: true,
           },
         },
@@ -577,6 +589,23 @@ class QuestionNodePrismaAdapter {
       },
     });
   }
+
+  removeFormSteps(questionId: string, steps: Array<{ id: string }>) {
+    return this.prisma.questionNode.update({
+      where: {
+        id: questionId,
+      },
+      data: {
+        form: {
+          update: {
+            steps: {
+              disconnect: steps,
+            },
+          },
+        },
+      },
+    });
+  };
 
   removeFormFields(questionId: string, fields: Array<{ id: string }>) {
     return this.prisma.questionNode.update({
