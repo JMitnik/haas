@@ -17,13 +17,29 @@ interface EventBarsProps {
   width: number;
   height: number;
   events: Event[];
+  startDate: Date;
+  endDate: Date;
+  tickFormat?: DateFormat;
+  showFrequency?: boolean;
+  fill?: string;
 }
 
-export const EventBars = ({ events, width, height }: EventBarsProps) => {
-  const { format, getNWeekAgo, getNow } = useDate();
+export const EventBars = ({
+  events,
+  startDate,
+  endDate,
+  width,
+  height,
+  tickFormat,
+  showFrequency,
+  fill = mainTheme.colors.off[100],
+}: EventBarsProps) => {
+  const { format, getNWeekAgo, getNow, parse } = useDate();
 
   const formatDate = (date: Date) => format(date, DateFormat.DayFormat);
-  const dateRange = useMemo(() => calculateDateRange(getNWeekAgo(2), getNow()), [getNWeekAgo, getNow]);
+  const dateRange = useMemo(() => calculateDateRange(startDate, endDate), [getNWeekAgo, getNow]);
+
+  const showTicks = !!tickFormat;
 
   const dateScale = useMemo(() => scaleBand<string>({
     domain: dateRange,
@@ -31,13 +47,17 @@ export const EventBars = ({ events, width, height }: EventBarsProps) => {
     range: [0, width],
   }), [dateRange, width]);
 
-  const yMax = height - 2;
+  const bottomPadding = showTicks ? 50 : 0;
+  const topPadding = showFrequency ? 30 : 0;
+
+  // Max y coordinates
+  const yMax = height + topPadding;
 
   const maxFreq = useMemo(() => Math.max(...events.map((event) => event.frequency)), [events]);
 
   const freqScale = useMemo(() => scaleLinear<number>({
     domain: [0, maxFreq],
-    range: [0, height],
+    range: [0, height - bottomPadding],
   }), [maxFreq, height]);
 
   const { tooltipOpen, tooltipLeft, tooltipTop, tooltipData, hideTooltip, showTooltip } = useTooltip<Event>();
@@ -46,7 +66,7 @@ export const EventBars = ({ events, width, height }: EventBarsProps) => {
     scroll: true,
   });
 
-  const paddedEvents = padEvents(events, getNWeekAgo(2), getNow());
+  const paddedEvents = padEvents(events, startDate, endDate);
 
   return (
     <EventBarsContainer>
@@ -60,34 +80,56 @@ export const EventBars = ({ events, width, height }: EventBarsProps) => {
             const barY = yMax - barHeight;
 
             return (
-              <Bar
+              <Group
                 key={`${event.date}-${event.id}`}
-                className="event-bar"
                 x={barX}
                 y={barY}
-                width={barWidth}
-                height={barHeight}
-                fill={mainTheme.colors.off[100]}
-                onMouseOver={(e) => showTooltip({
-                  tooltipData: event,
-                  tooltipTop: localPoint(e)?.y || 0,
-                  tooltipLeft: (barX ?? 0) + barWidth / 2,
-                })}
-                onMouseOut={hideTooltip}
-              />
+              >
+                {showFrequency && (
+                  <text className="event-label" x={(barX || 0) + 5} y={barY - 55}>
+                    <tspan>
+                      {Math.floor(event.frequency)}
+                    </tspan>
+                  </text>
+                )}
+                <Bar
+                  className="event-bar"
+                  x={barX}
+                  y={barY - bottomPadding}
+                  width={barWidth}
+                  height={barHeight}
+                  fill={fill}
+                  onMouseOver={(e) => showTooltip({
+                    tooltipData: event,
+                    tooltipTop: localPoint(e)?.y || 0,
+                    tooltipLeft: (barX ?? 0) + barWidth / 2,
+                  })}
+                  onMouseOut={hideTooltip}
+                />
+              </Group>
             );
           })}
 
           <Axis
             orientation={Orientation.bottom}
-            top={yMax}
+            top={yMax - 50}
             scale={dateScale}
             stroke="transparent"
             tickStroke={mainTheme.colors.off[200]}
-            tickValues={undefined}
-            numTicks={events.length}
+            tickClassName="tick"
+            numTicks={paddedEvents.length}
+            tickFormat={(tickDate: string) => {
+              if (!showTicks) return undefined;
+              return format(parse(tickDate, DateFormat.DayFormat), DateFormat.HumanDay);
+            }}
           />
         </Group>
+
+        {tickFormat && (
+          <Group>
+            test
+          </Group>
+        )}
       </svg>
 
       {tooltipOpen && tooltipData && (

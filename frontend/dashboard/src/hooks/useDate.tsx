@@ -1,4 +1,4 @@
-import { format as dateFormat, endOfDay, isValid, parse, startOfDay, startOfWeek, sub } from 'date-fns';
+import { format as dateFormat, endOfDay, endOfWeek, isValid, parse, startOfDay, startOfWeek, sub } from 'date-fns';
 import { format as tzFormat, utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz';
 
 export enum DateFormat {
@@ -19,6 +19,9 @@ export enum DateFormat {
 
   /** Example: Monday 16 of July */
   MonthDate = "EEEE do 'of' LLLL",
+
+  /** Example: Mon */
+  HumanDay = 'EEE',
 
   /** Example: 13:37 */
   Time = 'HH:mm',
@@ -54,9 +57,8 @@ export const useDate = () => ({
   getOneWeekAgo: () => startOfDay(sub(new Date(), { days: 7 })),
   getNWeekAgo: (weeks: number) => sub(new Date(), { days: 7 * weeks }),
   getTomorrow: () => sub(new Date(), { days: -1 }),
-  getStartOfWeek: (date = new Date()) => startOfWeek(date, {
-    weekStartsOn: 1,
-  }),
+  getStartOfWeek: (date = new Date()) => startOfWeek(date, { weekStartsOn: 1 }),
+  getEndOfWeek: (date = new Date()) => endOfWeek(date, { weekStartsOn: 1 }),
   toUTC: (date: Date): Date => zonedTimeToUtc(date, 'UTC'),
   toZonedTime: (date: Date, timeZone: string): Date => utcToZonedTime(date, timeZone),
   toDayFormat: (date: Date) => dateFormat(date, DateFormat.DayFormat),
