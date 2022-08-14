@@ -21,6 +21,7 @@ interface EventBarsProps {
   endDate: Date;
   tickFormat?: DateFormat;
   showFrequency?: boolean;
+  id?: string;
   fill?: string;
 }
 
@@ -32,6 +33,7 @@ export const EventBars = ({
   height,
   tickFormat,
   showFrequency,
+  id = 'events',
   fill = mainTheme.colors.off[100],
 }: EventBarsProps) => {
   const { format, getNWeekAgo, getNow, parse } = useDate();
@@ -81,7 +83,7 @@ export const EventBars = ({
 
             return (
               <Group
-                key={`${event.date}-${event.id}`}
+                key={`${id}-${event.date}-${event.id}`}
                 x={barX}
                 y={barY}
               >

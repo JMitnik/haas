@@ -24,6 +24,7 @@ import { CampaignService } from '../models/Campaigns/CampaignService'
 import DynamoScheduleService from '../services/DynamoScheduleService'
 import LinkService from '../models/link/LinkService';
 import AutomationService from '../models/automations/AutomationService'
+import { WorkspaceStatisticsService } from '../models/customer/WorkspaceStatisticsService'
 import DialogueStatisticsService from '../models/questionnaire/DialogueStatisticsService'
 import QuestionStatisticsService from '../models/QuestionNode/QuestionStatisticsService'
 import GenerateWorkspaceService from '../models/generate-workspace/GenerateWorkspaceService'
@@ -62,6 +63,7 @@ export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOption
   const redisService = new RedisService(redis);
   const organizationService = new OrganizationService(prisma);
   const scheduledAutomationService = new ScheduledAutomationService(prisma);
+  const workspaceStatisticsService = new WorkspaceStatisticsService(prisma);
 
   return {
     scheduledAutomationService,
@@ -92,5 +94,6 @@ export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOption
     linkService,
     topicService,
     issueService,
+    workspaceStatisticsService,
   }
 }

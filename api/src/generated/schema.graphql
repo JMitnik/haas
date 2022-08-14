@@ -2296,6 +2296,9 @@ type WorkspaceStatistics {
   health(input: HealthScoreInput): HealthScore
   id: ID
 
+  """Histogram of issues over time."""
+  issueHistogram(input: DialogueStatisticsSummaryFilterInput): DateHistogram
+
   """
   
           Get the path (sequence of topics) with the most changed impact score.
@@ -2309,6 +2312,9 @@ type WorkspaceStatistics {
   Topics of a workspace ranked by either impact score or number of responses
   """
   rankedTopics(input: DialogueStatisticsSummaryFilterInput): [TopicType]
+
+  """Histogram of responses over time."""
+  responseHistogram(input: DialogueStatisticsSummaryFilterInput): DateHistogram
   workspaceStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!]!
 }
 

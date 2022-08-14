@@ -1,30 +1,20 @@
 import * as UI from '@haas/ui';
-import { useHistory } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { isPresent } from 'ts-is-present';
 import React, { } from 'react';
 
-import { ReactComponent as RankingThumbnail } from 'assets/images/thumbnails/sm/rounded-ranking.svg';
-import { ReactComponent as TopicsThumbnail } from 'assets/images/thumbnails/sm/rounded-topics.svg';
-import { ReactComponent as UsersThumbnail } from 'assets/images/thumbnails/sm/rounded-users.svg';
-
 import { DateFormat, useDate } from 'hooks/useDate';
+import { DialogueImpactScoreType, useGetIssuesQuery, useGetWorkspaceReportQuery } from 'types/generated-types';
 import { EventBars } from 'components/Analytics/Common/EventBars';
+import { ReactComponent as RankingThumbnail } from 'assets/images/thumbnails/sm/rounded-ranking.svg';
 import { ReportsLayout } from 'layouts/ReportsLayout/ReportsLayout';
 import { ScoreBox } from 'components/ScoreBox';
+import { ReactComponent as TopicsThumbnail } from 'assets/images/thumbnails/sm/rounded-topics.svg';
 import { User } from 'react-feather';
+import { ReactComponent as UsersThumbnail } from 'assets/images/thumbnails/sm/rounded-users.svg';
 import { View } from 'layouts/View';
-import { useNavigator } from 'hooks/useNavigator';
+import { useCustomer } from 'providers/CustomerProvider';
 import mainTheme from 'config/theme';
 import useMeasure from 'react-use-measure';
-
-const data = [{
-  score: 50,
-  dialogueName: 'Product Development - Line Managers - Team A14',
-  responseCount: 16,
-  problemCount: 12,
-  actionCount: 4,
-  events: [],
-}];
 
 const topics = [
   {
@@ -50,9 +40,8 @@ const topics = [
   },
 ];
 
-export const DialogueReportView = ({ }: ReportViewInput) => {
-  const history = useHistory();
-  const { t } = useTranslation();
+export const DialogueReportView = () => {
+  const { activeCustomer } = useCustomer();
   const { format, getNWeekAgo, getStartOfWeek, getEndOfWeek } = useDate();
 
   const relevantWeek = getNWeekAgo(0);
@@ -60,40 +49,35 @@ export const DialogueReportView = ({ }: ReportViewInput) => {
   const endDate = getEndOfWeek(new Date());
 
   const [ref, bounds] = useMeasure();
-  const width = bounds.width || 600;
 
-  // /**
-  //  * Cache dialogue statistics data when switching between date filters.
-  //  * */
-  // const [
-  //   cachedDialogueCustomer,
-  //   setCachedDialogueCustomer,
-  // ] = useState<GetDialogueStatisticsQuery['customer'] | undefined>(undefined);
+  const { data: d } = useGetWorkspaceReportQuery({
+    variables: {
+      workspaceId: activeCustomer?.id || '',
+      filter: {
+        impactType: DialogueImpactScoreType.Average,
+        startDateTime: format(startDate, DateFormat.DayTimeFormat),
+        endDateTime: format(endDate, DateFormat.DayTimeFormat),
+        refresh: true,
+      },
+    },
+  });
 
-  // const { data, loading } = useGetDialogueStatisticsQuery({
-  //   variables: {
-  //     dialogueSlug,
-  //     customerSlug,
-  //     statisticsDateFilter: {
-  //       startDate: startDate.toISOString(),
-  //     },
-  //     prevDateFilter: {
-  //       endDate: compareStatisticStartDate.toISOString(),
-  //     },
-  //   },
-  //   pollInterval: 5000,
-  // });
+  const { data: issuesData } = useGetIssuesQuery({
+    variables: {
+      workspaceId: activeCustomer?.id || '',
+      filter: {
+        startDate: format(startDate, DateFormat.DayTimeFormat),
+        endDate: format(endDate, DateFormat.DayTimeFormat),
+        dialogueStrings: [],
+        topicStrings: [],
+      },
+    },
+  });
 
-  // console.log('Data: ', data?.customer);
+  const responseHistogramItems = d?.customer?.statistics?.responseHistogram?.items || [];
+  const issueHistogramItems = d?.customer?.statistics?.issueHistogram?.items || [];
 
-  // useEffect(() => {
-  //   if (data && !loading) {
-  //     setCachedDialogueCustomer(data?.customer);
-  //   }
-  // }, [data, loading]);
-
-  // if (!cachedDialogueCustomer) return <UI.Loader />;
-  // const { dialogue } = cachedDialogueCustomer;
+  const issues = issuesData?.customer?.issues || [];
 
   return (
     <ReportsLayout>
@@ -148,17 +132,14 @@ export const DialogueReportView = ({ }: ReportViewInput) => {
                 <UI.CardBody _size="lg">
                   <UI.Div ref={ref}>
                     <EventBars
+                      id="responses"
                       width={bounds.width}
                       height={200}
                       startDate={startDate}
                       endDate={endDate}
                       tickFormat={DateFormat.DayFormat}
                       showFrequency
-                      events={[{
-                        date: new Date(),
-                        frequency: 10,
-                        id: 't',
-                      }]}
+                      events={responseHistogramItems}
                     />
                   </UI.Div>
                 </UI.CardBody>
@@ -175,6 +156,7 @@ export const DialogueReportView = ({ }: ReportViewInput) => {
                 <UI.CardBody _size="lg">
                   <UI.Div ref={ref}>
                     <EventBars
+                      id="issues"
                       width={bounds.width}
                       height={200}
                       startDate={startDate}
@@ -182,11 +164,7 @@ export const DialogueReportView = ({ }: ReportViewInput) => {
                       endDate={endDate}
                       tickFormat={DateFormat.DayFormat}
                       showFrequency
-                      events={[{
-                        date: new Date(),
-                        frequency: 10,
-                        id: 't',
-                      }]}
+                      events={issueHistogramItems}
                     />
                   </UI.Div>
                 </UI.CardBody>
@@ -215,7 +193,7 @@ export const DialogueReportView = ({ }: ReportViewInput) => {
             <UI.Div>
               <UI.Card>
                 <UI.CardHeader>
-                  <UI.Grid gridTemplateColumns="50px 2fr 1fr 1fr 1fr 200px">
+                  <UI.Grid gridTemplateColumns="50px 2fr 1fr 1fr 200px">
                     <UI.Div>
                       <UI.Helper>Score</UI.Helper>
                     </UI.Div>
@@ -226,9 +204,6 @@ export const DialogueReportView = ({ }: ReportViewInput) => {
                       <UI.Helper>Responses</UI.Helper>
                     </UI.Div>
                     <UI.Div>
-                      <UI.Helper>Problems</UI.Helper>
-                    </UI.Div>
-                    <UI.Div>
                       <UI.Helper>Action requests</UI.Helper>
                     </UI.Div>
                     <UI.Div>
@@ -237,22 +212,28 @@ export const DialogueReportView = ({ }: ReportViewInput) => {
                   </UI.Grid>
                 </UI.CardHeader>
                 <UI.CardBody>
-                  {data.map((el) => (
-                    <UI.Grid gridTemplateColumns="50px 2fr 1fr 1fr 1fr 200px">
+                  {issues.filter(isPresent).map((issue) => (
+                    <UI.Grid gridTemplateColumns="50px 2fr 1fr 1fr 200px" style={{ alignItems: 'center' }}>
                       <UI.Div>
-                        <ScoreBox score={el.score} />
+                        <ScoreBox score={issue.basicStats.average} />
                       </UI.Div>
                       <UI.Div>
-                        {el.dialogueName}
+                        {issue.dialogue?.title}
                       </UI.Div>
                       <UI.Div>
-                        {el.responseCount}
+                        {issue.basicStats.responseCount}
                       </UI.Div>
                       <UI.Div>
-                        {el.problemCount}
+                        {issue?.actionRequiredCount}
                       </UI.Div>
                       <UI.Div>
-                        {el.actionCount}
+                        <EventBars
+                          events={issue.history.items || []}
+                          startDate={startDate}
+                          endDate={endDate}
+                          width={200}
+                          height={35}
+                        />
                       </UI.Div>
                     </UI.Grid>
                   ))}
@@ -282,7 +263,7 @@ export const DialogueReportView = ({ }: ReportViewInput) => {
             <UI.Div>
               {topics.map((topic) => (
                 <UI.Div>
-                  <UI.Grid alignItems="center" gridTemplateColumns="70px 1fr 80px">
+                  <UI.Grid style={{ alignItems: 'center' }} gridTemplateColumns="70px 1fr 80px">
                     <UI.Div color="off.600">
                       <UI.Flex>
                         <UI.Icon mr={1}>

@@ -143,7 +143,6 @@ export type AutomationConditionBuilderModel = {
   childConditionBuilderId?: Maybe<Scalars['String']>;
   type?: Maybe<AutomationConditionBuilderType>;
   conditions?: Maybe<Array<Maybe<AutomationConditionModel>>>;
-  childConditionBuilder?: Maybe<AutomationConditionBuilderModel>;
 };
 
 export enum AutomationConditionBuilderType {
@@ -1199,6 +1198,7 @@ export type FormNodeField = {
   isRequired?: Maybe<Scalars['Boolean']>;
   position?: Maybe<Scalars['Int']>;
   placeholder?: Maybe<Scalars['String']>;
+  /** List of possible contact points for a form-node. */
   contacts?: Maybe<Array<Maybe<UserType>>>;
 };
 
@@ -2077,12 +2077,6 @@ export type PermssionType = {
   name?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   customer?: Maybe<Customer>;
-};
-
-export type PickerEntryInput = {
-  label: Scalars['String'];
-  value: Scalars['String'];
-  type: Scalars['String'];
 };
 
 export type PreviewDataType = {
@@ -2988,6 +2982,10 @@ export type WorkspaceStatistics = {
   workspaceStatisticsSummary: Array<DialogueStatisticsSummaryModel>;
   /** Basic statistics of a workspace (e.g. number of responses, average general score, etc) */
   basicStats?: Maybe<BasicStatistics>;
+  /** Histogram of responses over time. */
+  responseHistogram?: Maybe<DateHistogram>;
+  /** Histogram of issues over time. */
+  issueHistogram?: Maybe<DateHistogram>;
   /** Topics of a workspace ranked by either impact score or number of responses */
   rankedTopics?: Maybe<Array<Maybe<TopicType>>>;
   /** Gets the health score of the workspace */
@@ -3005,6 +3003,16 @@ export type WorkspaceStatisticsWorkspaceStatisticsSummaryArgs = {
 
 
 export type WorkspaceStatisticsBasicStatsArgs = {
+  input?: Maybe<DialogueStatisticsSummaryFilterInput>;
+};
+
+
+export type WorkspaceStatisticsResponseHistogramArgs = {
+  input?: Maybe<DialogueStatisticsSummaryFilterInput>;
+};
+
+
+export type WorkspaceStatisticsIssueHistogramArgs = {
   input?: Maybe<DialogueStatisticsSummaryFilterInput>;
 };
 
@@ -3881,6 +3889,41 @@ export type SetDialoguePrivacyMutation = (
   )> }
 );
 
+export type GetWorkspaceReportQueryVariables = Exact<{
+  workspaceId: Scalars['ID'];
+  filter?: Maybe<DialogueStatisticsSummaryFilterInput>;
+}>;
+
+
+export type GetWorkspaceReportQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { statistics?: Maybe<(
+      { __typename?: 'WorkspaceStatistics' }
+      & { basicStats?: Maybe<(
+        { __typename?: 'BasicStatistics' }
+        & Pick<BasicStatistics, 'responseCount' | 'average'>
+      )>, responseHistogram?: Maybe<(
+        { __typename?: 'DateHistogram' }
+        & Pick<DateHistogram, 'id'>
+        & { items: Array<(
+          { __typename?: 'DateHistogramItem' }
+          & Pick<DateHistogramItem, 'id' | 'frequency' | 'date'>
+        )> }
+      )>, issueHistogram?: Maybe<(
+        { __typename?: 'DateHistogram' }
+        & Pick<DateHistogram, 'id'>
+        & { items: Array<(
+          { __typename?: 'DateHistogramItem' }
+          & Pick<DateHistogramItem, 'id' | 'frequency' | 'date'>
+        )> }
+      )> }
+    )> }
+  )> }
+);
+
 export type GetDialogueStatisticsQueryVariables = Exact<{
   customerSlug: Scalars['String'];
   dialogueSlug: Scalars['String'];
@@ -3981,56 +4024,6 @@ export type GetAutomationQuery = (
           { __typename?: 'QuestionNode' }
           & Pick<QuestionNode, 'id' | 'title' | 'type'>
         )> }
-      )>, conditionBuilder?: Maybe<(
-        { __typename?: 'AutomationConditionBuilderModel' }
-        & Pick<AutomationConditionBuilderModel, 'id' | 'type' | 'childConditionBuilderId'>
-        & { childConditionBuilder?: Maybe<(
-          { __typename?: 'AutomationConditionBuilderModel' }
-          & Pick<AutomationConditionBuilderModel, 'id' | 'type'>
-          & { conditions?: Maybe<Array<Maybe<(
-            { __typename?: 'AutomationConditionModel' }
-            & Pick<AutomationConditionModel, 'id' | 'scope' | 'operator'>
-            & { operands?: Maybe<Array<Maybe<(
-              { __typename?: 'AutomationConditionOperandModel' }
-              & Pick<AutomationConditionOperandModel, 'id' | 'type' | 'numberValue' | 'textValue'>
-            )>>>, dialogueScope?: Maybe<(
-              { __typename?: 'DialogueConditionScopeModel' }
-              & Pick<DialogueConditionScopeModel, 'id' | 'aspect'>
-              & { aggregate?: Maybe<(
-                { __typename?: 'ConditionPropertyAggregate' }
-                & Pick<ConditionPropertyAggregate, 'id' | 'type' | 'latest'>
-              )> }
-            )>, questionScope?: Maybe<(
-              { __typename?: 'QuestionConditionScopeModel' }
-              & Pick<QuestionConditionScopeModel, 'id' | 'aspect'>
-              & { aggregate?: Maybe<(
-                { __typename?: 'ConditionPropertyAggregate' }
-                & Pick<ConditionPropertyAggregate, 'id' | 'type' | 'latest'>
-              )> }
-            )> }
-          )>>> }
-        )>, conditions?: Maybe<Array<Maybe<(
-          { __typename?: 'AutomationConditionModel' }
-          & Pick<AutomationConditionModel, 'id' | 'scope' | 'operator'>
-          & { operands?: Maybe<Array<Maybe<(
-            { __typename?: 'AutomationConditionOperandModel' }
-            & Pick<AutomationConditionOperandModel, 'id' | 'type' | 'numberValue' | 'textValue'>
-          )>>>, dialogueScope?: Maybe<(
-            { __typename?: 'DialogueConditionScopeModel' }
-            & Pick<DialogueConditionScopeModel, 'id' | 'aspect'>
-            & { aggregate?: Maybe<(
-              { __typename?: 'ConditionPropertyAggregate' }
-              & Pick<ConditionPropertyAggregate, 'id' | 'type' | 'latest'>
-            )> }
-          )>, questionScope?: Maybe<(
-            { __typename?: 'QuestionConditionScopeModel' }
-            & Pick<QuestionConditionScopeModel, 'id' | 'aspect'>
-            & { aggregate?: Maybe<(
-              { __typename?: 'ConditionPropertyAggregate' }
-              & Pick<ConditionPropertyAggregate, 'id' | 'type' | 'latest'>
-            )> }
-          )> }
-        )>>> }
       )> }
     )> }
   )> }
@@ -6172,6 +6165,67 @@ export function useSetDialoguePrivacyMutation(baseOptions?: Apollo.MutationHookO
 export type SetDialoguePrivacyMutationHookResult = ReturnType<typeof useSetDialoguePrivacyMutation>;
 export type SetDialoguePrivacyMutationResult = Apollo.MutationResult<SetDialoguePrivacyMutation>;
 export type SetDialoguePrivacyMutationOptions = Apollo.BaseMutationOptions<SetDialoguePrivacyMutation, SetDialoguePrivacyMutationVariables>;
+export const GetWorkspaceReportDocument = gql`
+    query GetWorkspaceReport($workspaceId: ID!, $filter: DialogueStatisticsSummaryFilterInput) {
+  customer(id: $workspaceId) {
+    id
+    statistics {
+      basicStats(input: $filter) {
+        responseCount
+        average
+      }
+      responseHistogram(input: $filter) {
+        id
+        items {
+          id
+          frequency
+          date
+        }
+      }
+      issueHistogram(input: $filter) {
+        id
+        items {
+          id
+          frequency
+          date
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetWorkspaceReportQuery__
+ *
+ * To run a query within a React component, call `useGetWorkspaceReportQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetWorkspaceReportQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetWorkspaceReportQuery({
+ *   variables: {
+ *      workspaceId: // value for 'workspaceId'
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useGetWorkspaceReportQuery(baseOptions: Apollo.QueryHookOptions<GetWorkspaceReportQuery, GetWorkspaceReportQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetWorkspaceReportQuery, GetWorkspaceReportQueryVariables>(GetWorkspaceReportDocument, options);
+      }
+export function useGetWorkspaceReportLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceReportQuery, GetWorkspaceReportQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetWorkspaceReportQuery, GetWorkspaceReportQueryVariables>(GetWorkspaceReportDocument, options);
+        }
+export type GetWorkspaceReportQueryHookResult = ReturnType<typeof useGetWorkspaceReportQuery>;
+export type GetWorkspaceReportLazyQueryHookResult = ReturnType<typeof useGetWorkspaceReportLazyQuery>;
+export type GetWorkspaceReportQueryResult = Apollo.QueryResult<GetWorkspaceReportQuery, GetWorkspaceReportQueryVariables>;
+export function refetchGetWorkspaceReportQuery(variables?: GetWorkspaceReportQueryVariables) {
+      return { query: GetWorkspaceReportDocument, variables: variables }
+    }
 export const GetDialogueStatisticsDocument = gql`
     query GetDialogueStatistics($customerSlug: String!, $dialogueSlug: String!, $prevDateFilter: DialogueFilterInputType, $statisticsDateFilter: DialogueFilterInputType) {
   customer(slug: $customerSlug) {
@@ -6328,73 +6382,6 @@ export const GetAutomationDocument = gql`
           id
           title
           type
-        }
-      }
-      conditionBuilder {
-        id
-        type
-        childConditionBuilderId
-        childConditionBuilder {
-          id
-          type
-          conditions {
-            id
-            scope
-            operator
-            operands {
-              id
-              type
-              numberValue
-              textValue
-            }
-            dialogueScope {
-              id
-              aspect
-              aggregate {
-                id
-                type
-                latest
-              }
-            }
-            questionScope {
-              id
-              aspect
-              aggregate {
-                id
-                type
-                latest
-              }
-            }
-          }
-        }
-        conditions {
-          id
-          scope
-          operator
-          operands {
-            id
-            type
-            numberValue
-            textValue
-          }
-          dialogueScope {
-            id
-            aspect
-            aggregate {
-              id
-              type
-              latest
-            }
-          }
-          questionScope {
-            id
-            aspect
-            aggregate {
-              id
-              type
-              latest
-            }
-          }
         }
       }
     }
@@ -7429,6 +7416,19 @@ export namespace SetDialoguePrivacy {
   export const Document = SetDialoguePrivacyDocument;
 }
 
+export namespace GetWorkspaceReport {
+  export type Variables = GetWorkspaceReportQueryVariables;
+  export type Query = GetWorkspaceReportQuery;
+  export type Customer = (NonNullable<GetWorkspaceReportQuery['customer']>);
+  export type Statistics = (NonNullable<(NonNullable<GetWorkspaceReportQuery['customer']>)['statistics']>);
+  export type BasicStats = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceReportQuery['customer']>)['statistics']>)['basicStats']>);
+  export type ResponseHistogram = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceReportQuery['customer']>)['statistics']>)['responseHistogram']>);
+  export type Items = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceReportQuery['customer']>)['statistics']>)['responseHistogram']>)['items']>)[number]>;
+  export type IssueHistogram = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceReportQuery['customer']>)['statistics']>)['issueHistogram']>);
+  export type _Items = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceReportQuery['customer']>)['statistics']>)['issueHistogram']>)['items']>)[number]>;
+  export const Document = GetWorkspaceReportDocument;
+}
+
 export namespace GetDialogueStatistics {
   export type Variables = GetDialogueStatisticsQueryVariables;
   export type Query = GetDialogueStatisticsQuery;
@@ -7462,20 +7462,6 @@ export namespace GetAutomation {
   export type Event = (NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['event']>);
   export type Dialogue = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['event']>)['dialogue']>);
   export type Question = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['event']>)['question']>);
-  export type ConditionBuilder = (NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>);
-  export type ChildConditionBuilder = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['childConditionBuilder']>);
-  export type Conditions = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['childConditionBuilder']>)['conditions']>)[number]>;
-  export type Operands = NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['childConditionBuilder']>)['conditions']>)[number]>['operands']>)[number]>;
-  export type DialogueScope = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['childConditionBuilder']>)['conditions']>)[number]>['dialogueScope']>);
-  export type Aggregate = (NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['childConditionBuilder']>)['conditions']>)[number]>['dialogueScope']>)['aggregate']>);
-  export type QuestionScope = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['childConditionBuilder']>)['conditions']>)[number]>['questionScope']>);
-  export type _Aggregate = (NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['childConditionBuilder']>)['conditions']>)[number]>['questionScope']>)['aggregate']>);
-  export type _Conditions = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['conditions']>)[number]>;
-  export type _Operands = NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['conditions']>)[number]>['operands']>)[number]>;
-  export type _DialogueScope = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['conditions']>)[number]>['dialogueScope']>);
-  export type __Aggregate = (NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['conditions']>)[number]>['dialogueScope']>)['aggregate']>);
-  export type _QuestionScope = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['conditions']>)[number]>['questionScope']>);
-  export type ___Aggregate = (NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetAutomationQuery['automation']>)['automationTrigger']>)['conditionBuilder']>)['conditions']>)[number]>['questionScope']>)['aggregate']>);
   export const Document = GetAutomationDocument;
 }
 

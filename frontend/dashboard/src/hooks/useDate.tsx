@@ -4,7 +4,9 @@ import { format as tzFormat, utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz'
 export enum DateFormat {
   /** Example: 02-12-2021 */
   DayFormat = 'dd-MM-yyyy',
+
   DayTimeFormat = 'dd-MM-yyyy HH:mm',
+
   /** Example: Monday, June 16th */
   HumanGlobalWeekDayFormat = 'EEEE, MMMM do',
 

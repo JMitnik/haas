@@ -2288,10 +2288,12 @@ export interface NexusGenFieldTypes {
     basicStats: NexusGenRootTypes['BasicStatistics'] | null; // BasicStatistics
     health: NexusGenRootTypes['HealthScore'] | null; // HealthScore
     id: string | null; // ID
+    issueHistogram: NexusGenRootTypes['DateHistogram'] | null; // DateHistogram
     mostChangedPath: NexusGenRootTypes['MostChangedPath'] | null; // MostChangedPath
     mostPopularPath: NexusGenRootTypes['MostPopularPath'] | null; // MostPopularPath
     mostTrendingTopic: NexusGenRootTypes['MostTrendingTopic'] | null; // MostTrendingTopic
     rankedTopics: Array<NexusGenRootTypes['TopicType'] | null> | null; // [TopicType]
+    responseHistogram: NexusGenRootTypes['DateHistogram'] | null; // DateHistogram
     workspaceStatisticsSummary: NexusGenRootTypes['DialogueStatisticsSummaryModel'][]; // [DialogueStatisticsSummaryModel!]!
   }
   lineChartDataType: { // field return type
@@ -3178,10 +3180,12 @@ export interface NexusGenFieldTypeNames {
     basicStats: 'BasicStatistics'
     health: 'HealthScore'
     id: 'ID'
+    issueHistogram: 'DateHistogram'
     mostChangedPath: 'MostChangedPath'
     mostPopularPath: 'MostPopularPath'
     mostTrendingTopic: 'MostTrendingTopic'
     rankedTopics: 'TopicType'
+    responseHistogram: 'DateHistogram'
     workspaceStatisticsSummary: 'DialogueStatisticsSummaryModel'
   }
   lineChartDataType: { // field return type name
@@ -3610,6 +3614,9 @@ export interface NexusGenArgTypes {
     health: { // args
       input?: NexusGenInputs['HealthScoreInput'] | null; // HealthScoreInput
     }
+    issueHistogram: { // args
+      input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
+    }
     mostChangedPath: { // args
       input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
     }
@@ -3620,6 +3627,9 @@ export interface NexusGenArgTypes {
       input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
     }
     rankedTopics: { // args
+      input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
+    }
+    responseHistogram: { // args
       input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
     }
     workspaceStatisticsSummary: { // args

@@ -1,0 +1,27 @@
+query GetWorkspaceReport($workspaceId: ID!, $filter: DialogueStatisticsSummaryFilterInput) {
+  customer(id: $workspaceId) {
+    id
+    statistics {
+      basicStats(input: $filter) {
+        responseCount
+        average
+      }
+      responseHistogram(input: $filter) {
+        id
+        items {
+          id
+          frequency
+          date
+        }
+      }
+      issueHistogram(input: $filter) {
+        id
+        items {
+          id
+          frequency
+          date
+        }
+      }
+    }
+  }
+}
