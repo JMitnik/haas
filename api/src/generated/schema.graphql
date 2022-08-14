@@ -584,6 +584,7 @@ type Customer {
   dialogues(filter: DialogueFilterInputType): [Dialogue]
   id: ID
   isDemo: Boolean
+  issueTopics(input: IssueFilterInput): [Issue]
   issues(filter: IssueFilterInput): [Issue]
   name: String!
   nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel] @deprecated(reason: "Deprecated, see statistics")

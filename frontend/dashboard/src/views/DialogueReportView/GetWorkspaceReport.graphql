@@ -1,6 +1,21 @@
-query GetWorkspaceReport($workspaceId: ID!, $filter: DialogueStatisticsSummaryFilterInput) {
+query GetWorkspaceReport($workspaceId: ID!, $filter: DialogueStatisticsSummaryFilterInput, $issueFilter: IssueFilterInput) {
   customer(id: $workspaceId) {
     id
+
+    issueTopics(input: $issueFilter) {
+      id
+      rankScore
+      topic
+      dialogue {
+        id
+        title
+      }
+      basicStats {
+        responseCount
+        average
+      }
+    }
+
     statistics {
       basicStats(input: $filter) {
         responseCount

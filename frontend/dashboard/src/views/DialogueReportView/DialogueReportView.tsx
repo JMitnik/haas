@@ -16,29 +16,29 @@ import { useCustomer } from 'providers/CustomerProvider';
 import mainTheme from 'config/theme';
 import useMeasure from 'react-use-measure';
 
-const topics = [
-  {
-    topic: 'Management',
-    dialogue: 'Canada - SME & Productivity',
-    responseCount: 97,
-    averageScore: 40,
-    actionRequests: 1,
-  },
-  {
-    topic: 'Recruitment',
-    dialogue: 'Canada - SME & Productivity',
-    responseCount: 23,
-    averageScore: 44,
-    actionRequests: 0,
-  },
-  {
-    topic: 'Recruitment',
-    dialogue: 'Canada - SME & Productivity',
-    responseCount: 23,
-    averageScore: 44,
-    actionRequests: 2,
-  },
-];
+// const topics = [
+//   {
+//     topic: 'Management',
+//     dialogue: 'Canada - SME & Productivity',
+//     responseCount: 97,
+//     averageScore: 40,
+//     actionRequests: 1,
+//   },
+//   {
+//     topic: 'Recruitment',
+//     dialogue: 'Canada - SME & Productivity',
+//     responseCount: 23,
+//     averageScore: 44,
+//     actionRequests: 0,
+//   },
+//   {
+//     topic: 'Recruitment',
+//     dialogue: 'Canada - SME & Productivity',
+//     responseCount: 23,
+//     averageScore: 44,
+//     actionRequests: 2,
+//   },
+// ];
 
 export const DialogueReportView = () => {
   const { activeCustomer } = useCustomer();
@@ -59,6 +59,12 @@ export const DialogueReportView = () => {
         endDateTime: format(endDate, DateFormat.DayTimeFormat),
         refresh: true,
       },
+      issueFilter: {
+        startDate: format(startDate, DateFormat.DayTimeFormat),
+        endDate: format(endDate, DateFormat.DayTimeFormat),
+        dialogueStrings: [],
+        topicStrings: [],
+      },
     },
   });
 
@@ -78,6 +84,8 @@ export const DialogueReportView = () => {
   const issueHistogramItems = d?.customer?.statistics?.issueHistogram?.items || [];
 
   const issues = issuesData?.customer?.issues || [];
+
+  const topics = d?.customer?.issueTopics || [];
 
   return (
     <ReportsLayout>
@@ -261,7 +269,7 @@ export const DialogueReportView = () => {
             </UI.Div>
 
             <UI.Div>
-              {topics.map((topic) => (
+              {topics.filter(isPresent).map((topic) => (
                 <UI.Div>
                   <UI.Grid style={{ alignItems: 'center' }} gridTemplateColumns="70px 1fr 80px">
                     <UI.Div color="off.600">
@@ -269,7 +277,7 @@ export const DialogueReportView = () => {
                         <UI.Icon mr={1}>
                           <User />
                         </UI.Icon>
-                        {topic.responseCount}
+                        {topic?.basicStats.responseCount}
                       </UI.Flex>
                     </UI.Div>
 
@@ -281,12 +289,12 @@ export const DialogueReportView = () => {
 
                       <UI.Span color="off.400">
                         {'in '}
-                        {topic.dialogue}
+                        {topic.dialogue?.title}
                       </UI.Span>
                     </UI.Div>
 
                     <UI.Div>
-                      <ScoreBox score={topic.averageScore} />
+                      <ScoreBox score={topic.basicStats.average} />
                     </UI.Div>
                   </UI.Grid>
 

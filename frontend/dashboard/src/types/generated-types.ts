@@ -636,6 +636,7 @@ export type Customer = {
   /** Workspace statistics */
   statistics?: Maybe<WorkspaceStatistics>;
   issues?: Maybe<Array<Maybe<Issue>>>;
+  issueTopics?: Maybe<Array<Maybe<Issue>>>;
   dialogueConnection?: Maybe<DialogueConnection>;
   automationConnection?: Maybe<AutomationConnection>;
   usersConnection?: Maybe<UserConnection>;
@@ -664,6 +665,11 @@ export type CustomerSessionConnectionArgs = {
 
 export type CustomerIssuesArgs = {
   filter?: Maybe<IssueFilterInput>;
+};
+
+
+export type CustomerIssueTopicsArgs = {
+  input?: Maybe<IssueFilterInput>;
 };
 
 
@@ -3892,6 +3898,7 @@ export type SetDialoguePrivacyMutation = (
 export type GetWorkspaceReportQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
   filter?: Maybe<DialogueStatisticsSummaryFilterInput>;
+  issueFilter?: Maybe<IssueFilterInput>;
 }>;
 
 
@@ -3900,7 +3907,17 @@ export type GetWorkspaceReportQuery = (
   & { customer?: Maybe<(
     { __typename?: 'Customer' }
     & Pick<Customer, 'id'>
-    & { statistics?: Maybe<(
+    & { issueTopics?: Maybe<Array<Maybe<(
+      { __typename?: 'Issue' }
+      & Pick<Issue, 'id' | 'rankScore' | 'topic'>
+      & { dialogue?: Maybe<(
+        { __typename?: 'Dialogue' }
+        & Pick<Dialogue, 'id' | 'title'>
+      )>, basicStats: (
+        { __typename?: 'BasicStatistics' }
+        & Pick<BasicStatistics, 'responseCount' | 'average'>
+      ) }
+    )>>>, statistics?: Maybe<(
       { __typename?: 'WorkspaceStatistics' }
       & { basicStats?: Maybe<(
         { __typename?: 'BasicStatistics' }
@@ -6166,9 +6183,22 @@ export type SetDialoguePrivacyMutationHookResult = ReturnType<typeof useSetDialo
 export type SetDialoguePrivacyMutationResult = Apollo.MutationResult<SetDialoguePrivacyMutation>;
 export type SetDialoguePrivacyMutationOptions = Apollo.BaseMutationOptions<SetDialoguePrivacyMutation, SetDialoguePrivacyMutationVariables>;
 export const GetWorkspaceReportDocument = gql`
-    query GetWorkspaceReport($workspaceId: ID!, $filter: DialogueStatisticsSummaryFilterInput) {
+    query GetWorkspaceReport($workspaceId: ID!, $filter: DialogueStatisticsSummaryFilterInput, $issueFilter: IssueFilterInput) {
   customer(id: $workspaceId) {
     id
+    issueTopics(input: $issueFilter) {
+      id
+      rankScore
+      topic
+      dialogue {
+        id
+        title
+      }
+      basicStats {
+        responseCount
+        average
+      }
+    }
     statistics {
       basicStats(input: $filter) {
         responseCount
@@ -6209,6 +6239,7 @@ export const GetWorkspaceReportDocument = gql`
  *   variables: {
  *      workspaceId: // value for 'workspaceId'
  *      filter: // value for 'filter'
+ *      issueFilter: // value for 'issueFilter'
  *   },
  * });
  */
@@ -7420,8 +7451,11 @@ export namespace GetWorkspaceReport {
   export type Variables = GetWorkspaceReportQueryVariables;
   export type Query = GetWorkspaceReportQuery;
   export type Customer = (NonNullable<GetWorkspaceReportQuery['customer']>);
+  export type IssueTopics = NonNullable<(NonNullable<(NonNullable<GetWorkspaceReportQuery['customer']>)['issueTopics']>)[number]>;
+  export type Dialogue = (NonNullable<NonNullable<(NonNullable<(NonNullable<GetWorkspaceReportQuery['customer']>)['issueTopics']>)[number]>['dialogue']>);
+  export type BasicStats = (NonNullable<NonNullable<(NonNullable<(NonNullable<GetWorkspaceReportQuery['customer']>)['issueTopics']>)[number]>['basicStats']>);
   export type Statistics = (NonNullable<(NonNullable<GetWorkspaceReportQuery['customer']>)['statistics']>);
-  export type BasicStats = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceReportQuery['customer']>)['statistics']>)['basicStats']>);
+  export type _BasicStats = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceReportQuery['customer']>)['statistics']>)['basicStats']>);
   export type ResponseHistogram = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceReportQuery['customer']>)['statistics']>)['responseHistogram']>);
   export type Items = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceReportQuery['customer']>)['statistics']>)['responseHistogram']>)['items']>)[number]>;
   export type IssueHistogram = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceReportQuery['customer']>)['statistics']>)['issueHistogram']>);

@@ -1622,6 +1622,7 @@ export interface NexusGenFieldTypes {
     dialogues: Array<NexusGenRootTypes['Dialogue'] | null> | null; // [Dialogue]
     id: string | null; // ID
     isDemo: boolean | null; // Boolean
+    issueTopics: Array<NexusGenRootTypes['Issue'] | null> | null; // [Issue]
     issues: Array<NexusGenRootTypes['Issue'] | null> | null; // [Issue]
     name: string; // String!
     nestedDialogueStatisticsSummary: Array<NexusGenRootTypes['DialogueStatisticsSummaryModel'] | null> | null; // [DialogueStatisticsSummaryModel]
@@ -2514,6 +2515,7 @@ export interface NexusGenFieldTypeNames {
     dialogues: 'Dialogue'
     id: 'ID'
     isDemo: 'Boolean'
+    issueTopics: 'Issue'
     issues: 'Issue'
     name: 'String'
     nestedDialogueStatisticsSummary: 'DialogueStatisticsSummaryModel'
@@ -3233,6 +3235,9 @@ export interface NexusGenArgTypes {
     }
     dialogues: { // args
       filter?: NexusGenInputs['DialogueFilterInputType'] | null; // DialogueFilterInputType
+    }
+    issueTopics: { // args
+      input?: NexusGenInputs['IssueFilterInput'] | null; // IssueFilterInput
     }
     issues: { // args
       filter?: NexusGenInputs['IssueFilterInput'] | null; // IssueFilterInput
