@@ -1,5 +1,5 @@
 import * as UI from '@haas/ui';
-import { ArrowLeft, ArrowRight, AtSign, Feather, FileText, Hash, Link2, Phone, Type, Users } from 'react-feather';
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, AtSign, Feather, FileText, Hash, Link2, Phone, Trash, Type, Users } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
@@ -30,6 +30,7 @@ interface FormStepPreviewProps {
   onOpen: any;
   fieldIndex: number;
   nrFields: number;
+  onDelete: () => void;
 }
 
 const fieldMap: FieldProps[] = [
@@ -100,14 +101,12 @@ const fieldMap: FieldProps[] = [
 ];
 
 export const FormStepPreview = (
-  { field, onMoveRight, onMoveLeft, onOpen, fieldIndex, nrFields }: FormStepPreviewProps,
+  { field, onMoveRight, onMoveLeft, onOpen, fieldIndex, nrFields, onDelete }: FormStepPreviewProps,
 ) => {
   const fieldCategory = fieldMap.find((fieldItem) => fieldItem?.type === field?.type);
 
   const FieldIcon = fieldCategory?.icon || Feather;
   const { t } = useTranslation();
-
-  console.log('Field: ', field);
 
   return (
     <UI.Card>
@@ -117,7 +116,7 @@ export const FormStepPreview = (
             <UI.Flex mb={[4, 0]}>
               <UI.IconBox mr={2} bg={fieldCategory?.color}><FieldIcon /></UI.IconBox>
               <UI.ColumnFlex>
-                <UI.Text color="gray.500" fontWeight="700">{field?.header || 'Unnamed field'}</UI.Text>
+                <UI.Text color="gray.500" fontWeight="700">{field?.header ? `Page ${fieldIndex + 1}: ${field?.header} ` : `Page ${fieldIndex + 1}: Unnamed page`}</UI.Text>
                 <UI.Text fontWeight="300" color="gray.500">
                   {field?.fields?.length || 0}
                   {' '}
@@ -135,7 +134,7 @@ export const FormStepPreview = (
             <UI.IconButton
               size="sm"
               aria-label="Move field left"
-              icon={() => <ArrowLeft />}
+              icon={() => <ArrowUp />}
               type="button"
               isDisabled={fieldIndex === 0}
               onClick={(event) => {
@@ -149,12 +148,22 @@ export const FormStepPreview = (
             <UI.IconButton
               size="sm"
               aria-label="Move field right"
-              icon={() => <ArrowRight />}
+              icon={() => <ArrowDown />}
               type="button"
               isDisabled={fieldIndex === nrFields - 1}
               onClick={(event) => {
                 event.stopPropagation();
                 onMoveRight();
+              }}
+            />
+            <UI.IconButton
+              size="sm"
+              aria-label="Delete step"
+              icon={() => <Trash />}
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                onDelete();
               }}
             />
           </UI.ButtonGroup>

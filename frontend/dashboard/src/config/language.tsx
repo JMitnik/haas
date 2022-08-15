@@ -11,6 +11,30 @@ const language = {
     },
   },
   general: {
+    step_header: {
+      en: 'Header',
+      de: 'Header',
+    },
+    step_header_helper: {
+      en: 'What will be the header of the page?',
+      de: 'Was wird die Kopfzeile der Seite sein?',
+    },
+    step_helper: {
+      en: 'Instruction',
+      de: 'Anweisung',
+    },
+    step_helper_helper: {
+      en: 'What will be the instruction text of the page?',
+      de: 'Was wird der Anweisungstext der Seite sein?',
+    },
+    step_sub_helper: {
+      en: 'Instruction helper',
+      de: 'Anweisungshilfetext',
+    },
+    step_sub_helper_helper: {
+      en: 'What will be the instruction helper text of the page?',
+      de: 'Was wird der Anweisungshilfetext der Seite sein?',
+    },
     users_and_roles: {
       en: 'Users and roles',
       de: 'Benutzer und Rollen',
@@ -1025,6 +1049,10 @@ const language = {
       en: 'Contact',
       de: 'Kontakt',
     },
+    delete_step: {
+      en: 'Delete step',
+      de: 'Schritt löschen',
+    },
     delete_field: {
       en: 'Delete field',
       de: 'Feld löschen',
@@ -1096,6 +1124,10 @@ const language = {
     add_field_reminder: {
       en: 'Add your first field!',
       de: 'Fügen Sie Ihr erstes Feld hinzu!',
+    },
+    add_step: {
+      en: 'Add step',
+      de: 'Schritt hinzufügen',
     },
     add_field: {
       en: 'Add field',

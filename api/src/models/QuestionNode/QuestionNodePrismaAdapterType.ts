@@ -27,6 +27,7 @@ export interface CreateCTAInput {
 export interface UpdateFormFieldsInput {
   questionId: string;
   // fields: Prisma.FormNodeFieldUpsertArgs[];
+  steps: any;
   helperText?: string;
 }
 

@@ -57,19 +57,22 @@ const mapLeafs = (leafs: any) => leafs?.map((leaf: any) => {
       type: 'FORM',
       icon: RegisterIcon,
       form: {
-        steps: leaf.form.steps || [],
-        fields: leaf.form.fields.map((field: any) => ({
-          ...field,
-          contact: {
-            contacts: field.contacts.map(
-              (contact: {
-                id: string,
-                lastName?: string,
-                firstName?: string
-              }) => ({ label: `${contact?.firstName} ${contact?.lastName}`, value: contact.id, type: 'USER' }),
-            ),
-          },
-        })),
+        steps: leaf.form.steps.map((step: any) => ({
+          ...step,
+          fields: step.fields.map((field: any) => ({
+            ...field,
+            contact: {
+              contacts: field.contacts.map(
+                (contact: {
+                  id: string,
+                  lastName?: string,
+                  firstName?: string
+                }) => ({ label: `${contact?.firstName} ${contact?.lastName}`, value: contact.id, type: 'USER' }),
+              ),
+            },
+          })),
+        })) || [],
+
       },
     };
   }

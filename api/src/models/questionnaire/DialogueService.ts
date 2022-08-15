@@ -687,7 +687,7 @@ class DialogueService {
 
   async getCTAsByDialogueId(dialogueId: string, searchTerm?: string | null | undefined) {
     const leafs = await this.dialoguePrismaAdapter.getCTAsByDialogueId(dialogueId);
-
+    // console.dir(leafs, { depth: 10 });
     if (searchTerm) {
       const lowerCasedSearch = searchTerm.toLowerCase();
       return leafs.filter((leaf) => leaf.title.toLowerCase().includes(lowerCasedSearch));

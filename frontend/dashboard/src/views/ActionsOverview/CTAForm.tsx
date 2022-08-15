@@ -110,7 +110,7 @@ const schema = yup.object().shape({
       fields: yup.array().of(yup.object().shape({
         label: yup.string(),
         type: yup.string(),
-      })),
+      })).required(),
     })),
   }),
 });
@@ -245,19 +245,7 @@ const CTAForm = ({
   const watchType = form.watch('ctaType');
 
   const onSubmit = (formData: FormDataProps) => {
-    const formFields = formData.formNode?.fields?.map(
-      (field) => {
-        const { contact, type: fieldType, ...rest } = field;
-        return ({
-          ...rest,
-          type: fieldType as FormNodeFieldTypeEnum,
-          userIds: contact?.contacts?.map((user) => user.value) || [],
-          isRequired: intToBool(field.isRequired),
-        });
-      },
-    );
-
-    const stepFields = formData.formNode?.steps.map((step) => {
+    const stepFields = formData.formNode?.steps.map((step, index) => {
       const fields = step.fields.map((field) => {
         const { contact, type: fieldType, ...rest } = field;
         return ({
@@ -270,10 +258,10 @@ const CTAForm = ({
         }
         );
       });
-      return { ...step, __typename: undefined, type: step.type as FormNodeStepType, fields };
+      return {
+        ...step, __typename: undefined, position: index + 1, type: step.type as FormNodeStepType, fields,
+      };
     });
-
-    console.log('Form data CTA Form: ', formData);
 
     if (id === '-1') {
       const mappedLinks = {

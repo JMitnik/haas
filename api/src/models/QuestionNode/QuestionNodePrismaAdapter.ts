@@ -350,6 +350,7 @@ class QuestionNodePrismaAdapter {
         form: {
           update: {
             helperText: input.helperText,
+            steps: input.steps || undefined,
           },
         },
       },

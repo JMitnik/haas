@@ -704,7 +704,7 @@ export const QuestionNodeMutations = extendType({
           || typeof validatedType === undefined
           || (args.input.type === NodeType.LINK && links?.linkTypes?.length === 0)
           || (args.input.type === NodeType.SHARE && !args.input?.share?.title)
-          || (args.input.type === NodeType.FORM && args.input.form?.fields?.length === 0))
+          || (args.input.type === NodeType.FORM && args.input.form?.steps?.length === 0))
           throw new UserInputError(`Input data is unsufficient: ${args.input}`);
 
 

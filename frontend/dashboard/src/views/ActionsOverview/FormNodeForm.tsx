@@ -21,10 +21,10 @@ import React, { useRef, useState } from 'react';
 
 import * as Modal from 'components/Common/Modal';
 import { ReactComponent as FieldIll } from 'assets/images/undraw_form.svg';
+import { FormNodeFieldTypeEnum } from 'types/generated-types';
 import { ReactComponent as SelectIll } from 'assets/images/undraw_select.svg';
 import useOnClickOutside from 'hooks/useClickOnOutside';
 
-import { FormNodeFieldTypeEnum } from 'types/generated-types';
 import { FormStepPreview } from './FormStepPreview';
 import { StepFormNodeFormFragment } from './StepNodeFormFragment';
 import FormNodeContactsFragment from './FormNodeContactFragment';
@@ -186,7 +186,9 @@ interface FormNodeFieldFragmentProps {
   onDelete: () => void;
 }
 
-export const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete, fieldIndex }: FormNodeFieldFragmentProps) => {
+export const FormNodeFieldFragment = (
+  { field, onClose, onSubmit, onDelete }: FormNodeFieldFragmentProps,
+) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const { t } = useTranslation();
 
@@ -341,8 +343,6 @@ const FormNodeForm = () => {
 
   const stepsFields = form.watch('formNode.steps');
 
-  console.log('Steps: ', stepsFields);
-
   return (
     <UI.FormSection id="form-node-form">
       <UI.Div>
@@ -350,14 +350,6 @@ const FormNodeForm = () => {
         <UI.FormSectionHelper>{t('form_node_helper')}</UI.FormSectionHelper>
       </UI.Div>
       <UI.Div>
-
-        <UI.Div mb={4}>
-          <UI.InputHeader>{t('about_form_helpertext_header')}</UI.InputHeader>
-          <UI.InputHelper>{t('about_form_helpertext_helper')}</UI.InputHelper>
-          <UI.FormControl>
-            <UI.Input {...form.register('formNode.helperText')} placeholder={t('form_helpertext_placeholder')} />
-          </UI.FormControl>
-        </UI.Div>
         <UI.Div>
           <UI.InputGrid>
             {fields?.map((field, index) => (
@@ -371,8 +363,11 @@ const FormNodeForm = () => {
                     <StepFormNodeFormFragment
                       key={field.fieldIndex}
                       position={index}
-                      step={stepsFields[index]}
-                      onSubmit={(subForm) => form.setValue(`formNode.steps.${index}`, { ...subForm })}
+                      onClose={() => setOpenedStep(null)}
+                      onDelete={() => {
+                        setOpenedStep(null);
+                        remove(index);
+                      }}
                     />
                   </Modal.Root>
                 </AnimatePresence>
@@ -386,6 +381,7 @@ const FormNodeForm = () => {
                   onMoveRight={() => {
                     move(index, Math.min(index + 1, fields.length - 1));
                   }}
+                  onDelete={() => remove(index)}
                 />
 
               </UI.Div>
@@ -393,10 +389,10 @@ const FormNodeForm = () => {
             ))}
             {fields?.length === 0 ? (
               <UI.IllustrationCard svg={<FieldIll />} text={t('add_field_reminder')}>
-                <UI.Button type="button" onClick={() => handleNewField()}>{t('add_field')}</UI.Button>
+                <UI.Button type="button" onClick={() => handleNewField()}>{t('add_step')}</UI.Button>
               </UI.IllustrationCard>
             ) : (
-              <UI.Button mt={4} type="button" onClick={() => handleNewField()}>{t('add_field')}</UI.Button>
+              <UI.Button mt={4} type="button" onClick={() => handleNewField()}>{t('add_step')}</UI.Button>
             )}
           </UI.InputGrid>
         </UI.Div>

@@ -1,19 +1,19 @@
 import * as UI from '@haas/ui';
 import { AnimatePresence } from 'framer-motion';
-import { useFieldArray, useForm, useFormContext } from 'react-hook-form';
+import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import React, { useRef, useState } from 'react';
 
 import * as Modal from 'components/Common/Modal';
 import { ReactComponent as FieldIll } from 'assets/images/undraw_form.svg';
-import useOnClickOutside from 'hooks/useClickOnOutside';
 
+import { XCircle } from 'react-feather';
 import { FormNodeFieldFragment, FormNodePreview, TempFieldType } from './FormNodeForm';
 
 interface StepFormNodeFormProps {
   position: number;
-  onSubmit: (subForm: any) => void;
-  step: any;
+  onClose: (value: React.SetStateAction<number | null>) => void;
+  onDelete: () => void
 }
 
 interface TempFieldProps {
@@ -32,7 +32,7 @@ const appendNewField = (index: number): TempFieldProps => ({
   contact: { contacts: [] },
 });
 
-export const StepFormNodeFormFragment = ({ onSubmit, position, step }: StepFormNodeFormProps) => {
+export const StepFormNodeFormFragment = ({ position, onClose, onDelete }: StepFormNodeFormProps) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const form = useFormContext();
   const [openedField, setOpenedField] = useState<number | null>(null);
@@ -50,34 +50,37 @@ export const StepFormNodeFormFragment = ({ onSubmit, position, step }: StepFormN
 
   const formNodeFields = form.watch(`formNode.steps.${position}.fields`, []);
 
-  console.log('Form node fields: ', formNodeFields);
-
   return (
-    <UI.Card padding="1em" zIndex={299} ref={ref}>
-      <UI.InputHeader>
-        Step
-        {' '}
-        {position}
-      </UI.InputHeader>
+    <UI.Card padding="2em" zIndex={299} ref={ref}>
+      <UI.Flex mb={2} justifyContent="space-between">
+        <UI.H4 color="main.500">
+          Step
+          {' '}
+          {position + 1}
+        </UI.H4>
+        <UI.Icon style={{ cursor: 'pointer' }} color="main.500" onClick={() => onClose(null)}>
+          <XCircle />
+        </UI.Icon>
+      </UI.Flex>
+
       <UI.Grid gridTemplateColumns="1fr 1fr">
         <UI.FormControl>
-          <UI.FormLabel htmlFor="title">{t('title')}</UI.FormLabel>
-          <UI.InputHelper>{t('cta:title_helper')}</UI.InputHelper>
-          <UI.Input {...form.register(`formNode.steps.${position}.header`)} placeholder={t('form_helpertext_placeholder')} />
+          <UI.FormLabel htmlFor="title">{t('step_header')}</UI.FormLabel>
+          <UI.InputHelper>{t('step_header_helper')}</UI.InputHelper>
+          <UI.Input {...form.register(`formNode.steps.${position}.header`)} placeholder="Contact Details" />
         </UI.FormControl>
         <UI.FormControl>
-          <UI.FormLabel htmlFor="title">{t('title')}</UI.FormLabel>
-          <UI.InputHelper>{t('cta:title_helper')}</UI.InputHelper>
+          <UI.FormLabel htmlFor="title">{t('step_helper')}</UI.FormLabel>
+          <UI.InputHelper>{t('step_helper_helper')}</UI.InputHelper>
           <UI.Input {...form.register(`formNode.steps.${position}.helper`)} placeholder={t('form_helpertext_placeholder')} />
         </UI.FormControl>
         <UI.FormControl>
-          <UI.FormLabel htmlFor="title">{t('title')}</UI.FormLabel>
-          <UI.InputHelper>{t('cta:title_helper')}</UI.InputHelper>
-          <UI.Input {...form.register(`formNode.steps.${position}.subHelper`)} placeholder={t('form_helpertext_placeholder')} />
+          <UI.FormLabel htmlFor="title">{t('step_sub_helper')}</UI.FormLabel>
+          <UI.InputHelper>{t('step_sub_helper_helper')}</UI.InputHelper>
+          <UI.Input {...form.register(`formNode.steps.${position}.subHelper`)} placeholder="Please fill in your details..." />
         </UI.FormControl>
       </UI.Grid>
-
-      <UI.Grid gridTemplateColumns="1fr 1fr">
+      <UI.Grid mt={4} gridTemplateColumns="1fr 1fr">
         {fields?.map((field, index) => (
           <UI.Div position="relative" key={field.fieldIndex}>
             <AnimatePresence>
@@ -105,7 +108,7 @@ export const StepFormNodeFormFragment = ({ onSubmit, position, step }: StepFormN
                   form={form}
                   onClose={() => setOpenedField(null)}
                   onDelete={() => remove(index)}
-                  field={formNodeFields[index]} // formNodeFields[index]
+                  field={formNodeFields[index]}
                   fieldIndex={index}
                   key={field.fieldIndex}
                 />
@@ -130,9 +133,21 @@ export const StepFormNodeFormFragment = ({ onSubmit, position, step }: StepFormN
         fields.length === 0 ? (
           <UI.IllustrationCard svg={<FieldIll />} text={t('add_field_reminder')}>
             <UI.Button type="button" onClick={() => handleNewField()}>{t('add_field')}</UI.Button>
+            or
+            <UI.Button
+              onClick={() => onDelete()}
+              variantColor="red"
+              variant="outline"
+            >
+              {t('delete_step')}
+
+            </UI.Button>
           </UI.IllustrationCard>
         ) : (
-          <UI.Button mt={4} type="button" onClick={() => handleNewField()}>{t('add_field')}</UI.Button>
+          <UI.Flex mt={4} justifyContent="space-between">
+            <UI.Button type="button" onClick={() => handleNewField()}>{t('add_field')}</UI.Button>
+          </UI.Flex>
+
         )
       }
     </UI.Card>

@@ -453,6 +453,9 @@ class DialoguePrismaAdapter {
         form: {
           include: {
             steps: {
+              orderBy: {
+                position: 'asc',
+              },
               include: {
                 fields: {
                   include: {
