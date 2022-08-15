@@ -1,5 +1,5 @@
 import * as UI from '@haas/ui';
-import { AtSign, FileText, Hash, Link2, Phone, Send, Type } from 'react-feather';
+import { AtSign, FileText, Frown, Hash, Link2, Phone, Send, Type } from 'react-feather';
 import { ClientButton } from 'components/Buttons/Buttons';
 import { Controller, useForm } from 'react-hook-form';
 import { Div } from '@haas/ui';
@@ -14,6 +14,7 @@ import { FormNodeFieldTypeEnum } from 'types/generated-types';
 import { GenericQuestionNodeProps } from 'modules/Node/Node.types';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { SessionActionType } from 'types/core-types';
+import Color from 'color';
 
 type FormNodeProps = GenericQuestionNodeProps;
 
@@ -51,7 +52,7 @@ const DrawerContainer = styled(UI.Div)`
 `;
 
 export const TypeBadge = styled(Div)`
- ${({ backgroundColor, theme }) => css`
+ ${({ theme }) => css`
     display: flex;
     justify-content: center;
     width: fit-content;
@@ -59,6 +60,24 @@ export const TypeBadge = styled(Div)`
     padding: 0.5em;
     background-color: ${theme.colors.main['400']};
   `}
+`;
+
+export const ButtonIconContainer = styled(UI.Div)`
+   //TODO: Adjust color of custom icon using inverse CSS property (?)
+   ${({ theme }) => css`
+      img {
+        color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.8).saturate(1).hex() : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
+        width: 24px;
+        height: auto
+      }
+
+      ${UI.Icon} svg {
+        color: ${theme.colors.main['500']};
+        width: 150px;
+        height: auto;
+      }
+
+   `}
 `;
 
 const getFieldValue = (field: any, relatedField: any) => {
@@ -73,10 +92,21 @@ const getFieldValue = (field: any, relatedField: any) => {
   return field.value || undefined;
 };
 
+const getFirstFocusableFieldIndex = (step: any) => {
+  let index = -1;
+  step.fields.forEach((field: any, fieldindex: number) => {
+    if (field.type !== 'contacts') index = fieldindex;
+  });
+
+  return index;
+};
+
 const FormNode = ({ node, onRunAction }: FormNodeProps) => {
   const { t } = useTranslation();
   const [activeStep, setActiveStep] = useState(0);
-  const { register, getValues, formState, control, watch } = useForm<FormNodeFormProps>({
+  const [wantsToShare, setWantsToShare] = useState(false);
+
+  const { register, getValues, formState, control } = useForm<FormNodeFormProps>({
     mode: 'onChange',
     shouldUnregister: false,
     defaultValues: {
@@ -120,8 +150,6 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
     });
   };
 
-  console.log('Form watch: ', watch());
-
   return (
     <UI.Div>
 
@@ -129,156 +157,196 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
 
       <motion.div animate={{ opacity: 1, y: 0 }} initial={{ opacity: 0, y: 350 }}>
         <DrawerContainer>
-          <UI.Flex alignItems="center">
-            <TypeBadge>
-              <AtSign color="white" />
-            </TypeBadge>
-            <UI.Flex ml={2} flexDirection="column" alignItems="flex-start">
-              <UI.Text
-                textAlign="left"
-                fontWeight={700}
-                color="main.400"
-                fontSize="1.2rem"
-              >
-                {step?.header || t('leave_your_details')}
-              </UI.Text>
-              <UI.Helper>
-                Step
-                {' '}
-                {activeStep + 1}
-                /
-                {node?.form?.steps?.length}
-              </UI.Helper>
-            </UI.Flex>
-          </UI.Flex>
-          <UI.Div mt="1em">
-            <UI.Text textAlign="left" fontSize="1.2rem" color="main.400" fontWeight={350}>
-              {step?.helper || t('leave_your_details')}
-            </UI.Text>
-            <UI.Text textAlign="left" fontSize="0.8rem" color="off.500">
-              {step?.subHelper || t('leave_your_details')}
-            </UI.Text>
-          </UI.Div>
-
-          <UI.Form onSubmit={(e: React.FormEvent<HTMLFormElement>) => { handleSubmit(e); return false; }}>
-            <Div mt={2}>
-              <UI.Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
-                {fields?.map((field, index) => (
-                  <UI.Div
-                    key={index}
-                    gridColumn={field.type === 'longText'
-                      || field.type === FormNodeFieldTypeEnum.Contacts ? 'span 2' : '1fr'}
+          {wantsToShare ? (
+            <>
+              <UI.Flex alignItems="center">
+                <TypeBadge>
+                  <AtSign color="white" />
+                </TypeBadge>
+                <UI.Flex ml={2} flexDirection="column" alignItems="flex-start">
+                  <UI.Text
+                    textAlign="left"
+                    fontWeight={700}
+                    color="main.400"
+                    fontSize="1.2rem"
                   >
-                    <UI.FormControl isRequired={field.isRequired || false}>
-                      <UI.FormLabel htmlFor={`fields.${index}.value`}>{field.label}</UI.FormLabel>
-                      {field.type === 'longText' && (
-                        <UI.Textarea
-                          key={`longText-${index}`}
-                          id={`fields[${index}].value`}
-                          variant="outline"
-                          {...register(`steps.${activeStep}.fields.${index}.value`)}
-                          minHeight="40px"
-                          placeholder={field.placeholder || undefined}
-                        />
-                      )}
-                      {field.type === FormNodeFieldTypeEnum.Contacts && (
-                        <Controller
-                          key="contactsradio"
-                          name={`steps.${activeStep}.fields.${index}.value`}
-                          control={control}
-                          defaultValue={undefined}
-                          rules={{ required: field.isRequired || false }}
-                          render={({ field: { value, onBlur, onChange } }) => (
-                            <RadioGroup.Root
-                              defaultValue={value as string}
-                              onValueChange={onChange}
-                              onBlur={onBlur}
-                              variant="tight"
-                            >
-                              {field.contacts?.map((contact) => (
-                                <RadioGroup.Item
-                                  isActive={value === contact?.email}
-                                  value={contact?.email as string}
-                                  key={contact?.id}
-                                  contentVariant="twoLine"
-                                  variant="boxed"
-                                >
-                                  <UI.Flex flexDirection="column" alignItems="flex-start" justifyContent="center">
-                                    <RadioGroup.Label style={{ marginBottom: 0, marginTop: '4px' }}>
-                                      {contact?.firstName}
-                                      {' '}
-                                      {contact?.lastName}
-                                    </RadioGroup.Label>
-                                  </UI.Flex>
+                    {step?.header || t('leave_your_details')}
+                  </UI.Text>
+                  {node?.form?.steps?.length && node?.form?.steps?.length > 1 && (
+                    <UI.Helper>
+                      Step
+                      {' '}
+                      {activeStep + 1}
+                      /
+                      {node?.form?.steps?.length}
+                    </UI.Helper>
+                  )}
 
-                                </RadioGroup.Item>
-                              ))}
-                            </RadioGroup.Root>
-                          )}
-                        />
-                      )}
-                      {field.type !== 'longText' && field.type !== 'contacts' && (
-                        <UI.Input
-                          key={fields[index].id}
-                          id={`fields[${index}].value`}
-                          variant="outline"
-                          leftEl={mapIcon[field?.type] || <Type />}
-                          type={mapFieldType[field?.type] || 'text'}
-                          placeholder={field.placeholder || undefined}
-                          maxWidth={mapFieldType[field?.type] === 'number' ? '100px' : 'auto'}
-                          {...register(`steps.${activeStep}.fields.${index}.value`, { required: field.isRequired || false })}
-                        />
-                      )}
-                    </UI.FormControl>
-                  </UI.Div>
-                ))}
-              </UI.Grid>
-              <UI.Div mt={4}>
-                <UI.Flex flexWrap="wrap" justifyContent="space-between" alignItems="center">
-
-                  <UI.Button size="sm" variant="ghost" onClick={(e) => handleSubmit(e, true)}>
-                    {t('do_not_share')}
-                  </UI.Button>
-                  <UI.Flex>
-                    <UI.Button
-                      size="sm"
-                      variant="outline"
-                      height="40px"
-                      isDisabled={activeStep === 0}
-                      onClick={() => setActiveStep((prevStep) => prevStep - 1)}
-                    >
-                      Back
-                    </UI.Button>
-                    {(node?.form?.steps?.length && activeStep + 1 >= node?.form?.steps?.length) ? (
-                      <ClientButton
-                        // @ts-ignore
-                        flexBasis="200px"
-                        ml={2}
-                        width="auto"
-                        type="submit"
-                        leftIcon={() => <Send />}
-                        isDisabled={!isValid}
-                        isActive={isValid}
-                      >
-                        {t('submit')}
-                      </ClientButton>
-                    ) : (
-                      <UI.Button
-                        ml={2}
-                        size="sm"
-                        variant="solid"
-                        height="40px"
-                        onClick={() => setActiveStep((prevStep) => prevStep + 1)}
-                      >
-                        Next
-                      </UI.Button>
-                    )}
-
-                  </UI.Flex>
                 </UI.Flex>
+              </UI.Flex>
+              <UI.Div mt="1em">
+                <UI.Text textAlign="left" fontSize="1.2rem" color="main.400" fontWeight={350}>
+                  {step?.helper || t('leave_your_details')}
+                </UI.Text>
+                <UI.Text textAlign="left" fontSize="0.8rem" color="off.500">
+                  {step?.subHelper || t('leave_your_details')}
+                </UI.Text>
               </UI.Div>
-            </Div>
-          </UI.Form>
+
+              <UI.Form onSubmit={(e: React.FormEvent<HTMLFormElement>) => { handleSubmit(e); return false; }}>
+                <Div mt={2}>
+                  <UI.Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
+                    {fields?.map((field, index) => (
+                      <UI.Div
+                        key={index}
+                        gridColumn={field.type === 'longText'
+                          || field.type === FormNodeFieldTypeEnum.Contacts ? 'span 2' : '1fr'}
+                      >
+                        <UI.FormControl isRequired={field.isRequired || false}>
+                          <UI.FormLabel htmlFor={`fields.${index}.value`}>{field.label}</UI.FormLabel>
+                          {field.type === 'longText' && (
+                            <UI.Textarea
+                              key={`longText-${index}`}
+                              id={`fields[${index}].value`}
+                              variant="outline"
+                              {...register(`steps.${activeStep}.fields.${index}.value`)}
+                              minHeight="40px"
+                              placeholder={field.placeholder || undefined}
+                            />
+                          )}
+                          {field.type === FormNodeFieldTypeEnum.Contacts && (
+                            <Controller
+                              key="contactsradio"
+                              name={`steps.${activeStep}.fields.${index}.value`}
+                              control={control}
+                              defaultValue={undefined}
+                              rules={{ required: field.isRequired || false }}
+                              render={({ field: { value, onBlur, onChange } }) => (
+                                <RadioGroup.Root
+                                  defaultValue={value as string}
+                                  onValueChange={onChange}
+                                  onBlur={onBlur}
+                                  variant="tight"
+                                >
+                                  {field.contacts?.map((contact) => (
+                                    <RadioGroup.Item
+                                      isActive={value === contact?.email}
+                                      value={contact?.email as string}
+                                      key={contact?.id}
+                                      contentVariant="twoLine"
+                                      variant="boxed"
+                                    >
+                                      <UI.Flex flexDirection="column" alignItems="flex-start" justifyContent="center">
+                                        <RadioGroup.Label style={{ marginBottom: 0, marginTop: '4px' }}>
+                                          {contact?.firstName}
+                                          {' '}
+                                          {contact?.lastName}
+                                        </RadioGroup.Label>
+                                      </UI.Flex>
+
+                                    </RadioGroup.Item>
+                                  ))}
+                                </RadioGroup.Root>
+                              )}
+                            />
+                          )}
+                          {field.type !== 'longText' && field.type !== 'contacts' && (
+                            <UI.Input
+                              autoFocus={index === getFirstFocusableFieldIndex(step)}
+                              key={fields[index].id}
+                              id={`fields[${index}].value`}
+                              variant="outline"
+                              leftEl={mapIcon[field?.type] || <Type />}
+                              type={mapFieldType[field?.type] || 'text'}
+                              placeholder={field.placeholder || undefined}
+                              maxWidth={mapFieldType[field?.type] === 'number' ? '100px' : 'auto'}
+                              {...register(`steps.${activeStep}.fields.${index}.value`, { required: field.isRequired || false })}
+                            />
+                          )}
+                        </UI.FormControl>
+                      </UI.Div>
+                    ))}
+                  </UI.Grid>
+                  <UI.Div mt={4}>
+                    <UI.Flex flexWrap="wrap" justifyContent="space-between" alignItems="center">
+
+                      <UI.Button size="sm" variant="ghost" onClick={(e) => handleSubmit(e, true)}>
+                        {t('do_not_share')}
+                      </UI.Button>
+                      <UI.Flex>
+                        {node?.form?.steps?.length && node?.form?.steps?.length > 1 && (
+                          <UI.Button
+                            size="sm"
+                            variant="outline"
+                            height="40px"
+                            isDisabled={activeStep === 0}
+                            onClick={() => setActiveStep((prevStep) => prevStep - 1)}
+                          >
+                            Back
+                          </UI.Button>
+                        )}
+
+                        {(node?.form?.steps?.length && activeStep + 1 >= node?.form?.steps?.length) ? (
+                          <ClientButton
+                            // @ts-ignore
+                            flexBasis="200px"
+                            ml={2}
+                            width="auto"
+                            type="submit"
+                            leftIcon={() => <Send />}
+                            isDisabled={!isValid}
+                            isActive={isValid}
+                          >
+                            {t('submit')}
+                          </ClientButton>
+                        ) : (
+                          <UI.Button
+                            ml={2}
+                            size="sm"
+                            variant="solid"
+                            height="40px"
+                            onClick={() => setActiveStep((prevStep) => prevStep + 1)}
+                          >
+                            Next
+                          </UI.Button>
+                        )}
+
+                      </UI.Flex>
+                    </UI.Flex>
+                  </UI.Div>
+                </Div>
+              </UI.Form>
+            </>
+          ) : (
+            <UI.Div>
+              <UI.Text fontSize="1.2rem" color="main.400" fontWeight={700}>We are sorry</UI.Text>
+              <UI.Text fontSize="0.8rem" color="off.400" fontWeight={500}>
+                Would you like to share your thoughts and feelings with someone you feel comfortable with?
+              </UI.Text>
+              <ButtonIconContainer mt={2}>
+                <UI.Icon stroke="main.400">
+                  <Frown />
+                </UI.Icon>
+              </ButtonIconContainer>
+
+              <UI.Div mt={2}>
+                <ClientButton
+                  // @ts-ignore
+                  flexBasis="200px"
+                  width="100%"
+                  type="button"
+                  onClick={() => setWantsToShare(true)}
+                >
+                  Get me in touch with someone
+                </ClientButton>
+                <UI.Button width="100%" mt={1} size="sm" variant="ghost" onClick={(e) => handleSubmit(e, true)}>
+                  I don't want to share anything
+                </UI.Button>
+              </UI.Div>
+
+            </UI.Div>
+          )}
+
         </DrawerContainer>
       </motion.div>
     </UI.Div>

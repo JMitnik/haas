@@ -458,6 +458,9 @@ class DialoguePrismaAdapter {
               },
               include: {
                 fields: {
+                  orderBy: {
+                    position: 'asc',
+                  },
                   include: {
                     contacts: true,
                   },
