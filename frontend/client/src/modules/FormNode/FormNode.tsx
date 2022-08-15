@@ -1,12 +1,12 @@
 import * as UI from '@haas/ui';
-import { AtSign, FileText, Hash, Link2, Phone, Type } from 'react-feather';
+import { AtSign, FileText, Hash, Link2, Phone, Send, Type } from 'react-feather';
 import { ClientButton } from 'components/Buttons/Buttons';
 import { Controller, useForm } from 'react-hook-form';
 import { Div } from '@haas/ui';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import React from 'react';
-import styled from 'styled-components';
+import React, { useState } from 'react';
+import styled, { css } from 'styled-components';
 
 import * as RadioGroup from 'components/RadioGroup';
 
@@ -18,8 +18,10 @@ import { SessionActionType } from 'types/core-types';
 type FormNodeProps = GenericQuestionNodeProps;
 
 interface FormNodeFormProps {
-  fields: {
-    value: string | number;
+  steps: {
+    fields: {
+      value: string | number;
+    }[]
   }[]
 }
 
@@ -48,6 +50,17 @@ const DrawerContainer = styled(UI.Div)`
   backdrop-filter: blur(10px);
 `;
 
+export const TypeBadge = styled(Div)`
+ ${({ backgroundColor, theme }) => css`
+    display: flex;
+    justify-content: center;
+    width: fit-content;
+    border-radius: 45px;
+    padding: 0.5em;
+    background-color: ${theme.colors.main['400']};
+  `}
+`;
+
 const getFieldValue = (field: any, relatedField: any) => {
   if (relatedField?.type === 'number') {
     try {
@@ -62,27 +75,32 @@ const getFieldValue = (field: any, relatedField: any) => {
 
 const FormNode = ({ node, onRunAction }: FormNodeProps) => {
   const { t } = useTranslation();
-  const { register, getValues, formState, control } = useForm<FormNodeFormProps>({
+  const [activeStep, setActiveStep] = useState(0);
+  const { register, getValues, formState, control, watch } = useForm<FormNodeFormProps>({
     mode: 'onChange',
+    shouldUnregister: false,
     defaultValues: {
-      fields: node?.form?.fields?.map(() => ({
-        value: '',
-      })) || [],
+      steps: node?.form?.steps?.map(() => ({
+        fields: node?.form?.fields?.map(() => ({
+          value: '',
+        })) || [],
+      })),
     },
   });
 
   const { isValid } = formState;
 
-  const fields = node?.form?.fields || [];
+  const step = node.form?.steps?.[activeStep] || undefined;
+  const fields = node.form?.steps?.[activeStep].fields || [];
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>, ignoreFields = false) => {
     event.preventDefault();
     const formEntry = getValues();
 
-    const formFieldValues = formEntry.fields?.map((fieldEntry, index) => ({
+    const formFieldValues = formEntry.steps.flatMap((stepEntry) => stepEntry.fields?.map((fieldEntry, index) => ({
       relatedFieldId: fields?.[index]?.id,
       [fields?.[index]?.type || '']: !ignoreFields ? getFieldValue(fieldEntry, fields?.[index]) : undefined,
-    }));
+    })));
 
     // TODO: Think of some logic
     const childEdge = undefined;
@@ -102,24 +120,48 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
     });
   };
 
+  console.log('Form watch: ', watch());
+
   return (
     <UI.Div>
+
       <NodeTitle>{node.title}</NodeTitle>
 
       <motion.div animate={{ opacity: 1, y: 0 }} initial={{ opacity: 0, y: 350 }}>
         <DrawerContainer>
-          <UI.Text
-            textAlign="left"
-            fontWeight={700}
-            color="gray.600"
-            fontSize="1.2rem"
-            mb={2}
-          >
-            {node.form?.helperText || t('leave_your_details')}
-          </UI.Text>
-          <UI.Hr />
+          <UI.Flex alignItems="center">
+            <TypeBadge>
+              <AtSign color="white" />
+            </TypeBadge>
+            <UI.Flex ml={2} flexDirection="column" alignItems="flex-start">
+              <UI.Text
+                textAlign="left"
+                fontWeight={700}
+                color="main.400"
+                fontSize="1.2rem"
+              >
+                {step?.header || t('leave_your_details')}
+              </UI.Text>
+              <UI.Helper>
+                Step
+                {' '}
+                {activeStep + 1}
+                /
+                {node?.form?.steps?.length}
+              </UI.Helper>
+            </UI.Flex>
+          </UI.Flex>
+          <UI.Div mt="1em">
+            <UI.Text textAlign="left" fontSize="1.2rem" color="main.400" fontWeight={350}>
+              {step?.helper || t('leave_your_details')}
+            </UI.Text>
+            <UI.Text textAlign="left" fontSize="0.8rem" color="off.500">
+              {step?.subHelper || t('leave_your_details')}
+            </UI.Text>
+          </UI.Div>
+
           <UI.Form onSubmit={(e: React.FormEvent<HTMLFormElement>) => { handleSubmit(e); return false; }}>
-            <Div>
+            <Div mt={2}>
               <UI.Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
                 {fields?.map((field, index) => (
                   <UI.Div
@@ -134,7 +176,7 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                           key={`longText-${index}`}
                           id={`fields[${index}].value`}
                           variant="outline"
-                          {...register(`fields.${index}.value`)}
+                          {...register(`steps.${activeStep}.fields.${index}.value`)}
                           minHeight="40px"
                           placeholder={field.placeholder || undefined}
                         />
@@ -142,7 +184,7 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                       {field.type === FormNodeFieldTypeEnum.Contacts && (
                         <Controller
                           key="contactsradio"
-                          name={`fields.${index}.value`}
+                          name={`steps.${activeStep}.fields.${index}.value`}
                           control={control}
                           defaultValue={undefined}
                           rules={{ required: field.isRequired || false }}
@@ -184,7 +226,7 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                           type={mapFieldType[field?.type] || 'text'}
                           placeholder={field.placeholder || undefined}
                           maxWidth={mapFieldType[field?.type] === 'number' ? '100px' : 'auto'}
-                          {...register(`fields.${index}.value`, { required: field.isRequired || false })}
+                          {...register(`steps.${activeStep}.fields.${index}.value`, { required: field.isRequired || false })}
                         />
                       )}
                     </UI.FormControl>
@@ -192,21 +234,47 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                 ))}
               </UI.Grid>
               <UI.Div mt={4}>
-                <UI.Flex flexWrap="wrap" alignItems="center">
-                  <ClientButton
-                    // @ts-ignore
-                    flexBasis="200px"
-                    mr={2}
-                    width="auto"
-                    type="submit"
-                    isDisabled={!isValid}
-                    isActive={isValid}
-                  >
-                    {t('submit')}
-                  </ClientButton>
+                <UI.Flex flexWrap="wrap" justifyContent="space-between" alignItems="center">
+
                   <UI.Button size="sm" variant="ghost" onClick={(e) => handleSubmit(e, true)}>
                     {t('do_not_share')}
                   </UI.Button>
+                  <UI.Flex>
+                    <UI.Button
+                      size="sm"
+                      variant="outline"
+                      height="40px"
+                      isDisabled={activeStep === 0}
+                      onClick={() => setActiveStep((prevStep) => prevStep - 1)}
+                    >
+                      Back
+                    </UI.Button>
+                    {(node?.form?.steps?.length && activeStep + 1 >= node?.form?.steps?.length) ? (
+                      <ClientButton
+                        // @ts-ignore
+                        flexBasis="200px"
+                        ml={2}
+                        width="auto"
+                        type="submit"
+                        leftIcon={() => <Send />}
+                        isDisabled={!isValid}
+                        isActive={isValid}
+                      >
+                        {t('submit')}
+                      </ClientButton>
+                    ) : (
+                      <UI.Button
+                        ml={2}
+                        size="sm"
+                        variant="solid"
+                        height="40px"
+                        onClick={() => setActiveStep((prevStep) => prevStep + 1)}
+                      >
+                        Next
+                      </UI.Button>
+                    )}
+
+                  </UI.Flex>
                 </UI.Flex>
               </UI.Div>
             </Div>

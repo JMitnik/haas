@@ -12,6 +12,7 @@ import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import { CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType';
 import { CreateSliderNodeInput, UpdateQuestionInput } from './QuestionNodePrismaAdapterType';
 import UserOfCustomerPrismaAdapter from '../../models/users/UserOfCustomerPrismaAdapter';
+import { groupBy } from 'lodash';
 
 export interface IdMapProps {
   [details: string]: string;
@@ -145,7 +146,6 @@ export class NodeService {
       )
       : [];
     const allUserIds = targetUsers.map((user) => ({ id: user.userId }));
-    console.log('All user Ids: ', allUserIds);
 
     return (
       input.fields?.map((field) => ({
@@ -300,8 +300,12 @@ export class NodeService {
       );
 
       if (removedFields.length) {
-        const mappedFields = removedFields.map((field) => ({ id: field?.id?.toString() || '' }))
-        await this.questionNodePrismaAdapter.removeFormFields(input.id, mappedFields);
+        const groupedByStepId = groupBy(removedFields, (field: any) => field.formNodeStepId);
+        for (const step of Object.entries(groupedByStepId)) {
+          const stepId = step[0];
+          const mappedFields = step[1]?.map((field) => ({ id: field?.id?.toString() || '' }))
+          await this.questionNodePrismaAdapter.removeStepFields(stepId, mappedFields);
+        }
       }
 
       const removedSteps = findDifference(

@@ -608,6 +608,25 @@ class QuestionNodePrismaAdapter {
     });
   };
 
+  /**
+   * Disconnects fields from a FormNodeStep entry based on id array provided
+   * @param stepId 
+   * @param fields 
+   * @returns 
+   */
+  removeStepFields(stepId: string, fields: Array<{ id: string }>) {
+    return this.prisma.formNodeStep.update({
+      where: {
+        id: stepId,
+      },
+      data: {
+        fields: {
+          disconnect: fields,
+        },
+      },
+    });
+  };
+
   removeFormFields(questionId: string, fields: Array<{ id: string }>) {
     return this.prisma.questionNode.update({
       where: {

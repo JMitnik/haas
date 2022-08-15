@@ -143,7 +143,6 @@ export type AutomationConditionBuilderModel = {
   childConditionBuilderId?: Maybe<Scalars['String']>;
   type?: Maybe<AutomationConditionBuilderType>;
   conditions?: Maybe<Array<Maybe<AutomationConditionModel>>>;
-  childConditionBuilder?: Maybe<AutomationConditionBuilderModel>;
 };
 
 export enum AutomationConditionBuilderType {
@@ -490,7 +489,6 @@ export type CreateAutomationInput = {
   workspaceId?: Maybe<Scalars['String']>;
   automationType?: Maybe<AutomationType>;
   event?: Maybe<AutomationEventInput>;
-  conditionBuilder?: Maybe<AutomationConditionBuilderInput>;
   schedule?: Maybe<AutomationScheduleInput>;
   actions?: Maybe<Array<Maybe<AutomationActionInput>>>;
 };
@@ -1200,6 +1198,7 @@ export type FormNodeField = {
   isRequired?: Maybe<Scalars['Boolean']>;
   position?: Maybe<Scalars['Int']>;
   placeholder?: Maybe<Scalars['String']>;
+  /** List of possible contact points for a form-node. */
   contacts?: Maybe<Array<Maybe<UserType>>>;
 };
 
@@ -1228,13 +1227,41 @@ export type FormNodeInputType = {
   id?: Maybe<Scalars['String']>;
   helperText?: Maybe<Scalars['String']>;
   fields?: Maybe<Array<FormNodeFieldInput>>;
+  steps?: Maybe<Array<FormNodeStepInput>>;
 };
+
+export type FormNodeStep = {
+  __typename?: 'FormNodeStep';
+  id: Scalars['String'];
+  position: Scalars['Int'];
+  header?: Maybe<Scalars['String']>;
+  helper?: Maybe<Scalars['String']>;
+  subHelper?: Maybe<Scalars['String']>;
+  type: FormNodeStepType;
+  fields?: Maybe<Array<FormNodeField>>;
+};
+
+export type FormNodeStepInput = {
+  id?: Maybe<Scalars['ID']>;
+  type: FormNodeStepType;
+  header: Scalars['String'];
+  helper: Scalars['String'];
+  subHelper: Scalars['String'];
+  position: Scalars['Int'];
+  fields?: Maybe<Array<FormNodeFieldInput>>;
+};
+
+export enum FormNodeStepType {
+  GenericFields = 'GENERIC_FIELDS',
+  InputData = 'INPUT_DATA'
+}
 
 export type FormNodeType = {
   __typename?: 'FormNodeType';
   id?: Maybe<Scalars['String']>;
   helperText?: Maybe<Scalars['String']>;
   fields?: Maybe<Array<FormNodeField>>;
+  steps?: Maybe<Array<FormNodeStep>>;
 };
 
 /** Generate savales documents */
@@ -2080,12 +2107,6 @@ export type PermssionType = {
   customer?: Maybe<Customer>;
 };
 
-export type PickerEntryInput = {
-  label: Scalars['String'];
-  value: Scalars['String'];
-  type: Scalars['String'];
-};
-
 export type PreviewDataType = {
   __typename?: 'PreviewDataType';
   colors?: Maybe<Array<Maybe<Scalars['String']>>>;
@@ -2475,7 +2496,7 @@ export type SandboxInput = {
 
 export type SendAutomationDialogueLinkInput = {
   workspaceSlug: Scalars['String'];
-  automationScheduleId: Scalars['String'];
+  automationActionId: Scalars['String'];
 };
 
 export type SendAutomationReportInput = {
@@ -3213,7 +3234,18 @@ export type QuestionFragmentFragment = (
   )>, form?: Maybe<(
     { __typename?: 'FormNodeType' }
     & Pick<FormNodeType, 'id' | 'helperText'>
-    & { fields?: Maybe<Array<(
+    & { steps?: Maybe<Array<(
+      { __typename?: 'FormNodeStep' }
+      & Pick<FormNodeStep, 'id' | 'header' | 'helper' | 'subHelper' | 'position' | 'type'>
+      & { fields?: Maybe<Array<(
+        { __typename?: 'FormNodeField' }
+        & Pick<FormNodeField, 'id' | 'label' | 'type' | 'placeholder' | 'isRequired' | 'position'>
+        & { contacts?: Maybe<Array<Maybe<(
+          { __typename?: 'UserType' }
+          & Pick<UserType, 'id' | 'email' | 'firstName' | 'lastName'>
+        )>>> }
+      )>> }
+    )>>, fields?: Maybe<Array<(
       { __typename?: 'FormNodeField' }
       & Pick<FormNodeField, 'id' | 'label' | 'type' | 'placeholder' | 'isRequired' | 'position'>
       & { contacts?: Maybe<Array<Maybe<(
@@ -3326,6 +3358,28 @@ export const QuestionFragmentFragmentDoc = gql`
   form {
     id
     helperText
+    steps {
+      id
+      header
+      helper
+      subHelper
+      position
+      type
+      fields {
+        id
+        label
+        type
+        placeholder
+        isRequired
+        position
+        contacts {
+          id
+          email
+          firstName
+          lastName
+        }
+      }
+    }
     fields {
       id
       label
@@ -3669,8 +3723,11 @@ export namespace QuestionFragment {
   export type OverrideLeaf = (NonNullable<QuestionFragmentFragment['overrideLeaf']>);
   export type Share = (NonNullable<QuestionFragmentFragment['share']>);
   export type Form = (NonNullable<QuestionFragmentFragment['form']>);
-  export type Fields = NonNullable<(NonNullable<(NonNullable<QuestionFragmentFragment['form']>)['fields']>)[number]>;
-  export type Contacts = NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<QuestionFragmentFragment['form']>)['fields']>)[number]>['contacts']>)[number]>;
+  export type Steps = NonNullable<(NonNullable<(NonNullable<QuestionFragmentFragment['form']>)['steps']>)[number]>;
+  export type Fields = NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<QuestionFragmentFragment['form']>)['steps']>)[number]>['fields']>)[number]>;
+  export type Contacts = NonNullable<(NonNullable<NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<QuestionFragmentFragment['form']>)['steps']>)[number]>['fields']>)[number]>['contacts']>)[number]>;
+  export type _Fields = NonNullable<(NonNullable<(NonNullable<QuestionFragmentFragment['form']>)['fields']>)[number]>;
+  export type _Contacts = NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<QuestionFragmentFragment['form']>)['fields']>)[number]>['contacts']>)[number]>;
   export type Links = NonNullable<(NonNullable<QuestionFragmentFragment['links']>)[number]>;
   export type SliderNode = (NonNullable<QuestionFragmentFragment['sliderNode']>);
   export type Markers = NonNullable<(NonNullable<(NonNullable<QuestionFragmentFragment['sliderNode']>)['markers']>)[number]>;
