@@ -820,6 +820,8 @@ enum DialogueTemplateType {
   MASS_SEED
   SPORT_ENG
   SPORT_NL
+  STUDENT_ENG
+  TEACHER_ENG
 }
 
 input DialogueWhereUniqueInput {
