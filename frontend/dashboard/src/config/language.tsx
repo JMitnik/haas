@@ -1121,6 +1121,10 @@ const language = {
       en: 'Email',
       de: 'Email',
     },
+    add_step_reminder: {
+      en: 'Add your first step!',
+      de: 'Fügen Sie Ihren ersten Schritt hinzu!',
+    },
     add_field_reminder: {
       en: 'Add your first field!',
       de: 'Fügen Sie Ihr erstes Feld hinzu!',

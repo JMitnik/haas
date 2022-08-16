@@ -212,17 +212,6 @@ export const FormNodeFieldFragment = (
     control: form.control,
   });
 
-  console.log('Contacts: ', contacts);
-
-  useEffect(() => {
-    const component = ref.current;
-
-    return () => {
-      console.log('Unmounted');
-      onClose();
-    };
-  }, []);
-
   return (
     <UI.Card zIndex={300} ref={ref}>
       <UI.CardForm dualPane>
@@ -396,7 +385,7 @@ const FormNodeForm = () => {
 
             ))}
             {fields?.length === 0 ? (
-              <UI.IllustrationCard svg={<FieldIll />} text={t('add_field_reminder')}>
+              <UI.IllustrationCard svg={<FieldIll />} text={t('add_step_reminder')}>
                 <UI.Button type="button" onClick={() => handleNewField()}>{t('add_step')}</UI.Button>
               </UI.IllustrationCard>
             ) : (
