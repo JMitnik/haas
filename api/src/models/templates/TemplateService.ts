@@ -49,6 +49,11 @@ const yesNoOptions = [
   { value: 'No', position: 2, isTopic: false },
 ]
 
+const nextFinishOptions = [
+  { value: 'Next', position: 1, isTopic: false },
+  { value: 'Finish', position: 2, isTopic: false },
+]
+
 const sportOptionsEng = [
   { value: 'Physical & Mental', position: 1 },
   { value: 'Coaching', position: 2 },

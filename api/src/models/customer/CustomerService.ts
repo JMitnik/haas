@@ -1,4 +1,4 @@
-import { Customer, PrismaClient, CustomerSettings, DialogueImpactScore, ChoiceNodeEntry, NodeEntry } from '@prisma/client';
+import { Customer, PrismaClient, CustomerSettings, DialogueImpactScore, ChoiceNodeEntry, NodeEntry, DialogueTemplateType } from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
 import { clone, groupBy, maxBy, meanBy, orderBy, uniq } from 'lodash';
 import cuid from 'cuid';
@@ -18,7 +18,6 @@ import UserOfCustomerPrismaAdapter from '../users/UserOfCustomerPrismaAdapter';
 import { CreateDialogueInput } from '../questionnaire/DialoguePrismaAdapterType';
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import NodeEntryService from '../node-entry/NodeEntryService';
-import { DialogueTemplateType } from '../QuestionNode/NodeServiceType';
 import TemplateService from '../templates/TemplateService';
 
 export class CustomerService {
