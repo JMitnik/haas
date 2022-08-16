@@ -289,7 +289,6 @@ export const FormNodeFieldFragment = (
                   stepIndex={stepIndex}
                   fieldIndex={fieldIndex}
                   contacts={contacts}
-                // form={subform}
                 />
               )}
             </UI.InputGrid>

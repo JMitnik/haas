@@ -49,17 +49,6 @@ export const StepFormNodeFormFragment = ({ position, onClose, onDelete }: StepFo
   };
 
   const formNodeFields = form.watch(`formNode.steps.${position}.fields`, []);
-  console.log('Opened field: ', openedField);
-
-  useEffect(() => {
-    const component = ref.current;
-
-    return () => {
-      console.log('Unmounted');
-      setOpenedField(null);
-      onClose(null);
-    };
-  }, []);
 
   return (
     <UI.Card padding="2em" zIndex={299} ref={ref}>
@@ -95,20 +84,23 @@ export const StepFormNodeFormFragment = ({ position, onClose, onDelete }: StepFo
         {fields?.map((field, index) => (
           <UI.Div position="relative" key={field.fieldIndex}>
             <AnimatePresence>
-              <Modal.Root
-                open={openedField === index}
-                onClose={() => setOpenedField(null)}
-                style={{ maxWidth: 1000 }}
-              >
-                <FormNodeFieldFragment
+              {openedField === index && (
+                <Modal.Root
+                  open={openedField === index}
                   onClose={() => setOpenedField(null)}
-                  onDelete={() => remove(index)}
-                  field={formNodeFields[index]}
-                  fieldIndex={index}
-                  stepIndex={position}
-                  key={field.fieldIndex}
-                />
-              </Modal.Root>
+                  style={{ maxWidth: 1000 }}
+                >
+                  <FormNodeFieldFragment
+                    onClose={() => setOpenedField(null)}
+                    onDelete={() => remove(index)}
+                    field={formNodeFields[index]}
+                    fieldIndex={index}
+                    stepIndex={position}
+                    key={field.fieldIndex}
+                  />
+                </Modal.Root>
+              )}
+
             </AnimatePresence>
 
             <FormNodePreview
