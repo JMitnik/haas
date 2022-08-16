@@ -5,6 +5,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { Div } from '@haas/ui';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import Color from 'color';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -14,7 +15,7 @@ import { FormNodeFieldTypeEnum } from 'types/generated-types';
 import { GenericQuestionNodeProps } from 'modules/Node/Node.types';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { SessionActionType } from 'types/core-types';
-import Color from 'color';
+import { ReactComponent as SliderIcon } from '../../../public/logo-haas.svg';
 
 type FormNodeProps = GenericQuestionNodeProps;
 
@@ -104,7 +105,7 @@ const getFirstFocusableFieldIndex = (step: any) => {
 const FormNode = ({ node, onRunAction }: FormNodeProps) => {
   const { t } = useTranslation();
   const [activeStep, setActiveStep] = useState(0);
-  const [wantsToShare, setWantsToShare] = useState(false);
+  const [wantsToShare, setWantsToShare] = useState(true);
 
   const { register, getValues, formState, control } = useForm<FormNodeFormProps>({
     mode: 'onChange',
@@ -161,7 +162,9 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
             <>
               <UI.Flex alignItems="center">
                 <TypeBadge>
-                  <AtSign color="white" />
+                  <UI.Icon>
+                    <SliderIcon width={32} height={32} color="white" />
+                  </UI.Icon>
                 </TypeBadge>
                 <UI.Flex ml={2} flexDirection="column" alignItems="flex-start">
                   <UI.Text
@@ -319,9 +322,9 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
             </>
           ) : (
             <UI.Div>
-              <UI.Text fontSize="1.2rem" color="main.400" fontWeight={700}>We are sorry</UI.Text>
-              <UI.Text fontSize="0.8rem" color="off.400" fontWeight={500}>
-                Would you like to share your thoughts and feelings with someone you feel comfortable with?
+              <UI.Text fontSize="1.2rem" color="main.400" fontWeight={700}>We are sorry to hear that</UI.Text>
+              <UI.Text fontSize="0.9rem" color="off.400" fontWeight={500}>
+                Would you like to talk with Daan Helsloot, Rick Scipio or Lev Chneider about this (your choice)?
               </UI.Text>
               <ButtonIconContainer mt={2}>
                 <UI.Icon stroke="main.400">
@@ -337,10 +340,10 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                   type="button"
                   onClick={() => setWantsToShare(true)}
                 >
-                  Get me in touch with someone
+                  Yes, put me in touch with somebody
                 </ClientButton>
                 <UI.Button width="100%" mt={1} size="sm" variant="ghost" onClick={(e) => handleSubmit(e, true)}>
-                  I don't want to share anything
+                  No, I’d rather not share anything
                 </UI.Button>
               </UI.Div>
 

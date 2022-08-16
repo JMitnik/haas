@@ -40,7 +40,7 @@ const sportWorkspaceTemplate: DemoWorkspaceTemplate = {
   ],
   postLeafText: {
     header: 'Thank you for your input!',
-    subHeader: 'Work should be fulfilling',
+    subHeader: 'Life should be fulfilling',
   },
   rootSliderOptions: {
     markers: [

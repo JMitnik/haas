@@ -2,13 +2,13 @@ import * as UI from '@haas/ui';
 import { AnimatePresence } from 'framer-motion';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import * as Modal from 'components/Common/Modal';
 import { ReactComponent as FieldIll } from 'assets/images/undraw_form.svg';
 
-import { XCircle } from 'react-feather';
 import { FormNodeFieldFragment, FormNodePreview, TempFieldType } from './FormNodeForm';
+import { XCircle } from 'react-feather';
 
 interface StepFormNodeFormProps {
   position: number;
@@ -49,6 +49,17 @@ export const StepFormNodeFormFragment = ({ position, onClose, onDelete }: StepFo
   };
 
   const formNodeFields = form.watch(`formNode.steps.${position}.fields`, []);
+  console.log('Opened field: ', openedField);
+
+  useEffect(() => {
+    const component = ref.current;
+
+    return () => {
+      console.log('Unmounted');
+      setOpenedField(null);
+      onClose(null);
+    };
+  }, []);
 
   return (
     <UI.Card padding="2em" zIndex={299} ref={ref}>
@@ -90,26 +101,11 @@ export const StepFormNodeFormFragment = ({ position, onClose, onDelete }: StepFo
                 style={{ maxWidth: 1000 }}
               >
                 <FormNodeFieldFragment
-                  onSubmit={(subForm: any) => {
-                    form.setValue(
-                      `formNode.steps.${position}.fields.${index}`,
-                      {
-                        ...subForm,
-                        contact: {
-                          contacts: subForm.contact?.contacts
-                            ? [...subForm.contact.contacts]
-                            : [],
-                        },
-                      },
-                      { shouldValidate: true, shouldDirty: true },
-                    );
-                    form.trigger();
-                  }}
-                  form={form}
                   onClose={() => setOpenedField(null)}
                   onDelete={() => remove(index)}
                   field={formNodeFields[index]}
                   fieldIndex={index}
+                  stepIndex={position}
                   key={field.fieldIndex}
                 />
               </Modal.Root>

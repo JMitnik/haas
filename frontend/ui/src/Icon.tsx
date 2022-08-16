@@ -12,13 +12,19 @@ interface IconProps extends LayoutProps, TypographyProps, ColorProps, SpaceProps
 }
 
 export const Icon = styled.span<IconProps>`
-  ${({ theme, stroke }) => css`
+  ${({ theme, stroke, width }) => css`
     display: inline-block;
     vertical-align: bottom;
 
     ${stroke && css`
       svg {
         stroke: ${stroke};
+      }
+    `}
+    ${width && css`
+      svg {
+        width: width;
+        height: auto;
       }
     `}
   `}

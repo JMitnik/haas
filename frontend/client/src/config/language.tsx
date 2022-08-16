@@ -27,9 +27,9 @@ const language = {
       nl: 'Voornaam',
     },
     do_not_share: {
-      en: 'Do not share',
-      de: 'Nicht teilen',
-      nl: 'Niet delen',
+      en: 'No, do not share',
+      de: 'Nein, Nicht teilen',
+      nl: 'Nee, Niet delen',
     },
     submit: {
       en: 'Submit',

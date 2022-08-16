@@ -23,7 +23,7 @@ const businessWorkspaceTemplate: DemoWorkspaceTemplate = {
   primaryColor: '#667EEA',
   postLeafText: {
     header: 'Thank you for your input!',
-    subHeader: 'Work should be fulfilling',
+    subHeader: 'Life should be fulfilling',
   },
   tags: [
     {

@@ -17,11 +17,10 @@ import { AnimatePresence } from 'framer-motion';
 import { Controller, useFieldArray, useForm, useFormContext, useWatch } from 'react-hook-form';
 import { IllustrationCard } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import * as Modal from 'components/Common/Modal';
 import { ReactComponent as FieldIll } from 'assets/images/undraw_form.svg';
-import { FormNodeFieldTypeEnum } from 'types/generated-types';
 import { ReactComponent as SelectIll } from 'assets/images/undraw_select.svg';
 import useOnClickOutside from 'hooks/useClickOnOutside';
 
@@ -178,30 +177,24 @@ export const FormNodePreview = (
 };
 
 interface FormNodeFieldFragmentProps {
-  form: any;
   field: any;
   fieldIndex: number;
+  stepIndex: number;
   onClose: () => void;
-  onSubmit: (values: any) => void;
+  onSubmit?: (values: any) => void;
   onDelete: () => void;
 }
 
 export const FormNodeFieldFragment = (
-  { field, onClose, onSubmit, onDelete }: FormNodeFieldFragmentProps,
+  { field, onClose, onDelete, stepIndex, fieldIndex }: FormNodeFieldFragmentProps,
 ) => {
+  const form = useFormContext();
   const ref = useRef<HTMLDivElement | null>(null);
   const { t } = useTranslation();
 
-  const subform = useForm({
-    mode: 'all',
-    shouldUnregister: false,
-    defaultValues: field,
-  });
-
-  const formType = subform.watch('type');
+  const formType = form.watch(`formNode.steps.${stepIndex}.fields.${fieldIndex}.type`);
 
   const handleSaveValues = () => {
-    onSubmit(subform.getValues());
     onClose();
   };
 
@@ -215,9 +208,20 @@ export const FormNodeFieldFragment = (
   });
 
   const contacts = useWatch({
-    name: 'contact.contacts',
-    control: subform.control,
+    name: `formNode.steps.${stepIndex}.fields.${fieldIndex}.contact.contacts`,
+    control: form.control,
   });
+
+  console.log('Contacts: ', contacts);
+
+  useEffect(() => {
+    const component = ref.current;
+
+    return () => {
+      console.log('Unmounted');
+      onClose();
+    };
+  }, []);
 
   return (
     <UI.Card zIndex={300} ref={ref}>
@@ -230,7 +234,7 @@ export const FormNodeFieldFragment = (
                 key={index}
                 accent={fieldCategory.color}
                 isSelected={formType === fieldCategory.type}
-                onClick={() => subform.setValue('type', fieldCategory.type)}
+                onClick={() => form.setValue(`formNode.steps.${stepIndex}.fields.${fieldIndex}.type`, fieldCategory.type)}
               >
                 <UI.ListIcon bg={fieldCategory.color}><fieldCategory.icon /></UI.ListIcon>
                 <UI.ListItemBody>
@@ -247,17 +251,17 @@ export const FormNodeFieldFragment = (
             <UI.InputGrid>
               <UI.FormControl>
                 <UI.FormLabel htmlFor="label">{t('label')}</UI.FormLabel>
-                <UI.Input {...subform.register('label')} />
+                <UI.Input {...form.register(`formNode.steps.${stepIndex}.fields.${fieldIndex}.label`)} />
               </UI.FormControl>
               <UI.FormControl>
                 <UI.FormLabel htmlFor="placeholder">{t('placeholder')}</UI.FormLabel>
-                <UI.Input {...subform.register('placeholder')} />
+                <UI.Input {...form.register(`formNode.steps.${stepIndex}.fields.${fieldIndex}.placeholder`)} />
               </UI.FormControl>
               <UI.FormControl>
                 <UI.FormLabel htmlFor="isRequired">{t('is_required')}</UI.FormLabel>
                 <Controller
-                  control={subform.control}
-                  name="isRequired"
+                  control={form.control}
+                  name={`formNode.steps.${stepIndex}.fields.${fieldIndex}.isRequired`}
                   defaultValue={field?.isRequired}
                   render={({ field: { onBlur, onChange, value } }) => (
                     <UI.RadioButtons onBlur={onBlur} onChange={onChange} value={value}>
@@ -281,7 +285,12 @@ export const FormNodeFieldFragment = (
               </UI.FormControl>
 
               {formType === TempFieldType.CONTACTS && (
-                <FormNodeContactsFragment contacts={contacts} form={subform} />
+                <FormNodeContactsFragment
+                  stepIndex={stepIndex}
+                  fieldIndex={fieldIndex}
+                  contacts={contacts}
+                // form={subform}
+                />
               )}
             </UI.InputGrid>
             <UI.ButtonGroup justifySelf="flex-end" display="flex">
