@@ -1,8 +1,8 @@
-import { NodeType, PrismaClient, QuestionNode } from '@prisma/client';
+import { DialogueTemplateType, NodeType, PrismaClient, QuestionNode } from '@prisma/client';
 
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import { NexusGenEnums } from '../../generated/nexus';
-import { DialogueTemplateType, LeafNodeDataEntryProps } from '../QuestionNode/NodeServiceType';
+import { LeafNodeDataEntryProps } from '../QuestionNode/NodeServiceType';
 import templates from '.';
 import { CreateQuestionsInput } from '../questionnaire/DialoguePrismaAdapterType';
 import EdgeService from '../edge/EdgeService';
@@ -58,6 +58,24 @@ const sportOptionsEng = [
   { value: 'Own Performance', position: 6 },
 ];
 
+const studentOptionsNl = [
+  { value: 'Lichaam & Geest', position: 1 },
+  { value: 'Leraren', position: 2 },
+  { value: 'Thuis', position: 3 },
+  { value: 'Activiteiten buiten school / hobby', position: 4 },
+  { value: 'Klasgenoten', position: 5 },
+  { value: 'Eigen Prestatie', position: 6 },
+]
+
+const teacherOptionsNl = [
+  { value: 'Lichaam & Geest', position: 1 },
+  { value: 'Management', position: 2 },
+  { value: 'Thuis', position: 3 },
+  { value: 'Activiteit buiten school / Hobby', position: 4 },
+  { value: 'Collega\'s', position: 5 },
+  { value: 'Eigen Prestatie / Werkdruk', position: 6 },
+]
+
 const sportOptionsNl = [
   { value: 'Lichaam & Geest', position: 1 },
   { value: 'Begeleiding', position: 2 },
@@ -109,6 +127,10 @@ class TemplateService {
 
   findTemplate = (templateType: NexusGenEnums['DialogueTemplateType']): WorkspaceTemplate => {
     switch (templateType) {
+      case DialogueTemplateType.STUDENT_NL:
+        return templates.studentNl;
+      case DialogueTemplateType.TEACHER_NL:
+        return templates.teacherNl;
       case DialogueTemplateType.STUDENT_ENG:
         return templates.student;
       case DialogueTemplateType.TEACHER_ENG:
@@ -128,6 +150,10 @@ class TemplateService {
 
   findTemplateLeadNodes = (templateType: NexusGenEnums['DialogueTemplateType']): LeafNodeDataEntryProps[] => {
     switch (templateType) {
+      case DialogueTemplateType.STUDENT_NL:
+        return templates.studentNl.leafNodes;
+      case DialogueTemplateType.TEACHER_NL:
+        return templates.teacherNl.leafNodes;
       case DialogueTemplateType.TEACHER_ENG:
         return templates.teacher.leafNodes;
       case DialogueTemplateType.STUDENT_ENG:
@@ -221,6 +247,10 @@ class TemplateService {
     templateType: string
   ) => {
     switch (templateType) {
+      case DialogueTemplateType.STUDENT_NL:
+        return this.createStudentNlTemplateNodes(dialogueId, workspaceName, leafs);
+      case DialogueTemplateType.TEACHER_NL:
+        return this.createTeacherNlTemplateNodes(dialogueId, workspaceName, leafs);
       case DialogueTemplateType.STUDENT_ENG:
         return this.createStudentEngTemplateNodes(dialogueId, workspaceName, leafs);
       case DialogueTemplateType.TEACHER_ENG:
@@ -238,6 +268,134 @@ class TemplateService {
       default:
         return this.createDefaultTemplateNodes(dialogueId, workspaceName, leafs);
     };
+  };
+
+  /**
+   * Create nodes from a default template.
+   * */
+  createTeacherNlTemplateNodes = async (
+    dialogueId: string,
+    workspaceName: string,
+    leafs: QuestionNode[],
+  ) => {
+    // Root question (How do you feel about?)
+    const rootQuestion = await this.nodeService.createQuestionNode(
+      'Hoe gaat het met je?',
+      dialogueId, NodeType.SLIDER, [], true,
+    );
+
+    const { markers, happyText, unhappyText } = templates.teacherNl.rootSliderOptions;
+    if (markers.length || happyText || unhappyText) {
+      await this.nodeService.createSliderNode({
+        markers,
+        happyText: happyText || null,
+        unhappyText: unhappyText || null,
+        parentNodeId: rootQuestion.id,
+      });
+    }
+
+    const hrWillContactCTA = TemplateService.findLeafIdContainingText(leafs, 'met iemand over wil praten');
+
+    // Very Positive Sub child 1 (Great to hear! What are you most satisfied about?)
+    const greatToHear = await this.nodeService.createQuestionNode(
+      'Fijn om te horen! Waar ben je het meest tevreden over?', dialogueId, NodeType.CHOICE, teacherOptionsNl, false);
+
+    // Positive Sub child 2
+    const notCompletelySatisfied = await this.nodeService.createQuestionNode(
+      'Je bent niet helemaal tevreden dus. Wat kan er beter?', dialogueId, NodeType.CHOICE, teacherOptionsNl, false);
+
+    // Negative Sub child 3
+    const negative = await this.nodeService.createQuestionNode(
+      'Wat vervelend! Wat is er aan de hand?', dialogueId, NodeType.CHOICE,
+      teacherOptionsNl, false, hrWillContactCTA,
+    );
+
+    // Very Negative Sub child 4
+    const veryNegative = await this.nodeService.createQuestionNode(
+      'Wat vervelend! Wat is er aan de hand?', dialogueId,
+      NodeType.CHOICE, teacherOptionsNl, false, hrWillContactCTA
+    );
+
+    // ################################### EDGES ################################
+
+    // Positive edges
+    await this.edgeService.createEdge(rootQuestion, greatToHear,
+      { conditionType: 'valueBoundary', matchValue: null, renderMin: 70, renderMax: 100 });
+
+    // Neutral edges
+    await this.edgeService.createEdge(rootQuestion, notCompletelySatisfied,
+      { conditionType: 'valueBoundary', matchValue: null, renderMin: 55, renderMax: 70 });
+
+    // Negative edges
+    await this.edgeService.createEdge(rootQuestion, negative,
+      { conditionType: 'valueBoundary', matchValue: null, renderMin: 25, renderMax: 55 });
+
+    await this.edgeService.createEdge(rootQuestion, veryNegative,
+      { conditionType: 'valueBoundary', matchValue: null, renderMin: 0, renderMax: 25 });
+  };
+
+  /**
+  * Create nodes from a default template.
+  * */
+  createStudentNlTemplateNodes = async (
+    dialogueId: string,
+    workspaceName: string,
+    leafs: QuestionNode[],
+  ) => {
+    // Root question (How do you feel about?)
+    const rootQuestion = await this.nodeService.createQuestionNode(
+      'Hoe gaat het met je?',
+      dialogueId, NodeType.SLIDER, [], true,
+    );
+
+    const { markers, happyText, unhappyText } = templates.studentNl.rootSliderOptions;
+    if (markers.length || happyText || unhappyText) {
+      await this.nodeService.createSliderNode({
+        markers,
+        happyText: happyText || null,
+        unhappyText: unhappyText || null,
+        parentNodeId: rootQuestion.id,
+      });
+    }
+
+    const hrWillContactCTA = TemplateService.findLeafIdContainingText(leafs, 'met iemand over wil praten');
+
+    // Very Positive Sub child 1 (Great to hear! What are you most satisfied about?)
+    const greatToHear = await this.nodeService.createQuestionNode(
+      'Fijn om te horen! Waar ben je het meest tevreden over?', dialogueId, NodeType.CHOICE, studentOptionsNl, false);
+
+    // Positive Sub child 2
+    const notCompletelySatisfied = await this.nodeService.createQuestionNode(
+      'Je bent niet helemaal tevreden dus. Wat kan er beter?', dialogueId, NodeType.CHOICE, studentOptionsNl, false);
+
+    // Negative Sub child 3
+    const negative = await this.nodeService.createQuestionNode(
+      'Wat vervelend! Wat is er aan de hand?', dialogueId, NodeType.CHOICE,
+      studentOptionsNl, false, hrWillContactCTA,
+    );
+
+    // Very Negative Sub child 4
+    const veryNegative = await this.nodeService.createQuestionNode(
+      'Wat vervelend! Wat is er aan de hand?', dialogueId,
+      NodeType.CHOICE, studentOptionsNl, false, hrWillContactCTA
+    );
+
+    // ################################### EDGES ################################
+
+    // Positive edges
+    await this.edgeService.createEdge(rootQuestion, greatToHear,
+      { conditionType: 'valueBoundary', matchValue: null, renderMin: 70, renderMax: 100 });
+
+    // Neutral edges
+    await this.edgeService.createEdge(rootQuestion, notCompletelySatisfied,
+      { conditionType: 'valueBoundary', matchValue: null, renderMin: 55, renderMax: 70 });
+
+    // Negative edges
+    await this.edgeService.createEdge(rootQuestion, negative,
+      { conditionType: 'valueBoundary', matchValue: null, renderMin: 25, renderMax: 55 });
+
+    await this.edgeService.createEdge(rootQuestion, veryNegative,
+      { conditionType: 'valueBoundary', matchValue: null, renderMin: 0, renderMax: 25 });
   };
 
   /**

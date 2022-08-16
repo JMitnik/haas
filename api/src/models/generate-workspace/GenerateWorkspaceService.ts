@@ -1,4 +1,4 @@
-import { PrismaClient, Role, RoleTypeEnum } from '@prisma/client';
+import { DialogueTemplateType, PrismaClient, Role, RoleTypeEnum } from '@prisma/client';
 import { ApolloError } from 'apollo-server-express';
 
 import TemplateService from '../templates/TemplateService';
@@ -13,7 +13,7 @@ import { generateCreateDialogueDataByTemplateLayers, getTemplate } from './Gener
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import DialogueService from '../questionnaire/DialogueService';
 import { DemoWorkspaceTemplate } from '../templates/TemplateTypes';
-import { DialogueTemplateType } from '../QuestionNode/NodeServiceType';
+// import { DialogueTemplateType } from '../QuestionNode/NodeServiceType';
 import UserService from '../../models/users/UserService';
 import { GenerateWorkspaceCSVInput, Workspace } from './GenerateWorkspace.types';
 import CustomerService from '../../models/customer/CustomerService';
