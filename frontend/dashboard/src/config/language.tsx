@@ -11,6 +11,38 @@ const language = {
     },
   },
   general: {
+    pulse: {
+      en: 'Pulse',
+      de: 'Pulse',
+    },
+    action_requests: {
+      en: 'Action requests',
+      de: 'Action requests',
+    },
+    total_responses: {
+      en: 'Total responses',
+      de: 'Total responses',
+    },
+    total_problems: {
+      en: 'Total problems',
+      de: 'Total problems',
+    },
+    trending_teams: {
+      en: 'Trending teams',
+      de: 'Trending teams',
+    },
+    trending_topics: {
+      en: 'Trending topics',
+      de: 'Trending topics',
+    },
+    responses: {
+      en: 'Responses',
+      de: 'Responses',
+    },
+    weekly_report: {
+      en: 'Weekly report',
+      de: 'Weekly report',
+    },
     users_and_roles: {
       en: 'Users and roles',
       de: 'Benutzer und Rollen',
@@ -3325,6 +3357,20 @@ Sie finden diese ID in der URL des Videos. Derzeit wird nur YouTube unterstützt
     can_create_deliveries: {
       en: 'This permissions allows a user to create new deliveries for a campaign',
       de: 'Mit dieser Berechtigung kann ein Benutzer neue Lieferungen für eine Kampagne erstellen',
+    },
+  },
+  reporting: {
+    trending_topics_helper: {
+      en: 'Find out which topics are trending and require more attention',
+      de: 'Find out which topics are trending and require more attention',
+    },
+    trending_teams_helper: {
+      en: 'Find out which teams require the most attention.',
+      de: 'Find out which teams require the most attention.',
+    },
+    responses_helper: {
+      en: 'See a general pulse of the response rate of this week.',
+      de: 'See a general pulse of the response rate of this week.',
     },
   },
   validation: {

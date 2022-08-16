@@ -12,37 +12,16 @@ import { ReactComponent as TopicsThumbnail } from 'assets/images/thumbnails/sm/r
 import { User } from 'react-feather';
 import { ReactComponent as UsersThumbnail } from 'assets/images/thumbnails/sm/rounded-users.svg';
 import { View } from 'layouts/View';
+import { sumBy } from 'lodash';
 import { useCustomer } from 'providers/CustomerProvider';
+import { useTranslation } from 'react-i18next';
 import mainTheme from 'config/theme';
 import useMeasure from 'react-use-measure';
-
-// const topics = [
-//   {
-//     topic: 'Management',
-//     dialogue: 'Canada - SME & Productivity',
-//     responseCount: 97,
-//     averageScore: 40,
-//     actionRequests: 1,
-//   },
-//   {
-//     topic: 'Recruitment',
-//     dialogue: 'Canada - SME & Productivity',
-//     responseCount: 23,
-//     averageScore: 44,
-//     actionRequests: 0,
-//   },
-//   {
-//     topic: 'Recruitment',
-//     dialogue: 'Canada - SME & Productivity',
-//     responseCount: 23,
-//     averageScore: 44,
-//     actionRequests: 2,
-//   },
-// ];
 
 export const DialogueReportView = () => {
   const { activeCustomer } = useCustomer();
   const { format, getNWeekAgo, getStartOfWeek, getEndOfWeek } = useDate();
+  const { t } = useTranslation(['general', 'reporting']);
 
   const relevantWeek = getNWeekAgo(0);
   const startDate = getStartOfWeek(relevantWeek);
@@ -50,7 +29,7 @@ export const DialogueReportView = () => {
 
   const [ref, bounds] = useMeasure();
 
-  const { data: d } = useGetWorkspaceReportQuery({
+  const { data: d, loading: loadingReport } = useGetWorkspaceReportQuery({
     variables: {
       workspaceId: activeCustomer?.id || '',
       filter: {
@@ -68,7 +47,7 @@ export const DialogueReportView = () => {
     },
   });
 
-  const { data: issuesData } = useGetIssuesQuery({
+  const { data: issuesData, loading: loadingIssues } = useGetIssuesQuery({
     variables: {
       workspaceId: activeCustomer?.id || '',
       filter: {
@@ -81,11 +60,19 @@ export const DialogueReportView = () => {
   });
 
   const responseHistogramItems = d?.customer?.statistics?.responseHistogram?.items || [];
+  const basicStatistics = d?.customer?.statistics?.basicStats || undefined;
   const issueHistogramItems = d?.customer?.statistics?.issueHistogram?.items || [];
 
-  const issues = issuesData?.customer?.issues || [];
+  const issuesCount = sumBy(d?.customer?.statistics?.issueHistogram?.items, (item) => item.frequency);
 
+  const issues = issuesData?.customer?.issues || [];
   const topics = d?.customer?.issueTopics || [];
+
+  const isLoading = loadingReport || loadingIssues;
+
+  if (isLoading) {
+    return <UI.Loader />;
+  }
 
   return (
     <ReportsLayout>
@@ -94,7 +81,7 @@ export const DialogueReportView = () => {
           <UI.ViewTitle>
             <UI.Flex justifyContent="space-between">
               <UI.Div>
-                Weekly people report
+                {t('weekly_report')}
               </UI.Div>
 
               <UI.Div>
@@ -119,11 +106,11 @@ export const DialogueReportView = () => {
               </UI.Thumbnail>
               <UI.Div>
                 <UI.H3 mb={1} lineHeight={1} color="off.600">
-                  Responses
+                  {t('responses')}
                 </UI.H3>
 
                 <UI.Span fontSize="1.1rem" color="off.500">
-                  See a general pulse of the response rate of this week.
+                  {t('reporting:responses_helper')}
                 </UI.Span>
               </UI.Div>
             </UI.Flex>
@@ -131,9 +118,9 @@ export const DialogueReportView = () => {
               <UI.Card>
                 <UI.CardBody _size="lg">
                   <UI.Flex justifyContent="space-between">
-                    <UI.H3 color="off.600" fontWeight={700}>Total responses</UI.H3>
+                    <UI.H3 color="off.600" fontWeight={700}>{t('total_responses')}</UI.H3>
                     <UI.H3 lineHeight={1} mt={1} mb={1} color="off.500" fontWeight={700}>
-                      20
+                      {basicStatistics?.responseCount}
                     </UI.H3>
                   </UI.Flex>
                 </UI.CardBody>
@@ -155,9 +142,9 @@ export const DialogueReportView = () => {
               <UI.Card>
                 <UI.CardBody _size="lg">
                   <UI.Flex justifyContent="space-between">
-                    <UI.H3 color="off.600" fontWeight={700}>Total problems</UI.H3>
+                    <UI.H3 color="off.600" fontWeight={700}>{t('total_problems')}</UI.H3>
                     <UI.H3 lineHeight={1} mt={1} mb={1} color="off.500" fontWeight={700}>
-                      20
+                      {issuesCount}
                     </UI.H3>
                   </UI.Flex>
                 </UI.CardBody>
@@ -188,11 +175,11 @@ export const DialogueReportView = () => {
                 </UI.Thumbnail>
                 <UI.Div>
                   <UI.H3 mb={1} lineHeight={1} color="off.600">
-                    Trending teams
+                    {t('trending_teams')}
                   </UI.H3>
 
                   <UI.Span fontSize="1.1rem" color="off.500">
-                    Find out which teams require the most attention.
+                    {t('reporting:trending_teams_helper')}
                   </UI.Span>
                 </UI.Div>
               </UI.Flex>
@@ -203,19 +190,19 @@ export const DialogueReportView = () => {
                 <UI.CardHeader>
                   <UI.Grid gridTemplateColumns="50px 2fr 1fr 1fr 200px">
                     <UI.Div>
-                      <UI.Helper>Score</UI.Helper>
+                      <UI.Helper>{t('score')}</UI.Helper>
                     </UI.Div>
                     <UI.Div>
-                      <UI.Helper>Team</UI.Helper>
+                      <UI.Helper>{t('team')}</UI.Helper>
                     </UI.Div>
                     <UI.Div>
-                      <UI.Helper>Responses</UI.Helper>
+                      <UI.Helper>{t('responses')}</UI.Helper>
                     </UI.Div>
                     <UI.Div>
-                      <UI.Helper>Action requests</UI.Helper>
+                      <UI.Helper>{t('action_requests')}</UI.Helper>
                     </UI.Div>
                     <UI.Div>
-                      <UI.Helper>Pulse</UI.Helper>
+                      <UI.Helper>{t('pulse')}</UI.Helper>
                     </UI.Div>
                   </UI.Grid>
                 </UI.CardHeader>
@@ -258,11 +245,11 @@ export const DialogueReportView = () => {
                 </UI.Thumbnail>
                 <UI.Div>
                   <UI.H3 mb={1} lineHeight={1} color="off.600">
-                    Trending topics
+                    {t('trending_topics')}
                   </UI.H3>
 
                   <UI.Span fontSize="1.1rem" color="off.500">
-                    Find out which topics are trending and require more attention
+                    {t('reporting:trending_topics_helper')}
                   </UI.Span>
                 </UI.Div>
               </UI.Flex>
