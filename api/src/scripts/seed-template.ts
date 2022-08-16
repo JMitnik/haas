@@ -6,8 +6,8 @@ import { CustomerPrismaAdapter } from '../models/customer/CustomerPrismaAdapter'
 import UserService from '../models/users/UserService';
 import GenerateWorkspaceService from '../models/generate-workspace/GenerateWorkspaceService';
 import { DialogueTemplateType } from '../models/QuestionNode/NodeServiceType';
-import { getTemplate } from 'models/generate-workspace/GenerateWorkspaceService.helpers';
-import UserOfCustomerPrismaAdapter from 'models/users/UserOfCustomerPrismaAdapter';
+import { getTemplate } from '../models/generate-workspace/GenerateWorkspaceService.helpers';
+import UserOfCustomerPrismaAdapter from '../models/users/UserOfCustomerPrismaAdapter';
 
 const prisma = new PrismaClient();
 
