@@ -104,9 +104,9 @@ export const schema = yup.object().shape({
   }),
   formNode: yup.object().shape({
     steps: yup.array().of(yup.object().shape({
-      header: yup.string(),
-      helper: yup.string(),
-      subHelper: yup.string(),
+      header: yup.string().required(),
+      helper: yup.string().required(),
+      subHelper: yup.string().required(),
       fields: yup.array().of(yup.object().shape({
         label: yup.string(),
         type: yup.string(),

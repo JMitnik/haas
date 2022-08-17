@@ -209,18 +209,18 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                           <UI.FormLabel htmlFor={`fields.${index}.value`}>{field.label}</UI.FormLabel>
                           {field.type === 'longText' && (
                             <UI.Textarea
+                              {...register(`steps.${activeStep}.fields.${index}.value`)}
                               key={`longText-${index}`}
                               id={`fields[${index}].value`}
                               variant="outline"
-                              {...register(`steps.${activeStep}.fields.${index}.value`)}
                               minHeight="40px"
                               placeholder={field.placeholder || undefined}
                             />
                           )}
                           {field.type === FormNodeFieldTypeEnum.Contacts && (
                             <Controller
-                              key="contactsradio"
                               name={`steps.${activeStep}.fields.${index}.value`}
+                              key="contactsradio"
                               control={control}
                               defaultValue={undefined}
                               rules={{ required: field.isRequired || false }}
@@ -255,6 +255,7 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                           )}
                           {field.type !== 'longText' && field.type !== 'contacts' && (
                             <UI.Input
+                              {...register(`steps.${activeStep}.fields.${index}.value`, { required: field.isRequired || false })}
                               autoFocus={index === getFirstFocusableFieldIndex(step)}
                               key={fields[index].id}
                               id={`fields[${index}].value`}
@@ -263,7 +264,6 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                               type={mapFieldType[field?.type] || 'text'}
                               placeholder={field.placeholder || undefined}
                               maxWidth={mapFieldType[field?.type] === 'number' ? '100px' : 'auto'}
-                              {...register(`steps.${activeStep}.fields.${index}.value`, { required: field.isRequired || false })}
                             />
                           )}
                         </UI.FormControl>

@@ -8,7 +8,9 @@ import React, { useRef, useState } from 'react';
 import * as Modal from 'components/Common/Modal';
 import { ReactComponent as FieldIll } from 'assets/images/undraw_form.svg';
 
-import { FormNodeFieldFragment, FormNodePreview, TempFieldType } from './FormNodeForm';
+import { FormNodeFieldFragment } from './FormNodeFieldFragment';
+import { FormNodePreview } from './FormNodePreview';
+import { TempFieldType } from './FormNodeForm.types';
 
 interface StepFormNodeFormProps {
   position: number;
@@ -64,17 +66,17 @@ export const StepFormNodeFormFragment = ({ position, onClose, onDelete }: StepFo
       </UI.Flex>
 
       <UI.Grid gridTemplateColumns="1fr 1fr">
-        <UI.FormControl>
+        <UI.FormControl isRequired>
           <UI.FormLabel htmlFor="header">{t('step_header')}</UI.FormLabel>
           <UI.InputHelper>{t('step_header_helper')}</UI.InputHelper>
           <UI.Input id="header" {...form.register(`formNode.steps.${position}.header`)} placeholder="Contact Details" />
         </UI.FormControl>
-        <UI.FormControl>
+        <UI.FormControl isRequired>
           <UI.FormLabel htmlFor="helper">{t('step_helper')}</UI.FormLabel>
           <UI.InputHelper>{t('step_helper_helper')}</UI.InputHelper>
           <UI.Input id="helper" {...form.register(`formNode.steps.${position}.helper`)} placeholder={t('form_helpertext_placeholder')} />
         </UI.FormControl>
-        <UI.FormControl>
+        <UI.FormControl isRequired>
           <UI.FormLabel htmlFor="subHelper">{t('step_sub_helper')}</UI.FormLabel>
           <UI.InputHelper>{t('step_sub_helper_helper')}</UI.InputHelper>
           <UI.Input id="subHelper" {...form.register(`formNode.steps.${position}.subHelper`)} placeholder="Please fill in your details..." />

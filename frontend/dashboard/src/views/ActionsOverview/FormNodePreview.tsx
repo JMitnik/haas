@@ -1,22 +1,21 @@
 import * as UI from '@haas/ui';
-import { ArrowDown, ArrowUp, Feather, Trash } from 'react-feather';
+import { ArrowLeft, ArrowRight, Feather } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
 import { fieldMap } from './FormNodeForm.types';
 
-interface FormStepPreviewProps {
+interface FormNodePreviewProps {
   field: any;
   onMoveRight: any;
   onMoveLeft: any;
   onOpen: any;
   fieldIndex: number;
   nrFields: number;
-  onDelete: () => void;
 }
 
-export const FormStepPreview = (
-  { field, onMoveRight, onMoveLeft, onOpen, fieldIndex, nrFields, onDelete }: FormStepPreviewProps,
+export const FormNodePreview = (
+  { field, onMoveRight, onMoveLeft, onOpen, fieldIndex, nrFields }: FormNodePreviewProps,
 ) => {
   const fieldCategory = fieldMap.find((fieldItem) => fieldItem?.type === field?.type);
 
@@ -31,12 +30,8 @@ export const FormStepPreview = (
             <UI.Flex mb={[4, 0]}>
               <UI.IconBox mr={2} bg={fieldCategory?.color}><FieldIcon /></UI.IconBox>
               <UI.ColumnFlex>
-                <UI.Text color="gray.500" fontWeight="700">{field?.header ? `Page ${fieldIndex + 1}: ${field?.header} ` : `Page ${fieldIndex + 1}: Unnamed page`}</UI.Text>
-                <UI.Text fontWeight="300" color="gray.500">
-                  {field?.fields?.length || 0}
-                  {' '}
-                  field(s)
-                </UI.Text>
+                <UI.Text color="gray.500" fontWeight="700">{field?.label || 'Unnamed field'}</UI.Text>
+                <UI.Text fontWeight="300" color="gray.500">{t(`${field?.type}_type`)}</UI.Text>
               </UI.ColumnFlex>
             </UI.Flex>
           ) : (
@@ -48,8 +43,8 @@ export const FormStepPreview = (
           <UI.ButtonGroup display="flex">
             <UI.IconButton
               size="sm"
-              aria-label="Move step up"
-              icon={() => <ArrowUp />}
+              aria-label="Move field left"
+              icon={() => <ArrowLeft />}
               type="button"
               isDisabled={fieldIndex === 0}
               onClick={(event) => {
@@ -58,27 +53,17 @@ export const FormStepPreview = (
               }}
             />
             <UI.Button size="sm" type="button" onClick={onOpen}>
-              {t('edit_step')}
+              {t('edit_field')}
             </UI.Button>
             <UI.IconButton
               size="sm"
-              aria-label="Move step down"
-              icon={() => <ArrowDown />}
+              aria-label="Move field right"
+              icon={() => <ArrowRight />}
               type="button"
               isDisabled={fieldIndex === nrFields - 1}
               onClick={(event) => {
                 event.stopPropagation();
                 onMoveRight();
-              }}
-            />
-            <UI.IconButton
-              size="sm"
-              aria-label="Delete step"
-              icon={() => <Trash />}
-              type="button"
-              onClick={(event) => {
-                event.stopPropagation();
-                onDelete();
               }}
             />
           </UI.ButtonGroup>
