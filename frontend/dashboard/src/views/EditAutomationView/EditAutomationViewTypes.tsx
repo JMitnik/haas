@@ -72,7 +72,7 @@ export interface AutomationInput {
       value?: string;
     } | null;
   }
-  conditionBuilder: {
+  conditionBuilder?: {
     id?: string;
     logical: { label: string, value: string };
     conditions: ConditionInput[];

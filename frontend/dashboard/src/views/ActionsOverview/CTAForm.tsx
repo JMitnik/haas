@@ -60,7 +60,7 @@ interface CTAFormProps {
 const isShareType = (ctaType: any) => ctaType?.value === 'SHARE';
 const isLinkType = (ctaType: any) => ctaType?.value === 'LINK';
 
-const schema = yup.object().shape({
+export const schema = yup.object().shape({
   title: yup.string().required(),
   ctaType: yup.object().shape(
     { label: yup.string().required(), value: yup.string().required() },

@@ -1021,6 +1021,10 @@ const language = {
       en: 'See it in the interactions table.',
       de: 'Sehen Sie es in der Interaktions-Tabelle.',
     },
+    edit_step: {
+      en: 'Edit step',
+      de: 'Schritt bearbeiten',
+    },
     edit_field: {
       en: 'Edit field',
       de: 'Feld bearbeiten',

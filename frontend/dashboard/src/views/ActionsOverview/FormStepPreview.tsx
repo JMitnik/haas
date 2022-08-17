@@ -133,7 +133,7 @@ export const FormStepPreview = (
           <UI.ButtonGroup display="flex">
             <UI.IconButton
               size="sm"
-              aria-label="Move field left"
+              aria-label="Move step up"
               icon={() => <ArrowUp />}
               type="button"
               isDisabled={fieldIndex === 0}
@@ -143,11 +143,11 @@ export const FormStepPreview = (
               }}
             />
             <UI.Button size="sm" type="button" onClick={onOpen}>
-              {t('edit_field')}
+              {t('edit_step')}
             </UI.Button>
             <UI.IconButton
               size="sm"
-              aria-label="Move field right"
+              aria-label="Move step down"
               icon={() => <ArrowDown />}
               type="button"
               isDisabled={fieldIndex === nrFields - 1}

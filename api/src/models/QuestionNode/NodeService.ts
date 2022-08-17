@@ -207,34 +207,6 @@ export class NodeService {
     }
   }
 
-  private async saveEditFormStepsInput(
-    input: FormNodeInput,
-    workspaceSlug,
-  ): Promise<Prisma.FormNodeStepUpsertArgs[] | undefined> {
-    if (!input.steps?.length) return undefined;
-
-    const steps = input.steps.map((step) => {
-      return {
-        create: {
-          ...step,
-          id: step.id || undefined,
-          fields: undefined,
-        },
-        update: {
-          ...step,
-          id: step.id || undefined,
-          fields: undefined,
-        },
-        where: {
-          id: step.id || '-1',
-        },
-      }
-    })
-
-    return steps;
-
-  }
-
   /**
    * Converts FormNode to Prisma-friendly format.
    * */
