@@ -6,7 +6,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import React from 'react';
 
 import { FormDataProps } from '../CTATypes';
-import { includesText, mockQueryDialogueConnection } from './helpers';
+import { includesText } from './helpers';
 import { schema } from '../CTAForm';
 
 import FormNodeForm from '../FormNodeForm';
@@ -35,7 +35,6 @@ describe('FormNodeForm', () => {
   });
 
   test('Can render FormNodeForm component', async () => {
-    mockQueryDialogueConnection((res) => ({ ...res }));
     renderComponent();
   });
 

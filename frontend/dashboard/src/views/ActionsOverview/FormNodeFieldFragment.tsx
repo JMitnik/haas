@@ -75,7 +75,7 @@ export const FormNodeFieldFragment = (
             <UI.InputGrid>
               <UI.FormControl>
                 <UI.FormLabel htmlFor="label">{t('label')}</UI.FormLabel>
-                <UI.Input {...form.register(`formNode.steps.${stepIndex}.fields.${fieldIndex}.label`)} />
+                <UI.Input id="label" {...form.register(`formNode.steps.${stepIndex}.fields.${fieldIndex}.label`)} />
               </UI.FormControl>
               <UI.FormControl>
                 <UI.FormLabel htmlFor="placeholder">{t('placeholder')}</UI.FormLabel>

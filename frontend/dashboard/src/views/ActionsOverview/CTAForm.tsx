@@ -321,6 +321,8 @@ const CTAForm = ({
     onCancel?.();
   };
 
+  console.log('Errors: ', form.formState.errors);
+
   return (
     <FormProvider {...form}>
       <FormContainer expandedForm>
@@ -342,6 +344,7 @@ const CTAForm = ({
                       defaultValue={title}
                       render={({ field }) => (
                         <UI.MarkdownEditor
+                          id="title"
                           value={field.value}
                           onChange={field.onChange}
                         />
@@ -351,7 +354,7 @@ const CTAForm = ({
                   </FormControl>
 
                   <FormControl isRequired>
-                    <FormLabel htmlFor="ctaType">{t('cta:type')}</FormLabel>
+                    <FormLabel aria-label="ctaTypeYo">{t('cta:type')}</FormLabel>
                     <InputHelper>{t('cta:share_type_helper')}</InputHelper>
 
                     <Controller
@@ -359,6 +362,9 @@ const CTAForm = ({
                       control={form.control}
                       render={({ field }) => (
                         <Select
+                          id="ctaTypeYo"
+                          aria-label="ctaTypeTwo"
+                          data-testid="custom-element"
                           options={CTA_TYPES}
                           value={field.value as any}
                           onChange={field.onChange}
