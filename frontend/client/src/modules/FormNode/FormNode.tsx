@@ -105,7 +105,7 @@ const getFirstFocusableFieldIndex = (step: any) => {
 const FormNode = ({ node, onRunAction }: FormNodeProps) => {
   const { t } = useTranslation();
   const [activeStep, setActiveStep] = useState(0);
-  const [wantsToShare, setWantsToShare] = useState(true);
+  const [wantsToShare, setWantsToShare] = useState(false);
 
   const { register, getValues, formState, control } = useForm<FormNodeFormProps>({
     mode: 'onChange',
@@ -322,9 +322,9 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
             </>
           ) : (
             <UI.Div>
-              <UI.Text fontSize="1.2rem" color="main.400" fontWeight={700}>We are sorry to hear that</UI.Text>
+              <UI.Text fontSize="1.2rem" color="main.400" fontWeight={700}>We’re sorry to hear that.</UI.Text>
               <UI.Text fontSize="0.9rem" color="off.400" fontWeight={500}>
-                Would you like to talk with Daan Helsloot, Rick Scipio or Lev Chneider about this (your choice)?
+                Click next to find out who you can talk to about this. Click finish to end the survey.
               </UI.Text>
               <ButtonIconContainer mt={2}>
                 <UI.Icon stroke="main.400">
@@ -340,10 +340,10 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                   type="button"
                   onClick={() => setWantsToShare(true)}
                 >
-                  Yes, put me in touch with somebody
+                  Next
                 </ClientButton>
                 <UI.Button width="100%" mt={1} size="sm" variant="ghost" onClick={(e) => handleSubmit(e, true)}>
-                  No, I’d rather not share anything
+                  Finish
                 </UI.Button>
               </UI.Div>
 
