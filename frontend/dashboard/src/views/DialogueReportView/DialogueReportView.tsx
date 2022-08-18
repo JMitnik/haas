@@ -112,7 +112,7 @@ export const DialogueReportView = () => {
                 </UI.Span>
               </UI.Div>
             </UI.Flex>
-            <UI.Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
+            <UI.Grid gridTemplateColumns={['1fr', '1fr', '1fr', '1fr', '1fr 1fr']}>
               <UI.Card>
                 <UI.CardBody _size="lg">
                   <UI.Flex justifyContent="space-between">
