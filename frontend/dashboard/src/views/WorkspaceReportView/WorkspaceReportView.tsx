@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import mainTheme from 'config/theme';
 import useMeasure from 'react-use-measure';
 
-export const DialogueReportView = () => {
+export const WorkspaceReportView = () => {
   const { activeCustomer } = useCustomer();
   const { format, getNWeekAgo, getStartOfWeek, getEndOfWeek } = useDate();
   const { t } = useTranslation(['general', 'reporting']);
@@ -166,7 +166,8 @@ export const DialogueReportView = () => {
             <UI.Div>
               <UI.Flex>
                 <UI.Thumbnail size="sm" mr={3}>
-                  <RankingThumbnail />
+                  <img width={60} height={60} src="/assets/images/thumbnails/rounded-ranking.svg" />
+                  {/* <RankingThumbnail /> */}
                 </UI.Thumbnail>
                 <UI.Div>
                   <UI.H3 mb={1} lineHeight={1} color="off.600">
@@ -287,4 +288,4 @@ export const DialogueReportView = () => {
   );
 };
 
-export default DialogueReportView;
+export default WorkspaceReportView;

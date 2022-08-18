@@ -4,7 +4,7 @@ import React from 'react';
 
 import { render, screen } from 'test';
 
-import { DialogueReportView } from '../DialogueReportView';
+import { WorkspaceReportView } from '../WorkspaceReportView';
 import {
   mockGetIssuesQuery, mockGetWorkspaceReportQuery,
 } from './helpers';
@@ -18,7 +18,7 @@ test('display bar chart', async () => {
   mockGetIssuesQuery((res) => res);
   mockGetWorkspaceReportQuery((res) => res);
 
-  render(<DialogueReportView />);
+  render(<WorkspaceReportView />);
 
   expect(await screen.findByText('Weekly report')).toBeInTheDocument();
 
