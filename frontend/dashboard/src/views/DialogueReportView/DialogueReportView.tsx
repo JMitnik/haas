@@ -6,7 +6,7 @@ import { DateFormat, useDate } from 'hooks/useDate';
 import { DialogueImpactScoreType, useGetIssuesQuery, useGetWorkspaceReportQuery } from 'types/generated-types';
 import { EventBars } from 'components/Analytics/Common/EventBars';
 import { ReactComponent as RankingThumbnail } from 'assets/images/thumbnails/sm/rounded-ranking.svg';
-import { ReportsLayout } from 'layouts/ReportsLayout/ReportsLayout';
+import { ReportsHeader, ReportsLayout } from 'layouts/ReportsLayout/ReportsLayout';
 import { ScoreBox } from 'components/ScoreBox';
 import { ReactComponent as TopicsThumbnail } from 'assets/images/thumbnails/sm/rounded-topics.svg';
 import { User } from 'react-feather';
@@ -77,30 +77,28 @@ export const DialogueReportView = () => {
   return (
     <ReportsLayout>
       <View documentTitle="Report">
-        <UI.ViewHead>
-          <UI.ViewTitle>
-            <UI.Flex justifyContent="space-between">
-              <UI.Div>
-                {t('weekly_report')}
-              </UI.Div>
+        <ReportsHeader>
+          <UI.ViewHead>
+            <UI.ViewTitle>
+              <UI.Flex justifyContent="space-between">
+                <UI.Div>
+                  {t('weekly_report')}
+                </UI.Div>
 
-              <UI.Div>
-                <UI.Span color="off.500" fontSize="1.4rem">
-                  {format(startDate, DateFormat.DayFormat)}
-                  {' - '}
-                  {format(endDate, DateFormat.DayFormat)}
-                </UI.Span>
-              </UI.Div>
-            </UI.Flex>
-          </UI.ViewTitle>
-
-          <UI.Div mt={2}>
-            <UI.Hr />
-          </UI.Div>
-        </UI.ViewHead>
+                <UI.Div>
+                  <UI.Span color="off.500" fontSize="1.4rem">
+                    {format(startDate, DateFormat.DayFormat)}
+                    {' - '}
+                    {format(endDate, DateFormat.DayFormat)}
+                  </UI.Span>
+                </UI.Div>
+              </UI.Flex>
+            </UI.ViewTitle>
+          </UI.ViewHead>
+        </ReportsHeader>
         <UI.ViewBody>
-          <UI.Div>
-            <UI.Flex mb={48}>
+          <UI.Grid mt={24} gridGap={48}>
+            <UI.Flex>
               <UI.Thumbnail size="sm" mr={3}>
                 <UsersThumbnail />
               </UI.Thumbnail>
@@ -165,10 +163,7 @@ export const DialogueReportView = () => {
                 </UI.CardBody>
               </UI.Card>
             </UI.Grid>
-          </UI.Div>
-
-          <UI.Div mt={48}>
-            <UI.Div mb={48}>
+            <UI.Div>
               <UI.Flex>
                 <UI.Thumbnail size="sm" mr={3}>
                   <RankingThumbnail />
@@ -184,7 +179,6 @@ export const DialogueReportView = () => {
                 </UI.Div>
               </UI.Flex>
             </UI.Div>
-
             <UI.Div>
               <UI.Card>
                 <UI.CardHeader>
@@ -235,61 +229,58 @@ export const DialogueReportView = () => {
                 </UI.CardBody>
               </UI.Card>
             </UI.Div>
-          </UI.Div>
-
-          <UI.Div mt={48}>
-            <UI.Div mb={48}>
-              <UI.Flex>
-                <UI.Thumbnail size="sm" mr={3}>
-                  <TopicsThumbnail />
-                </UI.Thumbnail>
-                <UI.Div>
-                  <UI.H3 mb={1} lineHeight={1} color="off.600">
-                    {t('trending_topics')}
-                  </UI.H3>
-
-                  <UI.Span fontSize="1.1rem" color="off.500">
-                    {t('reporting:trending_topics_helper')}
-                  </UI.Span>
-                </UI.Div>
-              </UI.Flex>
-            </UI.Div>
-
             <UI.Div>
-              {topics.filter(isPresent).map((topic) => (
-                <UI.Div>
-                  <UI.Grid style={{ alignItems: 'center' }} gridTemplateColumns="70px 1fr 80px">
-                    <UI.Div color="off.600">
-                      <UI.Flex>
-                        <UI.Icon mr={1}>
-                          <User />
-                        </UI.Icon>
-                        {topic?.basicStats.responseCount}
-                      </UI.Flex>
-                    </UI.Div>
+              <UI.Div>
+                <UI.Flex>
+                  <UI.Thumbnail size="sm" mr={3}>
+                    <TopicsThumbnail />
+                  </UI.Thumbnail>
+                  <UI.Div>
+                    <UI.H3 mb={1} lineHeight={1} color="off.600">
+                      {t('trending_topics')}
+                    </UI.H3>
 
-                    <UI.Div>
-                      <UI.Strong color="off.600">
-                        {topic.topic}
-                      </UI.Strong>
-                      <br />
+                    <UI.Span fontSize="1.1rem" color="off.500">
+                      {t('reporting:trending_topics_helper')}
+                    </UI.Span>
+                  </UI.Div>
+                </UI.Flex>
+              </UI.Div>
 
-                      <UI.Span color="off.400">
-                        {'in '}
-                        {topic.dialogue?.title}
-                      </UI.Span>
-                    </UI.Div>
+              <UI.Div>
+                {topics.filter(isPresent).map((topic) => (
+                  <UI.Div>
+                    <UI.Grid style={{ alignItems: 'center' }} gridTemplateColumns="70px 1fr 80px">
+                      <UI.Div color="off.600">
+                        <UI.Flex>
+                          <UI.Icon mr={1}>
+                            <User />
+                          </UI.Icon>
+                          {topic?.basicStats.responseCount}
+                        </UI.Flex>
+                      </UI.Div>
 
-                    <UI.Div>
-                      <ScoreBox score={topic.basicStats.average} />
-                    </UI.Div>
-                  </UI.Grid>
+                      <UI.Div>
+                        <UI.Strong color="off.600">
+                          {topic.topic}
+                        </UI.Strong>
+                        <br />
 
-                  <UI.Hr />
-                </UI.Div>
-              ))}
+                        <UI.Span color="off.400">
+                          {'in '}
+                          {topic.dialogue?.title}
+                        </UI.Span>
+                      </UI.Div>
+
+                      <UI.Div>
+                        <ScoreBox score={topic.basicStats.average} />
+                      </UI.Div>
+                    </UI.Grid>
+                  </UI.Div>
+                ))}
+              </UI.Div>
             </UI.Div>
-          </UI.Div>
+          </UI.Grid>
         </UI.ViewBody>
       </View>
     </ReportsLayout>
