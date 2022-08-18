@@ -1,30 +1,44 @@
-himport '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom/extend-expect';
 
-import { MockedResponse } from '@apollo/client/testing';
-import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
+import { render, screen } from 'test';
+
+import { DialogueReportView } from '../DialogueReportView';
 import {
-  createGetMock
+  mockGetIssuesQuery, mockGetWorkspaceReportQuery,
 } from './helpers';
-import { getMockedWrapper } from '../../../../__tests__/Wrapper';
-import Component, { ComponentProps } from '../Component';
 
-const renderComponent = (props: ComponentProps, mocks: MockedResponse[] = []) => {
-  const MockedWrapper = getMockedWrapper(mocks);
+/**
+ * Fetch a widget card
+ */
+const getWidget = (headerText: string) => screen.getByText(headerText).parentElement?.parentElement?.parentElement;
 
-  return render(<Component {...props} />, { wrapper: MockedWrapper });
-};
+test('display bar chart', async () => {
+  mockGetIssuesQuery((res) => res);
+  mockGetWorkspaceReportQuery((res) => res);
 
-test('display maximum details', async () => {
-  const GetMock = createGetMock(
-    (variables) => variables,
-    (response) => response,
-  );
+  render(<DialogueReportView />);
 
-  renderComponent({
+  expect(await screen.findByText('Weekly report')).toBeInTheDocument();
 
-  }, [GetMock]);
+  // Check that the total summaries are 0
+  expect((await screen.findByText('Total responses')).parentElement).toContainHTML('24');
+  expect(screen.getByText('Total problems').parentElement).toContainHTML('0');
 
-  expect(await screen.findByText('X')).toBeInTheDocument();
+  // Check that only *one* bar chart for responses has a certain height
+  const responseWidget = getWidget('Total responses');
+  const bars = responseWidget?.querySelectorAll('rect') || [];
+  const barHeightLabels = [...bars].map((bar) => bar.getAttribute('aria-label'));
+  const barHeights = barHeightLabels.map((label) => {
+    const regexMatch = label?.match('bar-height-(.*)');
+
+    if (regexMatch && regexMatch.length > 1) {
+      return Number(regexMatch[1]);
+    }
+
+    return 0;
+  });
+
+  expect(barHeights.filter((height) => height > 100)).toHaveLength(1);
 });

@@ -55,7 +55,7 @@ export const EventBars = ({
   // Max y coordinates
   const yMax = height + topPadding;
 
-  const maxFreq = useMemo(() => Math.max(...events.map((event) => event.frequency)), [events]);
+  const maxFreq = useMemo(() => Math.max(...events.map((event) => event.frequency), 0), [events]);
 
   const freqScale = useMemo(() => scaleLinear<number>({
     domain: [0, maxFreq],
@@ -96,6 +96,7 @@ export const EventBars = ({
                 )}
                 <Bar
                   className="event-bar"
+                  aria-label={`bar-height-${barHeight}`}
                   x={barX}
                   y={barY - bottomPadding}
                   width={barWidth}
