@@ -57,7 +57,13 @@ const mapLeafs = (leafs: any) => leafs?.map((leaf: any) => {
       type: 'FORM',
       icon: RegisterIcon,
       form: {
-        steps: leaf.form.steps.map((step: any) => ({
+        preFormNode: leaf?.form?.preForm ? {
+          header: leaf.form.preForm.header,
+          helper: leaf.form.preForm.helper,
+          nextText: leaf.form.preForm.nextText,
+          finishText: leaf.form.preForm.finishText,
+        } : undefined,
+        steps: leaf?.form?.steps?.map((step: any) => ({
           ...step,
           fields: step.fields.map((field: any) => ({
             ...field,

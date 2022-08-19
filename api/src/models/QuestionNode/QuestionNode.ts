@@ -133,12 +133,26 @@ export const FormNodeStepInput = inputObjectType({
   },
 });
 
+export const PreFormNodeInput = inputObjectType({
+  name: 'PreFormNodeInput',
+
+  definition(t) {
+    t.nonNull.string('header');
+    t.nonNull.string('helper');
+    t.nonNull.string('nextText');
+    t.nonNull.string('finishText');
+  },
+})
+
+
 export const FormNodeInputType = inputObjectType({
   name: 'FormNodeInputType',
 
   definition(t) {
     t.string('id', { nullable: true });
     t.string('helperText', { nullable: true });
+
+    t.nullable.field('preFormNode', { type: PreFormNodeInput });
 
     t.list.nonNull.field('fields', { type: FormNodeFieldInput });
     t.list.nonNull.field('steps', { type: FormNodeStepInput });
@@ -184,6 +198,18 @@ export const FormNodeStep = objectType({
     t.nonNull.field('type', { type: FormNodeStepType });
     t.list.nonNull.field('fields', { type: FormNodeField });
   },
+});
+
+export const PreFormNodeType = objectType({
+  name: 'PreFormNodeType',
+
+  definition(t) {
+    t.nonNull.string('id')
+    t.nonNull.string('header');
+    t.nonNull.string('helper');
+    t.nonNull.string('nextText');
+    t.nonNull.string('finishText');
+  },
 })
 
 export const FormNodeType = objectType({
@@ -193,6 +219,7 @@ export const FormNodeType = objectType({
     t.string('id', { nullable: true });
     t.string('helperText', { nullable: true });
 
+    t.nullable.field('preForm', { type: PreFormNodeType });
     t.list.nonNull.field('fields', { type: FormNodeField });
     t.list.nonNull.field('steps', { type: FormNodeStep });
   },

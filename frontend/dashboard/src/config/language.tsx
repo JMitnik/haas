@@ -11,6 +11,14 @@ const language = {
     },
   },
   general: {
+    add_pre_form_node: {
+      en: 'Add Pre-Form',
+      de: 'Pre-Form hinzufügen',
+    },
+    pre_node_form: {
+      en: 'Pre-Form Node',
+      de: 'Pre-Form Node',
+    },
     step_header: {
       en: 'Header',
       de: 'Header',

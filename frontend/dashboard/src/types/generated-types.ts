@@ -1226,6 +1226,7 @@ export enum FormNodeFieldTypeEnum {
 export type FormNodeInputType = {
   id?: Maybe<Scalars['String']>;
   helperText?: Maybe<Scalars['String']>;
+  preFormNode?: Maybe<PreFormNodeInput>;
   fields?: Maybe<Array<FormNodeFieldInput>>;
   steps?: Maybe<Array<FormNodeStepInput>>;
 };
@@ -1243,11 +1244,11 @@ export type FormNodeStep = {
 
 export type FormNodeStepInput = {
   id?: Maybe<Scalars['ID']>;
-  type?: Maybe<FormNodeStepType>;
-  header?: Maybe<Scalars['String']>;
-  helper?: Maybe<Scalars['String']>;
-  subHelper?: Maybe<Scalars['String']>;
-  position?: Maybe<Scalars['Int']>;
+  type: FormNodeStepType;
+  header: Scalars['String'];
+  helper: Scalars['String'];
+  subHelper: Scalars['String'];
+  position: Scalars['Int'];
   fields?: Maybe<Array<FormNodeFieldInput>>;
 };
 
@@ -1260,6 +1261,7 @@ export type FormNodeType = {
   __typename?: 'FormNodeType';
   id?: Maybe<Scalars['String']>;
   helperText?: Maybe<Scalars['String']>;
+  preForm?: Maybe<PreFormNodeType>;
   fields?: Maybe<Array<FormNodeField>>;
   steps?: Maybe<Array<FormNodeStep>>;
 };
@@ -2105,6 +2107,22 @@ export type PermssionType = {
   name?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   customer?: Maybe<Customer>;
+};
+
+export type PreFormNodeInput = {
+  header: Scalars['String'];
+  helper: Scalars['String'];
+  nextText: Scalars['String'];
+  finishText: Scalars['String'];
+};
+
+export type PreFormNodeType = {
+  __typename?: 'PreFormNodeType';
+  id: Scalars['String'];
+  header: Scalars['String'];
+  helper: Scalars['String'];
+  nextText: Scalars['String'];
+  finishText: Scalars['String'];
 };
 
 export type PreviewDataType = {

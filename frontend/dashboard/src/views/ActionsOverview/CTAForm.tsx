@@ -103,6 +103,12 @@ export const schema = yup.object().shape({
     otherwise: yup.object().notRequired(),
   }),
   formNode: yup.object().shape({
+    preFormNode: yup.object().shape({
+      header: yup.string(),
+      helper: yup.string(),
+      nextText: yup.string(),
+      finishText: yup.string(),
+    }).nullable(),
     steps: yup.array().of(yup.object().shape({
       header: yup.string().required(),
       helper: yup.string().required(),
@@ -161,6 +167,7 @@ const CTAForm = ({
       formNode: {
         id: formNode?.id,
         helperText: formNode?.helperText || '',
+        preFormNode: formNode?.preFormNode,
         steps: formNode?.steps || [],
         fields: formNode?.fields?.map((field: any) => ({
           id: field.id,

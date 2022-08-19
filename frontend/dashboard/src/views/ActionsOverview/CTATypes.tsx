@@ -38,6 +38,12 @@ export interface FormDataProps {
   formNode?: {
     id?: string;
     helperText?: string;
+    preFormNode?: {
+      header: string,
+      helper: string,
+      nextText: string,
+      finishText: string,
+    },
     steps: {
       header?: string;
       helper?: string;

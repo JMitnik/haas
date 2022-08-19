@@ -407,6 +407,7 @@ export interface NexusGenInputs {
     fields?: NexusGenInputs['FormNodeFieldInput'][] | null; // [FormNodeFieldInput!]
     helperText?: string | null; // String
     id?: string | null; // String
+    preFormNode?: NexusGenInputs['PreFormNodeInput'] | null; // PreFormNodeInput
     steps?: NexusGenInputs['FormNodeStepInput'][] | null; // [FormNodeStepInput!]
   }
   FormNodeStepInput: { // input type
@@ -549,6 +550,12 @@ export interface NexusGenInputs {
     customerId?: string | null; // String
     description?: string | null; // String
     name?: string | null; // String
+  }
+  PreFormNodeInput: { // input type
+    finishText: string; // String!
+    header: string; // String!
+    helper: string; // String!
+    nextText: string; // String!
   }
   QuestionNodeWhereInputType: { // input type
     id?: string | null; // ID
@@ -1116,6 +1123,7 @@ export interface NexusGenObjects {
     fields?: NexusGenRootTypes['FormNodeField'][] | null; // [FormNodeField!]
     helperText?: string | null; // String
     id?: string | null; // String
+    preForm?: NexusGenRootTypes['PreFormNodeType'] | null; // PreFormNodeType
     steps?: NexusGenRootTypes['FormNodeStep'][] | null; // [FormNodeStep!]
   }
   HealthScore: { // root type
@@ -1240,6 +1248,13 @@ export interface NexusGenObjects {
     description?: string | null; // String
     id?: string | null; // ID
     name?: string | null; // String
+  }
+  PreFormNodeType: { // root type
+    finishText: string; // String!
+    header: string; // String!
+    helper: string; // String!
+    id: string; // String!
+    nextText: string; // String!
   }
   PreviewDataType: { // root type
     colors?: Array<string | null> | null; // [String]
@@ -1833,6 +1848,7 @@ export interface NexusGenFieldTypes {
     fields: NexusGenRootTypes['FormNodeField'][] | null; // [FormNodeField!]
     helperText: string | null; // String
     id: string | null; // String
+    preForm: NexusGenRootTypes['PreFormNodeType'] | null; // PreFormNodeType
     steps: NexusGenRootTypes['FormNodeStep'][] | null; // [FormNodeStep!]
   }
   HealthScore: { // field return type
@@ -2041,6 +2057,13 @@ export interface NexusGenFieldTypes {
     description: string | null; // String
     id: string | null; // ID
     name: string | null; // String
+  }
+  PreFormNodeType: { // field return type
+    finishText: string; // String!
+    header: string; // String!
+    helper: string; // String!
+    id: string; // String!
+    nextText: string; // String!
   }
   PreviewDataType: { // field return type
     colors: Array<string | null> | null; // [String]
@@ -2733,6 +2756,7 @@ export interface NexusGenFieldTypeNames {
     fields: 'FormNodeField'
     helperText: 'String'
     id: 'String'
+    preForm: 'PreFormNodeType'
     steps: 'FormNodeStep'
   }
   HealthScore: { // field return type name
@@ -2941,6 +2965,13 @@ export interface NexusGenFieldTypeNames {
     description: 'String'
     id: 'ID'
     name: 'String'
+  }
+  PreFormNodeType: { // field return type name
+    finishText: 'String'
+    header: 'String'
+    helper: 'String'
+    id: 'String'
+    nextText: 'String'
   }
   PreviewDataType: { // field return type name
     colors: 'String'

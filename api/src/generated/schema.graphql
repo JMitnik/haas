@@ -1036,6 +1036,7 @@ input FormNodeInputType {
   fields: [FormNodeFieldInput!]
   helperText: String
   id: String
+  preFormNode: PreFormNodeInput
   steps: [FormNodeStepInput!]
 }
 
@@ -1068,6 +1069,7 @@ type FormNodeType {
   fields: [FormNodeField!]
   helperText: String
   id: String
+  preForm: PreFormNodeType
   steps: [FormNodeStep!]
 }
 
@@ -1581,6 +1583,21 @@ type PermssionType {
   description: String
   id: ID
   name: String
+}
+
+input PreFormNodeInput {
+  finishText: String!
+  header: String!
+  helper: String!
+  nextText: String!
+}
+
+type PreFormNodeType {
+  finishText: String!
+  header: String!
+  helper: String!
+  id: String!
+  nextText: String!
 }
 
 type PreviewDataType {

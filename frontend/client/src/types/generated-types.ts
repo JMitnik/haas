@@ -1226,6 +1226,7 @@ export enum FormNodeFieldTypeEnum {
 export type FormNodeInputType = {
   id?: Maybe<Scalars['String']>;
   helperText?: Maybe<Scalars['String']>;
+  preFormNode?: Maybe<PreFormNodeInput>;
   fields?: Maybe<Array<FormNodeFieldInput>>;
   steps?: Maybe<Array<FormNodeStepInput>>;
 };
@@ -1260,6 +1261,7 @@ export type FormNodeType = {
   __typename?: 'FormNodeType';
   id?: Maybe<Scalars['String']>;
   helperText?: Maybe<Scalars['String']>;
+  preForm?: Maybe<PreFormNodeType>;
   fields?: Maybe<Array<FormNodeField>>;
   steps?: Maybe<Array<FormNodeStep>>;
 };
@@ -2105,6 +2107,22 @@ export type PermssionType = {
   name?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   customer?: Maybe<Customer>;
+};
+
+export type PreFormNodeInput = {
+  header: Scalars['String'];
+  helper: Scalars['String'];
+  nextText: Scalars['String'];
+  finishText: Scalars['String'];
+};
+
+export type PreFormNodeType = {
+  __typename?: 'PreFormNodeType';
+  id: Scalars['String'];
+  header: Scalars['String'];
+  helper: Scalars['String'];
+  nextText: Scalars['String'];
+  finishText: Scalars['String'];
 };
 
 export type PreviewDataType = {
@@ -3234,7 +3252,10 @@ export type QuestionFragmentFragment = (
   )>, form?: Maybe<(
     { __typename?: 'FormNodeType' }
     & Pick<FormNodeType, 'id' | 'helperText'>
-    & { steps?: Maybe<Array<(
+    & { preForm?: Maybe<(
+      { __typename?: 'PreFormNodeType' }
+      & Pick<PreFormNodeType, 'id' | 'header' | 'helper' | 'nextText' | 'finishText'>
+    )>, steps?: Maybe<Array<(
       { __typename?: 'FormNodeStep' }
       & Pick<FormNodeStep, 'id' | 'header' | 'helper' | 'subHelper' | 'position' | 'type'>
       & { fields?: Maybe<Array<(
@@ -3358,6 +3379,13 @@ export const QuestionFragmentFragmentDoc = gql`
   form {
     id
     helperText
+    preForm {
+      id
+      header
+      helper
+      nextText
+      finishText
+    }
     steps {
       id
       header
@@ -3723,6 +3751,7 @@ export namespace QuestionFragment {
   export type OverrideLeaf = (NonNullable<QuestionFragmentFragment['overrideLeaf']>);
   export type Share = (NonNullable<QuestionFragmentFragment['share']>);
   export type Form = (NonNullable<QuestionFragmentFragment['form']>);
+  export type PreForm = (NonNullable<(NonNullable<QuestionFragmentFragment['form']>)['preForm']>);
   export type Steps = NonNullable<(NonNullable<(NonNullable<QuestionFragmentFragment['form']>)['steps']>)[number]>;
   export type Fields = NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<QuestionFragmentFragment['form']>)['steps']>)[number]>['fields']>)[number]>;
   export type Contacts = NonNullable<(NonNullable<NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<QuestionFragmentFragment['form']>)['steps']>)[number]>['fields']>)[number]>['contacts']>)[number]>;

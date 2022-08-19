@@ -203,10 +203,25 @@ model FormNodeField {
   formNodeStepId         String?
 }
 
+model PreFormNode {
+  id String @id @default(cuid())
+
+  header     String?
+  helper     String?
+  nextText   String?
+  finishText String?
+
+  formNode FormNode?
+}
+
 model FormNode {
-  id           String          @id @default(cuid())
-  helperText   String?
-  createdAt    DateTime        @default(now())
+  id         String   @id @default(cuid())
+  helperText String?
+  createdAt  DateTime @default(now())
+
+  preFormNodeId String?      @unique
+  preForm       PreFormNode? @relation(fields: [preFormNodeId], references: [id])
+
   steps        FormNodeStep[]
   fields       FormNodeField[]
   QuestionNode QuestionNode[]

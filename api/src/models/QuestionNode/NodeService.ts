@@ -106,6 +106,7 @@ export class NodeService {
     const dialogue = await this.dialoguePrismaAdapter.getDialogueBySlugs(input.customerSlug, input.dialogueSlug);
     if (!dialogue?.id) throw 'No Dialogue found to add CTA to!'
 
+    console.log('Form: ', input.form);
     const form = input.form ? await this.createFormNodeInput(input.form, input.customerSlug) : undefined;
 
     const callToAction = await this.questionNodePrismaAdapter.createCallToAction({
@@ -301,11 +302,31 @@ export class NodeService {
           await Promise.all(fields.map((field) => this.questionNodePrismaAdapter.upsertFormNodeField(field)));
           return;
         }) || []);
-        // await this.questionNodePrismaAdapter.updateFieldsOfForm({
-        //   questionId: input.id,
-        //   steps,
-        //   helperText: input.form.helperText || '',
-        // })
+        // TODO: Move this to a PrismaAdapter
+        await this.prisma.formNode.update({
+          where: {
+            id: existingNode.form.id,
+          },
+          data: {
+            preForm: {
+              delete: (existingNode.form.preFormNodeId && !input.form.preFormNode) || false,
+              upsert: input.form.preFormNode ? {
+                create: {
+                  header: input.form.preFormNode.header,
+                  helper: input.form.preFormNode.helper,
+                  nextText: input.form.preFormNode.nextText,
+                  finishText: input.form.preFormNode.finishText,
+                },
+                update: {
+                  header: input.form.preFormNode.header,
+                  helper: input.form.preFormNode.helper,
+                  nextText: input.form.preFormNode.nextText,
+                  finishText: input.form.preFormNode.finishText,
+                },
+              } : undefined,
+            },
+          },
+        })
       } else {
         const fields = await this.createFormNodeInput(input.form, input.customerSlug);
         await this.questionNodePrismaAdapter.createFieldsOfForm({
@@ -546,6 +567,14 @@ export class NodeService {
 
     return ({
       helperText: input.helperText,
+      preForm: {
+        create: input.preFormNode ? {
+          header: input.preFormNode?.header,
+          helper: input.preFormNode?.helper,
+          nextText: input.preFormNode?.nextText,
+          finishText: input.preFormNode?.finishText,
+        } : undefined,
+      },
       steps: {
         create: steps,
       },

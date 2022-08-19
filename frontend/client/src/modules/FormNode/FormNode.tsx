@@ -105,7 +105,7 @@ const getFirstFocusableFieldIndex = (step: any) => {
 const FormNode = ({ node, onRunAction }: FormNodeProps) => {
   const { t } = useTranslation();
   const [activeStep, setActiveStep] = useState(0);
-  const [wantsToShare, setWantsToShare] = useState(false);
+  const [wantsToShare, setWantsToShare] = useState(!node.form?.preForm);
 
   const { register, getValues, formState, control } = useForm<FormNodeFormProps>({
     mode: 'onChange',
@@ -120,6 +120,8 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
   });
 
   const { isValid } = formState;
+
+  console.log('node.form.preForm', node.form?.preForm);
 
   const step = node.form?.steps?.[activeStep] || undefined;
   const fields = node.form?.steps?.[activeStep].fields || [];
@@ -322,9 +324,9 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
             </>
           ) : (
             <UI.Div>
-              <UI.Text fontSize="1.2rem" color="main.400" fontWeight={700}>We’re sorry to hear that.</UI.Text>
+              <UI.Text fontSize="1.2rem" color="main.400" fontWeight={700}>{node.form?.preForm?.header}</UI.Text>
               <UI.Text fontSize="0.9rem" color="off.400" fontWeight={500}>
-                Click next to find out who you can talk to about this. Click finish to end the survey.
+                {node.form?.preForm?.helper}
               </UI.Text>
               <ButtonIconContainer mt={2}>
                 <UI.Icon stroke="main.400">
@@ -340,10 +342,10 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                   type="button"
                   onClick={() => setWantsToShare(true)}
                 >
-                  Next
+                  {node.form?.preForm?.nextText || 'Next'}
                 </ClientButton>
                 <UI.Button width="100%" mt={1} size="sm" variant="ghost" onClick={(e) => handleSubmit(e, true)}>
-                  Finish
+                  {node.form?.preForm?.finishText || 'Finish'}
                 </UI.Button>
               </UI.Div>
 

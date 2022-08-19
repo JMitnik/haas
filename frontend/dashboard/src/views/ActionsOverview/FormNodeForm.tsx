@@ -1,14 +1,17 @@
 import * as UI from '@haas/ui';
 import { AnimatePresence } from 'framer-motion';
-import { useFieldArray, useFormContext } from 'react-hook-form';
+import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
+import { PlusCircle } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
 import * as Modal from 'components/Common/Modal';
 import { ReactComponent as FieldIll } from 'assets/images/undraw_form.svg';
 
-import { FormStepPreview } from './FormStepPreview';
 // eslint-disable-next-line import/no-cycle
+import { FormStepPreview } from './FormStepPreview';
+import { PreFormNodeFormFragment } from './PreFormNodeFragment';
+import { PreNodeFormCell } from './PreNodeFormCell';
 import { StepFormNodeFormFragment } from './StepNodeFormFragment';
 import { TempFieldType } from './FormNodeForm.types';
 
@@ -30,6 +33,7 @@ const FormNodeForm = () => {
   const form = useFormContext();
   const { t } = useTranslation();
   const [openedStep, setOpenedStep] = useState<number | null>(null);
+  const [openPreFormModal, setOpenPreFormModal] = useState(false);
 
   const { fields, append, move, remove } = useFieldArray({
     control: form.control,
@@ -42,6 +46,9 @@ const FormNodeForm = () => {
   };
 
   const stepsFields = form.watch('formNode.steps');
+  const preFormNode = form.watch('formNode.preFormNode');
+
+  console.log('Pre form node: ', preFormNode);
 
   return (
     <UI.FormSection id="form-node-form">
@@ -52,6 +59,81 @@ const FormNodeForm = () => {
       <UI.Div>
         <UI.Div>
           <UI.InputGrid>
+            <UI.Div
+              width="100%"
+              backgroundColor="#fbfcff"
+              border="1px solid #edf2f7"
+              borderRadius="10px"
+              padding={4}
+            >
+              <>
+                <UI.Grid gridTemplateColumns="2fr 1fr">
+                  <UI.Helper>{t('pre_node_form')}</UI.Helper>
+                </UI.Grid>
+
+                <UI.Grid
+                  pt={2}
+                  pb={2}
+                  pl={0}
+                  pr={0}
+                  borderBottom="1px solid #edf2f7"
+                  gridTemplateColumns="1fr"
+                >
+                  <UI.Div alignItems="center" display="flex">
+                    <Controller
+                      name="formNode.preFormNode"
+                      control={form.control}
+                      defaultValue={undefined}
+                      render={({ field }) => {
+                        console.log('field value: ', field);
+                        return (
+                          <UI.Div
+                            width="100%"
+                          // justifyContent="center"
+                          // display="flex"
+                          // alignItems="center"
+                          >
+                            {field.value ? (
+                              <PreNodeFormCell
+                                onClick={() => setOpenPreFormModal(true)}
+                                onRemove={() => form.setValue('formNode.preFormNode', null)}
+                                node={field.value}
+                              />
+                            ) : (
+                              <UI.Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setOpenPreFormModal(true)}
+                                variantColor="altGray"
+                              >
+                                <UI.Icon mr={1}>
+                                  <PlusCircle />
+                                </UI.Icon>
+                                {t('add_pre_form_node')}
+                              </UI.Button>
+                            )}
+                          </UI.Div>
+
+                        );
+                      }}
+                    />
+                    <AnimatePresence>
+                      <Modal.Root
+                        open={openPreFormModal}
+                        onClose={() => setOpenPreFormModal(false)}
+                        style={{ maxWidth: 1000 }}
+                      >
+                        <PreFormNodeFormFragment
+                          preFormNode={preFormNode}
+                          onSubmit={(subForm: any) => form.setValue('formNode.preFormNode', subForm)}
+                          onClose={() => setOpenPreFormModal(false)}
+                        />
+                      </Modal.Root>
+                    </AnimatePresence>
+                  </UI.Div>
+                </UI.Grid>
+              </>
+            </UI.Div>
             {fields?.map((field, index) => (
               <UI.Div position="relative" key={field.fieldIndex}>
                 <AnimatePresence>
