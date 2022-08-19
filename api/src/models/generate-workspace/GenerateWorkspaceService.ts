@@ -17,6 +17,7 @@ import CustomerService from '../customer/CustomerService';
 import { DialogueTemplateType } from '../QuestionNode/NodeServiceType';
 import UserService from '../../models/users/UserService';
 import { GenerateWorkspaceCSVInput, Workspace } from './GenerateWorkspace.types';
+import { RoleType } from 'models/role';
 
 class GenerateWorkspaceService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -109,7 +110,7 @@ class GenerateWorkspaceService {
       await this.templateService.createTemplatePostLeafNode(templateType as NexusGenEnums['DialogueTemplateType'], dialogue.id);
 
       // Make the leafs
-      const leafs = await this.templateService.createTemplateLeafNodes(templateType as NexusGenEnums['DialogueTemplateType'], dialogue.id);
+      const leafs = await this.templateService.createTemplateLeafNodes(templateType as NexusGenEnums['DialogueTemplateType'], dialogue.id, []);
 
       // Make nodes
       await this.templateService.createTemplateNodes(dialogue.id, workspace.name, leafs, templateType);
@@ -161,8 +162,34 @@ class GenerateWorkspaceService {
 
       await this.userService.connectPrivateDialoguesToUser(user.id, workspace.id);
 
-      void this.userService.sendInvitationMail(invitedUser);
+      void this.userService.sendInvitationMail(invitedUser, true);
     }
+  }
+
+  /**
+   * Creates 
+   * @param contactsEntry 
+   * @param workspace 
+   * @returns 
+   */
+  private async upsertUsersWorkspace(emailAddresses: string[], workspace: Workspace) {
+    const managerRole = workspace.roles.find((role) => role.type === RoleTypeEnum.MANAGER) as Role;
+
+    const userIds = await Promise.all(emailAddresses.map(async (contact) => {
+      const user = await this.userService.upsertUserByEmail({
+        email: contact,
+      })
+
+      await this.userOfCustomerPrismaAdapter.upsertUserOfCustomer(
+        workspace.id,
+        user.id,
+        managerRole.id,
+      );
+
+      return user.id;
+    }));
+
+    return userIds;
   }
 
   /**
@@ -218,8 +245,21 @@ class GenerateWorkspaceService {
       const dialogue = await this.dialoguePrismaAdapter.createTemplate(dialogueInput);
 
       if (!dialogue) throw new ApolloError('ERROR: No dialogue created! aborting...');
+
+      const contactsEntry = Object.entries(record).find((entry) => entry[0] === 'contacts');
+      const hasContacts = !!contactsEntry?.[1];
+
+      const contactEmails = hasContacts ? (contactsEntry?.[1] as string)?.trim().replaceAll(' ', '').split(',') : [];
+      let contactIds: string[] = [];
+
+      if (hasContacts) {
+        contactIds = await this.upsertUsersWorkspace(contactEmails, workspace);
+      }
+
+      // console.log('Contact IDS: ', contactIds);
+
       // Make the leafs
-      const leafs = await this.templateService.createTemplateLeafNodes(type as NexusGenEnums['DialogueTemplateType'], dialogue.id);
+      const leafs = await this.templateService.createTemplateLeafNodes(type as NexusGenEnums['DialogueTemplateType'], dialogue.id, contactIds);
 
       // Make nodes
       await this.templateService.createTemplateNodes(dialogue.id, workspace.name, leafs, type as string);
@@ -246,7 +286,7 @@ class GenerateWorkspaceService {
         user.id === userId ? adminRole?.id as string : userRole.id, // If user generating is upserted => give admin role
       );
 
-      void this.userService.sendInvitationMail(invitedUser);
+      void this.userService.sendInvitationMail(invitedUser, true);
     };
   };
 
@@ -317,7 +357,8 @@ class GenerateWorkspaceService {
       }
 
       return workspace;
-    } catch {
+    } catch (error) {
+      console.log('Error: ', (error as any)?.message);
       await this.customerService.deleteWorkspace(workspace.id);
       throw new ApolloError('Something went wrong generating generating workspace. All changes have been reverted');
     }

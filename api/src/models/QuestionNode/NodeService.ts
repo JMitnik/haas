@@ -13,6 +13,7 @@ import { CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType'
 import { CreateSliderNodeInput, UpdateQuestionInput } from './QuestionNodePrismaAdapterType';
 import UserOfCustomerPrismaAdapter from '../../models/users/UserOfCustomerPrismaAdapter';
 import { groupBy } from 'lodash';
+import { stringMap } from 'aws-sdk/clients/backup';
 
 export interface IdMapProps {
   [details: string]: string;
@@ -478,17 +479,26 @@ export class NodeService {
      */
   private async createFormNodeStepInput(
     input: FormNodeStepInput,
-    workspaceSlug: string
+    workspaceSlug: string,
+    contactIds: string[] = [],
   ): Promise<Prisma.FormNodeStepCreateInput> {
-    const communicationUser = input.fields?.find((field) => field.userIds?.length);
-    const targetUsers = communicationUser?.userIds?.length
-      ? await this.userOfCustomerPrismaAdapter.findTargetUsers(
-        workspaceSlug, {
-        roleIds: communicationUser?.userIds.filter(isPresent), userIds: communicationUser?.userIds.filter(isPresent),
-      }
-      )
-      : [];
-    const allUserIds = targetUsers.map((user) => ({ id: user.userId }));
+    let allUserIds = contactIds.map((contactId) => ({ id: contactId }));
+
+    if (!allUserIds.length) {
+      const communicationUser = input.fields?.find((field) => field.userIds?.length);
+      const targetUsers = communicationUser?.userIds?.length
+        ? await this.userOfCustomerPrismaAdapter.findTargetUsers(
+          workspaceSlug,
+          {
+            roleIds: communicationUser?.userIds.filter(isPresent),
+            userIds: communicationUser?.userIds.filter(isPresent),
+          }
+        )
+        : [];
+      allUserIds = targetUsers.map((user) => ({ id: user.userId }));
+    }
+
+    console.log('All user Ids: ', allUserIds);
 
     return ({
       header: input.header as string,
@@ -513,15 +523,14 @@ export class NodeService {
   /**
      * Save FormNodeInput when `creating`
      */
-  private async createFormNodeInput(
+  public async createFormNodeInput(
     input: FormNodeInput,
-    workspaceSlug: string
+    workspaceSlug: string,
+    contactIds: string[] = [],
   ): Promise<Prisma.FormNodeCreateInput> {
     const steps = await Promise.all(input.steps?.map(
-      async (step) => await this.createFormNodeStepInput(step, workspaceSlug)
+      async (step) => await this.createFormNodeStepInput(step, workspaceSlug, contactIds)
     ) as Promise<Prisma.FormNodeStepCreateInput>[])
-
-    console.dir(steps, { depth: 10 })
     // const fieldsWithinSteps = input.steps?.flatMap((step) => step.fields).filter(isPresent);
     // const positionAdjustedFields = fieldsWithinSteps?.map((field, index) => ({ ...field, position: index + 1 }));
 

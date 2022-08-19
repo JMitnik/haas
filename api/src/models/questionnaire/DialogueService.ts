@@ -1262,33 +1262,32 @@ class DialogueService {
 
     // Create leaf nodes
     const leafs = updatedTemplateQuestions?.filter((question) => question.isLeaf);
-    const mappedLeafs: CreateQuestionsInput = leafs?.map((leaf) => ({
-      id: leaf.id,
-      isRoot: false,
-      isLeaf: leaf.isLeaf,
-      title: leaf.title,
-      type: leaf.type,
-      links: leaf.links?.create?.map((link) => link) || [],
-      form: leaf.form ? {
-        fields: leaf.form?.fields?.map((field) => ({
-          label: field?.label,
-          type: field?.type || 'shortText',
-          isRequired: field?.isRequired || false,
-          position: field?.position,
-        })),
-      } : undefined,
-      sliderNode: leaf.sliderNode ? {
-        markers: leaf?.sliderNode?.markers?.map((marker) => ({
-          label: marker?.label,
-          subLabel: marker?.subLabel,
-          range: {
-            start: marker?.range?.start,
-            end: marker?.range?.end,
-          },
-        })),
-      } : undefined,
-    })) || [];
-    await this.dialoguePrismaAdapter.createNodes(dialogue.id, mappedLeafs)
+
+    const mappedLeafs = await Promise.all(leafs?.map(async (leaf) => {
+      const form = leaf.form ? await this.nodeService.createFormNodeInput(leaf?.form, '', []) : undefined;
+      return {
+        ...leaf,
+        id: leaf.id,
+        isRoot: false,
+        isLeaf: leaf.isLeaf,
+        title: leaf.title,
+        type: leaf.type,
+        form: form as Required<Prisma.FormNodeCreateInput>,
+        links: leaf.links?.create?.map((link) => link) || [],
+        sliderNode: leaf.sliderNode ? {
+          markers: leaf?.sliderNode?.markers?.map((marker) => ({
+            label: marker?.label,
+            subLabel: marker?.subLabel,
+            range: {
+              start: marker?.range?.start,
+              end: marker?.range?.end,
+            },
+          })),
+        } : undefined,
+      }
+    }) || []) || [];
+
+    await this.dialoguePrismaAdapter.createNodes(dialogue.id, mappedLeafs as any)
 
     // Create question nodes
     const questions = updatedTemplateQuestions?.filter((question) => !question.isLeaf);

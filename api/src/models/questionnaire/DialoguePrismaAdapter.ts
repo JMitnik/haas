@@ -332,11 +332,16 @@ class DialoguePrismaAdapter {
             } : undefined,
             form: question.form ? {
               create: {
-                fields: {
-                  create: question.form?.fields,
-                },
+                steps: question.form?.steps,
               },
             } : undefined,
+            // form: question.form ? {
+            //   create: {
+            //     fields: {
+            //       create: question.form?.fields,
+            //     },
+            //   },
+            // } : undefined,
             sliderNode: question.sliderNode ? {
               create: {
                 markers: {

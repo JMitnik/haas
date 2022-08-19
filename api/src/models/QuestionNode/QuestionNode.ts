@@ -740,8 +740,6 @@ export const QuestionNodeMutations = extendType({
           questionId: args.input.questionId,
         }
 
-        console.dir(args.input.form, { depth: 10 });
-
         return ctx.services.nodeService.createCallToAction(createCTAInput);
       },
     });

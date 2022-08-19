@@ -337,7 +337,6 @@ class QuestionNodePrismaAdapter {
   };
 
   async upsertFormNodeStep(input: Prisma.FormNodeStepUpsertArgs) {
-    console.dir(input, { depth: 10 });
     return this.prisma.formNodeStep.upsert(input);
   }
 
@@ -516,8 +515,8 @@ class QuestionNodePrismaAdapter {
         } : undefined,
         form: question.form ? {
           create: {
-            fields: {
-              create: question.form?.fields,
+            steps: {
+              create: question.form?.steps,
             },
           },
         } : undefined,

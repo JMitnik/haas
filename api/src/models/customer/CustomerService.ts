@@ -478,7 +478,7 @@ export class CustomerService {
 
     if (!dialogue) throw 'ERROR: No dialogue created!'
     // Step 2: Make the leafs
-    const leafs = await this.templateService.createTemplateLeafNodes(DialogueTemplateType.DEFAULT, dialogue.id);
+    const leafs = await this.templateService.createTemplateLeafNodes(DialogueTemplateType.DEFAULT, dialogue.id, []);
 
     // Step 3: Make nodes
     await this.templateService.createTemplateNodes(dialogue.id, customer.name, leafs, 'DEFAULT');

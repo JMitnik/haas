@@ -76,7 +76,7 @@ const sportWorkspaceTemplate: DemoWorkspaceTemplate = {
   leafNodes: [
     {
       title:
-        'Jouw feedback blijft altijd anoniem, tenzij je er met iemand over wil praten. Als je dat wil, laat dan je email en/of naam achter.',
+        'Jouw feedback blijft altijd anoniem, tenzij je er met iemand over wil praten. Als je dat wil, laat dan je email achter.',
       type: NodeType.FORM,
       form: defaultForm,
     },

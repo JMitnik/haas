@@ -1,4 +1,4 @@
-import { LanguageEnum, Link, Prisma, TagEnum } from '@prisma/client';
+import { FormNodeStepType, LanguageEnum, Link, Prisma, TagEnum } from '@prisma/client';
 import { NexusGenInputs } from '../../generated/nexus';
 
 export interface Tag {
@@ -39,44 +39,79 @@ export interface DemoWorkspaceTemplate extends WorkspaceTemplate {
 }
 
 export const defaultSportTextFieldForm: NexusGenInputs['FormNodeInputType'] = {
-  fields: [
+  steps: [
     {
-      type: 'email',
-      isRequired: true,
-      label: 'Leave your email address and a senior leader will contact you ⇣',
+      header: 'Your Choice',
+      helper: 'We would love to get you in touch with the right person.',
+      subHelper: 'Please select with whom you would prefer to discuss your issue',
+      position: 1,
+      type: FormNodeStepType.GENERIC_FIELDS,
+      fields: [
+        {
+          type: 'email',
+          position: 1,
+          isRequired: true,
+          label: 'Email',
+        },
+        {
+          type: 'contacts',
+          position: 2,
+          isRequired: false,
+          label: 'Contacts',
+        },
+      ],
     },
   ],
 }
 
 export const defaultBusinessTextFieldForm: NexusGenInputs['FormNodeInputType'] = {
-  fields: [
+  steps: [
     {
-      type: 'email',
-      isRequired: true,
-      label: 'Leave your email address and a senior leader will contact you ⇣',
+      header: 'Your Choice',
+      helper: 'We would love to get you in touch with the right person.',
+      subHelper: 'Please select with whom you would prefer to discuss your issue',
+      position: 1,
+      type: FormNodeStepType.GENERIC_FIELDS,
+      fields: [
+        {
+          type: 'email',
+          position: 1,
+          isRequired: true,
+          label: 'Email',
+        },
+        {
+          type: 'contacts',
+          position: 2,
+          isRequired: false,
+          label: 'Contacts',
+        },
+      ],
     },
   ],
 }
 
 export const defaultForm: NexusGenInputs['FormNodeInputType'] = {
-  fields: [
+  steps: [
     {
-      isRequired: false,
-      label: 'First name',
-      type: 'shortText',
+      header: 'Jouw Keuze',
+      helper: 'We zouden je graag in contact brengen met de juiste persoon.',
+      subHelper: 'Selecteer met wie je jouw probleem zou willen bespreken alsjeblieft',
       position: 1,
-    },
-    {
-      isRequired: false,
-      label: 'Last name',
-      type: 'shortText',
-      position: 1,
-    },
-    {
-      isRequired: true,
-      label: 'Email',
-      type: 'email',
-      position: 1,
+      type: FormNodeStepType.GENERIC_FIELDS,
+      fields: [
+        {
+          type: 'email',
+          position: 1,
+          isRequired: true,
+          label: 'Email',
+        },
+        {
+          type: 'contacts',
+          position: 2,
+          isRequired: false,
+          label: 'Contacten',
+        },
+      ],
     },
   ],
 };
