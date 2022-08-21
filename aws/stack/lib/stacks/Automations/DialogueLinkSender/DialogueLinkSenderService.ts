@@ -2,6 +2,7 @@ import {
   Duration,
   aws_sqs as sqs,
   aws_lambda_nodejs,
+  aws_lambda,
   aws_ssm as ssm,
   aws_cloudwatch as cloudwatch
 } from 'aws-cdk-lib'
@@ -33,6 +34,7 @@ export class DialogueLinkSenderService extends BaseLambdaService {
       timeout: Duration.seconds(60),
       onFailure: new SqsDestination(dlqLambda),
       deadLetterQueue: dlqLambda,
+      tracing: aws_lambda.Tracing.ACTIVE,
       environment: {
         AUTOMATION_API_KEY: props.AUTOMATION_API_KEY,
       }

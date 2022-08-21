@@ -49,6 +49,7 @@ export class ReportCrawlerService extends BaseLambdaService {
       runtime: Runtime.FROM_IMAGE,
       timeout: Duration.seconds(210),
       role: lambdaRole,
+      tracing: lambdaFn.Tracing.ACTIVE,
       environment: {
         bucketName: bucket.ref,
         // TODO: Needs to be fetched inside lambda
