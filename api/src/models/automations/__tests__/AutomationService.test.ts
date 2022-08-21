@@ -180,6 +180,9 @@ describe('AutomationService', () => {
     await prisma.$disconnect();
   });
 
+  test('test', () => {
+    expect(1).toBe(1);
+  })
 
   // test('Sets up compare data for slider-related node', async () => {
   //   const setupData = await automationService.setupSliderCompareData(sliderQuestionCompareDataInput);
