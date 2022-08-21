@@ -1,12 +1,12 @@
 import {
-  aws_secretsmanager as secretsmanager,
+  App,
+  aws_secretsmanager as secretsmanager, Stack,
 } from 'aws-cdk-lib'
-import { Construct } from "constructs";
 import { DialogueLinkSenderService } from './DialogueLinkSender/DialogueLinkSenderService';
 import { ReportCrawlerService } from './ReportCrawler/ReportCrawlerService';
 
-export class Automations extends Construct {
-  constructor(scope: Construct, id: string) {
+export class Automations extends Stack {
+  constructor(scope: App, id: string) {
     super(scope, id);
 
     const jwtSecret = secretsmanager.Secret.fromSecretNameV2(this,

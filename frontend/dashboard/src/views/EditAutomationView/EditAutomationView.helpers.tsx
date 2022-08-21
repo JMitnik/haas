@@ -1,6 +1,5 @@
 import {
   AutomationActionType,
-  AutomationConditionBuilderType,
   AutomationConditionOperatorType,
   AutomationConditionScopeType,
   AutomationEventModel,
@@ -150,32 +149,33 @@ export const mapAutomation = (input: GetAutomationQuery['automation']): Automati
       id: input?.automationScheduled?.activeDialogue?.id,
     } : null,
   },
-  conditionBuilder: {
-    id: input?.automationTrigger?.conditionBuilder?.id || undefined,
-    logical: {
-      label: input?.automationTrigger?.conditionBuilder?.type as AutomationConditionBuilderType,
-      value: input?.automationTrigger?.conditionBuilder?.type as AutomationConditionBuilderType,
-    },
-    conditions: mapConditionsToFormInput(
-      input?.automationTrigger?.event,
-      input?.automationTrigger?.conditionBuilder?.conditions as any,
-      input?.automationTrigger?.activeDialogue,
-    ),
-    childBuilder: {
-      logical: input?.automationTrigger?.conditionBuilder?.childConditionBuilder?.type ? {
-        label: input?.automationTrigger?.conditionBuilder?.childConditionBuilder?.type,
-        value: input?.automationTrigger?.conditionBuilder?.childConditionBuilder?.type,
-      } : {
-        label: 'AND',
-        value: 'AND',
-      },
-      conditions: mapConditionsToFormInput(
-        input?.automationTrigger?.event,
-        input?.automationTrigger?.conditionBuilder?.childConditionBuilder?.conditions as any,
-        input?.automationTrigger?.activeDialogue,
-      ),
-    },
-  },
+  conditionBuilder: undefined,
+  // conditionBuilder: {
+  //   id: input?.automationTrigger?.conditionBuilder?.id || undefined,
+  //   logical: {
+  //     label: input?.automationTrigger?.conditionBuilder?.type as AutomationConditionBuilderType,
+  //     value: input?.automationTrigger?.conditionBuilder?.type as AutomationConditionBuilderType,
+  //   },
+  //   conditions: mapConditionsToFormInput(
+  //     input?.automationTrigger?.event,
+  //     input?.automationTrigger?.conditionBuilder?.conditions as any,
+  //     input?.automationTrigger?.activeDialogue,
+  //   ),
+  //   childBuilder: {
+  //     logical: input?.automationTrigger?.conditionBuilder?.childConditionBuilder?.type ? {
+  //       label: input?.automationTrigger?.conditionBuilder?.childConditionBuilder?.type,
+  //       value: input?.automationTrigger?.conditionBuilder?.childConditionBuilder?.type,
+  //     } : {
+  //       label: 'AND',
+  //       value: 'AND',
+  //     },
+  //     conditions: mapConditionsToFormInput(
+  //       input?.automationTrigger?.event,
+  //       input?.automationTrigger?.conditionBuilder?.childConditionBuilder?.conditions as any,
+  //       input?.automationTrigger?.activeDialogue,
+  //     ),
+  //   },
+  // },
 });
 
 export const findUniqueConditionEntries = (entries: ConditionEntry[]) => {

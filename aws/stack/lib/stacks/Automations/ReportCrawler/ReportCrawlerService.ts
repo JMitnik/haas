@@ -35,7 +35,7 @@ export class ReportCrawlerService extends BaseLambdaService {
     const jwtSecret = this.getJWTKey();
     const lambdaRole = this.getLambdaRole();
 
-    const lambdaImage = new lambdaFn.AssetImageCode(`${__dirname}/Automations/`, {
+    const lambdaImage = new lambdaFn.AssetImageCode(`${__dirname}/ReportCrawlerLambda/`, {
       exclude: ['node_modules', 'infra'],
       invalidation: {
         file: true,
@@ -82,9 +82,9 @@ export class ReportCrawlerService extends BaseLambdaService {
       ],
       effect: iam.Effect.ALLOW,
       principals: [
-        new iam.AccountRootPrincipal(),
-        new iam.AccountPrincipal('356797133903'),
-        new iam.AccountPrincipal('649621042808'), //TODO: Moet gefixed (dit is Jonathan's accountId)
+        // new iam.AccountRootPrincipal(),
+        // new iam.AccountPrincipal('356797133903'),
+        // new iam.AccountPrincipal('649621042808'), //TODO: Moet gefixed (dit is Jonathan's accountId)
         new iam.AccountPrincipal(Stack.of(this).account),
       ],
     }));
@@ -96,7 +96,7 @@ export class ReportCrawlerService extends BaseLambdaService {
 
     snsTopic.addSubscription(snsLambdaSubscription);
 
-    const canInvokeAllLambdasRole = new iam.Role(this, 'invoke-all-lambdas-role', {
+    const canInvokeAllLambdasRole = new iam.Role(this, 'InvokeAllLambdas_Role', {
       roleName: 'InvokeAllLambdasRole',
       assumedBy: new iam.ServicePrincipal('events.amazonaws.com'),
     })
@@ -113,7 +113,7 @@ export class ReportCrawlerService extends BaseLambdaService {
       effect: iam.Effect.ALLOW,
     }));
 
-    const generateReportLambdaArnParam = new ssm.StringParameter(this, 'generate-report-lambda-arn', {
+    const generateReportLambdaArnParam = new ssm.StringParameter(this, `${name}_ARN`, {
       parameterName: 'GenerateReportLambdaArn',
       stringValue: snsTopic.topicArn,
       description: 'the arn of the lambda used to generate reports',
@@ -122,10 +122,10 @@ export class ReportCrawlerService extends BaseLambdaService {
       allowedPattern: '.*',
     });
 
-    const eventBridgeRunAllLambdasArnParam = new ssm.StringParameter(this, 'event-bridge-run-all-lambdas-role-arn', {
+    const eventBridgeRunAllLambdasArnParam = new ssm.StringParameter(this, 'EventBridgeRunAllLambdasRole_ARN', {
       parameterName: 'EventBridgeRunAllLambdasRoleArn',
       stringValue: canInvokeAllLambdasRole.roleArn,
-      description: 'the arn of the role used by all EventBridge rules to execute automation lambdas',
+      description: 'The ARN of the role used by all EventBridge rules to execute automation lambdas',
       type: ssm.ParameterType.STRING,
       tier: ssm.ParameterTier.STANDARD,
       allowedPattern: '.*',
@@ -147,7 +147,7 @@ export class ReportCrawlerService extends BaseLambdaService {
   }
 
   private createUploadBucket() {
-    const bucketProps = crpm.load<s3.CfnBucketProps>(`${__dirname}/ReportClaw/infra/res/storage/s3/bucket/props.yaml`);
+    const bucketProps = crpm.load<s3.CfnBucketProps>(`${__dirname}/ReportCrawlerLambda/infra/res/storage/s3/bucket/props.yaml`);
     const bucket = new s3.CfnBucket(this, 'Bucket', bucketProps);
 
     return bucket;
