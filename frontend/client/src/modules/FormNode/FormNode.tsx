@@ -178,7 +178,7 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                       {field.type !== 'longText' && field.type !== 'contacts' && (
                         <UI.Input
                           key={fields[index].id}
-                          id={`fields[${index}].value`}
+                          id={`fields.${index}.value`}
                           variant="outline"
                           leftEl={mapIcon[field?.type] || <Type />}
                           type={mapFieldType[field?.type] || 'text'}
