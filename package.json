@@ -28,6 +28,7 @@
     "aws:deploy-pipeline": "cd aws/stack && cdk deploy haasSvcPipeline --profile haas-prod",
     "aws:deploy:campaign": "cd aws/commands && bash deploy-campaign.bash",
     "aws:deploy:internal": "cd aws/stack && cdk deploy InternalNotifyStack --profile haas-prod",
+    "aws:deploy:automations:staging": "cd aws/stack && cdk deploy StagingAutomationStack --profile haas-prod",
     "start": "concurrently \"yarn start:client\" \"yarn start:dashboard\" \"yarn start:api\"",
     "start:api": "yarn workspace @haas/api start",
     "start:api-debug": "yarn workspace @haas/api start:debug",

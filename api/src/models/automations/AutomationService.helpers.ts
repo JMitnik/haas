@@ -40,9 +40,9 @@ export const findReportQueryParamsByCron = (frequency: CustomRecurringType) => {
 
 /**
  * Finds the correct parameters for a specific lambda based on the AutomationActionType
- * @param type 
- * @param generateLambdaParams 
- * @param sendDialogueLinkParams 
+ * @param type
+ * @param generateLambdaParams
+ * @param sendDialogueLinkParams
  * @returns a params object
  */
 export const findLambdaParamsByActionType = (
@@ -101,8 +101,8 @@ export const getDayRange = (dayOfWeek: string) => {
 
 /**
  * Constructs a frequency cron string based on the matching period type
- * @param scheduledAutomation 
- * @returns 
+ * @param scheduledAutomation
+ * @returns
  */
 export const buildFrequencyCronString = (scheduledAutomation: AutomationScheduled) => {
   const frequency = `${scheduledAutomation.dayOfMonth} ${scheduledAutomation.month} ${scheduledAutomation.dayOfWeek}`;
@@ -417,4 +417,16 @@ export const constructUpdateAutomationInput = (input: NexusGenInputs['CreateAuto
   // if (input.automationType === AutomationType.TRIGGER && !input.conditionBuilder?.id) throw new UserInputError('No ID provided for the root condition builder');
 
   return { ...constructCreateAutomationInput(input), id: input.id }
+}
+
+/**
+ * Converts an AutomationScheduled properties to a relevant cron expression.
+ */
+export const parseScheduleToCron = (schedule: AutomationScheduled): string => {
+  const { minutes, hours, dayOfMonth, dayOfWeek, month } = schedule;
+
+  // Transform the CRON expression to one supported by AWS (? indicator is not part of cron-validator)
+  const scheduledExpression = `cron(${minutes} ${hours} ${dayOfMonth === '*' ? '?' : dayOfMonth} ${month} ${dayOfMonth === '1' ? '?' : dayOfWeek} *)`
+
+  return scheduledExpression;
 }

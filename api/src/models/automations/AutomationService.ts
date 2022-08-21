@@ -1,11 +1,8 @@
 import {
-  AutomationAction,
   PrismaClient,
   AutomationType,
   AutomationScheduled,
-  Automation,
 } from '@prisma/client';
-import { ApolloError } from 'apollo-server-express';
 import * as AWS from 'aws-sdk';
 
 import { offsetPaginate } from '../general/PaginationHelpers';
@@ -20,9 +17,13 @@ import {
   getDayRange,
   constructUpdateAutomationInput,
   constructCreateAutomationInput,
+  parseScheduleToCron,
 } from './AutomationService.helpers';
 import { WorkspaceWithRoles } from './AutomationService.types';
+import { Automation } from './AutomationTypes';
 import ScheduledAutomationService from './ScheduledAutomationService';
+import { logger } from '../../config/logger';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 class AutomationService {
   automationPrismaAdapter: AutomationPrismaAdapter;
@@ -51,63 +52,54 @@ class AutomationService {
   }
 
   /**
-   * Upserts an AWS EventBridge (and its targets) based on a scheduled automation
-   * @param workspaceId
-   * @param automationScheduled a scheduled automation
-   * @param parentAutomation the parent automation the scheduled automation is connected to
-   * @param dialogueId
+   * Upserts an AWS EventBridge (and its targets) based on a scheduled automation.
    */
   upsertEventBridge = async (
     workspaceId: string,
     automationScheduled: AutomationScheduled,
-    // TODO: Not scalable type, need to establish this as a core type
-    parentAutomation: Automation & {
-      automationScheduled: (AutomationScheduled & {
-        actions: AutomationAction[];
-      }) | null;
-    },
+    automation: Automation,
     dialogueId?: string
   ) => {
-    const { minutes, hours, dayOfMonth, dayOfWeek, month } = automationScheduled;
+    const cronExpression = parseScheduleToCron(automationScheduled);
 
-    // Transform the CRON expression to one supported by AWS (? indicator is not part of cron-validator)
-    const scheduledExpression = `cron(${minutes} ${hours} ${dayOfMonth === '*' ? '?' : dayOfMonth} ${month} ${dayOfMonth === '1' ? '?' : dayOfWeek} *)`
     // Find the state of the automation and adjust event bridge rule to that
-    const state = parentAutomation?.isActive ? 'ENABLED' : 'DISABLED';
+    const state = automation?.isActive ? 'ENABLED' : 'DISABLED';
 
+    // Get relevant parameters
     const workspace = await this.customerService.findWorkspaceById(workspaceId) as WorkspaceWithRoles;
     const dialogue = dialogueId ? await this.dialogueService.getDialogueById(dialogueId) : undefined;
 
-    let user = await this.userService.findBotByWorkspaceName(workspace.slug);
-
     // If no bot user exists in the workspace => Create one
-    if (!user) {
+    let botUser = await this.userService.findBotByWorkspaceName(workspace.slug);
+    if (!botUser) {
       await this.customerService.createBotUser(workspace.id, workspace.slug, workspace.roles);
-      user = await this.userService.findBotByWorkspaceName(workspace.slug);
+      botUser = await this.userService.findBotByWorkspaceName(workspace.slug);
     };
 
+    // Map actions to relevant Lambda ARNS for eventbridge to use as targets
     const ruleTargets = await this.scheduledAutomationService.mapActionsToRuleTargets(
       automationScheduled.id,
-      parentAutomation.automationScheduled?.actions || [],
-      user!,
+      automation.automationScheduled?.actions || [],
+      botUser!,
       workspace.slug,
       dialogue?.slug,
     );
 
     await this.eventBridge.putRule({
       Name: automationScheduled.id,
-      ScheduleExpression: scheduledExpression,
+      ScheduleExpression: cronExpression,
       State: state,
     }).promise().catch((e) => {
-      console.log(`upserting a event bridge rule for automation schedule: ${automationScheduled.id} with error ${e}`)
-      throw new ApolloError(`upserting a event bridge rule for automation schedule: ${automationScheduled.id} with error ${e}`)
+      logger.error(`Unable to put EventBridge rule to automation ${automationScheduled.id}`, e);
+      throw new GraphQLYogaError('Internal error');
     });
 
     await this.eventBridge.putTargets({
       Rule: automationScheduled.id,
       Targets: ruleTargets,
     }).promise().catch((e) => {
-      throw new ApolloError(`upserting targets automation schedule: ${automationScheduled.id} with error ${e}`)
+      logger.error(`Unable to add EventBridge targets to automation ${automationScheduled.id}`, e);
+      throw new GraphQLYogaError('Internal error');
     });
   }
 
@@ -153,11 +145,19 @@ class AutomationService {
     const enabledAutomation = await this.automationPrismaAdapter.enableAutomation(input);
 
     if (enabledAutomation.type === AutomationType.SCHEDULED && enabledAutomation.automationScheduledId) {
-      input.state
-        ? await this.eventBridge.enableRule({ Name: enabledAutomation.automationScheduledId }).promise()
-          .catch((e) => console.log(e))
-        : await this.eventBridge.disableRule({ Name: enabledAutomation.automationScheduledId }).promise()
-          .catch((e) => console.log(e));
+      if (input.state) {
+        await this.eventBridge.enableRule({
+          Name: enabledAutomation.automationScheduledId,
+        }).promise().catch((e) => {
+          logger.error('Unable to enable rule', e);
+        })
+      } else {
+        await this.eventBridge.disableRule({
+          Name: enabledAutomation.automationScheduledId,
+        }).promise().catch((e) => {
+          logger.error('Unable to disable rule', e);
+        });
+      }
     }
 
     return enabledAutomation;
