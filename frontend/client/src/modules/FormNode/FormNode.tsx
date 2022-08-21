@@ -134,7 +134,7 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                           key={`longText-${index}`}
                           id={`fields[${index}].value`}
                           variant="outline"
-                          {...register(`fields.${index}.value`)}
+                          {...register(`fields.${index}.value` as const)}
                           minHeight="40px"
                           placeholder={field.placeholder || undefined}
                         />
@@ -142,7 +142,7 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                       {field.type === FormNodeFieldTypeEnum.Contacts && (
                         <Controller
                           key="contactsradio"
-                          name={`fields.${index}.value`}
+                          name={`fields.${index}.value` as const}
                           control={control}
                           defaultValue={undefined}
                           rules={{ required: field.isRequired || false }}
@@ -184,7 +184,7 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                           type={mapFieldType[field?.type] || 'text'}
                           placeholder={field.placeholder || undefined}
                           maxWidth={mapFieldType[field?.type] === 'number' ? '100px' : 'auto'}
-                          {...register(`fields.${index}.value`, { required: field.isRequired || false })}
+                          {...register(`fields.${index}.value` as const, { required: field.isRequired || false })}
                         />
                       )}
                     </UI.FormControl>
