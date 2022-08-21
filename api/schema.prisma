@@ -840,6 +840,8 @@ model Automation {
 }
 
 enum DialogueTemplateType {
+  STUDENT_ENG
+  TEACHER_ENG
   SPORT_ENG
   SPORT_NL
   BUSINESS_ENG

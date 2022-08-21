@@ -38,6 +38,27 @@ export interface DemoWorkspaceTemplate extends WorkspaceTemplate {
   language: LanguageEnum;
 }
 
+export const defaultStudentTextFieldForm: NexusGenInputs['FormNodeInputType'] = {
+  fields: [
+    {
+      type: 'email',
+      isRequired: true,
+      label: 'Leave your email address and a School Counselor will contact you ⇣',
+    },
+  ],
+}
+
+export const defaultTeacherTextFieldForm: NexusGenInputs['FormNodeInputType'] = {
+  fields: [
+    {
+      type: 'email',
+      isRequired: true,
+      label: 'Leave your email address and a Paraprofessional will contact you ⇣',
+    },
+  ],
+}
+
+
 export const defaultSportTextFieldForm: NexusGenInputs['FormNodeInputType'] = {
   fields: [
     {

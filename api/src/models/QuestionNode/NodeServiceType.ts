@@ -11,6 +11,8 @@ export enum DialogueTemplateType {
   MASS_SEED = 'MASS_SEED',
   SPORT_ENG = 'SPORT_ENG',
   SPORT_NL = 'SPORT_NL',
+  TEACHER_ENG = 'TEACHER_ENG',
+  STUDENT_ENG = 'STUDENT_ENG',
 }
 
 export interface QuestionOptionProps {

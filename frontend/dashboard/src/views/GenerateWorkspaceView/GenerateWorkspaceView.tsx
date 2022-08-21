@@ -35,6 +35,16 @@ const DIALOGUE_TYPE_OPTIONS = [
     value: DialogueTemplateType.BusinessEng,
   },
   {
+    label: 'Teacher template',
+    description: 'For teacher-related dialogues.',
+    value: DialogueTemplateType.TeacherEng,
+  },
+  {
+    label: 'Student Template',
+    description: 'For student-related dialogues.',
+    value: DialogueTemplateType.StudentEng,
+  },
+  {
     label: 'Sport team (English)',
     description: 'The Club Hades sports team model (in English).',
     value: DialogueTemplateType.SportEng,

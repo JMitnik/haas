@@ -1077,6 +1077,8 @@ export type DialogueStatisticsSummaryModel = {
 };
 
 export enum DialogueTemplateType {
+  TeacherEng = 'TEACHER_ENG',
+  StudentEng = 'STUDENT_ENG',
   SportEng = 'SPORT_ENG',
   SportNl = 'SPORT_NL',
   BusinessEng = 'BUSINESS_ENG',
