@@ -39,6 +39,12 @@ export interface DemoWorkspaceTemplate extends WorkspaceTemplate {
 }
 
 export const defaultSportTextFieldForm: NexusGenInputs['FormNodeInputType'] = {
+  preFormNode: {
+    header: 'We’re sorry to hear that.',
+    helper: 'Click next to find out who you can talk to about this. Click finish to end the survey.',
+    nextText: 'Next',
+    finishText: 'Finish',
+  },
   steps: [
     {
       header: 'Your Choice',
@@ -65,6 +71,12 @@ export const defaultSportTextFieldForm: NexusGenInputs['FormNodeInputType'] = {
 }
 
 export const defaultBusinessTextFieldForm: NexusGenInputs['FormNodeInputType'] = {
+  preFormNode: {
+    header: 'We\'re sorry to hear that.',
+    helper: 'Click next to find out who you can talk to about this. Click finish to end the survey.',
+    nextText: 'Next',
+    finishText: 'Finish',
+  },
   steps: [
     {
       header: 'Your Choice',
@@ -91,6 +103,12 @@ export const defaultBusinessTextFieldForm: NexusGenInputs['FormNodeInputType'] =
 }
 
 export const defaultForm: NexusGenInputs['FormNodeInputType'] = {
+  preFormNode: {
+    header: 'Wat vervelend om te horen.',
+    helper: 'Klik op volgende om erachter te komen met wie je kan praten. Klik op afronden om de survey te beindigen.',
+    nextText: 'Volgende',
+    finishText: 'Afronden',
+  },
   steps: [
     {
       header: 'Jouw Keuze',

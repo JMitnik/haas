@@ -332,16 +332,10 @@ class DialoguePrismaAdapter {
             } : undefined,
             form: question.form ? {
               create: {
+                preForm: question.form.preForm,
                 steps: question.form?.steps,
               },
             } : undefined,
-            // form: question.form ? {
-            //   create: {
-            //     fields: {
-            //       create: question.form?.fields,
-            //     },
-            //   },
-            // } : undefined,
             sliderNode: question.sliderNode ? {
               create: {
                 markers: {
@@ -587,6 +581,16 @@ class DialoguePrismaAdapter {
             },
             form: {
               include: {
+                preForm: true,
+                steps: {
+                  include: {
+                    fields: {
+                      include: {
+                        contacts: true,
+                      },
+                    },
+                  },
+                },
                 fields: true,
               },
             },

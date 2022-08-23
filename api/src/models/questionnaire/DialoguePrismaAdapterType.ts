@@ -68,6 +68,12 @@ export interface CreateQuestionInput {
   }>;
   form?: {
     helperText?: string;
+    preForm?: {
+      header: string;
+      helper: string;
+      nextText: string;
+      finishText: string;
+    },
     steps: {
       header: string;
       helper: string;

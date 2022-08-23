@@ -57,8 +57,8 @@ export const PreFormNodeFormFragment = ({ onClose, onSubmit, preFormNode }: Step
 
       <UI.Grid gridTemplateColumns="1fr 1fr">
         <UI.FormControl isRequired>
-          <UI.FormLabel htmlFor="header">{t('step_header')}</UI.FormLabel>
-          <UI.InputHelper>{t('step_header_helper')}</UI.InputHelper>
+          <UI.FormLabel htmlFor="header">{t('pre_form_header')}</UI.FormLabel>
+          <UI.InputHelper>{t('pre_form_header_helper')}</UI.InputHelper>
           <UI.Input
             id="header"
             defaultValue={preFormNode?.header}
@@ -67,8 +67,8 @@ export const PreFormNodeFormFragment = ({ onClose, onSubmit, preFormNode }: Step
           />
         </UI.FormControl>
         <UI.FormControl isRequired>
-          <UI.FormLabel htmlFor="instruction">{t('step_helper')}</UI.FormLabel>
-          <UI.InputHelper>{t('step_helper_helper')}</UI.InputHelper>
+          <UI.FormLabel htmlFor="instruction">{t('pre_form_helper')}</UI.FormLabel>
+          <UI.InputHelper>{t('pre_form_helper_helper')}</UI.InputHelper>
           <UI.Input
             id="instruction"
             defaultValue={preFormNode?.helper}
@@ -77,8 +77,8 @@ export const PreFormNodeFormFragment = ({ onClose, onSubmit, preFormNode }: Step
           />
         </UI.FormControl>
         <UI.FormControl isRequired>
-          <UI.FormLabel htmlFor="subHelper">{t('step_sub_helper')}</UI.FormLabel>
-          <UI.InputHelper>{t('step_sub_helper_helper')}</UI.InputHelper>
+          <UI.FormLabel htmlFor="subHelper">{t('pre_form_next_text')}</UI.FormLabel>
+          <UI.InputHelper>{t('pre_form_next_text_helper')}</UI.InputHelper>
           <UI.Input
             id="nextText"
             defaultValue={preFormNode?.nextText}
@@ -87,8 +87,8 @@ export const PreFormNodeFormFragment = ({ onClose, onSubmit, preFormNode }: Step
           />
         </UI.FormControl>
         <UI.FormControl isRequired>
-          <UI.FormLabel htmlFor="subHelper">{t('step_sub_helper')}</UI.FormLabel>
-          <UI.InputHelper>{t('step_sub_helper_helper')}</UI.InputHelper>
+          <UI.FormLabel htmlFor="subHelper">{t('pre_form_finish_text')}</UI.FormLabel>
+          <UI.InputHelper>{t('pre_form_finish_text_helper')}</UI.InputHelper>
           <UI.Input
             id="finishText"
             defaultValue={preFormNode?.finishText}

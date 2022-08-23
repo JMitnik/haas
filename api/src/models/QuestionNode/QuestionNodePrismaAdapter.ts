@@ -415,14 +415,21 @@ class QuestionNodePrismaAdapter {
   updateQuestionOptions = async (options: QuestionOptionProps[]): Promise<{ id: number }[]> => Promise.all(
     options?.map(async (option) => {
       const optionId = option.id ? option.id : -1
-      const optionUpsertInput = {
+      const optionCreateInput = {
         value: option.value,
         publicValue: option.publicValue,
         overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : undefined,
         position: option.position,
         isTopic: option.isTopic,
       }
-      const updatedQOption = await this.upsertQuestionOption(optionId, optionUpsertInput, optionUpsertInput);
+      const optionUpdateInput = {
+        value: option.value,
+        publicValue: option.publicValue,
+        overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : { disconnect: true },
+        position: option.position,
+        isTopic: option.isTopic,
+      }
+      const updatedQOption = await this.upsertQuestionOption(optionId, optionCreateInput, optionUpdateInput);
 
       return { id: updatedQOption.id };
     }),

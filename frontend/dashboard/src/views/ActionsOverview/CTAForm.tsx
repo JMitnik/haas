@@ -167,7 +167,7 @@ const CTAForm = ({
       formNode: {
         id: formNode?.id,
         helperText: formNode?.helperText || '',
-        preFormNode: formNode?.preFormNode,
+        preFormNode: formNode?.preFormNode && Object.keys(formNode?.preFormNode).length ? formNode?.preFormNode : null,
         steps: formNode?.steps || [],
         fields: formNode?.fields?.map((field: any) => ({
           id: field.id,

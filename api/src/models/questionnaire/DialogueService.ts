@@ -1222,7 +1222,7 @@ class DialogueService {
       const mappedId = idMap[question.id];
       const mappedDialogueId = question.questionDialogueId && idMap[question.questionDialogueId];
 
-      const mappedLinks = question.links.map((link) => {
+      const mappedLinks = question?.links?.map((link) => {
         const { id, ...linkData } = link;
         const updateLink = { ...linkData, questionNodeId: idMap[mappedId] };
         return updateLink;
@@ -1264,7 +1264,19 @@ class DialogueService {
     const leafs = updatedTemplateQuestions?.filter((question) => question.isLeaf);
 
     const mappedLeafs = await Promise.all(leafs?.map(async (leaf) => {
-      const form = leaf.form ? await this.nodeService.createFormNodeInput(leaf?.form, '', []) : undefined;
+      const contactStep = leaf.form?.steps.find((step) => step.fields.find((field) => field.type === 'contacts'));
+      const contactField = contactStep?.fields.find((field) => field.type === 'contacts');
+      const userIds = contactField?.contacts?.map((contact) => contact.id) || [];
+      const mappedLeafForm = {
+        ...leaf.form,
+        preFormNode: leaf.form?.preFormNodeId ? {
+          header: leaf.form.preForm?.header as string,
+          helper: leaf.form.preForm?.helper as string,
+          nextText: leaf.form.preForm?.nextText as string,
+          finishText: leaf.form.preForm?.finishText as string,
+        } : null,
+      };
+      const form = leaf.form ? await this.nodeService.createFormNodeInput(mappedLeafForm, '', userIds) : undefined;
       return {
         ...leaf,
         id: leaf.id,

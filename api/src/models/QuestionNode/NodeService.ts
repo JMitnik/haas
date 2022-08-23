@@ -552,18 +552,6 @@ export class NodeService {
     const steps = await Promise.all(input.steps?.map(
       async (step) => await this.createFormNodeStepInput(step, workspaceSlug, contactIds)
     ) as Promise<Prisma.FormNodeStepCreateInput>[])
-    // const fieldsWithinSteps = input.steps?.flatMap((step) => step.fields).filter(isPresent);
-    // const positionAdjustedFields = fieldsWithinSteps?.map((field, index) => ({ ...field, position: index + 1 }));
-
-    // const communicationUser = input.fields?.find((field) => field.userIds?.length);
-    // const targetUsers = communicationUser?.userIds?.length
-    //   ? await this.userOfCustomerPrismaAdapter.findTargetUsers(
-    //     workspaceSlug, {
-    //     roleIds: communicationUser?.userIds.filter(isPresent), userIds: communicationUser?.userIds.filter(isPresent),
-    //   }
-    //   )
-    //   : [];
-    // const allUserIds = targetUsers.map((user) => ({ id: user.userId }));
 
     return ({
       helperText: input.helperText,
@@ -578,18 +566,6 @@ export class NodeService {
       steps: {
         create: steps,
       },
-      // fields: {
-      //   create: positionAdjustedFields?.map((field) => ({
-      //     type: field.type || 'shortText',
-      //     label: field.label || '',
-      //     position: field.position || -1,
-      //     placeholder: field.placeholder || '',
-      //     isRequired: field.isRequired || false,
-      //     contacts: field.type === 'contacts' ? {
-      //       connect: allUserIds,
-      //     } : undefined,
-      //   })),
-      // },
     })
   };
 

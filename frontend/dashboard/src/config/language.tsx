@@ -11,6 +11,38 @@ const language = {
     },
   },
   general: {
+    pre_form_finish_text_helper: {
+      en: 'What will be the text on the finish button?',
+      de: 'Was wird der Text auf dem Finish-Button sein?',
+    },
+    pre_form_finish_text: {
+      en: 'Finish button',
+      de: 'Beenden Knopf',
+    },
+    pre_form_next_text_helper: {
+      en: 'What will be the text on the next button?',
+      de: 'Was wird der Text auf der nächsten Schaltfläche sein?',
+    },
+    pre_form_next_text: {
+      en: 'Next button',
+      de: 'Nächster Knopf',
+    },
+    pre_form_helper: {
+      en: 'Helper',
+      de: 'Helfer',
+    },
+    pre_form_helper_helper: {
+      en: 'What will be the helper text of the pre-form page?',
+      de: 'Was wird der Hilfstext der Vorformseite sein?',
+    },
+    pre_form_header: {
+      en: 'Header',
+      de: 'Header',
+    },
+    pre_form_header_helper: {
+      en: 'What will be the header of the pre-form page?',
+      de: 'Was wird die Kopfzeile der Vorformblattseite sein?',
+    },
     add_pre_form_node: {
       en: 'Add Pre-Form',
       de: 'Pre-Form hinzufügen',
