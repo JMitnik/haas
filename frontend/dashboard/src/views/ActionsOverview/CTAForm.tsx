@@ -267,7 +267,14 @@ const CTAForm = ({
         );
       });
       return {
-        ...step, __typename: undefined, position: index + 1, type: step.type as FormNodeStepType, fields,
+        ...step,
+        header: step.header as string,
+        helper: step.helper as string,
+        subHelper: step.subHelper as string,
+        __typename: undefined,
+        position: index + 1,
+        type: step.type as FormNodeStepType,
+        fields,
       };
     });
 

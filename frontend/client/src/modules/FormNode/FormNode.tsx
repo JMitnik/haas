@@ -211,7 +211,7 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                           <UI.FormLabel htmlFor={`fields.${index}.value`}>{field.label}</UI.FormLabel>
                           {field.type === 'longText' && (
                             <UI.Textarea
-                              {...register(`steps.${activeStep}.fields.${index}.value`)}
+                              {...register(`steps.${activeStep}.fields.${index}.value` as const)}
                               key={`longText-${index}`}
                               id={`fields[${index}].value`}
                               variant="outline"
@@ -221,7 +221,7 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                           )}
                           {field.type === FormNodeFieldTypeEnum.Contacts && (
                             <Controller
-                              name={`steps.${activeStep}.fields.${index}.value`}
+                              name={`steps.${activeStep}.fields.${index}.value` as const}
                               key="contactsradio"
                               control={control}
                               defaultValue={undefined}
@@ -257,7 +257,7 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                           )}
                           {field.type !== 'longText' && field.type !== 'contacts' && (
                             <UI.Input
-                              {...register(`steps.${activeStep}.fields.${index}.value`, { required: field.isRequired || false })}
+                              {...register(`steps.${activeStep}.fields.${index}.value` as const, { required: field.isRequired || false })}
                               autoFocus={index === getFirstFocusableFieldIndex(step)}
                               key={fields[index].id}
                               id={`fields[${index}].value`}
