@@ -25,7 +25,16 @@ export function cartesian(...args: any) {
  */
 export const generateCreateDialogueDataByTemplateLayers = (templateType: string) => {
   const template = getTemplate(templateType);
-  const uniqueDialogues: string[][] = cartesian(template.rootLayer, template.subLayer, template.subSubLayer);
+
+  let uniqueDialogues: string[][];
+
+  if (template.rootLayer.length && template.subLayer.length && template.subSubLayer.length) {
+    uniqueDialogues = cartesian(template.rootLayer, template.subLayer, template.subSubLayer);
+  } else if (template.rootLayer.length && template.subLayer.length && !template.subSubLayer.length) {
+    uniqueDialogues = cartesian(template.rootLayer, template.subLayer);
+  } else {
+    uniqueDialogues = cartesian(template.rootLayer);
+  }
 
   const mappedDialogueInputData = uniqueDialogues.map(
     (dialogue: string[]) => {
@@ -40,6 +49,14 @@ export const generateCreateDialogueDataByTemplateLayers = (templateType: string)
 
 export const getTemplate = (templateType: string): DemoWorkspaceTemplate => {
   switch (templateType) {
+    case DialogueTemplateType.STUDENT_NL:
+      return templates.studentNl;
+    case DialogueTemplateType.TEACHER_NL:
+      return templates.teacherNl;
+    case DialogueTemplateType.STUDENT_ENG:
+      return templates.student;
+    case DialogueTemplateType.TEACHER_ENG:
+      return templates.teacher;
     case DialogueTemplateType.BUSINESS_ENG:
       return templates.business;
     case DialogueTemplateType.SPORT_ENG:

@@ -35,6 +35,16 @@ const DIALOGUE_TYPE_OPTIONS = [
     value: DialogueTemplateType.BusinessEng,
   },
   {
+    label: 'Teacher template',
+    description: 'For teacher-related dialogues.',
+    value: DialogueTemplateType.TeacherEng,
+  },
+  {
+    label: 'Student Template (English)',
+    description: 'For student-related dialogues.',
+    value: DialogueTemplateType.StudentEng,
+  },
+  {
     label: 'Sport team (English)',
     description: 'The Club Hades sports team model (in English).',
     value: DialogueTemplateType.SportEng,
@@ -43,6 +53,16 @@ const DIALOGUE_TYPE_OPTIONS = [
     label: 'Sport team (Dutch)',
     description: 'The Club Hades sports team model (in Dutch).',
     value: DialogueTemplateType.SportNl,
+  },
+  {
+    label: 'Student Template (Dutch)',
+    description: 'For dutch student-related dialogues.',
+    value: DialogueTemplateType.StudentNl,
+  },
+  {
+    label: 'Teacher Template (Dutch)',
+    description: 'For dutch teacher-related dialogues.',
+    value: DialogueTemplateType.TeacherNl,
   },
 ];
 

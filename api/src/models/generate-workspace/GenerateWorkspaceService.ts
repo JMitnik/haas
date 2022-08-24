@@ -1,4 +1,4 @@
-import { PrismaClient, Role, RoleTypeEnum } from '@prisma/client';
+import { DialogueTemplateType, PrismaClient, Role, RoleTypeEnum } from '@prisma/client';
 import { ApolloError } from 'apollo-server-express';
 
 import TemplateService from '../templates/TemplateService';
@@ -13,11 +13,9 @@ import { generateCreateDialogueDataByTemplateLayers, getTemplate } from './Gener
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import DialogueService from '../questionnaire/DialogueService';
 import { DemoWorkspaceTemplate } from '../templates/TemplateTypes';
-import CustomerService from '../customer/CustomerService';
-import { DialogueTemplateType } from '../QuestionNode/NodeServiceType';
 import UserService from '../../models/users/UserService';
 import { GenerateWorkspaceCSVInput, Workspace } from './GenerateWorkspace.types';
-import { RoleType } from 'models/role';
+import CustomerService from '../../models/customer/CustomerService';
 
 class GenerateWorkspaceService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -313,6 +311,7 @@ class GenerateWorkspaceService {
     const { uploadedCsv, workspaceSlug, workspaceTitle, type, managerCsv, isDemo } = input;
 
     const template = getTemplate(type);
+
     const workspace = await this.customerPrismaAdapter.createWorkspace({
       name: workspaceTitle,
       primaryColour: '',
