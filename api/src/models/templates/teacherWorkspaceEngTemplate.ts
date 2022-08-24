@@ -1,7 +1,75 @@
 import { LanguageEnum, NodeType } from '@prisma/client';
 import { defaultAdminRole, defaultBotRole, defaultManagerRole, defaultSportTextFieldForm, defaultTeacherTextFieldForm, defaultUserRole, DemoWorkspaceTemplate } from './TemplateTypes';
 
+const teacherOptions = [
+  { value: 'Physical & Mental', position: 1 },
+  { value: 'Students', position: 2 },
+  { value: 'Home', position: 3 },
+  { value: 'Work Pressure', position: 4 },
+  { value: 'Colleagues', position: 5 },
+  { value: 'Own Performance', position: 6 },
+]
+
 const teacherWorkspaceTemplate: DemoWorkspaceTemplate = {
+  structure: [
+    {
+      title: 'How are you feeling?',
+      isRoot: true,
+      type: NodeType.SLIDER,
+      edge: null,
+      options: [],
+      children: [
+        {
+          title: 'What\'s going well?',
+          type: NodeType.CHOICE,
+          edge: {
+            conditionType: 'valueBoundary',
+            matchValue: null,
+            renderMin: 70,
+            renderMax: 100,
+          },
+          options: teacherOptions,
+          cta: null,
+        },
+        {
+          title: 'What\'s going well, but can be improved?',
+          type: NodeType.CHOICE,
+          edge: {
+            conditionType: 'valueBoundary',
+            matchValue: null,
+            renderMin: 55,
+            renderMax: 70,
+          },
+          options: teacherOptions,
+          cta: null,
+        },
+        {
+          title: 'What is bothering you?',
+          type: NodeType.CHOICE,
+          edge: {
+            conditionType: 'valueBoundary',
+            matchValue: null,
+            renderMin: 25,
+            renderMax: 55,
+          },
+          options: teacherOptions,
+          cta: 'ContactFormNode',
+        },
+        {
+          title: 'What is bothering you?',
+          type: NodeType.CHOICE,
+          edge: {
+            conditionType: 'valueBoundary',
+            matchValue: null,
+            renderMin: 0,
+            renderMax: 25,
+          },
+          options: teacherOptions,
+          cta: 'ContactFormNode',
+        },
+      ],
+    },
+  ],
   title: 'How do you feel about us?',
   slug: 'sport',
   language: LanguageEnum.ENGLISH,
@@ -73,6 +141,7 @@ const teacherWorkspaceTemplate: DemoWorkspaceTemplate = {
   },
   leafNodes: [
     {
+      leafMatchId: 'ContactFormNode',
       title:
         'Your feedback will always remain anonymous, unless you want to talk to someone.',
       type: NodeType.FORM,

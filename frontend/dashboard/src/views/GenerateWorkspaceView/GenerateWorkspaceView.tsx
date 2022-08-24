@@ -25,11 +25,6 @@ type FormProps = yup.InferType<typeof schema>;
 
 const DIALOGUE_TYPE_OPTIONS = [
   {
-    label: 'Default',
-    description: 'The original haas dialogue, regarding Facilities, Cleanliness, and co.',
-    value: DialogueTemplateType.Default,
-  },
-  {
     label: 'Business Template',
     description: 'For business-related dialogues.',
     value: DialogueTemplateType.BusinessEng,

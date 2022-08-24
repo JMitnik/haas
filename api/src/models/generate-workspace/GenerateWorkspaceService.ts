@@ -16,6 +16,7 @@ import { DemoWorkspaceTemplate } from '../templates/TemplateTypes';
 import UserService from '../../models/users/UserService';
 import { GenerateWorkspaceCSVInput, Workspace } from './GenerateWorkspace.types';
 import CustomerService from '../../models/customer/CustomerService';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 class GenerateWorkspaceService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -105,13 +106,20 @@ class GenerateWorkspaceService {
 
       if (!dialogue) throw new ApolloError('ERROR: No dialogue created! aborting...');
       // Make post leaf node if data specified in template
-      await this.templateService.createTemplatePostLeafNode(templateType as NexusGenEnums['DialogueTemplateType'], dialogue.id);
+      await this.templateService.createTemplatePostLeafNode(template, dialogue.id);
 
       // Make the leafs
       const leafs = await this.templateService.createTemplateLeafNodes(templateType as NexusGenEnums['DialogueTemplateType'], dialogue.id, []);
 
       // Make nodes
-      await this.templateService.createTemplateNodes(dialogue.id, workspace.name, leafs, templateType);
+      if (!template.structure) throw new GraphQLYogaError('Now dialogue structure provided in template. abort.');
+      await this.templateService.createTemplateNodesRecursive(
+        template,
+        null,
+        template.structure || [],
+        dialogue.id,
+        leafs
+      );
 
       // Generate data
       if (generateData) {
@@ -260,7 +268,14 @@ class GenerateWorkspaceService {
       const leafs = await this.templateService.createTemplateLeafNodes(type as NexusGenEnums['DialogueTemplateType'], dialogue.id, contactIds);
 
       // Make nodes
-      await this.templateService.createTemplateNodes(dialogue.id, workspace.name, leafs, type as string);
+      if (!template.structure) throw new GraphQLYogaError('Now dialogue structure provided in template. abort.');
+      await this.templateService.createTemplateNodesRecursive(
+        template,
+        null,
+        template.structure || [],
+        dialogue.id,
+        leafs
+      );
 
       // Generate data
       if (generateData) {

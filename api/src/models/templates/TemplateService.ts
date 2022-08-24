@@ -6,7 +6,7 @@ import { LeafNodeDataEntryProps } from '../QuestionNode/NodeServiceType';
 import templates from '.';
 import EdgeService from '../edge/EdgeService';
 import NodeService from '../QuestionNode/NodeService';
-import WorkspaceTemplate from './TemplateTypes';
+import WorkspaceTemplate, { QuestionTemplateInput } from './TemplateTypes';
 
 const standardOptions = [
   { value: 'Facilities', position: 1 },
@@ -46,11 +46,6 @@ const teacherOptions = [
 const yesNoOptions = [
   { value: 'Yes', position: 1, isTopic: false },
   { value: 'No', position: 2, isTopic: false },
-]
-
-const nextFinishOptions = [
-  { value: 'Next', position: 1, isTopic: false },
-  { value: 'Finish', position: 2, isTopic: false },
 ]
 
 const sportOptionsEng = [
@@ -131,6 +126,11 @@ class TemplateService {
     this.prisma = prismaClient;
   };
 
+  /**
+   * Finds a template based on template type
+   * @param templateType 
+   * @returns 
+   */
   findTemplate = (templateType: NexusGenEnums['DialogueTemplateType']): WorkspaceTemplate => {
     switch (templateType) {
       case DialogueTemplateType.STUDENT_NL:
@@ -154,6 +154,11 @@ class TemplateService {
     }
   };
 
+  /**
+   * Finds Template CTA nodes based on template type
+   * @param templateType 
+   * @returns 
+   */
   findTemplateLeadNodes = (templateType: NexusGenEnums['DialogueTemplateType']): LeafNodeDataEntryProps[] => {
     switch (templateType) {
       case DialogueTemplateType.STUDENT_NL:
@@ -186,10 +191,9 @@ class TemplateService {
    * @param dialogueId
    */
   createTemplatePostLeafNode = async (
-    templateType: NexusGenEnums['DialogueTemplateType'],
+    template: WorkspaceTemplate,
     dialogueId: string,
   ) => {
-    const template = this.findTemplate(templateType);
     if (!template.postLeafText) return;
 
     await this.dialoguePrismaAdapter.createPostLeafNode(dialogueId, template.postLeafText);
@@ -334,6 +338,56 @@ class TemplateService {
     await this.edgeService.createEdge(rootQuestion, veryNegative,
       { conditionType: 'valueBoundary', matchValue: null, renderMin: 0, renderMax: 25 });
   };
+
+  createTemplateNodesRecursive = async (
+    template: WorkspaceTemplate,
+    parentNode: QuestionNode | null,
+    structure: QuestionTemplateInput[],
+    dialogueId: string,
+    leafs: QuestionNode[],
+  ) => {
+    for (const questionInput of structure) {
+      let cta: string | undefined;
+      if (questionInput.cta) {
+        const inputLeaf = template.leafNodes.find((leaf: any) => leaf.leafMatchId === questionInput.cta);
+        const dbLeaf = leafs.find((leaf) => leaf.title === inputLeaf.title);
+        cta = dbLeaf?.id || undefined;
+      }
+
+      const question = await this.nodeService.createQuestionNode(
+        questionInput.title,
+        dialogueId,
+        questionInput.type,
+        questionInput.options || [],
+        questionInput.isRoot || false,
+        cta,
+      );
+
+      if (question.type === NodeType.SLIDER) {
+        const { markers, happyText, unhappyText } = template.rootSliderOptions;
+        if (markers.length || happyText || unhappyText) {
+          await this.nodeService.createSliderNode({
+            markers,
+            happyText: happyText || null,
+            unhappyText: unhappyText || null,
+            parentNodeId: question.id,
+          });
+        }
+      }
+
+      if (questionInput.edge && parentNode) {
+        await this.edgeService.createEdge(
+          parentNode,
+          question,
+          questionInput.edge
+        );
+      }
+
+      if (questionInput.children?.length) {
+        await this.createTemplateNodesRecursive(template, question, questionInput.children, dialogueId, leafs);
+      }
+    }
+  }
 
   /**
   * Create nodes from a default template.
@@ -802,63 +856,13 @@ class TemplateService {
 
     // Negative Sub child 3
     const negative = await this.nodeService.createQuestionNode(
-      'What is bothering you?', dialogueId, NodeType.CHOICE, studentOptions
-    );
-
-    const mappedYesNoOptions = yesNoOptions.map((option) => ({ ...option, overrideLeafId: option.value === 'Yes' ? hrWillContactCTA : undefined }))
-
-    const negativeDiscussWith1 = await this.nodeService.createQuestionNode(
-      'Would you like to discuss this with someone?', dialogueId, NodeType.CHOICE, mappedYesNoOptions,
-    );
-
-    const negativeDiscussWith2 = await this.nodeService.createQuestionNode(
-      'Would you like to discuss this with someone?', dialogueId, NodeType.CHOICE, mappedYesNoOptions,
-    );
-
-    const negativeDiscussWith3 = await this.nodeService.createQuestionNode(
-      'Would you like to discuss this with someone?', dialogueId, NodeType.CHOICE, mappedYesNoOptions,
-    );
-
-    const negativeDiscussWith4 = await this.nodeService.createQuestionNode(
-      'Would you like to discuss this with someone?', dialogueId, NodeType.CHOICE, mappedYesNoOptions,
-    );
-
-    const negativeDiscussWith5 = await this.nodeService.createQuestionNode(
-      'Would you like to discuss this with someone?', dialogueId, NodeType.CHOICE, mappedYesNoOptions,
-    );
-
-    const negativeDiscussWith6 = await this.nodeService.createQuestionNode(
-      'Would you like to discuss this with someone?', dialogueId, NodeType.CHOICE, mappedYesNoOptions,
+      'What is bothering you?', dialogueId, NodeType.CHOICE, studentOptions, false, hrWillContactCTA
     );
 
     // Very Negative Sub child 4
     const veryNegative = await this.nodeService.createQuestionNode(
       'What is bothering you?', dialogueId,
-      NodeType.CHOICE, studentOptions,
-    );
-
-    const veryNegativeDiscussWith1 = await this.nodeService.createQuestionNode(
-      'Would you like to discuss this with someone?', dialogueId, NodeType.CHOICE, mappedYesNoOptions,
-    );
-
-    const veryNegativeDiscussWith2 = await this.nodeService.createQuestionNode(
-      'Would you like to discuss this with someone?', dialogueId, NodeType.CHOICE, mappedYesNoOptions,
-    );
-
-    const veryNegativeDiscussWith3 = await this.nodeService.createQuestionNode(
-      'Would you like to discuss this with someone?', dialogueId, NodeType.CHOICE, mappedYesNoOptions,
-    );
-
-    const veryNegativeDiscussWith4 = await this.nodeService.createQuestionNode(
-      'Would you like to discuss this with someone?', dialogueId, NodeType.CHOICE, mappedYesNoOptions,
-    );
-
-    const veryNegativeDiscussWith5 = await this.nodeService.createQuestionNode(
-      'Would you like to discuss this with someone?', dialogueId, NodeType.CHOICE, mappedYesNoOptions,
-    );
-
-    const veryNegativeDiscussWith6 = await this.nodeService.createQuestionNode(
-      'Would you like to discuss this with someone?', dialogueId, NodeType.CHOICE, mappedYesNoOptions,
+      NodeType.CHOICE, studentOptions, false, hrWillContactCTA
     );
 
     // ################################### EDGES ################################
@@ -875,46 +879,8 @@ class TemplateService {
     await this.edgeService.createEdge(rootQuestion, negative,
       { conditionType: 'valueBoundary', matchValue: null, renderMin: 25, renderMax: 55 });
 
-    await this.edgeService.createEdge(negative, negativeDiscussWith1,
-      { conditionType: 'match', matchValue: 'Physical & Mental', renderMin: null, renderMax: null });
-
-    await this.edgeService.createEdge(negative, negativeDiscussWith2,
-      { conditionType: 'match', matchValue: 'Teacher', renderMin: null, renderMax: null });
-
-    await this.edgeService.createEdge(negative, negativeDiscussWith3,
-      { conditionType: 'match', matchValue: 'Home', renderMin: null, renderMax: null });
-
-    await this.edgeService.createEdge(negative, negativeDiscussWith4,
-      { conditionType: 'match', matchValue: 'Activity Outside School', renderMin: null, renderMax: null });
-
-    await this.edgeService.createEdge(negative, negativeDiscussWith5,
-      { conditionType: 'match', matchValue: 'Classmates', renderMin: null, renderMax: null });
-
-    await this.edgeService.createEdge(negative, negativeDiscussWith6,
-      { conditionType: 'match', matchValue: 'School Performance', renderMin: null, renderMax: null });
-
-
     await this.edgeService.createEdge(rootQuestion, veryNegative,
       { conditionType: 'valueBoundary', matchValue: null, renderMin: 0, renderMax: 25 });
-
-    await this.edgeService.createEdge(veryNegative, veryNegativeDiscussWith1,
-      { conditionType: 'match', matchValue: 'Physical & Mental', renderMin: null, renderMax: null });
-
-    await this.edgeService.createEdge(veryNegative, veryNegativeDiscussWith2,
-      { conditionType: 'match', matchValue: 'Teacher', renderMin: null, renderMax: null });
-
-    await this.edgeService.createEdge(veryNegative, veryNegativeDiscussWith3,
-      { conditionType: 'match', matchValue: 'Home', renderMin: null, renderMax: null });
-
-    await this.edgeService.createEdge(veryNegative, veryNegativeDiscussWith4,
-      { conditionType: 'match', matchValue: 'Activity Outside School', renderMin: null, renderMax: null });
-
-    await this.edgeService.createEdge(veryNegative, veryNegativeDiscussWith5,
-      { conditionType: 'match', matchValue: 'Classmates', renderMin: null, renderMax: null });
-
-    await this.edgeService.createEdge(veryNegative, veryNegativeDiscussWith6,
-      { conditionType: 'match', matchValue: 'School Performance', renderMin: null, renderMax: null });
-
 
   };
 

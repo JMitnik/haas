@@ -1,8 +1,76 @@
 import { LanguageEnum, NodeType } from '@prisma/client';
 import WorkspaceTemplate, { defaultAdminRole, defaultBotRole, defaultForm, defaultManagerRole, defaultUserRole, DemoWorkspaceTemplate } from './TemplateTypes';
 
+const studentOptionsNl = [
+  { value: 'Lichaam & Geest', position: 1 },
+  { value: 'Leraren', position: 2 },
+  { value: 'Thuis', position: 3 },
+  { value: 'Activiteiten buiten school / hobby', position: 4 },
+  { value: 'Klasgenoten', position: 5 },
+  { value: 'Eigen Prestatie', position: 6 },
+]
+
 const sportWorkspaceTemplate: DemoWorkspaceTemplate = {
-  title: 'How do you feel about us?',
+  structure: [
+    {
+      title: 'Hoe gaat het met je?',
+      isRoot: true,
+      type: NodeType.SLIDER,
+      edge: null,
+      options: [],
+      children: [
+        {
+          title: 'Fijn om te horen! Waar ben je het meest tevreden over?',
+          type: NodeType.CHOICE,
+          edge: {
+            conditionType: 'valueBoundary',
+            matchValue: null,
+            renderMin: 70,
+            renderMax: 100,
+          },
+          options: studentOptionsNl,
+          cta: null,
+        },
+        {
+          title: 'Je bent niet helemaal tevreden dus. Wat kan er beter?',
+          type: NodeType.CHOICE,
+          edge: {
+            conditionType: 'valueBoundary',
+            matchValue: null,
+            renderMin: 55,
+            renderMax: 70,
+          },
+          options: studentOptionsNl,
+          cta: null,
+        },
+        {
+          title: 'Wat vervelend! Wat is er aan de hand?',
+          type: NodeType.CHOICE,
+          edge: {
+            conditionType: 'valueBoundary',
+            matchValue: null,
+            renderMin: 25,
+            renderMax: 55,
+          },
+          options: studentOptionsNl,
+          cta: 'ContactFormNode',
+        },
+        {
+          title: 'Wat vervelend! Wat is er aan de hand?',
+          type: NodeType.CHOICE,
+          edge: {
+            conditionType: 'valueBoundary',
+            matchValue: null,
+            renderMin: 0,
+            renderMax: 25,
+          },
+          options: studentOptionsNl,
+          cta: 'ContactFormNode',
+        },
+      ],
+    },
+  ],
+  title: 'Hoe gaat het met je?',
   slug: 'sport',
   language: LanguageEnum.DUTCH,
   rootLayer: ['VMBOT', 'HAVO', 'VWO'],
@@ -75,6 +143,7 @@ const sportWorkspaceTemplate: DemoWorkspaceTemplate = {
   },
   leafNodes: [
     {
+      leafMatchId: 'ContactFormNode',
       title:
         'Jouw feedback blijft altijd anoniem, tenzij je er met iemand over wil praten. Als je dat wil, laat dan je gegevens achter achter.',
       type: NodeType.FORM,

@@ -5,7 +5,76 @@ import { defaultAdminRole, defaultBotRole, defaultBusinessTextFieldForm, default
 export type rootTopics = 'Physical & Mental' | 'Management' | 'Home Situation' | 'Colleagues'
   | 'Performance' | 'Work Pressure';
 
+const businessOptions = [
+  { value: 'Physical & Mental', position: 1 },
+  { value: 'Management', position: 2 },
+  { value: 'Home Situation', position: 3 },
+  { value: 'Colleagues', position: 4 },
+  { value: 'Performance', position: 5 },
+  { value: 'Work Pressure', position: 6 },
+  { value: 'Company Leadership', position: 7 },
+];
+
 const businessWorkspaceTemplate: DemoWorkspaceTemplate = {
+  structure: [
+    {
+      title: 'How are you feeling?',
+      isRoot: true,
+      type: NodeType.SLIDER,
+      edge: null,
+      options: [],
+      children: [
+        {
+          title: 'What\'s going well?',
+          type: NodeType.CHOICE,
+          edge: {
+            conditionType: 'valueBoundary',
+            matchValue: null,
+            renderMin: 70,
+            renderMax: 100,
+          },
+          options: businessOptions,
+          cta: null,
+        },
+        {
+          title: 'You\'re not completely satisfied. What can be improved?',
+          type: NodeType.CHOICE,
+          edge: {
+            conditionType: 'valueBoundary',
+            matchValue: null,
+            renderMin: 55,
+            renderMax: 70,
+          },
+          options: businessOptions,
+          cta: null,
+        },
+        {
+          title: 'That\'s unfortunate! What went wrong?',
+          type: NodeType.CHOICE,
+          edge: {
+            conditionType: 'valueBoundary',
+            matchValue: null,
+            renderMin: 25,
+            renderMax: 55,
+          },
+          options: businessOptions,
+          cta: 'ContactFormNode',
+        },
+        {
+          title: 'That\'s unfortunate! What went wrong?',
+          type: NodeType.CHOICE,
+          edge: {
+            conditionType: 'valueBoundary',
+            matchValue: null,
+            renderMin: 0,
+            renderMax: 25,
+          },
+          options: businessOptions,
+          cta: 'ContactFormNode',
+        },
+      ],
+    },
+  ],
   title: 'How do you feel about us?',
   slug: 'business',
   language: LanguageEnum.ENGLISH,
@@ -76,8 +145,8 @@ const businessWorkspaceTemplate: DemoWorkspaceTemplate = {
     ],
   },
   leafNodes: [
-    // TODO: Give some sort of identifier so we know this is THE leaf we want to add as CTA to a question
     {
+      leafMatchId: 'ContactFormNode',
       title:
         'Your feedback will always remain anonymous, unless you want to talk to someone.',
       type: NodeType.FORM,
