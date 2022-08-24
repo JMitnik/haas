@@ -264,7 +264,7 @@ class TemplateService {
       });
     }
 
-    const hrWillContactCTA = TemplateService.findLeafIdContainingText(leafs, 'laat dan je naam');
+    const hrWillContactCTA = TemplateService.findLeafIdContainingText(leafs, 'tenzij je er met iemand');
 
     // Very Positive Sub child 1 (Great to hear! What are you most satisfied about?)
     const greatToHear = await this.nodeService.createQuestionNode(
