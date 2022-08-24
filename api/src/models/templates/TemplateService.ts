@@ -220,7 +220,6 @@ class TemplateService {
         form: form as Required<Prisma.FormNodeCreateInput>,
       }
     }));
-    console.dir(mappedLeafs, { depth: 10 });
 
     // Make leafs based on array
     const updatedNodes = await this.dialoguePrismaAdapter.createNodes(dialogueId, mappedLeafs as any);
@@ -339,7 +338,15 @@ class TemplateService {
       { conditionType: 'valueBoundary', matchValue: null, renderMin: 0, renderMax: 25 });
   };
 
-  createTemplateNodesRecursive = async (
+  /**
+   * Recursively sets up the structure of a dialogue based on provided template
+   * @param template 
+   * @param parentNode 
+   * @param structure 
+   * @param dialogueId 
+   * @param leafs 
+   */
+  createDialogueStructure = async (
     template: WorkspaceTemplate,
     parentNode: QuestionNode | null,
     structure: QuestionTemplateInput[],
@@ -384,7 +391,7 @@ class TemplateService {
       }
 
       if (questionInput.children?.length) {
-        await this.createTemplateNodesRecursive(template, question, questionInput.children, dialogueId, leafs);
+        await this.createDialogueStructure(template, question, questionInput.children, dialogueId, leafs);
       }
     }
   }

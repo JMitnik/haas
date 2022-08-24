@@ -25,12 +25,12 @@ type FormProps = yup.InferType<typeof schema>;
 
 const DIALOGUE_TYPE_OPTIONS = [
   {
-    label: 'Business Template',
+    label: 'Business Template (English)',
     description: 'For business-related dialogues.',
     value: DialogueTemplateType.BusinessEng,
   },
   {
-    label: 'Teacher template',
+    label: 'Teacher template (English)',
     description: 'For teacher-related dialogues.',
     value: DialogueTemplateType.TeacherEng,
   },

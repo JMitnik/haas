@@ -113,7 +113,7 @@ class GenerateWorkspaceService {
 
       // Make nodes
       if (!template.structure) throw new GraphQLYogaError('Now dialogue structure provided in template. abort.');
-      await this.templateService.createTemplateNodesRecursive(
+      await this.templateService.createDialogueStructure(
         template,
         null,
         template.structure || [],
@@ -269,7 +269,7 @@ class GenerateWorkspaceService {
 
       // Make nodes
       if (!template.structure) throw new GraphQLYogaError('Now dialogue structure provided in template. abort.');
-      await this.templateService.createTemplateNodesRecursive(
+      await this.templateService.createDialogueStructure(
         template,
         null,
         template.structure || [],
