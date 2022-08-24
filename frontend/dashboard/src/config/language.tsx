@@ -11,6 +11,10 @@ const language = {
     },
   },
   general: {
+    save_pre_form: {
+      en: 'Save Pre-Form',
+      de: 'Save Pre-Form',
+    },
     pre_form_finish_text_helper: {
       en: 'What will be the text on the finish button?',
       de: 'Was wird der Text auf dem Finish-Button sein?',

@@ -89,9 +89,6 @@ const FormNodeForm = () => {
                         return (
                           <UI.Div
                             width="100%"
-                          // justifyContent="center"
-                          // display="flex"
-                          // alignItems="center"
                           >
                             {field.value ? (
                               <PreNodeFormCell

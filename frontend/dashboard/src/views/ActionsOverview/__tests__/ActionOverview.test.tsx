@@ -1,5 +1,5 @@
 
-import { act, fireEvent, render, screen, userEvent, within } from 'test';
+import { act, fireEvent, render, screen, userEvent, waitFor, within } from 'test';
 import { debug } from 'jest-preview';
 import React from 'react';
 
@@ -59,7 +59,6 @@ describe('ActionOverview', () => {
     await new Promise((r) => setTimeout(r, 2000));
 
     debug();
-    // pasteWysiwyg('CTA title', document.querySelectorAll('textarea')[1]);
 
     const select = screen.getByLabelText('ctaTypeTwo');
 
@@ -117,6 +116,75 @@ describe('ActionOverview', () => {
     // debug();
 
     expect(screen.getByText('Save')).not.toBeDisabled();
+  });
+
+  test('Can create pre-form node', async () => {
+    mockQueryGetCTANodesOfDialogue((res) => ({ ...res }));
+    act(() => {
+      renderComponent();
+    });
+
+    await new Promise((r) => setTimeout(r, 1000));
+    fireEvent.click(screen.getByText((text) => includesText(text, 'add call')));
+
+    await new Promise((r) => setTimeout(r, 2000));
+
+    const select = screen.getByLabelText('ctaTypeTwo');
+
+    fireEvent.click(select);
+    userEvent.type(select, 'Form{enter}');
+
+    await new Promise((r) => setTimeout(r, 2000));
+
+    const addPreFormButton = screen.getByText((text) => includesText(text, 'Add pre'));
+
+    fireEvent.click(addPreFormButton);
+
+    waitFor(() => {
+      screen.findByLabelText((text) => includesText(text, 'header'));
+    });
+
+    const headerField = screen.getByLabelText((text) => includesText(text, 'header'));
+    userEvent.type(headerField, 'Pre-Form Header Test');
+    expect(headerField).toHaveValue('Pre-Form Header Test');
+
+    const helperField = screen.getByLabelText((text) => includesText(text, 'helper'));
+    userEvent.type(helperField, 'Pre-form Helper');
+    expect(helperField).toHaveValue('Pre-form Helper');
+
+    const nextField = screen.getByLabelText((text) => includesText(text, 'next b'));
+    userEvent.type(nextField, 'Next');
+    expect(nextField).toHaveValue('Next');
+
+    const finishField = screen.getByLabelText((text) => includesText(text, 'finish b'));
+    userEvent.type(finishField, 'Finish');
+    expect(finishField).toHaveValue('Finish');
+
+    screen.debug(headerField.parentElement?.parentElement!.parentElement!);
+
+    await new Promise((r) => setTimeout(r, 2000));
+
+    // const savePreFormNodeButton = await within(
+    //   headerField.parentElement?.parentElement!.parentElement!,
+    // ).findByText('Save');
+
+    const savePreFormNodeButton = await screen.findByText((text) => includesText(text, 'Save Pre'));
+    screen.debug(savePreFormNodeButton);
+
+    expect(savePreFormNodeButton).not.toBeDisabled();
+    fireEvent.click(savePreFormNodeButton);
+
+    await new Promise((r) => setTimeout(r, 2000));
+
+    debug();
+
+    expect(screen.getByText('Pre-Form Header Test')).toBeInTheDocument();
+
+    const closeButton = await within(screen.getByLabelText('PreNodeFormCell')).findByRole('button');
+    fireEvent.click(closeButton);
+
+    await new Promise((r) => setTimeout(r, 2000));
+    expect(screen.queryByText('Pre-Form Header Test')).not.toBeInTheDocument();
   });
 });
 

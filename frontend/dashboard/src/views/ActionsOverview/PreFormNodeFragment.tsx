@@ -44,6 +44,8 @@ export const PreFormNodeFormFragment = ({ onClose, onSubmit, preFormNode }: Step
 
   useOnClickOutside(ref, () => onClose(null));
 
+  console.log('subForm watch values: ', subForm.watch());
+
   return (
     <UI.Card padding="2em" zIndex={299} ref={ref}>
       <UI.Flex mb={2} justifyContent="space-between">
@@ -67,17 +69,17 @@ export const PreFormNodeFormFragment = ({ onClose, onSubmit, preFormNode }: Step
           />
         </UI.FormControl>
         <UI.FormControl isRequired>
-          <UI.FormLabel htmlFor="instruction">{t('pre_form_helper')}</UI.FormLabel>
+          <UI.FormLabel htmlFor="helper">{t('pre_form_helper')}</UI.FormLabel>
           <UI.InputHelper>{t('pre_form_helper_helper')}</UI.InputHelper>
           <UI.Input
-            id="instruction"
+            id="helper"
             defaultValue={preFormNode?.helper}
             {...subForm.register('helper')}
             placeholder={t('form_helpertext_placeholder')}
           />
         </UI.FormControl>
         <UI.FormControl isRequired>
-          <UI.FormLabel htmlFor="subHelper">{t('pre_form_next_text')}</UI.FormLabel>
+          <UI.FormLabel htmlFor="nextText">{t('pre_form_next_text')}</UI.FormLabel>
           <UI.InputHelper>{t('pre_form_next_text_helper')}</UI.InputHelper>
           <UI.Input
             id="nextText"
@@ -87,7 +89,7 @@ export const PreFormNodeFormFragment = ({ onClose, onSubmit, preFormNode }: Step
           />
         </UI.FormControl>
         <UI.FormControl isRequired>
-          <UI.FormLabel htmlFor="subHelper">{t('pre_form_finish_text')}</UI.FormLabel>
+          <UI.FormLabel htmlFor="finishText">{t('pre_form_finish_text')}</UI.FormLabel>
           <UI.InputHelper>{t('pre_form_finish_text_helper')}</UI.InputHelper>
           <UI.Input
             id="finishText"
@@ -97,7 +99,7 @@ export const PreFormNodeFormFragment = ({ onClose, onSubmit, preFormNode }: Step
           />
         </UI.FormControl>
         <UI.Div>
-          <UI.Button isDisabled={!subForm.formState.isValid} onClick={handleSaveValues}>{t('save')}</UI.Button>
+          <UI.Button isDisabled={!subForm.formState.isValid} onClick={handleSaveValues}>{t('save_pre_form')}</UI.Button>
         </UI.Div>
       </UI.Grid>
 

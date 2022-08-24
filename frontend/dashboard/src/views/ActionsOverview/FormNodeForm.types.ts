@@ -77,12 +77,4 @@ export const fieldMap: FieldProps[] = [
       allowsRequired: false,
     },
   },
-  {
-    type: TempFieldType.GENERIC_FIELDS,
-    icon: Users,
-    color: '#7274f4',
-    constraints: {
-      allowsRequired: false,
-    },
-  },
 ];

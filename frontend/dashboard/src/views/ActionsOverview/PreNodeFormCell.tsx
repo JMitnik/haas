@@ -21,7 +21,12 @@ export const PreNodeFormCell = ({ node, onClick, onRemove }: NodeCellProps) => {
   };
 
   return (
-    <NodeCellContainer noFill onClick={onClick} style={{ padding: '8px 12px', width: '100%', position: 'relative' }}>
+    <NodeCellContainer
+      aria-label="PreNodeFormCell"
+      noFill
+      onClick={onClick}
+      style={{ padding: '8px 12px', width: '100%', position: 'relative' }}
+    >
       <UI.CloseButton onClose={removePreNodeForm} top="5px" right="5px" />
       <UI.Flex width="100%">
         <UI.Icon

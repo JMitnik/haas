@@ -1,9 +1,9 @@
 import * as UI from '@haas/ui';
-import { ArrowDown, ArrowUp, Feather, Trash } from 'react-feather';
+import { ArrowDown, ArrowUp, Feather, Trash, Users } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
-import { fieldMap } from './FormNodeForm.types';
+import { TempFieldType } from './FormNodeForm.types';
 
 interface FormStepPreviewProps {
   field: any;
@@ -18,7 +18,14 @@ interface FormStepPreviewProps {
 export const FormStepPreview = (
   { field, onMoveRight, onMoveLeft, onOpen, fieldIndex, nrFields, onDelete }: FormStepPreviewProps,
 ) => {
-  const fieldCategory = fieldMap.find((fieldItem) => fieldItem?.type === field?.type);
+  const fieldCategory = {
+    type: TempFieldType.GENERIC_FIELDS,
+    icon: Users,
+    color: '#7274f4',
+    constraints: {
+      allowsRequired: false,
+    },
+  };
 
   const FieldIcon = fieldCategory?.icon || Feather;
   const { t } = useTranslation();
