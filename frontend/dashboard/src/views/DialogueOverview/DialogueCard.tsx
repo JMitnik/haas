@@ -1,5 +1,6 @@
 import * as Dropdown from 'components/Common/Dropdown';
 import * as UI from '@haas/ui';
+import { Clipboard } from 'react-feather';
 import { formatDistance } from 'date-fns';
 import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
@@ -150,22 +151,38 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
 
           <UI.Flex justifyContent="space-between" alignItems="flex-end">
             <UI.Div style={{ marginTop: 'auto' }}>
-              {!!dialogue.language && (
-                <UI.Div mt="auto">
+              <UI.Flex>
+                <UI.Div mt="auto" mr={2}>
                   <UI.Label size="sm">
                     <UI.Flex alignItems="center">
-                      <UI.Icon verticalAlign="middle" mt="4px">
-                        {renderFlag(dialogue.language)}
+                      <UI.Icon color="off.400" verticalAlign="middle">
+                        <Clipboard width="16px" height="16px" />
                       </UI.Icon>
                       <UI.Span ml={1}>
                         <UI.Helper>
-                          {t(`languages:${dialogue.language.toLowerCase()}`)}
+                          {dialogue.template?.replaceAll('_', ' ')}
                         </UI.Helper>
                       </UI.Span>
                     </UI.Flex>
                   </UI.Label>
                 </UI.Div>
-              )}
+                {!!dialogue.language && (
+                  <UI.Div mt="auto">
+                    <UI.Label size="sm">
+                      <UI.Flex alignItems="center">
+                        <UI.Icon verticalAlign="middle" mt="4px">
+                          {renderFlag(dialogue.language)}
+                        </UI.Icon>
+                        <UI.Span ml={1}>
+                          <UI.Helper>
+                            {t(`languages:${dialogue.language.toLowerCase()}`)}
+                          </UI.Helper>
+                        </UI.Span>
+                      </UI.Flex>
+                    </UI.Label>
+                  </UI.Div>
+                )}
+              </UI.Flex>
 
               <UI.Flex alignItems="center" mt={1} justifyContent="space-between">
                 <UI.Div>

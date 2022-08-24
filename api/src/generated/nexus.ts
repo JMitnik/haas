@@ -1721,6 +1721,7 @@ export interface NexusGenFieldTypes {
     slug: string; // String!
     statistics: NexusGenRootTypes['DialogueStatistics'] | null; // DialogueStatistics
     tags: Array<NexusGenRootTypes['Tag'] | null> | null; // [Tag]
+    template: string | null; // String
     title: string; // String!
     topic: NexusGenRootTypes['TopicType'] | null; // TopicType
     updatedAt: string | null; // String
@@ -2614,6 +2615,7 @@ export interface NexusGenFieldTypeNames {
     slug: 'String'
     statistics: 'DialogueStatistics'
     tags: 'Tag'
+    template: 'String'
     title: 'String'
     topic: 'TopicType'
     updatedAt: 'String'

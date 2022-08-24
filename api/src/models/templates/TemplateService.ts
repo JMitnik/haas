@@ -264,7 +264,7 @@ class TemplateService {
       });
     }
 
-    const hrWillContactCTA = TemplateService.findLeafIdContainingText(leafs, 'laat dan je naam');
+    const hrWillContactCTA = TemplateService.findLeafIdContainingText(leafs, 'tenzij je er met iemand');
 
     // Very Positive Sub child 1 (Great to hear! What are you most satisfied about?)
     const greatToHear = await this.nodeService.createQuestionNode(
@@ -336,11 +336,11 @@ class TemplateService {
 
     // Positive Sub child 2
     const notCompletelySatisfied = await this.nodeService.createQuestionNode(
-      'What\'s going well, but can be improved?', dialogueId, NodeType.CHOICE, sportOptionsEng, false);
+      'What\'s going well, but can be improved?', dialogueId, NodeType.CHOICE, sportOptionsEng, false, hrWillContactCTA);
 
     // Negative Sub child 3
     const negative = await this.nodeService.createQuestionNode(
-      'What went wrong?', dialogueId, NodeType.CHOICE, sportOptionsEng,
+      'What went wrong?', dialogueId, NodeType.CHOICE, sportOptionsEng, false, hrWillContactCTA
     );
 
     const mappedYesNoOptions = yesNoOptions.map((option) => ({ ...option, overrideLeafId: option.value === 'Yes' ? hrWillContactCTA : undefined }))
