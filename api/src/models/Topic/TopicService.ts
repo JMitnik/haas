@@ -3,9 +3,10 @@ import { Prisma, PrismaClient } from '@prisma/client';
 import { SessionWithEntries } from '../session/Session.types';
 import SessionService from '../session/SessionService';
 import { CustomerService as WorkspaceService } from '../customer/CustomerService';
-import { TopicFilterInput, TopicByString, DeselectTopicInput } from './Topic.types';
+import { TopicFilterInput, TopicByString, DeselectTopicInput, CreateTopicInput } from './Topic.types';
 import DialogueService from '../../models/questionnaire/DialogueService';
 import QuestionNodePrismaAdapter from '../../models/QuestionNode/QuestionNodePrismaAdapter';
+import { TopicPrismaAdapter } from './TopicPrismaAdapter';
 
 export class TopicService {
   private prisma: PrismaClient;
@@ -13,6 +14,7 @@ export class TopicService {
   private workspaceService: WorkspaceService;
   private dialogueService: DialogueService;
   private questionNodePrismaAdapter: QuestionNodePrismaAdapter;
+  private topicPrismaAdapter: TopicPrismaAdapter;
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
@@ -20,6 +22,20 @@ export class TopicService {
     this.workspaceService = new WorkspaceService(prisma);
     this.dialogueService = new DialogueService(prisma);
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prisma);
+    this.topicPrismaAdapter = new TopicPrismaAdapter(prisma);
+  }
+
+
+
+  public async createTopics(input: CreateTopicInput[]) {
+    try {
+      for (const topic of input) {
+        await this.topicPrismaAdapter.createTopics(topic);
+      }
+    } catch {
+      return false;
+    }
+    return true;
   }
 
   /**

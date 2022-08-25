@@ -468,6 +468,13 @@ input CreateQuestionNodeInputType {
   unhappyText: String
 }
 
+"""Creates a topic (with subTopics) based on input"""
+input CreateTopicInput {
+  name: String!
+  subTopics: [CreateTopicInput]
+  type: String = "SYSTEM"
+}
+
 input CreateTriggerInputType {
   customerSlug: String
   recipients: RecipientsInputType
@@ -1230,6 +1237,7 @@ type Mutation {
   createRole(data: RoleInput): RoleType
   createSession(input: SessionInput): Session
   createTag(customerSlug: String, name: String, type: TagTypeEnum): Tag
+  createTopics(input: [CreateTopicInput!]): Boolean
   createTrigger(input: CreateTriggerInputType): TriggerType
   createWorkspace(input: CreateWorkspaceInput): Customer
   deleteCTA(input: DeleteNodeInputType): QuestionNode
@@ -1914,6 +1922,17 @@ input TagsInputObjectType {
 """Input type for a textbox node"""
 input TextboxNodeEntryInput {
   value: String
+}
+
+"""Model for topic"""
+type Topic {
+  id: ID!
+  name: String!
+  parentTopics: [Topic]
+  subTopics: [Topic]
+  type: String!
+  usedByOptions: [QuestionOption]
+  workspace: Customer
 }
 
 type TopicDelta {
