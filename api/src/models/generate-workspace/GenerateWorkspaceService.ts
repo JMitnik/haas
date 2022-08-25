@@ -203,9 +203,9 @@ class GenerateWorkspaceService {
         && Object.values(DialogueTemplateType).includes(customDialogueTemplate)
       ) || false;
       const validatedTemplateType = hasValidCustomDialogueTemplate ? customDialogueTemplate : type;
-      console.log(validatedTemplateType);
-      const userRole = workspace.roles.find((role) => role.type === RoleTypeEnum.USER);
 
+      const userRole = workspace.roles.find((role) => role.type === RoleTypeEnum.USER);
+      const overrideTemplate = this.templateService.findTemplate(validatedTemplateType as DialogueTemplateType)
       const dialogueInput: CreateDialogueInput = {
         slug: dialogueSlug,
         title: dialogueTitle,
@@ -213,10 +213,10 @@ class GenerateWorkspaceService {
         customer: { id: workspace.id, create: false },
         isPrivate: hasEmailAssignee,
         postLeafText: {
-          header: template.postLeafText?.header,
-          subHeader: template.postLeafText?.subHeader,
+          header: overrideTemplate.postLeafText?.header,
+          subHeader: overrideTemplate.postLeafText?.subHeader,
         },
-        language: template.language,
+        language: overrideTemplate.language,
         template: Object.values(DialogueTemplateType).includes(validatedTemplateType as any)
           ? validatedTemplateType as DialogueTemplateType
           : (Object.values(DialogueTemplateType).includes(type as any)
@@ -243,9 +243,7 @@ class GenerateWorkspaceService {
       if (generateData) {
         await this.dialogueService.massGenerateFakeData(
           dialogue.id,
-          hasValidCustomDialogueTemplate
-            ? this.templateService.findTemplate(validatedTemplateType as DialogueTemplateType)
-            : template,
+          overrideTemplate,
           1,
           true,
           2,
