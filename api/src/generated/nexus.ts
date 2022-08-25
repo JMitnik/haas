@@ -258,6 +258,11 @@ export interface NexusGenInputs {
     type?: string | null; // String
     unhappyText?: string | null; // String
   }
+  CreateTopicInput: { // input type
+    name: string; // String!
+    subTopics?: Array<NexusGenInputs['CreateTopicInput'] | null> | null; // [CreateTopicInput]
+    type: string | null; // String
+  }
   CreateTriggerInputType: { // input type
     customerSlug?: string | null; // String
     recipients?: NexusGenInputs['RecipientsInputType'] | null; // RecipientsInputType
@@ -598,6 +603,10 @@ export interface NexusGenInputs {
   }
   RequestInviteInput: { // input type
     email: string; // String!
+  }
+  RevokeTopicInput: { // input type
+    subTopic: string; // String!
+    topic: string; // String!
   }
   RoleDataInput: { // input type
     description?: string | null; // String
@@ -1343,6 +1352,7 @@ export interface NexusGenObjects {
     unhappyText?: string | null; // String
   }
   Tag: prisma.Tag;
+  Topic: prisma.Topic;
   TopicDelta: { // root type
     averageCurrent?: number | null; // Float
     averagePrevious?: number | null; // Float
@@ -1358,13 +1368,7 @@ export interface NexusGenObjects {
     nodeEntryId?: string | null; // String
     value?: string | null; // String
   }
-  TopicType: { // root type
-    basicStats?: NexusGenRootTypes['BasicStatistics'] | null; // BasicStatistics
-    impactScore?: number | null; // Float
-    name: string; // String!
-    nrVotes?: number | null; // Int
-    subTopics?: Array<NexusGenRootTypes['TopicType'] | null> | null; // [TopicType]
-  }
+  TopicType: prisma.TopicType;
   TriggerConditionType: { // root type
     id?: number | null; // Int
     maxValue?: number | null; // Int
@@ -1957,6 +1961,7 @@ export interface NexusGenFieldTypes {
     createRole: NexusGenRootTypes['RoleType'] | null; // RoleType
     createSession: NexusGenRootTypes['Session'] | null; // Session
     createTag: NexusGenRootTypes['Tag'] | null; // Tag
+    createTopics: boolean | null; // Boolean
     createTrigger: NexusGenRootTypes['TriggerType'] | null; // TriggerType
     createWorkspace: NexusGenRootTypes['Customer'] | null; // Customer
     deleteAutomation: NexusGenRootTypes['AutomationModel'] | null; // AutomationModel
@@ -1985,6 +1990,7 @@ export interface NexusGenFieldTypes {
     requestInvite: NexusGenRootTypes['RequestInviteOutput'] | null; // RequestInviteOutput
     resetWorkspaceData: boolean | null; // Boolean
     retryAutodeckJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
+    revokeTopic: NexusGenRootTypes['Topic'] | null; // Topic
     sandbox: string | null; // String
     sendAutomationDialogueLink: boolean | null; // Boolean
     sendAutomationReport: boolean | null; // Boolean
@@ -2233,6 +2239,15 @@ export interface NexusGenFieldTypes {
     id: string | null; // ID
     name: string | null; // String
     type: NexusGenEnums['TagTypeEnum'] | null; // TagTypeEnum
+  }
+  Topic: { // field return type
+    id: string; // ID!
+    name: string; // String!
+    parentTopics: Array<NexusGenRootTypes['Topic'] | null> | null; // [Topic]
+    subTopics: Array<NexusGenRootTypes['Topic'] | null> | null; // [Topic]
+    type: string; // String!
+    usedByOptions: Array<NexusGenRootTypes['QuestionOption'] | null> | null; // [QuestionOption]
+    workspace: NexusGenRootTypes['Customer'] | null; // Customer
   }
   TopicDelta: { // field return type
     averageCurrent: number | null; // Float
@@ -2865,6 +2880,7 @@ export interface NexusGenFieldTypeNames {
     createRole: 'RoleType'
     createSession: 'Session'
     createTag: 'Tag'
+    createTopics: 'Boolean'
     createTrigger: 'TriggerType'
     createWorkspace: 'Customer'
     deleteAutomation: 'AutomationModel'
@@ -2893,6 +2909,7 @@ export interface NexusGenFieldTypeNames {
     requestInvite: 'RequestInviteOutput'
     resetWorkspaceData: 'Boolean'
     retryAutodeckJob: 'CreateWorkspaceJobType'
+    revokeTopic: 'Topic'
     sandbox: 'String'
     sendAutomationDialogueLink: 'Boolean'
     sendAutomationReport: 'Boolean'
@@ -3141,6 +3158,15 @@ export interface NexusGenFieldTypeNames {
     id: 'ID'
     name: 'String'
     type: 'TagTypeEnum'
+  }
+  Topic: { // field return type name
+    id: 'ID'
+    name: 'String'
+    parentTopics: 'Topic'
+    subTopics: 'Topic'
+    type: 'String'
+    usedByOptions: 'QuestionOption'
+    workspace: 'Customer'
   }
   TopicDelta: { // field return type name
     averageCurrent: 'Float'
@@ -3419,6 +3445,9 @@ export interface NexusGenArgTypes {
       name?: string | null; // String
       type?: NexusGenEnums['TagTypeEnum'] | null; // TagTypeEnum
     }
+    createTopics: { // args
+      input?: NexusGenInputs['CreateTopicInput'][] | null; // [CreateTopicInput!]
+    }
     createTrigger: { // args
       input?: NexusGenInputs['CreateTriggerInputType'] | null; // CreateTriggerInputType
     }
@@ -3513,6 +3542,9 @@ export interface NexusGenArgTypes {
     }
     retryAutodeckJob: { // args
       jobId?: string | null; // String
+    }
+    revokeTopic: { // args
+      input?: NexusGenInputs['RevokeTopicInput'] | null; // RevokeTopicInput
     }
     sandbox: { // args
       input?: NexusGenInputs['SandboxInput'] | null; // SandboxInput
