@@ -562,6 +562,10 @@ export interface NexusGenInputs {
   RequestInviteInput: { // input type
     email: string; // String!
   }
+  RevokeTopicInput: { // input type
+    subTopic: string; // String!
+    topic: string; // String!
+  }
   RoleDataInput: { // input type
     description?: string | null; // String
     name?: string | null; // String
@@ -1854,6 +1858,7 @@ export interface NexusGenFieldTypes {
     requestInvite: NexusGenRootTypes['RequestInviteOutput'] | null; // RequestInviteOutput
     resetWorkspaceData: boolean | null; // Boolean
     retryAutodeckJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
+    revokeTopic: NexusGenRootTypes['Topic'] | null; // Topic
     sandbox: string | null; // String
     setDialoguePrivacy: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     singleUpload: NexusGenRootTypes['ImageType'] | null; // ImageType
@@ -2718,6 +2723,7 @@ export interface NexusGenFieldTypeNames {
     requestInvite: 'RequestInviteOutput'
     resetWorkspaceData: 'Boolean'
     retryAutodeckJob: 'CreateWorkspaceJobType'
+    revokeTopic: 'Topic'
     sandbox: 'String'
     setDialoguePrivacy: 'Dialogue'
     singleUpload: 'ImageType'
@@ -3335,6 +3341,9 @@ export interface NexusGenArgTypes {
     }
     retryAutodeckJob: { // args
       jobId?: string | null; // String
+    }
+    revokeTopic: { // args
+      input?: NexusGenInputs['RevokeTopicInput'] | null; // RevokeTopicInput
     }
     sandbox: { // args
       input?: NexusGenInputs['SandboxInput'] | null; // SandboxInput

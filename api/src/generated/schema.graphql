@@ -1274,6 +1274,7 @@ type Mutation {
   requestInvite(input: RequestInviteInput): RequestInviteOutput
   resetWorkspaceData(workspaceId: String): Boolean
   retryAutodeckJob(jobId: String): CreateWorkspaceJobType
+  revokeTopic(input: RevokeTopicInput): Topic
   sandbox(input: SandboxInput): String
   setDialoguePrivacy(input: SetDialoguePrivacyInput): Dialogue
   singleUpload(file: Upload!): ImageType
@@ -1675,6 +1676,12 @@ type RequestInviteOutput {
   didInvite: Boolean
   loginToken: String
   userExists: Boolean
+}
+
+"""Revokes a sub topic from a topic based on input"""
+input RevokeTopicInput {
+  subTopic: String!
+  topic: String!
 }
 
 type RoleConnection implements DeprecatedConnectionInterface {

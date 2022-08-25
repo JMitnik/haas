@@ -3,7 +3,7 @@ import { Prisma, PrismaClient } from '@prisma/client';
 import { SessionWithEntries } from '../session/Session.types';
 import SessionService from '../session/SessionService';
 import { CustomerService as WorkspaceService } from '../customer/CustomerService';
-import { TopicFilterInput, TopicByString, DeselectTopicInput, CreateTopicInput } from './Topic.types';
+import { TopicFilterInput, TopicByString, DeselectTopicInput, CreateTopicInput, RevokeTopicInput } from './Topic.types';
 import DialogueService from '../../models/questionnaire/DialogueService';
 import QuestionNodePrismaAdapter from '../../models/QuestionNode/QuestionNodePrismaAdapter';
 import { TopicPrismaAdapter } from './TopicPrismaAdapter';
@@ -25,7 +25,9 @@ export class TopicService {
     this.topicPrismaAdapter = new TopicPrismaAdapter(prisma);
   }
 
-
+  public async revokeTopic(input: RevokeTopicInput) {
+    return this.topicPrismaAdapter.revokeTopic(input);
+  }
 
   public async createTopics(input: CreateTopicInput[]) {
     try {

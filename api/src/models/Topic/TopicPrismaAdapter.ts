@@ -1,7 +1,7 @@
 import { Prisma, PrismaClient, TopicType } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 
-import { CreateTopicInput } from './Topic.types';
+import { CreateTopicInput, RevokeTopicInput } from './Topic.types';
 
 export class TopicPrismaAdapter {
   private prisma: PrismaClient;
@@ -10,7 +10,25 @@ export class TopicPrismaAdapter {
     this.prisma = prisma;
   }
 
-  public createTopicInput(input: CreateTopicInput): Prisma.TopicCreateInput {
+  public revokeTopic(input: RevokeTopicInput) {
+    return this.prisma.topic.update({
+      where: {
+        name: input.topic,
+      },
+      data: {
+        subTopics: {
+          disconnect: {
+            name: input.subTopic,
+          },
+        },
+      },
+      include: {
+        subTopics: true,
+      },
+    })
+  }
+
+  private createTopicInput(input: CreateTopicInput): Prisma.TopicCreateInput {
     const createSubTopicsInput = input.subTopics?.map((subTopic) => ({
       create: {
         name: subTopic?.name as string,

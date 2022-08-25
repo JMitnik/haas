@@ -6,7 +6,7 @@ import { Prisma } from '@prisma/client';
 export type DeselectTopicInput = NexusGenInputs['DeselectTopicInput'];
 export type TopicFilterInput = NexusGenInputs['TopicFilterInput'];
 export type CreateTopicInput = NexusGenInputs['CreateTopicInput'];
-export type PrismaUpdateTopicInputWithoutId = Omit<Prisma.TopicUpdateInput, 'id'>
+export type RevokeTopicInput = NexusGenInputs['RevokeTopicInput'];
 
 /**
  * TopicCount contains meta-statistics about a topic.
