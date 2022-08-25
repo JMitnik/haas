@@ -9,6 +9,27 @@ datasource postgresql {
   url      = env("DB_STRING")
 }
 
+enum TopicType {
+  SYSTEM
+  WORKSPACE
+}
+
+model Topic {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name        String    @unique
+  type        TopicType @default(SYSTEM)
+  workspaceId String?
+
+  subTopics     Topic[]          @relation("topics_to_sub_topics")
+  parentTopics  Topic[]          @relation(name: "topics_to_sub_topics")
+  workspace     Customer?        @relation(fields: [workspaceId], references: [id])
+  usedByOptions QuestionOption[]
+  QuestionNode  QuestionNode[]
+}
+
 model DialogueTopicCache {
   id              String               @id @default(cuid())
   updatedAt       DateTime             @updatedAt
@@ -114,6 +135,7 @@ model Customer {
   tags            Tag[]
   triggers        Trigger[]
   users           UserOfCustomer[]
+  topics          Topic[]
 }
 
 model Tag {
@@ -242,19 +264,22 @@ model VideoEmbeddedNode {
 }
 
 model QuestionNode {
-  id                         String                @id @default(cuid())
-  creationDate               DateTime              @default(now())
-  updatedAt                  DateTime              @updatedAt
-  isLeaf                     Boolean               @default(false)
-  isRoot                     Boolean               @default(false)
-  title                      String
-  type                       NodeType              @default(GENERIC)
-  overrideLeafId             String?
-  questionDialogueId         String?
-  edgeId                     String?
-  videoEmbeddedNodeId        String?
-  sliderNodeId               String?
-  formNodeId                 String?
+  id                  String   @id @default(cuid())
+  creationDate        DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  isLeaf              Boolean  @default(false)
+  isRoot              Boolean  @default(false)
+  title               String
+  type                NodeType @default(GENERIC)
+  overrideLeafId      String?
+  questionDialogueId  String?
+  edgeId              String?
+  videoEmbeddedNodeId String?
+  sliderNodeId        String?
+  formNodeId          String?
+  topicId             String?
+
+  topic                      Topic?                @relation(fields: [topicId], references: [id])
   Edge                       Edge?                 @relation("EdgeChildrenRelation", fields: [edgeId], references: [id])
   form                       FormNode?             @relation(fields: [formNodeId], references: [id])
   overrideLeaf               QuestionNode?         @relation("QNodeToOverrideLeaf", fields: [overrideLeafId], references: [id])
@@ -333,17 +358,20 @@ model QuestionCondition {
 }
 
 model QuestionOption {
-  id             Int           @id @default(autoincrement())
+  id             Int     @id @default(autoincrement())
   publicValue    String?
   value          String
   overrideLeafId String?
   questionId     String?
   questionNodeId String?
   position       Int?
-  isTopic        Boolean       @default(true)
-  overrideLeaf   QuestionNode? @relation("ChoiceCTANode", fields: [overrideLeafId], references: [id])
-  question       QuestionNode? @relation("QuestionNodeOptions", fields: [questionId], references: [id])
-  QuestionNode   QuestionNode? @relation(fields: [questionNodeId], references: [id])
+  isTopic        Boolean @default(true)
+  topicId        String?
+
+  topic        Topic?        @relation(fields: [topicId], references: [id])
+  overrideLeaf QuestionNode? @relation("ChoiceCTANode", fields: [overrideLeafId], references: [id])
+  question     QuestionNode? @relation("QuestionNodeOptions", fields: [questionId], references: [id])
+  QuestionNode QuestionNode? @relation(fields: [questionNodeId], references: [id])
 }
 
 model Session {

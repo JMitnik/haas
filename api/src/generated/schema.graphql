@@ -527,6 +527,13 @@ input CreateQuestionNodeInputType {
   unhappyText: String
 }
 
+"""Creates a topic (with subTopics) based on input"""
+input CreateTopicInput {
+  name: String!
+  subTopics: [CreateTopicInput]
+  type: String = "SYSTEM"
+}
+
 input CreateTriggerInputType {
   customerSlug: String
   recipients: RecipientsInputType
@@ -1316,6 +1323,7 @@ type Mutation {
   createRole(data: RoleInput): RoleType
   createSession(input: SessionInput): Session
   createTag(customerSlug: String, name: String, type: TagTypeEnum): Tag
+  createTopics(input: [CreateTopicInput!]): Boolean
   createTrigger(input: CreateTriggerInputType): TriggerType
   createWorkspace(input: CreateWorkspaceInput): Customer
   deleteAutomation(input: DeleteAutomationInput): AutomationModel
@@ -1354,6 +1362,7 @@ type Mutation {
   requestInvite(input: RequestInviteInput): RequestInviteOutput
   resetWorkspaceData(workspaceId: String): Boolean
   retryAutodeckJob(jobId: String): CreateWorkspaceJobType
+  revokeTopic(input: RevokeTopicInput): Topic
   sandbox(input: SandboxInput): String
   sendAutomationDialogueLink(input: SendAutomationDialogueLinkInput): Boolean
   sendAutomationReport(input: SendAutomationReportInput): Boolean
@@ -1762,6 +1771,12 @@ type RequestInviteOutput {
   userExists: Boolean
 }
 
+"""Revokes a sub topic from a topic based on input"""
+input RevokeTopicInput {
+  subTopic: String!
+  topic: String!
+}
+
 type RoleConnection implements DeprecatedConnectionInterface {
   cursor: String
   endDate: String
@@ -2018,6 +2033,17 @@ input TagsInputObjectType {
 """Input type for a textbox node"""
 input TextboxNodeEntryInput {
   value: String
+}
+
+"""Model for topic"""
+type Topic {
+  id: ID!
+  name: String!
+  parentTopics: [Topic]
+  subTopics: [Topic]
+  type: String!
+  usedByOptions: [QuestionOption]
+  workspace: Customer
 }
 
 type TopicDelta {
