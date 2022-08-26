@@ -491,6 +491,16 @@ class QuestionNodePrismaAdapter {
         isLeaf: question.isLeaf,
         title: question.title,
         type: question.type,
+        topic: question.topic?.name ? {
+          connectOrCreate: {
+            create: {
+              name: question.topic.name,
+            },
+            where: {
+              name: question.topic.name,
+            },
+          },
+        } : undefined,
         questionDialogue: question.dialogueId ? {
           connect: {
             id: question.dialogueId,

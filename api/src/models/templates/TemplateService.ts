@@ -368,6 +368,8 @@ class TemplateService {
         questionInput.options || [],
         questionInput.isRoot || false,
         cta,
+        undefined,
+        questionInput.topic
       );
 
       if (question.type === NodeType.SLIDER) {

@@ -519,8 +519,6 @@ export class NodeService {
       allUserIds = targetUsers.map((user) => ({ id: user.userId }));
     }
 
-    console.log('All user Ids: ', allUserIds);
-
     return ({
       header: input.header as string,
       helper: input.helper as string,
@@ -658,7 +656,8 @@ export class NodeService {
     options: Array<any> = [],
     isRoot: boolean = false,
     overrideLeafId: string = '',
-    isLeaf: boolean = false
+    isLeaf: boolean = false,
+    topic?: Prisma.TopicCreateInput,
   ) => {
     const qOptions = options.length > 0 ? options : [];
     const params: CreateQuestionInput =
@@ -670,6 +669,7 @@ export class NodeService {
       options: qOptions,
       overrideLeafId,
       dialogueId: questionnaireId,
+      topic,
     }
 
     return this.questionNodePrismaAdapter.createQuestion(params);

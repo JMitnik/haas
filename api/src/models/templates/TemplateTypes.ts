@@ -13,6 +13,7 @@ export interface RootSliderOptions {
 export interface QuestionTemplateInput {
   title: string;
   type: NodeType;
+  topic?: Prisma.TopicCreateInput;
   isRoot?: boolean;
   cta?: string | null;
   edge?: {
