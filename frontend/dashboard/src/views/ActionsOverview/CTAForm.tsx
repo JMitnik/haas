@@ -278,6 +278,8 @@ const CTAForm = ({
       };
     });
 
+    console.log('ID: ', id);
+
     if (id === '-1') {
       const mappedLinks = {
         linkTypes: formData.links,

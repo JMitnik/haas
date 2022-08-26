@@ -11,6 +11,7 @@ interface NodeCellProps {
 }
 
 export const NodeCell = ({ node, onClick, onRemove }: NodeCellProps) => {
+  console.log('CTA CELL: ', node);
   if (!node.type) return null;
   const nodeProps = MapNodeToProperties(node.type);
 

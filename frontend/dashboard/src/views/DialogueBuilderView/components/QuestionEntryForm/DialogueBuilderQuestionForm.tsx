@@ -23,6 +23,7 @@ import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useNavigator } from 'hooks/useNavigator';
 import Dropdown from 'components/Dropdown';
+import intToBool from 'utils/intToBool';
 import updateQuestionMutation from 'mutations/updateQuestion';
 
 import {
@@ -64,6 +65,7 @@ interface FormDataProps {
   unhappyText: string;
   happyText: string;
   useCustomerSatisfactionTexts: number;
+  updateSameTemplate: number;
   range: number[];
 }
 
@@ -80,6 +82,7 @@ const schema = yup.object().shape({
   title: yup.string().required(),
   questionType: yup.string().required(),
   conditionType: yup.string().notRequired(),
+  updateSameTemplate: yup.number().required(),
   videoEmbedded: yup.string().when(['questionType'], {
     is: (questionType: string) => questionType === 'VIDEO_EMBEDDED',
     then: yup.string().required(),
@@ -127,6 +130,8 @@ const createQuestionMutation = gql`
 `;
 
 const setOverrideLeaf = (ctaNodes: CTANode[], overrideLeafId?: string) => {
+  console.log('cta nodes: ', ctaNodes);
+  console.log('override leaf: ', overrideLeafId);
   const activeLeaf = ctaNodes.find((node) => node.id === overrideLeafId);
   if (!activeLeaf) return null;
 
@@ -205,6 +210,8 @@ const DialogueBuilderQuestionForm = ({
       label: condition.conditionType,
     } : null,
   );
+
+  console.log('FORM CTA: ', form.watch('overrideLeaf'));
 
   const [activeCondition, setActiveCondition] = useState<null | EdgeConditionProps>(
     condition || { conditionType: parentQuestionType === 'Slider' ? 'valueBoundary' : 'match' },
@@ -346,6 +353,7 @@ const DialogueBuilderQuestionForm = ({
 
   const onSubmit = (formData: FormDataProps) => {
     const { title } = formData;
+    const updateSameTemplate = intToBool(formData.updateSameTemplate);
     const type = formData.questionType;
     const overrideLeafId = formData.overrideLeaf?.value;
     const edgeCondition: EdgeConditionProps = {
@@ -369,6 +377,7 @@ const DialogueBuilderQuestionForm = ({
         variables: {
           input: {
             id,
+            updateSameTemplate,
             unhappyText,
             happyText,
             extraContent: formData.videoEmbedded,
@@ -756,6 +765,33 @@ const DialogueBuilderQuestionForm = ({
             </>
           )}
         </UI.Div>
+        <UI.FormControl>
+          <UI.Flex alignItems="center">
+            <UI.Div>
+              <UI.FormLabel>Save for all</UI.FormLabel>
+              <UI.InputHelper>Adjust changes within all teams with the same template</UI.InputHelper>
+            </UI.Div>
+
+            <UI.Div ml={120}>
+              <Controller
+                control={form.control}
+                name="updateSameTemplate"
+                defaultValue={0}
+                render={({ field: { onChange, value, onBlur } }) => (
+                  <UI.Toggle
+                    isChecked={value === 1}
+                    size="lg"
+                    onChange={() => (value === 1 ? onChange(0) : onChange(1))}
+                    value={value}
+                    onBlur={onBlur}
+                  />
+                )}
+              />
+            </UI.Div>
+
+          </UI.Flex>
+
+        </UI.FormControl>
 
         <UI.Flex justifyContent="space-between">
           <ButtonGroup display="flex">

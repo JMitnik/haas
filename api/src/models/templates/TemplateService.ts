@@ -212,6 +212,16 @@ class TemplateService {
       const form = leaf.form ? await this.nodeService.createFormNodeInput(leaf?.form, '', contactIds || []) : undefined;
       return {
         ...leaf,
+        topic: leaf.leafMatchId ? {
+          connectOrCreate: {
+            create: {
+              name: leaf.leafMatchId,
+            },
+            where: {
+              name: leaf.leafMatchId,
+            },
+          },
+        } : undefined,
         title: leaf.title as string,
         type: leaf.type,
         dialogueId: dialogueId,

@@ -41,6 +41,7 @@ export interface EdgeNodeProps {
 
 export interface LeafNodeDataEntryProps {
   title: string;
+  leafMatchId?: string;
   type: NodeType;
   links: any[];
   form?: NexusGenInputs['FormNodeInputType'];

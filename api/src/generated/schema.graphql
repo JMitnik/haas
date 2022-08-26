@@ -2226,6 +2226,7 @@ input UpdateQuestionNodeInputType {
   title: String
   type: String
   unhappyText: String
+  updateSameTemplate: Boolean = false
 }
 
 """The `Upload` scalar type represents a file upload."""

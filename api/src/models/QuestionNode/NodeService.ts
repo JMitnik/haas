@@ -14,6 +14,7 @@ import { CreateSliderNodeInput, UpdateQuestionInput } from './QuestionNodePrisma
 import UserOfCustomerPrismaAdapter from '../../models/users/UserOfCustomerPrismaAdapter';
 import { groupBy } from 'lodash';
 import { stringMap } from 'aws-sdk/clients/backup';
+import { EdgeWithConditions } from './QuestionNodePrismaAdapter.types';
 
 export interface IdMapProps {
   [details: string]: string;
@@ -901,6 +902,7 @@ export class NodeService {
    * TODO: Rename to updateNode.
    * */
   updateQuestionFromBuilder = async (
+    workspaceId: string,
     questionId: string,
     title: string,
     type: NodeType,
@@ -912,77 +914,134 @@ export class NodeService {
     extraContent: string | null | undefined,
     happyText: string | null | undefined,
     unhappyText: string | null | undefined,
+    updateSameTemplate: boolean = false,
   ) => {
-    const activeQuestion = await this.questionNodePrismaAdapter.getDialogueBuilderNode(questionId);
+    const currentQuestion = await this.questionNodePrismaAdapter.getDialogueBuilderNode(questionId);
+    const dbEdge = await this.edgeService.getEdgeById(edgeId || '-1') as EdgeWithConditions;
+    console.log('Edge: ', dbEdge);
 
-    const dbEdge = await this.edgeService.getEdgeById(edgeId || '-1');
+    const activeQuestions = updateSameTemplate
+      && currentQuestion?.topic?.name
+      && currentQuestion.questionDialogue?.template
+      ? await this.questionNodePrismaAdapter.getDialogueBuilderNodes(
+        workspaceId,
+        currentQuestion.topic.name,
+        currentQuestion.questionDialogue?.template
+      )
+      : [currentQuestion]
 
-    const activeOptions = activeQuestion ? activeQuestion?.options?.map((option) => option.id) : [];
-    const currentOverrideLeafId = activeQuestion?.overrideLeafId || null;
-    const leaf = NodeService.constructUpdateLeafState(currentOverrideLeafId, overrideLeafId);
+    const activeEdges = updateSameTemplate && currentQuestion?.topic?.name
+      ? await this.questionNodePrismaAdapter.findDialogueBuilderEdges(dbEdge, currentQuestion.topic.name, workspaceId)
+      : [dbEdge];
 
-    const existingEdgeCondition = dbEdge?.conditions && dbEdge.conditions[0];
+    const activeCTA = overrideLeafId ? await this.findNodeById(overrideLeafId) : undefined;
 
-    try {
-      await this.removeNonExistingQuestionOptions(activeOptions, options);
-    } catch (e) {
-      console.log('Something went wrong removing options: ', e);
-    };
+    for (const activeQuestion of activeQuestions) {
+      // TODO: Figure out a way to identify the correct edge for question
+      const activeOptions = activeQuestion ? activeQuestion?.options?.map((option) => option.id) : [];
+      // const currentOverrideLeafId = activeQuestion?.overrideLeafId || null;
+      const mappedOverrideLeaf = activeCTA?.topic?.name
+        ? await this.questionNodePrismaAdapter.findCTAByTopic(
+          activeQuestion?.questionDialogueId as string,
+          activeCTA?.topic?.name)
+        : undefined;
 
-    // Updating any question except root question should have this edge
-    if (existingEdgeCondition) {
+      // Find matching options in matching template question
+      const mappedOptions = await Promise.all(options.map(
+        async (option) => {
+          let mappedOverrideLeaf;
+          if (option.overrideLeafId) {
+            const activeCTA = option.overrideLeafId
+              ? await this.findNodeById(option.overrideLeafId)
+              : undefined;
+
+            mappedOverrideLeaf = activeCTA?.topic?.name
+              ? await this.questionNodePrismaAdapter.findCTAByTopic(
+                activeQuestion?.questionDialogueId as string,
+                activeCTA?.topic?.name)
+              : undefined;
+          }
+
+          const targetOption = activeQuestion?.options.find(
+            (activeOption) => activeOption.value === option.value) as QuestionOptionProps
+
+          if (!targetOption) return {
+            ...option,
+            id: undefined,
+            overrideLeafId: mappedOverrideLeaf?.id || undefined,
+          };
+
+          return { ...option, id: targetOption.id, overrideLeafId: mappedOverrideLeaf?.id || undefined }
+        }
+      ).filter(isPresent));
+
       try {
-        await this.updateEdge(existingEdgeCondition, edgeCondition);
+        await this.removeNonExistingQuestionOptions(activeOptions, mappedOptions);
       } catch (e) {
-        // @ts-ignore
-        console.log('something went wrong updating edges: ', e.stack);
-      }
-    };
-
-    await this.updateStaleEdgeConditions(options, activeQuestion?.options, activeQuestion?.id);
-
-    const updateInput: UpdateQuestionInput = {
-      title,
-      type,
-      options,
-      overrideLeafId: overrideLeafId || undefined,
-      currentOverrideLeafId: currentOverrideLeafId,
-      videoEmbeddedNode: {
-        id: activeQuestion?.videoEmbeddedNodeId || undefined,
-      },
-    };
-
-    const updatedNode = await this.questionNodePrismaAdapter.updateDialogueBuilderNode(questionId, updateInput);
-
-    if (type === NodeType.VIDEO_EMBEDDED) {
-      if (updatedNode?.videoEmbeddedNodeId) {
-        await this.questionNodePrismaAdapter.updateVideoNode(updatedNode.videoEmbeddedNodeId, {
-          videoUrl: extraContent,
-        });
-      } else {
-        await this.questionNodePrismaAdapter.createVideoNode({
-          videoUrl: extraContent,
-          parentNodeId: questionId,
-        });
-      }
-    } else if (type === NodeType.SLIDER) {
-      if (updatedNode?.sliderNodeId) {
-        await this.questionNodePrismaAdapter.updateSliderNode(updatedNode.sliderNodeId, {
-          happyText: happyText || null,
-          unhappyText: unhappyText || null,
-          markers: sliderNode?.markers?.filter(isPresent),
-        });
-      } else {
-        await this.questionNodePrismaAdapter.createSliderNode({
-          happyText: happyText || null,
-          unhappyText: unhappyText || null,
-          parentNodeId: questionId,
-          markers: sliderNode?.markers?.filter(isPresent),
-        });
+        console.log('Something went wrong removing options: ', e);
       };
-    };
 
-    return updatedNode;
+      await this.updateStaleEdgeConditions(mappedOptions, activeQuestion?.options, activeQuestion?.id);
+
+      const updateInput: UpdateQuestionInput = {
+        title,
+        type,
+        options: mappedOptions,
+        overrideLeafId: mappedOverrideLeaf?.id || undefined, // TODO: Add topic to all CTAs in templates
+        // currentOverrideLeafId: currentOverrideLeafId,
+        videoEmbeddedNode: {
+          id: activeQuestion?.videoEmbeddedNodeId || undefined,
+        },
+      };
+
+      const updatedNode = await this.questionNodePrismaAdapter.updateDialogueBuilderNode(
+        activeQuestion?.id as string,
+        updateInput
+      );
+
+      if (type === NodeType.VIDEO_EMBEDDED) {
+        if (updatedNode?.videoEmbeddedNodeId) {
+          await this.questionNodePrismaAdapter.updateVideoNode(updatedNode.videoEmbeddedNodeId, {
+            videoUrl: extraContent,
+          });
+        } else {
+          await this.questionNodePrismaAdapter.createVideoNode({
+            videoUrl: extraContent,
+            parentNodeId: questionId,
+          });
+        }
+      } else if (type === NodeType.SLIDER) {
+        if (updatedNode?.sliderNodeId) {
+          await this.questionNodePrismaAdapter.updateSliderNode(updatedNode.sliderNodeId, {
+            happyText: happyText || null,
+            unhappyText: unhappyText || null,
+            markers: sliderNode?.markers?.filter(isPresent),
+          });
+        } else {
+          await this.questionNodePrismaAdapter.createSliderNode({
+            happyText: happyText || null,
+            unhappyText: unhappyText || null,
+            parentNodeId: questionId,
+            markers: sliderNode?.markers?.filter(isPresent),
+          });
+        };
+      };
+    }
+
+    for (const activeEdge of activeEdges) {
+      const existingEdgeCondition = activeEdge?.conditions && activeEdge.conditions[0];
+      // Updating any question except root question should have this edge
+      if (existingEdgeCondition) {
+        try {
+          await this.updateEdge(existingEdgeCondition, edgeCondition);
+        } catch (e) {
+          // @ts-ignore
+          console.log('something went wrong updating edges: ', e.stack);
+        }
+      };
+    }
+
+    return this.questionNodePrismaAdapter.findNodeById(questionId);
   };
 
   /**

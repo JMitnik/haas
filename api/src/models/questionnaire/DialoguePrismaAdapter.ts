@@ -298,6 +298,7 @@ class DialoguePrismaAdapter {
         questions: {
           create: questions.map((question) => ({
             id: question.id,
+            topic: question.topic,
             isRoot: question.isRoot,
             isLeaf: question.isLeaf,
             title: question.title,

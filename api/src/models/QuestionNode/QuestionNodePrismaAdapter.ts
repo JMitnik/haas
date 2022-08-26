@@ -1,10 +1,11 @@
-import { Prisma, PrismaClient, Edge, QuestionNode, QuestionOption, VideoEmbeddedNode, NodeType, Link, Share } from '@prisma/client';
+import { Prisma, PrismaClient, Edge, QuestionNode, QuestionOption, VideoEmbeddedNode, NodeType, Link, Share, DialogueTemplateType } from '@prisma/client';
 import { NexusGenInputs } from 'generated/nexus';
 
 import { CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType';
 import NodeService from './NodeService';
 import { QuestionOptionProps } from './NodeServiceType';
 import { CreateFormFieldsInput, UpdateFormFieldsInput, CreateCTAInput, UpdateQuestionInput, CreateLinkInput, UpdateLinkInput, CreateShareInput, UpdateShareInput, UpdateSliderNodeInput, CreateSliderNodeInput, CreateVideoEmbeddedNodeInput } from './QuestionNodePrismaAdapterType';
+import { EdgeWithConditions } from './QuestionNodePrismaAdapter.types';
 
 class QuestionNodePrismaAdapter {
   prisma: PrismaClient;
@@ -454,7 +455,13 @@ class QuestionNodePrismaAdapter {
         options: {
           connect: updatedOptionIds,
         },
-        overrideLeaf: leaf || undefined,
+        overrideLeaf: overrideLeafId ? {
+          connect: {
+            id: overrideLeafId,
+          },
+        } : {
+          disconnect: true,
+        },
         videoEmbeddedNode: embedVideoInput,
       },
       include: {
@@ -463,16 +470,97 @@ class QuestionNodePrismaAdapter {
     })
   }
 
-  getDialogueBuilderNode(nodeId: string): Promise<(QuestionNode & { videoEmbeddedNode: VideoEmbeddedNode | null; children: Edge[]; options: QuestionOption[]; questionDialogue: { id: string } | null; overrideLeaf: { id: string } | null }) | null> {
-    return this.prisma.questionNode.findUnique({
-      where: { id: nodeId },
+  findCTAByTopic(dialogueId: string, topic: string) {
+    return this.prisma.questionNode.findFirst({
+      where: {
+        questionDialogueId: dialogueId,
+        topic: {
+          name: topic,
+        },
+      },
+    })
+  }
+
+  findDialogueBuilderEdges(edge: EdgeWithConditions, topic: string, workspaceId: string) {
+    return this.prisma.edge.findMany({
+      where: {
+        dialogue: {
+          customerId: workspaceId,
+        },
+        childNode: {
+          topic: {
+            name: topic,
+          },
+        },
+        OR: [
+          {
+            conditions: {
+              some: {
+                matchValue: edge.conditions[0].matchValue,
+                conditionType: edge.conditions[0].conditionType,
+              },
+            },
+          },
+          {
+            conditions: {
+              some: {
+                conditionType: edge.conditions[0].conditionType,
+                renderMin: edge.conditions[0]?.renderMin,
+                renderMax: edge.conditions[0]?.renderMax,
+              },
+            },
+          },
+        ],
+      },
       include: {
+        conditions: true,
+      },
+    });
+  }
+
+  getDialogueBuilderNodes(workspaceId: string, topic: string, template: DialogueTemplateType) {
+    return this.prisma.questionNode.findMany({
+      where: {
+        questionDialogue: {
+          customerId: workspaceId,
+          template: template,
+        },
+        topic: {
+          name: topic,
+        },
+      },
+      include: {
+        topic: true,
         videoEmbeddedNode: true,
         children: true,
         options: true,
         questionDialogue: {
           select: {
             id: true,
+            template: true,
+          },
+        },
+        overrideLeaf: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    })
+  }
+
+  getDialogueBuilderNode(nodeId: string) {
+    return this.prisma.questionNode.findUnique({
+      where: { id: nodeId },
+      include: {
+        topic: true,
+        videoEmbeddedNode: true,
+        children: true,
+        options: true,
+        questionDialogue: {
+          select: {
+            id: true,
+            template: true,
           },
         },
         overrideLeaf: {
@@ -685,10 +773,11 @@ class QuestionNodePrismaAdapter {
     });
   };
 
-  async findNodeById(nodeId: string): Promise<QuestionNode | null> {
+  async findNodeById(nodeId: string) {
     return this.prisma.questionNode.findUnique({
       where: { id: nodeId },
       include: {
+        topic: true,
         options: true,
         videoEmbeddedNode: true,
         isOverrideLeafOf: true,

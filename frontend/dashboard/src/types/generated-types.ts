@@ -575,6 +575,13 @@ export type CreateQuestionNodeInputType = {
   edgeCondition?: Maybe<EdgeConditionInputType>;
 };
 
+/** Creates a topic (with subTopics) based on input */
+export type CreateTopicInput = {
+  name: Scalars['String'];
+  type?: Maybe<Scalars['String']>;
+  subTopics?: Maybe<Array<Maybe<CreateTopicInput>>>;
+};
+
 export type CreateTriggerInputType = {
   customerSlug?: Maybe<Scalars['String']>;
   recipients?: Maybe<RecipientsInputType>;
@@ -1540,6 +1547,8 @@ export type Mutation = {
   deleteTag?: Maybe<Tag>;
   /** Deselcting a topic implies that all question-options related to the topic string are disregarded as topic. */
   deselectTopic?: Maybe<Scalars['Boolean']>;
+  createTopics?: Maybe<Scalars['Boolean']>;
+  revokeTopic?: Maybe<Topic>;
   /** Creates a new automation. */
   createAutomation?: Maybe<AutomationModel>;
   updateAutomation?: Maybe<AutomationModel>;
@@ -1677,6 +1686,16 @@ export type MutationDeleteTagArgs = {
 
 export type MutationDeselectTopicArgs = {
   input?: Maybe<DeselectTopicInput>;
+};
+
+
+export type MutationCreateTopicsArgs = {
+  input?: Maybe<Array<CreateTopicInput>>;
+};
+
+
+export type MutationRevokeTopicArgs = {
+  input?: Maybe<RevokeTopicInput>;
 };
 
 
@@ -2476,6 +2495,12 @@ export type RequestInviteOutput = {
   loginToken?: Maybe<Scalars['String']>;
 };
 
+/** Revokes a sub topic from a topic based on input */
+export type RevokeTopicInput = {
+  topic: Scalars['String'];
+  subTopic: Scalars['String'];
+};
+
 export type RoleConnection = DeprecatedConnectionInterface & {
   __typename?: 'RoleConnection';
   cursor?: Maybe<Scalars['String']>;
@@ -2743,6 +2768,18 @@ export type TextboxNodeEntryInput = {
   value?: Maybe<Scalars['String']>;
 };
 
+/** Model for topic */
+export type Topic = {
+  __typename?: 'Topic';
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  type: Scalars['String'];
+  subTopics?: Maybe<Array<Maybe<Topic>>>;
+  parentTopics?: Maybe<Array<Maybe<Topic>>>;
+  workspace?: Maybe<Customer>;
+  usedByOptions?: Maybe<Array<Maybe<QuestionOption>>>;
+};
+
 export type TopicDelta = {
   __typename?: 'TopicDelta';
   topic?: Maybe<Scalars['String']>;
@@ -2882,6 +2919,7 @@ export type UpdateQuestionNodeInputType = {
   extraContent?: Maybe<Scalars['String']>;
   unhappyText?: Maybe<Scalars['String']>;
   happyText?: Maybe<Scalars['String']>;
+  updateSameTemplate?: Maybe<Scalars['Boolean']>;
   sliderNode?: Maybe<SliderNodeInputType>;
   optionEntries?: Maybe<OptionsInputType>;
   edgeCondition?: Maybe<EdgeConditionInputType>;

@@ -1,9 +1,9 @@
-import { inputObjectType, mutationField } from "nexus";
-import { NodeType } from "@prisma/client";
-import { UserInputError } from "apollo-server";
-import { NexusGenInputs } from "../../generated/nexus";
+import { inputObjectType, mutationField } from 'nexus';
+import { NodeType } from '@prisma/client';
+import { UserInputError } from 'apollo-server';
+import { NexusGenInputs } from '../../generated/nexus';
 
-import { EdgeConditionInputType, OptionsInputType, QuestionNodeType, SliderNodeInputType } from "./QuestionNode";
+import { EdgeConditionInputType, OptionsInputType, QuestionNodeType, SliderNodeInputType } from './QuestionNode';
 
 export const UpdateQuestionNodeInputType = inputObjectType({
   name: 'UpdateQuestionNodeInputType',
@@ -19,6 +19,8 @@ export const UpdateQuestionNodeInputType = inputObjectType({
     t.string('extraContent');
     t.string('unhappyText');
     t.string('happyText');
+
+    t.boolean('updateSameTemplate', { default: false });
 
     t.field('sliderNode', { type: SliderNodeInputType });
 
@@ -42,6 +44,7 @@ export const UpdateQuestionNode = mutationField('updateQuestion', {
     validateUpdateQuestion(args.input);
 
     return ctx.services.nodeService.updateQuestionFromBuilder(
+      args.input.customerId as string,
       args.input.id as string,
       args.input.title as string,
       args.input.type as NodeType,
@@ -53,6 +56,7 @@ export const UpdateQuestionNode = mutationField('updateQuestion', {
       args.input.extraContent,
       args.input.happyText,
       args.input.unhappyText,
+      args.input.updateSameTemplate || false,
     );
   },
 });
