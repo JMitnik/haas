@@ -261,5 +261,4 @@ describe('AutomationService', () => {
   //   expect(automations).toHaveLength(1);
   //   expect(automations?.[0]?.trigger).not.toBeNull();
   // });
-
 });
