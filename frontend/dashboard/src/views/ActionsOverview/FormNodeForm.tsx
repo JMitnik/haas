@@ -11,8 +11,10 @@ import {
   Link2,
   Phone,
   Type,
+  Users,
 } from 'react-feather';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { AnimatePresence } from 'framer-motion';
+import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { IllustrationCard } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
 import React, { useRef, useState } from 'react';
@@ -23,6 +25,7 @@ import { ReactComponent as SelectIll } from 'assets/images/undraw_select.svg';
 import useOnClickOutside from 'hooks/useClickOnOutside';
 
 import { CTANodeFormProps } from './CTATypes';
+import FormNodeContactsFragment from './FormNodeContactFragment';
 
 type FormNodeFormProps = CTANodeFormProps;
 
@@ -34,6 +37,7 @@ enum TempFieldType {
   SHORT_TEXT = 'shortText',
   LONG_TEXT = 'longText',
   NUMBER = 'number',
+  CONTACTS = 'contacts',
 }
 
 interface FieldProps {
@@ -94,6 +98,14 @@ const fieldMap: FieldProps[] = [
       allowsRequired: true,
     },
   },
+  {
+    type: TempFieldType.CONTACTS,
+    icon: Users,
+    color: '#7274f4',
+    constraints: {
+      allowsRequired: false,
+    },
+  },
 ];
 
 interface FormNodePreviewProps {
@@ -106,7 +118,7 @@ interface FormNodePreviewProps {
 }
 
 const FormNodePreview = ({ field, onMoveRight, onMoveLeft, onOpen, fieldIndex, nrFields }: FormNodePreviewProps) => {
-  const fieldCategory = fieldMap.find((fieldItem) => fieldItem.type === field.type);
+  const fieldCategory = fieldMap.find((fieldItem) => fieldItem?.type === field?.type);
 
   const FieldIcon = fieldCategory?.icon || Feather;
   const { t } = useTranslation();
@@ -115,7 +127,7 @@ const FormNodePreview = ({ field, onMoveRight, onMoveLeft, onOpen, fieldIndex, n
     <UI.Card>
       <UI.CardBody>
         <UI.Flex flexWrap="wrap" justifyContent="space-between">
-          {field.type ? (
+          {field?.type ? (
             <UI.Flex mb={[4, 0]}>
               <UI.IconBox mr={2} bg={fieldCategory?.color}><FieldIcon /></UI.IconBox>
               <UI.ColumnFlex>
@@ -163,6 +175,7 @@ const FormNodePreview = ({ field, onMoveRight, onMoveLeft, onOpen, fieldIndex, n
 };
 
 interface FormNodeFieldFragmentProps {
+  form: any;
   field: any;
   fieldIndex: number;
   onClose: () => void;
@@ -196,6 +209,11 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeF
     handleSaveValues();
   });
 
+  const contacts = useWatch({
+    name: 'contact.contacts',
+    control: subform.control,
+  });
+
   return (
     <UI.Card zIndex={300} ref={ref}>
       <UI.CardForm dualPane>
@@ -224,11 +242,11 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeF
             <UI.InputGrid>
               <UI.FormControl>
                 <UI.FormLabel htmlFor="label">{t('label')}</UI.FormLabel>
-                <UI.Input ref={subform.register()} name="label" key={field.fieldIndex} />
+                <UI.Input {...subform.register('label')} key={field.fieldIndex} />
               </UI.FormControl>
               <UI.FormControl>
                 <UI.FormLabel htmlFor="placeholder">{t('placeholder')}</UI.FormLabel>
-                <UI.Input ref={subform.register()} name="placeholder" key={field.fieldIndex} />
+                <UI.Input {...subform.register('placeholder')} key={field.fieldIndex} />
               </UI.FormControl>
               <UI.FormControl>
                 <UI.FormLabel htmlFor="isRequired">{t('is_required')}</UI.FormLabel>
@@ -236,7 +254,7 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeF
                   control={subform.control}
                   name="isRequired"
                   defaultValue={field.isRequired}
-                  render={({ onBlur, onChange, value }) => (
+                  render={({ field: { onBlur, onChange, value } }) => (
                     <UI.RadioButtons onBlur={onBlur} onChange={onChange} value={value}>
                       <UI.RadioButton
                         icon={AlertCircle}
@@ -256,6 +274,10 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeF
                   )}
                 />
               </UI.FormControl>
+
+              {formType === TempFieldType.CONTACTS && (
+                <FormNodeContactsFragment contacts={contacts} form={subform} />
+              )}
             </UI.InputGrid>
             <UI.ButtonGroup justifySelf="flex-end" display="flex">
               <UI.Button onClick={handleSaveValues} variantColor="teal">{t('finish_editing')}</UI.Button>
@@ -290,6 +312,7 @@ interface TempFieldProps {
   position: number;
   type: TempFieldType | null;
   isRequired: number;
+  contact: { contacts: any[] };
 }
 
 const appendNewField = (index: number): TempFieldProps => ({
@@ -297,6 +320,7 @@ const appendNewField = (index: number): TempFieldProps => ({
   position: index,
   type: null,
   isRequired: 0,
+  contact: { contacts: [] },
 });
 
 const FormNodeForm = ({ form }: FormNodeFormProps) => {
@@ -328,7 +352,7 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
           <UI.InputHeader>{t('about_form_helpertext_header')}</UI.InputHeader>
           <UI.InputHelper>{t('about_form_helpertext_helper')}</UI.InputHelper>
           <UI.FormControl>
-            <UI.Input name="formNode.helperText" ref={form.register()} placeholder={t('form_helpertext_placeholder')} />
+            <UI.Input {...form.register('formNode.helperText')} placeholder={t('form_helpertext_placeholder')} />
           </UI.FormControl>
         </UI.Div>
         <UI.Div>
@@ -339,19 +363,37 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
               <UI.Grid gridTemplateColumns="1fr 1fr">
                 {fields.map((field, index) => (
                   <UI.Div position="relative" key={field.fieldIndex}>
-                    <Modal.Root open={openedField === index} onClose={() => setOpenedField(null)}>
-                      <FormNodeFieldFragment
-                        onSubmit={(subForm: any) => {
-                          form.setValue(`formNode.fields[${index}]`, subForm, { shouldDirty: true, shouldValidate: true });
-                          form.trigger();
-                        }}
+                    <AnimatePresence>
+                      <Modal.Root
+                        open={openedField === index}
                         onClose={() => setOpenedField(null)}
-                        onDelete={() => remove(index)}
-                        field={formNodeFields[index]}
-                        fieldIndex={index}
-                        key={field.fieldIndex}
-                      />
-                    </Modal.Root>
+                        style={{ maxWidth: 1000 }}
+                      >
+                        <FormNodeFieldFragment
+                          onSubmit={(subForm: any) => {
+                            form.setValue(
+                              `formNode.fields.${index}`,
+                              {
+                                ...subForm,
+                                contact: {
+                                  contacts: subForm.contact?.contacts
+                                    ? [...subForm.contact.contacts]
+                                    : [],
+                                },
+                              },
+                              { shouldValidate: true, shouldDirty: true },
+                            );
+                            form.trigger();
+                          }}
+                          form={form}
+                          onClose={() => setOpenedField(null)}
+                          onDelete={() => remove(index)}
+                          field={formNodeFields[index]} // formNodeFields[index]
+                          fieldIndex={index}
+                          key={field.fieldIndex}
+                        />
+                      </Modal.Root>
+                    </AnimatePresence>
 
                     <FormNodePreview
                       fieldIndex={index}

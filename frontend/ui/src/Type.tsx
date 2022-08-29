@@ -121,7 +121,7 @@ export const H5 = styled(GenericType).attrs({ as: 'h5' })`
 export const Muted = styled(GenericType).attrs({ as: 'p' })`
   ${({ theme }) => css`
     font-weight: 500;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     color: ${theme.colors.gray['500']};
   `}
 `;

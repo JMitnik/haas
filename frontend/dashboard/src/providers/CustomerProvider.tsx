@@ -106,7 +106,11 @@ const CustomerProvider = ({ children, workspaceOverrideSlug, __test__ = false }:
 
   return (
     <CustomerContext.Provider value={{
-      activeCustomer, setActiveCustomer, activePermissions, isLoading, assignedDialogues,
+      activeCustomer,
+      setActiveCustomer,
+      activePermissions,
+      isLoading,
+      assignedDialogues,
     }}
     >
       {children}

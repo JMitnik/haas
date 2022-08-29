@@ -13,10 +13,10 @@ import { generateCreateDialogueDataByTemplateLayers, getTemplate } from './Gener
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import DialogueService from '../questionnaire/DialogueService';
 import { DemoWorkspaceTemplate } from '../templates/TemplateTypes';
+import CustomerService from '../customer/CustomerService';
 import { DialogueTemplateType } from '../QuestionNode/NodeServiceType';
 import UserService from '../../models/users/UserService';
 import { GenerateWorkspaceCSVInput, Workspace } from './GenerateWorkspace.types';
-import CustomerService from '../../models/customer/CustomerService';
 
 class GenerateWorkspaceService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -26,8 +26,8 @@ class GenerateWorkspaceService {
   sessionPrismaAdapter: SessionPrismaAdapter;
   templateService: TemplateService;
   dialogueService: DialogueService;
-  userService: UserService;
   customerService: CustomerService;
+  userService: UserService;
 
   constructor(prismaClient: PrismaClient) {
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
@@ -37,8 +37,8 @@ class GenerateWorkspaceService {
     this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
     this.templateService = new TemplateService(prismaClient);
     this.dialogueService = new DialogueService(prismaClient);
-    this.userService = new UserService(prismaClient);
     this.customerService = new CustomerService(prismaClient);
+    this.userService = new UserService(prismaClient);
   };
 
   /**
@@ -126,7 +126,7 @@ class GenerateWorkspaceService {
    * @param managerCsv
    * @param workspace
    */
-  addManagersFromCSV = async (managerCsv: any, workspace: Workspace) => {
+  addManagersToWorkspace = async (managerCsv: any, workspace: Workspace) => {
     let records = await parseCsv(await managerCsv, { delimiter: ';' });
 
     const managerRole = workspace.roles.find((role) => role.type === RoleTypeEnum.MANAGER) as Role;
@@ -282,6 +282,9 @@ class GenerateWorkspaceService {
       isDemo: isDemo,
     }, template);
 
+    // create bot role
+    await this.customerService.createBotUser(workspace.id, workspace.slug, workspace.roles);
+
     try {
       const adminRole = workspace.roles.find((role) => role.type === RoleTypeEnum.ADMIN) as Role;
       await this.userOfCustomerPrismaAdapter.connectUserToWorkspace(
@@ -306,7 +309,7 @@ class GenerateWorkspaceService {
         await this.generateDialoguesByTemplateLayers(workspace, type, undefined, input.generateDemoData || undefined);
       }
 
-      if (managerCsv) await this.addManagersFromCSV(managerCsv, workspace);
+      if (managerCsv) await this.addManagersToWorkspace(managerCsv, workspace);
 
       try {
         await this.createBotUser(workspace);

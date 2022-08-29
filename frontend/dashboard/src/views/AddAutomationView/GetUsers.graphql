@@ -1,0 +1,20 @@
+query getUsersAndRoles($customerSlug: String!) {
+  customer(slug: $customerSlug) {
+    id
+    users {
+      id
+      firstName
+      lastName
+      email
+      phone
+      role {
+        id
+        name
+      }
+    }
+    roles {
+      id
+      name
+    }
+  }
+}
