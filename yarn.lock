@@ -6484,7 +6484,7 @@
   resolved "https://registry.yarnpkg.com/@types/aria-query/-/aria-query-4.2.2.tgz#ed4e0ad92306a704f9fb132a0cfcf77486dbe2bc"
   integrity sha512-HnYpAE1Y6kRyKM/XkEuiRQhTHvkzMBurTHnpFLYLBGPIylZNPs9jJcuOOYWxPLJCSEtmZT0Y8rHDokKN7rRTig==
 
-"@types/aws-sdk@^2.739.0":
+"@types/aws-sdk@^2.7.0":
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/@types/aws-sdk/-/aws-sdk-2.7.0.tgz#83588b3d14ebdca1d4ce5e023387577568ce82f3"
   integrity sha512-bF6brnwPN9+kheqdKCpinMgCkj+sJIUEj+0v0LPug9OQwL5/1jy+kiJwl+Nkw4Kh+7oaL1phhC4gMz6Oq60jMg==
@@ -16410,10 +16410,10 @@ homedir-polyfill@^1.0.1:
   dependencies:
     parse-passwd "^1.0.0"
 
-honeycomb-grid@^4.0.0-alpha.5:
-  version "4.0.0-beta.6"
-  resolved "https://registry.yarnpkg.com/honeycomb-grid/-/honeycomb-grid-4.0.0-beta.6.tgz#5d65e8b83efad9d3aa89f69bc83bfb18009be2c7"
-  integrity sha512-OemWWAYsGxEPnBqud+0B1CGO9qT/f9AnI9lbj9E0OIZsHGnQ+MGKE24g6uDVWti2dx+kj4Vymr6wnXRVXBLmww==
+honeycomb-grid@4.0.0-alpha.5:
+  version "4.0.0-alpha.5"
+  resolved "https://registry.yarnpkg.com/honeycomb-grid/-/honeycomb-grid-4.0.0-alpha.5.tgz#ebe609d8b5d399fcbe42c2209f102a41d8046622"
+  integrity sha512-b8sYEMktd62ybe7Dr97w8+XHAsqITAt3qv7oIJg5cdvH7LhLesddKtIj9Fj64vqc9HkgyAHL4GmC1C3GNYCR7g==
 
 hosted-git-info@^2.1.4:
   version "2.8.9"
