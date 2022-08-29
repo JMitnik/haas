@@ -61,7 +61,7 @@ const EditAutomationView = () => {
 
   // TODO: Add child builder
   const conditionEntries: ConditionEntry[] = findUniqueConditionEntries(
-    mappedAutomation.conditionBuilder?.conditions.map(
+    (mappedAutomation.conditionBuilder?.conditions || []).map(
       (condition) => ({ ...condition.condition, label: cuid() }),
     ) as ConditionEntry[],
   );

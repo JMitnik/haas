@@ -3,6 +3,7 @@ import {
   aws_s3 as s3,
   aws_secretsmanager as secretsmanager,
   aws_lambda as lambdaFn,
+  aws_lambda_destinations as destinations,
   Duration,
   aws_sqs as sqs,
   aws_sns as sns,
@@ -42,11 +43,18 @@ export class ReportCrawlerService extends BaseLambdaService {
       }
     });
 
+    // Define a dead-letter-queue
+    const invocationDlq = new sqs.Queue(this, `${name}_INVOCATION_DLQ`, {
+      queueName: `${name}_INVOCATION_DLQ_queue`,
+      retentionPeriod: Duration.days(14),
+    });
+
     const lambda = new lambdaFn.Function(this, `${name}Lambda`, {
       code: lambdaImage,
       memorySize: 1920,
       handler: Handler.FROM_IMAGE,
       runtime: Runtime.FROM_IMAGE,
+      onFailure: new destinations.SqsDestination(invocationDlq),
       timeout: Duration.seconds(210),
       role: lambdaRole,
       tracing: lambdaFn.Tracing.ACTIVE,
