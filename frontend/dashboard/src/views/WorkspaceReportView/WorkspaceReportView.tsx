@@ -5,7 +5,6 @@ import React, { } from 'react';
 import { DateFormat, useDate } from 'hooks/useDate';
 import { DialogueImpactScoreType, useGetIssuesQuery, useGetWorkspaceReportQuery } from 'types/generated-types';
 import { EventBars } from 'components/Analytics/Common/EventBars';
-import { ReactComponent as RankingThumbnail } from 'assets/images/thumbnails/sm/rounded-ranking.svg';
 import { ReportsHeader, ReportsLayout } from 'layouts/ReportsLayout/ReportsLayout';
 import { ScoreBox } from 'components/ScoreBox';
 import { ReactComponent as TopicsThumbnail } from 'assets/images/thumbnails/sm/rounded-topics.svg';
@@ -18,14 +17,21 @@ import { useTranslation } from 'react-i18next';
 import mainTheme from 'config/theme';
 import useMeasure from 'react-use-measure';
 
-export const WorkspaceReportView = () => {
+export interface WorkspaceReportViewProps {
+  startDate?: Date;
+  endDate?: Date;
+}
+
+export const WorkspaceReportView = ({
+  startDate: inputStartDate,
+  endDate: inputEndDate,
+}: WorkspaceReportViewProps) => {
   const { activeCustomer } = useCustomer();
   const { format, getNWeekAgo, getStartOfWeek, getEndOfWeek } = useDate();
   const { t } = useTranslation(['general', 'reporting']);
 
-  const relevantWeek = getNWeekAgo(0);
-  const startDate = getStartOfWeek(relevantWeek);
-  const endDate = getEndOfWeek(new Date());
+  const startDate = inputStartDate || getStartOfWeek(getNWeekAgo(0));
+  const endDate = inputEndDate || getEndOfWeek(new Date());
 
   const [ref, bounds] = useMeasure();
 
@@ -166,7 +172,12 @@ export const WorkspaceReportView = () => {
             <UI.Div>
               <UI.Flex>
                 <UI.Thumbnail size="sm" mr={3}>
-                  <img width={60} height={60} src="/assets/images/thumbnails/rounded-ranking.svg" />
+                  <img
+                    width={60}
+                    height={60}
+                    src="/assets/images/thumbnails/rounded-ranking.svg"
+                    alt="rank"
+                  />
                   {/* <RankingThumbnail /> */}
                 </UI.Thumbnail>
                 <UI.Div>

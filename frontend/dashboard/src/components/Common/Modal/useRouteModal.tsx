@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 import { generatePath, useHistory, useLocation, useRouteMatch } from 'react-router-dom';
 
 import { useNavigator } from 'hooks/useNavigator';
@@ -15,9 +16,13 @@ type UseRouteModalOutput<T> = [
   params: T,
 ];
 
-export function useRouteModal<RouteParams>({ matchUrlKey, exitUrl, exitCallback }: UseRouteModal): UseRouteModalOutput<RouteParams> {
+export function useRouteModal<RouteParams>({
+  matchUrlKey,
+  exitUrl,
+  exitCallback,
+}: UseRouteModal): UseRouteModalOutput<RouteParams> {
   const { customerSlug, dialogueSlug } = useNavigator();
-  const match = useRouteMatch<RouteParams>({
+  const match = useRouteMatch<Record<string, string>>({
     path: matchUrlKey,
     exact: true,
   });
@@ -35,5 +40,5 @@ export function useRouteModal<RouteParams>({ matchUrlKey, exitUrl, exitCallback 
 
   const isOpen = !!match;
 
-  return [open, close, isOpen, match?.params as RouteParams];
+  return [open, close, isOpen, match?.params as unknown as RouteParams];
 }

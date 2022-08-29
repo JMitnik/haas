@@ -1,7 +1,9 @@
 import '@testing-library/jest-dom/extend-expect';
+import { parse } from 'date-fns';
 
 import React from 'react';
 
+import { DateFormat } from 'hooks/useDate';
 import { render, screen } from 'test';
 
 import { WorkspaceReportView } from '../WorkspaceReportView';
@@ -18,7 +20,12 @@ test('display bar chart', async () => {
   mockGetIssuesQuery((res) => res);
   mockGetWorkspaceReportQuery((res) => res);
 
-  render(<WorkspaceReportView />);
+  render(
+    <WorkspaceReportView
+      startDate={parse('12-08-2022', DateFormat.DayFormat, new Date())}
+      endDate={parse('21-08-2022', DateFormat.DayFormat, new Date())}
+    />,
+  );
 
   expect(await screen.findByText('Weekly report')).toBeInTheDocument();
 
