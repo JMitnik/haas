@@ -1,5 +1,6 @@
 import { logger } from '../../config/logger';
 import AWS from '../../config/aws';
+import { S3FileService } from '../Common/File/S3FileService';
 
 export interface ReportLambdaInput {
   API_URL: string;
@@ -16,11 +17,13 @@ export class ReportService {
   lambda: AWS.Lambda;
   sts: AWS.STS;
   sns: AWS.SNS;
+  s3FileService: S3FileService;
 
   constructor() {
     this.lambda = new AWS.Lambda();
     this.sts = new AWS.STS();
     this.sns = new AWS.SNS();
+    this.s3FileService = new S3FileService(new AWS.S3());
   }
 
   /**
