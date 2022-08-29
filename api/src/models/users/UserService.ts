@@ -1,4 +1,4 @@
-import { UserOfCustomer, PrismaClient, Customer, Prisma, User, CustomerSettings } from '@prisma/client';
+import { UserOfCustomer, PrismaClient, Customer, Prisma, User } from '@prisma/client';
 import { UserInputError } from 'apollo-server';
 import _ from 'lodash';
 
@@ -10,27 +10,49 @@ import makeRoleUpdateTemplate from '../../services/mailings/templates/makeRoleUp
 import UserPrismaAdapter from './UserPrismaAdapter';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import UserOfCustomerPrismaAdapter from './UserOfCustomerPrismaAdapter';
-import { DeletedUserOutput, UserWithWorkspaces } from './UserServiceTypes';
+import { DeletedUserOutput, GenerateReportPayload, UserWithWorkspaces } from './UserServiceTypes';
 import { offsetPaginate } from '../general/PaginationHelpers';
-import DialogueService from '../../models/questionnaire/DialogueService';
-import CustomerService from '../../models/customer/CustomerService';
 
 class UserService {
   prisma: PrismaClient;
   userPrismaAdapter: UserPrismaAdapter;
   customerPrismaAdapter: CustomerPrismaAdapter;
   userOfCustomerPrismaAdapter: UserOfCustomerPrismaAdapter;
-  customerService: CustomerService;
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
     this.userPrismaAdapter = new UserPrismaAdapter(prismaClient);
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
     this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
-    this.customerService = new CustomerService(prismaClient);
   };
 
   /**
+   * Finds all users based on a AutomationAction payload
+   * @param workspaceSlug 
+   * @param targetIds 
+   * @returns a list of users
+   */
+  findTargetUsers = async (workspaceSlug: string, payload: GenerateReportPayload) => {
+    const targets = payload?.targets;
+    const roleIds: string[] = [];
+    const userIds: string[] = [];
+
+    targets.forEach((target) => {
+      if (target.type === 'ROLE') {
+        roleIds.push(target.value);
+      };
+
+      if (target.type === 'USER') {
+        userIds.push(target.value);
+      }
+    });
+
+    const targetIds = { roleIds, userIds };
+
+    return this.userOfCustomerPrismaAdapter.findTargetUsers(workspaceSlug, targetIds);
+  };
+
+  /*
    * Creates a "root" user without any workspace associated.
    */
   public async createUser(email: string, firstName: string, lastName: string, isSuperAdmin: boolean) {
@@ -50,7 +72,7 @@ class UserService {
    * @param workspaceId
    */
   connectPrivateDialoguesToUser = async (userId: string, workspaceId: string) => {
-    const customerWithDialogues = await this.customerService.findPrivateDialoguesOfWorkspace(workspaceId);
+    const customerWithDialogues = await this.customerPrismaAdapter.findPrivateDialoguesOfWorkspace(workspaceId);
     const privateDialogueIds = customerWithDialogues?.dialogues.map((dialogue) => ({ id: dialogue.id })) || [];
     await this.userOfCustomerPrismaAdapter.connectPrivateDialoguesToUser(userId, privateDialogueIds);
   }
@@ -192,12 +214,16 @@ class UserService {
    * @param workspaceName the slug of the workspace
    * @returns the bot account within a workspace
    */
-  async findBotByWorkspaceName(workspaceName: string) {
-    const botEmail = `${workspaceName}@haas.live`
+  async findBotByWorkspaceName(workspaceSlug: string) {
+    const botEmail = `${workspaceSlug}@haas.live`
     return this.userPrismaAdapter.getUserByEmail(botEmail);
   }
 
-  async getUserOfCustomer(workspaceId: string | null | undefined, customerSlug: string | null | undefined, userId: string) {
+  async getUserOfCustomer(
+    workspaceId: string | null | undefined,
+    customerSlug: string | null | undefined,
+    userId: string
+  ) {
     let customerId = '';
     if (!workspaceId && customerSlug) {
       const customer = await this.customerPrismaAdapter.findWorkspaceBySlug(customerSlug)

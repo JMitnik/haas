@@ -3,6 +3,9 @@ import { useCustomer } from 'providers/CustomerProvider';
 import { useUser } from 'providers/UserProvider';
 
 interface UseAuthProps {
+  canCreateAutomations: boolean;
+  canUpdateAutomations: boolean;
+  canViewAutomations: boolean;
   canResetWorkspaceData: boolean;
   canGenerateWorkspaceFromCsv: boolean;
   canAssignUsersToDialogue: boolean;
@@ -78,6 +81,9 @@ const useAuth = (): UseAuthProps => {
   );
 
   return {
+    canCreateAutomations: hasPermission(SystemPermission.CanCreateAutomations),
+    canUpdateAutomations: hasPermission(SystemPermission.CanUpdateAutomations),
+    canViewAutomations: hasPermission(SystemPermission.CanViewAutomations),
     canResetWorkspaceData: hasPermission(SystemPermission.CanResetWorkspaceData),
     canGenerateWorkspaceFromCsv: hasPermission(SystemPermission.CanGenerateWorkspaceFromCsv),
     canAssignUsersToDialogue: hasPermission(SystemPermission.CanAssignUsersToDialogue),

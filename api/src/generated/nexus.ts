@@ -74,8 +74,12 @@ export interface NexusGenInputs {
     authenticateEmail?: string | null; // String
     workspaceEmail?: string | null; // String
   }
+  AutomationActionChannelInput: { // input type
+    id?: string | null; // ID
+  }
   AutomationActionInput: { // input type
     apiKey?: string | null; // String
+    channels?: Array<NexusGenInputs['AutomationActionChannelInput'] | null> | null; // [AutomationActionChannelInput]
     endpoint?: string | null; // String
     id?: string | null; // ID
     payload?: NexusGenScalars['JSONObject'] | null; // JSONObject
@@ -104,6 +108,16 @@ export interface NexusGenInputs {
     eventType?: NexusGenEnums['AutomationEventType'] | null; // AutomationEventType
     id?: string | null; // ID
     questionId?: string | null; // String
+  }
+  AutomationScheduleInput: { // input type
+    dayOfMonth: string; // String!
+    dayOfWeek: string; // String!
+    dialogueId?: string | null; // String
+    hours: string; // String!
+    id?: string | null; // ID
+    minutes: string; // String!
+    month: string; // String!
+    type: NexusGenEnums['RecurringPeriodType']; // RecurringPeriodType!
   }
   CTALinkInputObjectType: { // input type
     backgroundColor?: string | null; // String
@@ -170,11 +184,11 @@ export interface NexusGenInputs {
   CreateAutomationInput: { // input type
     actions?: Array<NexusGenInputs['AutomationActionInput'] | null> | null; // [AutomationActionInput]
     automationType?: NexusGenEnums['AutomationType'] | null; // AutomationType
-    conditionBuilder?: NexusGenInputs['AutomationConditionBuilderInput'] | null; // AutomationConditionBuilderInput
     description?: string | null; // String
     event?: NexusGenInputs['AutomationEventInput'] | null; // AutomationEventInput
     id?: string | null; // ID
     label?: string | null; // String
+    schedule?: NexusGenInputs['AutomationScheduleInput'] | null; // AutomationScheduleInput
     workspaceId?: string | null; // String
   }
   CreateAutomationOperandInput: { // input type
@@ -271,6 +285,10 @@ export interface NexusGenInputs {
   CustomerWhereUniqueInput: { // input type
     id: string; // ID!
   }
+  DeleteAutomationInput: { // input type
+    automationId: string; // String!
+    workspaceId: string; // String!
+  }
   DeleteDialogueInputType: { // input type
     customerSlug?: string | null; // String
     id?: string | null; // ID
@@ -359,11 +377,17 @@ export interface NexusGenInputs {
     primaryColour: string; // String!
     slug: string; // String!
   }
+  EnableAutomationInput: { // input type
+    automationId: string; // String!
+    state: boolean; // Boolean!
+    workspaceId: string; // String!
+  }
   FindRoleInput: { // input type
     roleId?: string | null; // String
     userId?: string | null; // String
   }
   FormNodeEntryFieldInput: { // input type
+    contacts?: string | null; // String
     email?: string | null; // String
     longText?: string | null; // String
     number?: number | null; // Int
@@ -382,6 +406,7 @@ export interface NexusGenInputs {
     placeholder?: string | null; // String
     position?: number | null; // Int
     type?: NexusGenEnums['FormNodeFieldTypeEnum'] | null; // FormNodeFieldTypeEnum
+    userIds?: Array<string | null> | null; // [String]
   }
   FormNodeInputType: { // input type
     fields?: NexusGenInputs['FormNodeFieldInput'][] | null; // [FormNodeFieldInput!]
@@ -581,6 +606,15 @@ export interface NexusGenInputs {
     onlyGet?: boolean | null; // Boolean
     value?: number | null; // Int
   }
+  SendAutomationDialogueLinkInput: { // input type
+    automationActionId: string; // String!
+    workspaceSlug: string; // String!
+  }
+  SendAutomationReportInput: { // input type
+    automationActionId: string; // String!
+    reportUrl: string; // String!
+    workspaceSlug: string; // String!
+  }
   SessionConnectionFilterInput: { // input type
     campaignVariantId?: string | null; // String
     deliveryType?: NexusGenEnums['SessionDeliveryType'] | null; // SessionDeliveryType
@@ -681,6 +715,7 @@ export interface NexusGenInputs {
   }
   UpdateCTAInputType: { // input type
     customerId?: string | null; // ID
+    customerSlug: string; // String!
     form?: NexusGenInputs['FormNodeInputType'] | null; // FormNodeInputType
     id?: string | null; // String
     links?: NexusGenInputs['CTALinksInputType'] | null; // CTALinksInputType
@@ -752,11 +787,12 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
+  AutomationActionChannelType: prisma.AutomationActionChannelType
   AutomationActionType: prisma.AutomationActionType
   AutomationConditionBuilderType: prisma.AutomationConditionBuilderType
   AutomationConditionOperatorType: prisma.AutomationConditionOperatorType
   AutomationConditionScopeType: prisma.AutomationConditionScopeType
-  AutomationConnectionOrderType: "type" | "updatedAt"
+  AutomationConnectionOrderType: "createdAt" | "type" | "updatedAt"
   AutomationEventType: prisma.AutomationEventType
   AutomationType: prisma.AutomationType
   CampaignVariantEnum: "EMAIL" | "QUEUE" | "SMS"
@@ -768,7 +804,7 @@ export interface NexusGenEnums {
   DialogueConnectionOrder: "createdAt"
   DialogueImpactScoreType: "AVERAGE"
   DialogueTemplateType: prisma.DialogueTemplateType
-  FormNodeFieldTypeEnum: "email" | "longText" | "number" | "phoneNumber" | "shortText" | "url"
+  FormNodeFieldTypeEnum: "contacts" | "email" | "longText" | "number" | "phoneNumber" | "shortText" | "url"
   JobProcessLocationType: prisma.JobProcessLocationType
   JobStatusType: prisma.JobStatusType
   LanguageEnumType: "DUTCH" | "ENGLISH" | "GERMAN"
@@ -827,9 +863,11 @@ export interface NexusGenObjects {
     pageInfo?: NexusGenRootTypes['DeprecatedPaginationPageInfo'] | null; // DeprecatedPaginationPageInfo
     startDate?: string | null; // String
   }
+  AutomationActionChannel: prisma.AutomationActionChannel;
   AutomationActionModel: { // root type
     createdAt?: NexusGenScalars['Date'] | null; // Date
     id?: string | null; // ID
+    payload?: NexusGenScalars['JSONObject'] | null; // JSONObject
     type?: NexusGenEnums['AutomationActionType'] | null; // AutomationActionType
     updatedAt?: NexusGenScalars['Date'] | null; // Date
   }
@@ -878,6 +916,7 @@ export interface NexusGenObjects {
     updatedAt?: NexusGenScalars['Date'] | null; // Date
   }
   AutomationModel: { // root type
+    automationScheduled?: NexusGenRootTypes['AutomationScheduledModel'] | null; // AutomationScheduledModel
     automationTrigger?: NexusGenRootTypes['AutomationTriggerModel'] | null; // AutomationTriggerModel
     createdAt?: NexusGenScalars['Date'] | null; // Date
     description?: string | null; // String
@@ -887,6 +926,22 @@ export interface NexusGenObjects {
     type?: NexusGenEnums['AutomationType'] | null; // AutomationType
     updatedAt?: NexusGenScalars['Date'] | null; // Date
     workspace?: NexusGenRootTypes['Customer'] | null; // Customer
+  }
+  AutomationScheduledModel: { // root type
+    actions?: Array<NexusGenRootTypes['AutomationActionModel'] | null> | null; // [AutomationActionModel]
+    createdAt?: NexusGenScalars['Date'] | null; // Date
+    dayOfMonth?: string | null; // String
+    dayOfWeek?: string | null; // String
+    dayRange?: Array<NexusGenRootTypes['DayRange'] | null> | null; // [DayRange]
+    dialogueId?: string | null; // String
+    frequency?: string | null; // String
+    hours?: string | null; // String
+    id?: string | null; // ID
+    minutes?: string | null; // String
+    month?: string | null; // String
+    time?: string | null; // String
+    type?: NexusGenEnums['RecurringPeriodType'] | null; // RecurringPeriodType
+    updatedAt?: NexusGenScalars['Date'] | null; // Date
   }
   AutomationTriggerModel: { // root type
     actions?: Array<NexusGenRootTypes['AutomationActionModel'] | null> | null; // [AutomationActionModel]
@@ -956,6 +1011,10 @@ export interface NexusGenObjects {
     date?: NexusGenScalars['Date'] | null; // Date
     frequency: number; // Int!
     id?: string | null; // ID
+  }
+  DayRange: { // root type
+    index?: number | null; // Int
+    label?: string | null; // String
   }
   DeleteUserOutput: { // root type
     deletedUser?: boolean | null; // Boolean
@@ -1393,14 +1452,22 @@ export interface NexusGenFieldTypes {
     pageInfo: NexusGenRootTypes['DeprecatedPaginationPageInfo'] | null; // DeprecatedPaginationPageInfo
     startDate: string | null; // String
   }
-  AutomationActionModel: { // field return type
+  AutomationActionChannel: { // field return type
     createdAt: NexusGenScalars['Date'] | null; // Date
     id: string | null; // ID
+    payload: NexusGenScalars['JSONObject'] | null; // JSONObject
+    type: NexusGenEnums['AutomationActionChannelType'] | null; // AutomationActionChannelType
+    updatedAt: NexusGenScalars['Date'] | null; // Date
+  }
+  AutomationActionModel: { // field return type
+    channels: Array<NexusGenRootTypes['AutomationActionChannel'] | null> | null; // [AutomationActionChannel]
+    createdAt: NexusGenScalars['Date'] | null; // Date
+    id: string | null; // ID
+    payload: NexusGenScalars['JSONObject'] | null; // JSONObject
     type: NexusGenEnums['AutomationActionType'] | null; // AutomationActionType
     updatedAt: NexusGenScalars['Date'] | null; // Date
   }
   AutomationConditionBuilderModel: { // field return type
-    childConditionBuilder: NexusGenRootTypes['AutomationConditionBuilderModel'] | null; // AutomationConditionBuilderModel
     childConditionBuilderId: string | null; // String
     conditions: Array<NexusGenRootTypes['AutomationConditionModel'] | null> | null; // [AutomationConditionModel]
     id: string | null; // ID
@@ -1445,6 +1512,7 @@ export interface NexusGenFieldTypes {
     updatedAt: NexusGenScalars['Date'] | null; // Date
   }
   AutomationModel: { // field return type
+    automationScheduled: NexusGenRootTypes['AutomationScheduledModel'] | null; // AutomationScheduledModel
     automationTrigger: NexusGenRootTypes['AutomationTriggerModel'] | null; // AutomationTriggerModel
     createdAt: NexusGenScalars['Date'] | null; // Date
     description: string | null; // String
@@ -1455,8 +1523,26 @@ export interface NexusGenFieldTypes {
     updatedAt: NexusGenScalars['Date'] | null; // Date
     workspace: NexusGenRootTypes['Customer'] | null; // Customer
   }
+  AutomationScheduledModel: { // field return type
+    actions: Array<NexusGenRootTypes['AutomationActionModel'] | null> | null; // [AutomationActionModel]
+    activeDialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
+    createdAt: NexusGenScalars['Date'] | null; // Date
+    dayOfMonth: string | null; // String
+    dayOfWeek: string | null; // String
+    dayRange: Array<NexusGenRootTypes['DayRange'] | null> | null; // [DayRange]
+    dialogueId: string | null; // String
+    frequency: string | null; // String
+    hours: string | null; // String
+    id: string | null; // ID
+    minutes: string | null; // String
+    month: string | null; // String
+    time: string | null; // String
+    type: NexusGenEnums['RecurringPeriodType'] | null; // RecurringPeriodType
+    updatedAt: NexusGenScalars['Date'] | null; // Date
+  }
   AutomationTriggerModel: { // field return type
     actions: Array<NexusGenRootTypes['AutomationActionModel'] | null> | null; // [AutomationActionModel]
+    activeDialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     conditionBuilder: NexusGenRootTypes['AutomationConditionBuilderModel'] | null; // AutomationConditionBuilderModel
     createdAt: NexusGenScalars['Date'] | null; // Date
     event: NexusGenRootTypes['AutomationEventModel'] | null; // AutomationEventModel
@@ -1540,6 +1626,7 @@ export interface NexusGenFieldTypes {
     dialogues: Array<NexusGenRootTypes['Dialogue'] | null> | null; // [Dialogue]
     id: string | null; // ID
     isDemo: boolean | null; // Boolean
+    issueTopics: Array<NexusGenRootTypes['Issue'] | null> | null; // [Issue]
     issues: Array<NexusGenRootTypes['Issue'] | null> | null; // [Issue]
     name: string; // String!
     nestedDialogueStatisticsSummary: Array<NexusGenRootTypes['DialogueStatisticsSummaryModel'] | null> | null; // [DialogueStatisticsSummaryModel]
@@ -1572,6 +1659,10 @@ export interface NexusGenFieldTypes {
     date: NexusGenScalars['Date'] | null; // Date
     frequency: number; // Int!
     id: string | null; // ID
+  }
+  DayRange: { // field return type
+    index: number | null; // Int
+    label: string | null; // String
   }
   DeleteUserOutput: { // field return type
     deletedUser: boolean | null; // Boolean
@@ -1713,6 +1804,7 @@ export interface NexusGenFieldTypes {
     url: string | null; // String
   }
   FormNodeField: { // field return type
+    contacts: Array<NexusGenRootTypes['UserType'] | null> | null; // [UserType]
     id: string | null; // ID
     isRequired: boolean | null; // Boolean
     label: string | null; // String
@@ -1834,6 +1926,7 @@ export interface NexusGenFieldTypes {
     createTopics: boolean | null; // Boolean
     createTrigger: NexusGenRootTypes['TriggerType'] | null; // TriggerType
     createWorkspace: NexusGenRootTypes['Customer'] | null; // Customer
+    deleteAutomation: NexusGenRootTypes['AutomationModel'] | null; // AutomationModel
     deleteCTA: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     deleteCustomer: NexusGenRootTypes['Customer'] | null; // Customer
     deleteDialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
@@ -1847,6 +1940,7 @@ export interface NexusGenFieldTypes {
     editTrigger: NexusGenRootTypes['TriggerType'] | null; // TriggerType
     editUser: NexusGenRootTypes['UserType'] | null; // UserType
     editWorkspace: NexusGenRootTypes['Customer'] | null; // Customer
+    enableAutomation: NexusGenRootTypes['AutomationModel'] | null; // AutomationModel
     generateAutodeck: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
     generateWorkspaceFromCSV: NexusGenRootTypes['Customer'] | null; // Customer
     handleUserStateInWorkspace: NexusGenRootTypes['UserCustomer'] | null; // UserCustomer
@@ -1860,6 +1954,8 @@ export interface NexusGenFieldTypes {
     retryAutodeckJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
     revokeTopic: NexusGenRootTypes['Topic'] | null; // Topic
     sandbox: string | null; // String
+    sendAutomationDialogueLink: boolean | null; // Boolean
+    sendAutomationReport: boolean | null; // Boolean
     setDialoguePrivacy: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     singleUpload: NexusGenRootTypes['ImageType'] | null; // ImageType
     updateAutomation: NexusGenRootTypes['AutomationModel'] | null; // AutomationModel
@@ -2208,10 +2304,12 @@ export interface NexusGenFieldTypes {
     basicStats: NexusGenRootTypes['BasicStatistics'] | null; // BasicStatistics
     health: NexusGenRootTypes['HealthScore'] | null; // HealthScore
     id: string | null; // ID
+    issueHistogram: NexusGenRootTypes['DateHistogram'] | null; // DateHistogram
     mostChangedPath: NexusGenRootTypes['MostChangedPath'] | null; // MostChangedPath
     mostPopularPath: NexusGenRootTypes['MostPopularPath'] | null; // MostPopularPath
     mostTrendingTopic: NexusGenRootTypes['MostTrendingTopic'] | null; // MostTrendingTopic
     rankedTopics: Array<NexusGenRootTypes['TopicType'] | null> | null; // [TopicType]
+    responseHistogram: NexusGenRootTypes['DateHistogram'] | null; // DateHistogram
     workspaceStatisticsSummary: NexusGenRootTypes['DialogueStatisticsSummaryModel'][]; // [DialogueStatisticsSummaryModel!]!
   }
   lineChartDataType: { // field return type
@@ -2258,14 +2356,22 @@ export interface NexusGenFieldTypeNames {
     pageInfo: 'DeprecatedPaginationPageInfo'
     startDate: 'String'
   }
-  AutomationActionModel: { // field return type name
+  AutomationActionChannel: { // field return type name
     createdAt: 'Date'
     id: 'ID'
+    payload: 'JSONObject'
+    type: 'AutomationActionChannelType'
+    updatedAt: 'Date'
+  }
+  AutomationActionModel: { // field return type name
+    channels: 'AutomationActionChannel'
+    createdAt: 'Date'
+    id: 'ID'
+    payload: 'JSONObject'
     type: 'AutomationActionType'
     updatedAt: 'Date'
   }
   AutomationConditionBuilderModel: { // field return type name
-    childConditionBuilder: 'AutomationConditionBuilderModel'
     childConditionBuilderId: 'String'
     conditions: 'AutomationConditionModel'
     id: 'ID'
@@ -2310,6 +2416,7 @@ export interface NexusGenFieldTypeNames {
     updatedAt: 'Date'
   }
   AutomationModel: { // field return type name
+    automationScheduled: 'AutomationScheduledModel'
     automationTrigger: 'AutomationTriggerModel'
     createdAt: 'Date'
     description: 'String'
@@ -2320,8 +2427,26 @@ export interface NexusGenFieldTypeNames {
     updatedAt: 'Date'
     workspace: 'Customer'
   }
+  AutomationScheduledModel: { // field return type name
+    actions: 'AutomationActionModel'
+    activeDialogue: 'Dialogue'
+    createdAt: 'Date'
+    dayOfMonth: 'String'
+    dayOfWeek: 'String'
+    dayRange: 'DayRange'
+    dialogueId: 'String'
+    frequency: 'String'
+    hours: 'String'
+    id: 'ID'
+    minutes: 'String'
+    month: 'String'
+    time: 'String'
+    type: 'RecurringPeriodType'
+    updatedAt: 'Date'
+  }
   AutomationTriggerModel: { // field return type name
     actions: 'AutomationActionModel'
+    activeDialogue: 'Dialogue'
     conditionBuilder: 'AutomationConditionBuilderModel'
     createdAt: 'Date'
     event: 'AutomationEventModel'
@@ -2405,6 +2530,7 @@ export interface NexusGenFieldTypeNames {
     dialogues: 'Dialogue'
     id: 'ID'
     isDemo: 'Boolean'
+    issueTopics: 'Issue'
     issues: 'Issue'
     name: 'String'
     nestedDialogueStatisticsSummary: 'DialogueStatisticsSummaryModel'
@@ -2437,6 +2563,10 @@ export interface NexusGenFieldTypeNames {
     date: 'Date'
     frequency: 'Int'
     id: 'ID'
+  }
+  DayRange: { // field return type name
+    index: 'Int'
+    label: 'String'
   }
   DeleteUserOutput: { // field return type name
     deletedUser: 'Boolean'
@@ -2578,6 +2708,7 @@ export interface NexusGenFieldTypeNames {
     url: 'String'
   }
   FormNodeField: { // field return type name
+    contacts: 'UserType'
     id: 'ID'
     isRequired: 'Boolean'
     label: 'String'
@@ -2699,6 +2830,7 @@ export interface NexusGenFieldTypeNames {
     createTopics: 'Boolean'
     createTrigger: 'TriggerType'
     createWorkspace: 'Customer'
+    deleteAutomation: 'AutomationModel'
     deleteCTA: 'QuestionNode'
     deleteCustomer: 'Customer'
     deleteDialogue: 'Dialogue'
@@ -2712,6 +2844,7 @@ export interface NexusGenFieldTypeNames {
     editTrigger: 'TriggerType'
     editUser: 'UserType'
     editWorkspace: 'Customer'
+    enableAutomation: 'AutomationModel'
     generateAutodeck: 'CreateWorkspaceJobType'
     generateWorkspaceFromCSV: 'Customer'
     handleUserStateInWorkspace: 'UserCustomer'
@@ -2725,6 +2858,8 @@ export interface NexusGenFieldTypeNames {
     retryAutodeckJob: 'CreateWorkspaceJobType'
     revokeTopic: 'Topic'
     sandbox: 'String'
+    sendAutomationDialogueLink: 'Boolean'
+    sendAutomationReport: 'Boolean'
     setDialoguePrivacy: 'Dialogue'
     singleUpload: 'ImageType'
     updateAutomation: 'AutomationModel'
@@ -3073,10 +3208,12 @@ export interface NexusGenFieldTypeNames {
     basicStats: 'BasicStatistics'
     health: 'HealthScore'
     id: 'ID'
+    issueHistogram: 'DateHistogram'
     mostChangedPath: 'MostChangedPath'
     mostPopularPath: 'MostPopularPath'
     mostTrendingTopic: 'MostTrendingTopic'
     rankedTopics: 'TopicType'
+    responseHistogram: 'DateHistogram'
     workspaceStatisticsSummary: 'DialogueStatisticsSummaryModel'
   }
   lineChartDataType: { // field return type name
@@ -3124,6 +3261,9 @@ export interface NexusGenArgTypes {
     }
     dialogues: { // args
       filter?: NexusGenInputs['DialogueFilterInputType'] | null; // DialogueFilterInputType
+    }
+    issueTopics: { // args
+      input?: NexusGenInputs['IssueFilterInput'] | null; // IssueFilterInput
     }
     issues: { // args
       filter?: NexusGenInputs['IssueFilterInput'] | null; // IssueFilterInput
@@ -3259,6 +3399,9 @@ export interface NexusGenArgTypes {
     createWorkspace: { // args
       input?: NexusGenInputs['CreateWorkspaceInput'] | null; // CreateWorkspaceInput
     }
+    deleteAutomation: { // args
+      input?: NexusGenInputs['DeleteAutomationInput'] | null; // DeleteAutomationInput
+    }
     deleteCTA: { // args
       input?: NexusGenInputs['DeleteNodeInputType'] | null; // DeleteNodeInputType
     }
@@ -3312,6 +3455,9 @@ export interface NexusGenArgTypes {
     editWorkspace: { // args
       input?: NexusGenInputs['EditWorkspaceInput'] | null; // EditWorkspaceInput
     }
+    enableAutomation: { // args
+      input?: NexusGenInputs['EnableAutomationInput'] | null; // EnableAutomationInput
+    }
     generateAutodeck: { // args
       input?: NexusGenInputs['GenerateAutodeckInput'] | null; // GenerateAutodeckInput
     }
@@ -3347,6 +3493,12 @@ export interface NexusGenArgTypes {
     }
     sandbox: { // args
       input?: NexusGenInputs['SandboxInput'] | null; // SandboxInput
+    }
+    sendAutomationDialogueLink: { // args
+      input?: NexusGenInputs['SendAutomationDialogueLinkInput'] | null; // SendAutomationDialogueLinkInput
+    }
+    sendAutomationReport: { // args
+      input?: NexusGenInputs['SendAutomationReportInput'] | null; // SendAutomationReportInput
     }
     setDialoguePrivacy: { // args
       input?: NexusGenInputs['SetDialoguePrivacyInput'] | null; // SetDialoguePrivacyInput
@@ -3499,6 +3651,9 @@ export interface NexusGenArgTypes {
     health: { // args
       input?: NexusGenInputs['HealthScoreInput'] | null; // HealthScoreInput
     }
+    issueHistogram: { // args
+      input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
+    }
     mostChangedPath: { // args
       input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
     }
@@ -3509,6 +3664,9 @@ export interface NexusGenArgTypes {
       input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
     }
     rankedTopics: { // args
+      input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
+    }
+    responseHistogram: { // args
       input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
     }
     workspaceStatisticsSummary: { // args

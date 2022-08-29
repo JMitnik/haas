@@ -3,6 +3,7 @@ import React from 'react';
 import 'whatwg-fetch';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import '@testing-library/jest-dom/extend-expect';
+import 'mutationobserver-shim';
 import { server } from './server';
 
 jest.setTimeout(10000);
@@ -14,7 +15,7 @@ jest.mock('utils/getEnv', () => ({
 
 // Mock API endpoint
 jest.mock('utils/getApiEndpoint', () => ({
-  getApiEndpoint: () => 'http://localhost:4999/graphql',
+  getApiEndpoint: () => 'http://localhost:4000/graphql',
 }));
 
 // Mock react-lottie

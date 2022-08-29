@@ -97,7 +97,7 @@ export const FormNodeFieldTypeEnum = enumType({
   name: 'FormNodeFieldTypeEnum',
   description: 'The types a field can assume',
 
-  members: ['email', 'phoneNumber', 'url', 'shortText', 'longText', 'number'],
+  members: ['email', 'phoneNumber', 'url', 'shortText', 'longText', 'number', 'contacts'],
 });
 
 export const FormNodeFieldInput = inputObjectType({
@@ -110,6 +110,7 @@ export const FormNodeFieldInput = inputObjectType({
     t.field('type', { type: FormNodeFieldTypeEnum });
     t.boolean('isRequired', { default: false });
     t.int('position');
+    t.list.string('userIds');
   },
 });
 
@@ -138,7 +139,15 @@ export const FormNodeField = objectType({
       resolve(root) {
         return root.placeholder;
       },
-    })
+    });
+
+    t.list.field('contacts', {
+      type: 'UserType',
+      description: `
+        List of possible contact points for a form-node.
+      `,
+      nullable: true,
+    });
   },
 });
 

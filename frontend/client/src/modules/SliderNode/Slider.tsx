@@ -34,9 +34,7 @@ const adaptColor = (colorHex: string) => {
 const AdjustedColourWrapper = styled(UI.Div)`
   ${({ theme }) => css`
     font-weight: 600;
-    color: ${Color(theme.colors.primary).isDark()
-    ? Color(theme.colors.primary).mix(Color('white'), 0.9).saturate(1).hex()
-    : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
+    color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.9).saturate(1).hex() : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
   `}
 `;
 
@@ -67,7 +65,6 @@ const sliderValueAnimeVariants: Variants = {
 
 interface SliderProps {
   form: any;
-  register: any;
   onSubmit: () => void;
   markers: Marker[];
   unhappyText: string | null | undefined;
@@ -77,7 +74,7 @@ interface SliderProps {
 const endTime = 40;
 const initialWindUpSec = 2;
 
-const Slider = ({ form, register, onSubmit, markers }: SliderProps) => {
+const Slider = ({ form, onSubmit, markers }: SliderProps) => {
   const [isValid, setIsValid] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [showIsEarly, setShowIsEarly] = useState(false);
@@ -194,6 +191,8 @@ const Slider = ({ form, register, onSubmit, markers }: SliderProps) => {
 
   const adaptedColor = adaptColor(sliderColor);
   const adjustedScore = (Math.round(sliderValue * 2) / 2);
+
+  const { onChange, onBlur, name, ref } = form.register('slider');
 
   return (
     <>
@@ -330,17 +329,22 @@ const Slider = ({ form, register, onSubmit, markers }: SliderProps) => {
           data-testid="slider"
           data-cy="Slider"
           width={1}
-          name="slider"
+          // name="slider"
           disabled={isComplete}
           style={{ zIndex: 300, height: 90, opacity: 0, cursor: 'pointer' }}
-          onChange={(e) => moveBunny(e)}
           onMouseUp={() => handleSubmit()}
           onTouchEnd={() => handleSubmit()}
           min={1}
           max={100}
           autoFocus
           defaultValue={50}
-          ref={register}
+          onChange={(e) => {
+            onChange(e);
+            moveBunny(e);
+          }}
+          name={name}
+          ref={ref}
+          onBlur={onBlur}
         />
         <LS.PseudoSliderTrack style={{
           height: 15, position: 'absolute', bottom: 0, left: 0, right: 0,

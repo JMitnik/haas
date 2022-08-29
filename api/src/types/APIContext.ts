@@ -27,9 +27,14 @@ import AutomationService from '../models/automations/AutomationService';
 import QuestionStatisticsService from '../models/QuestionNode/QuestionStatisticsService';
 import GenerateWorkspaceService from '../models/generate-workspace/GenerateWorkspaceService';
 import TemplateService from '../models/templates/TemplateService';
+import { AutomationActionService } from '../models/automations/AutomationActionService';
 import { IssueService } from '../models/Issue/IssueService';
+import ScheduledAutomationService from '../models/automations/ScheduledAutomationService';
+import { WorkspaceStatisticsService } from '../models/customer/WorkspaceStatisticsService';
 
 export interface APIServiceContainer {
+  scheduledAutomationService: ScheduledAutomationService;
+  automationActionService: AutomationActionService;
   organizationService: OrganizationService;
   issueService: IssueService;
   templateService: TemplateService;
@@ -56,6 +61,7 @@ export interface APIServiceContainer {
   redisService: RedisService;
   dialogueStatisticsService: DialogueStatisticsService;
   questionStatisticsService: QuestionStatisticsService;
+  workspaceStatisticsService: WorkspaceStatisticsService;
 }
 
 export interface APIContext extends ExpressContext {

@@ -2,6 +2,8 @@ import { Dialogue, LinkTypeEnum, NodeType } from '@prisma/client';
 import { NexusGenInputs } from '../../generated/nexus';
 import { QuestionConditionProps } from '../questionnaire/Dialogue.types';
 
+export type FormNodeInput = NexusGenInputs['FormNodeInputType'];
+
 export enum DialogueTemplateType {
   BUSINESS_ENG = 'BUSINESS_ENG',
   BUSINESS_NL = 'BUSINESS_NL',

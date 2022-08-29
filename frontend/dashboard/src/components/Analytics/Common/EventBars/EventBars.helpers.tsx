@@ -28,7 +28,7 @@ export const padEvents = (events: Event[], startDate: Date, endDate: Date) => {
         id: `${day}-empty`,
         date,
         frequency: 0.1,
-      }
+      };
     }
 
     return matchingEvent;

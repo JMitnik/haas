@@ -183,6 +183,8 @@ model Dialogue {
   sessions                    Session[]
   tags                        Tag[]
 
+  AutomationScheduled AutomationScheduled[]
+
   @@unique([slug, customerId], map: "Dialogue.slug_customerId_unique")
 }
 
@@ -193,6 +195,7 @@ model FormNodeField {
   type                   FormNodeFieldType        @default(shortText)
   isRequired             Boolean                  @default(false)
   position               Int
+  contacts               User[]
   formNodeId             String?
   FormNode               FormNode?                @relation(fields: [formNodeId], references: [id])
   FormNodeFieldEntryData FormNodeFieldEntryData[]
@@ -213,6 +216,7 @@ model FormNodeFieldEntryData {
   url             String?
   shortText       String?
   longText        String?
+  contacts        String?
   number          Int?
   relatedFieldId  String
   formNodeEntryId Int?
@@ -490,7 +494,9 @@ model User {
   customers          UserOfCustomer[]
   triggers           Trigger[]
 
-  isAssignedTo Dialogue[]
+  isAssignedTo    Dialogue[]
+  FormNodeField   FormNodeField? @relation(fields: [formNodeFieldId], references: [id])
+  formNodeFieldId String?
 }
 
 model UserOfCustomer {
@@ -768,15 +774,40 @@ model AutomationCondition {
   workspaceScope               WorkspaceConditionScope?
 }
 
-model AutomationAction {
-  id                 String               @id @default(cuid())
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime?            @updatedAt
-  type               AutomationActionType
-  apiKey             String?
-  endpoint           String?
+enum AutomationActionChannelType {
+  EMAIL
+  SMS
+  SLACK
+}
+
+model AutomationActionChannel {
+  id                 String    @id @default(cuid())
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime? @updatedAt
   payload            Json?
-  automationTriggers AutomationTrigger[]
+  automationActionId String?
+
+  type             AutomationActionChannelType @default(EMAIL)
+  AutomationAction AutomationAction?           @relation(fields: [automationActionId], references: [id])
+}
+
+model AutomationAction {
+  id                    String                    @id @default(cuid())
+  createdAt             DateTime                  @default(now())
+  updatedAt             DateTime?                 @updatedAt
+  type                  AutomationActionType
+
+  // TODO: What is APIKey for again?
+  apiKey                String?
+
+  // TODO: What is endpoint again?
+  endpoint              String?
+
+  // The channels defines the means of outputting the actions (slack, etc)
+  channels              AutomationActionChannel[]
+  automationTriggers    AutomationTrigger[]
+  AutomationScheduled   AutomationScheduled?      @relation(fields: [automationScheduledId], references: [id])
+  automationScheduledId String?
 }
 
 model AutomationTrigger {
@@ -791,18 +822,49 @@ model AutomationTrigger {
   actions                      AutomationAction[]
 }
 
+model AutomationScheduled {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  // Enum which defines the "rhythm" of the schedule
+  type RecurringPeriodType @default(CUSTOM)
+
+  minutes    String
+  hours      String
+  dayOfMonth String
+  month      String
+  dayOfWeek  String
+
+  // Potential connected dialogue
+  dialogueId    String?
+  dialogueScope Dialogue? @relation(fields: [dialogueId], references: [id])
+
+  // Which automations use this scheduled automation-type
+  automations Automation[]
+
+  // Which actions are related to this scheduled automation-type
+  actions     AutomationAction[]
+}
+
 model Automation {
-  id                  String             @id @default(cuid())
-  createdAt           DateTime           @default(now())
-  updatedAt           DateTime?          @updatedAt
-  isActive            Boolean            @default(false)
-  label               String
-  description         String?
-  type                AutomationType
+  id          String         @id @default(cuid())
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime?      @updatedAt
+  isActive    Boolean        @default(false)
+  label       String
+  description String?
+  type        AutomationType
+  workspaceId String
+  workspace   Customer @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  // Type A: Trigger automation (if X happens, do Y)
   automationTriggerId String?
-  workspaceId         String
   automationTrigger   AutomationTrigger? @relation(fields: [automationTriggerId], references: [id], onDelete: SetNull)
-  workspace           Customer           @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  // Type B: Scheduled automations (every X time-metric, do Y)
+  automationScheduledId String?
+  automationScheduled   AutomationScheduled? @relation(fields: [automationScheduledId], references: [id])
 }
 
 enum DialogueTemplateType {
@@ -856,6 +918,7 @@ enum FormNodeFieldType {
   shortText
   longText
   number
+  contacts
 }
 
 enum LinkTypeEnum {
@@ -982,6 +1045,7 @@ enum DeliveryStatusTypeEnum {
 
 enum AutomationType {
   TRIGGER
+  SCHEDULED
   CAMPAIGN
 }
 
@@ -993,12 +1057,15 @@ enum AutomationEventType {
 }
 
 enum RecurringPeriodType {
+  EVERY_YEAR
+  EVERY_MONTH
   EVERY_WEEK
   EVERY_DAY
   START_OF_DAY
   END_OF_DAY
   START_OF_WEEK
   END_OF_WEEK
+  CUSTOM
 }
 
 enum AutomationConditionScopeType {
@@ -1056,7 +1123,11 @@ enum AutomationActionType {
   SEND_SMS
   SEND_EMAIL
   API_CALL
-  GENERATE_REPORT
+  SEND_DIALOGUE_LINK
+  WEEK_REPORT
+  MONTH_REPORT
+  YEAR_REPORT
+  CUSTOM_REPORT
   WEBHOOK
 }
 

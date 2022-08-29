@@ -11,6 +11,7 @@ export const UpdateCTAInputType = inputObjectType({
   definition(t) {
     t.string('id');
     t.id('customerId');
+    t.string('customerSlug', { required: true });
     t.string('title');
     t.field('type', { type: QuestionNodeTypeEnum });
 
@@ -27,5 +28,5 @@ export const UpdateCTAResolver = mutationField('updateCTA', {
   async resolve(parent, args, ctx) {
     if (!args.input?.id) throw new UserInputError('No ID Found');
     return ctx.services.nodeService.updateCTA(args.input);
-  }
+  },
 });

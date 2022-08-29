@@ -1,13 +1,16 @@
 import * as UI from '@haas/ui';
 import { AtSign, FileText, Hash, Link2, Phone, Type } from 'react-feather';
+import { ClientButton } from 'components/Buttons/Buttons';
+import { Controller, useForm } from 'react-hook-form';
 import { Div } from '@haas/ui';
 import { motion } from 'framer-motion';
-import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 import styled from 'styled-components';
 
-import { ClientButton } from 'components/Buttons/Buttons';
+import * as RadioGroup from 'components/RadioGroup';
+
+import { FormNodeFieldTypeEnum } from 'types/generated-types';
 import { GenericQuestionNodeProps } from 'modules/Node/Node.types';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { SessionActionType } from 'types/core-types';
@@ -59,9 +62,13 @@ const getFieldValue = (field: any, relatedField: any) => {
 
 const FormNode = ({ node, onRunAction }: FormNodeProps) => {
   const { t } = useTranslation();
-  const { register, getValues, formState } = useForm<FormNodeFormProps>({
+  const { register, getValues, formState, control } = useForm<FormNodeFormProps>({
     mode: 'onChange',
-    reValidateMode: 'onChange',
+    defaultValues: {
+      fields: node?.form?.fields?.map(() => ({
+        value: '',
+      })) || [],
+    },
   });
 
   const { isValid } = formState;
@@ -114,29 +121,70 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
           <UI.Form onSubmit={(e: React.FormEvent<HTMLFormElement>) => { handleSubmit(e); return false; }}>
             <Div>
               <UI.Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
-                {fields.map((field, index) => (
-                  <UI.Div key={index} gridColumn={field.type === 'longText' ? 'span 2' : '1fr'}>
+                {fields?.map((field, index) => (
+                  <UI.Div
+                    key={index}
+                    gridColumn={field.type === 'longText'
+                      || field.type === FormNodeFieldTypeEnum.Contacts ? 'span 2' : '1fr'}
+                  >
                     <UI.FormControl isRequired={field.isRequired || false}>
-                      <UI.FormLabel htmlFor={`fields[${index}].value`}>{field.label}</UI.FormLabel>
-                      {field.type === 'longText' ? (
+                      <UI.FormLabel htmlFor={`fields.${index}.value`}>{field.label}</UI.FormLabel>
+                      {field.type === 'longText' && (
                         <UI.Textarea
+                          key={`longText-${index}`}
                           id={`fields[${index}].value`}
                           variant="outline"
-                          ref={register({ required: field.isRequired || false })}
-                          name={`fields.${index}.value`}
-                          minHeight="150px"
+                          {...register(`fields.${index}.value` as const)}
+                          minHeight="40px"
                           placeholder={field.placeholder || undefined}
                         />
-                      ) : (
+                      )}
+                      {field.type === FormNodeFieldTypeEnum.Contacts && (
+                        <Controller
+                          key="contactsradio"
+                          name={`fields.${index}.value` as const}
+                          control={control}
+                          defaultValue={undefined}
+                          rules={{ required: field.isRequired || false }}
+                          render={({ field: { value, onBlur, onChange } }) => (
+                            <RadioGroup.Root
+                              defaultValue={value as string}
+                              onValueChange={onChange}
+                              onBlur={onBlur}
+                              variant="tight"
+                            >
+                              {field.contacts?.map((contact) => (
+                                <RadioGroup.Item
+                                  isActive={value === contact?.email}
+                                  value={contact?.email as string}
+                                  key={contact?.id}
+                                  contentVariant="twoLine"
+                                  variant="boxed"
+                                >
+                                  <UI.Flex flexDirection="column" alignItems="flex-start" justifyContent="center">
+                                    <RadioGroup.Label style={{ marginBottom: 0, marginTop: '4px' }}>
+                                      {contact?.firstName}
+                                      {' '}
+                                      {contact?.lastName}
+                                    </RadioGroup.Label>
+                                  </UI.Flex>
+
+                                </RadioGroup.Item>
+                              ))}
+                            </RadioGroup.Root>
+                          )}
+                        />
+                      )}
+                      {field.type !== 'longText' && field.type !== 'contacts' && (
                         <UI.Input
-                          id={`fields[${index}].value`}
+                          key={fields[index].id}
+                          id={`fields.${index}.value`}
                           variant="outline"
                           leftEl={mapIcon[field?.type] || <Type />}
                           type={mapFieldType[field?.type] || 'text'}
-                          ref={register({ required: field.isRequired || false })}
-                          name={`fields.${index}.value`}
                           placeholder={field.placeholder || undefined}
                           maxWidth={mapFieldType[field?.type] === 'number' ? '100px' : 'auto'}
+                          {...register(`fields.${index}.value` as const, { required: field.isRequired || false })}
                         />
                       )}
                     </UI.FormControl>

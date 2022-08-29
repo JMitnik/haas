@@ -1,7 +1,6 @@
 import * as UI from '@haas/ui';
 import { ArrowDown, ArrowUp, PlusCircle, Trash } from 'react-feather';
-
-import { Controller, UseFormMethods, useFieldArray } from 'react-hook-form';
+import { Controller, UseFormReturn, useFieldArray } from 'react-hook-form';
 import { useTranslation } from 'react-i18next/';
 import React from 'react';
 
@@ -38,7 +37,7 @@ export const ChoiceDropdown = ({ onChange, onClose, value }: any) => {
 
 export interface ChoiceNodeFormProps {
   ctaNodes: CTANode[];
-  form: UseFormMethods<any>;
+  form: UseFormReturn<any>;
 }
 
 export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
@@ -64,21 +63,15 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
   };
 
   const handleRemoveCTAFromOption = (index: number) => {
-    const choice = choicesForm.fields[index];
     const newChoice = {
-      id: choice.id,
       overrideLeaf: {
         label: undefined,
         value: undefined,
         type: undefined,
       },
-      position: undefined,
-      publicValue: choice.publicValue,
-      value: choice.value,
     };
 
-    choicesForm.remove(index);
-    choicesForm.insert(index, newChoice);
+    choicesForm.update(index, newChoice);
   };
 
   return (
@@ -109,7 +102,7 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                 <UI.Helper>{t('call_to_action')}</UI.Helper>
                 <UI.Helper>{t('is_topic')}</UI.Helper>
               </UI.Grid>
-              {choicesForm.fields.map((choice, index) => (
+              {choicesForm.fields.map((choice: any, index) => (
                 <UI.Grid
                   key={choice.fieldIndex}
                   p={2}
@@ -125,30 +118,30 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                   >
                     <Controller
                       name={`optionsFull[${index}].value`}
-                      defaultValue={choice.value}
+                      defaultValue={(choice as any)?.value}
                       control={form.control}
-                      render={({ value, onChange }) => (
+                      render={({ field }) => (
                         <Dropdown
                           placement="left-start"
                           renderOverlay={({ onClose }) => (
                             <ChoiceDropdown
-                              value={value}
-                              onChange={onChange}
+                              value={field.value}
+                              onChange={field.onChange}
                               onClose={onClose}
                             />
                           )}
                         >
                           {({ onOpen, containerRef }) => (
                             <>
-                              {value ? (
+                              {field.value ? (
                                 <UI.GradientButton onClick={onOpen} ref={containerRef}>
-                                  {value}
+                                  {field.value}
                                 </UI.GradientButton>
                               ) : (
                                 <UI.Button
                                   size="sm"
                                   variantColor={
-                                    form.errors?.optionsFull?.[index].value ? 'red' : 'altGray'
+                                    form.formState.errors?.optionsFull?.[index].value ? 'red' : 'altGray'
                                   }
                                   variant="outline"
                                   onClick={onOpen}
@@ -169,18 +162,17 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                     <Controller
                       name={`optionsFull[${index}].overrideLeaf`}
                       control={form.control}
-                      defaultValue={choice.overrideLeaf}
-                      render={({ value, onChange }) => (
+                      defaultValue={(choice as any)?.overrideLeaf}
+                      render={({ field }) => (
                         <Dropdown
                           defaultCloseOnClickOutside={false}
                           renderOverlay={({ onClose, setCloseClickOnOutside }) => (
                             <NodePicker
                               items={formattedCtaNodes}
                               onClose={onClose}
-                              onChange={(data) => onChange(data)}
+                              onChange={(data) => field.onChange(data)}
                               onModalOpen={() => setCloseClickOnOutside(false)}
                               onModalClose={() => setCloseClickOnOutside(true)}
-                              questionId={index}
                             />
                           )}
                         >
@@ -191,11 +183,11 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                               display="flex"
                               alignItems="center"
                             >
-                              {value?.label ? (
+                              {field.value?.label ? (
                                 <NodeCell
                                   onRemove={() => handleRemoveCTAFromOption(index)}
                                   onClick={onOpen}
-                                  node={value}
+                                  node={field.value}
                                 />
                               ) : (
                                 <UI.Button
@@ -220,8 +212,8 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                     <Controller
                       control={form.control}
                       name={`optionsFull[${index}].isTopic`}
-                      defaultValue={choice.isTopic}
-                      render={({ onChange, value }) => (
+                      defaultValue={(choice as any)?.isTopic}
+                      render={({ field: { onChange, value } }) => (
                         <UI.Checkbox
                           size="lg"
                           isChecked={value}
