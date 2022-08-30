@@ -24,7 +24,7 @@ export const TopicType = objectType({
   name: 'TopicType',
   definition(t) {
     t.nonNull.string('name', {
-      resolve: (parent) => parent,
+      resolve: (parent) => (parent as any)?.name,
     });
     t.float('impactScore');
     t.int('nrVotes');
