@@ -180,6 +180,9 @@ describe('AutomationService', () => {
     await prisma.$disconnect();
   });
 
+  test('test', () => {
+    expect(1).toBe(1);
+  })
 
   // test('Sets up compare data for slider-related node', async () => {
   //   const setupData = await automationService.setupSliderCompareData(sliderQuestionCompareDataInput);
@@ -258,5 +261,4 @@ describe('AutomationService', () => {
   //   expect(automations).toHaveLength(1);
   //   expect(automations?.[0]?.trigger).not.toBeNull();
   // });
-
 });

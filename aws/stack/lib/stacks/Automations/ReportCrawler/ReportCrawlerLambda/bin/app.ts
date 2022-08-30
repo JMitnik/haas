@@ -151,6 +151,15 @@ const getCustomerData = async (apiUrl: string, customerSlug: string, userId: str
     });
 }
 
+/**
+ * Lambda function which goes to a page, which is triggered by SNS.
+ *
+ * 1. Authenticates by going to the core API, and receiving a temporary token.
+ * 2. Verifies the token with the core API => accessToken.
+ * 3. Send puppeteer to go the url of the reporting page.
+ * 4. Makes a pdf at the relevant page, and store it in S3 bucket.
+ * 5. Communicate back to the core API that this has been finished,
+ */
 export const lambdaHandler = async (event: any, context: Context) => {
   const url = event.url;
   console.log(`URL: ${url}`);

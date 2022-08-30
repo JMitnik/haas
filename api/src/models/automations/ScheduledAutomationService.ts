@@ -2,16 +2,14 @@ import {
   AutomationAction,
   PrismaClient,
   AutomationActionType,
-  Customer,
-  Role,
-  User,
-  UserOfCustomer,
 } from '@prisma/client';
 import * as AWS from 'aws-sdk';
 
 import config from '../../config/config';
 import DialogueService from '../questionnaire/DialogueService';
 import UserService from '../users/UserService';
+import { User } from '../users/User.types';
+import { dashboardDialogueUrl, workspaceDashboardUrl } from '../Common/Mappings/DashboardMappings.helpers';
 import { AutomationPrismaAdapter } from './AutomationPrismaAdapter';
 import { AutomationActionService } from './AutomationActionService';
 import CustomerService from '../../models/customer/CustomerService';
@@ -52,7 +50,7 @@ class ScheduledAutomationService {
 
   /**
    * Finds a scheduled automation by its ID
-   * @param scheduledAutomationId 
+   * @param scheduledAutomationId
    * @returns An AutomationScheduled entry with all its actions and respective channels
    */
   findScheduledAutomationById = (scheduledAutomationId: string) => {
@@ -61,7 +59,7 @@ class ScheduledAutomationService {
 
   /**
    * Finds the query params used for the report page based on an automation action type
-   * @param automationAction 
+   * @param automationAction
    * @returns an object containing info on the type of the report as well as date range
    */
   findReportQueryParamsByActionType = async (automationAction: AutomationAction) => {
@@ -87,36 +85,23 @@ class ScheduledAutomationService {
 
   /**
    * Maps the actions of a scheduled automation to valid AWS EventBridge rule targets
-   * @param automationScheduledId the id of a scheduled automation
-   * @param actions a list of automation actions
-   * @param botUser the bot user of a workspace
-   * @param workspaceSlug the slug of a workspace
-   * @param dialogueSlug the slug of a dialogue
    * @returns a list of targets for an AWS EventBridge rule
    */
   mapActionsToRuleTargets = async (
     automationScheduledId: string,
     actions: AutomationAction[],
-    // TODO: Not scalable type, need to establish this as a core type
-    botUser: (User & {
-      customers: (UserOfCustomer & {
-        customer: Customer;
-        role: Role;
-        user: User;
-      })[];
-    }),
+    botUser: User,
     workspaceSlug: string,
     dialogueSlug?: string,
   ): Promise<AWS.EventBridge.TargetList> => {
     return Promise.all(actions.map(async (action, index) => {
       const lambdaTargetArn = findLambdaArnByActionType(action.type);
       if (!lambdaTargetArn) throw new GraphQLYogaError('No lambda target arn found in env file');
-      const dashboardUrl = config.dashboardUrl;
 
       const queryParams = await this.findReportQueryParamsByActionType(action);
       const reportUrl = dialogueSlug
-        ? `${dashboardUrl}/dashboard/b/${workspaceSlug}/d/${dialogueSlug}/_reports/weekly`
-        : `${dashboardUrl}/dashboard/b/${workspaceSlug}/_reports?type=${queryParams.type}`;
+        ? `${dashboardDialogueUrl(workspaceSlug, dialogueSlug)}/_reports/weekly`
+        : `${workspaceDashboardUrl(workspaceSlug)}/_reports?type=${queryParams.type}`;
 
       const extraGenerateParams = {
         USER_ID: botUser.id,

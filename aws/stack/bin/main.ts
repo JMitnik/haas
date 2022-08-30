@@ -4,7 +4,7 @@ import { App } from 'aws-cdk-lib';
 import { CoreFixed } from '../lib/stacks/Core/CoreFixed';
 import { CoreTempStack } from '../lib/stacks/Core/CoreTempStack';
 import { prodVariables, stagingVariables } from '../lib/stacks/Core/CoreVariables';
-import { StagingAutomations } from '../lib/stacks/Core/StagingAutomations';
+import { Automations } from '../lib/stacks/Automations/Automations';
 
 const app = new App();
 
@@ -39,4 +39,5 @@ const prodCoreTemp = new CoreTempStack(app, 'ProdCoreTemp', {
   env: prodEnv,
   variables: prodVariables
 });
-const stagingAutomations = new StagingAutomations(app, 'StagingAutomations');
+
+const stagingAutomations = new Automations(app, 'StagingAutomationStack');

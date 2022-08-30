@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import { JSONInputError } from "../../helpers/errors";
+import { JSONInputError } from "../../../helpers/errors";
 
 interface MessageProps {
   payload: any;

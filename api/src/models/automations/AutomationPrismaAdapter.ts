@@ -8,6 +8,7 @@ import { NexusGenInputs } from '../../generated/nexus';
 import {
   UpdateAutomationInput,
   CreateAutomationInput,
+  defaultAutomationFields,
 } from './AutomationTypes';
 import { ScheduledAutomationPrismaAdapter } from './ScheduledAutomationPrismaAdapter';
 
@@ -22,7 +23,7 @@ export class AutomationPrismaAdapter {
 
   /**
    * Deletes an automation from the database
-   * @param input 
+   * @param input
    * @returns the deleted automation
    */
   deleteAutomation = async (input: NexusGenInputs['DeleteAutomationInput']) => {
@@ -321,7 +322,7 @@ export class AutomationPrismaAdapter {
   }
 
   /**
-   * Enables/Disables an automation 
+   * Enables/Disables an automation
    * @param input an object containing the automation id as well as the state (true/false) of the automation
    */
   enableAutomation = async (input: NexusGenInputs['EnableAutomationInput']) => {
@@ -375,13 +376,7 @@ export class AutomationPrismaAdapter {
           },
         } : undefined,
       },
-      include: {
-        automationScheduled: {
-          include: {
-            actions: true,
-          },
-        },
-      },
+      include: defaultAutomationFields.include,
     });
   }
 
@@ -409,13 +404,7 @@ export class AutomationPrismaAdapter {
           },
         },
       },
-      include: {
-        automationScheduled: {
-          include: {
-            actions: true,
-          },
-        },
-      },
+      include: defaultAutomationFields.include,
     });
   };
 
@@ -447,15 +436,7 @@ export class AutomationPrismaAdapter {
         id: workspaceId,
       },
       include: {
-        automations: {
-          include: {
-            automationTrigger: {
-              include: {
-                actions: true,
-              },
-            },
-          },
-        },
+        automations: defaultAutomationFields,
       },
     });
 

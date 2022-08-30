@@ -8,7 +8,6 @@ import { CampaignView } from 'views/CampaignView/CampaignView';
 import { DashboardView } from 'views/DashboardView';
 import { DialogueLinkFetchOverview } from 'views/DialogueLinkFetchOverview';
 import { DialogueProvider } from 'providers/DialogueProvider';
-import { DialogueReportView } from 'views/DialogueReportView';
 import { FeedbackOverview } from 'views/FeedbackView/index';
 import { FirstTimeView } from 'views/FirstTimeView';
 import { GenerateWorkspaceView } from 'views/GenerateWorkspaceView';
@@ -64,9 +63,9 @@ const CustomerRoutes = () => (
               path={ROUTES.WORKSPACE_REPORT_VIEW}
               render={() => (
                 <WorkspaceReportView
-                  startDate={sub(new Date(), { weeks: 1 })}
-                  dateLabel="last_week"
-                  compareStatisticStartDate={sub(new Date(), { weeks: 2 })}
+                  // startDate={sub(new Date(), { weeks: 1 })}
+                  // dateLabel="last_week"
+                  // compareStatisticStartDate={sub(new Date(), { weeks: 2 })}
                 />
               )}
             />
@@ -239,28 +238,6 @@ const PublicRoutes = () => (
   </Switch>
 );
 
-const ReportRoutes = () => (
-  <AnimatePresence>
-    <CustomerProvider>
-      <DialogueProvider>
-        <Switch>
-          <BotRoute
-            allowedPermission={SystemPermission.CanAccessReportPage}
-            path={ROUTES.DIALOGUE_REPORT_VIEW}
-            render={() => (
-              <DialogueReportView
-                startDate={sub(new Date(), { weeks: 1 })}
-                dateLabel="last_week"
-                compareStatisticStartDate={sub(new Date(), { weeks: 2 })}
-              />
-            )}
-          />
-        </Switch>
-      </DialogueProvider>
-    </CustomerProvider>
-  </AnimatePresence>
-);
-
 const RootAppRoute = () => {
   const { isLoggedIn } = useUser();
 
@@ -313,7 +290,6 @@ const AppRoutes = () => (
         )}
       />
 
-      <Route path="/dashboard/b/:customerSlug/d/:dialogueSlug/_reports" render={() => <ReportRoutes />} />
       <Route path="/dashboard/b/:customerSlug" render={() => <CustomerRoutes />} />
 
       <GuardedRoute

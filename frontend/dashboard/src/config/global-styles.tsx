@@ -14,6 +14,7 @@ const GlobalStyle = createGlobalStyle`
       -1.7px 2.6px 2.8px -2px hsl(var(--shadow-color) / 0.18),
       -3.7px 5.8px 6.2px -3px hsl(var(--shadow-color) / 0.14),
       -7.7px 12px 12.8px -4px hsl(var(--shadow-color) / 0.1);
+    --shadow-elevation-md: 0px 6px 20px rgba(59, 76, 106, 0.13), 0px 1.34018px 4.46726px rgba(59, 76, 106, 0.0774939), 0px 0.399006px 1.33002px rgba(59, 76, 106, 0.0525061);
     --shadow-elevation-high:
       -0.5px 0.8px 0.8px hsl(var(--shadow-color) / 0.26),
       -1px 1.5px 1.6px -0.5px hsl(var(--shadow-color) / 0.24),

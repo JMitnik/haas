@@ -89,7 +89,9 @@ export const CustomerType = objectType({
     });
 
     /**
-     * Issues
+     * Issues (by dialogue)
+     *
+     * TODO: Refactor to refer to this as issueDialogues
      */
     t.list.field('issues', {
       type: Issue,
@@ -99,6 +101,20 @@ export const CustomerType = objectType({
       resolve: async (parent, args, { services }) => {
         const filter = IssueValidator.resolveFilter(args.filter);
         return await services.issueService.getProblemDialoguesByWorkspace(parent.id, filter);
+      },
+    });
+
+    /**
+     * Issues (by topic)
+     */
+    t.list.field('issueTopics', {
+      type: Issue,
+      nullable: true,
+      args: { input: IssueFilterInput },
+
+      resolve: async (parent, args, { services }) => {
+        const filter = IssueValidator.resolveFilter(args.input);
+        return await services.issueService.getWorkspaceIssues(parent.id, filter);
       },
     });
 

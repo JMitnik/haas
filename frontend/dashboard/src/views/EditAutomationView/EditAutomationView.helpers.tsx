@@ -1,6 +1,5 @@
 import {
   AutomationActionType,
-  AutomationConditionBuilderType,
   AutomationConditionOperatorType,
   AutomationConditionScopeType,
   AutomationEventModel,

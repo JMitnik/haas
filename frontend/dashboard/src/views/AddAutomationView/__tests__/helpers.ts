@@ -1,5 +1,5 @@
-import { graphql } from 'msw';
-import { server } from 'test';
+import { server, graphql } from 'test';
+
 
 import {
   GetUsersAndRolesQuery,

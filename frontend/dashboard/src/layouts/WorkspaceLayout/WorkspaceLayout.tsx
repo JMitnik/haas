@@ -1,4 +1,5 @@
 import * as UI from '@haas/ui';
+import { useLocation } from 'react-router-dom';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -36,25 +37,32 @@ interface WorskpaceLayoutProps {
 const WorkspaceLayout = ({ children }: WorskpaceLayoutProps) => {
   const device = useMediaDevice();
   const { isLoading } = useCustomer();
+  const location = useLocation();
+
+  const isReportView = location.pathname.includes('_reports');
+
+  const hideTop = isReportView;
 
   return (
     <CustomThemeProviders>
       {/* With topbar */}
       {isLoading && (
-      <UI.Div position="absolute" bottom={0} right={0}>
-        <Loader testId="runner" />
-      </UI.Div>
+        <UI.Div position="absolute" bottom={0} right={0}>
+          <Loader testId="runner" />
+        </UI.Div>
       )}
-      <UI.Div
-        style={{
-          boxShadow: '2px 2px 2px rgba(0, 0, 0, 0.03)',
-        }}
-        position="relative"
-        zIndex={100000}
-      >
-        <WorkspaceTopbar withNav />
-        <TopSubNavBar />
-      </UI.Div>
+      {!hideTop && (
+        <UI.Div
+          style={{
+            boxShadow: '2px 2px 2px rgba(0, 0, 0, 0.03)',
+          }}
+          position="relative"
+          zIndex={100000}
+        >
+          <WorkspaceTopbar withNav />
+          <TopSubNavBar />
+        </UI.Div>
+      )}
       <WorkspaceLayoutContainer isMobile={device.isSmall}>
         <LS.DashboardViewContainer>
           {children}

@@ -1,4 +1,4 @@
-import { render, screen } from 'test';
+import { render } from 'test';
 import React from 'react';
 
 import { WorkspaceGridAdapter } from '../WorkspaceGridAdapter';

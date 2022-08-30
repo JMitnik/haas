@@ -7,14 +7,6 @@ import {
 
 import { NexusGenEnums } from '../../generated/nexus';
 
-type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
-
-/**
- * XOR is needed to have a real mutually exclusive union type
- * https://stackoverflow.com/questions/42123407/does-typescript-support-mutually-exclusive-types
- */
-type XOR<T, U> = (T | U) extends object ? (Without<T, U> & U) | (Without<U, T> & T) : T | U;
-
 export interface SetupQuestionCompareDataInput {
   questionId: string;
   aspect: QuestionAspect;
@@ -249,3 +241,15 @@ export interface CheckedConditions {
   AND?: (boolean | CheckedConditions)[];
   OR?: (boolean | CheckedConditions)[];
 }
+
+export const defaultAutomationFields = Prisma.validator<Prisma.AutomationArgs>()({
+  include: {
+    automationScheduled: {
+      include: {
+        actions: true,
+      },
+    },
+  },
+});
+
+export type Automation = Prisma.AutomationGetPayload<typeof defaultAutomationFields>;
