@@ -80,7 +80,7 @@ export const IllustrationCard = ({ svg, text, children, boxShadow, flatten }: Il
 
 export const Hr = styled.hr`
   ${({ theme }) => css`
-    padding: ${theme.gutter / 2}px 0;
+    margin: ${theme.gutter / 2}px 0;
   `}
 `;
 

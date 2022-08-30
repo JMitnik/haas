@@ -1,9 +1,12 @@
 import { SessionActionType } from '../session/Session.types';
 import { NexusGenInputs } from '../../generated/nexus';
 import { Nullable } from '../../types/generic';
+import { Prisma } from '@prisma/client';
 
 export type DeselectTopicInput = NexusGenInputs['DeselectTopicInput'];
 export type TopicFilterInput = NexusGenInputs['TopicFilterInput'];
+export type CreateTopicInput = NexusGenInputs['CreateTopicInput'];
+export type RevokeTopicInput = NexusGenInputs['RevokeTopicInput'];
 
 /**
  * TopicCount contains meta-statistics about a topic.

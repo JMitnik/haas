@@ -9,6 +9,7 @@ import { FilterEnabledLabel } from 'components/Analytics/WorkspaceGrid/FilterEna
 import { Issue } from 'components/Analytics/WorkspaceGrid/WorkspaceGrid.types';
 import { ReactComponent as NoDataIll } from 'assets/images/undraw_solution.svg';
 import { ScoreBox } from 'components/ScoreBox';
+import { useDate } from 'hooks/useDate';
 
 import { IssueActionLabels } from './IssueActionLabels';
 
@@ -57,6 +58,10 @@ export const SimpleIssueTable = ({
 }: SimpleIssueTableProps) => {
   const shownIssues = inPreview ? issues.slice(0, CUTOFF) : issues;
   const { t } = useTranslation();
+  const { getNWeekAgo, getNow } = useDate();
+
+  const endDate = getNow();
+  const twoWeeksBack = getNWeekAgo(2);
 
   return (
     <UI.Card border="1px solid" borderColor="off.100">
@@ -154,6 +159,8 @@ export const SimpleIssueTable = ({
                       events={issue.history.items}
                       width={150}
                       height={40}
+                      startDate={twoWeeksBack}
+                      endDate={endDate}
                     />
                   </UI.Div>
                 </UI.Flex>

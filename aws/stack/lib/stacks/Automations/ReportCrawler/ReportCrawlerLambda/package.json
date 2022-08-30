@@ -1,0 +1,35 @@
+{
+  "name": "lambda-puppeteer",
+  "version": "1.0.0",
+  "description": "Example of how to deploy an AWS Lambda function as a container containing Puppeteer",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "SHI International Corp.",
+    "url": "https://www.shi.com",
+    "organization": true
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shi/crpm-lambda-container-puppeteer.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "update-dependencies": "ncu -u"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.77",
+    "@types/jest": "^26.0.23",
+    "@types/puppeteer": "^5.4.2",
+    "jest": "~27.0.6",
+    "npm-check-updates": "~11.7.1",
+    "ts-jest": "~27.0.3",
+    "typescript": "~4.3.4"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1046.0",
+    "axios": "^0.24.0",
+    "puppeteer": "^5.5.0"
+  }
+}

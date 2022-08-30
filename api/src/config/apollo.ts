@@ -64,7 +64,7 @@ export const makeApollo = async (prisma: PrismaClient) => {
       services: bootstrapServices(prisma),
     }),
     plugins: process.env.NODE_ENV === 'test' ? [] : [
-      useGraphQlJit(),
+      // useGraphQlJit(),
       useValidationCache(),
       useParserCache(),
       useSentry(),

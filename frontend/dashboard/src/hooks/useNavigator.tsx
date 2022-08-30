@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 import { generatePath, useHistory, useLocation, useParams, useRouteMatch } from 'react-router';
 import { useMemo } from 'react';
 
@@ -21,12 +22,16 @@ export const ROUTES = {
   ADMIN_OVERVIEW: '/dashboard/admin',
   USER_VIEW: '/dashboard/b/:customerSlug/users/:userId',
   ROLE_USER_VIEW: '/dashboard/b/:customerSlug/users/:userId/role/:roleId',
-  WEEKLY_REPORT_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/_reports/weekly',
+  WORKSPACE_REPORT_VIEW: '/dashboard/b/:customerSlug/_reports',
+  DIALOGUE_REPORT_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/_reports/weekly',
   USERS_OVERVIEW: '/dashboard/b/:customerSlug/users',
   ALERTS_OVERVIEW: '/dashboard/b/:customerSlug/triggers',
   DIALOGUE_BUILDER_OVERVIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/builder',
   NEW_QUESTION_CTA_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/builder/question/:questionId/new-cta',
   NEW_OPTION_CTA_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/builder/option/:optionIndex/new-cta',
+  AUTOMATION_OVERVIEW: '/dashboard/b/:customerSlug/automations',
+  NEW_AUTOMATION_VIEW: '/dashboard/b/:customerSlug/automation/add',
+  EDIT_AUTOMATION_VIEW: '/dashboard/b/:customerSlug/automation/:automationId/edit',
 };
 
 export interface DashboardParams {
@@ -72,6 +77,30 @@ export const useNavigator = () => {
     if (withFollowUpAction) targetPath = `${targetPath}&withFollowUpAction=1`;
 
     history.push(targetPath + location.search);
+  };
+  const goToEditAutomationView = (automationId: string) => {
+    const path = generatePath(ROUTES.EDIT_AUTOMATION_VIEW, {
+      customerSlug,
+      automationId,
+    });
+
+    history.push(path + location.search);
+  };
+
+  const goToAutomationOverview = () => {
+    const path = generatePath(ROUTES.AUTOMATION_OVERVIEW, {
+      customerSlug,
+    });
+
+    history.push(path + location.search);
+  };
+
+  const goToNewAutomationView = () => {
+    const path = generatePath(ROUTES.NEW_AUTOMATION_VIEW, {
+      customerSlug,
+    });
+
+    history.push(path + location.search);
   };
 
   const goToWorkspaceFeedbackOverview = (
@@ -241,6 +270,9 @@ export const useNavigator = () => {
     getDialogueFeedbackOverviewPath,
     getDialogueViewPath,
     goToDialogueFeedbackOverview,
+    goToAutomationOverview,
+    goToNewAutomationView,
+    goToEditAutomationView,
     goTo,
     dashboardPath,
     dialoguePath,
@@ -272,3 +304,4 @@ export const useNavigator = () => {
     userOverviewMatch,
   };
 };
+

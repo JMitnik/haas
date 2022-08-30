@@ -13,13 +13,13 @@ import { Link, Trash, Type } from 'react-feather';
 import { useMutation } from '@apollo/client';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { yupResolver } from '@hookform/resolvers';
+import { yupResolver } from '@hookform/resolvers/yup';
 import React from 'react';
 import Select from 'react-select';
 
 import { MappedCTANode } from 'views/DialogueBuilderView/DialogueBuilderInterfaces';
 // import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
-import { useCreateCtaMutation } from 'types/generated-types';
+import { FormNodeFieldTypeEnum, useCreateCtaMutation } from 'types/generated-types';
 import { useCustomer } from 'providers/CustomerProvider';
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
@@ -141,9 +141,11 @@ const CTAForm = ({
   form: formNode,
 }: CTAFormProps) => {
   const { activeCustomer } = useCustomer();
-  const { customerSlug, dialogueSlug, questionId } = useParams<
-  { customerSlug: string, dialogueSlug: string, questionId?: string }
-  >();
+  const { customerSlug, dialogueSlug, questionId } = useParams<{
+    customerSlug: string, dialogueSlug: string, questionId?: string
+  }>();
+
+  console.log('Form node fields: ', formNode?.fields);
 
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
@@ -163,6 +165,7 @@ const CTAForm = ({
           placeholder: field.placeholder,
           isRequired: boolToInt(field.isRequired),
           position: field.position,
+          contact: field?.contact || { contact: { contacts: [] } },
         })),
       },
     },
@@ -199,7 +202,6 @@ const CTAForm = ({
         position: 'bottom-right',
         duration: 1500,
       });
-
       const CTA: MappedCTANode = {
         value: data?.createCTA?.id || undefined,
         label: data?.createCTA?.title || undefined,
@@ -239,6 +241,18 @@ const CTAForm = ({
   const watchType = form.watch('ctaType');
 
   const onSubmit = (formData: FormDataProps) => {
+    const formFields = formData.formNode?.fields?.map(
+      (field) => {
+        const { contact, type: fieldType, ...rest } = field;
+        return ({
+          ...rest,
+          type: fieldType as FormNodeFieldTypeEnum,
+          userIds: contact?.contacts?.map((user) => user.value) || [],
+          isRequired: intToBool(field.isRequired),
+        });
+      },
+    );
+
     if (id === '-1') {
       const mappedLinks = {
         linkTypes: formData.links,
@@ -256,9 +270,7 @@ const CTAForm = ({
             share: formData.share,
             form: {
               ...formData.formNode,
-              fields: formData.formNode?.fields?.map(
-                (field) => ({ ...field, isRequired: intToBool(field.isRequired) }),
-              ) as any, // TODO: Fix typing
+              fields: formFields,
             },
           },
         },
@@ -271,6 +283,7 @@ const CTAForm = ({
         variables: {
           input: {
             id,
+            customerSlug,
             customerId: activeCustomer?.id,
             title: formData.title,
             type: formData.ctaType.value || undefined,
@@ -278,9 +291,7 @@ const CTAForm = ({
             share: formData.share,
             form: {
               ...formData.formNode,
-              fields: formData.formNode?.fields?.map(
-                (field) => ({ ...field, isRequired: intToBool(field.isRequired) }),
-              ),
+              fields: formFields,
             },
           },
         },
@@ -308,21 +319,21 @@ const CTAForm = ({
             </Div>
             <Div>
               <InputGrid>
-                <FormControl gridColumn="1 / -1" isRequired isInvalid={!!form.errors.title}>
+                <FormControl gridColumn="1 / -1" isRequired isInvalid={!!form.formState.errors.title}>
                   <FormLabel htmlFor="title">{t('title')}</FormLabel>
                   <InputHelper>{t('cta:title_helper')}</InputHelper>
                   <Controller
                     name="title"
                     control={form.control}
                     defaultValue={title}
-                    render={({ value, onChange }) => (
+                    render={({ field }) => (
                       <UI.MarkdownEditor
-                        value={value}
-                        onChange={onChange}
+                        value={field.value}
+                        onChange={field.onChange}
                       />
                     )}
                   />
-                  <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
+                  <FormErrorMessage>{form.formState.errors.title?.message}</FormErrorMessage>
                 </FormControl>
 
                 <FormControl isRequired>
@@ -332,11 +343,16 @@ const CTAForm = ({
                   <Controller
                     name="ctaType"
                     control={form.control}
-                    options={CTA_TYPES}
-                    as={Select}
+                    render={({ field }) => (
+                      <Select
+                        options={CTA_TYPES}
+                        value={field.value as any}
+                        onChange={field.onChange}
+                      />
+                    )}
                   />
 
-                  <FormErrorMessage>{form.errors.ctaType?.value?.message}</FormErrorMessage>
+                  <FormErrorMessage>{form.formState.errors.ctaType?.value?.message}</FormErrorMessage>
                 </FormControl>
               </InputGrid>
             </Div>
@@ -355,17 +371,12 @@ const CTAForm = ({
                     <FormLabel htmlFor="share.title">{t('cta:text')}</FormLabel>
                     <InputHelper>{t('cta:shared_item_text_helper')}</InputHelper>
                     <Input
-                      name="share.title"
                       placeholder="Get a discount..."
                       leftEl={<Type />}
                       defaultValue={share?.title}
-                      ref={form.register({ required: true })}
+                      {...form.register('share.title', { required: true })}
                     />
-                    <FormErrorMessage>
-                      <>
-                        {form.errors.share?.title}
-                      </>
-                    </FormErrorMessage>
+                    <FormErrorMessage><UI.Div>{form.formState.errors.share?.title?.message}</UI.Div></FormErrorMessage>
                   </FormControl>
 
                   {/* TODO: Change default value and error */}
@@ -373,35 +384,25 @@ const CTAForm = ({
                     <FormLabel htmlFor="share.url">{t('url')}</FormLabel>
                     <InputHelper>{t('cta:url_share_helper')}</InputHelper>
                     <Input
-                      name="share.url"
                       placeholder="https://share/url"
                       // eslint-disable-next-line jsx-a11y/anchor-is-valid
                       leftEl={<Link />}
                       defaultValue={share?.url}
-                      ref={form.register({ required: true })}
+                      {...form.register('share.url', { required: true })}
                     />
-                    <FormErrorMessage>
-                      <>
-                        {form.errors.share?.url}
-                      </>
-                    </FormErrorMessage>
+                    <FormErrorMessage>{form.formState.errors.share?.url?.message}</FormErrorMessage>
                   </FormControl>
 
                   <FormControl isRequired>
                     <FormLabel htmlFor="share.tooltip">{t('cta:button_text')}</FormLabel>
                     <InputHelper>{t('cta:button_text_helper')}</InputHelper>
                     <Input
-                      name="share.tooltip"
                       placeholder="Share..."
                       leftEl={<Type />}
                       defaultValue={share?.tooltip}
-                      ref={form.register({ required: true })}
+                      {...form.register('share.tooltip', { required: true })}
                     />
-                    <FormErrorMessage>
-                      <>
-                        {form.errors.share?.tooltip}
-                      </>
-                    </FormErrorMessage>
+                    <FormErrorMessage>{form.formState.errors.share?.tooltip?.message}</FormErrorMessage>
                   </FormControl>
                 </UI.InputGrid>
               </FormSection>
@@ -424,7 +425,7 @@ const CTAForm = ({
         </Div>
 
         <Flex justifyContent="space-between">
-          <ButtonGroup>
+          <ButtonGroup display="flex">
             <UI.Button
               isLoading={addLoading || updateLoading}
               isDisabled={!form.formState.isValid}

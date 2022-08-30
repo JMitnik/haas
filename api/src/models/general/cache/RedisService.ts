@@ -1,3 +1,4 @@
+import { logger } from '../../../config/logger';
 import Redis from 'ioredis';
 
 export class RedisService {
@@ -11,7 +12,15 @@ export class RedisService {
     return this.redis.get(key);
   }
 
-  set(key: string, value: string | number) {
-    return this.redis.set(key, value);
+  async set(key: string, value: string | number) {
+    try {
+      const set = await this.redis.set(key, value);
+
+      return set;
+    } catch (error) {
+      logger.error('Error setting redis', error);
+
+      return Promise.resolve(() => {});
+    }
   }
 }

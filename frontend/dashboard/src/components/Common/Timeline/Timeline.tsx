@@ -55,7 +55,7 @@ export const Timeline = ({ children, enableFold, nrItems, ...props }: TimelinePr
   return (
     <TimelineContainer {...props}>
       {enableFold && (
-        <UI.Button size="xs" onClick={handleToggleFold} className="fold-button">
+        <UI.Button iconOnly size="xs" onClick={handleToggleFold} className="fold-button">
           {!isFold ? (
             <UI.Icon>
               <MinusCircle />

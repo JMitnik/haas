@@ -287,8 +287,12 @@ export const ControlContainer = styled(UI.Span)`
   `}
 `;
 
-export const ControlButton = styled(UI.Button)`
-  ${({ theme }) => css`
+interface ControlButtonProps {
+  iconOnly?: boolean
+}
+
+export const ControlButton = styled(UI.Button) <ControlButtonProps>`
+  ${({ theme, iconOnly }) => css`
     background-color: ${theme.colors.white} !important;
     box-shadow: ${theme.boxShadows.md};
     border-radius: ${theme.borderRadiuses.md}px;
@@ -310,6 +314,9 @@ export const ControlButton = styled(UI.Button)`
 
     ${UI.Icon} svg {
       width: 21px !important;
+      ${iconOnly && css`
+        margin-right: 0;
+      `}
     }
   `}
 `;

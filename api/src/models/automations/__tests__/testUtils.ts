@@ -121,7 +121,7 @@ export const seedAutomation = async (
           },
           actions: {
             create: [
-              { type: 'GENERATE_REPORT' },
+              { type: 'WEEK_REPORT' },
               { type: 'SEND_EMAIL' },
             ],
           },

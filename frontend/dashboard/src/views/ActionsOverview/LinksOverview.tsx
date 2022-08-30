@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Controller, UseFormMethods, useFieldArray } from 'react-hook-form';
+import { Controller, useFieldArray } from 'react-hook-form';
 import { Flex, FormControl, FormErrorMessage, FormLabel, Grid, useToast } from '@chakra-ui/core';
 import { PlusCircle, Type } from 'react-feather';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +12,7 @@ import Select from 'react-select';
 import { ReactComponent as NoDataIll } from 'assets/images/undraw_no_data.svg';
 import { useCustomer } from 'providers/CustomerProvider';
 
-import { FormDataProps, LinkInputProps, LinkSectionHeader } from './CTATypes';
+import { LinkInputProps, LinkSectionHeader } from './CTATypes';
 
 const LINK_TYPES = [
   { label: 'SINGLE', value: 'SINGLE' },
@@ -66,7 +66,7 @@ const ImageUploadLogoInput = ({ onChange, value }: any) => {
 };
 
 interface LinkOverviewProps {
-  form: UseFormMethods<FormDataProps>
+  form: any;
 }
 
 const LinksOverview = ({ form }: LinkOverviewProps) => {
@@ -88,8 +88,6 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
     subHeader: '',
     type: null,
   });
-
-  const linkType = form.watch('links[0].type');
 
   return (
     <>
@@ -116,7 +114,7 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
                 <UI.IllustrationCard svg={<NoDataIll />} text={t('no_data')} />
               )}
               <AnimatePresence>
-                {linkFields.map((link, index) => (
+                {linkFields.map((link: any, index) => (
                   <motion.div key={(`${link.id}` || link.url)} initial={{ opacity: 1 }} exit={{ opacity: 0, x: 100 }}>
                     <UI.Div
                       position="relative"
@@ -132,41 +130,40 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
                       >
 
                         <LinkSectionHeader title="General" />
-                        <FormControl isRequired isInvalid={!!form.errors?.links?.[index]?.url}>
+                        <FormControl isRequired isInvalid={!!form.formState.errors?.links?.[index]?.url}>
                           <FormLabel htmlFor={`links[${index}].url`}>{t('cta:url')}</FormLabel>
                           <UI.InputHelper>{t('cta:link_url_helper')}</UI.InputHelper>
                           <UI.Input
-                            name={`links[${index}].url`}
                             defaultValue={link.url}
                             placeholder="https://link.to/"
                             leftEl={<Type />}
-                            ref={form.register({ required: true })}
+                            {...form.register(`links.${index}.url`, { required: true })}
                           />
-                          <FormErrorMessage>{!!form.errors?.links?.[index]?.url?.message}</FormErrorMessage>
+                          <FormErrorMessage>{!!form.formState.errors?.links?.[index]?.url?.message}</FormErrorMessage>
                         </FormControl>
 
-                        <FormControl isRequired isInvalid={!!form.errors.links?.[index]?.type}>
+                        <FormControl isRequired isInvalid={!!form.formState.errors.links?.[index]?.type}>
                           <FormLabel htmlFor={`links[${index}].type`}>{t('cta:type')}</FormLabel>
                           <UI.InputHelper>{t('cta:link_type_helper')}</UI.InputHelper>
                           <Controller
-                            id={`link-${link.id}-${index}`}
+                            // TODO: Look how to add back id={`link-${link.id}-${index}`}
                             name={`links[${index}].type`}
                             control={form.control}
                             defaultValue={link.type}
-                            render={({ onChange, value }) => {
-                              const data = { label: value, value: value?.value };
+                            render={({ field }) => {
+                              const data = { label: field.value, value: field.value?.value };
                               return (
                                 <Select
                                   options={LINK_TYPES}
                                   value={data}
                                   onChange={(opt: any) => {
-                                    onChange(opt.value);
+                                    field.onChange(opt.value);
                                   }}
                                 />
                               );
                             }}
                           />
-                          <FormErrorMessage>{!!form.errors.links?.[index]?.type?.message}</FormErrorMessage>
+                          <FormErrorMessage>{!!form.formState.errors.links?.[index]?.type?.message}</FormErrorMessage>
                         </FormControl>
 
                         <>
@@ -176,13 +173,12 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
                             <FormLabel htmlFor={`links[${index}].header`}>{t('cta:upsell_header')}</FormLabel>
                             <UI.InputHelper>{t('cta:upsell_header_helper')}</UI.InputHelper>
                             <UI.Input
-                              isInvalid={!!form.errors.links?.[index]?.header}
-                              name={`links[${index}].header`}
+                              isInvalid={!!form.formState.errors.links?.[index]?.header}
                               defaultValue={link.header}
-                              ref={form.register({ required: false })}
+                              {...form.register(`links.${index}.header`, { required: false })}
                             />
                             <FormErrorMessage>
-                              {!!form.errors.links?.[index]?.header?.message}
+                              {!!form.formState.errors.links?.[index]?.header?.message}
                             </FormErrorMessage>
                           </FormControl>
 
@@ -190,13 +186,12 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
                             <FormLabel htmlFor={`links[${index}].subHeader`}>{t('cta:upsell_subheader')}</FormLabel>
                             <UI.InputHelper>{t('cta:upsell_subheader_helper')}</UI.InputHelper>
                             <UI.Input
-                              isInvalid={!!form.errors.links?.[index]?.subHeader}
-                              name={`links[${index}].subHeader`}
+                              isInvalid={!!form.formState.errors.links?.[index]?.subHeader}
                               defaultValue={link.subHeader}
-                              ref={form.register({ required: false })}
+                              {...form.register(`links.${index}.subHeader`, { required: false })}
                             />
                             <FormErrorMessage>
-                              {!!form.errors.links?.[index]?.subHeader?.message}
+                              {!!form.formState.errors.links?.[index]?.subHeader?.message}
                             </FormErrorMessage>
                           </FormControl>
 
@@ -208,10 +203,10 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
                               control={form.control}
                               name={`links[${index}].imageUrl`}
                               defaultValue={link.imageUrl}
-                              render={({ onChange, value }) => (
+                              render={({ field }) => (
                                 <ImageUploadLogoInput
-                                  value={value}
-                                  onChange={onChange}
+                                  value={field.value}
+                                  onChange={field.onChange}
                                 />
                               )}
                             />
@@ -224,37 +219,36 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
                           <FormLabel htmlFor={`links[${index}].title`}>{t('cta:link_tooltip')}</FormLabel>
                           <UI.InputHelper>{t('cta:link_tooltip_helper')}</UI.InputHelper>
                           <UI.Input
-                            isInvalid={!!form.errors.links?.[index]?.title}
-                            name={`links[${index}].title`}
+                            isInvalid={!!form.formState.errors.links?.[index]?.title}
                             defaultValue={link.title}
-                            ref={form.register({ required: false })}
+                            {...form.register(`links.${index}.title`, { required: false })}
                           />
-                          <FormErrorMessage>{!!form.errors.links?.[index]?.title?.message}</FormErrorMessage>
+                          <FormErrorMessage>{!!form.formState.errors.links?.[index]?.title?.message}</FormErrorMessage>
                         </FormControl>
 
                         <FormControl>
                           <FormLabel htmlFor={`links[${index}].iconUrl`}>{t('cta:link_icon')}</FormLabel>
                           <UI.InputHelper>{t('cta:link_icon_helper')}</UI.InputHelper>
                           <UI.Input
-                            isInvalid={!!form.errors.links?.[index]?.iconUrl}
-                            name={`links[${index}].iconUrl`}
+                            isInvalid={!!form.formState.errors.links?.[index]?.iconUrl}
                             defaultValue={link.iconUrl}
-                            ref={form.register({ required: false })}
+                            {...form.register(`links.${index}.iconUrl`, { required: false })}
                           />
-                          <FormErrorMessage>{!!form.errors.links?.[index]?.iconUrl?.message}</FormErrorMessage>
+                          <FormErrorMessage>
+                            {!!form.formState.errors.links?.[index]?.iconUrl?.message}
+                          </FormErrorMessage>
                         </FormControl>
 
                         <FormControl>
                           <FormLabel htmlFor={`links[${index}].backgroundColor`}>{t('cta:background_color')}</FormLabel>
                           <UI.InputHelper>{t('cta:background_color_helper')}</UI.InputHelper>
                           <UI.Input
-                            isInvalid={!!form.errors.links?.[index]?.backgroundColor}
-                            name={`links[${index}].backgroundColor`}
+                            isInvalid={!!form.formState.errors.links?.[index]?.backgroundColor}
                             defaultValue={link.backgroundColor}
-                            ref={form.register({ required: false })}
+                            {...form.register(`links.${index}.backgroundColor`, { required: false })}
                           />
                           <FormErrorMessage>
-                            {!!form.errors.links?.[index]?.backgroundColor?.message}
+                            {!!form.formState.errors.links?.[index]?.backgroundColor?.message}
                           </FormErrorMessage>
                         </FormControl>
 
@@ -262,13 +256,12 @@ const LinksOverview = ({ form }: LinkOverviewProps) => {
                           <FormLabel htmlFor={`links[${index}].buttonText`}>{t('cta:redirect_button_text')}</FormLabel>
                           <UI.InputHelper>{t('cta:redirect_button_text_helper')}</UI.InputHelper>
                           <UI.Input
-                            isInvalid={!!form.errors.links?.[index]?.buttonText}
-                            name={`links[${index}].buttonText`}
+                            isInvalid={!!form.formState.errors.links?.[index]?.buttonText}
                             defaultValue={link.buttonText}
-                            ref={form.register({ required: false })}
+                            {...form.register(`links.${index}.buttonText`, { required: false })}
                           />
                           <FormErrorMessage>
-                            {!!form.errors.links?.[index]?.buttonText?.message}
+                            {!!form.formState.errors.links?.[index]?.buttonText?.message}
                           </FormErrorMessage>
                         </FormControl>
 

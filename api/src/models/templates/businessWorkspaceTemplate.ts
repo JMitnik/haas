@@ -1,3 +1,4 @@
+
 import { LanguageEnum, NodeType } from '@prisma/client';
 import { defaultAdminRole, defaultBotRole, defaultBusinessTextFieldForm, defaultManagerRole, defaultUserRole, DemoWorkspaceTemplate } from './TemplateTypes';
 

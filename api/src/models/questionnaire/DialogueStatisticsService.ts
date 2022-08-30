@@ -230,6 +230,9 @@ class DialogueStatisticsService {
       refresh
     );
 
+    console.log(statisticSummaries);
+
+
     // Get all statistic summaries, and sum them up
     const cumulativeStats = statisticSummaries.reduce((acc, summary) => {
       acc.scoreSum += summary.impactScore;
@@ -423,6 +426,8 @@ class DialogueStatisticsService {
         startDateTime: startDateTime,
         endDateTime: endDateTimeSet,
       }
+
+      newCaches.push(data);
 
       void this.cacheService.createOrUpdate('dialogueStatisticsSummaryCache', nestedCacheId, data);
     });

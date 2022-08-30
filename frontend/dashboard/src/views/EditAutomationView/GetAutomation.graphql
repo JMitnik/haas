@@ -1,0 +1,141 @@
+query getAutomation($input: GetAutomationInput) {
+  automation(where: $input) {
+    id
+    createdAt
+    updatedAt
+    isActive
+    label
+    description
+    type
+    workspace {
+      slug
+      id
+    }
+    automationScheduled {
+      id
+      createdAt
+      updatedAt
+      type
+      minutes
+      hours
+      dayOfMonth
+      dayOfWeek
+      month
+      frequency
+      time
+      dayRange {
+        label
+        index
+      }
+      activeDialogue {
+        id
+        slug
+        title
+      }
+      actions {
+        id
+        # payload
+        type
+        channels {
+          id
+          type
+          payload
+        }
+      }
+    }
+    automationTrigger {
+      id
+      activeDialogue {
+        title
+        slug
+        id
+      }
+      actions {
+        id
+        type
+        payload
+      }
+      event {
+        id
+        type
+        dialogue {
+          title
+          slug
+          id
+        }
+        question {
+          id
+          title
+          type
+        }
+      }
+      # conditionBuilder {
+      #   id
+      #   type
+      #   childConditionBuilderId
+      #   childConditionBuilder {
+      #     id
+      #     type
+      #     conditions {
+      #       id
+      #       scope
+      #       operator
+      #       operands {
+      #         id
+      #         type
+      #         numberValue
+      #         textValue
+      #       }
+      #       dialogueScope {
+      #         id
+      #         aspect
+      #         aggregate {
+      #           id
+      #           type
+      #           latest
+      #         }
+      #       }
+      #       questionScope {
+      #         id
+      #         aspect
+      #         aggregate {
+      #           id
+      #           type
+      #           latest
+      #         }
+      #       }
+      #     }
+      #   }
+      #   conditions {
+      #     id
+      #     scope
+      #     operator
+      #     operands {
+      #       id
+      #       type
+      #       numberValue
+      #       textValue
+      #     }
+      #     dialogueScope {
+      #       id
+      #       aspect
+      #       aggregate {
+      #         id
+      #         type
+      #         latest
+      #       }
+      #     }
+      #     questionScope {
+      #       id
+      #       aspect
+      #       aggregate {
+      #         id
+      #         type
+      #         latest
+      #       }
+      #     }
+      #   }
+      # }
+    }
+  }
+}

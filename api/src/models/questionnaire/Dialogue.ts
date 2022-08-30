@@ -51,10 +51,16 @@ export const DialogueType = objectType({
     t.nonNull.string('title');
     t.nonNull.string('slug');
     t.nonNull.string('description');
+    t.string('template', {
+      resolve(parent) {
+        return parent.template;
+      },
+    });
 
     // Placeholder data related properties
     t.boolean('isWithoutGenData');
     t.boolean('wasGeneratedWithGenData');
+
     t.field('language', {
       type: LanguageEnumType,
     });

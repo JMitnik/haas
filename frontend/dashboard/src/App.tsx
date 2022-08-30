@@ -13,19 +13,20 @@ import { FirstTimeView } from 'views/FirstTimeView';
 import { GenerateWorkspaceView } from 'views/GenerateWorkspaceView';
 import { InteractionsOverview } from 'views/InteractionsOverview';
 import { ROUTES } from 'hooks/useNavigator';
-import { ReportView } from 'views/ReportView';
 import { SystemPermission } from 'types/generated-types';
 import { VerifyTokenView } from 'views/VerifyTokenView';
+import { WorkspaceReportView } from 'views/WorkspaceReportView';
 import { WorkspaceSettingsView } from 'views/WorkspaceSettingsView';
 import { fadeMotion } from 'components/animation/config';
-import { sub } from 'date-fns';
 import { useUser } from 'providers/UserProvider';
-import ActionsPage from 'pages/dashboard/actions';
+import ActionOverview from 'views/ActionsOverview/ActionsOverview';
+import AddAutomationView from 'views/AddAutomationView';
 import AddCustomerPage from 'pages/dashboard/customers/add';
 import AddDialogueView from 'views/AddDialogueView';
 import AddTriggerView from 'views/TriggerOverview/AddTriggerView';
 import AnalyticsPage from 'pages/dashboard/analytics';
 import AutodeckOverview from 'views/AutodeckOverview/AutodeckOverview';
+import AutomationsPage from 'pages/dashboard/automations/index';
 import CampaignsView from 'views/CampaignsView/CampaignsView';
 import CustomerPage from 'pages/dashboard/customer';
 import CustomerProvider from 'providers/CustomerProvider';
@@ -35,6 +36,7 @@ import DialogueBuilderPage from 'pages/dashboard/builder';
 import DialogueLayout from 'layouts/DialogueLayout';
 import DialogueOverview from 'views/DialogueOverview';
 import DialoguePage from 'pages/dashboard/dialogues/dialogue';
+import EditAutomationView from 'views/EditAutomationView';
 import EditDialogueView from 'views/EditDialogueView';
 import EditMePage from 'pages/me/edit';
 import EditTriggerView from 'views/TriggerOverview/EditTriggerView';
@@ -55,6 +57,13 @@ const CustomerRoutes = () => (
       <DialogueProvider>
         <WorkspaceLayout>
           <Switch>
+            <BotRoute
+              allowedPermission={SystemPermission.CanAccessReportPage}
+              path={ROUTES.WORKSPACE_REPORT_VIEW}
+              render={() => (
+                <WorkspaceReportView />
+              )}
+            />
             <CustomerRoute
               path="/dashboard/b/:customerSlug/d/:dialogueSlug"
               render={() => (
@@ -81,7 +90,7 @@ const CustomerRoutes = () => (
                       <GuardedRoute
                         allowedPermission={SystemPermission.CanBuildDialogue}
                         path="/dashboard/b/:customerSlug/d/:dialogueSlug/actions"
-                        render={() => <ActionsPage />}
+                        render={() => <ActionOverview />}
                       />
 
                       <GuardedRoute
@@ -122,6 +131,24 @@ const CustomerRoutes = () => (
                     <GuardedRoute
                       path="/dashboard/b/:customerSlug/analytics/"
                       render={() => <AnalyticsPage />}
+                    />
+
+                    <GuardedRoute
+                      allowedPermission={SystemPermission.CanCreateAutomations}
+                      path={ROUTES.NEW_AUTOMATION_VIEW}
+                      render={() => <AddAutomationView />}
+                    />
+
+                    <GuardedRoute
+                      allowedPermission={SystemPermission.CanUpdateAutomations}
+                      path={ROUTES.EDIT_AUTOMATION_VIEW}
+                      render={() => <EditAutomationView />}
+                    />
+
+                    <GuardedRoute
+                      allowedPermission={SystemPermission.CanViewAutomations}
+                      path="/dashboard/b/:customerSlug/automations/"
+                      render={() => <AutomationsPage />}
                     />
 
                     <GuardedRoute
@@ -213,28 +240,6 @@ const PublicRoutes = () => (
   </Switch>
 );
 
-const ReportRoutes = () => (
-  <AnimatePresence>
-    <CustomerProvider>
-      <DialogueProvider>
-        <Switch>
-          <BotRoute
-            allowedPermission={SystemPermission.CanAccessReportPage}
-            path={ROUTES.WEEKLY_REPORT_VIEW}
-            render={() => (
-              <ReportView
-                startDate={sub(new Date(), { weeks: 1 })}
-                dateLabel="last_week"
-                compareStatisticStartDate={sub(new Date(), { weeks: 2 })}
-              />
-            )}
-          />
-        </Switch>
-      </DialogueProvider>
-    </CustomerProvider>
-  </AnimatePresence>
-);
-
 const RootAppRoute = () => {
   const { isLoggedIn } = useUser();
 
@@ -287,7 +292,6 @@ const AppRoutes = () => (
         )}
       />
 
-      <Route path="/dashboard/b/:customerSlug/d/:dialogueSlug/_reports" render={() => <ReportRoutes />} />
       <Route path="/dashboard/b/:customerSlug" render={() => <CustomerRoutes />} />
 
       <GuardedRoute

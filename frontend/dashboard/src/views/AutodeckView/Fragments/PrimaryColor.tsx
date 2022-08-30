@@ -1,5 +1,5 @@
 import { Clipboard, Link2 } from 'react-feather';
-import { Controller, UseFormMethods } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import { FormControl, FormLabel } from '@chakra-ui/core';
 import { InputHelper, RadioButton, RadioButtons } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
@@ -7,15 +7,11 @@ import React from 'react';
 
 import ColorPickerInput from 'components/ColorPicker';
 
-import { FormDataProps } from '../Types';
 import ColorPaletteFragment from './ColorPalette';
 
-const PrimaryColourFragment = (
-  { form, isInEditing, palette }: {
-    form: UseFormMethods<FormDataProps>,
-    isInEditing: boolean, palette: Array<string>
-  },
-) => {
+const PrimaryColourFragment = ({ form, isInEditing, palette }: {
+  form: any, isInEditing: boolean, palette: Array<string>
+}) => {
   const { t } = useTranslation();
 
   return (
@@ -28,12 +24,12 @@ const PrimaryColourFragment = (
           control={form.control}
           key="customer_color_controller"
           name="useCustomColour"
-          render={({ onChange, onBlur, value }) => (
+          render={({ field }) => (
             <RadioButtons
-              value={value}
+              value={field.value}
               key="customer_color_key"
-              onChange={onChange}
-              onBlur={onBlur}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
             >
               <RadioButton
                 icon={Link2}
@@ -61,8 +57,8 @@ const PrimaryColourFragment = (
             control={form.control}
             name="primaryColour"
             defaultValue={palette?.[0] || '#BEE3F8'}
-            render={({ onChange, value }) => (
-              <ColorPaletteFragment palette={palette} form={form} onChange={onChange} value={value} />
+            render={({ field }) => (
+              <ColorPaletteFragment palette={palette} form={form} onChange={field.onChange} value={field.value} />
             )}
           />
         </FormControl>
@@ -71,14 +67,14 @@ const PrimaryColourFragment = (
       {form.watch('useCustomColour') === 0
         && (
           <>
-            <FormControl isInvalid={!!form.errors.primaryColour} isRequired>
+            <FormControl isInvalid={!!form.formState.errors.primaryColour} isRequired>
               <FormLabel htmlFor="primaryColour">{t('branding_color')}</FormLabel>
               <InputHelper>{t('customer:branding_color_helper')}</InputHelper>
               <Controller
                 control={form.control}
                 name="primaryColour"
                 defaultValue="#BEE3F8"
-                as={<ColorPickerInput />}
+                render={({ field }) => <ColorPickerInput {...field} />}
               />
             </FormControl>
           </>

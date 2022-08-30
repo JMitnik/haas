@@ -4,7 +4,7 @@ import { debounce } from 'lodash';
 import { useLazyQuery } from '@apollo/client';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { View } from 'layouts/View';
 import LinkIcon from 'components/Icons/LinkIcon';
@@ -15,10 +15,6 @@ import ShareIcon from 'components/Icons/ShareIcon';
 import getCTANodesQuery from 'queries/getCTANodes';
 
 import CallToActionCard from './CallToActionCard';
-
-interface ActionOverviewProps {
-  leafs: Array<any>;
-}
 
 const mapLeafs = (leafs: any) => leafs?.map((leaf: any) => {
   if (leaf.type === 'LINK') {
@@ -44,7 +40,25 @@ const mapLeafs = (leafs: any) => leafs?.map((leaf: any) => {
   }
 
   if (leaf.type === 'FORM') {
-    return { ...leaf, type: 'FORM', icon: RegisterIcon };
+    return {
+      ...leaf,
+      type: 'FORM',
+      icon: RegisterIcon,
+      form: {
+        fields: leaf.form.fields.map((field: any) => ({
+          ...field,
+          contact: {
+            contacts: field.contacts.map(
+              (contact: {
+                id: string,
+                lastName?: string,
+                firstName?: string
+              }) => ({ label: `${contact?.firstName} ${contact?.lastName}`, value: contact.id, type: 'USER' }),
+            ),
+          },
+        })),
+      },
+    };
   }
 
   return null;
@@ -74,7 +88,7 @@ const initializeCTAType = (type: string) => {
   return { label: 'None', value: '' };
 };
 
-const ActionOverview = ({ leafs }: ActionOverviewProps) => {
+const ActionOverview = () => {
   const { customerSlug, dialogueSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
   const [activeSearchTerm, setActiveSearchTerm] = useState('');
 
@@ -94,13 +108,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
     },
   });
 
-  const firstUpdate = useRef(true);
-
   useEffect(() => {
-    if (firstUpdate.current) {
-      firstUpdate.current = false;
-      return;
-    }
     fetchActions({
       variables: {
         customerSlug,
@@ -154,22 +162,6 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
               onNewCTAChange={setNewCTA}
             />
           )}
-
-          {!activeLeafs && leafs && leafs.map((leaf: any, index: number) => (
-            <CallToActionCard
-              key={index}
-              activeCTA={activeCTA}
-              onActiveCTAChange={setActiveCTA}
-              id={leaf.id}
-              Icon={leaf.icon}
-              title={leaf.title}
-              type={initializeCTAType(leaf.type)}
-              links={leaf.links}
-              share={leaf?.share}
-              form={leaf?.form}
-              onNewCTAChange={setNewCTA}
-            />
-          ))}
 
           {activeLeafs && activeLeafs?.map((leaf: any, index: number) => (
             <CallToActionCard
