@@ -1,5 +1,4 @@
 import * as UI from '@haas/ui';
-import { UseFormMethods } from 'react-hook-form';
 import React from 'react';
 
 export interface LinkInputProps {
@@ -17,7 +16,7 @@ export interface LinkInputProps {
 }
 
 export interface CTANodeFormProps {
-  form: UseFormMethods<FormDataProps>;
+  form: any;
 }
 
 export interface FormDataProps {
@@ -46,6 +45,13 @@ export interface FormDataProps {
       type: string;
       isRequired: boolean;
       position: number;
+      contact?: {
+        contacts: {
+          label: string;
+          value: string;
+          type: string;
+        }[]
+      }
     }[];
   };
 }

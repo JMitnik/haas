@@ -11,7 +11,7 @@ import { gql, useMutation } from '@apollo/client';
 import { motion } from 'framer-motion';
 import { useHistory, useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { yupResolver } from '@hookform/resolvers';
+import { yupResolver } from '@hookform/resolvers/yup';
 import React from 'react';
 import Select from 'react-select';
 
@@ -21,13 +21,13 @@ import getUsersQuery from 'queries/getUsers';
 
 const schema = yup.object().shape({
   email: yup.string().email('Expected email format').required(),
-  firstName: yup.string().ensure(),
-  lastName: yup.string().ensure(),
-  phone: yup.string().notRequired(),
+  firstName: yup.string().required(),
+  lastName: yup.string().required(),
+  phone: yup.string().notRequired().nullable(true),
   role: yup.object().shape({
     value: yup.string().required(),
-    label: yup.string().notRequired(),
-  }),
+    label: yup.string().required(),
+  }).required(),
 }).required();
 
 type FormDataProps = yup.InferType<typeof schema>;
@@ -71,7 +71,7 @@ const EditUserForm = ({ userCustomer }: { userCustomer: any }) => {
       email: userCustomer?.user?.email,
       firstName: userCustomer?.user?.firstName,
       lastName: userCustomer?.user?.lastName,
-      phone: userCustomer?.user?.phone,
+      phone: userCustomer?.user?.phone || null,
       role: {
         label: userCustomer?.role.name,
         value: userCustomer?.role.id,
@@ -147,49 +147,45 @@ const EditUserForm = ({ userCustomer }: { userCustomer: any }) => {
                 </Div>
                 <Div>
                   <InputGrid>
-                    <FormControl isRequired isInvalid={!!form.errors.firstName}>
+                    <FormControl isRequired isInvalid={!!form.formState.errors.firstName}>
                       <FormLabel htmlFor="firstName">{t('first_name')}</FormLabel>
                       <InputHelper>{t('first_name_helper')}</InputHelper>
                       <Input
                         placeholder="Jane"
                         leftEl={<User />}
-                        name="firstName"
-                        ref={form.register()}
+                        {...form.register('firstName')}
                       />
-                      <FormErrorMessage>{form.errors.firstName?.message}</FormErrorMessage>
+                      <FormErrorMessage>{form.formState.errors.firstName?.message}</FormErrorMessage>
                     </FormControl>
-                    <FormControl isRequired isInvalid={!!form.errors.lastName}>
+                    <FormControl isRequired isInvalid={!!form.formState.errors.lastName}>
                       <FormLabel htmlFor="lastName">{t('last_name')}</FormLabel>
                       <InputHelper>{t('last_name_helper')}</InputHelper>
                       <Input
                         placeholder="Doe"
                         leftEl={<User />}
-                        name="lastName"
-                        ref={form.register()}
+                        {...form.register('lastName')}
                       />
-                      <FormErrorMessage>{form.errors.lastName?.message}</FormErrorMessage>
+                      <FormErrorMessage>{form.formState.errors.lastName?.message}</FormErrorMessage>
                     </FormControl>
-                    <FormControl isInvalid={!!form.errors.phone}>
+                    <FormControl isInvalid={!!form.formState.errors.phone}>
                       <FormLabel htmlFor="phone">{t('phone')}</FormLabel>
                       <InputHelper>{t('phone_helper')}</InputHelper>
                       <Input
                         placeholder="Doe"
                         leftEl={<Phone />}
-                        name="phone"
-                        ref={form.register()}
+                        {...form.register('phone')}
                       />
-                      <FormErrorMessage>{form.errors.phone?.message}</FormErrorMessage>
+                      <FormErrorMessage>{form.formState.errors.phone?.message}</FormErrorMessage>
                     </FormControl>
-                    <FormControl isRequired isInvalid={!!form.errors.email}>
+                    <FormControl isRequired isInvalid={!!form.formState.errors.email}>
                       <FormLabel htmlFor="email">{t('email')}</FormLabel>
                       <InputHelper>{t('email_helper')}</InputHelper>
                       <Input
                         placeholder="Doe"
                         leftEl={<Mail />}
-                        name="email"
-                        ref={form.register()}
+                        {...form.register('email')}
                       />
-                      <FormErrorMessage>{form.errors.email?.message}</FormErrorMessage>
+                      <FormErrorMessage>{form.formState.errors.email?.message}</FormErrorMessage>
                     </FormControl>
                   </InputGrid>
                 </Div>
@@ -205,20 +201,25 @@ const EditUserForm = ({ userCustomer }: { userCustomer: any }) => {
                   </Muted>
                 </Div>
                 <Div>
-                  <FormControl isInvalid={!!form.errors.phone}>
+                  <FormControl isInvalid={!!form.formState.errors.phone}>
                     <FormLabel htmlFor="phone">{t('role_selector')}</FormLabel>
                     <InputHelper>{t('role_selector_helper')}</InputHelper>
                     <Controller
                       name="role"
-                      as={Select}
                       control={form.control}
-                      options={selectRoles}
+                      render={({ field }) => (
+                        <Select
+                          options={selectRoles}
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      )}
                     />
                   </FormControl>
                 </Div>
               </FormSection>
 
-              <ButtonGroup>
+              <ButtonGroup display="flex">
                 <UI.Button
                   isLoading={isLoading}
                   isDisabled={!form.formState.isValid}

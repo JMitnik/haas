@@ -17,7 +17,7 @@ import { isValidDateTime } from '../../../utils/isValidDate';
 import { DialogueStatisticsSummaryFilterInput, DialogueStatisticsSummaryModel, MostTrendingTopic } from '../../questionnaire';
 import { DialogueConnection, DialogueConnectionFilterInput } from '../../questionnaire';
 import { HealthScore, HealthScoreInput } from './HealthScore';
-import { Organization } from '../../Organization/graphql/OrganizationStructure';
+import { Organization } from '../../Organization/graphql/OrganizationModel';
 import { Issue, IssueFilterInput } from '../../Issue/graphql';
 import { IssueValidator } from '../../Issue/IssueValidator';
 import { SessionConnectionFilterInput } from '../../../models/session/graphql';
@@ -92,7 +92,9 @@ export const CustomerType = objectType({
     });
 
     /**
-     * Issues
+     * Issues (by dialogue)
+     *
+     * TODO: Refactor to refer to this as issueDialogues
      */
     t.list.field('issues', {
       type: Issue,
@@ -104,6 +106,20 @@ export const CustomerType = objectType({
         assertNonNullish(session?.user?.id, 'No user ID provided!');
 
         return await services.issueService.getProblemDialoguesByWorkspace(parent.id, filter, session.user.id);
+      },
+    });
+
+    /**
+     * Issues (by topic)
+     */
+    t.list.field('issueTopics', {
+      type: Issue,
+      nullable: true,
+      args: { input: IssueFilterInput },
+
+      resolve: async (parent, args, { services }) => {
+        const filter = IssueValidator.resolveFilter(args.input);
+        return await services.issueService.getWorkspaceIssues(parent.id, filter);
       },
     });
 
@@ -129,7 +145,7 @@ export const CustomerType = objectType({
       args: { filter: AutomationConnectionFilterInput },
       nullable: true,
       async resolve(parent, args, ctx) {
-        return ctx.services.automationService.paginatedAutomations(parent.slug, args.filter);
+        return ctx.services.automationService.paginatedAutomations(parent.slug, args.filter) as any;
       },
     });
 
@@ -298,7 +314,27 @@ export const CustomerType = objectType({
       // useQueryCounter: true,
       useTimeResolve: true,
       async resolve(parent, args, ctx) {
-        return null;
+        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+
+        let utcStartDateTime: Date | undefined;
+        let utcEndDateTime: Date | undefined;
+
+        if (args.input?.startDateTime) {
+          utcStartDateTime = isValidDateTime(args.input.startDateTime, 'START_DATE');
+        }
+
+        if (args.input?.endDateTime) {
+          utcEndDateTime = isValidDateTime(args.input.endDateTime, 'END_DATE');
+        }
+
+        return ctx.services.dialogueStatisticsService.findNestedDialogueStatisticsSummary(
+          parent.id,
+          args.input.impactType,
+          utcStartDateTime as Date,
+          utcEndDateTime,
+          args.input.refresh || false,
+        )
       },
     });
 

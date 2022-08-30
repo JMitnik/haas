@@ -43,13 +43,19 @@ class UserPrismaAdapter {
    * Finds the private dialogues assigned to an user
    * @param userId
    */
-  findPrivateDialogueOfUser = async (userId: string) => {
+  findPrivateDialogueOfUser = async (userId: string, workspaceSlug?: string) => {
     const user = await this.prisma.user.findUnique({
       where: {
         id: userId,
       },
       include: {
-        isAssignedTo: true,
+        isAssignedTo: workspaceSlug ? {
+          where: {
+            customer: {
+              slug: workspaceSlug,
+            },
+          },
+        } : true,
       },
     });
 

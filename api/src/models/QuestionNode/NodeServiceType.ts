@@ -2,6 +2,8 @@ import { Dialogue, LinkTypeEnum, NodeType } from '@prisma/client';
 import { NexusGenInputs } from '../../generated/nexus';
 import { QuestionConditionProps } from '../questionnaire/Dialogue.types';
 
+export type FormNodeInput = NexusGenInputs['FormNodeInputType'];
+
 export enum DialogueTemplateType {
   BUSINESS_ENG = 'BUSINESS_ENG',
   BUSINESS_NL = 'BUSINESS_NL',
@@ -9,6 +11,8 @@ export enum DialogueTemplateType {
   MASS_SEED = 'MASS_SEED',
   SPORT_ENG = 'SPORT_ENG',
   SPORT_NL = 'SPORT_NL',
+  TEACHER_ENG = 'TEACHER_ENG',
+  STUDENT_ENG = 'STUDENT_ENG',
 }
 
 export interface QuestionOptionProps {

@@ -124,6 +124,7 @@ export class CustomerPrismaAdapter {
     return this.prisma.customer.findUnique({
       where: { id: id },
       include: {
+        roles: true,
         settings: {
           include: {
             colourSettings: true,

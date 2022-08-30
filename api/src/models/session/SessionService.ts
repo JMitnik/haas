@@ -18,6 +18,8 @@ import prisma from '../../config/prisma';
 import Sentry from '../../config/sentry';
 import SessionPrismaAdapter from './SessionPrismaAdapter';
 import AutomationService from '../automations/AutomationService';
+
+import { CreateSessionInput } from './SessionPrismaAdapterType';
 import { CustomerService } from '../customer/CustomerService';
 import { logger } from '../../config/logger';
 
@@ -272,7 +274,7 @@ class SessionService {
   * Create a user-session from the client.
   */
   async createSession(sessionInput: any) {
-    const { dialogueId, entries } = sessionInput;
+    const { dialogueId, entries }: { dialogueId: string; entries: CreateSessionInput['entries'] } = sessionInput;
     const sliderNode = entries.find((entry: any) => entry?.data?.slider && entry?.depth === 0);
     const mainScore = sliderNode?.data?.slider?.value;
     const session = await this.sessionPrismaAdapter.createSession({
@@ -282,7 +284,7 @@ class SessionService {
       entries,
       dialogueId,
       createdAt: sessionInput?.createdAt,
-      mainScore,
+      mainScore: mainScore || undefined,
     });
 
     try {
@@ -319,11 +321,12 @@ class SessionService {
       logger.error('Something went wrong while handling sms triggers', error);
     };
 
-    try {
-      await this.automationService.handleTriggerAutomations(dialogueId);
-    } catch (error) {
-      logger.error('Something went wrong checking automation triggers', error);
-    }
+    // TODO: Set back?
+    // try {
+    //   await this.automationService.handleTriggerAutomations(dialogueId);
+    // } catch (error) {
+    //   logger.error('Something went wrong checking automation triggers', error);
+    // }
 
     return session;
   }

@@ -1,13 +1,13 @@
 import * as UI from '@haas/ui';
 import { AnimatePresence, AnimateSharedLayout, motion } from 'framer-motion';
+import { ChevronDown } from 'react-feather';
 import { LinkProps, NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
+import { ReactComponent as CPUIcon } from 'assets/icons/icon-cpu-sm.svg';
 import { ReactComponent as ChatIcon } from 'assets/icons/icon-chat-group-sm.svg';
-import { ChevronDown } from 'react-feather';
 import { ReactComponent as HomeIcon } from 'assets/icons/icon-view-grid-sm.svg';
-import { ReactComponent as NotificationIcon } from 'assets/icons/icon-notification-sm.svg';
 import { ReactComponent as SettingsIcon } from 'assets/icons/icon-cog-sm.svg';
 import { ReactComponent as SurveyIcon } from 'assets/icons/icon-survey-sm.svg';
 import { ReactComponent as UsersIcon } from 'assets/icons/icon-user-group-sm.svg';
@@ -43,10 +43,10 @@ export const WorkspaceNav = ({ customerSlug }: { customerSlug: string }) => {
   const {
     canViewUsers,
     canEditCustomer,
-    canCreateTriggers,
     canViewCampaigns,
     canBuildDialogues,
     canEditDialogue,
+    canViewAutomations,
   } = useAuth();
   const { dialogueMatch } = useNavigator();
   const dialogueSlug = dialogueMatch?.params?.dialogueSlug;
@@ -113,13 +113,13 @@ export const WorkspaceNav = ({ customerSlug }: { customerSlug: string }) => {
             <UsersIcon />
             {t('users')}
           </NavItem>
-          <NavItem isDisabled={!canCreateTriggers} to={`/dashboard/b/${customerSlug}/triggers`}>
-            <NotificationIcon />
-            {t('alerts')}
-          </NavItem>
           <NavItem isDisabled={!canViewCampaigns} to={`/dashboard/b/${customerSlug}/campaigns`}>
             <ChatIcon />
             {t('campaigns')}
+          </NavItem>
+          <NavItem isDisabled={!canViewAutomations} to={`/dashboard/b/${customerSlug}/automations`}>
+            <CPUIcon />
+            {t('automations')}
           </NavItem>
         </AnimateSharedLayout>
       </motion.ul>

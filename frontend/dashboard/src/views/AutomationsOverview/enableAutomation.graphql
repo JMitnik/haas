@@ -1,0 +1,7 @@
+mutation enableAutomation($input: EnableAutomationInput) {
+  enableAutomation(input: $input) {
+    id
+    label
+    isActive
+  }
+}

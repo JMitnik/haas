@@ -4,7 +4,7 @@ import { CustomerType } from '../../customer/graphql/Customer'
 
 export const DialogueTemplateType = enumType({
   name: 'DialogueTemplateType',
-  members: ['SPORT_ENG', 'SPORT_NL', 'BUSINESS_ENG', 'BUSINESS_NL', 'DEFAULT', 'MASS_SEED'],
+  members: ['TEACHER_ENG', 'STUDENT_ENG', 'SPORT_ENG', 'SPORT_NL', 'BUSINESS_ENG', 'BUSINESS_NL', 'DEFAULT', 'MASS_SEED'],
 })
 
 export const GenerateWorkspaceCSVInputType = inputObjectType({

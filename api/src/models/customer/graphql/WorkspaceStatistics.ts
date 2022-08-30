@@ -11,8 +11,10 @@ import {
 } from '../../questionnaire/DialogueStatisticsResolver';
 import { isValidDateTime } from '../../../utils/isValidDate';
 import { HealthScore, HealthScoreInput } from './HealthScore';
+import { WorkspaceStatisticsValidator } from '../WorkspaceStatisticsValidator';
 import { DialogueStatisticsSummaryModel } from '../../../models/questionnaire';
 import { assertNonNullish } from '../../../utils/assertNonNullish';
+import { DateHistogram } from '../../Common/Analytics/graphql/DateHistogram.graphql';
 
 export const WorkspaceStatistics = objectType({
   name: 'WorkspaceStatistics',
@@ -86,6 +88,38 @@ export const WorkspaceStatistics = objectType({
     });
 
     /**
+     * Histogram of responses over time.
+     */
+    t.field('responseHistogram', {
+      type: DateHistogram,
+      args: {
+        input: DialogueStatisticsSummaryFilterInput,
+      },
+      description: 'Histogram of responses over time.',
+
+      resolve: async (parent, args, { services }) => {
+        const filter = WorkspaceStatisticsValidator.resolveFilter(args.input);
+        return services.workspaceStatisticsService.getResponseHistogram(parent.id || '', filter);
+      },
+    })
+
+    /**
+     * Histogram of issues over time.
+     */
+    t.field('issueHistogram', {
+      type: DateHistogram,
+      args: {
+        input: DialogueStatisticsSummaryFilterInput,
+      },
+      description: 'Histogram of issues over time.',
+
+      resolve: async (parent, args, { services }) => {
+        const filter = WorkspaceStatisticsValidator.resolveFilter(args.input);
+        return services.workspaceStatisticsService.getIssueHistogram(parent.id || '', filter);
+      },
+    })
+
+    /**
      * Topics of a workspace ranked by either impact score or number of responses.
      */
     t.list.field('rankedTopics', {
@@ -115,7 +149,7 @@ export const WorkspaceStatistics = objectType({
           utcEndDateTime as Date,
           topicFilter,
           args.input.cutoff || undefined,
-        );
+        ) as any;
       },
     })
 

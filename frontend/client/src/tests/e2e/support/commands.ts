@@ -26,6 +26,17 @@
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 //
 
+// @ts-ignore
+const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+
+const setInput = (inputs: any, score: number) => {
+  const mainInput = inputs[0];
+
+  nativeInputValueSetter?.call(mainInput, score);
+  // @ts-ignore
+  mainInput.dispatchEvent(new Event('change', { value: score, bubbles: true }));
+};
+
 /**
  * Adds the ability to slide the slider to a given value.
  *
@@ -44,15 +55,11 @@ Cypress.Commands.add('slide', (score, wait) => {
     .focus()
     .trigger('change');
 
-  cy.findByTestId('slider')
-    .invoke('val', bound)
-    .trigger('change');
+  cy.findByTestId('slider').then((inputs) => setInput(inputs, bound));
 
   cy.wait((wait / 2) * 1000);
 
-  cy.findByTestId('slider')
-    .invoke('val', score)
-    .trigger('change');
+  cy.findByTestId('slider').then((inputs) => setInput(inputs, score));
 
   cy.findByTestId('slider')
     .trigger('mouseup');

@@ -84,7 +84,7 @@ export const CardBody = styled(Div) <CardBodyProps>`
     `}
 
     ${_size === 'lg' && css`
-      padding: ${theme.gutter * 1.25}px;
+      padding: ${theme.gutter * 1}px;
     `}
   `}
 `;
@@ -120,6 +120,10 @@ export const Card = styled(Div) <CardProps>`
     border-radius: ${theme.borderRadiuses.lg}px;
     box-shadow: ${theme.boxShadows[boxShadow]};
     transition: all ${theme.transitions.normal};
+
+    ${CardBody} + ${CardBody} {
+      border-top: 1px solid ${theme.colors.neutral[500]};
+    }
 
     ${hasHover && css`
       cursor: pointer;

@@ -77,12 +77,33 @@ export type AutodeckConnectionType = DeprecatedConnectionInterface & {
   jobs?: Maybe<Array<Maybe<CreateWorkspaceJobType>>>;
 };
 
+/** AutomationActionChannel */
+export type AutomationActionChannel = {
+  __typename?: 'AutomationActionChannel';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['Date']>;
+  updatedAt?: Maybe<Scalars['Date']>;
+  type?: Maybe<AutomationActionChannelType>;
+  payload?: Maybe<Scalars['JSONObject']>;
+};
+
+export type AutomationActionChannelInput = {
+  id?: Maybe<Scalars['ID']>;
+};
+
+export enum AutomationActionChannelType {
+  Sms = 'SMS',
+  Email = 'EMAIL',
+  Slack = 'SLACK'
+}
+
 export type AutomationActionInput = {
   id?: Maybe<Scalars['ID']>;
   type?: Maybe<AutomationActionType>;
   apiKey?: Maybe<Scalars['String']>;
   endpoint?: Maybe<Scalars['String']>;
   payload?: Maybe<Scalars['JSONObject']>;
+  channels?: Maybe<Array<Maybe<AutomationActionChannelInput>>>;
 };
 
 /** AutomationAction */
@@ -92,13 +113,19 @@ export type AutomationActionModel = {
   createdAt?: Maybe<Scalars['Date']>;
   updatedAt?: Maybe<Scalars['Date']>;
   type?: Maybe<AutomationActionType>;
+  channels?: Maybe<Array<Maybe<AutomationActionChannel>>>;
+  payload?: Maybe<Scalars['JSONObject']>;
 };
 
 export enum AutomationActionType {
   SendSms = 'SEND_SMS',
   SendEmail = 'SEND_EMAIL',
   ApiCall = 'API_CALL',
-  GenerateReport = 'GENERATE_REPORT',
+  SendDialogueLink = 'SEND_DIALOGUE_LINK',
+  WeekReport = 'WEEK_REPORT',
+  MonthReport = 'MONTH_REPORT',
+  YearReport = 'YEAR_REPORT',
+  CustomReport = 'CUSTOM_REPORT',
   Webhook = 'WEBHOOK'
 }
 
@@ -197,7 +224,8 @@ export type AutomationConnectionOrderByInput = {
 /** Fields to order UserConnection by. */
 export enum AutomationConnectionOrderType {
   UpdatedAt = 'updatedAt',
-  Type = 'type'
+  Type = 'type',
+  CreatedAt = 'createdAt'
 }
 
 export type AutomationEventInput = {
@@ -239,7 +267,39 @@ export type AutomationModel = {
   description?: Maybe<Scalars['String']>;
   type?: Maybe<AutomationType>;
   automationTrigger?: Maybe<AutomationTriggerModel>;
+  automationScheduled?: Maybe<AutomationScheduledModel>;
   workspace?: Maybe<Customer>;
+};
+
+export type AutomationScheduleInput = {
+  id?: Maybe<Scalars['ID']>;
+  type: RecurringPeriodType;
+  minutes: Scalars['String'];
+  hours: Scalars['String'];
+  dayOfMonth: Scalars['String'];
+  month: Scalars['String'];
+  dayOfWeek: Scalars['String'];
+  dialogueId?: Maybe<Scalars['String']>;
+};
+
+/** AutomationScheduled */
+export type AutomationScheduledModel = {
+  __typename?: 'AutomationScheduledModel';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['Date']>;
+  updatedAt?: Maybe<Scalars['Date']>;
+  type?: Maybe<RecurringPeriodType>;
+  minutes?: Maybe<Scalars['String']>;
+  hours?: Maybe<Scalars['String']>;
+  dayOfMonth?: Maybe<Scalars['String']>;
+  month?: Maybe<Scalars['String']>;
+  dayOfWeek?: Maybe<Scalars['String']>;
+  dialogueId?: Maybe<Scalars['String']>;
+  frequency?: Maybe<Scalars['String']>;
+  time?: Maybe<Scalars['String']>;
+  dayRange?: Maybe<Array<Maybe<DayRange>>>;
+  actions?: Maybe<Array<Maybe<AutomationActionModel>>>;
+  activeDialogue?: Maybe<Dialogue>;
 };
 
 /** AutomationTrigger */
@@ -248,6 +308,7 @@ export type AutomationTriggerModel = {
   id?: Maybe<Scalars['ID']>;
   createdAt?: Maybe<Scalars['Date']>;
   updatedAt?: Maybe<Scalars['Date']>;
+  activeDialogue?: Maybe<Dialogue>;
   event?: Maybe<AutomationEventModel>;
   conditionBuilder?: Maybe<AutomationConditionBuilderModel>;
   actions?: Maybe<Array<Maybe<AutomationActionModel>>>;
@@ -255,7 +316,8 @@ export type AutomationTriggerModel = {
 
 export enum AutomationType {
   Trigger = 'TRIGGER',
-  Campaign = 'CAMPAIGN'
+  Campaign = 'CAMPAIGN',
+  Scheduled = 'SCHEDULED'
 }
 
 /** Basic statistics for a general statistics */
@@ -429,6 +491,7 @@ export type CreateAutomationInput = {
   automationType?: Maybe<AutomationType>;
   event?: Maybe<AutomationEventInput>;
   conditionBuilder?: Maybe<AutomationConditionBuilderInput>;
+  schedule?: Maybe<AutomationScheduleInput>;
   actions?: Maybe<Array<Maybe<AutomationActionInput>>>;
 };
 
@@ -695,6 +758,17 @@ export type DateHistogramItem = {
   frequency: Scalars['Int'];
 };
 
+
+export type DayRange = {
+  __typename?: 'DayRange';
+  label?: Maybe<Scalars['String']>;
+  index?: Maybe<Scalars['Int']>;
+};
+
+export type DeleteAutomationInput = {
+  workspaceId: Scalars['String'];
+  automationId: Scalars['String'];
+};
 
 export type DeleteDialogueInputType = {
   id?: Maybe<Scalars['ID']>;
@@ -1062,6 +1136,12 @@ export type EditWorkspaceInput = {
   primaryColour: Scalars['String'];
 };
 
+export type EnableAutomationInput = {
+  workspaceId: Scalars['String'];
+  automationId: Scalars['String'];
+  state: Scalars['Boolean'];
+};
+
 export type FailedDeliveryModel = {
   __typename?: 'FailedDeliveryModel';
   record?: Maybe<Scalars['String']>;
@@ -1086,6 +1166,7 @@ export type FormNodeEntryFieldInput = {
   url?: Maybe<Scalars['String']>;
   shortText?: Maybe<Scalars['String']>;
   longText?: Maybe<Scalars['String']>;
+  contacts?: Maybe<Scalars['String']>;
   number?: Maybe<Scalars['Int']>;
 };
 
@@ -1119,6 +1200,7 @@ export type FormNodeField = {
   isRequired?: Maybe<Scalars['Boolean']>;
   position?: Maybe<Scalars['Int']>;
   placeholder?: Maybe<Scalars['String']>;
+  contacts?: Maybe<Array<Maybe<UserType>>>;
 };
 
 export type FormNodeFieldInput = {
@@ -1128,6 +1210,7 @@ export type FormNodeFieldInput = {
   type?: Maybe<FormNodeFieldTypeEnum>;
   isRequired?: Maybe<Scalars['Boolean']>;
   position?: Maybe<Scalars['Int']>;
+  userIds?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
 /** The types a field can assume */
@@ -1137,7 +1220,8 @@ export enum FormNodeFieldTypeEnum {
   Url = 'url',
   ShortText = 'shortText',
   LongText = 'longText',
-  Number = 'number'
+  Number = 'number',
+  Contacts = 'contacts'
 }
 
 export type FormNodeInputType = {
@@ -1190,6 +1274,7 @@ export type GenerateWorkspaceCsvInputType = {
   managerCsv?: Maybe<Scalars['Upload']>;
   type?: Scalars['String'];
   generateDemoData?: Maybe<Scalars['Boolean']>;
+  isDemo?: Scalars['Boolean'];
 };
 
 export type GetAutomationInput = {
@@ -1425,6 +1510,10 @@ export type Mutation = {
   /** Creates a new automation. */
   createAutomation?: Maybe<AutomationModel>;
   updateAutomation?: Maybe<AutomationModel>;
+  enableAutomation?: Maybe<AutomationModel>;
+  deleteAutomation?: Maybe<AutomationModel>;
+  sendAutomationDialogueLink?: Maybe<Scalars['Boolean']>;
+  sendAutomationReport?: Maybe<Scalars['Boolean']>;
   createCampaign?: Maybe<CampaignType>;
   createBatchDeliveries?: Maybe<CreateBatchDeliveriesOutputType>;
   updateDeliveryStatus?: Maybe<Scalars['String']>;
@@ -1565,6 +1654,26 @@ export type MutationCreateAutomationArgs = {
 
 export type MutationUpdateAutomationArgs = {
   input?: Maybe<CreateAutomationInput>;
+};
+
+
+export type MutationEnableAutomationArgs = {
+  input?: Maybe<EnableAutomationInput>;
+};
+
+
+export type MutationDeleteAutomationArgs = {
+  input?: Maybe<DeleteAutomationInput>;
+};
+
+
+export type MutationSendAutomationDialogueLinkArgs = {
+  input?: Maybe<SendAutomationDialogueLinkInput>;
+};
+
+
+export type MutationSendAutomationReportArgs = {
+  input?: Maybe<SendAutomationReportInput>;
 };
 
 
@@ -1971,6 +2080,12 @@ export type PermssionType = {
   customer?: Maybe<Customer>;
 };
 
+export type PickerEntryInput = {
+  label: Scalars['String'];
+  value: Scalars['String'];
+  type: Scalars['String'];
+};
+
 export type PreviewDataType = {
   __typename?: 'PreviewDataType';
   colors?: Maybe<Array<Maybe<Scalars['String']>>>;
@@ -2267,12 +2382,15 @@ export type RecipientsInputType = {
 };
 
 export enum RecurringPeriodType {
+  EveryYear = 'EVERY_YEAR',
+  EveryMonth = 'EVERY_MONTH',
   EveryWeek = 'EVERY_WEEK',
   EveryDay = 'EVERY_DAY',
   StartOfDay = 'START_OF_DAY',
   EndOfDay = 'END_OF_DAY',
   StartOfWeek = 'START_OF_WEEK',
-  EndOfWeek = 'END_OF_WEEK'
+  EndOfWeek = 'END_OF_WEEK',
+  Custom = 'CUSTOM'
 }
 
 export type RefreshAccessTokenOutput = {
@@ -2353,6 +2471,17 @@ export type SandboxInput = {
   name?: Maybe<Scalars['String']>;
   onlyGet?: Maybe<Scalars['Boolean']>;
   value?: Maybe<Scalars['Int']>;
+};
+
+export type SendAutomationDialogueLinkInput = {
+  workspaceSlug: Scalars['String'];
+  automationScheduleId: Scalars['String'];
+};
+
+export type SendAutomationReportInput = {
+  workspaceSlug: Scalars['String'];
+  automationActionId: Scalars['String'];
+  reportUrl: Scalars['String'];
 };
 
 export type Session = {
@@ -2687,6 +2816,7 @@ export enum TriggerTypeEnum {
 export type UpdateCtaInputType = {
   id?: Maybe<Scalars['String']>;
   customerId?: Maybe<Scalars['ID']>;
+  customerSlug: Scalars['String'];
   title?: Maybe<Scalars['String']>;
   type?: Maybe<QuestionNodeTypeEnum>;
   links?: Maybe<CtaLinksInputType>;
@@ -3086,6 +3216,10 @@ export type QuestionFragmentFragment = (
     & { fields?: Maybe<Array<(
       { __typename?: 'FormNodeField' }
       & Pick<FormNodeField, 'id' | 'label' | 'type' | 'placeholder' | 'isRequired' | 'position'>
+      & { contacts?: Maybe<Array<Maybe<(
+        { __typename?: 'UserType' }
+        & Pick<UserType, 'id' | 'email' | 'firstName' | 'lastName'>
+      )>>> }
     )>> }
   )>, links: Array<(
     { __typename?: 'LinkType' }
@@ -3199,6 +3333,12 @@ export const QuestionFragmentFragmentDoc = gql`
       placeholder
       isRequired
       position
+      contacts {
+        id
+        email
+        firstName
+        lastName
+      }
     }
   }
   links {
@@ -3530,6 +3670,7 @@ export namespace QuestionFragment {
   export type Share = (NonNullable<QuestionFragmentFragment['share']>);
   export type Form = (NonNullable<QuestionFragmentFragment['form']>);
   export type Fields = NonNullable<(NonNullable<(NonNullable<QuestionFragmentFragment['form']>)['fields']>)[number]>;
+  export type Contacts = NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<QuestionFragmentFragment['form']>)['fields']>)[number]>['contacts']>)[number]>;
   export type Links = NonNullable<(NonNullable<QuestionFragmentFragment['links']>)[number]>;
   export type SliderNode = (NonNullable<QuestionFragmentFragment['sliderNode']>);
   export type Markers = NonNullable<(NonNullable<(NonNullable<QuestionFragmentFragment['sliderNode']>)['markers']>)[number]>;

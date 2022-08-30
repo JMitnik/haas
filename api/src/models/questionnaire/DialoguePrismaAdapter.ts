@@ -423,9 +423,14 @@ class DialoguePrismaAdapter {
     });
   };
 
-  getDialogueById(dialogueId: string): Promise<Dialogue | null> {
+  getDialogueById = async (dialogueId: string, includeCustomer?: boolean): Promise<Dialogue | null> => {
     return this.prisma.dialogue.findUnique({
       where: { id: dialogueId },
+      include: includeCustomer
+        ? {
+          customer: true,
+        }
+        : undefined,
     });
   };
 
@@ -447,7 +452,11 @@ class DialoguePrismaAdapter {
       include: {
         form: {
           include: {
-            fields: true,
+            fields: {
+              include: {
+                contacts: true,
+              },
+            },
           },
         },
       },

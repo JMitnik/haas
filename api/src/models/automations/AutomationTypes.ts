@@ -1,19 +1,11 @@
 import {
   AutomationActionType, AutomationConditionBuilder, AutomationConditionOperand, AutomationConditionOperatorType,
-  AutomationConditionScopeType, AutomationEvent, AutomationType, ConditionPropertyAggregate,
+  AutomationConditionScopeType, AutomationEvent, AutomationType, ConditionPropertyAggregate, Prisma,
   Customer, Dialogue, DialogueConditionScope, NodeType, QuestionAspect, QuestionConditionScope, QuestionNode,
   WorkspaceConditionScope, AutomationCondition as PrismaAutomationCondition, AutomationConditionBuilderType,
 } from '@prisma/client';
 
 import { NexusGenEnums } from '../../generated/nexus';
-
-type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
-
-/**
- * XOR is needed to have a real mutually exclusive union type
- * https://stackoverflow.com/questions/42123407/does-typescript-support-mutually-exclusive-types
- */
-type XOR<T, U> = (T | U) extends object ? (Without<T, U> & U) | (Without<U, T> & T) : T | U;
 
 export interface SetupQuestionCompareDataInput {
   questionId: string;
@@ -131,8 +123,11 @@ export interface CreateAutomationInput {
     eventType: NexusGenEnums['AutomationEventType']; // AutomationEventType
     questionId?: string | null; // String
   };
-  conditionBuilder: CreateConditionBuilderInput;
+  conditionBuilder?: CreateConditionBuilderInput;
   conditions?: CreateAutomationConditionInput[];
+
+  schedule?: Prisma.AutomationScheduledCreateInput;
+
   actions: CreateAutomationActionInput[];
 };
 
@@ -140,6 +135,7 @@ export interface CreateAutomationActionInput {
   type: NexusGenEnums['AutomationActionType'];
   apiKey?: string | null;
   endpoint?: string | null;
+  channels: Prisma.AutomationActionChannelCreateInput[];
   payload?: object | null;
 }
 
@@ -152,8 +148,8 @@ export interface UpdateAutomationInput extends CreateAutomationInput {
   automationTriggerId?: string;
   automationCampaignId?: string;
   actions: UpdateAutomationActionInput[];
-  conditions: UpdateAutomationConditionInput[];
-  conditionBuilder: UpdateConditionBuilderInput;
+  conditions?: UpdateAutomationConditionInput[];
+  conditionBuilder?: UpdateConditionBuilderInput;
 }
 
 export type MoreXOR = CreateQuestionScopeInput['aspect'] | CreateDialogueScopeInput['aspect'] | CreateWorkspaceScopeInput['aspect']
@@ -245,3 +241,15 @@ export interface CheckedConditions {
   AND?: (boolean | CheckedConditions)[];
   OR?: (boolean | CheckedConditions)[];
 }
+
+export const defaultAutomationFields = Prisma.validator<Prisma.AutomationArgs>()({
+  include: {
+    automationScheduled: {
+      include: {
+        actions: true,
+      },
+    },
+  },
+});
+
+export type Automation = Prisma.AutomationGetPayload<typeof defaultAutomationFields>;
