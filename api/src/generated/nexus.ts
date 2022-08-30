@@ -258,6 +258,11 @@ export interface NexusGenInputs {
     type?: string | null; // String
     unhappyText?: string | null; // String
   }
+  CreateTopicInput: { // input type
+    name: string; // String!
+    subTopics?: Array<NexusGenInputs['CreateTopicInput'] | null> | null; // [CreateTopicInput]
+    type: NexusGenEnums['TopicEnumType'] | null; // TopicEnumType
+  }
   CreateTriggerInputType: { // input type
     customerSlug?: string | null; // String
     recipients?: NexusGenInputs['RecipientsInputType'] | null; // RecipientsInputType
@@ -599,6 +604,10 @@ export interface NexusGenInputs {
   RequestInviteInput: { // input type
     email: string; // String!
   }
+  RevokeTopicInput: { // input type
+    subTopic: string; // String!
+    topic: string; // String!
+  }
   RoleDataInput: { // input type
     description?: string | null; // String
     name?: string | null; // String
@@ -832,6 +841,7 @@ export interface NexusGenEnums {
   StatusType: "CLOSED" | "IN_PROGRESS" | "OPEN"
   SystemPermission: "CAN_ACCESS_ADMIN_PANEL" | "CAN_ACCESS_REPORT_PAGE" | "CAN_ADD_USERS" | "CAN_ASSIGN_USERS_TO_DIALOGUE" | "CAN_BUILD_DIALOGUE" | "CAN_CREATE_AUTOMATIONS" | "CAN_CREATE_CAMPAIGNS" | "CAN_CREATE_DELIVERIES" | "CAN_CREATE_TRIGGERS" | "CAN_DELETE_DIALOGUE" | "CAN_DELETE_TRIGGERS" | "CAN_DELETE_USERS" | "CAN_DELETE_WORKSPACE" | "CAN_DOWNLOAD_REPORTS" | "CAN_EDIT_DIALOGUE" | "CAN_EDIT_USERS" | "CAN_EDIT_WORKSPACE" | "CAN_GENERATE_WORKSPACE_FROM_CSV" | "CAN_RESET_WORKSPACE_DATA" | "CAN_UPDATE_AUTOMATIONS" | "CAN_VIEW_AUTOMATIONS" | "CAN_VIEW_CAMPAIGNS" | "CAN_VIEW_DIALOGUE" | "CAN_VIEW_DIALOGUE_ANALYTICS" | "CAN_VIEW_USERS"
   TagTypeEnum: "AGENT" | "DEFAULT" | "LOCATION"
+  TopicEnumType: "SYSTEM" | "WORKSPACE"
   TriggerConditionEnum: prisma.TriggerConditionEnum
   TriggerMediumEnum: "BOTH" | "EMAIL" | "PHONE"
   TriggerTypeEnum: "QUESTION" | "SCHEDULED"
@@ -1343,6 +1353,7 @@ export interface NexusGenObjects {
     unhappyText?: string | null; // String
   }
   Tag: prisma.Tag;
+  Topic: prisma.Topic;
   TopicDelta: { // root type
     averageCurrent?: number | null; // Float
     averagePrevious?: number | null; // Float
@@ -1358,13 +1369,7 @@ export interface NexusGenObjects {
     nodeEntryId?: string | null; // String
     value?: string | null; // String
   }
-  TopicType: { // root type
-    basicStats?: NexusGenRootTypes['BasicStatistics'] | null; // BasicStatistics
-    impactScore?: number | null; // Float
-    name: string; // String!
-    nrVotes?: number | null; // Int
-    subTopics?: Array<NexusGenRootTypes['TopicType'] | null> | null; // [TopicType]
-  }
+  TopicType: prisma.TopicType;
   TriggerConditionType: { // root type
     id?: number | null; // Int
     maxValue?: number | null; // Int
@@ -1749,6 +1754,7 @@ export interface NexusGenFieldTypes {
     slug: string; // String!
     statistics: NexusGenRootTypes['DialogueStatistics'] | null; // DialogueStatistics
     tags: Array<NexusGenRootTypes['Tag'] | null> | null; // [Tag]
+    template: string | null; // String
     title: string; // String!
     topic: NexusGenRootTypes['TopicType'] | null; // TopicType
     updatedAt: string | null; // String
@@ -1958,6 +1964,7 @@ export interface NexusGenFieldTypes {
     createRole: NexusGenRootTypes['RoleType'] | null; // RoleType
     createSession: NexusGenRootTypes['Session'] | null; // Session
     createTag: NexusGenRootTypes['Tag'] | null; // Tag
+    createTopic: boolean | null; // Boolean
     createTrigger: NexusGenRootTypes['TriggerType'] | null; // TriggerType
     createWorkspace: NexusGenRootTypes['Customer'] | null; // Customer
     deleteAutomation: NexusGenRootTypes['AutomationModel'] | null; // AutomationModel
@@ -1986,6 +1993,7 @@ export interface NexusGenFieldTypes {
     requestInvite: NexusGenRootTypes['RequestInviteOutput'] | null; // RequestInviteOutput
     resetWorkspaceData: boolean | null; // Boolean
     retryAutodeckJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
+    revokeTopic: NexusGenRootTypes['Topic'] | null; // Topic
     sandbox: string | null; // String
     sendAutomationDialogueLink: boolean | null; // Boolean
     sendAutomationReport: boolean | null; // Boolean
@@ -2234,6 +2242,15 @@ export interface NexusGenFieldTypes {
     id: string | null; // ID
     name: string | null; // String
     type: NexusGenEnums['TagTypeEnum'] | null; // TagTypeEnum
+  }
+  Topic: { // field return type
+    id: string; // ID!
+    name: string; // String!
+    parentTopics: Array<NexusGenRootTypes['Topic'] | null> | null; // [Topic]
+    subTopics: Array<NexusGenRootTypes['Topic'] | null> | null; // [Topic]
+    type: string; // String!
+    usedByOptions: Array<NexusGenRootTypes['QuestionOption'] | null> | null; // [QuestionOption]
+    workspace: NexusGenRootTypes['Customer'] | null; // Customer
   }
   TopicDelta: { // field return type
     averageCurrent: number | null; // Float
@@ -2660,6 +2677,7 @@ export interface NexusGenFieldTypeNames {
     slug: 'String'
     statistics: 'DialogueStatistics'
     tags: 'Tag'
+    template: 'String'
     title: 'String'
     topic: 'TopicType'
     updatedAt: 'String'
@@ -2869,6 +2887,7 @@ export interface NexusGenFieldTypeNames {
     createRole: 'RoleType'
     createSession: 'Session'
     createTag: 'Tag'
+    createTopic: 'Boolean'
     createTrigger: 'TriggerType'
     createWorkspace: 'Customer'
     deleteAutomation: 'AutomationModel'
@@ -2897,6 +2916,7 @@ export interface NexusGenFieldTypeNames {
     requestInvite: 'RequestInviteOutput'
     resetWorkspaceData: 'Boolean'
     retryAutodeckJob: 'CreateWorkspaceJobType'
+    revokeTopic: 'Topic'
     sandbox: 'String'
     sendAutomationDialogueLink: 'Boolean'
     sendAutomationReport: 'Boolean'
@@ -3145,6 +3165,15 @@ export interface NexusGenFieldTypeNames {
     id: 'ID'
     name: 'String'
     type: 'TagTypeEnum'
+  }
+  Topic: { // field return type name
+    id: 'ID'
+    name: 'String'
+    parentTopics: 'Topic'
+    subTopics: 'Topic'
+    type: 'String'
+    usedByOptions: 'QuestionOption'
+    workspace: 'Customer'
   }
   TopicDelta: { // field return type name
     averageCurrent: 'Float'
@@ -3428,6 +3457,9 @@ export interface NexusGenArgTypes {
       name?: string | null; // String
       type?: NexusGenEnums['TagTypeEnum'] | null; // TagTypeEnum
     }
+    createTopic: { // args
+      input?: NexusGenInputs['CreateTopicInput'][] | null; // [CreateTopicInput!]
+    }
     createTrigger: { // args
       input?: NexusGenInputs['CreateTriggerInputType'] | null; // CreateTriggerInputType
     }
@@ -3522,6 +3554,9 @@ export interface NexusGenArgTypes {
     }
     retryAutodeckJob: { // args
       jobId?: string | null; // String
+    }
+    revokeTopic: { // args
+      input?: NexusGenInputs['RevokeTopicInput'] | null; // RevokeTopicInput
     }
     sandbox: { // args
       input?: NexusGenInputs['SandboxInput'] | null; // SandboxInput

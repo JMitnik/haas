@@ -556,7 +556,7 @@ class TemplateService {
 
     // Positive Sub child 2
     const notCompletelySatisfied = await this.nodeService.createQuestionNode(
-      'What\'s going well, but can be improved?', dialogueId, NodeType.CHOICE, sportOptionsEng, false);
+      'What\'s going well, but can be improved?', dialogueId, NodeType.CHOICE, sportOptionsEng, false, hrWillContactCTA);
 
     // Negative Sub child 3
     const negative = await this.nodeService.createQuestionNode(

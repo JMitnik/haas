@@ -527,6 +527,13 @@ input CreateQuestionNodeInputType {
   unhappyText: String
 }
 
+"""Creates a topic (with subTopics) based on input"""
+input CreateTopicInput {
+  name: String!
+  subTopics: [CreateTopicInput]
+  type: TopicEnumType = SYSTEM
+}
+
 input CreateTriggerInputType {
   customerSlug: String
   recipients: RecipientsInputType
@@ -789,6 +796,7 @@ type Dialogue {
   slug: String!
   statistics(input: DialogueFilterInputType): DialogueStatistics
   tags: [Tag]
+  template: String
   title: String!
   topic(input: TopicInputType): TopicType
   updatedAt: String
@@ -1346,6 +1354,9 @@ type Mutation {
   createRole(data: RoleInput): RoleType
   createSession(input: SessionInput): Session
   createTag(customerSlug: String, name: String, type: TagTypeEnum): Tag
+
+  """Creates a list of topics and its subtopics."""
+  createTopic(input: [CreateTopicInput!]): Boolean
   createTrigger(input: CreateTriggerInputType): TriggerType
   createWorkspace(input: CreateWorkspaceInput): Customer
   deleteAutomation(input: DeleteAutomationInput): AutomationModel
@@ -1384,6 +1395,7 @@ type Mutation {
   requestInvite(input: RequestInviteInput): RequestInviteOutput
   resetWorkspaceData(workspaceId: String): Boolean
   retryAutodeckJob(jobId: String): CreateWorkspaceJobType
+  revokeTopic(input: RevokeTopicInput): Topic
   sandbox(input: SandboxInput): String
   sendAutomationDialogueLink(input: SendAutomationDialogueLinkInput): Boolean
   sendAutomationReport(input: SendAutomationReportInput): Boolean
@@ -1807,6 +1819,12 @@ type RequestInviteOutput {
   userExists: Boolean
 }
 
+"""Revokes a sub topic from a topic based on input"""
+input RevokeTopicInput {
+  subTopic: String!
+  topic: String!
+}
+
 type RoleConnection implements DeprecatedConnectionInterface {
   cursor: String
   endDate: String
@@ -2065,6 +2083,19 @@ input TextboxNodeEntryInput {
   value: String
 }
 
+"""Model for topic"""
+type Topic {
+  id: ID!
+  name: String!
+  parentTopics: [Topic]
+  subTopics: [Topic]
+  type: String!
+
+  """A list of question options to which this topic is assigned to."""
+  usedByOptions: [QuestionOption]
+  workspace: Customer
+}
+
 type TopicDelta {
   averageCurrent: Float
   averagePrevious: Float
@@ -2073,6 +2104,12 @@ type TopicDelta {
   nrVotes: Int
   percentageChanged: Float
   topic: String
+}
+
+"""All the different types a topic can be."""
+enum TopicEnumType {
+  SYSTEM
+  WORKSPACE
 }
 
 """Generic filter object for filtering topics"""
