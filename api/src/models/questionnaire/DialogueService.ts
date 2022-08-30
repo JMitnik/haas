@@ -3,7 +3,7 @@ import _, { clone, groupBy, maxBy, meanBy, orderBy, sample, uniq } from 'lodash'
 import cuid from 'cuid';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import { isPresent } from 'ts-is-present';
-import { Prisma, Dialogue, LanguageEnum, NodeType, PostLeafNode, Tag, PrismaClient, Edge, NodeEntry, SliderNodeEntry, ChoiceNodeEntry, DialogueImpactScore, Session } from '@prisma/client';
+import { Prisma, Dialogue, LanguageEnum, NodeType, PostLeafNode, Tag, PrismaClient, Edge, NodeEntry, SliderNodeEntry, ChoiceNodeEntry, DialogueImpactScore, Session, DialogueTemplateType } from '@prisma/client';
 
 import NodeService from '../QuestionNode/NodeService';
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
@@ -25,7 +25,6 @@ import QuestionNodePrismaAdapter from '../QuestionNode/QuestionNodePrismaAdapter
 import EdgeService from '../edge/EdgeService';
 import { offsetPaginate } from '../general/PaginationHelpers';
 import config from '../../config/config';
-import { DialogueTemplateType } from '../QuestionNode/NodeServiceType';
 import TemplateService from '../templates/TemplateService';
 import { logger } from '../../config/logger';
 
@@ -687,7 +686,6 @@ class DialogueService {
 
   async getCTAsByDialogueId(dialogueId: string, searchTerm?: string | null | undefined) {
     const leafs = await this.dialoguePrismaAdapter.getCTAsByDialogueId(dialogueId);
-
     if (searchTerm) {
       const lowerCasedSearch = searchTerm.toLowerCase();
       return leafs.filter((leaf) => leaf.title.toLowerCase().includes(lowerCasedSearch));
@@ -1222,7 +1220,7 @@ class DialogueService {
       const mappedId = idMap[question.id];
       const mappedDialogueId = question.questionDialogueId && idMap[question.questionDialogueId];
 
-      const mappedLinks = question.links.map((link) => {
+      const mappedLinks = question?.links?.map((link) => {
         const { id, ...linkData } = link;
         const updateLink = { ...linkData, questionNodeId: idMap[mappedId] };
         return updateLink;
@@ -1262,33 +1260,44 @@ class DialogueService {
 
     // Create leaf nodes
     const leafs = updatedTemplateQuestions?.filter((question) => question.isLeaf);
-    const mappedLeafs: CreateQuestionsInput = leafs?.map((leaf) => ({
-      id: leaf.id,
-      isRoot: false,
-      isLeaf: leaf.isLeaf,
-      title: leaf.title,
-      type: leaf.type,
-      links: leaf.links?.create?.map((link) => link) || [],
-      form: leaf.form ? {
-        fields: leaf.form?.fields?.map((field) => ({
-          label: field?.label,
-          type: field?.type || 'shortText',
-          isRequired: field?.isRequired || false,
-          position: field?.position,
-        })),
-      } : undefined,
-      sliderNode: leaf.sliderNode ? {
-        markers: leaf?.sliderNode?.markers?.map((marker) => ({
-          label: marker?.label,
-          subLabel: marker?.subLabel,
-          range: {
-            start: marker?.range?.start,
-            end: marker?.range?.end,
-          },
-        })),
-      } : undefined,
-    })) || [];
-    await this.dialoguePrismaAdapter.createNodes(dialogue.id, mappedLeafs)
+
+    const mappedLeafs = await Promise.all(leafs?.map(async (leaf) => {
+      const contactStep = leaf.form?.steps.find((step) => step.fields.find((field) => field.type === 'contacts'));
+      const contactField = contactStep?.fields.find((field) => field.type === 'contacts');
+      const userIds = contactField?.contacts?.map((contact) => contact.id) || [];
+      const mappedLeafForm = {
+        ...leaf.form,
+        preFormNode: leaf.form?.preFormNodeId ? {
+          header: leaf.form.preForm?.header as string,
+          helper: leaf.form.preForm?.helper as string,
+          nextText: leaf.form.preForm?.nextText as string,
+          finishText: leaf.form.preForm?.finishText as string,
+        } : null,
+      };
+      const form = leaf.form ? await this.nodeService.createFormNodeInput(mappedLeafForm, '', userIds) : undefined;
+      return {
+        ...leaf,
+        id: leaf.id,
+        isRoot: false,
+        isLeaf: leaf.isLeaf,
+        title: leaf.title,
+        type: leaf.type,
+        form: form as Required<Prisma.FormNodeCreateInput>,
+        links: leaf.links?.create?.map((link) => link) || [],
+        sliderNode: leaf.sliderNode ? {
+          markers: leaf?.sliderNode?.markers?.map((marker) => ({
+            label: marker?.label,
+            subLabel: marker?.subLabel,
+            range: {
+              start: marker?.range?.start,
+              end: marker?.range?.end,
+            },
+          })),
+        } : undefined,
+      }
+    }) || []) || [];
+
+    await this.dialoguePrismaAdapter.createNodes(dialogue.id, mappedLeafs as any)
 
     // Create question nodes
     const questions = updatedTemplateQuestions?.filter((question) => !question.isLeaf);

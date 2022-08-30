@@ -26,22 +26,17 @@ type FormProps = yup.InferType<typeof schema>;
 
 const DIALOGUE_TYPE_OPTIONS = [
   {
-    label: 'Default',
-    description: 'The original haas dialogue, regarding Facilities, Cleanliness, and co.',
-    value: DialogueTemplateType.Default,
-  },
-  {
-    label: 'Business Template',
+    label: 'Business Template (English)',
     description: 'For business-related dialogues.',
     value: DialogueTemplateType.BusinessEng,
   },
   {
-    label: 'Teacher template',
+    label: 'Teacher template (English)',
     description: 'For teacher-related dialogues.',
     value: DialogueTemplateType.TeacherEng,
   },
   {
-    label: 'Student Template',
+    label: 'Student Template (English)',
     description: 'For student-related dialogues.',
     value: DialogueTemplateType.StudentEng,
   },
@@ -54,6 +49,16 @@ const DIALOGUE_TYPE_OPTIONS = [
     label: 'Sport team (Dutch)',
     description: 'The Club Hades sports team model (in Dutch).',
     value: DialogueTemplateType.SportNl,
+  },
+  {
+    label: 'Student Template (Dutch)',
+    description: 'For dutch student-related dialogues.',
+    value: DialogueTemplateType.StudentNl,
+  },
+  {
+    label: 'Teacher Template (Dutch)',
+    description: 'For dutch teacher-related dialogues.',
+    value: DialogueTemplateType.TeacherNl,
   },
 ];
 

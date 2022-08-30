@@ -418,6 +418,17 @@ export interface NexusGenInputs {
     fields?: NexusGenInputs['FormNodeFieldInput'][] | null; // [FormNodeFieldInput!]
     helperText?: string | null; // String
     id?: string | null; // String
+    preFormNode?: NexusGenInputs['PreFormNodeInput'] | null; // PreFormNodeInput
+    steps?: NexusGenInputs['FormNodeStepInput'][] | null; // [FormNodeStepInput!]
+  }
+  FormNodeStepInput: { // input type
+    fields?: NexusGenInputs['FormNodeFieldInput'][] | null; // [FormNodeFieldInput!]
+    header: string; // String!
+    helper: string; // String!
+    id?: string | null; // ID
+    position: number; // Int!
+    subHelper: string; // String!
+    type: NexusGenEnums['FormNodeStepType']; // FormNodeStepType!
   }
   GenerateAutodeckInput: { // input type
     answer1?: string | null; // String
@@ -551,6 +562,12 @@ export interface NexusGenInputs {
     customerId?: string | null; // String
     description?: string | null; // String
     name?: string | null; // String
+  }
+  PreFormNodeInput: { // input type
+    finishText: string; // String!
+    header: string; // String!
+    helper: string; // String!
+    nextText: string; // String!
   }
   QuestionNodeWhereInputType: { // input type
     id?: string | null; // ID
@@ -812,6 +829,7 @@ export interface NexusGenEnums {
   DialogueImpactScoreType: "AVERAGE"
   DialogueTemplateType: prisma.DialogueTemplateType
   FormNodeFieldTypeEnum: "contacts" | "email" | "longText" | "number" | "phoneNumber" | "shortText" | "url"
+  FormNodeStepType: prisma.FormNodeStepType
   JobProcessLocationType: prisma.JobProcessLocationType
   JobStatusType: prisma.JobStatusType
   LanguageEnumType: "DUTCH" | "ENGLISH" | "GERMAN"
@@ -1117,10 +1135,13 @@ export interface NexusGenObjects {
     url?: string | null; // String
   }
   FormNodeField: prisma.FormNodeField;
+  FormNodeStep: prisma.FormNodeStep;
   FormNodeType: { // root type
     fields?: NexusGenRootTypes['FormNodeField'][] | null; // [FormNodeField!]
     helperText?: string | null; // String
     id?: string | null; // String
+    preForm?: NexusGenRootTypes['PreFormNodeType'] | null; // PreFormNodeType
+    steps?: NexusGenRootTypes['FormNodeStep'][] | null; // [FormNodeStep!]
   }
   HealthScore: { // root type
     negativeResponseCount: number; // Int!
@@ -1244,6 +1265,13 @@ export interface NexusGenObjects {
     description?: string | null; // String
     id?: string | null; // ID
     name?: string | null; // String
+  }
+  PreFormNodeType: { // root type
+    finishText: string; // String!
+    header: string; // String!
+    helper: string; // String!
+    id: string; // String!
+    nextText: string; // String!
   }
   PreviewDataType: { // root type
     colors?: Array<string | null> | null; // [String]
@@ -1821,10 +1849,21 @@ export interface NexusGenFieldTypes {
     position: number | null; // Int
     type: NexusGenEnums['FormNodeFieldTypeEnum']; // FormNodeFieldTypeEnum!
   }
+  FormNodeStep: { // field return type
+    fields: NexusGenRootTypes['FormNodeField'][] | null; // [FormNodeField!]
+    header: string | null; // String
+    helper: string | null; // String
+    id: string; // String!
+    position: number; // Int!
+    subHelper: string | null; // String
+    type: NexusGenEnums['FormNodeStepType']; // FormNodeStepType!
+  }
   FormNodeType: { // field return type
     fields: NexusGenRootTypes['FormNodeField'][] | null; // [FormNodeField!]
     helperText: string | null; // String
     id: string | null; // String
+    preForm: NexusGenRootTypes['PreFormNodeType'] | null; // PreFormNodeType
+    steps: NexusGenRootTypes['FormNodeStep'][] | null; // [FormNodeStep!]
   }
   HealthScore: { // field return type
     negativeResponseCount: number; // Int!
@@ -2035,6 +2074,13 @@ export interface NexusGenFieldTypes {
     description: string | null; // String
     id: string | null; // ID
     name: string | null; // String
+  }
+  PreFormNodeType: { // field return type
+    finishText: string; // String!
+    header: string; // String!
+    helper: string; // String!
+    id: string; // String!
+    nextText: string; // String!
   }
   PreviewDataType: { // field return type
     colors: Array<string | null> | null; // [String]
@@ -2727,10 +2773,21 @@ export interface NexusGenFieldTypeNames {
     position: 'Int'
     type: 'FormNodeFieldTypeEnum'
   }
+  FormNodeStep: { // field return type name
+    fields: 'FormNodeField'
+    header: 'String'
+    helper: 'String'
+    id: 'String'
+    position: 'Int'
+    subHelper: 'String'
+    type: 'FormNodeStepType'
+  }
   FormNodeType: { // field return type name
     fields: 'FormNodeField'
     helperText: 'String'
     id: 'String'
+    preForm: 'PreFormNodeType'
+    steps: 'FormNodeStep'
   }
   HealthScore: { // field return type name
     negativeResponseCount: 'Int'
@@ -2941,6 +2998,13 @@ export interface NexusGenFieldTypeNames {
     description: 'String'
     id: 'ID'
     name: 'String'
+  }
+  PreFormNodeType: { // field return type name
+    finishText: 'String'
+    header: 'String'
+    helper: 'String'
+    id: 'String'
+    nextText: 'String'
   }
   PreviewDataType: { // field return type name
     colors: 'String'

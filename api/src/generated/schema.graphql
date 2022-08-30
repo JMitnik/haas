@@ -906,7 +906,9 @@ enum DialogueTemplateType {
   SPORT_ENG
   SPORT_NL
   STUDENT_ENG
+  STUDENT_NL
   TEACHER_ENG
+  TEACHER_NL
 }
 
 input DialogueWhereUniqueInput {
@@ -1054,12 +1056,41 @@ input FormNodeInputType {
   fields: [FormNodeFieldInput!]
   helperText: String
   id: String
+  preFormNode: PreFormNodeInput
+  steps: [FormNodeStepInput!]
+}
+
+type FormNodeStep {
+  fields: [FormNodeField!]
+  header: String
+  helper: String
+  id: String!
+  position: Int!
+  subHelper: String
+  type: FormNodeStepType!
+}
+
+input FormNodeStepInput {
+  fields: [FormNodeFieldInput!]
+  header: String!
+  helper: String!
+  id: ID
+  position: Int!
+  subHelper: String!
+  type: FormNodeStepType!
+}
+
+enum FormNodeStepType {
+  GENERIC_FIELDS
+  INPUT_DATA
 }
 
 type FormNodeType {
   fields: [FormNodeField!]
   helperText: String
   id: String
+  preForm: PreFormNodeType
+  steps: [FormNodeStep!]
 }
 
 """Generate savales documents"""
@@ -1578,6 +1609,21 @@ type PermssionType {
   description: String
   id: ID
   name: String
+}
+
+input PreFormNodeInput {
+  finishText: String!
+  header: String!
+  helper: String!
+  nextText: String!
+}
+
+type PreFormNodeType {
+  finishText: String!
+  header: String!
+  helper: String!
+  id: String!
+  nextText: String!
 }
 
 type PreviewDataType {

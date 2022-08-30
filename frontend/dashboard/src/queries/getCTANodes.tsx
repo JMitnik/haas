@@ -33,6 +33,35 @@ const getCTANodesOfDialogue = gql`
           form {
             id
             helperText
+            preForm {
+              id
+              header
+              helper
+              nextText
+              finishText
+            }
+            steps {
+              id
+              header
+              helper
+              subHelper
+              position
+              type
+              fields {
+                id
+                label
+                type
+                placeholder
+                isRequired
+                position
+                contacts {
+                  id
+                  email
+                  firstName
+                  lastName
+                }
+              }
+            }
             fields {
               id
               label

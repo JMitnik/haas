@@ -1,4 +1,5 @@
 import { Prisma, PrismaClient, Edge, QuestionNode, QuestionOption, VideoEmbeddedNode, NodeType, Link, Share } from '@prisma/client';
+import { NexusGenInputs } from 'generated/nexus';
 
 import { CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType';
 import NodeService from './NodeService';
@@ -50,10 +51,10 @@ class QuestionNodePrismaAdapter {
             markers: {
               include: {
                 range: true,
-              }
-            }
-          }
-        }
+              },
+            },
+          },
+        },
       },
     });
   }
@@ -331,6 +332,14 @@ class QuestionNodePrismaAdapter {
     })
   }
 
+  async upsertFormNodeField(input: Prisma.FormNodeFieldUpsertArgs) {
+    return this.prisma.formNodeField.upsert(input);
+  };
+
+  async upsertFormNodeStep(input: Prisma.FormNodeStepUpsertArgs) {
+    return this.prisma.formNodeStep.upsert(input);
+  }
+
   updateFieldsOfForm(input: UpdateFormFieldsInput) {
     return this.prisma.questionNode.update({
       where: {
@@ -340,9 +349,7 @@ class QuestionNodePrismaAdapter {
         form: {
           update: {
             helperText: input.helperText,
-            fields: {
-              upsert: input.fields,
-            },
+            steps: input.steps || undefined,
           },
         },
       },
@@ -408,14 +415,21 @@ class QuestionNodePrismaAdapter {
   updateQuestionOptions = async (options: QuestionOptionProps[]): Promise<{ id: number }[]> => Promise.all(
     options?.map(async (option) => {
       const optionId = option.id ? option.id : -1
-      const optionUpsertInput = {
+      const optionCreateInput = {
         value: option.value,
         publicValue: option.publicValue,
         overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : undefined,
         position: option.position,
         isTopic: option.isTopic,
       }
-      const updatedQOption = await this.upsertQuestionOption(optionId, optionUpsertInput, optionUpsertInput);
+      const optionUpdateInput = {
+        value: option.value,
+        publicValue: option.publicValue,
+        overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : { disconnect: true },
+        position: option.position,
+        isTopic: option.isTopic,
+      }
+      const updatedQOption = await this.upsertQuestionOption(optionId, optionCreateInput, optionUpdateInput);
 
       return { id: updatedQOption.id };
     }),
@@ -508,8 +522,8 @@ class QuestionNodePrismaAdapter {
         } : undefined,
         form: question.form ? {
           create: {
-            fields: {
-              create: question.form?.fields,
+            steps: {
+              create: question.form?.steps,
             },
           },
         } : undefined,
@@ -547,6 +561,11 @@ class QuestionNodePrismaAdapter {
         share: true,
         form: {
           include: {
+            steps: {
+              include: {
+                fields: true,
+              },
+            },
             fields: true,
           },
         },
@@ -577,6 +596,42 @@ class QuestionNodePrismaAdapter {
       },
     });
   }
+
+  removeFormSteps(questionId: string, steps: Array<{ id: string }>) {
+    return this.prisma.questionNode.update({
+      where: {
+        id: questionId,
+      },
+      data: {
+        form: {
+          update: {
+            steps: {
+              disconnect: steps,
+            },
+          },
+        },
+      },
+    });
+  };
+
+  /**
+   * Disconnects fields from a FormNodeStep entry based on id array provided
+   * @param stepId 
+   * @param fields 
+   * @returns 
+   */
+  removeStepFields(stepId: string, fields: Array<{ id: string }>) {
+    return this.prisma.formNodeStep.update({
+      where: {
+        id: stepId,
+      },
+      data: {
+        fields: {
+          disconnect: fields,
+        },
+      },
+    });
+  };
 
   removeFormFields(questionId: string, fields: Array<{ id: string }>) {
     return this.prisma.questionNode.update({

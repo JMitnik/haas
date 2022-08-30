@@ -326,7 +326,7 @@ class UserService {
         } | null;
       };
       user: User;
-    }) => {
+    }, noConsole?: boolean) => {
     const inviteLoginToken = AuthService.createUserToken(invitedUser.userId);
     await this.userPrismaAdapter.setLoginToken(invitedUser.userId, inviteLoginToken);
 
@@ -341,6 +341,7 @@ class UserService {
       recipient: invitedUser.user.email,
       subject: `HAAS: You have been invited to ${invitedUser.customer.name}`,
       body: emailBody,
+      noConsole,
     });
   }
 

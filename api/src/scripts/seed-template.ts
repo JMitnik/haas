@@ -1,11 +1,10 @@
-import { PrismaClient, Role, RoleTypeEnum } from '@prisma/client';
+import { DialogueTemplateType, PrismaClient, Role, RoleTypeEnum } from '@prisma/client';
 import cuid from 'cuid';
 import * as yargs from 'yargs';
 
 import { CustomerPrismaAdapter } from '../models/customer/CustomerPrismaAdapter';
 import UserService from '../models/users/UserService';
 import GenerateWorkspaceService from '../models/generate-workspace/GenerateWorkspaceService';
-import { DialogueTemplateType } from '../models/QuestionNode/NodeServiceType';
 import { getTemplate } from '../models/generate-workspace/GenerateWorkspaceService.helpers';
 import UserOfCustomerPrismaAdapter from '../models/users/UserOfCustomerPrismaAdapter';
 
@@ -32,6 +31,8 @@ const argv = yargs
       DialogueTemplateType.DEFAULT,
       DialogueTemplateType.SPORT_ENG,
       DialogueTemplateType.SPORT_NL,
+      DialogueTemplateType.STUDENT_NL,
+      DialogueTemplateType.TEACHER_NL,
     ],
     type: 'string',
     default: DialogueTemplateType.SPORT_ENG,

@@ -1,4 +1,4 @@
-import { PrismaClient, Role, RoleTypeEnum } from '@prisma/client';
+import { DialogueTemplateType, PrismaClient, Role, RoleTypeEnum } from '@prisma/client';
 import { ApolloError } from 'apollo-server-express';
 
 import TemplateService from '../templates/TemplateService';
@@ -13,10 +13,10 @@ import { generateCreateDialogueDataByTemplateLayers, getTemplate } from './Gener
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import DialogueService from '../questionnaire/DialogueService';
 import { DemoWorkspaceTemplate } from '../templates/TemplateTypes';
-import CustomerService from '../customer/CustomerService';
-import { DialogueTemplateType } from '../QuestionNode/NodeServiceType';
 import UserService from '../../models/users/UserService';
 import { GenerateWorkspaceCSVInput, Workspace } from './GenerateWorkspace.types';
+import CustomerService from '../../models/customer/CustomerService';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 class GenerateWorkspaceService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -107,13 +107,20 @@ class GenerateWorkspaceService {
 
       if (!dialogue) throw new ApolloError('ERROR: No dialogue created! aborting...');
       // Make post leaf node if data specified in template
-      await this.templateService.createTemplatePostLeafNode(templateType as NexusGenEnums['DialogueTemplateType'], dialogue.id);
+      await this.templateService.createTemplatePostLeafNode(template, dialogue.id);
 
       // Make the leafs
-      const leafs = await this.templateService.createTemplateLeafNodes(templateType as NexusGenEnums['DialogueTemplateType'], dialogue.id);
+      const leafs = await this.templateService.createTemplateLeafNodes(templateType as NexusGenEnums['DialogueTemplateType'], dialogue.id, []);
 
       // Make nodes
-      await this.templateService.createTemplateNodes(dialogue.id, workspace.name, leafs, templateType);
+      if (!template.structure) throw new GraphQLYogaError('Now dialogue structure provided in template. abort.');
+      await this.templateService.createDialogueStructure(
+        template,
+        null,
+        template.structure || [],
+        dialogue.id,
+        leafs
+      );
 
       // Generate data
       if (generateData) {
@@ -162,8 +169,34 @@ class GenerateWorkspaceService {
 
       await this.userService.connectPrivateDialoguesToUser(user.id, workspace.id);
 
-      void this.userService.sendInvitationMail(invitedUser);
+      void this.userService.sendInvitationMail(invitedUser, true);
     }
+  }
+
+  /**
+   * Creates 
+   * @param contactsEntry 
+   * @param workspace 
+   * @returns 
+   */
+  private async upsertUsersWorkspace(emailAddresses: string[], workspace: Workspace) {
+    const managerRole = workspace.roles.find((role) => role.type === RoleTypeEnum.MANAGER) as Role;
+
+    const userIds = await Promise.all(emailAddresses.map(async (contact) => {
+      const user = await this.userService.upsertUserByEmail({
+        email: contact,
+      })
+
+      await this.userOfCustomerPrismaAdapter.upsertUserOfCustomer(
+        workspace.id,
+        user.id,
+        managerRole.id,
+      );
+
+      return user.id;
+    }));
+
+    return userIds;
   }
 
   /**
@@ -230,15 +263,30 @@ class GenerateWorkspaceService {
       const dialogue = await this.dialoguePrismaAdapter.createTemplate(dialogueInput);
 
       if (!dialogue) throw new ApolloError('ERROR: No dialogue created! aborting...');
+
+      const contactsEntry = Object.entries(record).find((entry) => entry[0] === 'contacts');
+      const hasContacts = !!contactsEntry?.[1];
+
+      const contactEmails = hasContacts ? (contactsEntry?.[1] as string)?.trim().replaceAll(' ', '').split(',') : [];
+      let contactIds: string[] = [];
+
+      if (hasContacts) {
+        contactIds = await this.upsertUsersWorkspace(contactEmails, workspace);
+      }
+
+      // console.log('Contact IDS: ', contactIds);
+
       // Make the leafs
-      const leafs = await this.templateService.createTemplateLeafNodes(validatedTemplateType as NexusGenEnums['DialogueTemplateType'], dialogue.id);
+      const leafs = await this.templateService.createTemplateLeafNodes(type as NexusGenEnums['DialogueTemplateType'], dialogue.id, contactIds);
 
       // Make nodes
-      await this.templateService.createTemplateNodes(
+      if (!template.structure) throw new GraphQLYogaError('Now dialogue structure provided in template. abort.');
+      await this.templateService.createDialogueStructure(
+        template,
+        null,
+        template.structure || [],
         dialogue.id,
-        workspace.name,
-        leafs,
-        validatedTemplateType as string
+        leafs
       );
 
       // Generate data
@@ -276,7 +324,7 @@ class GenerateWorkspaceService {
         phoneAssignee
       );
 
-      void this.userService.sendInvitationMail(invitedUser);
+      void this.userService.sendInvitationMail(invitedUser, true);
     };
   };
 
@@ -356,7 +404,8 @@ class GenerateWorkspaceService {
       }
 
       return workspace;
-    } catch {
+    } catch (error) {
+      console.log('Error: ', (error as any)?.message);
       await this.customerService.deleteWorkspace(workspace.id);
       throw new ApolloError('Something went wrong generating generating workspace. All changes have been reverted');
     }

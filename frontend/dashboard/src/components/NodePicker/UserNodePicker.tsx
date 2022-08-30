@@ -2,7 +2,7 @@
 import * as UI from '@haas/ui';
 import { components } from 'react-select';
 import { useTranslation } from 'react-i18next';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { ConditionEntry } from 'views/AddAutomationView/CreateConditionModalCardTypes';
 import { NodeCellContainer } from 'components/NodeCell/NodeCellTypes';
@@ -89,7 +89,6 @@ export const UserNodePicker = ({
   currValues,
   isMulti,
 }: NodePickerProps) => {
-  console.log('Items: ', items);
   const [filteredState, setFilteredState] = useState<TargetTypeEnum | null>(null);
   const [filteredItems, setFilteredItems] = useState(items);
   const { t } = useTranslation();
