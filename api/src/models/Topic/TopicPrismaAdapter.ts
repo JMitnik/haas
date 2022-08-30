@@ -28,6 +28,22 @@ export class TopicPrismaAdapter {
     })
   }
 
+  /**
+   * Create a topic and its sub topics (Max 1 layer deep)
+   * @param input 
+   * @returns 
+   */
+  public async createTopics(input: CreateTopicInput) {
+    const createTopicInput = this.createTopicInput(input);
+    return this.prisma.topic.upsert({
+      where: {
+        name: input.name,
+      },
+      create: createTopicInput,
+      update: createTopicInput,
+    })
+  }
+
   private createTopicInput(input: CreateTopicInput): Prisma.TopicCreateInput {
     const createSubTopicsInput = input.subTopics?.map((subTopic) => ({
       create: {
@@ -46,21 +62,5 @@ export class TopicPrismaAdapter {
         connectOrCreate: createSubTopicsInput,
       },
     }
-  }
-
-  /**
-   * Create a topic and its sub topics (Max 1 layer deep)
-   * @param input 
-   * @returns 
-   */
-  public async createTopics(input: CreateTopicInput) {
-    const createTopicInput = this.createTopicInput(input);
-    return this.prisma.topic.upsert({
-      where: {
-        name: input.name,
-      },
-      create: createTopicInput,
-      update: createTopicInput,
-    })
   }
 }
