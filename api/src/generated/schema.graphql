@@ -472,7 +472,7 @@ input CreateQuestionNodeInputType {
 input CreateTopicInput {
   name: String!
   subTopics: [CreateTopicInput]
-  type: String = "SYSTEM"
+  type: TopicEnumType = SYSTEM
 }
 
 input CreateTriggerInputType {
@@ -1237,7 +1237,7 @@ type Mutation {
   createRole(data: RoleInput): RoleType
   createSession(input: SessionInput): Session
   createTag(customerSlug: String, name: String, type: TagTypeEnum): Tag
-  createTopics(input: [CreateTopicInput!]): Boolean
+  createTopic(input: [CreateTopicInput!]): Boolean
   createTrigger(input: CreateTriggerInputType): TriggerType
   createWorkspace(input: CreateWorkspaceInput): Customer
   deleteCTA(input: DeleteNodeInputType): QuestionNode
@@ -1938,6 +1938,8 @@ type Topic {
   parentTopics: [Topic]
   subTopics: [Topic]
   type: String!
+
+  """A list of question options to which this topic is assigned to."""
   usedByOptions: [QuestionOption]
   workspace: Customer
 }
@@ -1950,6 +1952,12 @@ type TopicDelta {
   nrVotes: Int
   percentageChanged: Float
   topic: String
+}
+
+"""All the different types a topic can be."""
+enum TopicEnumType {
+  SYSTEM
+  WORKSPACE
 }
 
 """Generic filter object for filtering topics"""

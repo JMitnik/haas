@@ -1,6 +1,6 @@
 import { inputObjectType, list, mutationField, nonNull } from 'nexus';
 import { GraphQLYogaError } from '@graphql-yoga/node';
-import { TopicType } from '.';
+import { TopicEnumType } from '.';
 
 export const CreateTopicInput = inputObjectType({
   name: 'CreateTopicInput',
@@ -8,7 +8,7 @@ export const CreateTopicInput = inputObjectType({
 
   definition(t) {
     t.nonNull.string('name');
-    t.field('type', { type: TopicType, default: 'SYSTEM' });
+    t.field('type', { type: TopicEnumType, default: 'SYSTEM' });
     t.nullable.list.field('subTopics', {
       type: CreateTopicInput,
     });
