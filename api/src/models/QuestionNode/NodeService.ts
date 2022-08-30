@@ -106,7 +106,6 @@ export class NodeService {
     const dialogue = await this.dialoguePrismaAdapter.getDialogueBySlugs(input.customerSlug, input.dialogueSlug);
     if (!dialogue?.id) throw 'No Dialogue found to add CTA to!'
 
-    console.log('Form: ', input.form);
     const form = input.form ? await this.createFormNodeInput(input.form, input.customerSlug) : undefined;
 
     const callToAction = await this.questionNodePrismaAdapter.createCallToAction({
@@ -518,8 +517,6 @@ export class NodeService {
         : [];
       allUserIds = targetUsers.map((user) => ({ id: user.userId }));
     }
-
-    console.log('All user Ids: ', allUserIds);
 
     return ({
       header: input.header as string,

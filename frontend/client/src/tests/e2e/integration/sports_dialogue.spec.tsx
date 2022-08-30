@@ -96,6 +96,8 @@ it('dialogue follows negative flow, share details', () => {
   // Find a coaching button and click on it.
   cy.findByText('Coaching').click();
 
+  cy.findByText('Next').click();
+
   cy.wait('@gqlcreateSessionMutation').then((req) => {
     const input = req.request.body.variables?.input as SessionInput;
 
