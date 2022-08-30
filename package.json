@@ -24,8 +24,7 @@
   },
   "resolutions": {
     "**/@typescript-eslint/eslint-plugin": "^4.1.1",
-    "**/@typescript-eslint/parser": "^4.1.1",
-    "jest-environment-jsdom": "^26.0.1"
+    "**/@typescript-eslint/parser": "^4.1.1"
   },
   "scripts": {
     "aws:install": "cd aws/stack && yarn",
