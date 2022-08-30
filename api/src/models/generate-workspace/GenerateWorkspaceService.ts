@@ -193,11 +193,19 @@ class GenerateWorkspaceService {
 
       const userEmailEntry = Object.entries(record).find((entry) => entry[0] === 'limited_access_assignee_email?');
       const userPhoneEntry = Object.entries(record).find((entry) => entry[0] === 'limited_access_assignee_phone?');
+      const customTemplateEntry = Object.entries(record).find((entry) => entry[0]?.toLowerCase() === 'template');
+
       const hasEmailAssignee = !!userEmailEntry?.[1];
       const emailAssignee = userEmailEntry?.[1] as string;
       const phoneAssignee = userPhoneEntry?.[1] as string | undefined;
-      const userRole = workspace.roles.find((role) => role.type === RoleTypeEnum.USER);
+      const customDialogueTemplate = customTemplateEntry?.[1] as DialogueTemplateType | undefined;
+      const hasValidCustomDialogueTemplate = (customDialogueTemplate
+        && Object.values(DialogueTemplateType).includes(customDialogueTemplate)
+      ) || false;
+      const validatedTemplateType = hasValidCustomDialogueTemplate ? customDialogueTemplate : type;
 
+      const userRole = workspace.roles.find((role) => role.type === RoleTypeEnum.USER);
+      const overrideTemplate = this.templateService.findTemplate(validatedTemplateType as DialogueTemplateType)
       const dialogueInput: CreateDialogueInput = {
         slug: dialogueSlug,
         title: dialogueTitle,
@@ -205,13 +213,15 @@ class GenerateWorkspaceService {
         customer: { id: workspace.id, create: false },
         isPrivate: hasEmailAssignee,
         postLeafText: {
-          header: template.postLeafText?.header,
-          subHeader: template.postLeafText?.subHeader,
+          header: overrideTemplate.postLeafText?.header,
+          subHeader: overrideTemplate.postLeafText?.subHeader,
         },
-        language: template.language,
-        template: Object.values(DialogueTemplateType).includes(type as any)
-          ? type as DialogueTemplateType
-          : undefined,
+        language: overrideTemplate.language,
+        template: Object.values(DialogueTemplateType).includes(validatedTemplateType as any)
+          ? validatedTemplateType as DialogueTemplateType
+          : (Object.values(DialogueTemplateType).includes(type as any)
+            ? type as DialogueTemplateType
+            : undefined),
       };
 
       // Create initial dialogue
@@ -219,14 +229,27 @@ class GenerateWorkspaceService {
 
       if (!dialogue) throw new ApolloError('ERROR: No dialogue created! aborting...');
       // Make the leafs
-      const leafs = await this.templateService.createTemplateLeafNodes(type as NexusGenEnums['DialogueTemplateType'], dialogue.id);
+      const leafs = await this.templateService.createTemplateLeafNodes(validatedTemplateType as NexusGenEnums['DialogueTemplateType'], dialogue.id);
 
       // Make nodes
-      await this.templateService.createTemplateNodes(dialogue.id, workspace.name, leafs, type as string);
+      await this.templateService.createTemplateNodes(
+        dialogue.id,
+        workspace.name,
+        leafs,
+        validatedTemplateType as string
+      );
 
       // Generate data
       if (generateData) {
-        await this.dialogueService.massGenerateFakeData(dialogue.id, template, 1, true, 2, 70, 80);
+        await this.dialogueService.massGenerateFakeData(
+          dialogue.id,
+          overrideTemplate,
+          1,
+          true,
+          2,
+          70,
+          80
+        );
       }
 
       // Check if user already exists

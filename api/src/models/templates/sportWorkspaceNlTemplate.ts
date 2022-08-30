@@ -71,7 +71,7 @@ const sportWorkspaceTemplate: DemoWorkspaceTemplate = {
   },
   postLeafText: {
     header: 'Dankjewel voor je feedback!',
-    subHeader: 'Werk moet voldoening geven',
+    subHeader: 'Sporten moet voldoening geven',
   },
   leafNodes: [
     {

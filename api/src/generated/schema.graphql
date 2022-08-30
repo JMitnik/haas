@@ -796,6 +796,7 @@ type Dialogue {
   slug: String!
   statistics(input: DialogueFilterInputType): DialogueStatistics
   tags: [Tag]
+  template: String
   title: String!
   topic(input: TopicInputType): TopicType
   updatedAt: String
