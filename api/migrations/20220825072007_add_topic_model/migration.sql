@@ -43,3 +43,17 @@ ALTER TABLE "_topics_to_sub_topics" ADD CONSTRAINT "_topics_to_sub_topics_A_fkey
 
 -- AddForeignKey
 ALTER TABLE "_topics_to_sub_topics" ADD CONSTRAINT "_topics_to_sub_topics_B_fkey" FOREIGN KEY ("B") REFERENCES "Topic"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+/*
+  Warnings:
+
+  - You are about to drop the column `parentTopicId` on the `Topic` table. All the data in the column will be lost.
+
+*/
+-- AlterTable
+ALTER TABLE "Topic" DROP COLUMN "parentTopicId";
+
+-- AlterTable
+ALTER TABLE "QuestionNode" ADD COLUMN     "topicId" TEXT;
+
+-- AddForeignKey
+ALTER TABLE "QuestionNode" ADD CONSTRAINT "QuestionNode_topicId_fkey" FOREIGN KEY ("topicId") REFERENCES "Topic"("id") ON DELETE SET NULL ON UPDATE CASCADE;
