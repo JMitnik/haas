@@ -1,6 +1,6 @@
 import { inputObjectType, list, mutationField, nonNull } from 'nexus';
-import { UserInputError } from 'apollo-server-express';
-import { Topic } from './Topic.graphql';
+import { GraphQLYogaError } from '@graphql-yoga/node';
+import { TopicEnumType } from '.';
 
 export const CreateTopicInput = inputObjectType({
   name: 'CreateTopicInput',
@@ -8,7 +8,7 @@ export const CreateTopicInput = inputObjectType({
 
   definition(t) {
     t.nonNull.string('name');
-    t.string('type', { default: 'SYSTEM' });
+    t.field('type', { type: TopicEnumType, default: 'SYSTEM' });
     t.nullable.list.field('subTopics', {
       type: CreateTopicInput,
     });
@@ -16,12 +16,12 @@ export const CreateTopicInput = inputObjectType({
 });
 
 
-export const CreateTopicsMutation = mutationField('createTopics', {
+export const CreateTopicMutation = mutationField('createTopic', {
   type: 'Boolean',
   args: { input: list(nonNull(CreateTopicInput)) },
+  description: 'Creates a list of topics and its subtopics.',
   async resolve(parent, args, ctx) {
-    console.log('Args: ', args);
-    if (!args.input) throw new UserInputError('No input object!');
+    if (!args.input) throw new GraphQLYogaError('No input object!');
     return ctx.services.topicService.createTopics(args.input);
   },
 });

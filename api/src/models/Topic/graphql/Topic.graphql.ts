@@ -23,6 +23,7 @@ export const Topic = objectType({
     });
 
     t.list.field('usedByOptions', {
+      description: 'A list of question options to which this topic is assigned to.',
       type: QuestionOptionType,
     });
   },

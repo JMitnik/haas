@@ -261,7 +261,7 @@ export interface NexusGenInputs {
   CreateTopicInput: { // input type
     name: string; // String!
     subTopics?: Array<NexusGenInputs['CreateTopicInput'] | null> | null; // [CreateTopicInput]
-    type: string | null; // String
+    type: NexusGenEnums['TopicEnumType'] | null; // TopicEnumType
   }
   CreateTriggerInputType: { // input type
     customerSlug?: string | null; // String
@@ -823,6 +823,7 @@ export interface NexusGenEnums {
   StatusType: "CLOSED" | "IN_PROGRESS" | "OPEN"
   SystemPermission: "CAN_ACCESS_ADMIN_PANEL" | "CAN_ACCESS_REPORT_PAGE" | "CAN_ADD_USERS" | "CAN_ASSIGN_USERS_TO_DIALOGUE" | "CAN_BUILD_DIALOGUE" | "CAN_CREATE_AUTOMATIONS" | "CAN_CREATE_CAMPAIGNS" | "CAN_CREATE_DELIVERIES" | "CAN_CREATE_TRIGGERS" | "CAN_DELETE_DIALOGUE" | "CAN_DELETE_TRIGGERS" | "CAN_DELETE_USERS" | "CAN_DELETE_WORKSPACE" | "CAN_DOWNLOAD_REPORTS" | "CAN_EDIT_DIALOGUE" | "CAN_EDIT_USERS" | "CAN_EDIT_WORKSPACE" | "CAN_GENERATE_WORKSPACE_FROM_CSV" | "CAN_RESET_WORKSPACE_DATA" | "CAN_UPDATE_AUTOMATIONS" | "CAN_VIEW_AUTOMATIONS" | "CAN_VIEW_CAMPAIGNS" | "CAN_VIEW_DIALOGUE" | "CAN_VIEW_DIALOGUE_ANALYTICS" | "CAN_VIEW_USERS"
   TagTypeEnum: "AGENT" | "DEFAULT" | "LOCATION"
+  TopicEnumType: "SYSTEM" | "WORKSPACE"
   TriggerConditionEnum: prisma.TriggerConditionEnum
   TriggerMediumEnum: "BOTH" | "EMAIL" | "PHONE"
   TriggerTypeEnum: "QUESTION" | "SCHEDULED"
@@ -1924,7 +1925,7 @@ export interface NexusGenFieldTypes {
     createRole: NexusGenRootTypes['RoleType'] | null; // RoleType
     createSession: NexusGenRootTypes['Session'] | null; // Session
     createTag: NexusGenRootTypes['Tag'] | null; // Tag
-    createTopics: boolean | null; // Boolean
+    createTopic: boolean | null; // Boolean
     createTrigger: NexusGenRootTypes['TriggerType'] | null; // TriggerType
     createWorkspace: NexusGenRootTypes['Customer'] | null; // Customer
     deleteAutomation: NexusGenRootTypes['AutomationModel'] | null; // AutomationModel
@@ -2829,7 +2830,7 @@ export interface NexusGenFieldTypeNames {
     createRole: 'RoleType'
     createSession: 'Session'
     createTag: 'Tag'
-    createTopics: 'Boolean'
+    createTopic: 'Boolean'
     createTrigger: 'TriggerType'
     createWorkspace: 'Customer'
     deleteAutomation: 'AutomationModel'
@@ -3392,7 +3393,7 @@ export interface NexusGenArgTypes {
       name?: string | null; // String
       type?: NexusGenEnums['TagTypeEnum'] | null; // TagTypeEnum
     }
-    createTopics: { // args
+    createTopic: { // args
       input?: NexusGenInputs['CreateTopicInput'][] | null; // [CreateTopicInput!]
     }
     createTrigger: { // args

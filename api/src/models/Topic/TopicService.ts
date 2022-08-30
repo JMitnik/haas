@@ -25,10 +25,16 @@ export class TopicService {
     this.topicPrismaAdapter = new TopicPrismaAdapter(prisma);
   }
 
+  /**
+   * Unassigns a topic as a child topic from the provided parent topic
+   */
   public async revokeTopic(input: RevokeTopicInput) {
     return this.topicPrismaAdapter.revokeTopic(input);
   }
 
+  /**
+   * Creates a list of topics (and its child topics) based on input
+   */
   public async createTopics(input: CreateTopicInput[]) {
     try {
       for (const topic of input) {
@@ -37,6 +43,7 @@ export class TopicService {
     } catch {
       return false;
     }
+
     return true;
   }
 

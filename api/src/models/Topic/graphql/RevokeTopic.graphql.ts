@@ -1,6 +1,6 @@
-import { inputObjectType, list, mutationField, nonNull } from 'nexus';
-import { UserInputError } from 'apollo-server-express';
+import { inputObjectType, mutationField } from 'nexus';
 import { Topic } from './Topic.graphql';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 export const RevokeTopicInput = inputObjectType({
   name: 'RevokeTopicInput',
@@ -16,8 +16,7 @@ export const RevokeTopicMutation = mutationField('revokeTopic', {
   type: Topic,
   args: { input: RevokeTopicInput },
   async resolve(parent, args, ctx) {
-    console.log('Args: ', args);
-    if (!args.input) throw new UserInputError('No input object!');
+    if (!args.input) throw new GraphQLYogaError('No input object!');
     return ctx.services.topicService.revokeTopic(args.input);
   },
 });
