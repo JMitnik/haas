@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import { ArrowDown, ArrowUp, PlusCircle, Trash } from 'react-feather';
-import { Controller, UseFormReturn, useFieldArray } from 'react-hook-form';
+import { Controller, UseFormReturn, useFieldArray, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next/';
 import React from 'react';
 
@@ -62,8 +62,14 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
     });
   };
 
+  const options = useWatch({
+    control: form.control,
+    name: 'optionsFull',
+  });
+
   const handleRemoveCTAFromOption = (index: number) => {
     const newChoice = {
+      ...options[index],
       overrideLeaf: {
         label: undefined,
         value: undefined,

@@ -49,6 +49,10 @@ export const generateCreateDialogueDataByTemplateLayers = (templateType: string)
 
 export const getTemplate = (templateType: string): DemoWorkspaceTemplate => {
   switch (templateType) {
+    case DialogueTemplateType.STUDENT_NL:
+      return templates.studentNl;
+    case DialogueTemplateType.TEACHER_NL:
+      return templates.teacherNl;
     case DialogueTemplateType.STUDENT_ENG:
       return templates.student;
     case DialogueTemplateType.TEACHER_ENG:

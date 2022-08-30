@@ -11,6 +11,74 @@ const language = {
     },
   },
   general: {
+    save_pre_form: {
+      en: 'Save Pre-Form',
+      de: 'Save Pre-Form',
+    },
+    pre_form_finish_text_helper: {
+      en: 'What will be the text on the finish button?',
+      de: 'Was wird der Text auf dem Finish-Button sein?',
+    },
+    pre_form_finish_text: {
+      en: 'Finish button',
+      de: 'Beenden Knopf',
+    },
+    pre_form_next_text_helper: {
+      en: 'What will be the text on the next button?',
+      de: 'Was wird der Text auf der nächsten Schaltfläche sein?',
+    },
+    pre_form_next_text: {
+      en: 'Next button',
+      de: 'Nächster Knopf',
+    },
+    pre_form_helper: {
+      en: 'Helper',
+      de: 'Helfer',
+    },
+    pre_form_helper_helper: {
+      en: 'What will be the helper text of the pre-form page?',
+      de: 'Was wird der Hilfstext der Vorformseite sein?',
+    },
+    pre_form_header: {
+      en: 'Header',
+      de: 'Header',
+    },
+    pre_form_header_helper: {
+      en: 'What will be the header of the pre-form page?',
+      de: 'Was wird die Kopfzeile der Vorformblattseite sein?',
+    },
+    add_pre_form_node: {
+      en: 'Add Pre-Form',
+      de: 'Pre-Form hinzufügen',
+    },
+    pre_node_form: {
+      en: 'Pre-Form Node',
+      de: 'Pre-Form Node',
+    },
+    step_header: {
+      en: 'Header',
+      de: 'Header',
+    },
+    step_header_helper: {
+      en: 'What will be the header of the page?',
+      de: 'Was wird die Kopfzeile der Seite sein?',
+    },
+    step_helper: {
+      en: 'Instruction',
+      de: 'Anweisung',
+    },
+    step_helper_helper: {
+      en: 'What will be the instruction text of the page?',
+      de: 'Was wird der Anweisungstext der Seite sein?',
+    },
+    step_sub_helper: {
+      en: 'Instruction helper',
+      de: 'Anweisungshilfetext',
+    },
+    step_sub_helper_helper: {
+      en: 'What will be the instruction helper text of the page?',
+      de: 'Was wird der Anweisungshilfetext der Seite sein?',
+    },
     pulse: {
       en: 'Pulse',
       de: 'Pulse',
@@ -1029,6 +1097,10 @@ const language = {
       en: 'See it in the interactions table.',
       de: 'Sehen Sie es in der Interaktions-Tabelle.',
     },
+    edit_step: {
+      en: 'Edit step',
+      de: 'Schritt bearbeiten',
+    },
     edit_field: {
       en: 'Edit field',
       de: 'Feld bearbeiten',
@@ -1056,6 +1128,10 @@ const language = {
     contacts_type: {
       en: 'Contact',
       de: 'Kontakt',
+    },
+    delete_step: {
+      en: 'Delete step',
+      de: 'Schritt löschen',
     },
     delete_field: {
       en: 'Delete field',
@@ -1125,9 +1201,17 @@ const language = {
       en: 'Email',
       de: 'Email',
     },
+    add_step_reminder: {
+      en: 'Add your first step!',
+      de: 'Fügen Sie Ihren ersten Schritt hinzu!',
+    },
     add_field_reminder: {
       en: 'Add your first field!',
       de: 'Fügen Sie Ihr erstes Feld hinzu!',
+    },
+    add_step: {
+      en: 'Add step',
+      de: 'Schritt hinzufügen',
     },
     add_field: {
       en: 'Add field',

@@ -39,7 +39,7 @@ const Overlay = styled(DialogPrimitive.DialogOverlay)`
 export const Root = ({ children, open, onClose, minWidth = 600, ...props }: RootProps) => (
   <RootContainer
     open={open}
-    onOpenChange={onClose}
+    onOpenChange={() => onClose()}
     {...slideUpFadeMotion}
   >
     <AnimatePresence>

@@ -1091,6 +1091,8 @@ export type DialogueStatisticsSummaryModel = {
 };
 
 export enum DialogueTemplateType {
+  TeacherNl = 'TEACHER_NL',
+  StudentNl = 'STUDENT_NL',
   TeacherEng = 'TEACHER_ENG',
   StudentEng = 'STUDENT_ENG',
   SportEng = 'SPORT_ENG',
@@ -1248,14 +1250,44 @@ export enum FormNodeFieldTypeEnum {
 export type FormNodeInputType = {
   id?: Maybe<Scalars['String']>;
   helperText?: Maybe<Scalars['String']>;
+  preFormNode?: Maybe<PreFormNodeInput>;
+  fields?: Maybe<Array<FormNodeFieldInput>>;
+  steps?: Maybe<Array<FormNodeStepInput>>;
+};
+
+export type FormNodeStep = {
+  __typename?: 'FormNodeStep';
+  id: Scalars['String'];
+  position: Scalars['Int'];
+  header?: Maybe<Scalars['String']>;
+  helper?: Maybe<Scalars['String']>;
+  subHelper?: Maybe<Scalars['String']>;
+  type: FormNodeStepType;
+  fields?: Maybe<Array<FormNodeField>>;
+};
+
+export type FormNodeStepInput = {
+  id?: Maybe<Scalars['ID']>;
+  type: FormNodeStepType;
+  header: Scalars['String'];
+  helper: Scalars['String'];
+  subHelper: Scalars['String'];
+  position: Scalars['Int'];
   fields?: Maybe<Array<FormNodeFieldInput>>;
 };
+
+export enum FormNodeStepType {
+  GenericFields = 'GENERIC_FIELDS',
+  InputData = 'INPUT_DATA'
+}
 
 export type FormNodeType = {
   __typename?: 'FormNodeType';
   id?: Maybe<Scalars['String']>;
   helperText?: Maybe<Scalars['String']>;
+  preForm?: Maybe<PreFormNodeType>;
   fields?: Maybe<Array<FormNodeField>>;
+  steps?: Maybe<Array<FormNodeStep>>;
 };
 
 /** Generate savales documents */
@@ -2113,6 +2145,22 @@ export type PermssionType = {
   name?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   customer?: Maybe<Customer>;
+};
+
+export type PreFormNodeInput = {
+  header: Scalars['String'];
+  helper: Scalars['String'];
+  nextText: Scalars['String'];
+  finishText: Scalars['String'];
+};
+
+export type PreFormNodeType = {
+  __typename?: 'PreFormNodeType';
+  id: Scalars['String'];
+  header: Scalars['String'];
+  helper: Scalars['String'];
+  nextText: Scalars['String'];
+  finishText: Scalars['String'];
 };
 
 export type PreviewDataType = {

@@ -4,7 +4,7 @@ import cuid from 'cuid';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import EdgeService from '../edge/EdgeService';
-import { QuestionOptionProps, CreateCTAInputProps, DialogueWithEdges, FormNodeInput } from './NodeServiceType';
+import { QuestionOptionProps, CreateCTAInputProps, DialogueWithEdges, FormNodeInput, FormNodeStepInput } from './NodeServiceType';
 import QuestionNodePrismaAdapter from './QuestionNodePrismaAdapter';
 import { findDifference } from '../../utils/findDifference';
 import EdgePrismaAdapter, { CreateEdgeInput } from '../edge/EdgePrismaAdapter';
@@ -12,6 +12,8 @@ import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import { CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType';
 import { CreateSliderNodeInput, UpdateQuestionInput } from './QuestionNodePrismaAdapterType';
 import UserOfCustomerPrismaAdapter from '../../models/users/UserOfCustomerPrismaAdapter';
+import { groupBy } from 'lodash';
+import { stringMap } from 'aws-sdk/clients/backup';
 
 export interface IdMapProps {
   [details: string]: string;
@@ -130,17 +132,18 @@ export class NodeService {
   /**
    * Converts FormNode to Prisma-friendly format.
    * */
-  private async saveEditFormNodeInput(
-    input: FormNodeInput,
-    workspaceSlug: string
-  ): Promise<Prisma.FormNodeFieldUpsertArgs[] | undefined> {
+  private async saveEditFormNodeFieldInput(
+    input: FormNodeStepInput,
+    workspaceSlug: string,
+    stepId: string,
+  ): Promise<Prisma.FormNodeFieldUpsertArgs[]> {
     const communicationUser = input.fields?.find((field) => field.userIds?.length);
     const targetUsers = communicationUser?.userIds?.length
       ? await this.userOfCustomerPrismaAdapter.findTargetUsers(
         workspaceSlug, {
-          roleIds: communicationUser?.userIds.filter(isPresent),
-          userIds: communicationUser?.userIds.filter(isPresent),
-        }
+        roleIds: communicationUser?.userIds.filter(isPresent),
+        userIds: communicationUser?.userIds.filter(isPresent),
+      }
       )
       : [];
     const allUserIds = targetUsers.map((user) => ({ id: user.userId }));
@@ -155,6 +158,11 @@ export class NodeService {
           contacts: field.type === 'contacts' ? {
             connect: allUserIds,
           } : undefined,
+          formNodeStep: {
+            connect: {
+              id: stepId,
+            },
+          },
         },
         update: {
           type: field.type || 'shortText',
@@ -170,8 +178,49 @@ export class NodeService {
         where: {
           id: field.id || '-1',
         },
-      })) || undefined
+      })) || []
     )
+  };
+
+  private async saveEditFormStepInput(
+    step: FormNodeStepInput,
+    formNodeId: string,
+  ): Promise<Prisma.FormNodeStepUpsertArgs> {
+    return {
+      create: {
+        ...step,
+        id: step.id || undefined,
+        fields: undefined,
+        formNode: {
+          connect: {
+            id: formNodeId,
+          },
+        },
+      },
+      update: {
+        ...step,
+        id: step.id || undefined,
+        fields: undefined,
+      },
+      where: {
+        id: step.id || '-1',
+      },
+    }
+  }
+
+  /**
+   * Converts FormNode to Prisma-friendly format.
+   * */
+  private async saveEditFormNodeInput(
+    step: FormNodeStepInput,
+    workspaceSlug: string,
+    dbStepId: string,
+  ): Promise<Prisma.FormNodeFieldUpsertWithWhereUniqueWithoutFormNodeStepInput[] | undefined> {
+    if (!step.fields?.length) return [];
+
+    const fields = await this.saveEditFormNodeFieldInput(step, workspaceSlug, step.id || dbStepId);
+
+    return fields;
   };
 
   /**
@@ -218,19 +267,64 @@ export class NodeService {
 
     // If form is passed
     if (input?.form && input.id) {
-      const removedFields = findDifference(existingNode?.form?.fields, input?.form?.fields as any);
+      const removedFields = findDifference(
+        existingNode?.form?.steps.flatMap((step) => step.fields),
+        input?.form?.steps?.flatMap((step) => step.fields) as any
+      );
 
       if (removedFields.length) {
-        const mappedFields = removedFields.map((field) => ({ id: field?.id?.toString() || '' }))
-        await this.questionNodePrismaAdapter.removeFormFields(input.id, mappedFields);
+        const groupedByStepId = groupBy(removedFields, (field: any) => field.formNodeStepId);
+        for (const step of Object.entries(groupedByStepId)) {
+          const stepId = step[0];
+          const mappedFields = step[1]?.map((field) => ({ id: field?.id?.toString() || '' }))
+          await this.questionNodePrismaAdapter.removeStepFields(stepId, mappedFields);
+        }
+      }
+
+      const removedSteps = findDifference(
+        existingNode?.form?.steps,
+        input?.form?.steps as any,
+      );
+
+      if (removedSteps.length) {
+        const mappedSteps = removedSteps.map((field) => ({ id: field?.id?.toString() || '' }))
+        await this.questionNodePrismaAdapter.removeFormSteps(input.id, mappedSteps);
       }
 
       if (existingNode?.form) {
-        const fields = await this.saveEditFormNodeInput(input.form, input.customerSlug) || [];
-        await this.questionNodePrismaAdapter.updateFieldsOfForm({
-          questionId: input.id,
-          fields,
-          helperText: input.form.helperText || '',
+
+        await Promise.all(input.form.steps?.map(async (step) => {
+          if (!step) return;
+          const stepData = await this.saveEditFormStepInput(step, existingNode?.form?.id as string);
+          const upsertedStep = await this.questionNodePrismaAdapter.upsertFormNodeStep(stepData);
+          const fields = await this.saveEditFormNodeInput(step, input.customerSlug, upsertedStep.id) || [];
+          await Promise.all(fields.map((field) => this.questionNodePrismaAdapter.upsertFormNodeField(field)));
+          return;
+        }) || []);
+        // TODO: Move this to a PrismaAdapter
+        await this.prisma.formNode.update({
+          where: {
+            id: existingNode.form.id,
+          },
+          data: {
+            preForm: {
+              delete: (existingNode.form.preFormNodeId && !input.form.preFormNode) || false,
+              upsert: input.form.preFormNode ? {
+                create: {
+                  header: input.form.preFormNode.header,
+                  helper: input.form.preFormNode.helper,
+                  nextText: input.form.preFormNode.nextText,
+                  finishText: input.form.preFormNode.finishText,
+                },
+                update: {
+                  header: input.form.preFormNode.header,
+                  helper: input.form.preFormNode.helper,
+                  nextText: input.form.preFormNode.nextText,
+                  finishText: input.form.preFormNode.finishText,
+                },
+              } : undefined,
+            },
+          },
         })
       } else {
         const fields = await this.createFormNodeInput(input.form, input.customerSlug);
@@ -250,8 +344,8 @@ export class NodeService {
   };
 
   /**
-   * Find node belonging to a link.
-   * **/
+ * Find node belonging to a link.
+ * **/
   findNodeByLinkId(linkId: string) {
     return this.questionNodePrismaAdapter.findNodeByLinkId(linkId);
   }
@@ -401,24 +495,34 @@ export class NodeService {
   };
 
   /**
-   * Save FormNodeInput when `creating`
-   */
-  private async createFormNodeInput(
-    input: FormNodeInput,
-    workspaceSlug: string
-  ): Promise<Prisma.FormNodeCreateInput> {
-    const communicationUser = input.fields?.find((field) => field.userIds?.length);
-    const targetUsers = communicationUser?.userIds?.length
-      ? await this.userOfCustomerPrismaAdapter.findTargetUsers(
-        workspaceSlug, {
-          roleIds: communicationUser?.userIds.filter(isPresent), userIds: communicationUser?.userIds.filter(isPresent),
-        }
-      )
-      : [];
-    const allUserIds = targetUsers.map((user) => ({ id: user.userId }));
+     * Save FormNodeInput when `creating`
+     */
+  private async createFormNodeStepInput(
+    input: FormNodeStepInput,
+    workspaceSlug: string,
+    contactIds: string[] = [],
+  ): Promise<Prisma.FormNodeStepCreateInput> {
+    let allUserIds = contactIds.map((contactId) => ({ id: contactId }));
+
+    if (!allUserIds.length) {
+      const communicationUser = input.fields?.find((field) => field.userIds?.length);
+      const targetUsers = communicationUser?.userIds?.length
+        ? await this.userOfCustomerPrismaAdapter.findTargetUsers(
+          workspaceSlug,
+          {
+            roleIds: communicationUser?.userIds.filter(isPresent),
+            userIds: communicationUser?.userIds.filter(isPresent),
+          }
+        )
+        : [];
+      allUserIds = targetUsers.map((user) => ({ id: user.userId }));
+    }
 
     return ({
-      helperText: input.helperText,
+      header: input.header as string,
+      helper: input.helper as string,
+      subHelper: input.subHelper as string,
+      position: input.position as number,
       fields: {
         create: input.fields?.map((field) => ({
           type: field.type || 'shortText',
@@ -430,6 +534,34 @@ export class NodeService {
             connect: allUserIds,
           } : undefined,
         })),
+      },
+    })
+  };
+
+  /**
+     * Save FormNodeInput when `creating`
+     */
+  public async createFormNodeInput(
+    input: FormNodeInput,
+    workspaceSlug: string,
+    contactIds: string[] = [],
+  ): Promise<Prisma.FormNodeCreateInput> {
+    const steps = await Promise.all(input.steps?.map(
+      async (step) => await this.createFormNodeStepInput(step, workspaceSlug, contactIds)
+    ) as Promise<Prisma.FormNodeStepCreateInput>[])
+
+    return ({
+      helperText: input.helperText,
+      preForm: {
+        create: input.preFormNode ? {
+          header: input.preFormNode?.header,
+          helper: input.preFormNode?.helper,
+          nextText: input.preFormNode?.nextText,
+          finishText: input.preFormNode?.finishText,
+        } : undefined,
+      },
+      steps: {
+        create: steps,
       },
     })
   };

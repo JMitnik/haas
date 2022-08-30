@@ -1,5 +1,5 @@
 import { createPortal } from 'react-dom';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { Div } from '@haas/ui';
 import { Placement } from '@popperjs/core';

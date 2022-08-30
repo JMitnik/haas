@@ -3,6 +3,7 @@ export interface MailSendInput {
   body: string;
   subject: string;
   from?: string | null;
+  noConsole?: boolean;
 }
 
 export interface MailServiceType {
