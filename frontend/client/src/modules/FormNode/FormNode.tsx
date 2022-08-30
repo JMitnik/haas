@@ -208,12 +208,12 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                           || field.type === FormNodeFieldTypeEnum.Contacts ? 'span 2' : '1fr'}
                       >
                         <UI.FormControl isRequired={field.isRequired || false}>
-                          <UI.FormLabel htmlFor={`fields.${index}.value`}>{field.label}</UI.FormLabel>
+                          <UI.FormLabel htmlFor={`steps.${activeStep}.fields.${index}.value`}>{field.label}</UI.FormLabel>
                           {field.type === 'longText' && (
                             <UI.Textarea
                               {...register(`steps.${activeStep}.fields.${index}.value` as const)}
                               key={`longText-${index}`}
-                              id={`fields[${index}].value`}
+                              id={`steps.${activeStep}.fields.${index}.value`}
                               variant="outline"
                               minHeight="40px"
                               placeholder={field.placeholder || undefined}
@@ -260,7 +260,7 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                               {...register(`steps.${activeStep}.fields.${index}.value` as const, { required: field.isRequired || false })}
                               autoFocus={index === getFirstFocusableFieldIndex(step)}
                               key={fields[index].id}
-                              id={`fields[${index}].value`}
+                              id={`steps.${activeStep}.fields.${index}.value`}
                               variant="outline"
                               leftEl={mapIcon[field?.type] || <Type />}
                               type={mapFieldType[field?.type] || 'text'}
