@@ -6,7 +6,7 @@ import {
   Cross1Icon,
   LockClosedIcon,
   LockOpen2Icon,
-  Pencil1Icon
+  Pencil1Icon,
 } from '@radix-ui/react-icons';
 import { formatDistance } from 'date-fns';
 import { useHistory } from 'react-router';
@@ -41,7 +41,6 @@ import { ThemeContext } from 'styled-components';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useNavigator } from 'hooks/useNavigator';
 import { useToast } from 'hooks/useToast';
-import { useUser } from 'providers/UserProvider';
 import getLocale from 'utils/getLocale';
 import useAuth from 'hooks/useAuth';
 
@@ -55,7 +54,6 @@ interface DialogueCardProps {
 const DialogueCard = ({ dialogue, users }: DialogueCardProps) => {
   const themeContext = useContext(ThemeContext);
   const history = useHistory();
-  const { user } = useUser();
   const { activeCustomer } = useCustomer();
   const { customerSlug } = useNavigator();
   const { canAccessAdmin, canDeleteDialogue, canEditDialogue, canAssignUsersToDialogue } = useAuth();
@@ -196,8 +194,22 @@ const DialogueCard = ({ dialogue, users }: DialogueCardProps) => {
                 <UI.Flex justifyContent="space-between" alignItems="flex-end">
                   <UI.Div style={{ marginTop: 'auto' }}>
                     <UI.Flex>
+                      <UI.Div mt="auto" mr={2}>
+                        <UI.Label size="sm">
+                          <UI.Flex height="25px" alignItems="center">
+                            <UI.Icon color={themeContext.colors.gray[500]} verticalAlign="middle">
+                              {dialogue.isPrivate ? <LockClosedIcon /> : <LockOpen2Icon />}
+                            </UI.Icon>
+                            <UI.Span ml={1}>
+                              <UI.Helper>
+                                {dialogue.isPrivate ? 'Private' : 'Public'}
+                              </UI.Helper>
+                            </UI.Span>
+                          </UI.Flex>
+                        </UI.Label>
+                      </UI.Div>
                       {!!dialogue.language && (
-                        <UI.Div mr={1} mt="auto">
+                        <UI.Div mt="auto">
                           <UI.Label size="sm">
                             <UI.Flex alignItems="center">
                               <UI.Icon verticalAlign="middle" mt="4px">
@@ -212,21 +224,6 @@ const DialogueCard = ({ dialogue, users }: DialogueCardProps) => {
                           </UI.Label>
                         </UI.Div>
                       )}
-
-                      <UI.Div mt="auto">
-                        <UI.Label size="sm">
-                          <UI.Flex height="25px" alignItems="center">
-                            <UI.Icon color={themeContext.colors.gray[500]} verticalAlign="middle">
-                              {dialogue.isPrivate ? <LockClosedIcon /> : <LockOpen2Icon />}
-                            </UI.Icon>
-                            <UI.Span ml={1}>
-                              <UI.Helper>
-                                {dialogue.isPrivate ? 'Private' : 'Public'}
-                              </UI.Helper>
-                            </UI.Span>
-                          </UI.Flex>
-                        </UI.Label>
-                      </UI.Div>
                     </UI.Flex>
 
                     <UI.Flex alignItems="center" mt={1} justifyContent="space-between">
@@ -287,9 +284,9 @@ const DialogueCard = ({ dialogue, users }: DialogueCardProps) => {
                             state: !isAssignedToDialogue,
                             userId: user.id,
                             workspaceId: activeCustomer?.id as string,
-                          }
+                          },
                         },
-                      }
+                      },
                     )}
                     onSelect={(e) => e.preventDefault()}
                   >

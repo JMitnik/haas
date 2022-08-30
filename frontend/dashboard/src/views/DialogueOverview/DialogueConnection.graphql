@@ -15,6 +15,7 @@ query dialogueConnection($customerSlug: String, $filter: DialogueConnectionFilte
         id
         title
         isPrivate
+        template
         language
         slug
         publicTitle

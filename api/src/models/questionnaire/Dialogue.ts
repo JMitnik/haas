@@ -18,6 +18,7 @@ import { DialogueStatisticsSummaryModel } from './DialogueStatisticsSummary';
 import { UserType } from '../users/graphql/User';
 import { PathedSessionsType, PathedSessionsInput, TopicType, TopicInputType, MostPopularPath, DialogueStatisticsSummaryFilterInput, MostChangedPath, MostTrendingTopic } from './DialogueStatisticsResolver';
 import { HealthScore, HealthScoreInput } from '../customer/graphql/HealthScore';
+import { DialogueTemplateType } from '../../models/generate-workspace';
 
 export const TEXT_NODES = [
   'TEXTBOX',
@@ -50,10 +51,16 @@ export const DialogueType = objectType({
     t.nonNull.string('title');
     t.nonNull.string('slug');
     t.nonNull.string('description');
+    t.string('template', {
+      resolve(parent) {
+        return parent.template;
+      },
+    });
 
     // Placeholder data related properties
     t.boolean('isWithoutGenData');
     t.boolean('wasGeneratedWithGenData');
+
     t.field('language', {
       type: LanguageEnumType,
     });
