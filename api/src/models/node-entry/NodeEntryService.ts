@@ -1,9 +1,8 @@
 import {
-  NodeEntry, //NodeEntryCreateWithoutSessionInput, NodeEntryWhereInput
+  NodeEntry,
   PrismaClient,
   Prisma,
 } from '@prisma/client';
-import { isPresent } from 'ts-is-present';
 import _ from 'lodash';
 
 import { NexusGenInputs } from '../../generated/nexus';
@@ -11,12 +10,25 @@ import { OrderByProps } from '../../types/generic';
 import { pickProperties } from '../../utils/pickProperties';
 import NodeEntryPrismaAdapter from './NodeEntryPrismaAdapter';
 import { NodeEntryWithTypes } from './NodeEntryServiceType';
+import SessionPrismaAdapter from '../../models/session/SessionPrismaAdapter';
+import DialoguePrismaAdapter from '../../models/questionnaire/DialoguePrismaAdapter';
+import { DialogueWithCustomer } from '../../models/session/Session.types';
+import makeEmergencyTemplate from '../../services/mailings/templates/makeEmergencyTemplate';
+import config from '../../config/config';
+import MailService from '../../services/mailings/MailService';
+import Sentry from '../../config/sentry';
 
 class NodeEntryService {
   nodeEntryPrismaAdapter: NodeEntryPrismaAdapter;
+  sessionPrismaAdapter: SessionPrismaAdapter;
+  dialoguePrismaAdapter: DialoguePrismaAdapter;
+  mailService: MailService;
 
   constructor(prismaClient: PrismaClient) {
     this.nodeEntryPrismaAdapter = new NodeEntryPrismaAdapter(prismaClient);
+    this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
+    this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
+    this.mailService = new MailService();
   };
 
   findDialogueStatisticsRootEntries = async (
@@ -32,13 +44,56 @@ class NodeEntryService {
   }
 
   /**
-   * Create node-entries.
-   * */
-  createNodeEntry(sessionId: string, nodeEntryInput: NexusGenInputs['NodeEntryInput']): Promise<NodeEntry> {
-    return this.nodeEntryPrismaAdapter.create({
-      session: { connect: { id: sessionId } },
-      ...NodeEntryService.constructCreateNodeEntryFragment(nodeEntryInput),
+   * Builds the emergency email body and sends the email to the provided email address
+   * @param dialogueId 
+   * @param email 
+   * @param comment the text entered by a user in the comment (longText) field
+   */
+  sendEmergencyMail = async (dialogueId: string, email: string, comment?: string) => {
+    const dialogue = await this.dialoguePrismaAdapter.getDialogueById(dialogueId, true) as DialogueWithCustomer;
+
+    const loginBody = makeEmergencyTemplate({
+      recipientMail: email,
+      dialogueTitle: dialogue.title,
+      dashboardUrl: `${config.dashboardUrl}/dashboard/b/${dialogue.customer.slug}/dashboard`,
+      comment: comment,
     });
+
+    this.mailService.send({
+      body: loginBody,
+      recipient: email,
+      subject: 'HAAS: A team member requires immediate assistance!',
+    });
+  }
+
+  /**
+   * Create node-entries. if node entry contains an emergency contact, send a email to the contact 
+   * */
+  handleNodeEntryAppend = async (sessionId: string, nodeEntryInput: NexusGenInputs['NodeEntryInput']): Promise<NodeEntry> => {
+    const createNodeEntryFragment = NodeEntryService.constructCreateNodeEntryFragment(nodeEntryInput);
+    const emergencyContact = nodeEntryInput.data?.form?.values?.find((value) => value?.contacts);
+    const emergencyComment = nodeEntryInput.data?.form?.values?.find((value) => value?.longText);
+    const nodeEntry = await this.nodeEntryPrismaAdapter.create({
+      session: { connect: { id: sessionId } },
+      ...createNodeEntryFragment,
+    });
+
+    if (emergencyContact) {
+      try {
+        const emailAddress = emergencyContact.contacts;
+        const comment = emergencyComment?.longText;
+        const session = await this.sessionPrismaAdapter.findSessionById(sessionId);
+        await this.sendEmergencyMail(
+          session?.dialogueId as string,
+          emailAddress as string,
+          comment || undefined
+        )
+      } catch (error) {
+        Sentry.captureException(error);
+      }
+    }
+
+    return nodeEntry;
   };
 
   /**
@@ -109,7 +164,7 @@ class NodeEntryService {
             relatedField: { connect: { id: val?.relatedFieldId || '-1' } },
             ...pickProperties(
               val,
-              ['email', 'phoneNumber', 'url', 'shortText', 'longText', 'number'],
+              ['email', 'phoneNumber', 'url', 'shortText', 'longText', 'number', 'contacts'],
             ),
           })),
         },

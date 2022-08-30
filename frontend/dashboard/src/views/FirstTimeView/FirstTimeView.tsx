@@ -103,44 +103,40 @@ const FirstTimeForm = () => {
             </UI.Div>
             <UI.Div>
               <UI.InputGrid>
-                <UI.FormControl isRequired isInvalid={!!form.errors.firstName}>
+                <UI.FormControl isRequired isInvalid={!!form.formState.errors.firstName}>
                   <UI.FormLabel htmlFor="firstName">{t('first_name')}</UI.FormLabel>
                   <UI.InputHelper>{t('first_name_helper')}</UI.InputHelper>
                   <UI.Input
                     placeholder="Jane"
                     leftEl={<User />}
-                    name="firstName"
-                    ref={form.register()}
+                    {...form.register('firstName')}
                   />
                 </UI.FormControl>
-                <UI.FormControl isRequired isInvalid={!!form.errors.lastName}>
+                <UI.FormControl isRequired isInvalid={!!form.formState.errors.lastName}>
                   <UI.FormLabel htmlFor="lastName">{t('last_name')}</UI.FormLabel>
                   <UI.InputHelper>{t('last_name_helper')}</UI.InputHelper>
                   <UI.Input
                     placeholder="Doe"
                     leftEl={<User />}
-                    name="lastName"
-                    ref={form.register()}
+                    {...form.register('lastName')}
                   />
                 </UI.FormControl>
-                <UI.FormControl isRequired isInvalid={!!form.errors.email}>
+                <UI.FormControl isRequired isInvalid={!!form.formState.errors.email}>
                   <UI.FormLabel htmlFor="email">{t('email')}</UI.FormLabel>
                   <UI.InputHelper>{t('email_helper')}</UI.InputHelper>
                   <UI.Input
                     placeholder="Doe"
                     leftEl={<Mail />}
-                    name="email"
-                    ref={form.register()}
+                    {...form.register('email')}
                   />
                 </UI.FormControl>
-                <UI.FormControl isInvalid={!!form.errors.phone}>
+                <UI.FormControl isInvalid={!!form.formState.errors.phone}>
                   <UI.FormLabel htmlFor="phone">{t('phone')}</UI.FormLabel>
                   <UI.InputHelper>{t('phone_helper')}</UI.InputHelper>
                   <UI.Input
                     placeholder="Doe"
                     leftEl={<Phone />}
-                    name="phone"
-                    ref={form.register()}
+                    {...form.register('phone')}
                   />
                 </UI.FormControl>
               </UI.InputGrid>

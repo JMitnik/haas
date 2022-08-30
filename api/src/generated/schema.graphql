@@ -50,8 +50,28 @@ type AutodeckConnectionType implements DeprecatedConnectionInterface {
   startDate: String
 }
 
+"""AutomationActionChannel"""
+type AutomationActionChannel {
+  createdAt: Date
+  id: ID
+  payload: JSONObject
+  type: AutomationActionChannelType
+  updatedAt: Date
+}
+
+input AutomationActionChannelInput {
+  id: ID
+}
+
+enum AutomationActionChannelType {
+  EMAIL
+  SLACK
+  SMS
+}
+
 input AutomationActionInput {
   apiKey: String
+  channels: [AutomationActionChannelInput]
   endpoint: String
   id: ID
   payload: JSONObject
@@ -60,18 +80,24 @@ input AutomationActionInput {
 
 """AutomationAction"""
 type AutomationActionModel {
+  channels: [AutomationActionChannel]
   createdAt: Date
   id: ID
+  payload: JSONObject
   type: AutomationActionType
   updatedAt: Date
 }
 
 enum AutomationActionType {
   API_CALL
-  GENERATE_REPORT
+  CUSTOM_REPORT
+  MONTH_REPORT
+  SEND_DIALOGUE_LINK
   SEND_EMAIL
   SEND_SMS
   WEBHOOK
+  WEEK_REPORT
+  YEAR_REPORT
 }
 
 input AutomationConditionBuilderInput {
@@ -83,7 +109,6 @@ input AutomationConditionBuilderInput {
 
 """AutomationConditionBuilder"""
 type AutomationConditionBuilderModel {
-  childConditionBuilder: AutomationConditionBuilderModel
   childConditionBuilderId: String
   conditions: [AutomationConditionModel]
   id: ID
@@ -164,6 +189,7 @@ input AutomationConnectionOrderByInput {
 
 """Fields to order UserConnection by."""
 enum AutomationConnectionOrderType {
+  createdAt
   type
   updatedAt
 }
@@ -197,6 +223,7 @@ enum AutomationEventType {
 
 """Automation"""
 type AutomationModel {
+  automationScheduled: AutomationScheduledModel
   automationTrigger: AutomationTriggerModel
   createdAt: Date
   description: String
@@ -208,9 +235,40 @@ type AutomationModel {
   workspace: Customer
 }
 
+input AutomationScheduleInput {
+  dayOfMonth: String!
+  dayOfWeek: String!
+  dialogueId: String
+  hours: String!
+  id: ID
+  minutes: String!
+  month: String!
+  type: RecurringPeriodType!
+}
+
+"""AutomationScheduled"""
+type AutomationScheduledModel {
+  actions: [AutomationActionModel]
+  activeDialogue: Dialogue
+  createdAt: Date
+  dayOfMonth: String
+  dayOfWeek: String
+  dayRange: [DayRange]
+  dialogueId: String
+  frequency: String
+  hours: String
+  id: ID
+  minutes: String
+  month: String
+  time: String
+  type: RecurringPeriodType
+  updatedAt: Date
+}
+
 """AutomationTrigger"""
 type AutomationTriggerModel {
   actions: [AutomationActionModel]
+  activeDialogue: Dialogue
   conditionBuilder: AutomationConditionBuilderModel
   createdAt: Date
   event: AutomationEventModel
@@ -220,6 +278,7 @@ type AutomationTriggerModel {
 
 enum AutomationType {
   CAMPAIGN
+  SCHEDULED
   TRIGGER
 }
 
@@ -378,11 +437,11 @@ input CreateAutomationCondition {
 input CreateAutomationInput {
   actions: [AutomationActionInput]
   automationType: AutomationType
-  conditionBuilder: AutomationConditionBuilderInput
   description: String
   event: AutomationEventInput
   id: ID
   label: String
+  schedule: AutomationScheduleInput
   workspaceId: String
 }
 
@@ -532,6 +591,7 @@ type Customer {
   dialogues(filter: DialogueFilterInputType): [Dialogue]
   id: ID
   isDemo: Boolean
+  issueTopics(input: IssueFilterInput): [Issue]
   issues(filter: IssueFilterInput): [Issue]
   name: String!
   nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel] @deprecated(reason: "Deprecated, see statistics")
@@ -588,6 +648,16 @@ type DateHistogramItem {
   
 """
 scalar DateString
+
+type DayRange {
+  index: Int
+  label: String
+}
+
+input DeleteAutomationInput {
+  automationId: String!
+  workspaceId: String!
+}
 
 input DeleteDialogueInputType {
   customerSlug: String
@@ -884,6 +954,12 @@ input EditWorkspaceInput {
   slug: String!
 }
 
+input EnableAutomationInput {
+  automationId: String!
+  state: Boolean!
+  workspaceId: String!
+}
+
 type FailedDeliveryModel {
   error: String
   record: String
@@ -900,6 +976,7 @@ type FontSettings {
 
 """FormNodeEntryInput"""
 input FormNodeEntryFieldInput {
+  contacts: String
   email: String
   longText: String
   number: Int
@@ -930,6 +1007,12 @@ type FormNodeEntryValueType {
 }
 
 type FormNodeField {
+  """
+  
+          List of possible contact points for a form-node.
+        
+  """
+  contacts: [UserType]
   id: ID
   isRequired: Boolean
   label: String
@@ -945,10 +1028,12 @@ input FormNodeFieldInput {
   placeholder: String
   position: Int
   type: FormNodeFieldTypeEnum
+  userIds: [String]
 }
 
 """The types a field can assume"""
 enum FormNodeFieldTypeEnum {
+  contacts
   email
   longText
   number
@@ -1237,9 +1322,12 @@ type Mutation {
   createRole(data: RoleInput): RoleType
   createSession(input: SessionInput): Session
   createTag(customerSlug: String, name: String, type: TagTypeEnum): Tag
+
+  """Creates a list of topics and its subtopics."""
   createTopic(input: [CreateTopicInput!]): Boolean
   createTrigger(input: CreateTriggerInputType): TriggerType
   createWorkspace(input: CreateWorkspaceInput): Customer
+  deleteAutomation(input: DeleteAutomationInput): AutomationModel
   deleteCTA(input: DeleteNodeInputType): QuestionNode
   deleteCustomer(where: CustomerWhereUniqueInput): Customer
   deleteDialogue(input: DeleteDialogueInputType): Dialogue
@@ -1259,6 +1347,7 @@ type Mutation {
   editTrigger(customerSlug: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType
   editUser(input: EditUserInput, userId: String): UserType
   editWorkspace(input: EditWorkspaceInput): Customer
+  enableAutomation(input: EnableAutomationInput): AutomationModel
   generateAutodeck(input: GenerateAutodeckInput): CreateWorkspaceJobType
   generateWorkspaceFromCSV(input: GenerateWorkspaceCSVInputType): Customer
   handleUserStateInWorkspace(input: HandleUserStateInWorkspaceInput): UserCustomer
@@ -1276,6 +1365,8 @@ type Mutation {
   retryAutodeckJob(jobId: String): CreateWorkspaceJobType
   revokeTopic(input: RevokeTopicInput): Topic
   sandbox(input: SandboxInput): String
+  sendAutomationDialogueLink(input: SendAutomationDialogueLinkInput): Boolean
+  sendAutomationReport(input: SendAutomationReportInput): Boolean
   setDialoguePrivacy(input: SetDialoguePrivacyInput): Dialogue
   singleUpload(file: Upload!): ImageType
   updateAutomation(input: CreateAutomationInput): AutomationModel
@@ -1632,10 +1723,13 @@ input RecipientsInputType {
 }
 
 enum RecurringPeriodType {
+  CUSTOM
   END_OF_DAY
   END_OF_WEEK
   EVERY_DAY
+  EVERY_MONTH
   EVERY_WEEK
+  EVERY_YEAR
   START_OF_DAY
   START_OF_WEEK
 }
@@ -1720,6 +1814,17 @@ input SandboxInput {
   name: String
   onlyGet: Boolean
   value: Int
+}
+
+input SendAutomationDialogueLinkInput {
+  automationActionId: String!
+  workspaceSlug: String!
+}
+
+input SendAutomationReportInput {
+  automationActionId: String!
+  reportUrl: String!
+  workspaceSlug: String!
 }
 
 type Session {
@@ -2059,6 +2164,7 @@ enum TriggerTypeEnum {
 
 input UpdateCTAInputType {
   customerId: ID
+  customerSlug: String!
   form: FormNodeInputType
   id: String
   links: CTALinksInputType
@@ -2229,6 +2335,9 @@ type WorkspaceStatistics {
   health(input: HealthScoreInput): HealthScore
   id: ID
 
+  """Histogram of issues over time."""
+  issueHistogram(input: DialogueStatisticsSummaryFilterInput): DateHistogram
+
   """
   
           Get the path (sequence of topics) with the most changed impact score.
@@ -2242,6 +2351,9 @@ type WorkspaceStatistics {
   Topics of a workspace ranked by either impact score or number of responses
   """
   rankedTopics(input: DialogueStatisticsSummaryFilterInput): [TopicType]
+
+  """Histogram of responses over time."""
+  responseHistogram(input: DialogueStatisticsSummaryFilterInput): DateHistogram
   workspaceStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel!]!
 }
 

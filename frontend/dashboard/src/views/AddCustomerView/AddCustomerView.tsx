@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
 import { useToast } from '@chakra-ui/core';
-import { yupResolver } from '@hookform/resolvers';
+import { yupResolver } from '@hookform/resolvers/yup';
 import React from 'react';
 
 import { CreateWorkspaceInput } from 'types/globalTypes';

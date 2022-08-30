@@ -18,7 +18,7 @@ export const AutomationConnectionOrderType = enumType({
   name: 'AutomationConnectionOrderType',
   description: 'Fields to order UserConnection by.',
 
-  members: ['updatedAt', 'type'],
+  members: ['updatedAt', 'type', 'createdAt'],
 });
 
 export const AutomationConnectionFilterInput = inputObjectType({

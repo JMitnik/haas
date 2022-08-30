@@ -159,8 +159,7 @@ export const GenerateWorkspaceView = () => {
             <UI.FormControl isRequired>
               <UI.FormLabel>{t('workspace_title')}</UI.FormLabel>
               <UI.Input
-                name="workspaceTitle"
-                ref={form.register()}
+                {...form.register('workspaceTitle')}
                 placeholder={t('default_values:workspace_placeholder')}
               />
             </UI.FormControl>
@@ -171,8 +170,7 @@ export const GenerateWorkspaceView = () => {
               <UI.Input
                 placeholder={t('default_values:workspace_slug')}
                 leftAddOn="https://client.haas.live/"
-                name="workspaceSlug"
-                ref={form.register({ required: true })}
+                {...form.register('workspaceSlug', { required: true })}
               />
             </UI.FormControl>
 
@@ -181,7 +179,7 @@ export const GenerateWorkspaceView = () => {
               <Controller
                 name="dialogueType"
                 control={form.control}
-                render={({ value, onChange, onBlur }) => (
+                render={({ field: { value, onChange, onBlur } }) => (
                   <RadioGroup.Root
                     defaultValue={value}
                     onValueChange={onChange}
@@ -221,7 +219,7 @@ export const GenerateWorkspaceView = () => {
                     control={form.control}
                     name="isDemo"
                     defaultValue={0}
-                    render={({ onChange, value, onBlur }) => (
+                    render={({ field: { onChange, value, onBlur } }) => (
                       <UI.Toggle
                         size="lg"
                         onChange={() => {
@@ -253,7 +251,7 @@ export const GenerateWorkspaceView = () => {
                     control={form.control}
                     name="generateDemoData"
                     defaultValue={0}
-                    render={({ onChange, value, onBlur }) => (
+                    render={({ field: { onChange, value, onBlur } }) => (
                       <UI.Toggle
                         isDisabled={isDemoWatch !== 1}
                         isChecked={value === 1}

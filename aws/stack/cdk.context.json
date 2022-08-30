@@ -21,5 +21,10 @@
   "hosted-zone:account=954269587296:domainName=haas.live:region=eu-central-1": {
     "Id": "/hostedzone/Z086035536KCE99I1V7V6",
     "Name": "haas.live."
-  }
+  },
+  "availability-zones:account=118627563984:region=eu-central-1": [
+    "eu-central-1a",
+    "eu-central-1b",
+    "eu-central-1c"
+  ]
 }

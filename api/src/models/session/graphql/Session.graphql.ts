@@ -169,7 +169,6 @@ export const CreateSessionMutation = mutationField('createSession', {
       throw new Error('No valid new session data provided');
     }
 
-
     try {
       const session = await ctx.services.sessionService.createSession(args.input);
       await ctx.services.redisService.set(`session:${session.id}`, session.mainScore);
@@ -202,7 +201,10 @@ export const AppendToInteractionMutation = mutationField('appendToInteraction', 
     if (!args?.input) throw new UserInputError('No valid new interaction data provided');
     if (!args?.input.sessionId) throw new UserInputError('No valid existing interaction found');
 
-    const updatedInteraction = await ctx.services.nodeEntryService.createNodeEntry(args.input.sessionId, args.input);
+    const updatedInteraction = await ctx.services.nodeEntryService.handleNodeEntryAppend(
+      args.input.sessionId,
+      args.input
+    );
 
     return updatedInteraction as any;
   },

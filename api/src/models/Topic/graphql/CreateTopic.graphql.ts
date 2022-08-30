@@ -19,6 +19,7 @@ export const CreateTopicInput = inputObjectType({
 export const CreateTopicMutation = mutationField('createTopic', {
   type: 'Boolean',
   args: { input: list(nonNull(CreateTopicInput)) },
+  description: 'Creates a list of topics and its subtopics.',
   async resolve(parent, args, ctx) {
     if (!args.input) throw new GraphQLYogaError('No input object!');
     return ctx.services.topicService.createTopics(args.input);

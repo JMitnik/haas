@@ -51,6 +51,21 @@ const argv = yargs
   .help()
   .alias('help', 'h').argv as any;
 
+// const addUser = async (workspaceWithRoles: Workspace, type: RoleTypeEnum) => {
+//   const role = workspaceWithRoles.roles.find((role) => role.type === type);
+//   const user = await userService.upsertUserByEmail({
+//     email: `${workspaceWithRoles.slug}-${type.toLowerCase()}`,
+//     firstName: type,
+//     lastName: 'User',
+//   });
+
+//   await userOfCustomerPrismaAdapter.connectUserToWorkspace(
+//     workspaceWithRoles.id,
+//     role?.id as string,
+//     user.id as string
+//   );
+// }
+
 export const seedBusinessTemplate = async () => {
   const amtSessions = argv.sessions;
   const ownEmail = argv.email;

@@ -3,7 +3,7 @@ import * as yup from 'yup';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { yupResolver } from '@hookform/resolvers';
+import { yupResolver } from '@hookform/resolvers/yup';
 import React from 'react';
 
 import { LogoThumbnail } from 'components/Logo';
@@ -97,7 +97,7 @@ const LoginView = () => {
                           <UI.FormLabel htmlFor="email">
                             {t('email')}
                           </UI.FormLabel>
-                          <UI.Input autoFocus defaultValue={sentEmail} name="email" ref={form.register()} />
+                          <UI.Input autoFocus defaultValue={sentEmail} {...form.register('email')} />
                         </UI.FormControl>
                         <UI.Button
                           isDisabled={!form.formState.isValid || isRequestingInvite}

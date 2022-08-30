@@ -60,8 +60,16 @@ class DialogueService {
   }
 
   /**
-   * Finds all dialogues of a worksp
-   * ace but strips them off all sensitive information
+   * Finds dialogue by a question ID
+   * @param questionId 
+   * @returns 
+   */
+  findDialogueByQuestionId = async (questionId: string) => {
+    return this.dialoguePrismaAdapter.getDialogueByQuestionNodeId(questionId);
+  }
+
+  /**
+   * Finds all dialogues of a workspace but strips them off all sensitive information
    * @param workspaceId
    * @returns a list of dialogues including a url to their client version
    */

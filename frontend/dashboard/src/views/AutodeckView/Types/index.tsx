@@ -1,29 +1,31 @@
 import * as yup from 'yup';
-import { MutationFunctionOptions } from '@apollo/client';
-import { CreateWorkspaceJobMutation, Exact, GenerateAutodeckInput, CreateWorkspaceJobType, ConfirmWorkspaceJobMutation } from 'types/generated-types';
+import { ConfirmWorkspaceJobMutation, CreateWorkspaceJobMutation, CreateWorkspaceJobType, Exact, GenerateAutodeckInput } from 'types/generated-types';
 import { DeepPartial } from 'types/customTypes';
+import { MutationFunctionOptions } from '@apollo/client';
 
-const ACCEPTED_CHARS = /^[a-zA-Z0-9.,/ $@%()-_!'?^&* ]+$/gim
+const ACCEPTED_CHARS = /^[a-zA-Z0-9.,/ $@%()-_!'?^&* ]+$/gim;
 
 export const schema = yup.object().shape({
   name: yup.string(),
   customFields: yup.array().required().of(yup.object().nullable().notRequired().shape({
     key: yup.string().nullable(),
     value: yup.string().nullable().matches(ACCEPTED_CHARS, {
-      message: 'You have used special characters which are not allowed!'
+      message: 'You have used special characters which are not allowed!',
     }),
-  }).nullable()).notRequired(),
+  })
+    .nullable()).notRequired(),
   newCustomFields: yup.array().required().of(yup.object().nullable().notRequired().shape({
     key: yup.string().required().matches(/^[a-zA-Z]*$/, {
       message: 'Only alphabetic characters are accepted as key!',
     }),
     value: yup.string().required().matches(ACCEPTED_CHARS, {
-      message: 'You have used special characters which are not allowed!'
+      message: 'You have used special characters which are not allowed!',
     }),
-  }).nullable()).notRequired(),
+  })
+    .nullable()).notRequired(),
   jobLocation: yup.object().shape({
     value: yup.string().required(),
-    label: yup.string().required()
+    label: yup.string().required(),
   }).required(),
   website: yup.string().notRequired(),
   logo: yup.string().url('Url should be valid'),
@@ -32,7 +34,7 @@ export const schema = yup.object().shape({
   }),
   isGenerateWorkspace: yup.number(),
   slug: yup.string().matches(ACCEPTED_CHARS, {
-    message: 'You have used special characters which are not allowed!'
+    message: 'You have used special characters which are not allowed!',
   }),
   useRembg: yup.number(),
   useCustomUrl: yup.number(),
@@ -40,42 +42,43 @@ export const schema = yup.object().shape({
   useWebsiteUrl: yup.number(),
   isEditingLogo: yup.number(),
   isWebsiteUrlApproved: yup.number(),
+  uploadWebsite: yup.string(),
   isLogoUrlApproved: yup.number(),
   uploadLogo: yup.string().url(),
   adjustedLogo: yup.string().url(),
   firstName: yup.string().matches(ACCEPTED_CHARS, {
-    message: 'You have used special characters which are not allowed!'
+    message: 'You have used special characters which are not allowed!',
   }),
   companyName: yup.string().matches(ACCEPTED_CHARS, {
-    message: 'You have used special characters which are not allowed!'
+    message: 'You have used special characters which are not allowed!',
   }),
   answer2: yup.string().matches(ACCEPTED_CHARS, {
-      message: 'You have used special characters which are not allowed!'
-    }),
+    message: 'You have used special characters which are not allowed!',
+  }),
   answer1: yup.string().matches(ACCEPTED_CHARS, {
-      message: 'You have used special characters which are not allowed!'
-    }),
+    message: 'You have used special characters which are not allowed!',
+  }),
   answer3: yup.string().matches(ACCEPTED_CHARS, {
-      message: 'You have used special characters which are not allowed!'
-    }),
+    message: 'You have used special characters which are not allowed!',
+  }),
   answer4: yup.string().matches(ACCEPTED_CHARS, {
-      message: 'You have used special characters which are not allowed!'
-    }),
+    message: 'You have used special characters which are not allowed!',
+  }),
   sorryAboutX: yup.string().matches(ACCEPTED_CHARS, {
-      message: 'You have used special characters which are not allowed!'
-    }),
+    message: 'You have used special characters which are not allowed!',
+  }),
   youLoveX: yup.string().matches(ACCEPTED_CHARS, {
-      message: 'You have used special characters which are not allowed!'
-    }),
+    message: 'You have used special characters which are not allowed!',
+  }),
   reward: yup.string().matches(ACCEPTED_CHARS, {
-      message: 'You have used special characters which are not allowed!'
-    }),
+    message: 'You have used special characters which are not allowed!',
+  }),
   emailContent: yup.string().matches(ACCEPTED_CHARS, {
-      message: 'You have used special characters which are not allowed!'
-    }),
+    message: 'You have used special characters which are not allowed!',
+  }),
   textMessage: yup.string().matches(ACCEPTED_CHARS, {
-      message: 'You have used special characters which are not allowed!'
-    }),
+    message: 'You have used special characters which are not allowed!',
+  }),
 }).required();
 
 export type FormDataProps = yup.InferType<typeof schema>;

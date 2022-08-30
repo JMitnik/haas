@@ -64,10 +64,10 @@ export const AssignDialoguePicker = ({
         {workspaceDialogues?.map((dialogue) => (
           <Controller
             control={control}
-            name={dialogue.id}
+            name={dialogue.id as any}
             defaultValue={assignedDialogueIds?.includes(dialogue.id) || false}
             key={dialogue.id}
-            render={({ onChange, value }) => (
+            render={({ field: { onChange, value } }) => (
               <UI.CheckboxCard
                 value={value}
                 key={dialogue.id}
