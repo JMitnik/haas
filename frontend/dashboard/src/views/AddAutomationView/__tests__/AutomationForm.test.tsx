@@ -2,11 +2,15 @@ import { debug } from 'jest-preview';
 import { render, screen, userEvent } from 'test';
 import React from 'react';
 
+import { act } from 'react-dom/test-utils';
+
 import { AutomationForm } from '../AutomationForm';
 import { mockGetUsersAndRoles } from './helpers';
 
 const renderComponent = () => {
-  render(<AutomationForm />);
+  act(() => {
+    render(<AutomationForm />);
+  });
 };
 
 test('render form and validate state of create button', async () => {
@@ -51,8 +55,12 @@ test('render form and validate state of create button', async () => {
   const sendDialogueLinkChoice = await screen.findByText('Send dialogue link');
   userEvent.click(sendDialogueLinkChoice);
 
+  mockGetUsersAndRoles((res) => ({ ...res }));
+
   expect(screen.queryByText(/Schedule frequency/i)).not.toBeNull();
   expect(screen.queryByText('Create')).toBeDisabled();
+
+  userEvent.click(customizableChoice);
 
   // Add recipient
   const addTargetButton = await screen.findByText('Add target');
@@ -62,7 +70,7 @@ test('render form and validate state of create button', async () => {
 
   debug();
 
-  const userPickerEntry = await screen.findByText((text) => text.toLowerCase().includes('manager'.toLowerCase()));
+  const userPickerEntry = await screen.findByText((text) => text.toLowerCase().includes('admin user'.toLowerCase()));
   userEvent.click(userPickerEntry);
 
   // Verify that the create button is enabled now
