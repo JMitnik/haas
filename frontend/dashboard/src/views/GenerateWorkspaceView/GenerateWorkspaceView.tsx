@@ -90,12 +90,6 @@ export const GenerateWorkspaceView = () => {
     },
   });
 
-  const usesGeneratedData = useWatch({
-    control: form.control,
-    name: 'generateDemoData',
-    defaultValue: 0,
-  });
-
   const isDemoWatch = useWatch({
     control: form.control,
     name: 'isDemo',
@@ -283,7 +277,7 @@ export const GenerateWorkspaceView = () => {
                     control={form.control}
                     name="makeDialoguesPrivate"
                     defaultValue={0}
-                    render={({ onChange, value, onBlur }) => (
+                    render={({ field: { onChange, value, onBlur } }) => (
                       <UI.Toggle
                         isChecked={value === 1}
                         size="lg"

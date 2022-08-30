@@ -117,9 +117,11 @@ export const CustomerType = objectType({
       nullable: true,
       args: { input: IssueFilterInput },
 
-      resolve: async (parent, args, { services }) => {
+      resolve: async (parent, args, { services, session }) => {
         const filter = IssueValidator.resolveFilter(args.input);
-        return await services.issueService.getWorkspaceIssues(parent.id, filter);
+        assertNonNullish(session?.user?.id, 'No user ID provided!');
+
+        return await services.issueService.getWorkspaceIssues(parent.id, filter, session?.user.id);
       },
     });
 
