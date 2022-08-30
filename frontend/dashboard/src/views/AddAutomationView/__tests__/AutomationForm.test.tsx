@@ -1,3 +1,4 @@
+import { debug } from 'jest-preview';
 import { render, screen, userEvent } from 'test';
 import React from 'react';
 
@@ -57,7 +58,11 @@ test('render form and validate state of create button', async () => {
   const addTargetButton = await screen.findByText('Add target');
   userEvent.click(addTargetButton);
 
-  const userPickerEntry = await screen.findByText(/ADMIN User*/i);
+  await new Promise((r) => setTimeout(r, 2000));
+
+  debug();
+
+  const userPickerEntry = await screen.findByText((text) => text.toLowerCase().includes('manager'.toLowerCase()));
   userEvent.click(userPickerEntry);
 
   // Verify that the create button is enabled now

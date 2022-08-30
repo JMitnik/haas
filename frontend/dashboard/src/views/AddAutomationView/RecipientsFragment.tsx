@@ -18,6 +18,8 @@ export const RecipientsFragment = ({ recipientEntries }: RecipientFragmentProps)
   const { t } = useTranslation();
   const form = useFormContext();
 
+  console.log('Recipient entries: ', recipientEntries);
+
   return (
     <UI.FormSection id="actions">
       <UI.Div>

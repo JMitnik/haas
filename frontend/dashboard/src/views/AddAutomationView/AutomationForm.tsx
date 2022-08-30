@@ -93,6 +93,7 @@ export const AutomationForm = ({
   });
 
   const userPickerEntries = mapToUserPickerEntries(userRoleData?.customer as any);
+  console.log('Users: ', userPickerEntries);
 
   const dialogueItems = dialoguesData?.customer?.dialogues?.map((dialogue) => ({
     id: dialogue?.id,

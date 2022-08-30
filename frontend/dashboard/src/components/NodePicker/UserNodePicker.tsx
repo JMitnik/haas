@@ -89,6 +89,7 @@ export const UserNodePicker = ({
   currValues,
   isMulti,
 }: NodePickerProps) => {
+  console.log('Items: ', items);
   const [filteredState, setFilteredState] = useState<TargetTypeEnum | null>(null);
   const [filteredItems, setFilteredItems] = useState(items);
   const { t } = useTranslation();

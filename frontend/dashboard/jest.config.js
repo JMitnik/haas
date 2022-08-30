@@ -1,4 +1,5 @@
 module.exports = {
+  verbose: true,
   clearMocks: true,
   testEnvironment: './custom-env.ts',
   roots: ['src',],
