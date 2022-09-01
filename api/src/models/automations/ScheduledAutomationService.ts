@@ -5,6 +5,7 @@ import {
 } from '@prisma/client';
 import * as AWS from 'aws-sdk';
 
+import { AWSServiceMap } from '../Common/Mappings/AWSServiceMap';
 import config from '../../config/config';
 import DialogueService from '../questionnaire/DialogueService';
 import UserService from '../users/UserService';
@@ -15,7 +16,7 @@ import { AutomationActionService } from './AutomationActionService';
 import CustomerService from '../../models/customer/CustomerService';
 import {
   buildFrequencyCronString,
-  findLambdaArnByActionType,
+  findLambdaArnByAction,
   findLambdaParamsByActionType,
   findReportQueryParamsByCron,
 } from './AutomationService.helpers';
@@ -33,6 +34,7 @@ class ScheduledAutomationService {
   eventBridge: AWS.EventBridge;
   lambda: AWS.Lambda;
   iam: AWS.IAM;
+  awsServiceMap: AWSServiceMap;
 
   constructor(prisma: PrismaClient) {
     this.scheduledAutomationPrismaAdapter = new ScheduledAutomationPrismaAdapter(prisma);
@@ -46,6 +48,7 @@ class ScheduledAutomationService {
     this.iam = new AWS.IAM();
     this.eventBridge = new AWS.EventBridge();
     this.lambda = new AWS.Lambda();
+    this.awsServiceMap = new AWSServiceMap(process.env.AWS_ACCOUNT_ID as string, new AWS.Config())
   }
 
   /**
@@ -84,18 +87,19 @@ class ScheduledAutomationService {
   }
 
   /**
-   * Maps the actions of a scheduled automation to valid AWS EventBridge rule targets
-   * @returns a list of targets for an AWS EventBridge rule
+   * Maps the actions of a scheduled automation to valid AWS EventBridge rule targets.
    */
-  mapActionsToRuleTargets = async (
+  public async mapActionsToTargets(
     automationScheduledId: string,
     actions: AutomationAction[],
     botUser: User,
     workspaceSlug: string,
     dialogueSlug?: string,
-  ): Promise<AWS.EventBridge.TargetList> => {
+  ): Promise<AWS.EventBridge.TargetList> {
+    const generalDLQ = this.awsServiceMap.getSQSResource(this.awsServiceMap.Report_Eventbridge_DLQName);
+
     return Promise.all(actions.map(async (action, index) => {
-      const lambdaTargetArn = findLambdaArnByActionType(action.type);
+      const lambdaTargetArn = findLambdaArnByAction(action.type);
       if (!lambdaTargetArn) throw new GraphQLYogaError('No lambda target arn found in env file');
 
       const queryParams = await this.findReportQueryParamsByActionType(action);
@@ -123,12 +127,20 @@ class ScheduledAutomationService {
         WORKSPACE_SLUG: workspaceSlug,
       }
 
-      const finalInput = findLambdaParamsByActionType(action.type, extraGenerateParams, sendDialogueLinkParams);
+      // Lambda input is passed directly to
+      const lambdaInput = findLambdaParamsByActionType(
+        action.type,
+        extraGenerateParams,
+        sendDialogueLinkParams
+      );
 
       return {
         Id: `${automationScheduledId}-${index}-action`,
         Arn: lambdaTargetArn,
-        Input: JSON.stringify(finalInput),
+        Input: JSON.stringify(lambdaInput),
+        DeadLetterConfig: {
+          Arn: generalDLQ,
+        },
       }
     }))
   }
