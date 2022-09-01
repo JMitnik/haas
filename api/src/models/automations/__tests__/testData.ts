@@ -25,6 +25,7 @@ export const conditionInput: AutomationCondition = {
     id: 'SLIDER_ID',
     title: 'slider',
     type: 'SLIDER',
+    topicId: null,
     creationDate: new Date(Date.now()),
     edgeId: '',
     formNodeId: '',
@@ -76,6 +77,7 @@ export const automationTriggerInput: AutomationTrigger = {
     question: {
       id: 'SLIDER_ID',
       title: 'slider',
+      topicId: null,
       type: 'SLIDER',
       creationDate: new Date(Date.now()),
       edgeId: '',

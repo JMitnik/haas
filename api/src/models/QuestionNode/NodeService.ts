@@ -107,7 +107,6 @@ export class NodeService {
     const dialogue = await this.dialoguePrismaAdapter.getDialogueBySlugs(input.customerSlug, input.dialogueSlug);
     if (!dialogue?.id) throw 'No Dialogue found to add CTA to!'
 
-    console.log('Form: ', input.form);
     const form = input.form ? await this.createFormNodeInput(input.form, input.customerSlug) : undefined;
 
     const callToAction = await this.questionNodePrismaAdapter.createCallToAction({
@@ -937,10 +936,11 @@ export class NodeService {
       : [dbEdge];
 
     const activeCTA = overrideLeafId ? await this.findNodeById(overrideLeafId) : undefined;
-    console.log('activeCTA: ', activeCTA);
 
     for (const activeQuestion of activeQuestions) {
+      const isCurrentQuestion = activeQuestion?.id === questionId;
       const activeOptions = activeQuestion ? activeQuestion?.options?.map((option) => option.id) : [];
+
       // Find the correct CTA within a dialogue based on its topic 
       const mappedOverrideLeaf = activeCTA?.topic?.name
         ? await this.questionNodePrismaAdapter.findCTAByTopic(
@@ -949,7 +949,7 @@ export class NodeService {
         : undefined;
 
       // Find matching options in matching template question
-      const mappedOptions = await Promise.all(options.map(
+      const mappedOptions = !isCurrentQuestion ? await Promise.all(options.map(
         async (option) => {
           let mappedOverrideLeaf;
           if (option.overrideLeafId) {
@@ -970,16 +970,20 @@ export class NodeService {
           if (!targetOption) return {
             ...option,
             id: undefined,
-            overrideLeafId: activeQuestion?.id === questionId ? overrideLeafId : mappedOverrideLeaf?.id || undefined,
+            overrideLeafId: isCurrentQuestion
+              ? overrideLeafId || undefined
+              : mappedOverrideLeaf?.id || undefined,
           };
 
           return {
             ...option,
             id: targetOption.id,
-            overrideLeafId: activeQuestion?.id === questionId ? overrideLeafId : mappedOverrideLeaf?.id || undefined,
+            overrideLeafId: isCurrentQuestion
+              ? overrideLeafId || undefined
+              : mappedOverrideLeaf?.id || undefined,
           }
         }
-      ).filter(isPresent));
+      ).filter(isPresent)) : options;
 
       try {
         await this.removeNonExistingQuestionOptions(
@@ -1000,11 +1004,9 @@ export class NodeService {
         title,
         type,
         options: activeQuestions.length > 1 ? mappedOptions : options,
-        overrideLeafId: activeQuestion?.id === questionId
+        overrideLeafId: isCurrentQuestion
           ? overrideLeafId || undefined
-          : activeQuestions.length > 1
-            ? mappedOverrideLeaf?.id || undefined
-            : overrideLeafId || undefined,
+          : mappedOverrideLeaf?.id || undefined,
         videoEmbeddedNode: {
           id: activeQuestion?.videoEmbeddedNodeId || undefined,
         },
