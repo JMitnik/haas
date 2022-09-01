@@ -284,6 +284,35 @@ describe('Update Node Resolver', () => {
       matchValue: null,
     });
 
+    // Expect dialogues of another workspace not to be updated
+    const notUpdatedDialogue = await prisma.dialogue.findUnique({
+      where: {
+        slug_customerId: {
+          customerId: workspaceTwo.id,
+          slug: 'DIALOGUE_THREE',
+        },
+      },
+      include: {
+        edges: {
+          include: {
+            conditions: true,
+          },
+        },
+        questions: {
+          include: {
+            children: {
+              include: {
+                conditions: true,
+              },
+            },
+            options: true,
+          },
+        },
+      },
+    });
+
+    expect(notUpdatedDialogue?.title).not.toBe('What went wrong?');
+
 
   });
 
