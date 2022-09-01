@@ -9,7 +9,7 @@ export const authenticateLambda = async (
   workspaceEmail: string,
   authToken: string
  ) => {
-  const req = await axios.post(url, {
+  return axios.post(url, {
     query: `
     mutation authenticateLambda($input: AuthenticateLambdaInput) {
       authenticateLambda(input: $input)
@@ -21,9 +21,15 @@ export const authenticateLambda = async (
   }, {
     headers: {
       lambda: authToken,
-    }
+    },
+  })
+  .then(function (response) {
+    console.log('RESPONSE: ', response.data);
+    return response.data;
+  })
+  .catch(function (error) {
+    console.log('ERROR AXIOS', error);
   });
-  return req.data;
 }
 
 const verifyToken = async (apiUrl: string, token: string) => {
@@ -198,8 +204,8 @@ export const lambdaHandler = async (event: any, context: Context) => {
     body: 'Error: No dashboard url available!'
   };
 
-  const data = await authenticateLambda(apiUrl, authenticateEmail, workspaceEmail, authorizationKey);
-  const token = data.authenticateLambda;
+  const result = await authenticateLambda(apiUrl, authenticateEmail, workspaceEmail, authorizationKey);
+  const token = result.data?.authenticateLambda;
   const verifyTokenMutation = await verifyToken(apiUrl, token);
   const accessToken = verifyTokenMutation?.data?.verifyUserToken?.accessToken;
   console.log('Access token: ', accessToken);
@@ -283,7 +289,8 @@ export const lambdaHandler = async (event: any, context: Context) => {
         Bucket: process.env.bucketName,
         Key: key,
         Body: pdf,
-        ContentType: 'image'
+        ContentType: 'image',
+        ACL: 'public-read'
       }).promise();
 
       const s3ReportUrl = `https://${process.env.bucketName}.s3.eu-central-1.amazonaws.com/${key}`;
