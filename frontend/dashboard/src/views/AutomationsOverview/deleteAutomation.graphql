@@ -1,0 +1,6 @@
+mutation deleteAutomation($input: DeleteAutomationInput) {
+  deleteAutomation(input: $input) {
+    id
+    label
+  }
+}

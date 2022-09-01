@@ -1,0 +1,6 @@
+mutation createAutomation($input: CreateAutomationInput) {
+  createAutomation(input: $input) {
+    id
+    label
+  }
+}

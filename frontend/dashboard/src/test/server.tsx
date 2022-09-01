@@ -1,9 +1,11 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { setupServer } from 'msw/node';
+
 import { defaultMockDeleteUser } from './mocks/defaults/MockDeleteUser';
 import { defaultMockGetCustomerOfUserHandler } from './mocks/defaults/MockGetCustomerOfUser';
 
 import { defaultMockMeHandler } from './mocks/defaults/MockMe';
+
 
 /**
  * Defines default graphql handlers. These handlers are the standard graphql response handlers.

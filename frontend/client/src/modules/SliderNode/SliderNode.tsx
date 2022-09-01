@@ -55,7 +55,6 @@ export const SliderNode = ({ node, onRunAction }: SliderNodeProps) => {
           markers={node?.sliderNode?.markers || []}
           form={form}
           onSubmit={handleSubmit}
-          register={form.register}
         />
       </Div>
     </SliderNodeContainer>

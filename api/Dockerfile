@@ -15,6 +15,8 @@ WORKDIR /app
 ###
 FROM base as prodBuilder
 
+RUN apk --no-cache add --virtual .builds-deps build-base python3
+
 # Copy package and install production deps (these will be put later in final image)
 COPY ./package.json tsconfig.json schema.prisma  ./
 

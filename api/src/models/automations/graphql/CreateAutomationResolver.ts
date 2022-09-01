@@ -1,4 +1,6 @@
 import { inputObjectType, mutationField } from 'nexus';
+import { GraphQLYogaError } from '@graphql-yoga/node';
+
 import { AutomationType } from './AutomationType'
 import { AutomationEventType } from './AutomationEventType';
 import { AutomationConditionScopeType } from './AutomationConditionScopeType';
@@ -10,8 +12,8 @@ import { WorkspaceAspectType } from './WorkspaceAspectType';
 import { ConditionPropertyAggregateType } from './ConditionPropertyAggregateType';
 import { AutomationActionType } from './AutomationActionType';
 import { AutomationModel } from './AutomationModel';
-import { UserInputError } from 'apollo-server-express';
 import { AutomationConditionBuilderType } from './AutomationConditionBuilderType';
+import { RecurringPeriodType } from './RecurringPeriodType';
 
 export const CreateAutomationOperandInput = inputObjectType({
   name: 'CreateAutomationOperandInput',
@@ -89,6 +91,14 @@ export const CreateAutomationCondition = inputObjectType({
   },
 });
 
+export const AutomationActionChannelInput = inputObjectType({
+  name: 'AutomationActionChannelInput',
+  definition(t) {
+    t.id('id', { nullable: true });
+    // TODO: Add other fields such as payload here later
+  },
+});
+
 export const AutomationActionInput = inputObjectType({
   name: 'AutomationActionInput',
   definition(t) {
@@ -97,6 +107,7 @@ export const AutomationActionInput = inputObjectType({
     t.string('apiKey');
     t.string('endpoint');
     t.json('payload');
+    t.list.field('channels', { type: AutomationActionChannelInput });
   },
 });
 
@@ -129,6 +140,20 @@ export const AutomationConditionBuilderInput = inputObjectType({
   },
 });
 
+export const AutomationScheduleInput = inputObjectType({
+  name: 'AutomationScheduleInput',
+  definition(t) {
+    t.id('id', { nullable: true });
+    t.field('type', { type: RecurringPeriodType, required: true });
+    t.string('minutes', { required: true });
+    t.string('hours', { required: true });
+    t.string('dayOfMonth', { required: true });
+    t.string('month', { required: true });
+    t.string('dayOfWeek', { required: true });
+    t.string('dialogueId', { nullable: true });
+  },
+})
+
 export const CreateAutomationInput = inputObjectType({
   name: 'CreateAutomationInput',
   definition(t) {
@@ -145,13 +170,15 @@ export const CreateAutomationInput = inputObjectType({
     t.field('event', { type: AutomationEventInput });
 
     // Trigger: condition related fields
-    t.field('conditionBuilder', { type: AutomationConditionBuilderInput });
+    // FIXME: Uncommenting this field wrecks entire resolver 😬
+    // t.field('conditionBuilder', { type: AutomationConditionBuilderInput });
+
+    t.field('schedule', { type: AutomationScheduleInput, nullable: true });
 
     // Automation Actions
     t.list.field('actions', { type: AutomationActionInput });
 
-    // Trigger:
-    // TODO: Add fields for Trigger:recurring as wel as Campaign
+    // TODO: Add fields Campaign
   },
 });
 
@@ -159,11 +186,10 @@ export const CreateAutomationResolver = mutationField('createAutomation', {
   description: 'Creates a new automation.',
   type: AutomationModel,
   args: { input: CreateAutomationInput },
-
   async resolve(parent, args, ctx) {
-    if (!args.input) throw new UserInputError('No input object provided for createAutomation Resolver');
+    if (!args.input) throw new GraphQLYogaError('No input object provided for createAutomation Resolver');
 
     const automation = await ctx.services.automationService.createAutomation(args.input);
-    return automation;
+    return automation as any;
   },
 });

@@ -23,7 +23,9 @@ export const DialogueStatisticsSummaryFilterInput = inputObjectType({
 export const TopicType = objectType({
   name: 'TopicType',
   definition(t) {
-    t.nonNull.string('name');
+    t.nonNull.string('name', {
+      resolve: (parent) => (parent as any)?.name,
+    });
     t.float('impactScore');
     t.int('nrVotes');
 

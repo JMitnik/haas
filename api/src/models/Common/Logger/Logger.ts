@@ -23,7 +23,9 @@ export class Logger {
   }
 
   public debug(val: string) {
-    console.debug(val);
+    if (this.environment === 'development') {
+      console.debug(val);
+    }
   }
 
   public log(val: string) {

@@ -1,6 +1,6 @@
 /* eslint-disable radix */
 import * as UI from '@haas/ui';
-import { Controller, UseFormMethods, useFieldArray, useWatch } from 'react-hook-form';
+import { Controller, useFieldArray, useWatch } from 'react-hook-form';
 import {
   CornerRightDown, CornerRightUp, Mail, Maximize2,
   Minimize2, MousePointer, PlusCircle, Smartphone, Target, Thermometer, Type, UserPlus, Watch,
@@ -52,43 +52,43 @@ const SingleScore = ({ form, fieldIndex, conditionKey, defaultValue, icon }: any
   );
 };
 
-interface FormDataProps {
-  name: string;
-  dialogue: {
-    label: string;
-    value: string;
-  };
-  type: string;
-  medium: string;
-  question: {
-    label: string;
-    value: string;
-  };
-  conditions: Array<{
-    id: string,
-    questionId: SelectType,
-    conditionType: string,
-    range: Array<number>,
-    highThreshold: number,
-    lowThreshold: number,
-    matchText: string
-  }>;
-  condition: string;
-  matchText: string;
-  lowThreshold: number;
-  highThreshold: number;
-  recipients: Array<{
-    label: string;
-    value: string;
-  }>;
-}
+// interface FormDataProps {
+//   name: string;
+//   dialogue: {
+//     label: string;
+//     value: string;
+//   };
+//   type: string;
+//   medium: string;
+//   question: {
+//     label: string;
+//     value: string;
+//   };
+//   conditions: Array<{
+//     id: string,
+//     questionId: SelectType,
+//     conditionType: string,
+//     range: Array<number>,
+//     highThreshold: number,
+//     lowThreshold: number,
+//     matchText: string
+//   }>;
+//   condition: string;
+//   matchText: string;
+//   lowThreshold: number;
+//   highThreshold: number;
+//   recipients: Array<{
+//     label: string;
+//     value: string;
+//   }>;
+// }
 
-const conditionTypeSelect = [
-  { label: 'Low threshold', value: 'LOW_THRESHOLD' },
-  { label: 'High threshold', value: 'HIGH_THRESHOLD' },
-  { label: 'Inner range', value: 'INNER_RANGE' },
-  { label: 'Outer range', value: 'OUTER_RANGE' },
-];
+// const conditionTypeSelect = [
+//   { label: 'Low threshold', value: 'LOW_THRESHOLD' },
+//   { label: 'High threshold', value: 'HIGH_THRESHOLD' },
+//   { label: 'Inner range', value: 'INNER_RANGE' },
+//   { label: 'Outer range', value: 'OUTER_RANGE' },
+// ];
 
 enum TriggerConditionType {
   LOW_THRESHOLD = 'LOW_THRESHOLD',
@@ -173,7 +173,7 @@ const getCustomerTriggerData = gql`
 `;
 
 interface TriggerFormProps {
-  form: UseFormMethods<FormDataProps>;
+  form: any;
   onFormSubmit: any;
   serverErrors: any;
   isLoading: any;
@@ -255,7 +255,7 @@ const FormConditionFragment = ({
         </UI.Div>
       </UI.Flex>
       <UI.Hr />
-      <input type="hidden" ref={form.register()} name={`conditions[${fieldIndex}].id`} />
+      <input type="hidden" {...form.register(`conditions[${fieldIndex}].id`)} />
       {form.watch('type') === TriggerQuestionType.QUESTION && activeDialogue && (
         <FormControl mb={4}>
           <FormLabel htmlFor={`conditions[${fieldIndex}].questionId`}>{t('trigger:question')}</FormLabel>
@@ -266,13 +266,12 @@ const FormConditionFragment = ({
             name={`conditions[${fieldIndex}].questionId`}
             defaultValue={fieldCondition?.questionId}
             control={form.control}
-            options={questionsSelect}
-            render={({ onChange, value }) => (
+            render={({ field }) => (
               <Select
                 options={questionsSelect}
-                value={value}
+                value={field.value}
                 onChange={(opt: any) => {
-                  onChange(opt);
+                  field.onChange(opt);
                   handleQuestionReset();
                 }}
               />
@@ -282,7 +281,7 @@ const FormConditionFragment = ({
       )}
 
       {watchConditionQuestion && (
-        <FormControl mb={4} isRequired isInvalid={!!form.errors.conditions?.[fieldIndex]?.conditionType}>
+        <FormControl mb={4} isRequired isInvalid={!!form.formState.errors.conditions?.[fieldIndex]?.conditionType}>
           <FormLabel htmlFor="condition">{t('trigger:condition')}</FormLabel>
           <InputHelper>
             {t('trigger:condition_helper')}
@@ -291,16 +290,15 @@ const FormConditionFragment = ({
             name={`conditions[${fieldIndex}].conditionType`}
             defaultValue={fieldCondition?.conditionType}
             control={form.control}
-            options={conditionTypeSelect}
-            render={({ onBlur, onChange, value }) => (
+            render={({ field }) => (
               <>
                 {nodeType === 'SLIDER' ? (
                   <RadioButtonGroup
                     display="flex"
-                    onBlur={onBlur}
-                    value={value}
+                    onBlur={field.onBlur}
+                    value={field.value}
                     onChange={(val) => {
-                      onChange(val);
+                      field.onChange(val);
                     }}
                   >
                     <RadioButton
@@ -335,10 +333,10 @@ const FormConditionFragment = ({
                 ) : (
                   <RadioButtonGroup
                     display="flex"
-                    value={value}
+                    value={field.value}
                     onChange={(val) => {
-                      onChange(val);
-                      onBlur();
+                      field.onChange(val);
+                      field.onBlur();
                     }}
                   >
                     <RadioButton
@@ -354,12 +352,12 @@ const FormConditionFragment = ({
             )}
           />
 
-          <FormErrorMessage>{form.errors.conditions?.[fieldIndex]?.conditionType?.message}</FormErrorMessage>
+          <FormErrorMessage>{form.formState.errors.conditions?.[fieldIndex]?.conditionType?.message}</FormErrorMessage>
         </FormControl>
       )}
 
       {watchConditionType === TriggerConditionType.TEXT_MATCH && (
-        <FormControl isInvalid={!!form.errors.conditions?.[fieldIndex]?.matchText}>
+        <FormControl isInvalid={!!form.formState.errors.conditions?.[fieldIndex]?.matchText}>
           <FormLabel htmlFor={`conditions[${fieldIndex}].matchText`}>{t('trigger:match_text')}</FormLabel>
           <InputHelper>
             {t('trigger:match_text_helper')}
@@ -368,14 +366,13 @@ const FormConditionFragment = ({
             defaultValue={fieldCondition.matchText}
             placeholder="Satisfied"
             leftEl={<Type />}
-            name={`conditions[${fieldIndex}].matchText`}
-            ref={form.register({ required: true })}
+            {...form.register(`conditions[${fieldIndex}].matchText`, { required: true })}
           />
         </FormControl>
       )}
 
       {watchConditionType === TriggerConditionType.LOW_THRESHOLD && (
-        <FormControl isInvalid={!!form.errors.conditions?.[fieldIndex]?.lowThreshold}>
+        <FormControl isInvalid={!!form.formState.errors.conditions?.[fieldIndex]?.lowThreshold}>
           <FormLabel htmlFor={`conditions[${fieldIndex}].lowThreshold`}>{t('trigger:low_threshold')}</FormLabel>
           <InputHelper>
             {t('trigger:low_threshold_helper')}
@@ -384,8 +381,8 @@ const FormConditionFragment = ({
             name={`conditions[${fieldIndex}].lowThreshold`}
             control={form.control}
             defaultValue={fieldCondition?.lowThreshold}
-            render={({ onChange, value }) => (
-              <Slider step={0.5} min={0} max={10} defaultValue={value} onAfterChange={onChange} />
+            render={({ field }) => (
+              <Slider step={0.5} min={0} max={10} defaultValue={field.value} onAfterChange={field.onChange} />
             )}
           />
           <SingleScore
@@ -400,7 +397,7 @@ const FormConditionFragment = ({
       )}
 
       {watchConditionType === TriggerConditionType.HIGH_THRESHOLD && (
-        <FormControl isInvalid={!!form.errors.conditions?.[fieldIndex]?.highThreshold}>
+        <FormControl isInvalid={!!form.formState.errors.conditions?.[fieldIndex]?.highThreshold}>
           <FormLabel htmlFor={`conditions[${fieldIndex}].highThreshold`}>{t('trigger:high_threshold')}</FormLabel>
           <InputHelper>
             {t('trigger:high_threshold_helper')}
@@ -409,16 +406,16 @@ const FormConditionFragment = ({
             name={`conditions[${fieldIndex}].highThreshold`}
             control={form.control}
             defaultValue={10 - fieldCondition?.highThreshold}
-            render={({ onChange, value }) => (
+            render={({ field }) => (
               <Slider
                 step={0.5}
                 min={0}
                 max={10}
-                tipFormatter={(val) => (val ? `${10 - val}` : 10)}
-                defaultValue={value}
+                tipFormatter={(value) => (value ? `${10 - value}` : 10)}
+                defaultValue={field.value}
                 reverse
                 onAfterChange={(e: number) => {
-                  onChange(10 - e);
+                  field.onChange(10 - e);
                 }}
               />
             )}
@@ -446,16 +443,16 @@ const FormConditionFragment = ({
               name={`conditions[${fieldIndex}].range`}
               control={form.control}
               defaultValue={fieldCondition?.range?.length === 2 ? fieldCondition.range : [3, 6]}
-              render={({ value, onChange }) => (
+              render={({ field }) => (
                 <OuterSliderContainer>
                   <Slider
                     range
                     step={0.5}
                     min={0}
                     max={10}
-                    defaultValue={value}
-                    onAfterChange={(val) => {
-                      onChange(val);
+                    defaultValue={field.value}
+                    onAfterChange={(value) => {
+                      field.onChange(value);
                     }}
                   />
                 </OuterSliderContainer>
@@ -467,7 +464,7 @@ const FormConditionFragment = ({
       )}
 
       {watchConditionType === TriggerConditionType.INNER_RANGE && (
-        <FormControl isInvalid={!!form.errors.conditions?.[fieldIndex]?.range}>
+        <FormControl isInvalid={!!form.formState.errors.conditions?.[fieldIndex]?.range}>
           <FormLabel htmlFor={`conditions[${fieldIndex}].range`}>{t('trigger:inner_range')}</FormLabel>
           <InputHelper>
             {t('trigger:inner_range_helper')}
@@ -476,15 +473,15 @@ const FormConditionFragment = ({
             name={`conditions[${fieldIndex}].range`}
             control={form.control}
             defaultValue={fieldCondition?.range?.length === 2 ? fieldCondition.range : [3, 6]}
-            render={({ onChange, value }) => (
+            render={({ field }) => (
               <Slider
                 range
-                defaultValue={value}
+                defaultValue={field.value}
                 step={0.5}
                 min={0}
                 max={10}
-                onAfterChange={(val) => {
-                  onChange(val);
+                onAfterChange={(value) => {
+                  field.onChange(value);
                 }}
               />
             )}
@@ -579,39 +576,37 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
         </Div>
         <Div>
           <InputGrid>
-            <FormControl isRequired isInvalid={!!form.errors.name}>
+            <FormControl isRequired isInvalid={!!form.formState.errors.name}>
               <FormLabel htmlFor="name">{t('name')}</FormLabel>
               <InputHelper>{t('trigger:name_helper')}</InputHelper>
               <Input
                 placeholder={t('trigger:my_first_trigger')}
                 leftEl={<Type />}
-                name="name"
-                ref={form.register({ required: true })}
+                {...form.register('name', { required: true })}
               />
-              <FormErrorMessage>{form.errors.name?.message}</FormErrorMessage>
+              <FormErrorMessage>{form.formState.errors.name?.message}</FormErrorMessage>
             </FormControl>
 
-            <FormControl isRequired isInvalid={!!form.errors.dialogue?.value}>
+            <FormControl isRequired isInvalid={!!form.formState.errors.dialogue?.value}>
               <FormLabel htmlFor="dialogue">{t('trigger:dialogue')}</FormLabel>
               <InputHelper>{t('trigger:dialogue_helper')}</InputHelper>
               <Controller
                 name="dialogue"
-                options={dialogues}
                 defaultValue={null}
                 control={form.control}
-                render={({ onChange, value }) => (
+                render={({ field }) => (
                   <Select
                     ref={questionSelectRef}
                     options={dialogues}
-                    value={value}
-                    onChange={onChange}
+                    value={field.value}
+                    onChange={field.onChange}
                   />
                 )}
               />
-              <FormErrorMessage>{form.errors.dialogue?.label?.message}</FormErrorMessage>
+              <FormErrorMessage>{form.formState.errors.dialogue?.label?.message}</FormErrorMessage>
             </FormControl>
 
-            <FormControl isInvalid={!!form.errors.type}>
+            <FormControl isInvalid={!!form.formState.errors.type}>
               <FormLabel htmlFor="type">{t('trigger:type')}</FormLabel>
               <InputHelper>{t('trigger:type_helper')}</InputHelper>
 
@@ -619,13 +614,13 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 control={form.control}
                 name="type"
                 defaultValue="QUESTION"
-                render={({ onChange, value }) => (
+                render={({ field }) => (
                   <>
                     <RadioButtonGroup
-                      defaultValue={value}
+                      defaultValue={field.value}
                       isInline
                       onChange={(data) => {
-                        onChange(data);
+                        field.onChange(data);
                       }}
                       display="flex"
                     >
@@ -647,7 +642,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 )}
               />
 
-              <FormErrorMessage>{form.errors.dialogue?.label?.message}</FormErrorMessage>
+              <FormErrorMessage>{form.formState.errors.dialogue?.label?.message}</FormErrorMessage>
             </FormControl>
           </InputGrid>
         </Div>
@@ -758,7 +753,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
 
               <UI.Hr />
               <InputGrid>
-                <FormControl isInvalid={!!form.errors.medium}>
+                <FormControl isInvalid={!!form.formState.errors.medium}>
                   <FormLabel htmlFor="medium">{t('trigger:recipient')}</FormLabel>
                   <InputHelper>{t('trigger:recipient_helper')}</InputHelper>
 
@@ -766,11 +761,16 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                     control={form.control}
                     name={`recipients[${index}]`}
                     defaultValue={recipient}
-                    options={recipients}
-                    as={<Select />}
+                    render={({ field }) => (
+                      <Select
+                        options={recipients}
+                        onChange={field.onChange}
+                        value={field.value}
+                      />
+                    )}
                   />
 
-                  <FormErrorMessage>{form.errors.medium?.message}</FormErrorMessage>
+                  <FormErrorMessage>{form.formState.errors.medium?.message}</FormErrorMessage>
                 </FormControl>
               </InputGrid>
             </UI.Card>
@@ -814,18 +814,18 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
         <Div>
 
           <InputGrid>
-            <FormControl isRequired isInvalid={!!form.errors.medium}>
+            <FormControl isRequired isInvalid={!!form.formState.errors.medium}>
               <FormLabel htmlFor="medium">{t('trigger:medium')}</FormLabel>
               <InputHelper>{t('trigger:medium_helper')}</InputHelper>
 
               <Controller
                 control={form.control}
                 name="medium"
-                render={({ onChange, value }) => (
+                render={({ field }) => (
                   <RadioButtonGroup
-                    defaultValue={value}
+                    defaultValue={field.value}
                     isInline
-                    onChange={onChange}
+                    onChange={field.onChange}
                     display="flex"
                   >
                     <RadioButton icon={Mail} value="EMAIL" text={t('email')} description={t('trigger:alert_email')} />
@@ -835,7 +835,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 )}
               />
 
-              <FormErrorMessage>{form.errors.medium?.message}</FormErrorMessage>
+              <FormErrorMessage>{form.formState.errors.medium?.message}</FormErrorMessage>
             </FormControl>
           </InputGrid>
         </Div>

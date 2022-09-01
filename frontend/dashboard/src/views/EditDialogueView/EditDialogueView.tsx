@@ -10,9 +10,8 @@ import {
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { motion } from 'framer-motion';
 import { useHistory, useParams } from 'react-router';
-
 import { useTranslation } from 'react-i18next';
-import { yupResolver } from '@hookform/resolvers';
+import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useState } from 'react';
 import Select from 'react-select';
 
@@ -77,8 +76,8 @@ interface FormDataProps {
 const schema = yup.object().shape({
   title: yup.string().required(),
   slug: yup.string().required('Slug is required'),
-  publicTitle: yup.string().notRequired(),
-  description: yup.string().required(),
+  publicTitle: yup.string().notRequired().nullable(),
+  description: yup.string().notRequired().nullable(),
   languageOption: yup.object().nullable(true).shape(
     { label: yup.string().required(), value: yup.string().required() },
   ).required('Content option is required'),
@@ -176,19 +175,18 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
                 </Div>
                 <Div>
                   <InputGrid>
-                    <FormControl isRequired isInvalid={!!form.errors.title}>
+                    <FormControl isRequired isInvalid={!!form.formState.errors.title}>
                       <FormLabel htmlFor="title">{t('title')}</FormLabel>
                       <InputHelper>{t('dialogue:title_helper')}</InputHelper>
                       <Input
                         placeholder={t('dialogue:title_placeholder')}
                         leftEl={<Type />}
-                        name="title"
-                        ref={form.register({ required: true })}
+                        {...form.register('title', { required: true })}
                       />
-                      <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
+                      <FormErrorMessage>{form.formState.errors.title?.message}</FormErrorMessage>
                     </FormControl>
 
-                    <FormControl isInvalid={!!form.errors.publicTitle}>
+                    <FormControl isInvalid={!!form.formState.errors.publicTitle}>
                       <FormLabel htmlFor="publicTitle">{t('dialogue:public_title')}</FormLabel>
                       <InputHelper>
                         {t('dialogue:public_title_helper')}
@@ -196,10 +194,9 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
                       <Input
                         placeholder={t('dialogue:public_title_placeholder')}
                         leftEl={<Type />}
-                        name="publicTitle"
-                        ref={form.register({ required: false })}
+                        {...form.register('publicTitle', { required: false })}
                       />
-                      <FormErrorMessage>{form.errors.publicTitle?.message}</FormErrorMessage>
+                      <FormErrorMessage>{form.formState.errors.publicTitle?.message}</FormErrorMessage>
                     </FormControl>
 
                     <FormControl isRequired>
@@ -212,34 +209,33 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
                       <Controller
                         name="languageOption"
                         control={form.control}
-                        as={Select}
-                        options={LANGUAGE_OPTIONS}
+                        render={({ field }) => (
+                          <Select onChange={field.onChange} value={field.value} options={LANGUAGE_OPTIONS} />
+                        )}
                       />
                     </FormControl>
 
-                    <FormControl isRequired isInvalid={!!form.errors.description}>
+                    <FormControl isInvalid={!!form.formState.errors.description}>
                       <FormLabel htmlFor="title">{t('description')}</FormLabel>
                       <InputHelper>
                         {t('dialogue:description_helper')}
                       </InputHelper>
                       <Textarea
                         placeholder={t('dialogue:description_placeholder')}
-                        name="description"
-                        ref={form.register({ required: true })}
+                        {...form.register('description', { required: true })}
                       />
-                      <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
+                      <FormErrorMessage>{form.formState.errors.title?.message}</FormErrorMessage>
                     </FormControl>
 
-                    <FormControl isRequired isInvalid={!!form.errors.slug}>
+                    <FormControl isRequired isInvalid={!!form.formState.errors.slug}>
                       <FormLabel htmlFor="slug">{t('slug')}</FormLabel>
                       <InputHelper>{t('dialogue:slug_helper')}</InputHelper>
                       <Input
                         placeholder="peaches-or-apples"
                         leftAddOn={`https://client.haas.live/${customerSlug}`}
-                        name="slug"
-                        ref={form.register({ required: true })}
+                        {...form.register('slug', { required: true })}
                       />
-                      <FormErrorMessage>{form.errors.slug?.message}</FormErrorMessage>
+                      <FormErrorMessage>{form.formState.errors.slug?.message}</FormErrorMessage>
                     </FormControl>
                   </InputGrid>
                 </Div>
@@ -256,7 +252,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
                 </Div>
                 <Div>
                   <InputGrid>
-                    <UI.FormControl isInvalid={!!form.errors.postLeafHeading}>
+                    <UI.FormControl isInvalid={!!form.formState.errors.postLeafHeading}>
                       <UI.FormLabel htmlFor="postLeafHeading">
                         {t('dialogue:finisher_heading')}
                       </UI.FormLabel>
@@ -264,15 +260,14 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
                         {t('dialogue:finisher_heading_helper')}
                       </UI.InputHelper>
                       <UI.Input
-                        name="postLeafHeading"
                         leftEl={<Type />}
-                        ref={form.register()}
+                        {...form.register('postLeafHeading')}
                         placeholder="Thank you for participating!"
                       />
-                      <FormErrorMessage>{form.errors.postLeafHeading?.message}</FormErrorMessage>
+                      <FormErrorMessage>{form.formState.errors.postLeafHeading?.message}</FormErrorMessage>
                     </UI.FormControl>
 
-                    <UI.FormControl isInvalid={!!form.errors.postLeafSubheading}>
+                    <UI.FormControl isInvalid={!!form.formState.errors.postLeafSubheading}>
                       <UI.FormLabel htmlFor="postLeafSubheading">
                         {t('dialogue:finisher_subheading')}
                       </UI.FormLabel>
@@ -280,12 +275,11 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
                         {t('dialogue:finisher_subheading_helper')}
                       </UI.InputHelper>
                       <UI.Input
-                        name="postLeafSubheading"
                         leftEl={<Type />}
                         placeholder="We strive to make you happier."
-                        ref={form.register()}
+                        {...form.register('postLeafSubheading')}
                       />
-                      <FormErrorMessage>{form.errors.postLeafSubheading?.message}</FormErrorMessage>
+                      <FormErrorMessage>{form.formState.errors.postLeafSubheading?.message}</FormErrorMessage>
                     </UI.FormControl>
                   </InputGrid>
                 </Div>
@@ -319,13 +313,14 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
                             flexGrow={9}
                           >
                             <Controller
-                              name={`tags[${index}]`}
+                              name={`tags[${index}]` as any}
                               control={form.control}
-                              as={Select}
-                              options={tagOptions}
+                              render={({ field }) => (
+                                <Select onChange={field.onChange} value={field.value} options={tagOptions} />
+                              )}
                               defaultValue={tag}
                             />
-                            <FormErrorMessage>{form.errors.tags?.[index]?.value?.message}</FormErrorMessage>
+                            <FormErrorMessage>{form.formState.errors.tags?.[index]?.value?.message}</FormErrorMessage>
                           </Div>
                           <Flex justifyContent="center" alignContent="center" flexGrow={1}>
                             <UI.Button
@@ -364,8 +359,13 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
                           <Controller
                             name="isWithoutGenData"
                             control={form.control}
-                            render={({ onChange, onBlur, value }) => (
-                              <RadioButtonGroup onBlur={onBlur} value={value} onChange={onChange} display="flex">
+                            render={({ field }) => (
+                              <RadioButtonGroup
+                                onBlur={field.onBlur}
+                                value={field.value}
+                                onChange={field.onChange}
+                                display="flex"
+                              >
                                 <RadioButton
                                   icon={Minus}
                                   value={1}
@@ -389,7 +389,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
                 </>
               )}
 
-              <ButtonGroup>
+              <ButtonGroup display="flex">
                 <UI.Button
                   isLoading={isLoading}
                   isDisabled={!form.formState.isValid}
