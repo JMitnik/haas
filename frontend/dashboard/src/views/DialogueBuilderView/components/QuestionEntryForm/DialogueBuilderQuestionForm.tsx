@@ -211,8 +211,6 @@ const DialogueBuilderQuestionForm = ({
     } : null,
   );
 
-  console.log('FORM CTA: ', form.watch('overrideLeaf'));
-
   const [activeCondition, setActiveCondition] = useState<null | EdgeConditionProps>(
     condition || { conditionType: parentQuestionType === 'Slider' ? 'valueBoundary' : 'match' },
   );

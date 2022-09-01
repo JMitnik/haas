@@ -918,8 +918,8 @@ export class NodeService {
   ) => {
     const currentQuestion = await this.questionNodePrismaAdapter.getDialogueBuilderNode(questionId);
     const dbEdge = await this.edgeService.getEdgeById(edgeId || '-1') as EdgeWithConditions;
-    console.log('Edge: ', dbEdge);
 
+    // If want to update same template => find all questions in workspace with same template + topic
     const activeQuestions = updateSameTemplate
       && currentQuestion?.topic?.name
       && currentQuestion.questionDialogue?.template
@@ -930,16 +930,18 @@ export class NodeService {
       )
       : [currentQuestion]
 
+    // If want to update same template => find all edges within workspace where dialogue
+    // has same template and childNode matches topic
     const activeEdges = updateSameTemplate && currentQuestion?.topic?.name
       ? await this.questionNodePrismaAdapter.findDialogueBuilderEdges(dbEdge, currentQuestion.topic.name, workspaceId)
       : [dbEdge];
 
     const activeCTA = overrideLeafId ? await this.findNodeById(overrideLeafId) : undefined;
+    console.log('activeCTA: ', activeCTA);
 
     for (const activeQuestion of activeQuestions) {
-      // TODO: Figure out a way to identify the correct edge for question
       const activeOptions = activeQuestion ? activeQuestion?.options?.map((option) => option.id) : [];
-      // const currentOverrideLeafId = activeQuestion?.overrideLeafId || null;
+      // Find the correct CTA within a dialogue based on its topic 
       const mappedOverrideLeaf = activeCTA?.topic?.name
         ? await this.questionNodePrismaAdapter.findCTAByTopic(
           activeQuestion?.questionDialogueId as string,
@@ -951,14 +953,14 @@ export class NodeService {
         async (option) => {
           let mappedOverrideLeaf;
           if (option.overrideLeafId) {
-            const activeCTA = option.overrideLeafId
+            const optionCTA = option.overrideLeafId
               ? await this.findNodeById(option.overrideLeafId)
               : undefined;
 
-            mappedOverrideLeaf = activeCTA?.topic?.name
+            mappedOverrideLeaf = optionCTA?.topic?.name
               ? await this.questionNodePrismaAdapter.findCTAByTopic(
                 activeQuestion?.questionDialogueId as string,
-                activeCTA?.topic?.name)
+                optionCTA?.topic?.name)
               : undefined;
           }
 
@@ -968,27 +970,41 @@ export class NodeService {
           if (!targetOption) return {
             ...option,
             id: undefined,
-            overrideLeafId: mappedOverrideLeaf?.id || undefined,
+            overrideLeafId: activeQuestion?.id === questionId ? overrideLeafId : mappedOverrideLeaf?.id || undefined,
           };
 
-          return { ...option, id: targetOption.id, overrideLeafId: mappedOverrideLeaf?.id || undefined }
+          return {
+            ...option,
+            id: targetOption.id,
+            overrideLeafId: activeQuestion?.id === questionId ? overrideLeafId : mappedOverrideLeaf?.id || undefined,
+          }
         }
       ).filter(isPresent));
 
       try {
-        await this.removeNonExistingQuestionOptions(activeOptions, mappedOptions);
+        await this.removeNonExistingQuestionOptions(
+          activeOptions,
+          activeQuestions.length > 1 ? mappedOptions : options
+        );
       } catch (e) {
         console.log('Something went wrong removing options: ', e);
       };
 
-      await this.updateStaleEdgeConditions(mappedOptions, activeQuestion?.options, activeQuestion?.id);
+      await this.updateStaleEdgeConditions(
+        activeQuestions.length > 1 ? mappedOptions : options,
+        activeQuestion?.options,
+        activeQuestion?.id
+      );
 
       const updateInput: UpdateQuestionInput = {
         title,
         type,
-        options: mappedOptions,
-        overrideLeafId: mappedOverrideLeaf?.id || undefined, // TODO: Add topic to all CTAs in templates
-        // currentOverrideLeafId: currentOverrideLeafId,
+        options: activeQuestions.length > 1 ? mappedOptions : options,
+        overrideLeafId: activeQuestion?.id === questionId
+          ? overrideLeafId || undefined
+          : activeQuestions.length > 1
+            ? mappedOverrideLeaf?.id || undefined
+            : overrideLeafId || undefined,
         videoEmbeddedNode: {
           id: activeQuestion?.videoEmbeddedNodeId || undefined,
         },
