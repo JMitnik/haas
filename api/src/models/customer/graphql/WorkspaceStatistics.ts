@@ -110,7 +110,7 @@ export const WorkspaceStatistics = objectType({
           utcEndDateTime as Date,
           topicFilter,
           args.input.cutoff || undefined,
-        );
+        ) as any;
       },
     })
 
