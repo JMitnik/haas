@@ -1,7 +1,7 @@
 import { GraphQLYogaError } from '@graphql-yoga/node';
 import { AutomationActionType, AutomationConditionBuilderType, AutomationConditionOperatorType, AutomationConditionScopeType, AutomationScheduled } from '@prisma/client';
 import { UserInputError } from 'apollo-server-express';
-import { format, sub } from 'date-fns';
+import { format } from 'date-fns';
 import { NexusGenInputs } from 'generated/nexus';
 import { isPresent } from 'ts-is-present';
 import {
@@ -64,11 +64,9 @@ export const findLambdaParamsByActionType = (
   }
 }
 /**
- * Finds the correct lambdaArn based on automation action
- * @param type AutomationActionType
- * @returns lambda arn
+ * Finds the correct deployed lambdaArn based on automation action
  */
-export const findLambdaArnByActionType = (type: AutomationActionType) => {
+export const findLambdaArnByAction = (type: AutomationActionType) => {
   switch (type) {
     case AutomationActionType.SEND_DIALOGUE_LINK:
       return process.env.SEND_DIALOGUE_LINK_LAMBDA_ARN as string;

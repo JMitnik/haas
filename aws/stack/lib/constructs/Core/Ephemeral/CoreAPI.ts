@@ -2,6 +2,7 @@ import {
   aws_ecs as ecs,
   aws_ec2 as ec2,
   aws_ecr as ecr,
+  Stack,
   aws_rds as rds,
   aws_iam as iam,
   aws_certificatemanager as acm,
@@ -65,9 +66,8 @@ export class CoreAPI extends Construct {
     const sendDialogueLinkLambdaArn = ssm.StringParameter.fromStringParameterName(
       this,
       'ImportedDialogueLinkLambdaArn',
-      'DialogueLinkLambdaArn'
+      'DialogueLinkSender_Arn'
     );
-
 
     const dbUrlSecret = this.syncDatabaseUrlSecret(
       props.databaseEndpoint,
@@ -107,10 +107,10 @@ export class CoreAPI extends Construct {
           MAIL_SENDER: props.apiOptions.mailSenderMail,
           REDIS_URL: props.redis.cluster.attrRedisEndpointAddress,
           ENVIRONMENT: props.apiOptions.environment,
+          AWS_ACCOUNT_ID: Stack.of(this).account,
           EVENT_BRIDGE_RUN_ALL_LAMBDAS_ROLE_ARN: runAllLambdasEventBridgeRoleArn.stringValue,
           GENERATE_REPORT_LAMBDA_ARN: generateReportLambdaArn.stringValue,
           SEND_DIALOGUE_LINK_LAMBDA_ARN: sendDialogueLinkLambdaArn.stringValue,
-          test: 'test'
         },
         secrets: {
           DB_STRING: ecs.Secret.fromSecretsManager(dbUrlSecret, 'url'),

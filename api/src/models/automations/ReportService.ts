@@ -1,6 +1,7 @@
 import { logger } from '../../config/logger';
 import AWS from '../../config/aws';
 import { S3FileService } from '../Common/File/S3FileService';
+import { AWSServiceMap } from '../Common/Mappings/AWSServiceMap';
 
 export interface ReportLambdaInput {
   API_URL: string;
@@ -18,24 +19,25 @@ export class ReportService {
   sts: AWS.STS;
   sns: AWS.SNS;
   s3FileService: S3FileService;
+  private serviceMap: AWSServiceMap;
 
   constructor() {
     this.lambda = new AWS.Lambda();
     this.sts = new AWS.STS();
     this.sns = new AWS.SNS();
     this.s3FileService = new S3FileService(new AWS.S3());
+    this.serviceMap = new AWSServiceMap(process.env.AWS_ACCOUNT_ID as string, new AWS.Config());
   }
 
   /**
    * Calls the 'GenerateReport' SNS which triggers the corresponding lambda which generate a report
    * @param payload the input necessary for the generate report lambda to run
    */
-  dispatchJob = async (payload: ReportLambdaInput) => {
+  public async dispatchJob (payload: ReportLambdaInput) {
     const stringifiedPayload = JSON.stringify(payload);
     const snsParams: AWS.SNS.PublishInput = {
       Message: stringifiedPayload,
-      // TODO: Track this as dependency
-      TopicArn: 'arn:aws:sns:eu-central-1:356797133903:haasApiReport',
+      TopicArn: this.serviceMap.getSNSResource(this.serviceMap.Report_SNS_PubTopic),
     }
 
     logger.debug(`payload for generating report: ${stringifiedPayload}`);

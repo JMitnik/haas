@@ -77,7 +77,7 @@ class AutomationService {
     };
 
     // Map actions to relevant Lambda ARNS for eventbridge to use as targets
-    const ruleTargets = await this.scheduledAutomationService.mapActionsToRuleTargets(
+    const ruleTargets = await this.scheduledAutomationService.mapActionsToTargets(
       automationScheduled.id,
       automation.automationScheduled?.actions || [],
       botUser!,
