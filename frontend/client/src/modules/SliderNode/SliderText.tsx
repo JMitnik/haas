@@ -10,12 +10,13 @@ interface SliderTextProps {
   score: number;
   isEarly: boolean;
   markers: Marker[];
+  isNotStarted: boolean;
 }
 
 /**
    * Renders adaptable SliderText based on current score, and relevant markers
    */
-export const SliderText = ({ color, adaptedColor, score, isEarly, markers }: SliderTextProps) => {
+export const SliderText = ({ color, adaptedColor, score, isEarly, markers, isNotStarted }: SliderTextProps) => {
   const { t } = useTranslation();
   let text = '';
   let subText = '';
@@ -25,7 +26,14 @@ export const SliderText = ({ color, adaptedColor, score, isEarly, markers }: Sli
     subText = t('quick_release_subtext');
   }
 
-  if (!isEarly && markers.length) {
+  if (isNotStarted) {
+    text = t('slide_explainer');
+    subText = t('slide_explainer_helper');
+    color = 'main.700';
+    adaptedColor = 'off.600';
+  }
+
+  if (!isNotStarted && !isEarly && markers.length) {
     const activeMarker = markers.find((marker) => {
       const lowerBound = marker?.range?.start || 0.0;
       const upperBound = marker?.range?.end || 10.1;

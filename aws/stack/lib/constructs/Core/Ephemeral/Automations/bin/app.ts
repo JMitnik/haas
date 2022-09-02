@@ -3,8 +3,13 @@ import * as aws from 'aws-sdk';
 import * as puppeteer from 'puppeteer';
 import axios from 'axios';
 
-const authenticateLambda = async (apiUrl: string, authenticateEmail: string, workspaceEmail: string, authorizationHeader: string) => {
-  return axios.post(apiUrl, {
+export const authenticateLambda = async (
+  url: string,
+  authenticateEmail: string,
+  workspaceEmail: string,
+  authToken: string
+) => {
+  return axios.post(url, {
     query: `
     mutation authenticateLambda($input: AuthenticateLambdaInput) {
       authenticateLambda(input: $input)
@@ -15,7 +20,7 @@ const authenticateLambda = async (apiUrl: string, authenticateEmail: string, wor
     }
   }, {
     headers: {
-      lambda: authorizationHeader,
+      lambda: authToken,
     },
   })
     .then(function (response) {
@@ -151,13 +156,21 @@ const getCustomerData = async (apiUrl: string, customerSlug: string, userId: str
     });
 }
 
+/**
+ * Lambda function which goes to a page, which is triggered by SQS.
+ *
+ * 1. Authenticates by going to the core API, and receiving a temporary token.
+ * 2. Verifies the token with the core API => accessToken.
+ * 3. Send puppeteer to go the url of the reporting page.
+ * 4. Makes a pdf at the relevant page, and store it in S3 bucket.
+ * 5. Communicate back to the core API that this has been finished,
+ */
 export const lambdaHandler = async (event: any, context: Context) => {
   const url = event.url;
   console.log(`URL: ${url}`);
   console.log('ENV: ', process.env);
-
-  console.log('EVENT: ', event.Records?.[0]?.Sns.Message, 'Type: ', typeof event.Records?.[0]?.Sns.Message);
-  const message = JSON.parse(event.Records?.[0]?.Sns.Message)
+  console.log('EVENT: ', event.Records?.[0]?.body);
+  const message = JSON.parse(event.Records?.[0]?.body)
   const apiUrl: string = message.API_URL;
   const dashboardUrl: string = message.DASHBOARD_URL;
   const authenticateEmail: string = message.AUTHENTICATE_EMAIL;
@@ -192,8 +205,7 @@ export const lambdaHandler = async (event: any, context: Context) => {
   };
 
   const result = await authenticateLambda(apiUrl, authenticateEmail, workspaceEmail, authorizationKey);
-  console.log('result: ', result?.data);
-  const token = result?.data.authenticateLambda;
+  const token = result.data?.authenticateLambda;
   const verifyTokenMutation = await verifyToken(apiUrl, token);
   const accessToken = verifyTokenMutation?.data?.verifyUserToken?.accessToken;
   console.log('Access token: ', accessToken);
@@ -228,13 +240,6 @@ export const lambdaHandler = async (event: any, context: Context) => {
           '--single-process'
         ]
       });
-      const browserVersion = await browser.version()
-
-      console.log(`Started ${browserVersion}`);
-
-      // const result = await authenticateLambda(apiUrl, authenticateEmail, workspaceEmail, authorizationKey);
-      // const token = result?.data.authenticateLambda;
-      // const verifyTokenMutation = await verifyToken(apiUrl, token);
 
       console.log('Access Token: ', verifyTokenMutation?.data?.verifyUserToken?.accessToken);
       const accessToken = verifyTokenMutation?.data?.verifyUserToken?.accessToken;
@@ -284,11 +289,11 @@ export const lambdaHandler = async (event: any, context: Context) => {
         Bucket: process.env.bucketName,
         Key: key,
         Body: pdf,
-        ContentType: 'image'
+        ContentType: 'image',
+        ACL: 'public-read'
       }).promise();
 
-      const s3ReportUrl = `https://stagingautomations-automationsbucketbb8c4ff5-1rgju9vwmmeyd.s3.eu-central-1.amazonaws.com/${key}`
-      console.log('URL To PDF on S3: ', s3ReportUrl);
+      const s3ReportUrl = `https://${process.env.bucketName}.s3.eu-central-1.amazonaws.com/${key}`;
       await sendAutomationReport(apiUrl, automationActionId, s3ReportUrl, workspaceSlug, accessToken);
 
       return {

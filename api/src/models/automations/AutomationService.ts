@@ -86,7 +86,8 @@ class AutomationService {
       user = await this.userService.findBotByWorkspaceName(workspace.slug);
     };
 
-    const ruleTargets = await this.scheduledAutomationService.mapActionsToRuleTargets(
+    // Map actions to relevant Lambda ARNS for eventbridge to use as targets
+    const ruleTargets = await this.scheduledAutomationService.mapActionsToTargets(
       automationScheduled.id,
       parentAutomation.automationScheduled?.actions || [],
       user!,

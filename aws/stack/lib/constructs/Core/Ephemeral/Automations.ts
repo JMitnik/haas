@@ -10,11 +10,12 @@ import {
   aws_sqs as sqs,
   aws_sns as sns,
   aws_sns_subscriptions as snsSubs,
-  CfnOutput,
   Stack,
   aws_events as events,
   aws_events_targets as eventTargets,
   aws_ssm as ssm,
+  CfnOutput,
+  aws_lambda_event_sources,
 } from 'aws-cdk-lib'
 import * as cdk from '@aws-cdk/core';
 import * as crpm from 'crpm';
@@ -116,19 +117,33 @@ export class Automations extends Construct {
       ],
       effect: iam.Effect.ALLOW,
       principals: [
-        new iam.AccountRootPrincipal(),
-        new iam.AccountPrincipal('356797133903'),
-        new iam.AccountPrincipal('649621042808'), //TODO: Moet gefixed (dit is Jonathan's accountId)
-        new iam.AccountPrincipal(cdk.Stack.of(this).account),
+        new iam.AccountPrincipal(Stack.of(this).account),
       ],
     }))
 
-    // Define a subscription wrapper for the sender
-    const snsLambdaSubscription = new snsSubs.LambdaSubscription(app2Fn, {
+    /** Define an SQS Queue */
+    const sqsQueue = new sqs.Queue(this, `${name}_SQS`, {
+      visibilityTimeout: Duration.seconds(240),
+      deadLetterQueue: {
+        queue: dlq,
+        maxReceiveCount: 1,
+      },
+    })
+
+    /** Let SQS listen to SNS */
+    const sqsListener = new snsSubs.SqsSubscription(sqsQueue, {
       deadLetterQueue: dlq,
+      rawMessageDelivery: true,
+    });
+    snsTopic.addSubscription(sqsListener);
+
+    /** Turn SQS into an event source */
+    const sqsEventSource = new aws_lambda_event_sources.SqsEventSource(sqsQueue, {
+      batchSize: 1
     });
 
-    snsTopic.addSubscription(snsLambdaSubscription);
+    /** Link SQS to Lambda */
+    lambda.addEventSource(sqsEventSource);
 
     new HaasDialogueLinkHandleService(this, 'HaasDialogueLinkHandleService', {
       AUTOMATION_API_KEY: jwtSecret.secretValueFromJson('AUTOMATION_API_KEY').toString()
@@ -160,7 +175,18 @@ export class Automations extends Construct {
       allowedPattern: '.*',
     });
 
-    const eventBridgeRunAllLambdasArnParam = new ssm.StringParameter(this, 'event-bridge-run-all-lambdas-role-arn', {
+    const eventBridgeDLQ = new sqs.Queue(this, `${name}_EventBridge_DLQ`, {
+      queueName: `${name}_EventBridge_DLQ`,
+    });
+
+    // Allow the Eventbridge Lambda role to send Messages to the DLQ.
+    canInvokeAllLambdasRole.addToPrincipalPolicy(new iam.PolicyStatement({
+      resources: [eventBridgeDLQ.queueArn],
+      actions: ['sqs:SendMessage',],
+      effect: iam.Effect.ALLOW,
+    }));
+
+    const eventBridgeRunAllLambdasArnParam = new ssm.StringParameter(this, 'EventBridgeRunAllLambdasRole_ARN', {
       parameterName: 'EventBridgeRunAllLambdasRoleArn',
       stringValue: canInvokeAllLambdasRole.roleArn,
       description: 'the arn of the role used by all EventBridge rules to execute automation lambdas',
