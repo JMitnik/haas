@@ -763,46 +763,45 @@ const DialogueBuilderQuestionForm = ({
             </>
           )}
         </UI.Div>
-        <UI.FormControl>
-          <UI.Flex alignItems="center">
-            <UI.Div>
-              <UI.FormLabel>Save for all</UI.FormLabel>
-              <UI.InputHelper>Adjust changes within all teams with the same template</UI.InputHelper>
-            </UI.Div>
 
-            <UI.Div ml={120}>
+        <UI.Flex justifyContent="space-between">
+          <UI.Flex alignItems="center">
+            <ButtonGroup mr="0.5rem" display="flex">
+              <UI.Button
+                isLoading={createLoading || updateLoading}
+                isDisabled={!form.formState.isValid}
+                variantColor="teal"
+                type="submit"
+              >
+                {t('save')}
+              </UI.Button>
+              <UI.Button variant="outline" onClick={() => handleCancelQuestion()}>Cancel</UI.Button>
+            </ButtonGroup>
+            <UI.Div>
               <Controller
                 control={form.control}
                 name="updateSameTemplate"
                 defaultValue={0}
                 render={({ field: { onChange, value, onBlur } }) => (
-                  <UI.Toggle
-                    isChecked={value === 1}
-                    size="lg"
-                    onChange={() => (value === 1 ? onChange(0) : onChange(1))}
-                    value={value}
-                    onBlur={onBlur}
-                  />
+                  <UI.Flex alignItems="center">
+                    <UI.Div mt="5px">
+                      <UI.Toggle
+                        isChecked={value === 1}
+                        size="lg"
+                        onChange={() => (value === 1 ? onChange(0) : onChange(1))}
+                        value={value}
+                        onBlur={onBlur}
+                      />
+                    </UI.Div>
+
+                    <UI.Text ml="0.5rem">Save for template-related questions?</UI.Text>
+                  </UI.Flex>
+
                 )}
               />
             </UI.Div>
-
           </UI.Flex>
 
-        </UI.FormControl>
-
-        <UI.Flex justifyContent="space-between">
-          <ButtonGroup display="flex">
-            <UI.Button
-              isLoading={createLoading || updateLoading}
-              isDisabled={!form.formState.isValid}
-              variantColor="teal"
-              type="submit"
-            >
-              {t('save')}
-            </UI.Button>
-            <UI.Button variant="outline" onClick={() => handleCancelQuestion()}>Cancel</UI.Button>
-          </ButtonGroup>
           <UI.Span onClick={(e) => e.stopPropagation()}>
             <Popover
               usePortal
