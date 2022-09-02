@@ -1,6 +1,16 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    slide_explainer: {
+      en: 'Slide left or right',
+      de: 'Nach links oder rechts schieben',
+      nl: 'Sleep links of rechts',
+    },
+    slide_explainer_helper: {
+      en: 'to let us know how you feel',
+      de: 'um dir zu sagen, wie du dich fühlst',
+      nl: 'om te vertellen hoe het gaat',
+    },
     happy: {
       en: 'Happy',
       de: 'Glücklich',
