@@ -114,6 +114,37 @@ export const FormNodeFieldInput = inputObjectType({
   },
 });
 
+export const FormNodeStepType = enumType({
+  name: 'FormNodeStepType',
+  members: ['GENERIC_FIELDS', 'INPUT_DATA'],
+})
+
+export const FormNodeStepInput = inputObjectType({
+  name: 'FormNodeStepInput',
+
+  definition(t) {
+    t.id('id', { required: false });
+    t.nonNull.field('type', { type: FormNodeStepType });
+    t.nonNull.string('header');
+    t.nonNull.string('helper');
+    t.nonNull.string('subHelper')
+    t.nonNull.int('position');
+    t.list.nonNull.field('fields', { type: FormNodeFieldInput });
+  },
+});
+
+export const PreFormNodeInput = inputObjectType({
+  name: 'PreFormNodeInput',
+
+  definition(t) {
+    t.nonNull.string('header');
+    t.nonNull.string('helper');
+    t.nonNull.string('nextText');
+    t.nonNull.string('finishText');
+  },
+})
+
+
 export const FormNodeInputType = inputObjectType({
   name: 'FormNodeInputType',
 
@@ -121,7 +152,10 @@ export const FormNodeInputType = inputObjectType({
     t.string('id', { nullable: true });
     t.string('helperText', { nullable: true });
 
+    t.nullable.field('preFormNode', { type: PreFormNodeInput });
+
     t.list.nonNull.field('fields', { type: FormNodeFieldInput });
+    t.list.nonNull.field('steps', { type: FormNodeStepInput });
   },
 });
 
@@ -151,6 +185,33 @@ export const FormNodeField = objectType({
   },
 });
 
+export const FormNodeStep = objectType({
+  name: 'FormNodeStep',
+  definition(t) {
+    t.nonNull.string('id');
+    t.nonNull.int('position');
+
+    t.string('header');
+    t.string('helper');
+    t.string('subHelper');
+
+    t.nonNull.field('type', { type: FormNodeStepType });
+    t.list.nonNull.field('fields', { type: FormNodeField });
+  },
+});
+
+export const PreFormNodeType = objectType({
+  name: 'PreFormNodeType',
+
+  definition(t) {
+    t.nonNull.string('id')
+    t.nonNull.string('header');
+    t.nonNull.string('helper');
+    t.nonNull.string('nextText');
+    t.nonNull.string('finishText');
+  },
+})
+
 export const FormNodeType = objectType({
   name: 'FormNodeType',
 
@@ -158,7 +219,9 @@ export const FormNodeType = objectType({
     t.string('id', { nullable: true });
     t.string('helperText', { nullable: true });
 
+    t.nullable.field('preForm', { type: PreFormNodeType });
     t.list.nonNull.field('fields', { type: FormNodeField });
+    t.list.nonNull.field('steps', { type: FormNodeStep });
   },
 });
 
@@ -668,7 +731,7 @@ export const QuestionNodeMutations = extendType({
           || typeof validatedType === undefined
           || (args.input.type === NodeType.LINK && links?.linkTypes?.length === 0)
           || (args.input.type === NodeType.SHARE && !args.input?.share?.title)
-          || (args.input.type === NodeType.FORM && args.input.form?.fields?.length === 0))
+          || (args.input.type === NodeType.FORM && args.input.form?.steps?.length === 0))
           throw new UserInputError(`Input data is unsufficient: ${args.input}`);
 
 

@@ -96,6 +96,8 @@ it('dialogue follows negative flow, share details', () => {
   // Find a coaching button and click on it.
   cy.findByText('Coaching').click();
 
+  cy.findByText('Next').click();
+
   cy.wait('@gqlcreateSessionMutation').then((req) => {
     const input = req.request.body.variables?.input as SessionInput;
 
@@ -112,9 +114,9 @@ it('dialogue follows negative flow, share details', () => {
 
   mockMutationAppendToInteraction((res) => ({ ...res }));
   // Fill out the form
-  cy.findByLabelText('First name').type('John');
-  cy.findByLabelText('Last name').type('Doe');
-  cy.findByLabelText('Email').type('johndoe@gmail.com');
+  // cy.findByLabelText('First name').type('John');
+  // cy.findByLabelText('Last name').type('Doe');
+  cy.findByLabelText('Email*').type('johndoe@gmail.com');
 
   // Submit button
   cy.findByRole('button', { name: 'Submit' }).click();
@@ -122,10 +124,10 @@ it('dialogue follows negative flow, share details', () => {
   cy.wait('@gqlappendToInteractionMutation').then((req) => {
     const input = req.request.body.variables?.input as AppendToInteractionInput;
     expect(input.sessionId).to.be.equal('TEST_SESSION_1');
-    expect(input.data?.form?.values).length(3);
-    expect(input.data?.form?.values?.[0]?.shortText).to.be.equal('John');
-    expect(input.data?.form?.values?.[1]?.shortText).to.be.equal('Doe');
-    expect(input.data?.form?.values?.[2]?.email).to.be.equal('johndoe@gmail.com');
+    expect(input.data?.form?.values).length(2);
+    // expect(input.data?.form?.values?.[0]?.shortText).to.be.equal('John');
+    // expect(input.data?.form?.values?.[1]?.shortText).to.be.equal('Doe');
+    expect(input.data?.form?.values?.[0]?.email).to.be.equal('johndoe@gmail.com');
   });
 
   // Should finish the dialogue
@@ -175,6 +177,8 @@ it('dialogue follows negative flow, not share details, and goes back', () => {
   // Find a coaching button and click on it.
   cy.findByText('Coaching').click();
 
+  cy.findByText('Next').click();
+
   cy.wait('@gqlcreateSessionMutation').then((req) => {
     const input = req.request.body.variables?.input as SessionInput;
 
@@ -191,15 +195,15 @@ it('dialogue follows negative flow, not share details, and goes back', () => {
 
   mockMutationAppendToInteraction((res) => ({ ...res }));
   // Submit button
-  cy.findByRole('button', { name: 'Do not share' }).click();
+  cy.findByRole('button', { name: 'No, do not share' }).click();
 
   cy.wait('@gqlappendToInteractionMutation').then((req) => {
     const input = req.request.body.variables?.input as AppendToInteractionInput;
     expect(input.sessionId).to.be.equal('TEST_SESSION_1');
-    expect(input.data?.form?.values).length(3);
-    expect(input.data?.form?.values?.[0]?.shortText).to.be.equal(undefined);
-    expect(input.data?.form?.values?.[1]?.shortText).to.be.equal(undefined);
-    expect(input.data?.form?.values?.[2]?.email).to.be.equal(undefined);
+    expect(input.data?.form?.values).length(2);
+    expect(input.data?.form?.values?.[0]?.email).to.be.equal(undefined);
+    // expect(input.data?.form?.values?.[1]?.shortText).to.be.equal(undefined);
+    // expect(input.data?.form?.values?.[2]?.email).to.be.equal(undefined);
   });
 
   // Should finish the dialogue

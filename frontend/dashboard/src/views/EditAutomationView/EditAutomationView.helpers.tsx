@@ -149,7 +149,6 @@ export const mapAutomation = (input: GetAutomationQuery['automation']): Automati
       id: input?.automationScheduled?.activeDialogue?.id,
     } : null,
   },
-  conditionBuilder: undefined,
   // conditionBuilder: {
   //   id: input?.automationTrigger?.conditionBuilder?.id || undefined,
   //   logical: {

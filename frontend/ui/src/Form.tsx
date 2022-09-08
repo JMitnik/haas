@@ -1,4 +1,4 @@
-import React, { forwardRef, Ref, ReactNode, useState, useEffect, useRef } from 'react';
+import React, { forwardRef, Ref, ReactNode, useState, useEffect, useRef, useMemo } from 'react';
 import 'antd/dist/antd.css'; // Slider,
 import 'easymde/dist/easymde.min.css'; // Markdown
 import AntdDatePickerGenerate from 'rc-picker/lib/generate/dateFns';
@@ -672,6 +672,7 @@ const defaultMarkdownEditorOptions: MarkdownEditorOptions = {
 }
 
 interface MarkdownEditorProps {
+  id?: string;
   value: string;
   onChange: (val: string) => void;
   options?: MarkdownEditorOptions;
@@ -703,19 +704,27 @@ export const MarkdownEditorContainer = styled(Div)`
   `}
 `;
 
-export const MarkdownEditor = ({ value, onChange, options = defaultMarkdownEditorOptions }: MarkdownEditorProps) => (
-  <MarkdownEditorContainer>
-    <SimpleMDE
-      value={value}
-      onChange={onChange}
-      options={{
-        status: options.hideStatus,
-        maxHeight: `${options.maxHeight}px`,
-        toolbar: ['bold', 'italic', 'preview'],
-      }}
-    />
-  </MarkdownEditorContainer>
-)
+export const MarkdownEditor = ({ value, onChange, options = defaultMarkdownEditorOptions }: MarkdownEditorProps) => {
+  const freshOptions = useMemo(() => {
+    return {
+      status: options.hideStatus,
+      maxHeight: `${options.maxHeight}px`,
+      toolbar: ['bold', 'italic', 'preview'] as any,
+    }
+  }, []);
+
+  return (
+    <MarkdownEditorContainer>
+      <SimpleMDE
+        id="editor"
+        data-testid="editor"
+        value={value}
+        onChange={onChange}
+        options={freshOptions}
+      />
+    </MarkdownEditorContainer>
+  )
+}
 
 interface TimePickerProps {
   minuteStep?: number;

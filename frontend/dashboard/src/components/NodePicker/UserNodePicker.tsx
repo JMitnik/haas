@@ -2,7 +2,7 @@
 import * as UI from '@haas/ui';
 import { components } from 'react-select';
 import { useTranslation } from 'react-i18next';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { ConditionEntry } from 'views/AddAutomationView/CreateConditionModalCardTypes';
 import { NodeCellContainer } from 'components/NodeCell/NodeCellTypes';
@@ -89,6 +89,7 @@ export const UserNodePicker = ({
   currValues,
   isMulti,
 }: NodePickerProps) => {
+  const ref = useRef(null);
   const [filteredState, setFilteredState] = useState<TargetTypeEnum | null>(null);
   const [filteredItems, setFilteredItems] = useState(items);
   const { t } = useTranslation();
@@ -100,6 +101,20 @@ export const UserNodePicker = ({
       setFilteredItems(items.filter((item: any) => item.type === filteredState));
     }
   }, [filteredState, setFilteredItems, items]);
+
+  // useEffect(() => {
+  //   const element = ref.current;
+
+  //   // 👇️ run function when component unmounts 👇️
+  //   return () => {
+  //     if (onClose) {
+  //       console.log('Unmounted!');
+  //       onClose();
+  //     } else {
+  //       console.log('No onClose available');
+  //     }
+  //   };
+  // }, []);
 
   return (
     <UI.List maxWidth={300}>

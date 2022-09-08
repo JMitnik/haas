@@ -5,8 +5,12 @@ import { defaultMassSeedTemplate } from './defaultWorkspaceTemplate';
 import sportWorkspaceNlTemplate from './sportWorkspaceNlTemplate';
 import studentWorkspaceTemplate from './studentWorkspaceEngTemplate';
 import teacherWorkspaceTemplate from './teacherWorkspaceEngTemplate';
+import studentWorkspaceNlTemplate from './studentWorkspaceNlTemplate';
+import teacherWorkspaceNlTemplate from './teacherWorkspaceNlTemplate';
 
 export default {
+  studentNl: studentWorkspaceNlTemplate,
+  teacherNl: teacherWorkspaceNlTemplate,
   student: studentWorkspaceTemplate,
   teacher: teacherWorkspaceTemplate,
   business: businessWorkspaceTemplate,

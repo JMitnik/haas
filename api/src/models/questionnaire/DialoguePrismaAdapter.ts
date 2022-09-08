@@ -332,9 +332,8 @@ class DialoguePrismaAdapter {
             } : undefined,
             form: question.form ? {
               create: {
-                fields: {
-                  create: question.form?.fields,
-                },
+                preForm: question.form.preForm,
+                steps: question.form?.steps,
               },
             } : undefined,
             sliderNode: question.sliderNode ? {
@@ -452,6 +451,22 @@ class DialoguePrismaAdapter {
       include: {
         form: {
           include: {
+            preForm: true,
+            steps: {
+              orderBy: {
+                position: 'asc',
+              },
+              include: {
+                fields: {
+                  orderBy: {
+                    position: 'asc',
+                  },
+                  include: {
+                    contacts: true,
+                  },
+                },
+              },
+            },
             fields: {
               include: {
                 contacts: true,
@@ -566,6 +581,16 @@ class DialoguePrismaAdapter {
             },
             form: {
               include: {
+                preForm: true,
+                steps: {
+                  include: {
+                    fields: {
+                      include: {
+                        contacts: true,
+                      },
+                    },
+                  },
+                },
                 fields: true,
               },
             },

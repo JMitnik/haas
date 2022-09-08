@@ -60,11 +60,11 @@ const EditAutomationView = () => {
   const mappedAutomation: AutomationInput = mapAutomation(automation);
 
   // TODO: Add child builder
-  const conditionEntries: ConditionEntry[] = findUniqueConditionEntries(
-    (mappedAutomation.conditionBuilder?.conditions || []).map(
-      (condition) => ({ ...condition.condition, label: cuid() }),
-    ) as ConditionEntry[],
-  );
+  // const conditionEntries: ConditionEntry[] = findUniqueConditionEntries(
+  //   mappedAutomation.conditionBuilder.conditions.map(
+  //     (condition) => ({ ...condition.condition, label: cuid() }),
+  //   ) as ConditionEntry[],
+  // );
 
   return (
     <>
@@ -75,7 +75,7 @@ const EditAutomationView = () => {
       <UI.ViewBody>
         <UI.FadeIn>
           <AutomationForm
-            mappedConditions={conditionEntries}
+            mappedConditions={[]} // conditionEntries
             automation={mappedAutomation}
             onUpdate={handleUpdate}
             isLoading={loading}
