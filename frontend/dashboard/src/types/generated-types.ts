@@ -575,6 +575,13 @@ export type CreateQuestionNodeInputType = {
   edgeCondition?: Maybe<EdgeConditionInputType>;
 };
 
+/** Creates a topic (with subTopics) based on input */
+export type CreateTopicInput = {
+  name: Scalars['String'];
+  type?: Maybe<TopicEnumType>;
+  subTopics?: Maybe<Array<Maybe<CreateTopicInput>>>;
+};
+
 export type CreateTriggerInputType = {
   customerSlug?: Maybe<Scalars['String']>;
   recipients?: Maybe<RecipientsInputType>;
@@ -893,7 +900,7 @@ export type Dialogue = {
   title: Scalars['String'];
   slug: Scalars['String'];
   description: Scalars['String'];
-  template: Scalars['String'];
+  template?: Maybe<Scalars['String']>;
   isWithoutGenData?: Maybe<Scalars['Boolean']>;
   wasGeneratedWithGenData?: Maybe<Scalars['Boolean']>;
   language?: Maybe<LanguageEnumType>;
@@ -1198,6 +1205,7 @@ export type FormNodeEntryValueType = {
   url?: Maybe<Scalars['String']>;
   shortText?: Maybe<Scalars['String']>;
   longText?: Maybe<Scalars['String']>;
+  contacts?: Maybe<Scalars['String']>;
   number?: Maybe<Scalars['Int']>;
 };
 
@@ -1547,6 +1555,9 @@ export type Mutation = {
   deleteTag?: Maybe<Tag>;
   /** Deselcting a topic implies that all question-options related to the topic string are disregarded as topic. */
   deselectTopic?: Maybe<Scalars['Boolean']>;
+  /** Creates a list of topics and its subtopics. */
+  createTopic?: Maybe<Scalars['Boolean']>;
+  revokeTopic?: Maybe<Topic>;
   /** Creates a new automation. */
   createAutomation?: Maybe<AutomationModel>;
   updateAutomation?: Maybe<AutomationModel>;
@@ -1684,6 +1695,16 @@ export type MutationDeleteTagArgs = {
 
 export type MutationDeselectTopicArgs = {
   input?: Maybe<DeselectTopicInput>;
+};
+
+
+export type MutationCreateTopicArgs = {
+  input?: Maybe<Array<CreateTopicInput>>;
+};
+
+
+export type MutationRevokeTopicArgs = {
+  input?: Maybe<RevokeTopicInput>;
 };
 
 
@@ -2483,6 +2504,12 @@ export type RequestInviteOutput = {
   loginToken?: Maybe<Scalars['String']>;
 };
 
+/** Revokes a sub topic from a topic based on input */
+export type RevokeTopicInput = {
+  topic: Scalars['String'];
+  subTopic: Scalars['String'];
+};
+
 export type RoleConnection = DeprecatedConnectionInterface & {
   __typename?: 'RoleConnection';
   cursor?: Maybe<Scalars['String']>;
@@ -2750,6 +2777,19 @@ export type TextboxNodeEntryInput = {
   value?: Maybe<Scalars['String']>;
 };
 
+/** Model for topic */
+export type Topic = {
+  __typename?: 'Topic';
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  type: Scalars['String'];
+  subTopics?: Maybe<Array<Maybe<Topic>>>;
+  parentTopics?: Maybe<Array<Maybe<Topic>>>;
+  workspace?: Maybe<Customer>;
+  /** A list of question options to which this topic is assigned to. */
+  usedByOptions?: Maybe<Array<Maybe<QuestionOption>>>;
+};
+
 export type TopicDelta = {
   __typename?: 'TopicDelta';
   topic?: Maybe<Scalars['String']>;
@@ -2760,6 +2800,12 @@ export type TopicDelta = {
   percentageChanged?: Maybe<Scalars['Float']>;
   group?: Maybe<Scalars['String']>;
 };
+
+/** All the different types a topic can be. */
+export enum TopicEnumType {
+  System = 'SYSTEM',
+  Workspace = 'WORKSPACE'
+}
 
 /** Generic filter object for filtering topics */
 export type TopicFilterInput = {
@@ -3308,7 +3354,7 @@ export type NodeEntryFragmentFragment = (
       & Pick<FormNodeEntryType, 'id'>
       & { values?: Maybe<Array<Maybe<(
         { __typename?: 'FormNodeEntryValueType' }
-        & Pick<FormNodeEntryValueType, 'email' | 'phoneNumber' | 'url' | 'shortText' | 'longText' | 'number'>
+        & Pick<FormNodeEntryValueType, 'email' | 'phoneNumber' | 'url' | 'shortText' | 'longText' | 'number' | 'contacts'>
         & { relatedField?: Maybe<(
           { __typename?: 'FormNodeField' }
           & Pick<FormNodeField, 'id' | 'type'>
@@ -4426,6 +4472,7 @@ export const NodeEntryFragmentFragmentDoc = gql`
         shortText
         longText
         number
+        contacts
       }
     }
   }

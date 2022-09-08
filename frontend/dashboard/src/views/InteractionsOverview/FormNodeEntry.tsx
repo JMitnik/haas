@@ -1,5 +1,5 @@
 import * as UI from '@haas/ui';
-import { AtSign, FileText, Hash, Link2, Phone, Type } from 'react-feather';
+import { AtSign, FileText, Hash, Link2, Phone, Type, User } from 'react-feather';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -32,6 +32,17 @@ const GeneralWrappedTextContainer = styled.div`
     word-break: break-word;
   }
 `;
+
+const FormNodeContactEntry = ({ formNodeFieldEntry }: { formNodeFieldEntry: any }) => (
+  <GeneralWrappedTextContainer>
+    <UI.Label textTransform="none" variantColor="gray" bg="gray.300">
+      <UI.Icon color="gray.500" mr={1}>
+        <User width="14px" height="14px" />
+      </UI.Icon>
+      {formNodeFieldEntry.contacts}
+    </UI.Label>
+  </GeneralWrappedTextContainer>
+);
 
 const FormNodeEmailEntry = ({ formNodeFieldEntry }: { formNodeFieldEntry: any }) => (
   <GeneralWrappedTextContainer>
@@ -106,6 +117,7 @@ const MapFormNodeEntryVal: { [key in FormNodeFieldTypeEnum]?: React.FC<{ formNod
   [FormNodeFieldTypeEnum.PhoneNumber]: FormNodePhoneNumberEntry,
   [FormNodeFieldTypeEnum.Number]: FormNodeNumberEntry,
   [FormNodeFieldTypeEnum.Url]: FormNodeUrlEntry,
+  [FormNodeFieldTypeEnum.Contacts]: FormNodeContactEntry,
 };
 
 export const FormNodeEntry = ({ nodeEntry }: { nodeEntry: FormNodeEntryType }) => (
@@ -120,6 +132,7 @@ export const FormNodeEntry = ({ nodeEntry }: { nodeEntry: FormNodeEntryType }) =
             phoneNumber: formNodeFieldEntry?.phoneNumber,
             shortText: formNodeFieldEntry?.shortText,
             url: formNodeFieldEntry?.url,
+            contacts: formNodeFieldEntry?.contacts,
           };
           // We can't rely on the relatedField.type because users may have changed the type whilst the value remains
           // on previous type.
