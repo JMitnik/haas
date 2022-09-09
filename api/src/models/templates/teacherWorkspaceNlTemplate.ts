@@ -2,12 +2,12 @@ import { LanguageEnum, NodeType } from '@prisma/client';
 import WorkspaceTemplate, { defaultAdminRole, defaultBotRole, defaultForm, defaultManagerRole, defaultUserRole, DemoWorkspaceTemplate } from './TemplateTypes';
 
 const teacherOptionsNl = [
-  { value: 'Lichaam & Geest', position: 1 },
-  { value: 'Management', position: 2 },
-  { value: 'Thuis', position: 3 },
-  { value: 'Activiteit buiten school / Hobby', position: 4 },
-  { value: 'Collega\'s', position: 5 },
-  { value: 'Eigen Prestatie / Werkdruk', position: 6 },
+  { value: 'Lichaam & Geest', position: 1, topic: 'Physical & Mental' },
+  { value: 'Management', position: 2, topic: 'Management' },
+  { value: 'Thuis', position: 3, topic: 'Home' },
+  { value: 'Activiteit buiten school / Hobby', position: 4, topic: 'Activity Outside School' },
+  { value: 'Collega\'s', position: 5, topic: 'Colleagues' },
+  { value: 'Eigen Prestatie / Werkdruk', position: 6, topic: 'Own Performance' },
 ]
 
 const sportWorkspaceTemplate: DemoWorkspaceTemplate = {

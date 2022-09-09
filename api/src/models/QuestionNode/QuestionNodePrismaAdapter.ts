@@ -1,5 +1,6 @@
 import { Prisma, PrismaClient, Edge, QuestionNode, QuestionOption, VideoEmbeddedNode, NodeType, Link, Share } from '@prisma/client';
 import { NexusGenInputs } from 'generated/nexus';
+import { Topic } from 'models/Topic/graphql';
 
 import { CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType';
 import NodeService from './NodeService';
@@ -505,13 +506,23 @@ class QuestionNodePrismaAdapter {
           create: question.links,
         } : undefined,
         options: question.options?.length ? {
-          create: question.options.map(({ value, overrideLeafId, publicValue, position, isTopic }) => {
+          create: question.options.map(({ value, overrideLeafId, publicValue, position, isTopic, topic }) => {
             return {
               value,
               publicValue,
               position,
               overrideLeaf: overrideLeafId ? { connect: { id: overrideLeafId } } : undefined,
               isTopic,
+              topic: isTopic ? {
+                connectOrCreate: {
+                  create: {
+                    name: topic || value,
+                  },
+                  where: {
+                    name: topic || value,
+                  },
+                },
+              } : undefined,
             }
           }),
         } : undefined,

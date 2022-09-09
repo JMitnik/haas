@@ -25,6 +25,7 @@ export interface QuestionTemplateInput {
     value: string;
     position: number;
     isTopic?: boolean;
+    topic?: string;
     cta?: string | null;
   }[];
   children?: QuestionTemplateInput[];

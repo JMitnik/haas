@@ -361,11 +361,13 @@ class TemplateService {
         cta = dbLeaf?.id || undefined;
       }
 
+      const includeTopicOptions = questionInput.options.map((option) => ({ ...option, isTopic: true })) || [];
+
       const question = await this.nodeService.createQuestionNode(
         questionInput.title,
         dialogueId,
         questionInput.type,
-        questionInput.options || [],
+        includeTopicOptions,
         questionInput.isRoot || false,
         cta,
       );

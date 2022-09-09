@@ -1157,19 +1157,7 @@ export interface NexusGenObjects {
     didAlreadyExist?: boolean | null; // Boolean
     didInvite?: boolean | null; // Boolean
   }
-  Issue: { // root type
-    actionRequiredCount: number; // Int!
-    basicStats: NexusGenRootTypes['BasicStatistics']; // BasicStatistics!
-    createdAt?: NexusGenScalars['Date'] | null; // Date
-    dialogueId: string; // String!
-    followUpAction?: NexusGenEnums['SessionActionType'] | null; // SessionActionType
-    history: NexusGenRootTypes['DateHistogram']; // DateHistogram!
-    id?: string | null; // ID
-    rankScore?: number | null; // Float
-    status: NexusGenEnums['StatusType']; // StatusType!
-    topic?: string | null; // String
-    updatedAt?: NexusGenScalars['Date'] | null; // Date
-  }
+  Issue: prisma.Issue;
   JobObjectType: { // root type
     createWorkspaceJob?: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
     createWorkspaceJobId?: string | null; // String

@@ -57,6 +57,7 @@ export interface CreateQuestionInput {
     value: string;
     position: number | null;
     overrideLeafId?: string;
+    topic?: string;
     isTopic?: boolean;
   }[];
   links?: Array<{
@@ -73,7 +74,7 @@ export interface CreateQuestionInput {
       helper: string;
       nextText: string;
       finishText: string;
-    },
+    };
     steps: {
       header: string;
       helper: string;
