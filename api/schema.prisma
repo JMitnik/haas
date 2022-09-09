@@ -53,6 +53,7 @@ model Actionable {
   comments Comment[]
   dialogue Dialogue  @relation(fields: [dialogueId], references: [id])
   issue    Issue?    @relation(fields: [issueId], references: [id])
+  session  Session?
 }
 
 enum TopicType {
@@ -464,15 +465,18 @@ model QuestionOption {
 }
 
 model Session {
-  createdAt                DateTime              @default(now())
-  id                       String                @id @default(cuid())
-  dialogueId               String
-  deliveryId               String?
-  originUrl                String?
-  totalTimeInSec           Int?
-  device                   String?
-  browser                  String?
-  mainScore                Float                 @default(0)
+  createdAt      DateTime @default(now())
+  id             String   @id @default(cuid())
+  dialogueId     String
+  deliveryId     String?
+  originUrl      String?
+  totalTimeInSec Int?
+  device         String?
+  browser        String?
+  mainScore      Float    @default(0)
+  actionableId   String?  @unique
+
+  actionable               Actionable?           @relation(fields: [actionableId], references: [id])
   delivery                 Delivery?             @relation(fields: [deliveryId], references: [id])
   dialogue                 Dialogue              @relation(fields: [dialogueId], references: [id], onDelete: Cascade)
   nodeEntries              NodeEntry[]

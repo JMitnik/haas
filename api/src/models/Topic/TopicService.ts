@@ -25,6 +25,13 @@ export class TopicService {
     this.topicPrismaAdapter = new TopicPrismaAdapter(prisma);
   }
 
+  public async findTopicIdByChoice(dialogueId: string, optionValue: string) {
+    const options = await this.questionNodePrismaAdapter.findQuestionOptionsBySelectedTopic([dialogueId], optionValue);
+    if (options.length === 0) return null;
+
+    return options[0].topicId;
+  }
+
   /**
    * Unassigns a topic as a child topic from the provided parent topic
    */

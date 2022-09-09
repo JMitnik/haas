@@ -22,18 +22,21 @@ import AutomationService from '../automations/AutomationService';
 import { CreateSessionInput } from './SessionPrismaAdapterType';
 import { CustomerService } from '../customer/CustomerService';
 import { logger } from '../../config/logger';
+import ActionableService from '../actionable/ActionableService';
 
 class SessionService {
   private sessionPrismaAdapter: SessionPrismaAdapter;
   private triggerService: TriggerService;
   private automationService: AutomationService;
   private workspaceService: CustomerService;
+  private actionableService: ActionableService;
 
   constructor(prismaClient: PrismaClient) {
     this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
     this.triggerService = new TriggerService(prismaClient);
     this.automationService = new AutomationService(prismaClient);
     this.workspaceService = new CustomerService(prismaClient);
+    this.actionableService = new ActionableService(prisma);
   };
 
   /**
@@ -286,6 +289,10 @@ class SessionService {
       createdAt: sessionInput?.createdAt,
       mainScore: mainScore || undefined,
     });
+
+    if (session.mainScore <= 55) {
+      await this.actionableService.createActionableFromSession(session, dialogueId);
+    }
 
     try {
       if (sessionInput.deliveryId) {

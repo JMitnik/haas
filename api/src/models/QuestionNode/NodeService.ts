@@ -140,9 +140,9 @@ export class NodeService {
     const targetUsers = communicationUser?.userIds?.length
       ? await this.userOfCustomerPrismaAdapter.findTargetUsers(
         workspaceSlug, {
-          roleIds: communicationUser?.userIds.filter(isPresent),
-          userIds: communicationUser?.userIds.filter(isPresent),
-        }
+        roleIds: communicationUser?.userIds.filter(isPresent),
+        userIds: communicationUser?.userIds.filter(isPresent),
+      }
       )
       : [];
     const allUserIds = targetUsers.map((user) => ({ id: user.userId }));
