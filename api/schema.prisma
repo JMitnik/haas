@@ -9,6 +9,52 @@ datasource postgresql {
   url      = env("DB_STRING")
 }
 
+model Issue {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  topicId     String   @unique
+  workspaceId String
+
+  topic       Topic        @relation(fields: [topicId], references: [id])
+  workspace   Customer     @relation(fields: [workspaceId], references: [id])
+  actionables Actionable[]
+}
+
+model Comment {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  data         String
+  actionableId String
+
+  actionable Actionable @relation(fields: [actionableId], references: [id])
+}
+
+enum ActionableState {
+  UNVERIFIED
+  PENDING
+  STALE
+  COMPLETED
+  DROPPED
+}
+
+model Actionable {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  dialogueId String
+  assigneeId String?
+  issueId    String?
+
+  status ActionableState @default(UNVERIFIED)
+
+  assignee User?     @relation(fields: [assigneeId], references: [id])
+  comments Comment[]
+  dialogue Dialogue  @relation(fields: [dialogueId], references: [id])
+  issue    Issue?    @relation(fields: [issueId], references: [id])
+}
+
 enum TopicType {
   SYSTEM
   WORKSPACE
@@ -28,6 +74,7 @@ model Topic {
   workspace     Customer?        @relation(fields: [workspaceId], references: [id])
   usedByOptions QuestionOption[]
   QuestionNode  QuestionNode[]
+  issue         Issue?
 }
 
 model DialogueTopicCache {
@@ -136,6 +183,7 @@ model Customer {
   triggers        Trigger[]
   users           UserOfCustomer[]
   topics          Topic[]
+  issues          Issue[]
 }
 
 model Tag {
@@ -182,6 +230,7 @@ model Dialogue {
   assignees                   User[]
   sessions                    Session[]
   tags                        Tag[]
+  actionables                 Actionable[]
 
   AutomationScheduled AutomationScheduled[]
 
@@ -523,6 +572,7 @@ model User {
   phone             String?
   firstName         String?
   lastName          String?
+  jobDescription    String?
   globalPermissions SystemPermissionEnum[]
 
   loginToken         String?
@@ -536,6 +586,7 @@ model User {
 
   isAssignedTo         Dialogue[]
   isContactOfFormField FormNodeField[]
+  actionables          Actionable[]
 }
 
 model UserOfCustomer {
