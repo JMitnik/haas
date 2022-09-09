@@ -10,18 +10,26 @@ import { Issue, IssueFilterInput } from './Issue.types';
 import { SessionActionType, SessionWithEntries } from '../../models/session/Session.types';
 import SessionService from '../../models/session/SessionService';
 import CustomerService from '../../models/customer/CustomerService';
+import IssuePrismaAdapter from './IssuePrismaAdapter';
+import { string } from 'yargs';
 
 export class IssueService {
   private prisma: PrismaClient;
   private topicService: TopicService;
   private workspaceService: CustomerService;
   private sessionService: SessionService;
+  private issuePrismaAdapter: IssuePrismaAdapter;
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
     this.topicService = new TopicService(prisma);
     this.workspaceService = new CustomerService(prisma);
     this.sessionService = new SessionService(prisma);
+    this.issuePrismaAdapter = new IssuePrismaAdapter(prisma);
+  }
+
+  public async createIssueIfNotExists(workspaceId: string, topicId: string) {
+    return this.issuePrismaAdapter.upsertIssueByTopicId(workspaceId, topicId);
   }
 
   /**
