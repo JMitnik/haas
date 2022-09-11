@@ -1212,6 +1212,7 @@ export type FormNodeEntryValueType = {
   url?: Maybe<Scalars['String']>;
   shortText?: Maybe<Scalars['String']>;
   longText?: Maybe<Scalars['String']>;
+  contacts?: Maybe<Scalars['String']>;
   number?: Maybe<Scalars['Int']>;
 };
 
@@ -3367,7 +3368,7 @@ export type NodeEntryFragmentFragment = (
       & Pick<FormNodeEntryType, 'id'>
       & { values?: Maybe<Array<Maybe<(
         { __typename?: 'FormNodeEntryValueType' }
-        & Pick<FormNodeEntryValueType, 'email' | 'phoneNumber' | 'url' | 'shortText' | 'longText' | 'number'>
+        & Pick<FormNodeEntryValueType, 'email' | 'phoneNumber' | 'url' | 'shortText' | 'longText' | 'number' | 'contacts'>
         & { relatedField?: Maybe<(
           { __typename?: 'FormNodeField' }
           & Pick<FormNodeField, 'id' | 'type'>
@@ -4522,6 +4523,7 @@ export const NodeEntryFragmentFragmentDoc = gql`
         shortText
         longText
         number
+        contacts
       }
     }
   }

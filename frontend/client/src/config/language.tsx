@@ -1,6 +1,16 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    slide_explainer: {
+      en: 'Slide left or right',
+      de: 'Nach links oder rechts schieben',
+      nl: 'Sleep links of rechts',
+    },
+    slide_explainer_helper: {
+      en: 'to let us know how you feel',
+      de: 'um dir zu sagen, wie du dich fühlst',
+      nl: 'om te vertellen hoe het gaat',
+    },
     happy: {
       en: 'Happy',
       de: 'Glücklich',
@@ -27,9 +37,9 @@ const language = {
       nl: 'Voornaam',
     },
     do_not_share: {
-      en: 'No, do not share',
-      de: 'Nein, Nicht teilen',
-      nl: 'Nee, Niet delen',
+      en: 'Stay anonymous',
+      de: 'Anonym bleiben',
+      nl: 'Anoniem blijven',
     },
     submit: {
       en: 'Submit',

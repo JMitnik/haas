@@ -1126,6 +1126,7 @@ export interface NexusGenObjects {
     values?: Array<NexusGenRootTypes['FormNodeEntryValueType'] | null> | null; // [FormNodeEntryValueType]
   }
   FormNodeEntryValueType: { // root type
+    contacts?: string | null; // String
     email?: string | null; // String
     longText?: string | null; // String
     number?: number | null; // Int
@@ -1832,6 +1833,7 @@ export interface NexusGenFieldTypes {
     values: Array<NexusGenRootTypes['FormNodeEntryValueType'] | null> | null; // [FormNodeEntryValueType]
   }
   FormNodeEntryValueType: { // field return type
+    contacts: string | null; // String
     email: string | null; // String
     longText: string | null; // String
     number: number | null; // Int
@@ -2756,6 +2758,7 @@ export interface NexusGenFieldTypeNames {
     values: 'FormNodeEntryValueType'
   }
   FormNodeEntryValueType: { // field return type name
+    contacts: 'String'
     email: 'String'
     longText: 'String'
     number: 'Int'

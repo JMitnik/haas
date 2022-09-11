@@ -76,8 +76,8 @@ interface FormDataProps {
 const schema = yup.object().shape({
   title: yup.string().required(),
   slug: yup.string().required('Slug is required'),
-  publicTitle: yup.string().notRequired(),
-  description: yup.string().required(),
+  publicTitle: yup.string().notRequired().nullable(),
+  description: yup.string().notRequired().nullable(),
   languageOption: yup.object().nullable(true).shape(
     { label: yup.string().required(), value: yup.string().required() },
   ).required('Content option is required'),
@@ -215,7 +215,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
                       />
                     </FormControl>
 
-                    <FormControl isRequired isInvalid={!!form.formState.errors.description}>
+                    <FormControl isInvalid={!!form.formState.errors.description}>
                       <FormLabel htmlFor="title">{t('description')}</FormLabel>
                       <InputHelper>
                         {t('dialogue:description_helper')}

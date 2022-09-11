@@ -1007,6 +1007,7 @@ type FormNodeEntryType {
 }
 
 type FormNodeEntryValueType {
+  contacts: String
   email: String
   longText: String
   number: Int

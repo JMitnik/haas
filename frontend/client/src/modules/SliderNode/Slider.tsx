@@ -269,6 +269,7 @@ const Slider = ({ form, onSubmit, markers }: SliderProps) => {
               adaptedColor={adaptedColor}
               score={adjustedScore}
               isEarly={showIsEarly}
+              isNotStarted={animationState.isStopped}
             />
           </motion.div>
         </SliderSpeechWrapper>
