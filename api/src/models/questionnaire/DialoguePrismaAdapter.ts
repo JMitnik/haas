@@ -926,26 +926,6 @@ class DialoguePrismaAdapter {
       ],
     }
 
-    // if (filter?.searchTerm) {
-    //   dialogueWhereInput = {
-    //     ...cloneDeep(dialogueWhereInput),
-    //     OR: [
-    //       { title: { contains: filter.searchTerm, mode: 'insensitive' } },
-    //       { description: { contains: filter.searchTerm, mode: 'insensitive' } },
-    //       {
-    //         tags: {
-    //           some: {
-    //             name: {
-    //               contains: filter.searchTerm,
-    //               mode: 'insensitive',
-    //             },
-    //           },
-    //         },
-    //       },
-    //     ],
-    //   }
-    // }
-
     return dialogueWhereInput;
   }
 

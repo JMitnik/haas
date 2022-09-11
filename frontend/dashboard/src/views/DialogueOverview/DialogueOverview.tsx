@@ -8,7 +8,6 @@ import React, { useState } from 'react';
 import * as Popover from 'components/Common/Popover';
 import * as Table from 'components/Common/Table';
 import {
-  Dialogue,
   DialogueConnection,
   DialogueConnectionOrder,
   UserType,

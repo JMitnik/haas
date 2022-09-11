@@ -1,5 +1,5 @@
 import { ColourSettings, Customer, CustomerSettings } from '@prisma/client';
-import { assertNonNullType, GraphQLError } from 'graphql';
+import { GraphQLError } from 'graphql';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import { arg, extendType, inputObjectType, mutationField, nonNull, objectType, scalarType } from 'nexus';
 import cloudinary, { UploadApiResponse } from 'cloudinary';

@@ -32,8 +32,8 @@ class UserService {
 
   /**
    * Finds all users based on a AutomationAction payload
-   * @param workspaceSlug 
-   * @param targetIds 
+   * @param workspaceSlug
+   * @param targetIds
    * @returns a list of users
    */
   findTargetUsers = async (workspaceSlug: string, payload: GenerateReportPayload) => {
@@ -112,8 +112,8 @@ class UserService {
 
   /**
    * Assigns user to all private dialogues within a workspace
-   * @param userId 
-   * @param workspaceId 
+   * @param userId
+   * @param workspaceId
    */
   public async assignUserToAllPrivateDialogues(userId: string, workspaceId: string) {
     const workspace = await this.customerService.findPrivateDialoguesOfWorkspace(workspaceId);
@@ -133,7 +133,7 @@ class UserService {
    * @param input
    * @returns
    */
-  assignUserToDialogue = async (input: NexusGenInputs['AssignUserToDialogueInput']) => {
+  public async assignUserToDialogue(input: NexusGenInputs['AssignUserToDialogueInput']) {
     const updatedUser = await this.userPrismaAdapter.updateDialogueAssignmentOfUser(input);
 
     return updatedUser;

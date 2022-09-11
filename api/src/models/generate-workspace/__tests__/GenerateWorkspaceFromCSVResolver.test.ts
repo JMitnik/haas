@@ -379,7 +379,6 @@ describe('GenerateWorkspaceFromCSV resolver', () => {
 
       // Check whether correct privacy settings are set for dialogues
       expect(dialogues[0]?.isPrivate).toBeTruthy();
-
     });
   });
 
@@ -427,8 +426,6 @@ describe('GenerateWorkspaceFromCSV resolver', () => {
 
       // Check whether correct privacy settings are set for dialogues
       expect(dialogues[0]?.isPrivate).toBe(false);
-
     });
   });
-
 })

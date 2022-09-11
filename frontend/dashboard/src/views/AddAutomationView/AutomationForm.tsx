@@ -90,17 +90,9 @@ export const AutomationForm = ({
     variables: {
       customerSlug: activeCustomer?.slug as string,
     },
-    onError(e) {
-      console.log('ERRRRORROROROROROROROROROROR: ', e.message);
-    },
   });
 
-  console.log('ACtive customer: ', activeCustomer);
-  console.log('userRoleData: ', userRoleData);
-
   const userPickerEntries = mapToUserPickerEntries(userRoleData?.customer as any);
-  console.log('Users: ', userPickerEntries);
-
   const dialogueItems = dialoguesData?.customer?.dialogues?.map((dialogue) => ({
     id: dialogue?.id,
     value: dialogue?.slug,

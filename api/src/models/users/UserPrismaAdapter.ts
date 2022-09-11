@@ -16,15 +16,6 @@ class UserPrismaAdapter {
   }
 
   /**
-   * Assigns user to all dialogues within a workspace
-   * @param userId 
-   * @param workspaceId 
-   */
-  assignUserToAllDialogues = async (userId: string, workspaceId: string) => {
-
-  };
-
-  /**
    * Upserts a user by checking if the email already exists or not
    * @param input
    * @returns

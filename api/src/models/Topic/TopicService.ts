@@ -96,8 +96,8 @@ export class TopicService {
   }
 
   /**
- * Count topics and their frequencies for a given topic.
- */
+  * Count topics and their frequencies for a given topic.
+  */
   async countWorkspaceTopics(
     workspaceId: string,
     startDate: Date,
