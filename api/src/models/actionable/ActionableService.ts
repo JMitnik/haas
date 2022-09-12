@@ -11,7 +11,7 @@ import { logger } from '../../config/logger';
 import { ActionablePrismaAdapter } from './ActionablePrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import IssuePrismaAdapter from '../Issue/IssuePrismaAdapter';
-import { ActionableFilterInput } from './Actionable.types';
+import { ActionableFilterInput, AssignUserToActionableInput } from './Actionable.types';
 
 class ActionableService {
   private actionablePrismaAdapter: ActionablePrismaAdapter;
@@ -25,6 +25,11 @@ class ActionableService {
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prisma);
     this.issuePrismaAdapter = new IssuePrismaAdapter(prisma);
   }
+
+  public async assignUserToActionable(input: AssignUserToActionableInput) {
+    const result = await this.actionablePrismaAdapter.assignUserToActionable(input);
+    return result;
+  };
 
   public async findActionablesByIssueId(issueId: string, filter?: ActionableFilterInput) {
     return this.actionablePrismaAdapter.findActionablesByIssue(issueId, filter);

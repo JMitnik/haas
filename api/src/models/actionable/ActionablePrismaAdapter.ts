@@ -1,8 +1,8 @@
 import {
   PrismaClient,
 } from '@prisma/client';
-import { ActionableFilterInput } from './Actionable.types';
-import { buildFindActionablesWhereInput } from './ActionablePrismaAdapter.helper';
+import { ActionableFilterInput, AssignUserToActionableInput } from './Actionable.types';
+import { buildFindActionablesWhereInput, buildUpdateActionableAssignee } from './ActionablePrismaAdapter.helper';
 
 export class ActionablePrismaAdapter {
   prisma: PrismaClient;
@@ -10,6 +10,20 @@ export class ActionablePrismaAdapter {
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
   }
+
+  public async assignUserToActionable(input: AssignUserToActionableInput) {
+    return this.prisma.actionable.update({
+      where: {
+        id: input.actionableId,
+      },
+      data: {
+        assignee: buildUpdateActionableAssignee(input),
+      },
+      include: {
+        assignee: true,
+      },
+    })
+  };
 
   public async findActionablesByIssue(issueId: string, filter?: ActionableFilterInput) {
     return this.prisma.actionable.findMany({

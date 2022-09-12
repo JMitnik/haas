@@ -1,5 +1,7 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 import { ActionableFilterInput } from 'models/actionable/Actionable.types';
+import { IssueFilterInput } from './Issue.types';
+import { buildFindIssuesWhereInput } from './IssuePrismaAdapter.helper';
 
 class IssuePrismaAdapter {
   prisma: PrismaClient;
@@ -8,14 +10,18 @@ class IssuePrismaAdapter {
     this.prisma = prismaClient;
   };
 
-  public async findIssuesByWorkspaceId(workspaceId: string) {
+  public async findIssuesByWorkspaceId(workspaceId: string, filter: IssueFilterInput) {
     return this.prisma.issue.findMany({
-      where: {
-        workspaceId,
-      },
+      where: buildFindIssuesWhereInput(workspaceId, filter),
       include: {
         topic: true,
         actionables: {
+          where: {
+            createdAt: {
+              gte: filter?.startDate,
+              lte: filter?.endDate,
+            },
+          },
           include: {
             assignee: true,
             comments: true,

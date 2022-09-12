@@ -31,8 +31,8 @@ export class IssueService {
   /**
    * Finds all issues by a workspace ID
    */
-  public async findIssuesByWorkspaceId(workspaceId: string) {
-    return this.issuePrismaAdapter.findIssuesByWorkspaceId(workspaceId);
+  public async findIssuesByWorkspaceId(workspaceId: string, filter: IssueFilterInput) {
+    return this.issuePrismaAdapter.findIssuesByWorkspaceId(workspaceId, filter);
   }
 
   /**

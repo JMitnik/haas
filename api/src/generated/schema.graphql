@@ -54,6 +54,11 @@ input AppendToInteractionInput {
   sessionId: ID
 }
 
+input AssignUserToActionableInput {
+  actionableId: String!
+  assigneeId: String
+}
+
 input AssignUserToDialoguesInput {
   assignedDialogueIds: [String!]
   userId: String!
@@ -622,7 +627,7 @@ type Customer {
   id: ID
   isDemo: Boolean
   issueTopics(input: IssueFilterInput): [Issue]
-  issues(filter: IssueFilterInput): [Issue]
+  issues(filter: IssueFilterInput): [IssueModel]
   name: String!
   nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel] @deprecated(reason: "Deprecated, see statistics")
   nestedHealthScore(input: HealthScoreInput): HealthScore @deprecated(reason: "Deprectaed, see statistics")
@@ -1380,6 +1385,7 @@ type MostTrendingTopic {
 type Mutation {
   appendToInteraction(input: AppendToInteractionInput): Session
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue
+  assignUserToActionable(input: AssignUserToActionableInput!): Actionable
   assignUserToDialogues(input: AssignUserToDialoguesInput): UserType
   authenticateLambda(input: AuthenticateLambdaInput): String
   confirmCreateWorkspaceJob(input: GenerateAutodeckInput): CreateWorkspaceJobType

@@ -18,7 +18,7 @@ import { DialogueStatisticsSummaryFilterInput, DialogueStatisticsSummaryModel, M
 import { DialogueConnection, DialogueConnectionFilterInput } from '../../questionnaire';
 import { HealthScore, HealthScoreInput } from './HealthScore';
 import { Organization } from '../../Organization/graphql/OrganizationModel';
-import { Issue, IssueFilterInput } from '../../Issue/graphql';
+import { Issue, IssueFilterInput, IssueModel } from '../../Issue/graphql';
 import { IssueValidator } from '../../Issue/IssueValidator';
 import { SessionConnectionFilterInput } from '../../../models/session/graphql';
 import { SessionConnection } from '../../session/graphql/Session.graphql'
@@ -94,13 +94,13 @@ export const CustomerType = objectType({
      * TODO: Refactor to refer to this as issueDialogues
      */
     t.list.field('issues', {
-      type: Issue,
+      type: IssueModel,
       nullable: true,
       args: { filter: IssueFilterInput },
 
       resolve: async (parent, args, { services }) => {
         const filter = IssueValidator.resolveFilter(args.filter);
-        return await services.issueService.getProblemDialoguesByWorkspace(parent.id, filter);
+        return await services.issueService.findIssuesByWorkspaceId(parent.id, filter);
       },
     });
 

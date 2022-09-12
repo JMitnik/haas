@@ -72,6 +72,10 @@ export interface NexusGenInputs {
     nodeId?: string | null; // String
     sessionId?: string | null; // ID
   }
+  AssignUserToActionableInput: { // input type
+    actionableId: string; // String!
+    assigneeId?: string | null; // String
+  }
   AssignUserToDialoguesInput: { // input type
     assignedDialogueIds?: string[] | null; // [String!]
     userId: string; // String!
@@ -1679,7 +1683,7 @@ export interface NexusGenFieldTypes {
     id: string | null; // ID
     isDemo: boolean | null; // Boolean
     issueTopics: Array<NexusGenRootTypes['Issue'] | null> | null; // [Issue]
-    issues: Array<NexusGenRootTypes['Issue'] | null> | null; // [Issue]
+    issues: Array<NexusGenRootTypes['IssueModel'] | null> | null; // [IssueModel]
     name: string; // String!
     nestedDialogueStatisticsSummary: Array<NexusGenRootTypes['DialogueStatisticsSummaryModel'] | null> | null; // [DialogueStatisticsSummaryModel]
     nestedHealthScore: NexusGenRootTypes['HealthScore'] | null; // HealthScore
@@ -1980,6 +1984,7 @@ export interface NexusGenFieldTypes {
   Mutation: { // field return type
     appendToInteraction: NexusGenRootTypes['Session'] | null; // Session
     assignTags: NexusGenRootTypes['Dialogue'] | null; // Dialogue
+    assignUserToActionable: NexusGenRootTypes['Actionable'] | null; // Actionable
     assignUserToDialogues: NexusGenRootTypes['UserType'] | null; // UserType
     authenticateLambda: string | null; // String
     confirmCreateWorkspaceJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
@@ -2625,7 +2630,7 @@ export interface NexusGenFieldTypeNames {
     id: 'ID'
     isDemo: 'Boolean'
     issueTopics: 'Issue'
-    issues: 'Issue'
+    issues: 'IssueModel'
     name: 'String'
     nestedDialogueStatisticsSummary: 'DialogueStatisticsSummaryModel'
     nestedHealthScore: 'HealthScore'
@@ -2926,6 +2931,7 @@ export interface NexusGenFieldTypeNames {
   Mutation: { // field return type name
     appendToInteraction: 'Session'
     assignTags: 'Dialogue'
+    assignUserToActionable: 'Actionable'
     assignUserToDialogues: 'UserType'
     authenticateLambda: 'String'
     confirmCreateWorkspaceJob: 'CreateWorkspaceJobType'
@@ -3467,6 +3473,9 @@ export interface NexusGenArgTypes {
     assignTags: { // args
       dialogueId?: string | null; // String
       tags?: NexusGenInputs['TagsInputObjectType'] | null; // TagsInputObjectType
+    }
+    assignUserToActionable: { // args
+      input: NexusGenInputs['AssignUserToActionableInput']; // AssignUserToActionableInput!
     }
     assignUserToDialogues: { // args
       input?: NexusGenInputs['AssignUserToDialoguesInput'] | null; // AssignUserToDialoguesInput
