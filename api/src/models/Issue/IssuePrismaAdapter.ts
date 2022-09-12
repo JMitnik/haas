@@ -7,6 +7,44 @@ class IssuePrismaAdapter {
     this.prisma = prismaClient;
   };
 
+  public async findIssueById(id: string) {
+    return this.prisma.issue.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        topic: true,
+        actionables: {
+          include: {
+            assignee: true,
+            comments: true,
+            dialogue: true,
+            session: true,
+          },
+        },
+      },
+    });
+  }
+
+  public async findIssueByTopicId(topicId: string) {
+    return this.prisma.issue.findUnique({
+      where: {
+        topicId,
+      },
+      include: {
+        topic: true,
+        actionables: {
+          include: {
+            assignee: true,
+            comments: true,
+            dialogue: true,
+            session: true,
+          },
+        },
+      },
+    });
+  }
+
   public async upsertIssueByTopicId(workspaceId: string, topicId: string) {
     return this.prisma.issue.upsert({
       where: {

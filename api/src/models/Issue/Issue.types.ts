@@ -1,6 +1,9 @@
 import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 
+
 type Modify<T, R> = Omit<T, keyof R> & R;
+
+export type GetIssueResolverInput = NexusGenInputs['GetIssueResolverInput'];
 
 export type Issue = NexusGenFieldTypes['Issue'];
 export type IssueFilterInput = Modify<NexusGenInputs['IssueFilterInput'], {

@@ -69,7 +69,7 @@ class SessionService {
 
       const dialogue = await this.dialoguePrismaAdapter.getDialogueById(dialogueId) as Dialogue;
       const issue = await this.issuePrismaAdapter.upsertIssueByTopicId(dialogue.customerId, topicId);
-      await this.actionablePrismaAdapter.createActionableFromChoice(dialogueId, issue.id);
+      await this.actionablePrismaAdapter.createActionable(dialogueId, issue.id, session.id);
     }
   }
 

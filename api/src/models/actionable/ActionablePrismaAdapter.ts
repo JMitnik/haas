@@ -9,9 +9,10 @@ export class ActionablePrismaAdapter {
     this.prisma = prisma;
   }
 
-  public async createActionableFromChoice(
+  public async createActionable(
     dialogueId: string,
     issueId: string,
+    sessionId: string,
   ) {
     return this.prisma.actionable.create({
       data: {
@@ -23,6 +24,11 @@ export class ActionablePrismaAdapter {
         issue: {
           connect: {
             id: issueId,
+          },
+        },
+        session: {
+          connect: {
+            id: sessionId,
           },
         },
       },

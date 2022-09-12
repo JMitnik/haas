@@ -28,7 +28,10 @@ import tagNexus from '../models/tag/Tag';
 import triggerNexus from '../models/trigger/Trigger';
 import uploadNexus from '../models/link/graphql/UploadUpsellFileResolver';
 
+import * as ActionableAPI from '../models/actionable/graphql'
+
 const nexus = [
+  ...Array(ActionableAPI),
   ...Array(OrganizationAPI),
   ...Array(CommonAnalyticsAPI),
   ...Array(DateAPI),

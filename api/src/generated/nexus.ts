@@ -470,6 +470,11 @@ export interface NexusGenInputs {
   GetCampaignsInput: { // input type
     customerSlug?: string | null; // String
   }
+  GetIssueResolverInput: { // input type
+    issueId?: string | null; // String
+    topicId?: string | null; // String
+    workspaceId?: string | null; // String
+  }
   HandleUserStateInWorkspaceInput: { // input type
     isActive?: boolean | null; // Boolean
     userId?: string | null; // String
@@ -804,6 +809,7 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
+  ActionableState: prisma.ActionableState
   AutomationActionChannelType: prisma.AutomationActionChannelType
   AutomationActionType: prisma.AutomationActionType
   AutomationConditionBuilderType: prisma.AutomationConditionBuilderType
@@ -869,6 +875,7 @@ export interface NexusGenObjects {
     mimetype?: string | null; // String
     url?: string | null; // String
   }
+  Actionable: prisma.Actionable;
   AssignedDialogues: { // root type
     assignedDialogues?: NexusGenRootTypes['Dialogue'][] | null; // [Dialogue!]
     privateWorkspaceDialogues?: NexusGenRootTypes['Dialogue'][] | null; // [Dialogue!]
@@ -1158,6 +1165,14 @@ export interface NexusGenObjects {
     didInvite?: boolean | null; // Boolean
   }
   Issue: prisma.Issue;
+  IssueModel: { // root type
+    actionables?: Array<NexusGenRootTypes['Actionable'] | null> | null; // [Actionable]
+    createdAt?: NexusGenScalars['Date'] | null; // Date
+    id?: string | null; // ID
+    topic?: NexusGenRootTypes['Topic'] | null; // Topic
+    topicId?: string | null; // String
+    updatedAt?: NexusGenScalars['Date'] | null; // Date
+  }
   JobObjectType: { // root type
     createWorkspaceJob?: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
     createWorkspaceJobId?: string | null; // String
@@ -1456,6 +1471,19 @@ export interface NexusGenFieldTypes {
     filename: string | null; // String
     mimetype: string | null; // String
     url: string | null; // String
+  }
+  Actionable: { // field return type
+    assignee: NexusGenRootTypes['UserType'] | null; // UserType
+    assigneeId: string | null; // String
+    createdAt: string | null; // String
+    dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
+    dialogueId: string | null; // String
+    id: string | null; // ID
+    issue: NexusGenRootTypes['IssueModel'] | null; // IssueModel
+    issueId: string | null; // String
+    session: NexusGenRootTypes['Session'] | null; // Session
+    status: NexusGenEnums['ActionableState'] | null; // ActionableState
+    updatedAt: string | null; // String
   }
   AssignedDialogues: { // field return type
     assignedDialogues: NexusGenRootTypes['Dialogue'][] | null; // [Dialogue!]
@@ -1882,6 +1910,14 @@ export interface NexusGenFieldTypes {
     topic: string | null; // String
     updatedAt: NexusGenScalars['Date'] | null; // Date
   }
+  IssueModel: { // field return type
+    actionables: Array<NexusGenRootTypes['Actionable'] | null> | null; // [Actionable]
+    createdAt: NexusGenScalars['Date'] | null; // Date
+    id: string | null; // ID
+    topic: NexusGenRootTypes['Topic'] | null; // Topic
+    topicId: string | null; // String
+    updatedAt: NexusGenScalars['Date'] | null; // Date
+  }
   JobObjectType: { // field return type
     createWorkspaceJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
     createWorkspaceJobId: string | null; // String
@@ -2081,6 +2117,7 @@ export interface NexusGenFieldTypes {
     url: string | null; // String
   }
   Query: { // field return type
+    Issue: NexusGenRootTypes['IssueModel'] | null; // IssueModel
     UserOfCustomer: NexusGenRootTypes['UserCustomer'] | null; // UserCustomer
     automation: NexusGenRootTypes['AutomationModel'] | null; // AutomationModel
     automations: Array<NexusGenRootTypes['AutomationModel'] | null> | null; // [AutomationModel]
@@ -2380,6 +2417,19 @@ export interface NexusGenFieldTypeNames {
     filename: 'String'
     mimetype: 'String'
     url: 'String'
+  }
+  Actionable: { // field return type name
+    assignee: 'UserType'
+    assigneeId: 'String'
+    createdAt: 'String'
+    dialogue: 'Dialogue'
+    dialogueId: 'String'
+    id: 'ID'
+    issue: 'IssueModel'
+    issueId: 'String'
+    session: 'Session'
+    status: 'ActionableState'
+    updatedAt: 'String'
   }
   AssignedDialogues: { // field return type name
     assignedDialogues: 'Dialogue'
@@ -2806,6 +2856,14 @@ export interface NexusGenFieldTypeNames {
     topic: 'String'
     updatedAt: 'Date'
   }
+  IssueModel: { // field return type name
+    actionables: 'Actionable'
+    createdAt: 'Date'
+    id: 'ID'
+    topic: 'Topic'
+    topicId: 'String'
+    updatedAt: 'Date'
+  }
   JobObjectType: { // field return type name
     createWorkspaceJob: 'CreateWorkspaceJobType'
     createWorkspaceJobId: 'String'
@@ -3005,6 +3063,7 @@ export interface NexusGenFieldTypeNames {
     url: 'String'
   }
   Query: { // field return type name
+    Issue: 'IssueModel'
     UserOfCustomer: 'UserCustomer'
     automation: 'AutomationModel'
     automations: 'AutomationModel'
@@ -3608,6 +3667,9 @@ export interface NexusGenArgTypes {
     }
   }
   Query: {
+    Issue: { // args
+      input?: NexusGenInputs['GetIssueResolverInput'] | null; // GetIssueResolverInput
+    }
     UserOfCustomer: { // args
       input?: NexusGenInputs['UserOfCustomerInput'] | null; // UserOfCustomerInput
     }

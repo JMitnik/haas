@@ -9,6 +9,28 @@ type AWSImageType {
   url: String
 }
 
+type Actionable {
+  assignee: UserType
+  assigneeId: String
+  createdAt: String
+  dialogue: Dialogue
+  dialogueId: String
+  id: ID
+  issue: IssueModel
+  issueId: String
+  session: Session
+  status: ActionableState
+  updatedAt: String
+}
+
+enum ActionableState {
+  COMPLETED
+  DROPPED
+  PENDING
+  STALE
+  UNVERIFIED
+}
+
 input AdjustedImageInput {
   bucket: String
   id: String
@@ -1139,6 +1161,12 @@ input GetCampaignsInput {
   customerSlug: String
 }
 
+input GetIssueResolverInput {
+  issueId: String
+  topicId: String
+  workspaceId: String
+}
+
 input HandleUserStateInWorkspaceInput {
   isActive: Boolean
   userId: String
@@ -1211,6 +1239,15 @@ input IssueFilterInput {
   endDate: String
   startDate: String
   topicStrings: [String!]
+}
+
+type IssueModel {
+  actionables: [Actionable]
+  createdAt: Date
+  id: ID
+  topic: Topic
+  topicId: String
+  updatedAt: Date
 }
 
 """
@@ -1638,6 +1675,7 @@ type PublicDialogueInfo {
 }
 
 type Query {
+  Issue(input: GetIssueResolverInput): IssueModel
   UserOfCustomer(input: UserOfCustomerInput): UserCustomer
   automation(where: GetAutomationInput): AutomationModel
   automations(where: GetAutomationsByWorkspaceInput): [AutomationModel]

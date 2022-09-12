@@ -6,12 +6,11 @@ import { Nullable } from '../../types/generic';
 import { convertDatesToHistogramItems } from '../Common/Analytics/Analytics.helpers';
 import { TopicByString, TopicFilterInput, TopicStatistics, TopicStatisticsByDialogueId } from '../Topic/Topic.types';
 import { TopicService } from '../Topic/TopicService';
-import { Issue, IssueFilterInput } from './Issue.types';
+import { GetIssueResolverInput, Issue, IssueFilterInput } from './Issue.types';
 import { SessionActionType, SessionWithEntries } from '../../models/session/Session.types';
 import SessionService from '../../models/session/SessionService';
 import CustomerService from '../../models/customer/CustomerService';
 import IssuePrismaAdapter from './IssuePrismaAdapter';
-import { string } from 'yargs';
 
 export class IssueService {
   private prisma: PrismaClient;
@@ -26,6 +25,18 @@ export class IssueService {
     this.workspaceService = new CustomerService(prisma);
     this.sessionService = new SessionService(prisma);
     this.issuePrismaAdapter = new IssuePrismaAdapter(prisma);
+  }
+
+  public async findIssueById(input: GetIssueResolverInput) {
+    if (input.issueId) {
+      return this.issuePrismaAdapter.findIssueById(input.issueId);
+    }
+
+    if (input.topicId) {
+      return this.issuePrismaAdapter.findIssueByTopicId(input.topicId);
+    }
+
+    return null;
   }
 
   public async createIssueIfNotExists(workspaceId: string, topicId: string) {
