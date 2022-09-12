@@ -1,4 +1,5 @@
 import { Prisma, PrismaClient } from '@prisma/client';
+import { ActionableFilterInput } from 'models/actionable/Actionable.types';
 
 class IssuePrismaAdapter {
   prisma: PrismaClient;
@@ -6,6 +7,25 @@ class IssuePrismaAdapter {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   };
+
+  public async findIssuesByWorkspaceId(workspaceId: string) {
+    return this.prisma.issue.findMany({
+      where: {
+        workspaceId,
+      },
+      include: {
+        topic: true,
+        actionables: {
+          include: {
+            assignee: true,
+            comments: true,
+            dialogue: true,
+            session: true,
+          },
+        },
+      },
+    })
+  }
 
   public async findIssueById(id: string) {
     return this.prisma.issue.findUnique({

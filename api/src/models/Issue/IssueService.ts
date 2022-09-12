@@ -11,6 +11,7 @@ import { SessionActionType, SessionWithEntries } from '../../models/session/Sess
 import SessionService from '../../models/session/SessionService';
 import CustomerService from '../../models/customer/CustomerService';
 import IssuePrismaAdapter from './IssuePrismaAdapter';
+import { ActionableFilterInput } from '../actionable/Actionable.types';
 
 export class IssueService {
   private prisma: PrismaClient;
@@ -27,6 +28,16 @@ export class IssueService {
     this.issuePrismaAdapter = new IssuePrismaAdapter(prisma);
   }
 
+  /**
+   * Finds all issues by a workspace ID
+   */
+  public async findIssuesByWorkspaceId(workspaceId: string) {
+    return this.issuePrismaAdapter.findIssuesByWorkspaceId(workspaceId);
+  }
+
+  /**
+   * Finds an issue be either the issue or topic ID
+   */
   public async findIssueById(input: GetIssueResolverInput) {
     if (input.issueId) {
       return this.issuePrismaAdapter.findIssueById(input.issueId);

@@ -23,6 +23,14 @@ type Actionable {
   updatedAt: String
 }
 
+input ActionableFilterInput {
+  assigneeId: String
+  endDate: DateString
+  startDate: DateString
+  status: ActionableState
+  withFollowUpAction: Boolean
+}
+
 enum ActionableState {
   COMPLETED
   DROPPED
@@ -1242,7 +1250,7 @@ input IssueFilterInput {
 }
 
 type IssueModel {
-  actionables: [Actionable]
+  actionables(input: ActionableFilterInput): [Actionable]
   createdAt: Date
   id: ID
   topic: Topic
@@ -1675,7 +1683,6 @@ type PublicDialogueInfo {
 }
 
 type Query {
-  Issue(input: GetIssueResolverInput): IssueModel
   UserOfCustomer(input: UserOfCustomerInput): UserCustomer
   automation(where: GetAutomationInput): AutomationModel
   automations(where: GetAutomationsByWorkspaceInput): [AutomationModel]
@@ -1691,6 +1698,7 @@ type Query {
   getJob(id: String): CreateWorkspaceJobType
   getJobProcessLocations: JobProcessLocations
   getPreviewData(id: String): PreviewDataType
+  issue(actionableFilter: ActionableFilterInput, input: GetIssueResolverInput): IssueModel
   me: UserType
   question(where: QuestionWhereUniqueInput): QuestionNode
   refreshAccessToken: RefreshAccessTokenOutput

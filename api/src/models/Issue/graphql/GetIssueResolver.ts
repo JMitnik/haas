@@ -11,14 +11,16 @@ export const GetIssueResolverInput = inputObjectType({
   },
 })
 
-export const GetIssueResolver = queryField('Issue', {
+export const GetIssueResolver = queryField('issue', {
   type: IssueModel,
   nullable: true,
   args: {
     input: GetIssueResolverInput,
+    actionableFilter: 'ActionableFilterInput',
   },
   async resolve(parent, args, ctx) {
     if (!args.input) throw new GraphQLYogaError('No input provided!');
+
     return ctx.services.issueService.findIssueById(args.input);
   },
 })

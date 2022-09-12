@@ -53,6 +53,13 @@ declare global {
 }
 
 export interface NexusGenInputs {
+  ActionableFilterInput: { // input type
+    assigneeId?: string | null; // String
+    endDate?: NexusGenScalars['DateString'] | null; // DateString
+    startDate?: NexusGenScalars['DateString'] | null; // DateString
+    status?: NexusGenEnums['ActionableState'] | null; // ActionableState
+    withFollowUpAction?: boolean | null; // Boolean
+  }
   AdjustedImageInput: { // input type
     bucket?: string | null; // String
     id?: string | null; // String
@@ -1166,7 +1173,6 @@ export interface NexusGenObjects {
   }
   Issue: prisma.Issue;
   IssueModel: { // root type
-    actionables?: Array<NexusGenRootTypes['Actionable'] | null> | null; // [Actionable]
     createdAt?: NexusGenScalars['Date'] | null; // Date
     id?: string | null; // ID
     topic?: NexusGenRootTypes['Topic'] | null; // Topic
@@ -2117,7 +2123,6 @@ export interface NexusGenFieldTypes {
     url: string | null; // String
   }
   Query: { // field return type
-    Issue: NexusGenRootTypes['IssueModel'] | null; // IssueModel
     UserOfCustomer: NexusGenRootTypes['UserCustomer'] | null; // UserCustomer
     automation: NexusGenRootTypes['AutomationModel'] | null; // AutomationModel
     automations: Array<NexusGenRootTypes['AutomationModel'] | null> | null; // [AutomationModel]
@@ -2133,6 +2138,7 @@ export interface NexusGenFieldTypes {
     getJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
     getJobProcessLocations: NexusGenRootTypes['JobProcessLocations'] | null; // JobProcessLocations
     getPreviewData: NexusGenRootTypes['PreviewDataType'] | null; // PreviewDataType
+    issue: NexusGenRootTypes['IssueModel'] | null; // IssueModel
     me: NexusGenRootTypes['UserType'] | null; // UserType
     question: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     refreshAccessToken: NexusGenRootTypes['RefreshAccessTokenOutput'] | null; // RefreshAccessTokenOutput
@@ -3063,7 +3069,6 @@ export interface NexusGenFieldTypeNames {
     url: 'String'
   }
   Query: { // field return type name
-    Issue: 'IssueModel'
     UserOfCustomer: 'UserCustomer'
     automation: 'AutomationModel'
     automations: 'AutomationModel'
@@ -3079,6 +3084,7 @@ export interface NexusGenFieldTypeNames {
     getJob: 'CreateWorkspaceJobType'
     getJobProcessLocations: 'JobProcessLocations'
     getPreviewData: 'PreviewDataType'
+    issue: 'IssueModel'
     me: 'UserType'
     question: 'QuestionNode'
     refreshAccessToken: 'RefreshAccessTokenOutput'
@@ -3449,6 +3455,11 @@ export interface NexusGenArgTypes {
       input?: NexusGenInputs['TopicInputType'] | null; // TopicInputType
     }
   }
+  IssueModel: {
+    actionables: { // args
+      input?: NexusGenInputs['ActionableFilterInput'] | null; // ActionableFilterInput
+    }
+  }
   Mutation: {
     appendToInteraction: { // args
       input?: NexusGenInputs['AppendToInteractionInput'] | null; // AppendToInteractionInput
@@ -3667,9 +3678,6 @@ export interface NexusGenArgTypes {
     }
   }
   Query: {
-    Issue: { // args
-      input?: NexusGenInputs['GetIssueResolverInput'] | null; // GetIssueResolverInput
-    }
     UserOfCustomer: { // args
       input?: NexusGenInputs['UserOfCustomerInput'] | null; // UserOfCustomerInput
     }
@@ -3710,6 +3718,10 @@ export interface NexusGenArgTypes {
     }
     getPreviewData: { // args
       id?: string | null; // String
+    }
+    issue: { // args
+      actionableFilter?: NexusGenInputs['ActionableFilterInput'] | null; // ActionableFilterInput
+      input?: NexusGenInputs['GetIssueResolverInput'] | null; // GetIssueResolverInput
     }
     question: { // args
       where?: NexusGenInputs['QuestionWhereUniqueInput'] | null; // QuestionWhereUniqueInput
