@@ -53,17 +53,17 @@ export const WorkspaceReportView = ({
     },
   });
 
-  const { data: issuesData, loading: loadingIssues } = useGetIssuesQuery({
-    variables: {
-      workspaceId: activeCustomer?.id || '',
-      filter: {
-        startDate: format(startDate, DateFormat.DayTimeFormat),
-        endDate: format(endDate, DateFormat.DayTimeFormat),
-        dialogueStrings: [],
-        topicStrings: [],
-      },
-    },
-  });
+  // const { data: issuesData, loading: loadingIssues } = useGetIssuesQuery({
+  //   variables: {
+  //     workspaceId: activeCustomer?.id || '',
+  //     filter: {
+  //       startDate: format(startDate, DateFormat.DayTimeFormat),
+  //       endDate: format(endDate, DateFormat.DayTimeFormat),
+  //       dialogueStrings: [],
+  //       topicStrings: [],
+  //     },
+  //   },
+  // });
 
   const responseHistogramItems = d?.customer?.statistics?.responseHistogram?.items || [];
   const basicStatistics = d?.customer?.statistics?.basicStats || undefined;
@@ -71,10 +71,10 @@ export const WorkspaceReportView = ({
 
   const issuesCount = sumBy(d?.customer?.statistics?.issueHistogram?.items, (item) => item.frequency);
 
-  const issues = issuesData?.customer?.issues || [];
+  const issues: any[] = [];
   const topics = d?.customer?.issueTopics || [];
 
-  const isLoading = loadingReport || loadingIssues;
+  const isLoading = loadingReport; // || loadingIssues;
 
   if (isLoading) {
     return <UI.Loader />;

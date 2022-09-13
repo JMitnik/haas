@@ -1,0 +1,7 @@
+query GetWorkspaceIssues($workspaceId: ID!, $filter: IssueFilterInput) {
+	customer(id: $workspaceId) {
+		issues(filter: $filter) {
+			...IssueFragment
+	  }
+	}
+}

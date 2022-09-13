@@ -887,6 +887,11 @@ export interface NexusGenObjects {
     url?: string | null; // String
   }
   Actionable: prisma.Actionable;
+  ActionableStatistics: { // root type
+    average: number; // Float!
+    responseCount: number; // Int!
+    urgentCount: number; // Int!
+  }
   AssignedDialogues: { // root type
     assignedDialogues?: NexusGenRootTypes['Dialogue'][] | null; // [Dialogue!]
     privateWorkspaceDialogues?: NexusGenRootTypes['Dialogue'][] | null; // [Dialogue!]
@@ -1179,8 +1184,8 @@ export interface NexusGenObjects {
   IssueModel: { // root type
     createdAt?: NexusGenScalars['Date'] | null; // Date
     id?: string | null; // ID
-    topic?: NexusGenRootTypes['Topic'] | null; // Topic
-    topicId?: string | null; // String
+    topic: NexusGenRootTypes['Topic']; // Topic!
+    topicId: string; // String!
     updatedAt?: NexusGenScalars['Date'] | null; // Date
   }
   JobObjectType: { // root type
@@ -1489,11 +1494,17 @@ export interface NexusGenFieldTypes {
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogueId: string | null; // String
     id: string | null; // ID
+    isUrgent: boolean; // Boolean!
     issue: NexusGenRootTypes['IssueModel'] | null; // IssueModel
     issueId: string | null; // String
     session: NexusGenRootTypes['Session'] | null; // Session
-    status: NexusGenEnums['ActionableState'] | null; // ActionableState
+    status: NexusGenEnums['ActionableState']; // ActionableState!
     updatedAt: string | null; // String
+  }
+  ActionableStatistics: { // field return type
+    average: number; // Float!
+    responseCount: number; // Int!
+    urgentCount: number; // Int!
   }
   AssignedDialogues: { // field return type
     assignedDialogues: NexusGenRootTypes['Dialogue'][] | null; // [Dialogue!]
@@ -1921,11 +1932,13 @@ export interface NexusGenFieldTypes {
     updatedAt: NexusGenScalars['Date'] | null; // Date
   }
   IssueModel: { // field return type
-    actionables: Array<NexusGenRootTypes['Actionable'] | null> | null; // [Actionable]
+    actionables: Array<NexusGenRootTypes['Actionable'] | null>; // [Actionable]!
+    basicStats: NexusGenRootTypes['ActionableStatistics'] | null; // ActionableStatistics
     createdAt: NexusGenScalars['Date'] | null; // Date
     id: string | null; // ID
-    topic: NexusGenRootTypes['Topic'] | null; // Topic
-    topicId: string | null; // String
+    teamCount: number; // Int!
+    topic: NexusGenRootTypes['Topic']; // Topic!
+    topicId: string; // String!
     updatedAt: NexusGenScalars['Date'] | null; // Date
   }
   JobObjectType: { // field return type
@@ -2436,11 +2449,17 @@ export interface NexusGenFieldTypeNames {
     dialogue: 'Dialogue'
     dialogueId: 'String'
     id: 'ID'
+    isUrgent: 'Boolean'
     issue: 'IssueModel'
     issueId: 'String'
     session: 'Session'
     status: 'ActionableState'
     updatedAt: 'String'
+  }
+  ActionableStatistics: { // field return type name
+    average: 'Float'
+    responseCount: 'Int'
+    urgentCount: 'Int'
   }
   AssignedDialogues: { // field return type name
     assignedDialogues: 'Dialogue'
@@ -2869,8 +2888,10 @@ export interface NexusGenFieldTypeNames {
   }
   IssueModel: { // field return type name
     actionables: 'Actionable'
+    basicStats: 'ActionableStatistics'
     createdAt: 'Date'
     id: 'ID'
+    teamCount: 'Int'
     topic: 'Topic'
     topicId: 'String'
     updatedAt: 'Date'

@@ -46,6 +46,7 @@ model Actionable {
   dialogueId String
   assigneeId String?
   issueId    String?
+  isUrgent   Boolean  @default(false)
 
   status ActionableState @default(UNVERIFIED)
 

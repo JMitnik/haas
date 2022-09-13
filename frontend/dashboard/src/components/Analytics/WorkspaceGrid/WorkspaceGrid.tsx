@@ -309,19 +309,19 @@ export const WorkspaceGrid = ({
 
   const summary = data?.customer?.statistics;
 
-  const { data: issuesData, loading: issuesLoading } = useGetIssuesQuery({
-    fetchPolicy: 'no-cache',
-    variables: {
-      workspaceId: activeCustomer?.id || '',
-      filter: {
-        startDate: format(startOfDay(startDate), DateFormat.DayTimeFormat),
-        endDate: format(endOfDay(endDate), DateFormat.DayTimeFormat),
-        dialogueStrings: visitedDialogueFragments,
-      },
-    },
-  });
+  // const { data: issuesData, loading: issuesLoading } = useGetIssuesQuery({
+  //   fetchPolicy: 'no-cache',
+  //   variables: {
+  //     workspaceId: activeCustomer?.id || '',
+  //     filter: {
+  //       startDate: format(startOfDay(startDate), DateFormat.DayTimeFormat),
+  //       endDate: format(endOfDay(endDate), DateFormat.DayTimeFormat),
+  //       dialogueStrings: visitedDialogueFragments,
+  //     },
+  //   },
+  // });
 
-  const issues = issuesData?.customer?.issues || [];
+  const issues: any[] = [];
   const issueStats = issues.reduce((acc, issue) => {
     acc.problems += (issue?.basicStats?.responseCount || 0);
     acc.actionsRequested += (issue?.actionRequiredCount || 0);
@@ -375,7 +375,7 @@ export const WorkspaceGrid = ({
                     onChange={setDateRange}
                   />
                   {data?.customer?.isDemo && canResetWorkspaceData && (
-                    <ControlButton  height="100%" onClick={() => resetWorkspaceData()} ml={2}>
+                    <ControlButton height="100%" onClick={() => resetWorkspaceData()} ml={2}>
                       <UI.Flex alignItems="center">
                         <UI.Div mr={1}>
                           {resetLoading && (
@@ -456,7 +456,7 @@ export const WorkspaceGrid = ({
                   isFilterEnabled={historyQueue.length > 0}
                   issues={issues.filter(isPresent)}
                   onIssueClick={handleIssueClick}
-                  isLoading={issuesLoading}
+                  isLoading={false}
                   onOpenIssueModal={() => setIssuesModalIsOpen(true)}
                 />
               </UI.Div>

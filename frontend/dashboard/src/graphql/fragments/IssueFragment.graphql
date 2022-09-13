@@ -1,0 +1,31 @@
+fragment IssueFragment on IssueModel {
+  id
+  createdAt
+  topic {
+    id
+    name
+  }
+  teamCount
+  basicStats {
+    average
+    responseCount
+    urgentCount
+  }
+  actionables {
+    id
+    createdAt
+    session {
+      id
+      mainScore
+    }
+    dialogue {
+      id
+      title
+    }
+    status
+    assignee {
+      id
+      email
+    }
+  }
+}

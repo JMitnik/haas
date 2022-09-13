@@ -17,17 +17,20 @@ import makeEmergencyTemplate from '../../services/mailings/templates/makeEmergen
 import config from '../../config/config';
 import MailService from '../../services/mailings/MailService';
 import Sentry from '../../config/sentry';
+import { ActionablePrismaAdapter } from '../actionable/ActionablePrismaAdapter';
 
 class NodeEntryService {
   nodeEntryPrismaAdapter: NodeEntryPrismaAdapter;
   sessionPrismaAdapter: SessionPrismaAdapter;
   dialoguePrismaAdapter: DialoguePrismaAdapter;
+  actionablePrismaAdapter: ActionablePrismaAdapter;
   mailService: MailService;
 
   constructor(prismaClient: PrismaClient) {
     this.nodeEntryPrismaAdapter = new NodeEntryPrismaAdapter(prismaClient);
     this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
+    this.actionablePrismaAdapter = new ActionablePrismaAdapter(prismaClient);
     this.mailService = new MailService();
   };
 
@@ -78,20 +81,41 @@ class NodeEntryService {
       ...createNodeEntryFragment,
     });
 
-    if (emergencyContact) {
-      try {
+    const actionable = await this.actionablePrismaAdapter.findActionableBySessionId(sessionId);
+    const actionableExists = !!actionable?.id
+
+    if (nodeEntryInput.data?.form?.values?.length) {
+      let actionableUpdateArgs: Prisma.ActionableUpdateInput = {};
+
+      if (emergencyContact) {
         const emailAddress = emergencyContact.contacts;
-        const comment = emergencyComment?.longText;
-        const session = await this.sessionPrismaAdapter.findSessionById(sessionId);
-        await this.sendEmergencyMail(
-          session?.dialogueId as string,
-          emailAddress as string,
-          comment || undefined
-        )
-      } catch (error) {
-        Sentry.captureException(error);
+        actionableUpdateArgs = {
+          assignee: emailAddress ? {
+            connect: {
+              email: emailAddress,
+            },
+          } : undefined,
+        }
+
+        try {
+          const comment = emergencyComment?.longText;
+          const session = await this.sessionPrismaAdapter.findSessionById(sessionId);
+          await this.sendEmergencyMail(
+            session?.dialogueId as string,
+            emailAddress as string,
+            comment || undefined
+          )
+        } catch (error) {
+          Sentry.captureException(error);
+        }
+      }
+
+      if (actionableExists) {
+        await this.actionablePrismaAdapter.updateActionable(actionable.id, { ...actionableUpdateArgs, isUrgent: true });
       }
     }
+
+
 
     return nodeEntry;
   };

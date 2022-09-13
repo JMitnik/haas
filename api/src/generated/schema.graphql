@@ -16,10 +16,11 @@ type Actionable {
   dialogue: Dialogue
   dialogueId: String
   id: ID
+  isUrgent: Boolean!
   issue: IssueModel
   issueId: String
   session: Session
-  status: ActionableState
+  status: ActionableState!
   updatedAt: String
 }
 
@@ -37,6 +38,18 @@ enum ActionableState {
   PENDING
   STALE
   UNVERIFIED
+}
+
+"""Basic statistics for actionables of an issue"""
+type ActionableStatistics {
+  """Average value of summarizable statistic"""
+  average: Float!
+
+  """Number of responses"""
+  responseCount: Int!
+
+  """Number of urgent actionables """
+  urgentCount: Int!
 }
 
 input AdjustedImageInput {
@@ -1255,11 +1268,15 @@ input IssueFilterInput {
 }
 
 type IssueModel {
-  actionables(input: ActionableFilterInput): [Actionable]
+  actionables(input: ActionableFilterInput): [Actionable]!
+  basicStats: ActionableStatistics
   createdAt: Date
   id: ID
-  topic: Topic
-  topicId: String
+
+  """Number of different teams issue exists for"""
+  teamCount: Int!
+  topic: Topic!
+  topicId: String!
   updatedAt: Date
 }
 

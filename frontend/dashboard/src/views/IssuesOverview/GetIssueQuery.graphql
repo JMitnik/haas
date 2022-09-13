@@ -1,0 +1,23 @@
+query GetIssue($input: GetIssueResolverInput, $actionableFilter: ActionableFilterInput) {
+	issue(input: $input) {
+		id
+		topicId
+		topic {
+			name
+		}
+		actionables(input: $actionableFilter) {
+			createdAt
+			session {
+				id
+				mainScore
+			}
+			dialogue {
+				title
+			}
+			status
+			assignee {
+				email
+			}		
+		}
+	}
+}

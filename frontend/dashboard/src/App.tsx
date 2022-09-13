@@ -12,6 +12,7 @@ import { FeedbackOverview } from 'views/FeedbackView/index';
 import { FirstTimeView } from 'views/FirstTimeView';
 import { GenerateWorkspaceView } from 'views/GenerateWorkspaceView';
 import { InteractionsOverview } from 'views/InteractionsOverview';
+import { IssuesOverview } from 'views/IssuesOverview/IssuesOverview';
 import { ROUTES } from 'hooks/useNavigator';
 import { SystemPermission } from 'types/generated-types';
 import { VerifyTokenView } from 'views/VerifyTokenView';
@@ -62,11 +63,7 @@ const CustomerRoutes = () => (
               allowedPermission={SystemPermission.CanAccessReportPage}
               path={ROUTES.WORKSPACE_REPORT_VIEW}
               render={() => (
-                <WorkspaceReportView
-                  // startDate={sub(new Date(), { weeks: 1 })}
-                  // dateLabel="last_week"
-                  // compareStatisticStartDate={sub(new Date(), { weeks: 2 })}
-                />
+                <WorkspaceReportView />
               )}
             />
             <CustomerRoute
@@ -194,6 +191,11 @@ const CustomerRoutes = () => (
                     <GuardedRoute
                       path="/dashboard/b/:customerSlug/d"
                       render={() => <DialogueOverview />}
+                    />
+
+                    <GuardedRoute
+                      path="/dashboard/b/:customerSlug/dashboard/issues"
+                      render={() => <IssuesOverview />}
                     />
 
                     <GuardedRoute

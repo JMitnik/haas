@@ -142,10 +142,10 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
 
     onRunAction({
       startTimestamp: new Date(Date.now()),
-      action: {
+      action: !ignoreFields ? {
         type: SessionActionType.FormAction,
         form: { values: formFieldValues },
-      },
+      } : undefined,
       reward: {
         overrideCallToActionId: node.overrideLeaf?.id,
         toEdge: childEdge,

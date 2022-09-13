@@ -95,7 +95,6 @@ export const CustomerType = objectType({
      */
     t.list.field('issues', {
       type: IssueModel,
-      nullable: true,
       args: { filter: IssueFilterInput },
 
       resolve: async (parent, args, { services }) => {

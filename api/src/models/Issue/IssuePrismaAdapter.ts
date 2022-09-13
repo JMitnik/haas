@@ -26,7 +26,15 @@ class IssuePrismaAdapter {
             assignee: true,
             comments: true,
             dialogue: true,
-            session: true,
+            session: {
+              include: {
+                nodeEntries: {
+                  include: {
+                    formNodeEntry: true,
+                  },
+                },
+              },
+            },
           },
         },
       },

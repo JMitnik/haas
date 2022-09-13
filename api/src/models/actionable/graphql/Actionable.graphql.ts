@@ -16,8 +16,9 @@ export const ActionableType = objectType({
     t.string('dialogueId');
     t.string('assigneeId');
     t.string('issueId');
+    t.nonNull.boolean('isUrgent');
 
-    t.field('status', {
+    t.nonNull.field('status', {
       type: ActionableState,
     });
 
