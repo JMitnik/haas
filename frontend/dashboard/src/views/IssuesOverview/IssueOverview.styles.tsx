@@ -3,6 +3,29 @@ import { ActionableState } from 'types/generated-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+export const ChangeableEmailContainer = styled(UI.Div)`
+ ${({ theme }) => css`
+    display: flex;
+    align-items: center;
+    color: ${theme.colors.off[500]};
+    
+    button {
+        margin-left: 10px;
+        max-width: 20px !important;
+        max-height: 20px;
+
+        min-width: auto;
+        min-height: auto;
+
+        svg {
+          width: 80%;
+          height: 100%;
+        }
+      }
+ `}
+  
+`;
+
 export const UrgentContainer = styled(UI.Div) <{ hasUrgent?: boolean }>`
   ${({ theme, hasUrgent }) => css`
     display: flex;

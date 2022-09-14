@@ -8,6 +8,7 @@ import { ActionableStatistics } from './ActionableStats.graphql';
 import { ActionableValidator } from '../../actionable/ActionableValidator';
 import { ActionableFilterInput } from '../../actionable/Actionable.types';
 import { IssueWithActionables } from '../Issue.types';
+import { ActionableConnection, ActionableConnectionFilterInput } from '../../actionable/graphql';
 
 
 export const IssueModel = objectType({
@@ -55,6 +56,16 @@ export const IssueModel = objectType({
           responseCount: issue.actionables?.length || 0,
           urgentCount: _.filter(issue.actionables, (actionable) => actionable.isUrgent)?.length,
         }
+      },
+    });
+
+    t.field('actionableConnection', {
+      type: ActionableConnection,
+      args: {
+        input: ActionableConnectionFilterInput,
+      },
+      async resolve(parent, args, ctx) {
+        return ctx.services.actionableService.findPaginatedActionables(parent.id as string, args.input);
       },
     });
 

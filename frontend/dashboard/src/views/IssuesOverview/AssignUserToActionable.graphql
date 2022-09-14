@@ -1,0 +1,16 @@
+mutation assignUserToActionable($input: AssignUserToActionableInput!) {
+	assignUserToActionable (input: $input) {
+		createdAt
+    session {
+      id
+      mainScore
+    }
+    dialogue {
+      title
+    }
+    status
+    assignee {
+      email
+    }
+	}
+}

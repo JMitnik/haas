@@ -2,8 +2,8 @@ import {
   Prisma,
   PrismaClient,
 } from '@prisma/client';
-import { ActionableFilterInput, AssignUserToActionableInput } from './Actionable.types';
-import { buildFindActionablesWhereInput, buildUpdateActionableAssignee } from './ActionablePrismaAdapter.helper';
+import { ActionableConnectionFilterInput, ActionableFilterInput, AssignUserToActionableInput } from './Actionable.types';
+import { buildFindActionablesWhereInput, buildOrderByQuery, buildUpdateActionableAssignee } from './ActionablePrismaAdapter.helper';
 
 export class ActionablePrismaAdapter {
   prisma: PrismaClient;
@@ -44,6 +44,27 @@ export class ActionablePrismaAdapter {
       },
     })
   };
+
+  public async countActionables(issueId: string, filter?: ActionableConnectionFilterInput) {
+    return this.prisma.actionable.count({
+      where: buildFindActionablesWhereInput(issueId, filter),
+    })
+  }
+
+  public async findPaginatedActionables(issueId: string, filter?: ActionableConnectionFilterInput) {
+    return this.prisma.actionable.findMany({
+      where: buildFindActionablesWhereInput(issueId, filter),
+      take: filter?.perPage,
+      skip: filter?.offset,
+      orderBy: buildOrderByQuery(filter),
+      include: {
+        assignee: true,
+        comments: true,
+        dialogue: true,
+        session: true,
+      },
+    })
+  }
 
   public async findActionablesByIssue(issueId: string, filter?: ActionableFilterInput) {
     return this.prisma.actionable.findMany({

@@ -43,7 +43,7 @@ export class IssueService {
 
     const issues = await this.issuePrismaAdapter.findPaginatedIssues(workspaceId, filter);
     const totalIssues = await this.issuePrismaAdapter.countIssues(workspaceId, filter);
-
+    console.log('Total issues: ', totalIssues);
     const { totalPages, ...pageInfo } = offsetPaginate(totalIssues, offset, perPage);
 
     return {

@@ -24,6 +24,34 @@ type Actionable {
   updatedAt: String
 }
 
+type ActionableConnection implements ConnectionInterface {
+  actionables: [Actionable]
+  pageInfo: PaginationPageInfo
+  totalPages: Int
+}
+
+input ActionableConnectionFilterInput {
+  assigneeId: String
+  endDate: DateString
+  offset: Int!
+  orderBy: ActionableConnectionOrderByInput
+  perPage: Int! = 10
+  search: String
+  startDate: DateString
+  status: ActionableState
+}
+
+"""Sorting of ActionableConnection"""
+input ActionableConnectionOrderByInput {
+  by: ActionableConnectionOrderType!
+  desc: Boolean = true
+}
+
+"""Fields to order ActionableConnection by."""
+enum ActionableConnectionOrderType {
+  createdAt
+}
+
 input ActionableFilterInput {
   assigneeId: String
   endDate: DateString
@@ -1297,6 +1325,7 @@ input IssueFilterInput {
 }
 
 type IssueModel {
+  actionableConnection(input: ActionableConnectionFilterInput): ActionableConnection
   actionables(input: ActionableFilterInput): [Actionable]!
   basicStats: ActionableStatistics
   createdAt: Date

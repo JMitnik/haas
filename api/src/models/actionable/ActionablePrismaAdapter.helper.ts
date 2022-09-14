@@ -1,5 +1,17 @@
 import { Prisma } from '@prisma/client';
-import { ActionableFilterInput, AssignUserToActionableInput } from './Actionable.types';
+import { ActionableConnectionFilterInput, ActionableFilterInput, AssignUserToActionableInput } from './Actionable.types';
+
+export const buildOrderByQuery = (filter?: ActionableConnectionFilterInput) => {
+  let orderByQuery: Prisma.ActionableOrderByWithRelationInput[] = [];
+
+  if (filter?.orderBy?.by === 'createdAt') {
+    orderByQuery.push({
+      createdAt: filter.orderBy.desc ? 'desc' : 'asc',
+    });
+  }
+
+  return orderByQuery;
+};
 
 export const buildFindActionablesWhereInput = (
   issueId: string,

@@ -26,6 +26,7 @@ import {
   GetWorkspaceSessions, IssueConnectionOrderType, IssueFragmentFragment,
   SessionConnectionOrder,
   SessionFragmentFragment,
+  useGetUsersAndRolesQuery,
   useGetWorkspaceIssuesQuery,
   useGetWorkspaceSessionsQuery,
 } from 'types/generated-types';
@@ -40,6 +41,7 @@ import { useFormatter } from 'hooks/useFormatter';
 import { useMenu } from 'components/Common/Menu/useMenu';
 import SearchBar from 'components/Common/SearchBar/SearchBar';
 
+import { mapToUserPickerEntries } from 'views/AddAutomationView/AutomationForm.helpers';
 import { ContactableUserCell } from './InteractionTableCells';
 import { InteractionModalCard } from '../InteractionsOverview/InteractionModalCard';
 import { IssueModalCard } from './IssueModalCard';
@@ -116,8 +118,12 @@ export const IssuesOverview = () => {
         topicStrings: filter.topicStrings?.filter(isPresent) || [],
       },
     },
-    errorPolicy: 'ignore',
+    // errorPolicy: 'ignore',
+    onError(e) {
+      console.log(e.message);
+    },
     onCompleted: (fetchedData) => {
+      console.log('fetched: ', fetchedData?.customer?.issueConnection?.issues);
       setIssues(
         fetchedData?.customer?.issueConnection?.issues as IssueFragmentFragment[] || [],
       );
@@ -126,39 +132,13 @@ export const IssuesOverview = () => {
     },
   });
 
-  console.log('Issues: ', issues);
-
-  const { loading: isLoading } = useGetWorkspaceSessionsQuery({
-    fetchPolicy: 'cache-and-network',
+  const { data: userRoleData } = useGetUsersAndRolesQuery({
     variables: {
-      workspaceId: activeCustomer?.id as string,
-      filter: {
-        offset: filter.pageIndex * filter.perPage,
-        startDate: filter.startDate ? filter.startDate : undefined,
-        perPage: filter.perPage,
-        endDate: filter.endDate ? filter.endDate : undefined,
-        orderBy: {
-          by: filter.orderByField as SessionConnectionOrder,
-          desc: filter.orderByDescending,
-        },
-        search: filter.search,
-        dialogueIds: filter.dialogueIds?.filter(isPresent) || [],
-        scoreRange: {
-          min: filter.minScore,
-          max: filter.maxScore,
-        },
-        withFollowUpAction: filter.withFollowUpAction,
-      },
-    },
-    errorPolicy: 'ignore',
-    onCompleted: (fetchedData) => {
-      setSessions(
-        fetchedData?.customer?.sessionConnection?.sessions || [],
-      );
-
-      setTotalPages(fetchedData?.customer?.sessionConnection?.totalPages || 0);
+      customerSlug: activeCustomer?.slug as string,
     },
   });
+
+  const userPickerEntries = mapToUserPickerEntries(userRoleData?.customer as any);
 
   const handleDateChange = (dates: Date[] | null) => {
     if (dates) {
@@ -204,7 +184,7 @@ export const IssuesOverview = () => {
       pageIndex: 0,
     }));
   };
-  const { menuProps, openMenu, closeMenu, activeItem: contextInteraction } = useMenu<IssueFragmentFragment>();
+
   const columns = '50px minmax(200px, 1fr) minmax(150px, 1fr) minmax(300px, 1fr) minmax(300px, 1fr)';
 
   return (
@@ -355,114 +335,14 @@ export const IssuesOverview = () => {
             </Table.HeadingCell>
           </Table.HeadingRow>
           <UI.Div>
-            <Menu.Base
-              {...menuProps}
-              onClose={closeMenu}
-            >
-              <Menu.Header>
-                <UI.Icon>
-                  <Filter />
-                </UI.Icon>
-                {t('filter')}
-              </Menu.Header>
-              <Menu.SubMenu label={(
-                <UI.Flex>
-                  <UI.Icon mr={1} width={10}>
-                    <AlignLeft />
-                  </UI.Icon>
-                  {t('Session')}
-                </UI.Flex>
-              )}
-              >
-                <Menu.Item
-                  disabled={!contextInteraction?.followUpAction}
-                  onClick={
-                    () => setFilter({ pageIndex: 0, withFollowUpAction: true })
-                  }
-                >
-                  Show only urgent feedback
-                </Menu.Item>
-                {contextInteraction && (
-                  <Menu.Item
-                    onClick={
-                      () => setFilter({
-                        pageIndex: 0, search: getMainTopicValue(contextInteraction as SessionFragmentFragment),
-                      })
-                    }
-                  >
-                    <UI.Span>Show feedback with answer</UI.Span>
-                    <UI.Span ml="2px" fontWeight="bold" color="main">
-                      {getMainTopicValue(contextInteraction as SessionFragmentFragment)}
-                    </UI.Span>
-                  </Menu.Item>
-                )}
-
-              </Menu.SubMenu>
-              <Menu.SubMenu label={(
-                <UI.Flex>
-                  <UI.Icon mr={1} width={10}>
-                    <User />
-                  </UI.Icon>
-                  {t('Team')}
-                </UI.Flex>
-              )}
-              >
-                <Menu.Item
-                  onClick={
-                    () => setFilter({ pageIndex: 0, dialogueIds: [contextInteraction?.dialogueId as string] })
-                  }
-                >
-                  Show all from this team
-                </Menu.Item>
-              </Menu.SubMenu>
-              <Menu.SubMenu label={(
-                <UI.Flex>
-                  <UI.Icon mr={1} width={10}>
-                    <Calendar />
-                  </UI.Icon>
-                  {t('date')}
-                </UI.Flex>
-              )}
-              >
-                <Menu.Item
-                  onClick={() => handleMultiDateFilterChange(undefined, new Date(contextInteraction?.createdAt))}
-                >
-                  <>
-                    {t('before_day_of')}
-                    {' '}
-                    {formatSimpleDate(contextInteraction?.createdAt)}
-                  </>
-                </Menu.Item>
-                <Menu.Item
-                  onClick={() => handleSingleDateFilterChange(contextInteraction?.createdAt)}
-                >
-                  <>
-                    {t('on_day_of')}
-                    {' '}
-                    {formatSimpleDate(contextInteraction?.createdAt)}
-                  </>
-                </Menu.Item>
-                <Menu.Item
-                  onClick={() => handleMultiDateFilterChange(new Date(contextInteraction?.createdAt), undefined)}
-                >
-                  <>
-                    {t('after_day_of')}
-                    {' '}
-                    {formatSimpleDate(contextInteraction?.createdAt)}
-                  </>
-                </Menu.Item>
-              </Menu.SubMenu>
-            </Menu.Base>
-
             {issues.map((issue) => (
               <Table.Row
-                isLoading={isLoading}
+                isLoading={isIssuesLoading}
                 onClick={() => {
                   setModalIsOpen({ isOpen: true, issueId: issue.id as string });
                 }}
                 gridTemplateColumns={columns}
                 key={issue.id}
-                onContextMenu={(e) => openMenu(e, issue)}
               >
                 <Table.Cell>
                   <ScoreBox score={issue.basicStats?.average} />
@@ -515,7 +395,7 @@ export const IssuesOverview = () => {
                 pageIndex={filter.pageIndex}
                 maxPages={totalPages}
                 perPage={filter.perPage}
-                isLoading={isLoading}
+                isLoading={isIssuesLoading}
                 setPageIndex={(page) => setFilter((newFilter) => ({ ...newFilter, pageIndex: page - 1 }))}
               />
             )}
@@ -523,6 +403,7 @@ export const IssuesOverview = () => {
         </UI.Div>
         <Modal.Root onClose={() => setModalIsOpen({ isOpen: false, issueId: '' })} open={modalIsOpen.isOpen}>
           <IssueModalCard
+            userEntries={userPickerEntries}
             issueId={modalIsOpen.issueId}
           />
         </Modal.Root>

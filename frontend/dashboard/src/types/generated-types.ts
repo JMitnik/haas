@@ -50,6 +50,35 @@ export type Actionable = {
   session?: Maybe<Session>;
 };
 
+export type ActionableConnection = ConnectionInterface & {
+  __typename?: 'ActionableConnection';
+  totalPages?: Maybe<Scalars['Int']>;
+  pageInfo?: Maybe<PaginationPageInfo>;
+  actionables?: Maybe<Array<Maybe<Actionable>>>;
+};
+
+export type ActionableConnectionFilterInput = {
+  search?: Maybe<Scalars['String']>;
+  startDate?: Maybe<Scalars['DateString']>;
+  endDate?: Maybe<Scalars['DateString']>;
+  assigneeId?: Maybe<Scalars['String']>;
+  status?: Maybe<ActionableState>;
+  orderBy?: Maybe<ActionableConnectionOrderByInput>;
+  offset: Scalars['Int'];
+  perPage?: Scalars['Int'];
+};
+
+/** Sorting of ActionableConnection */
+export type ActionableConnectionOrderByInput = {
+  by: ActionableConnectionOrderType;
+  desc?: Maybe<Scalars['Boolean']>;
+};
+
+/** Fields to order ActionableConnection by. */
+export enum ActionableConnectionOrderType {
+  CreatedAt = 'createdAt'
+}
+
 export type ActionableFilterInput = {
   startDate?: Maybe<Scalars['DateString']>;
   endDate?: Maybe<Scalars['DateString']>;
@@ -1513,7 +1542,13 @@ export type IssueModel = {
   /** Number of different teams issue exists for */
   teamCount: Scalars['Int'];
   basicStats?: Maybe<ActionableStatistics>;
+  actionableConnection?: Maybe<ActionableConnection>;
   actionables: Array<Maybe<Actionable>>;
+};
+
+
+export type IssueModelActionableConnectionArgs = {
+  input?: Maybe<ActionableConnectionFilterInput>;
 };
 
 
@@ -3410,6 +3445,21 @@ export type GetWorkspaceSummaryDetailsQuery = (
   )> }
 );
 
+export type ActionableFragmentFragment = (
+  { __typename?: 'Actionable' }
+  & Pick<Actionable, 'id' | 'createdAt' | 'isUrgent' | 'dialogueId' | 'status'>
+  & { session?: Maybe<(
+    { __typename?: 'Session' }
+    & Pick<Session, 'id' | 'mainScore'>
+  )>, dialogue?: Maybe<(
+    { __typename?: 'Dialogue' }
+    & Pick<Dialogue, 'id' | 'title' | 'slug'>
+  )>, assignee?: Maybe<(
+    { __typename?: 'UserType' }
+    & Pick<UserType, 'id' | 'email'>
+  )> }
+);
+
 export type DeliveryEventFragmentFragment = (
   { __typename?: 'DeliveryEventType' }
   & Pick<DeliveryEventType, 'id' | 'status' | 'createdAt' | 'failureMessage'>
@@ -4327,9 +4377,32 @@ export type GetInteractionsQueryQuery = (
   )> }
 );
 
+export type AssignUserToActionableMutationVariables = Exact<{
+  input: AssignUserToActionableInput;
+}>;
+
+
+export type AssignUserToActionableMutation = (
+  { __typename?: 'Mutation' }
+  & { assignUserToActionable?: Maybe<(
+    { __typename?: 'Actionable' }
+    & Pick<Actionable, 'createdAt' | 'status'>
+    & { session?: Maybe<(
+      { __typename?: 'Session' }
+      & Pick<Session, 'id' | 'mainScore'>
+    )>, dialogue?: Maybe<(
+      { __typename?: 'Dialogue' }
+      & Pick<Dialogue, 'title'>
+    )>, assignee?: Maybe<(
+      { __typename?: 'UserType' }
+      & Pick<UserType, 'email'>
+    )> }
+  )> }
+);
+
 export type GetIssueQueryVariables = Exact<{
   input?: Maybe<GetIssueResolverInput>;
-  actionableFilter?: Maybe<ActionableFilterInput>;
+  actionableFilter?: Maybe<ActionableConnectionFilterInput>;
 }>;
 
 
@@ -4341,20 +4414,27 @@ export type GetIssueQuery = (
     & { topic: (
       { __typename?: 'Topic' }
       & Pick<Topic, 'id' | 'name'>
-    ), actionables: Array<Maybe<(
-      { __typename?: 'Actionable' }
-      & Pick<Actionable, 'id' | 'createdAt' | 'isUrgent' | 'dialogueId' | 'status'>
-      & { session?: Maybe<(
-        { __typename?: 'Session' }
-        & Pick<Session, 'id' | 'mainScore'>
-      )>, dialogue?: Maybe<(
-        { __typename?: 'Dialogue' }
-        & Pick<Dialogue, 'id' | 'title' | 'slug'>
-      )>, assignee?: Maybe<(
-        { __typename?: 'UserType' }
-        & Pick<UserType, 'id' | 'email'>
+    ), actionableConnection?: Maybe<(
+      { __typename?: 'ActionableConnection' }
+      & Pick<ActionableConnection, 'totalPages'>
+      & { actionables?: Maybe<Array<Maybe<(
+        { __typename?: 'Actionable' }
+        & Pick<Actionable, 'id' | 'createdAt' | 'isUrgent' | 'dialogueId' | 'status'>
+        & { session?: Maybe<(
+          { __typename?: 'Session' }
+          & Pick<Session, 'id' | 'mainScore'>
+        )>, dialogue?: Maybe<(
+          { __typename?: 'Dialogue' }
+          & Pick<Dialogue, 'id' | 'title' | 'slug'>
+        )>, assignee?: Maybe<(
+          { __typename?: 'UserType' }
+          & Pick<UserType, 'id' | 'email'>
+        )> }
+      )>>>, pageInfo?: Maybe<(
+        { __typename?: 'PaginationPageInfo' }
+        & Pick<PaginationPageInfo, 'hasNextPage' | 'hasPrevPage' | 'nextPageOffset' | 'pageIndex' | 'prevPageOffset'>
       )> }
-    )>> }
+    )> }
   )> }
 );
 
@@ -4604,6 +4684,28 @@ export type GetWorkspaceReportQuery = (
   )> }
 );
 
+export const ActionableFragmentFragmentDoc = gql`
+    fragment ActionableFragment on Actionable {
+  id
+  createdAt
+  isUrgent
+  dialogueId
+  session {
+    id
+    mainScore
+  }
+  dialogue {
+    id
+    title
+    slug
+  }
+  status
+  assignee {
+    id
+    email
+  }
+}
+    `;
 export const DeliveryEventFragmentFragmentDoc = gql`
     fragment DeliveryEventFragment on DeliveryEventType {
   id
@@ -6850,8 +6952,52 @@ export type GetInteractionsQueryQueryResult = Apollo.QueryResult<GetInteractions
 export function refetchGetInteractionsQueryQuery(variables?: GetInteractionsQueryQueryVariables) {
       return { query: GetInteractionsQueryDocument, variables: variables }
     }
+export const AssignUserToActionableDocument = gql`
+    mutation assignUserToActionable($input: AssignUserToActionableInput!) {
+  assignUserToActionable(input: $input) {
+    createdAt
+    session {
+      id
+      mainScore
+    }
+    dialogue {
+      title
+    }
+    status
+    assignee {
+      email
+    }
+  }
+}
+    `;
+export type AssignUserToActionableMutationFn = Apollo.MutationFunction<AssignUserToActionableMutation, AssignUserToActionableMutationVariables>;
+
+/**
+ * __useAssignUserToActionableMutation__
+ *
+ * To run a mutation, you first call `useAssignUserToActionableMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAssignUserToActionableMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [assignUserToActionableMutation, { data, loading, error }] = useAssignUserToActionableMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useAssignUserToActionableMutation(baseOptions?: Apollo.MutationHookOptions<AssignUserToActionableMutation, AssignUserToActionableMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AssignUserToActionableMutation, AssignUserToActionableMutationVariables>(AssignUserToActionableDocument, options);
+      }
+export type AssignUserToActionableMutationHookResult = ReturnType<typeof useAssignUserToActionableMutation>;
+export type AssignUserToActionableMutationResult = Apollo.MutationResult<AssignUserToActionableMutation>;
+export type AssignUserToActionableMutationOptions = Apollo.BaseMutationOptions<AssignUserToActionableMutation, AssignUserToActionableMutationVariables>;
 export const GetIssueDocument = gql`
-    query GetIssue($input: GetIssueResolverInput, $actionableFilter: ActionableFilterInput) {
+    query GetIssue($input: GetIssueResolverInput, $actionableFilter: ActionableConnectionFilterInput) {
   issue(input: $input) {
     id
     topicId
@@ -6859,24 +7005,34 @@ export const GetIssueDocument = gql`
       id
       name
     }
-    actionables(input: $actionableFilter) {
-      id
-      createdAt
-      isUrgent
-      dialogueId
-      session {
+    actionableConnection(input: $actionableFilter) {
+      actionables {
         id
-        mainScore
+        createdAt
+        isUrgent
+        dialogueId
+        session {
+          id
+          mainScore
+        }
+        dialogue {
+          id
+          title
+          slug
+        }
+        status
+        assignee {
+          id
+          email
+        }
       }
-      dialogue {
-        id
-        title
-        slug
-      }
-      status
-      assignee {
-        id
-        email
+      totalPages
+      pageInfo {
+        hasNextPage
+        hasPrevPage
+        nextPageOffset
+        pageIndex
+        prevPageOffset
       }
     }
   }
@@ -7487,6 +7643,13 @@ export namespace GetWorkspaceSummaryDetails {
   export const Document = GetWorkspaceSummaryDetailsDocument;
 }
 
+export namespace ActionableFragment {
+  export type Fragment = ActionableFragmentFragment;
+  export type Session = (NonNullable<ActionableFragmentFragment['session']>);
+  export type Dialogue = (NonNullable<ActionableFragmentFragment['dialogue']>);
+  export type Assignee = (NonNullable<ActionableFragmentFragment['assignee']>);
+}
+
 export namespace DeliveryEventFragment {
   export type Fragment = DeliveryEventFragmentFragment;
 }
@@ -7882,15 +8045,27 @@ export namespace GetInteractionsQuery {
   export const Document = GetInteractionsQueryDocument;
 }
 
+export namespace AssignUserToActionable {
+  export type Variables = AssignUserToActionableMutationVariables;
+  export type Mutation = AssignUserToActionableMutation;
+  export type AssignUserToActionable = (NonNullable<AssignUserToActionableMutation['assignUserToActionable']>);
+  export type Session = (NonNullable<(NonNullable<AssignUserToActionableMutation['assignUserToActionable']>)['session']>);
+  export type Dialogue = (NonNullable<(NonNullable<AssignUserToActionableMutation['assignUserToActionable']>)['dialogue']>);
+  export type Assignee = (NonNullable<(NonNullable<AssignUserToActionableMutation['assignUserToActionable']>)['assignee']>);
+  export const Document = AssignUserToActionableDocument;
+}
+
 export namespace GetIssue {
   export type Variables = GetIssueQueryVariables;
   export type Query = GetIssueQuery;
   export type Issue = (NonNullable<GetIssueQuery['issue']>);
   export type Topic = (NonNullable<(NonNullable<GetIssueQuery['issue']>)['topic']>);
-  export type Actionables = NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionables']>)[number]>;
-  export type Session = (NonNullable<NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionables']>)[number]>['session']>);
-  export type Dialogue = (NonNullable<NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionables']>)[number]>['dialogue']>);
-  export type Assignee = (NonNullable<NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionables']>)[number]>['assignee']>);
+  export type ActionableConnection = (NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionableConnection']>);
+  export type Actionables = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionableConnection']>)['actionables']>)[number]>;
+  export type Session = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionableConnection']>)['actionables']>)[number]>['session']>);
+  export type Dialogue = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionableConnection']>)['actionables']>)[number]>['dialogue']>);
+  export type Assignee = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionableConnection']>)['actionables']>)[number]>['assignee']>);
+  export type PageInfo = (NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionableConnection']>)['pageInfo']>);
   export const Document = GetIssueDocument;
 }
 

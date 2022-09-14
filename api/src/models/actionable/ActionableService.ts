@@ -1,17 +1,13 @@
 import {
-  Dialogue,
   PrismaClient,
 } from '@prisma/client';
 
-import { IssueService } from '../Issue/IssueService';
-import DialogueService from '../questionnaire/DialogueService';
 import QuestionNodePrismaAdapter from '../QuestionNode/QuestionNodePrismaAdapter';
-import { SessionWithNodeEntries } from '../session/Session.types';
-import { logger } from '../../config/logger';
 import { ActionablePrismaAdapter } from './ActionablePrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import IssuePrismaAdapter from '../Issue/IssuePrismaAdapter';
-import { ActionableFilterInput, AssignUserToActionableInput } from './Actionable.types';
+import { ActionableConnectionFilterInput, ActionableFilterInput, AssignUserToActionableInput } from './Actionable.types';
+import { offsetPaginate } from '../general/PaginationHelpers';
 
 class ActionableService {
   private actionablePrismaAdapter: ActionablePrismaAdapter;
@@ -33,6 +29,22 @@ class ActionableService {
 
   public async findActionablesByIssueId(issueId: string, filter?: ActionableFilterInput) {
     return this.actionablePrismaAdapter.findActionablesByIssue(issueId, filter);
+  }
+
+  public async findPaginatedActionables(issueId: string, filter?: ActionableConnectionFilterInput) {
+    const offset = filter?.offset ?? 0;
+    const perPage = filter?.perPage ?? 5;
+
+    const actionables = await this.actionablePrismaAdapter.findPaginatedActionables(issueId, filter);
+    const totalActionables = await this.actionablePrismaAdapter.countActionables(issueId, filter);
+
+    const { totalPages, ...pageInfo } = offsetPaginate(totalActionables, offset, perPage);
+
+    return {
+      actionables: actionables,
+      totalPages,
+      pageInfo,
+    };
   }
 
 }

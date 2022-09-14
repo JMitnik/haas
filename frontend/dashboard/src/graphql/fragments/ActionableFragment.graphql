@@ -1,0 +1,20 @@
+fragment ActionableFragment on Actionable {
+  id
+  createdAt
+  isUrgent
+  dialogueId
+  session {
+    id
+    mainScore
+  }
+  dialogue {
+    id
+    title
+    slug
+  }
+  status
+  assignee {
+    id
+    email
+  }		
+}

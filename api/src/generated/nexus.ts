@@ -53,6 +53,20 @@ declare global {
 }
 
 export interface NexusGenInputs {
+  ActionableConnectionFilterInput: { // input type
+    assigneeId?: string | null; // String
+    endDate?: NexusGenScalars['DateString'] | null; // DateString
+    offset: number; // Int!
+    orderBy?: NexusGenInputs['ActionableConnectionOrderByInput'] | null; // ActionableConnectionOrderByInput
+    perPage: number; // Int!
+    search?: string | null; // String
+    startDate?: NexusGenScalars['DateString'] | null; // DateString
+    status?: NexusGenEnums['ActionableState'] | null; // ActionableState
+  }
+  ActionableConnectionOrderByInput: { // input type
+    by: NexusGenEnums['ActionableConnectionOrderType']; // ActionableConnectionOrderType!
+    desc: boolean | null; // Boolean
+  }
   ActionableFilterInput: { // input type
     assigneeId?: string | null; // String
     endDate?: NexusGenScalars['DateString'] | null; // DateString
@@ -834,6 +848,7 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
+  ActionableConnectionOrderType: "createdAt"
   ActionableState: prisma.ActionableState
   AutomationActionChannelType: prisma.AutomationActionChannelType
   AutomationActionType: prisma.AutomationActionType
@@ -902,6 +917,11 @@ export interface NexusGenObjects {
     url?: string | null; // String
   }
   Actionable: prisma.Actionable;
+  ActionableConnection: { // root type
+    actionables?: Array<NexusGenRootTypes['Actionable'] | null> | null; // [Actionable]
+    pageInfo?: NexusGenRootTypes['PaginationPageInfo'] | null; // PaginationPageInfo
+    totalPages?: number | null; // Int
+  }
   ActionableStatistics: { // root type
     average: number; // Float!
     responseCount: number; // Int!
@@ -1489,7 +1509,7 @@ export interface NexusGenObjects {
 }
 
 export interface NexusGenInterfaces {
-  ConnectionInterface: NexusGenRootTypes['AutomationConnection'] | NexusGenRootTypes['DeliveryConnectionType'] | NexusGenRootTypes['DialogueConnection'] | NexusGenRootTypes['IssueConnection'] | NexusGenRootTypes['PublicDialogueConnection'] | NexusGenRootTypes['SessionConnection'] | NexusGenRootTypes['UserConnection'];
+  ConnectionInterface: NexusGenRootTypes['ActionableConnection'] | NexusGenRootTypes['AutomationConnection'] | NexusGenRootTypes['DeliveryConnectionType'] | NexusGenRootTypes['DialogueConnection'] | NexusGenRootTypes['IssueConnection'] | NexusGenRootTypes['PublicDialogueConnection'] | NexusGenRootTypes['SessionConnection'] | NexusGenRootTypes['UserConnection'];
   DeprecatedConnectionInterface: NexusGenRootTypes['AutodeckConnectionType'] | NexusGenRootTypes['RoleConnection'] | NexusGenRootTypes['TriggerConnectionType'];
 }
 
@@ -1520,6 +1540,11 @@ export interface NexusGenFieldTypes {
     session: NexusGenRootTypes['Session'] | null; // Session
     status: NexusGenEnums['ActionableState']; // ActionableState!
     updatedAt: string | null; // String
+  }
+  ActionableConnection: { // field return type
+    actionables: Array<NexusGenRootTypes['Actionable'] | null> | null; // [Actionable]
+    pageInfo: NexusGenRootTypes['PaginationPageInfo'] | null; // PaginationPageInfo
+    totalPages: number | null; // Int
   }
   ActionableStatistics: { // field return type
     average: number; // Float!
@@ -1958,6 +1983,7 @@ export interface NexusGenFieldTypes {
     totalPages: number | null; // Int
   }
   IssueModel: { // field return type
+    actionableConnection: NexusGenRootTypes['ActionableConnection'] | null; // ActionableConnection
     actionables: Array<NexusGenRootTypes['Actionable'] | null>; // [Actionable]!
     basicStats: NexusGenRootTypes['ActionableStatistics'] | null; // ActionableStatistics
     createdAt: NexusGenScalars['Date'] | null; // Date
@@ -2482,6 +2508,11 @@ export interface NexusGenFieldTypeNames {
     status: 'ActionableState'
     updatedAt: 'String'
   }
+  ActionableConnection: { // field return type name
+    actionables: 'Actionable'
+    pageInfo: 'PaginationPageInfo'
+    totalPages: 'Int'
+  }
   ActionableStatistics: { // field return type name
     average: 'Float'
     responseCount: 'Int'
@@ -2919,6 +2950,7 @@ export interface NexusGenFieldTypeNames {
     totalPages: 'Int'
   }
   IssueModel: { // field return type name
+    actionableConnection: 'ActionableConnection'
     actionables: 'Actionable'
     basicStats: 'ActionableStatistics'
     createdAt: 'Date'
@@ -3518,6 +3550,9 @@ export interface NexusGenArgTypes {
     }
   }
   IssueModel: {
+    actionableConnection: { // args
+      input?: NexusGenInputs['ActionableConnectionFilterInput'] | null; // ActionableConnectionFilterInput
+    }
     actionables: { // args
       input?: NexusGenInputs['ActionableFilterInput'] | null; // ActionableFilterInput
     }
@@ -3873,11 +3908,12 @@ export interface NexusGenArgTypes {
 }
 
 export interface NexusGenAbstractTypeMembers {
-  ConnectionInterface: "AutomationConnection" | "DeliveryConnectionType" | "DialogueConnection" | "IssueConnection" | "PublicDialogueConnection" | "SessionConnection" | "UserConnection"
+  ConnectionInterface: "ActionableConnection" | "AutomationConnection" | "DeliveryConnectionType" | "DialogueConnection" | "IssueConnection" | "PublicDialogueConnection" | "SessionConnection" | "UserConnection"
   DeprecatedConnectionInterface: "AutodeckConnectionType" | "RoleConnection" | "TriggerConnectionType"
 }
 
 export interface NexusGenTypeInterfaces {
+  ActionableConnection: "ConnectionInterface"
   AutodeckConnectionType: "DeprecatedConnectionInterface"
   AutomationConnection: "ConnectionInterface"
   DeliveryConnectionType: "ConnectionInterface"

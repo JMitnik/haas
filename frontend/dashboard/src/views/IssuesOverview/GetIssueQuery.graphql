@@ -1,4 +1,4 @@
-query GetIssue($input: GetIssueResolverInput, $actionableFilter: ActionableFilterInput) {
+query GetIssue($input: GetIssueResolverInput, $actionableFilter: ActionableConnectionFilterInput) {
 	issue(input: $input) {
 		id
 		topicId
@@ -6,25 +6,35 @@ query GetIssue($input: GetIssueResolverInput, $actionableFilter: ActionableFilte
       id
 			name
 		}
-		actionables(input: $actionableFilter) {
-      id
-			createdAt
-      isUrgent
-      dialogueId
-			session {
-				id
-				mainScore
-			}
-			dialogue {
+    actionableConnection(input: $actionableFilter) {
+      actionables {
         id
-				title
-        slug
-			}
-			status
-			assignee {
-        id
-				email
-			}		
-		}
+        createdAt
+        isUrgent
+        dialogueId
+        session {
+          id
+          mainScore
+        }
+        dialogue {
+          id
+          title
+          slug
+        }
+        status
+        assignee {
+          id
+          email
+        }
+      }
+      totalPages
+      pageInfo {
+        hasNextPage
+        hasPrevPage
+        nextPageOffset
+        pageIndex
+        prevPageOffset
+      }
+    }
 	}
 }
