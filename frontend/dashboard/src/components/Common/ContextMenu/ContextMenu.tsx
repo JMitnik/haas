@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 import * as ContextMenuPrimitive from '@radix-ui/react-context-menu';
 import * as UI from '@haas/ui';
 import React from 'react';
@@ -14,7 +15,7 @@ const StyledContent = styled(ContextMenuPrimitive.Content)`
   `}
 `;
 
-const Content = (props: any) => (
+const ContextMenuContent = (props: any) => (
   <ContextMenuPrimitive.Portal>
     <StyledContent {...props} />
   </ContextMenuPrimitive.Portal>
@@ -31,7 +32,7 @@ const StyledSubContent = styled(ContextMenuPrimitive.SubContent)`
   `}
 `;
 
-const SubContent = (props: any) => (
+const ContextMenuSubContent = (props: any) => (
   <ContextMenuPrimitive.Portal>
     <StyledSubContent {...props} />
   </ContextMenuPrimitive.Portal>
@@ -185,14 +186,12 @@ const StyledSeparator = styled(ContextMenuPrimitive.Separator)`
 `;
 
 const StyledItemIndicator = styled(ContextMenuPrimitive.ItemIndicator)`
-  ${({ theme }) => css`
-    position: absolute;
-    left: 0;
-    width: 25px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  `}
+  position: absolute;
+  left: 0;
+  width: 25px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const StyledRightSlot = styled(UI.Div)`
@@ -200,29 +199,29 @@ const StyledRightSlot = styled(UI.Div)`
     margin-left: auto;
     padding-left: 20px;
     color: ${theme.colors.main['500']};
-    
-    [data-highlighted] > & { 
+
+    [data-highlighted] > & {
       color: white;
     };
 
-    [data-disabled] &: { 
+    [data-disabled] &: {
       ${theme.colors.altGray['300']};
     };
   `}
 `;
 
 // Exports
-export const ContextMenu = ContextMenuPrimitive.Root;
-export const ContextMenuTrigger = ContextMenuPrimitive.Trigger;
-export const ContextMenuContent = Content;
-export const ContextMenuItem = StyledItem;
-export const ContextMenuCheckboxItem = StyledCheckboxItem;
-export const ContextMenuRadioGroup = ContextMenuPrimitive.RadioGroup;
-export const ContextMenuRadioItem = StyledRadioItem;
-export const ContextMenuItemIndicator = StyledItemIndicator;
-export const ContextMenuRightSlot = StyledRightSlot;
-export const ContextMenuLabel = StyledLabel;
-export const ContextMenuSeparator = StyledSeparator;
-export const ContextMenuSub = ContextMenuPrimitive.Sub;
-export const ContextMenuSubTrigger = StyledSubTrigger;
-export const ContextMenuSubContent = SubContent;
+export const Root = ContextMenuPrimitive.Root;
+export const Trigger = ContextMenuPrimitive.Trigger;
+export const Content = ContextMenuContent;
+export const Item = StyledItem;
+export const CheckboxItem = StyledCheckboxItem;
+export const RadioGroup = ContextMenuPrimitive.RadioGroup;
+export const RadioItem = StyledRadioItem;
+export const ItemIndicator = StyledItemIndicator;
+export const RightSlot = StyledRightSlot;
+export const Label = StyledLabel;
+export const Separator = StyledSeparator;
+export const Sub = ContextMenuPrimitive.Sub;
+export const SubTrigger = StyledSubTrigger;
+export const SubContent = ContextMenuSubContent;

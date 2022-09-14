@@ -13,19 +13,7 @@ import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import React, { useContext, useRef, useState } from 'react';
 
-import {
-  ContextMenu,
-  ContextMenuCheckboxItem,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuItemIndicator,
-  ContextMenuRightSlot,
-  ContextMenuSeparator,
-  ContextMenuSub,
-  ContextMenuSubContent,
-  ContextMenuSubTrigger,
-  ContextMenuTrigger,
-} from 'components/Common/ContextMenu';
+import * as ContextMenu from 'components/Common/ContextMenu';
 import { ReactComponent as DEFlag } from 'assets/icons/flags/flag-de.svg';
 import {
   Dialogue,
@@ -131,8 +119,8 @@ const DialogueCard = ({ dialogue, users }: DialogueCardProps) => {
 
   return (
     <UI.Div>
-      <ContextMenu>
-        <ContextMenuTrigger>
+      <ContextMenu.Root>
+        <ContextMenu.Trigger>
           <UI.Card
             ref={ref}
             data-cy="DialogueCard"
@@ -251,29 +239,29 @@ const DialogueCard = ({ dialogue, users }: DialogueCardProps) => {
               </UI.ColumnFlex>
             </UI.CardBody>
           </UI.Card>
-        </ContextMenuTrigger>
-        <ContextMenuContent sideOffset={5} align="end">
-          <ContextMenuItem
+        </ContextMenu.Trigger>
+        <ContextMenu.Content sideOffset={5} align="end">
+          <ContextMenu.Item
             onClick={() => history.push(`/dashboard/b/${customerSlug}/d/${dialogue.slug}/edit`)}
             disabled={!canEditDialogue}
           >
             {t('edit')}
-            <ContextMenuRightSlot>
+            <ContextMenu.RightSlot>
               <Pencil1Icon />
-            </ContextMenuRightSlot>
-          </ContextMenuItem>
-          <ContextMenuSub>
-            <ContextMenuSubTrigger>
+            </ContextMenu.RightSlot>
+          </ContextMenu.Item>
+          <ContextMenu.Sub>
+            <ContextMenu.SubTrigger>
               Assign to...
-              <ContextMenuRightSlot>
+              <ContextMenu.RightSlot>
                 <ChevronRightIcon />
-              </ContextMenuRightSlot>
-            </ContextMenuSubTrigger>
-            <ContextMenuSubContent sideOffset={2} alignOffset={-5}>
+              </ContextMenu.RightSlot>
+            </ContextMenu.SubTrigger>
+            <ContextMenu.SubContent sideOffset={2} alignOffset={-5}>
               {users?.map((user) => {
                 const isAssignedToDialogue = !!dialogue.assignees?.find((assignee) => assignee?.id === user.id);
                 return (
-                  <ContextMenuCheckboxItem
+                  <ContextMenu.CheckboxItem
                     disabled={!canAssignUsersToDialogue}
                     checked={isAssignedToDialogue}
                     onCheckedChange={() => assignDialogueToUser(
@@ -290,45 +278,45 @@ const DialogueCard = ({ dialogue, users }: DialogueCardProps) => {
                     )}
                     onSelect={(e) => e.preventDefault()}
                   >
-                    <ContextMenuItemIndicator>
+                    <ContextMenu.ItemIndicator>
                       <UI.Icon marginRight={1}>
                         <CheckIcon />
                       </UI.Icon>
-                    </ContextMenuItemIndicator>
+                    </ContextMenu.ItemIndicator>
                     <UI.Span>
                       {user.firstName}
                       {' '}
                       {user.lastName}
                     </UI.Span>
-                  </ContextMenuCheckboxItem>
+                  </ContextMenu.CheckboxItem>
                 );
               })}
-            </ContextMenuSubContent>
-          </ContextMenuSub>
-          <ContextMenuSeparator />
-          <ContextMenuCheckboxItem
+            </ContextMenu.SubContent>
+          </ContextMenu.Sub>
+          <ContextMenu.Separator />
+          <ContextMenu.CheckboxItem
             disabled={!canEditDialogue}
             checked={dialogue?.isPrivate || undefined}
             onCheckedChange={() => setDialoguePrivacy()}
           >
-            <ContextMenuItemIndicator>
+            <ContextMenu.ItemIndicator>
               <UI.Icon marginRight={1}>
                 <CheckIcon />
               </UI.Icon>
-            </ContextMenuItemIndicator>
+            </ContextMenu.ItemIndicator>
             <UI.Span>
               Only assignees can access
             </UI.Span>
-          </ContextMenuCheckboxItem>
-          <ContextMenuSeparator />
-          <ContextMenuItem onClick={() => deleteDialogue()} disabled={!canDeleteDialogue}>
+          </ContextMenu.CheckboxItem>
+          <ContextMenu.Separator />
+          <ContextMenu.Item onClick={() => deleteDialogue()} disabled={!canDeleteDialogue}>
             {t('delete')}
-            <ContextMenuRightSlot>
+            <ContextMenu.RightSlot>
               <Cross1Icon />
-            </ContextMenuRightSlot>
-          </ContextMenuItem>
-        </ContextMenuContent>
-      </ContextMenu>
+            </ContextMenu.RightSlot>
+          </ContextMenu.Item>
+        </ContextMenu.Content>
+      </ContextMenu.Root>
     </UI.Div>
   );
 };
