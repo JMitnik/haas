@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import { XCircle } from 'react-feather';
-import { useForm, useFormContext } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useRef } from 'react';
@@ -43,8 +43,6 @@ export const PreFormNodeFormFragment = ({ onClose, onSubmit, preFormNode }: Step
   };
 
   useOnClickOutside(ref, () => onClose(null));
-
-  console.log('subForm watch values: ', subForm.watch());
 
   return (
     <UI.Card padding="2em" zIndex={299} ref={ref}>

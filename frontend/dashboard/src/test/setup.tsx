@@ -3,13 +3,14 @@ import React from 'react';
 import 'whatwg-fetch';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import '@testing-library/jest-dom/extend-expect';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { configure } from '@testing-library/react';
 
 import { server } from './server';
 
 import 'mutationobserver-shim';
 
-jest.setTimeout(10000);
+jest.setTimeout(100000);
 
 // Mock call to import.meta.ENV
 jest.mock('utils/getEnv', () => ({

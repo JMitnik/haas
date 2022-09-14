@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
 import React, { useState } from 'react';
 
-import * as Tooltip from 'components/Common/Tooltip/Tooltip';
+import * as Tooltip from 'components/Common/Tooltip';
 import { Avatar } from 'components/Common/Avatar';
 import { UserType } from 'types/generated-types';
 

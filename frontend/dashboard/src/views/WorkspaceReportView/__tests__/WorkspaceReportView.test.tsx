@@ -4,7 +4,7 @@ import { parse } from 'date-fns';
 import React from 'react';
 
 import { DateFormat } from 'hooks/useDate';
-import { render, screen } from 'test';
+import { render, screen, waitFor } from 'test';
 
 import { WorkspaceReportView } from '../WorkspaceReportView';
 import {
@@ -27,11 +27,13 @@ test('display bar chart', async () => {
     />,
   );
 
-  expect(await screen.findByText('Weekly report')).toBeInTheDocument();
+  await waitFor(async () => {
+    expect(await screen.findByText('Weekly report')).toBeInTheDocument();
+  });
 
   // Check that the total summaries are 0
   expect((await screen.findByText('Total responses')).parentElement).toContainHTML('24');
-  expect(screen.getByText('Total problems').parentElement).toContainHTML('0');
+  expect((await screen.findByText('Total problems')).parentElement).toContainHTML('0');
 
   // Check that only *one* bar chart for responses has a certain height
   const responseWidget = getWidget('Total responses');

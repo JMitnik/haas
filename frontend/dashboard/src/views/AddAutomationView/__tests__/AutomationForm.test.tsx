@@ -1,20 +1,16 @@
-import { debug } from 'jest-preview';
 import { render, screen, userEvent } from 'test';
 import React from 'react';
 
-import { act } from 'react-dom/test-utils';
-
 import { AutomationForm } from '../AutomationForm';
-import { mockGetUsersAndRoles } from './helpers';
+import { mockGetUsersAndRoles, mockGetWorkspaceDialogues } from './helpers';
 
 const renderComponent = () => {
-  act(() => {
-    render(<AutomationForm />);
-  });
+  render(<AutomationForm />);
 };
 
 test('render form and validate state of create button', async () => {
   mockGetUsersAndRoles((res) => ({ ...res }));
+  mockGetWorkspaceDialogues((res) => ({ ...res }));
   renderComponent();
 
   // Verify initially create button is disabled
@@ -67,8 +63,6 @@ test('render form and validate state of create button', async () => {
   userEvent.click(addTargetButton);
 
   await new Promise((r) => setTimeout(r, 2000));
-
-  debug();
 
   const userPickerEntry = await screen.findByText((text) => text.toLowerCase().includes('admin user'.toLowerCase()));
   userEvent.click(userPickerEntry);
