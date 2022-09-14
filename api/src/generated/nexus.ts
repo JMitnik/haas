@@ -710,6 +710,10 @@ export interface NexusGenInputs {
     dialogueId?: string | null; // ID
     id?: string | null; // ID
   }
+  SetActionableStatusInput: { // input type
+    actionableId: string; // String!
+    status: NexusGenEnums['ActionableState']; // ActionableState!
+  }
   SetDialoguePrivacyInput: { // input type
     customerId: string; // String!
     dialogueSlug: string; // String!
@@ -2099,6 +2103,7 @@ export interface NexusGenFieldTypes {
     sandbox: string | null; // String
     sendAutomationDialogueLink: boolean | null; // Boolean
     sendAutomationReport: boolean | null; // Boolean
+    setActionableStatus: NexusGenRootTypes['Actionable'] | null; // Actionable
     setDialoguePrivacy: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     singleUpload: NexusGenRootTypes['ImageType'] | null; // ImageType
     updateAutomation: NexusGenRootTypes['AutomationModel'] | null; // AutomationModel
@@ -3066,6 +3071,7 @@ export interface NexusGenFieldTypeNames {
     sandbox: 'String'
     sendAutomationDialogueLink: 'Boolean'
     sendAutomationReport: 'Boolean'
+    setActionableStatus: 'Actionable'
     setDialoguePrivacy: 'Dialogue'
     singleUpload: 'ImageType'
     updateAutomation: 'AutomationModel'
@@ -3727,6 +3733,9 @@ export interface NexusGenArgTypes {
     }
     sendAutomationReport: { // args
       input?: NexusGenInputs['SendAutomationReportInput'] | null; // SendAutomationReportInput
+    }
+    setActionableStatus: { // args
+      input: NexusGenInputs['SetActionableStatusInput']; // SetActionableStatusInput!
     }
     setDialoguePrivacy: { // args
       input?: NexusGenInputs['SetDialoguePrivacyInput'] | null; // SetDialoguePrivacyInput

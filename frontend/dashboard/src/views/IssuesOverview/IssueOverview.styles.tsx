@@ -48,10 +48,11 @@ export const UrgentContainer = styled(UI.Div) <{ hasUrgent?: boolean }>`
 
 interface StatusContainerProps {
   status: ActionableState;
+  isSelected?: boolean;
 }
 
 export const StatusContainer = styled(UI.Div) <StatusContainerProps>`
-  ${({ theme, status }) => css`
+  ${({ theme, status, isSelected }) => css`
     display: flex;
     justify-content: center;
     align-items: center;
@@ -63,31 +64,48 @@ export const StatusContainer = styled(UI.Div) <StatusContainerProps>`
     ${(status === ActionableState.Unverified || status === ActionableState.Dropped) && css`
       background: ${theme.colors.gray[100]};
       color: ${theme.colors.gray[500]};
+
+      ${isSelected && css`
+        border: 1px solid ${theme.colors.gray[500]};
+      `}
     `}
 
     ${status === ActionableState.Pending && css`
       background: ${theme.colors.orange[100]};
       color: ${theme.colors.orange[500]};
+      
+      ${isSelected && css`
+        border: 1px solid ${theme.colors.orange[500]};
+      `}
     `}
 
     ${status === ActionableState.Completed && css`
       background: ${theme.colors.green[100]};
       color: ${theme.colors.green[500]};
+
+      ${isSelected && css`
+        border: 1px solid ${theme.colors.green[500]};
+      `}
     `}
 
     ${status === ActionableState.Stale && css`
       background: ${theme.colors.red[100]};
       color: ${theme.colors.red[500]};
+
+      ${isSelected && css`
+        border: 1px solid ${theme.colors.red[500]};
+      `}
     `}
   `}
 `;
 
 interface StatusBoxProps {
+  isSelected?: boolean;
   status: ActionableState;
 }
 
-export const StatusBox = ({ status }: StatusBoxProps) => (
-  <StatusContainer status={status}>
+export const StatusBox = ({ status, isSelected }: StatusBoxProps) => (
+  <StatusContainer isSelected={isSelected} status={status}>
     {status}
   </StatusContainer>
 );

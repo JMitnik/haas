@@ -1,4 +1,5 @@
 import {
+  Prisma,
   PrismaClient,
 } from '@prisma/client';
 
@@ -6,7 +7,7 @@ import QuestionNodePrismaAdapter from '../QuestionNode/QuestionNodePrismaAdapter
 import { ActionablePrismaAdapter } from './ActionablePrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import IssuePrismaAdapter from '../Issue/IssuePrismaAdapter';
-import { ActionableConnectionFilterInput, ActionableFilterInput, AssignUserToActionableInput } from './Actionable.types';
+import { ActionableConnectionFilterInput, ActionableFilterInput, AssignUserToActionableInput, SetActionableStatusInput } from './Actionable.types';
 import { offsetPaginate } from '../general/PaginationHelpers';
 
 class ActionableService {
@@ -21,6 +22,12 @@ class ActionableService {
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prisma);
     this.issuePrismaAdapter = new IssuePrismaAdapter(prisma);
   }
+
+  public async setActionableStatus(input: SetActionableStatusInput) {
+    const updateArgs: Prisma.ActionableUpdateInput = { status: input.status };
+    const result = await this.actionablePrismaAdapter.updateActionable(input.actionableId, updateArgs);
+    return result;
+  };
 
   public async assignUserToActionable(input: AssignUserToActionableInput) {
     const result = await this.actionablePrismaAdapter.assignUserToActionable(input);

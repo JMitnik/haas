@@ -1682,6 +1682,7 @@ export type MostTrendingTopic = {
 export type Mutation = {
   __typename?: 'Mutation';
   assignUserToActionable?: Maybe<Actionable>;
+  setActionableStatus?: Maybe<Actionable>;
   sandbox?: Maybe<Scalars['String']>;
   generateWorkspaceFromCSV?: Maybe<Customer>;
   resetWorkspaceData?: Maybe<Scalars['Boolean']>;
@@ -1758,6 +1759,11 @@ export type Mutation = {
 
 export type MutationAssignUserToActionableArgs = {
   input: AssignUserToActionableInput;
+};
+
+
+export type MutationSetActionableStatusArgs = {
+  input: SetActionableStatusInput;
 };
 
 
@@ -2799,6 +2805,11 @@ export type SessionScoreRangeFilter = {
 export type SessionWhereUniqueInput = {
   id?: Maybe<Scalars['ID']>;
   dialogueId?: Maybe<Scalars['ID']>;
+};
+
+export type SetActionableStatusInput = {
+  status: ActionableState;
+  actionableId: Scalars['String'];
 };
 
 export type SetDialoguePrivacyInput = {
@@ -4459,6 +4470,19 @@ export type GetWorkspaceIssuesQuery = (
         & Pick<PaginationPageInfo, 'hasNextPage' | 'hasPrevPage' | 'nextPageOffset' | 'pageIndex' | 'prevPageOffset'>
       )> }
     )> }
+  )> }
+);
+
+export type SetActionableStatusMutationVariables = Exact<{
+  input: SetActionableStatusInput;
+}>;
+
+
+export type SetActionableStatusMutation = (
+  { __typename?: 'Mutation' }
+  & { setActionableStatus?: Maybe<(
+    { __typename?: 'Actionable' }
+    & Pick<Actionable, 'id' | 'status'>
   )> }
 );
 
@@ -7121,6 +7145,40 @@ export type GetWorkspaceIssuesQueryResult = Apollo.QueryResult<GetWorkspaceIssue
 export function refetchGetWorkspaceIssuesQuery(variables?: GetWorkspaceIssuesQueryVariables) {
       return { query: GetWorkspaceIssuesDocument, variables: variables }
     }
+export const SetActionableStatusDocument = gql`
+    mutation setActionableStatus($input: SetActionableStatusInput!) {
+  setActionableStatus(input: $input) {
+    id
+    status
+  }
+}
+    `;
+export type SetActionableStatusMutationFn = Apollo.MutationFunction<SetActionableStatusMutation, SetActionableStatusMutationVariables>;
+
+/**
+ * __useSetActionableStatusMutation__
+ *
+ * To run a mutation, you first call `useSetActionableStatusMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetActionableStatusMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [setActionableStatusMutation, { data, loading, error }] = useSetActionableStatusMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useSetActionableStatusMutation(baseOptions?: Apollo.MutationHookOptions<SetActionableStatusMutation, SetActionableStatusMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SetActionableStatusMutation, SetActionableStatusMutationVariables>(SetActionableStatusDocument, options);
+      }
+export type SetActionableStatusMutationHookResult = ReturnType<typeof useSetActionableStatusMutation>;
+export type SetActionableStatusMutationResult = Apollo.MutationResult<SetActionableStatusMutation>;
+export type SetActionableStatusMutationOptions = Apollo.BaseMutationOptions<SetActionableStatusMutation, SetActionableStatusMutationVariables>;
 export const RequestInviteDocument = gql`
     mutation RequestInvite($input: RequestInviteInput) {
   requestInvite(input: $input) {
@@ -8077,6 +8135,13 @@ export namespace GetWorkspaceIssues {
   export type Issues = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceIssuesQuery['customer']>)['issueConnection']>)['issues']>)[number]>;
   export type PageInfo = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceIssuesQuery['customer']>)['issueConnection']>)['pageInfo']>);
   export const Document = GetWorkspaceIssuesDocument;
+}
+
+export namespace SetActionableStatus {
+  export type Variables = SetActionableStatusMutationVariables;
+  export type Mutation = SetActionableStatusMutation;
+  export type SetActionableStatus = (NonNullable<SetActionableStatusMutation['setActionableStatus']>);
+  export const Document = SetActionableStatusDocument;
 }
 
 export namespace RequestInvite {

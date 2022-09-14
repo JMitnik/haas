@@ -1526,6 +1526,7 @@ type Mutation {
   sandbox(input: SandboxInput): String
   sendAutomationDialogueLink(input: SendAutomationDialogueLinkInput): Boolean
   sendAutomationReport(input: SendAutomationReportInput): Boolean
+  setActionableStatus(input: SetActionableStatusInput!): Actionable
   setDialoguePrivacy(input: SetDialoguePrivacyInput): Dialogue
   singleUpload(file: Upload!): ImageType
   updateAutomation(input: CreateAutomationInput): AutomationModel
@@ -2083,6 +2084,11 @@ input SessionScoreRangeFilter {
 input SessionWhereUniqueInput {
   dialogueId: ID
   id: ID
+}
+
+input SetActionableStatusInput {
+  actionableId: String!
+  status: ActionableState!
 }
 
 input SetDialoguePrivacyInput {

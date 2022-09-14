@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
 import * as Table from 'components/Common/Table';
-import { ActionableConnectionOrderType, ActionableFragmentFragment, useAssignUserToActionableMutation, useGetIssueQuery } from 'types/generated-types';
+import { ActionableConnectionOrderType, ActionableFragmentFragment, useAssignUserToActionableMutation, useGetIssueQuery, useSetActionableStatusMutation } from 'types/generated-types';
 import { DateFormat, useDate } from 'hooks/useDate';
 import { ReactComponent as IconClose } from 'assets/icons/icon-close.svg';
 import { PickerButton } from 'components/Common/Picker/PickerButton';
@@ -17,6 +17,7 @@ import { useFormatter } from 'hooks/useFormatter';
 import Dropdown from 'components/Dropdown';
 import SearchBar from 'components/Common/SearchBar';
 
+import { ActionableStatusPicker } from './ActionableStatusPicker';
 import { ChangeableEmailContainer, StatusBox } from './IssueOverview.styles';
 
 interface InteractionModalCardProps {
@@ -88,6 +89,10 @@ export const IssueModalCard = ({ issueId, userEntries }: InteractionModalCardPro
   });
 
   const [assignUserToActionable] = useAssignUserToActionableMutation({
+    refetchQueries: ['GetIssue'],
+  });
+
+  const [setActionableStatus] = useSetActionableStatusMutation({
     refetchQueries: ['GetIssue'],
   });
 
@@ -295,7 +300,12 @@ export const IssueModalCard = ({ issueId, userEntries }: InteractionModalCardPro
                 <Table.Cell maxWidth={300}>
                   <UI.ColumnFlex justifyContent="flex-start">
                     <UI.Flex alignItems="center">
-                      <StatusBox status={actionable.status} />
+                      <ActionableStatusPicker
+                        actionableId={actionable.id as string}
+                        onChange={setActionableStatus}
+                        status={actionable.status}
+                      />
+                      {/* <StatusBox isSelected status={actionable.status} /> */}
                     </UI.Flex>
                   </UI.ColumnFlex>
                 </Table.Cell>
