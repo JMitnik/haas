@@ -18,7 +18,7 @@ import { DialogueStatisticsSummaryFilterInput, DialogueStatisticsSummaryModel, M
 import { DialogueConnection, DialogueConnectionFilterInput } from '../../questionnaire';
 import { HealthScore, HealthScoreInput } from './HealthScore';
 import { Organization } from '../../Organization/graphql/OrganizationModel';
-import { Issue, IssueFilterInput, IssueModel } from '../../Issue/graphql';
+import { Issue, IssueFilterInput, IssueModel, IssueConnectionFilterInput, IssueConnection } from '../../Issue/graphql';
 import { IssueValidator } from '../../Issue/IssueValidator';
 import { SessionConnectionFilterInput } from '../../../models/session/graphql';
 import { SessionConnection } from '../../session/graphql/Session.graphql'
@@ -85,6 +85,19 @@ export const CustomerType = objectType({
 
       resolve: async (parent) => {
         return { id: parent.id }
+      },
+    });
+
+    /**
+     * Issues Connection
+     *
+     */
+    t.field('issueConnection', {
+      type: IssueConnection,
+      args: { filter: IssueConnectionFilterInput },
+      resolve: async (parent, args, { services }) => {
+        const filter = IssueValidator.resolveIssueConnectionFilter(args.filter);
+        return await services.issueService.paginatedIssues(parent.id, filter);
       },
     });
 

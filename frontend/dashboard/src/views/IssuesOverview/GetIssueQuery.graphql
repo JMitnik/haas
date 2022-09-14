@@ -3,19 +3,26 @@ query GetIssue($input: GetIssueResolverInput, $actionableFilter: ActionableFilte
 		id
 		topicId
 		topic {
+      id
 			name
 		}
 		actionables(input: $actionableFilter) {
+      id
 			createdAt
+      isUrgent
+      dialogueId
 			session {
 				id
 				mainScore
 			}
 			dialogue {
+        id
 				title
+        slug
 			}
 			status
 			assignee {
+        id
 				email
 			}		
 		}

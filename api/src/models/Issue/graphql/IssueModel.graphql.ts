@@ -26,7 +26,7 @@ export const IssueModel = objectType({
       description: 'Number of different teams issue exists for',
       async resolve(parent, _, ctx) {
         let issue: IssueWithActionables
-        if ((parent as any)?.actionables.length) {
+        if ((parent as any)?.actionables?.length) {
           issue = parent as any;
         } else {
           issue = await ctx.services.issueService.findIssueById(
@@ -35,7 +35,7 @@ export const IssueModel = objectType({
         }
 
         const teamCount = groupBy(issue.actionables, (actionable) => actionable.dialogueId);
-        return Object.keys(teamCount).length;
+        return Object.keys(teamCount)?.length || 0;
       },
     });
 
@@ -43,7 +43,7 @@ export const IssueModel = objectType({
       type: ActionableStatistics,
       async resolve(parent, args, ctx) {
         let issue: IssueWithActionables
-        if ((parent as any)?.actionables.length) {
+        if ((parent as any)?.actionables?.length) {
           issue = parent as any;
         } else {
           issue = await ctx.services.issueService.findIssueById(
@@ -52,8 +52,8 @@ export const IssueModel = objectType({
         }
         return {
           average: _.meanBy(issue.actionables, (actionable) => actionable.session?.mainScore),
-          responseCount: issue.actionables.length,
-          urgentCount: _.filter(issue.actionables, (actionable) => actionable.isUrgent).length,
+          responseCount: issue.actionables?.length || 0,
+          urgentCount: _.filter(issue.actionables, (actionable) => actionable.isUrgent)?.length,
         }
       },
     });

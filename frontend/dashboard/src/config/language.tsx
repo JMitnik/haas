@@ -271,6 +271,10 @@ const language = {
       en: 'Teams with problems',
       de: 'Mannschaften mit Problemen',
     },
+    issue: {
+      en: 'Issue',
+      de: 'Issue',
+    },
     issues: {
       en: 'Issues',
       de: 'Issues',

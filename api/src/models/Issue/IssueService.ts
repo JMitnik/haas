@@ -6,12 +6,12 @@ import { Nullable } from '../../types/generic';
 import { convertDatesToHistogramItems } from '../Common/Analytics/Analytics.helpers';
 import { TopicByString, TopicFilterInput, TopicStatistics, TopicStatisticsByDialogueId } from '../Topic/Topic.types';
 import { TopicService } from '../Topic/TopicService';
-import { GetIssueResolverInput, Issue, IssueFilterInput } from './Issue.types';
+import { GetIssueResolverInput, Issue, IssueConnectionFilterInput, IssueFilterInput } from './Issue.types';
 import { SessionActionType, SessionWithEntries } from '../../models/session/Session.types';
 import SessionService from '../../models/session/SessionService';
 import CustomerService from '../../models/customer/CustomerService';
 import IssuePrismaAdapter from './IssuePrismaAdapter';
-import { ActionableFilterInput } from '../actionable/Actionable.types';
+import { offsetPaginate } from '../general/PaginationHelpers';
 
 export class IssueService {
   private prisma: PrismaClient;
@@ -29,15 +29,40 @@ export class IssueService {
   }
 
   /**
-   * Finds all issues by a workspace ID
+   * Paginate through all issues of a workspace
+   * @param workpsaceId the ID of the workspace
+   * @param filter a filter object used to paginate through issues of a workspace
+   * @returns a list of paginated issues
    */
+  public paginatedIssues = async (
+    workspaceId: string,
+    filter: IssueConnectionFilterInput,
+  ) => {
+    const offset = filter.offset;
+    const perPage = filter.perPage;
+
+    const issues = await this.issuePrismaAdapter.findPaginatedIssues(workspaceId, filter);
+    const totalIssues = await this.issuePrismaAdapter.countIssues(workspaceId, filter);
+
+    const { totalPages, ...pageInfo } = offsetPaginate(totalIssues, offset, perPage);
+
+    return {
+      issues: issues,
+      totalPages,
+      pageInfo,
+    };
+  };
+
+  /**
+  * Finds all issues by a workspace ID
+  */
   public async findIssuesByWorkspaceId(workspaceId: string, filter: IssueFilterInput) {
     return this.issuePrismaAdapter.findIssuesByWorkspaceId(workspaceId, filter);
   }
 
   /**
-   * Finds an issue be either the issue or topic ID
-   */
+  * Finds an issue be either the issue or topic ID
+  */
   public async findIssueById(input: GetIssueResolverInput) {
     if (input.issueId) {
       return this.issuePrismaAdapter.findIssueById(input.issueId);
@@ -55,9 +80,9 @@ export class IssueService {
   }
 
   /**
-   * Retrieves all workspace issues. This can be filtered, based on the required filter (startDate, endDate).
-   * @param workspaceId Workspace ID
-   */
+  * Retrieves all workspace issues. This can be filtered, based on the required filter (startDate, endDate).
+  * @param workspaceId Workspace ID
+  */
   public async getProblemDialoguesByWorkspace(workspaceId: string, filter: IssueFilterInput): Promise<Issue[]> {
     const dialogues = await this.countNegativeInteractionsPerDialogue(
       workspaceId, filter.startDate, filter.endDate, filter
@@ -69,9 +94,9 @@ export class IssueService {
   }
 
   /**
-   * Retrieves all workspace issues. This can be filtered, based on the required filter (startDate, endDate).
-   * @param workspaceId Workspace ID
-   */
+  * Retrieves all workspace issues. This can be filtered, based on the required filter (startDate, endDate).
+  * @param workspaceId Workspace ID
+  */
   public async getWorkspaceIssues(workspaceId: string, filter: IssueFilterInput): Promise<Issue[]> {
     const topics = await this.topicService.countWorkspaceTopics(workspaceId, filter.startDate, filter.endDate, filter);
     const issues = orderBy(this.extractIssues(topics), (topic) => topic.rankScore, 'desc');
@@ -81,13 +106,13 @@ export class IssueService {
   }
 
   /**
-   * Calculate the issue score based on the underlying topics statistics.
-   *
-   * We follow a certain heuristic:
-   * - A single negative ranking is a simple inverse addition. A "1" (or 10) gets us 10 points, 3 gets us 3,3 points. Therefore,
-   * we calculate the
-   * - A "contact" me adds a single extra 100 points.
-   */
+  * Calculate the issue score based on the underlying topics statistics.
+  *
+  * We follow a certain heuristic:
+  * - A single negative ranking is a simple inverse addition. A "1" (or 10) gets us 10 points, 3 gets us 3,3 points. Therefore,
+  * we calculate the
+  * - A "contact" me adds a single extra 100 points.
+  */
   public calculateScore(relatedTopicStatistics: TopicStatistics): number {
     // We weigh the score by the count; not clean heuristic
     const scoreRanking = (1 / ((relatedTopicStatistics.score + 0.01) / 100)) * relatedTopicStatistics.count;
@@ -99,8 +124,8 @@ export class IssueService {
   }
 
   /**
-   * Count negative interactions and their frequencies per dialogue within a workspace.
-   */
+  * Count negative interactions and their frequencies per dialogue within a workspace.
+  */
   async countNegativeInteractionsPerDialogue(
     workspaceId: string,
     startDate: Date,
@@ -135,12 +160,12 @@ export class IssueService {
   }
 
   /**
-   * Calculate part of the issue score from actions.
-   *
-   * We follow a certain heuristic:
-   * - Contact is worth "50" points.
-   * @param actions
-   */
+  * Calculate part of the issue score from actions.
+  *
+  * We follow a certain heuristic:
+  * - Contact is worth "50" points.
+  * @param actions
+  */
   private scoreFromActions(actions: Nullable<SessionActionType>[]) {
     const score = actions.reduce((acc, action) => {
       if (action && action === 'CONTACT') {
@@ -154,10 +179,10 @@ export class IssueService {
   }
 
   /**
-   * Extracts all issues from a topic-by-string map.
-   *
-   * Warning: Potentially costly due to the `convertDatesToHistogramItems` call.
-   */
+  * Extracts all issues from a topic-by-string map.
+  *
+  * Warning: Potentially costly due to the `convertDatesToHistogramItems` call.
+  */
   private calculateDialogueIssueScore(dialogues: TopicStatisticsByDialogueId): Issue[] {
     let issues: Issue[] = [];
 
@@ -190,10 +215,10 @@ export class IssueService {
   }
 
   /**
-   * Extracts all issues from a topic-by-string map.
-   *
-   * Warning: Potentially costly due to the `convertDatesToHistogramItems` call.
-   */
+  * Extracts all issues from a topic-by-string map.
+  *
+  * Warning: Potentially costly due to the `convertDatesToHistogramItems` call.
+  */
   private extractIssues(topics: TopicByString): Issue[] {
     let issues: Issue[] = [];
 

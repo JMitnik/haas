@@ -639,6 +639,7 @@ type Customer {
   dialogues(filter: DialogueFilterInputType): [Dialogue]
   id: ID
   isDemo: Boolean
+  issueConnection(filter: IssueConnectionFilterInput): IssueConnection
   issueTopics(input: IssueFilterInput): [Issue]
   issues(filter: IssueFilterInput): [IssueModel]
   name: String!
@@ -1257,6 +1258,34 @@ type Issue {
   status: StatusType!
   topic: String
   updatedAt: Date
+}
+
+type IssueConnection implements ConnectionInterface {
+  issues: [IssueModel]
+  pageInfo: PaginationPageInfo
+  totalPages: Int
+}
+
+input IssueConnectionFilterInput {
+  endDate: String
+  label: String
+  offset: Int!
+  orderBy: IssueConnectionOrderByInput
+  perPage: Int! = 10
+  search: String
+  startDate: String
+  topicStrings: [String!]
+}
+
+"""Sorting of IssueConnection"""
+input IssueConnectionOrderByInput {
+  by: IssueConnectionOrderType!
+  desc: Boolean = true
+}
+
+"""Fields to order IssueConnection by."""
+enum IssueConnectionOrderType {
+  issue
 }
 
 """Filter input for Issues"""

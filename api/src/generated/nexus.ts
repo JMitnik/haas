@@ -502,6 +502,20 @@ export interface NexusGenInputs {
     email: string; // String!
     roleId: string; // String!
   }
+  IssueConnectionFilterInput: { // input type
+    endDate?: string | null; // String
+    label?: string | null; // String
+    offset: number; // Int!
+    orderBy?: NexusGenInputs['IssueConnectionOrderByInput'] | null; // IssueConnectionOrderByInput
+    perPage: number; // Int!
+    search?: string | null; // String
+    startDate?: string | null; // String
+    topicStrings?: string[] | null; // [String!]
+  }
+  IssueConnectionOrderByInput: { // input type
+    by: NexusGenEnums['IssueConnectionOrderType']; // IssueConnectionOrderType!
+    desc: boolean | null; // Boolean
+  }
   IssueFilterInput: { // input type
     dialogueStrings?: string[] | null; // [String!]
     endDate?: string | null; // String
@@ -840,6 +854,7 @@ export interface NexusGenEnums {
   DialogueTemplateType: prisma.DialogueTemplateType
   FormNodeFieldTypeEnum: "contacts" | "email" | "longText" | "number" | "phoneNumber" | "shortText" | "url"
   FormNodeStepType: prisma.FormNodeStepType
+  IssueConnectionOrderType: "issue"
   JobProcessLocationType: prisma.JobProcessLocationType
   JobStatusType: prisma.JobStatusType
   LanguageEnumType: "DUTCH" | "ENGLISH" | "GERMAN"
@@ -1181,6 +1196,11 @@ export interface NexusGenObjects {
     didInvite?: boolean | null; // Boolean
   }
   Issue: prisma.Issue;
+  IssueConnection: { // root type
+    issues?: Array<NexusGenRootTypes['IssueModel'] | null> | null; // [IssueModel]
+    pageInfo?: NexusGenRootTypes['PaginationPageInfo'] | null; // PaginationPageInfo
+    totalPages?: number | null; // Int
+  }
   IssueModel: { // root type
     createdAt?: NexusGenScalars['Date'] | null; // Date
     id?: string | null; // ID
@@ -1469,7 +1489,7 @@ export interface NexusGenObjects {
 }
 
 export interface NexusGenInterfaces {
-  ConnectionInterface: NexusGenRootTypes['AutomationConnection'] | NexusGenRootTypes['DeliveryConnectionType'] | NexusGenRootTypes['DialogueConnection'] | NexusGenRootTypes['PublicDialogueConnection'] | NexusGenRootTypes['SessionConnection'] | NexusGenRootTypes['UserConnection'];
+  ConnectionInterface: NexusGenRootTypes['AutomationConnection'] | NexusGenRootTypes['DeliveryConnectionType'] | NexusGenRootTypes['DialogueConnection'] | NexusGenRootTypes['IssueConnection'] | NexusGenRootTypes['PublicDialogueConnection'] | NexusGenRootTypes['SessionConnection'] | NexusGenRootTypes['UserConnection'];
   DeprecatedConnectionInterface: NexusGenRootTypes['AutodeckConnectionType'] | NexusGenRootTypes['RoleConnection'] | NexusGenRootTypes['TriggerConnectionType'];
 }
 
@@ -1693,6 +1713,7 @@ export interface NexusGenFieldTypes {
     dialogues: Array<NexusGenRootTypes['Dialogue'] | null> | null; // [Dialogue]
     id: string | null; // ID
     isDemo: boolean | null; // Boolean
+    issueConnection: NexusGenRootTypes['IssueConnection'] | null; // IssueConnection
     issueTopics: Array<NexusGenRootTypes['Issue'] | null> | null; // [Issue]
     issues: Array<NexusGenRootTypes['IssueModel'] | null> | null; // [IssueModel]
     name: string; // String!
@@ -1930,6 +1951,11 @@ export interface NexusGenFieldTypes {
     status: NexusGenEnums['StatusType']; // StatusType!
     topic: string | null; // String
     updatedAt: NexusGenScalars['Date'] | null; // Date
+  }
+  IssueConnection: { // field return type
+    issues: Array<NexusGenRootTypes['IssueModel'] | null> | null; // [IssueModel]
+    pageInfo: NexusGenRootTypes['PaginationPageInfo'] | null; // PaginationPageInfo
+    totalPages: number | null; // Int
   }
   IssueModel: { // field return type
     actionables: Array<NexusGenRootTypes['Actionable'] | null>; // [Actionable]!
@@ -2648,6 +2674,7 @@ export interface NexusGenFieldTypeNames {
     dialogues: 'Dialogue'
     id: 'ID'
     isDemo: 'Boolean'
+    issueConnection: 'IssueConnection'
     issueTopics: 'Issue'
     issues: 'IssueModel'
     name: 'String'
@@ -2885,6 +2912,11 @@ export interface NexusGenFieldTypeNames {
     status: 'StatusType'
     topic: 'String'
     updatedAt: 'Date'
+  }
+  IssueConnection: { // field return type name
+    issues: 'IssueModel'
+    pageInfo: 'PaginationPageInfo'
+    totalPages: 'Int'
   }
   IssueModel: { // field return type name
     actionables: 'Actionable'
@@ -3412,6 +3444,9 @@ export interface NexusGenArgTypes {
     dialogues: { // args
       filter?: NexusGenInputs['DialogueFilterInputType'] | null; // DialogueFilterInputType
     }
+    issueConnection: { // args
+      filter?: NexusGenInputs['IssueConnectionFilterInput'] | null; // IssueConnectionFilterInput
+    }
     issueTopics: { // args
       input?: NexusGenInputs['IssueFilterInput'] | null; // IssueFilterInput
     }
@@ -3838,7 +3873,7 @@ export interface NexusGenArgTypes {
 }
 
 export interface NexusGenAbstractTypeMembers {
-  ConnectionInterface: "AutomationConnection" | "DeliveryConnectionType" | "DialogueConnection" | "PublicDialogueConnection" | "SessionConnection" | "UserConnection"
+  ConnectionInterface: "AutomationConnection" | "DeliveryConnectionType" | "DialogueConnection" | "IssueConnection" | "PublicDialogueConnection" | "SessionConnection" | "UserConnection"
   DeprecatedConnectionInterface: "AutodeckConnectionType" | "RoleConnection" | "TriggerConnectionType"
 }
 
@@ -3847,6 +3882,7 @@ export interface NexusGenTypeInterfaces {
   AutomationConnection: "ConnectionInterface"
   DeliveryConnectionType: "ConnectionInterface"
   DialogueConnection: "ConnectionInterface"
+  IssueConnection: "ConnectionInterface"
   PublicDialogueConnection: "ConnectionInterface"
   RoleConnection: "DeprecatedConnectionInterface"
   SessionConnection: "ConnectionInterface"

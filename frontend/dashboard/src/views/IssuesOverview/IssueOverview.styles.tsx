@@ -1,4 +1,6 @@
 import * as UI from '@haas/ui';
+import { ActionableState } from 'types/generated-types';
+import React from 'react';
 import styled, { css } from 'styled-components';
 
 export const UrgentContainer = styled(UI.Div) <{ hasUrgent?: boolean }>`
@@ -18,7 +20,51 @@ export const UrgentContainer = styled(UI.Div) <{ hasUrgent?: boolean }>`
       background: ${theme.colors.red[100]};
       color: ${theme.colors.red[500]};
     `}
-   
-
   `}
 `;
+
+interface StatusContainerProps {
+  status: ActionableState;
+}
+
+export const StatusContainer = styled(UI.Div) <StatusContainerProps>`
+  ${({ theme, status }) => css`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: ${theme.borderRadiuses.sm}px;
+    font-weight: 700;
+    padding: 5px;
+    text-align: center;
+
+    ${(status === ActionableState.Unverified || status === ActionableState.Dropped) && css`
+      background: ${theme.colors.gray[100]};
+      color: ${theme.colors.gray[500]};
+    `}
+
+    ${status === ActionableState.Pending && css`
+      background: ${theme.colors.orange[100]};
+      color: ${theme.colors.orange[500]};
+    `}
+
+    ${status === ActionableState.Completed && css`
+      background: ${theme.colors.green[100]};
+      color: ${theme.colors.green[500]};
+    `}
+
+    ${status === ActionableState.Stale && css`
+      background: ${theme.colors.red[100]};
+      color: ${theme.colors.red[500]};
+    `}
+  `}
+`;
+
+interface StatusBoxProps {
+  status: ActionableState;
+}
+
+export const StatusBox = ({ status }: StatusBoxProps) => (
+  <StatusContainer status={status}>
+    {status}
+  </StatusContainer>
+);

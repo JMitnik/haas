@@ -23,7 +23,7 @@ import * as Table from 'components/Common/Table';
 import { DateFormat, useDate } from 'hooks/useDate';
 import {
   GetWorkspaceIssuesQuery,
-  GetWorkspaceSessions, IssueFragmentFragment,
+  GetWorkspaceSessions, IssueConnectionOrderType, IssueFragmentFragment,
   SessionConnectionOrder,
   SessionFragmentFragment,
   useGetWorkspaceIssuesQuery,
@@ -42,6 +42,7 @@ import SearchBar from 'components/Common/SearchBar/SearchBar';
 
 import { ContactableUserCell } from './InteractionTableCells';
 import { InteractionModalCard } from '../InteractionsOverview/InteractionModalCard';
+import { IssueModalCard } from './IssueModalCard';
 import { UrgentContainer } from './IssueOverview.styles';
 
 const DateCell = ({ timestamp }: { timestamp: string }) => {
@@ -78,7 +79,7 @@ export const IssuesOverview = () => {
   const { activeCustomer } = useCustomer();
   const { formatScore } = useFormatter();
 
-  const [modalIsOpen, setModalIsOpen] = useState({ isOpen: false, sessionId: '' });
+  const [modalIsOpen, setModalIsOpen] = useState({ isOpen: false, issueId: '' });
   const [sessions, setSessions] = useState<SessionFragmentFragment[]>(() => []);
   const [issues, setIssues] = useState<IssueFragmentFragment[]>(() => []);
 
@@ -88,8 +89,8 @@ export const IssuesOverview = () => {
     search: StringParam,
     pageIndex: withDefault(NumberParam, 0),
     perPage: withDefault(NumberParam, 10),
-    orderByField: withDefault(StringParam, SessionConnectionOrder.CreatedAt),
-    orderByDescending: withDefault(BooleanParam, true),
+    orderByField: withDefault(StringParam, IssueConnectionOrderType.Issue),
+    orderByDescending: withDefault(BooleanParam, false),
     topicStrings: ArrayParam,
     dialogueIds: ArrayParam,
     minScore: withDefault(NumberParam, 0),
@@ -103,6 +104,13 @@ export const IssuesOverview = () => {
     variables: {
       workspaceId: activeCustomer?.id as string,
       filter: {
+        perPage: filter.perPage,
+        offset: filter.pageIndex * filter.perPage,
+        orderBy: {
+          by: filter.orderByField as IssueConnectionOrderType,
+          desc: filter.orderByDescending,
+        },
+        search: filter.search,
         startDate: filter.startDate ? filter.startDate : undefined,
         endDate: filter.endDate ? filter.endDate : undefined,
         topicStrings: filter.topicStrings?.filter(isPresent) || [],
@@ -111,11 +119,10 @@ export const IssuesOverview = () => {
     errorPolicy: 'ignore',
     onCompleted: (fetchedData) => {
       setIssues(
-        fetchedData?.customer?.issues as IssueFragmentFragment[] || [],
+        fetchedData?.customer?.issueConnection?.issues as IssueFragmentFragment[] || [],
       );
 
-      // setTotalPages(fetchedData?.customer?.sessionConnection?.totalPages || 0);
-      setTotalPages(0);
+      setTotalPages(fetchedData?.customer?.issueConnection?.totalPages || 0);
     },
   });
 
@@ -344,7 +351,7 @@ export const IssuesOverview = () => {
               {t('urgent')}
             </Table.HeadingCell>
             <Table.HeadingCell>
-              {t('teams')}
+              {t('groups')}
             </Table.HeadingCell>
           </Table.HeadingRow>
           <UI.Div>
@@ -451,7 +458,7 @@ export const IssuesOverview = () => {
               <Table.Row
                 isLoading={isLoading}
                 onClick={() => {
-                  setModalIsOpen({ isOpen: true, sessionId: issue.id as string });
+                  setModalIsOpen({ isOpen: true, issueId: issue.id as string });
                 }}
                 gridTemplateColumns={columns}
                 key={issue.id}
@@ -485,7 +492,7 @@ export const IssuesOverview = () => {
                     <UI.Span ml="0.5em" fontWeight={600}>
                       {issue.basicStats?.urgentCount}
                       {' '}
-                      urgent
+                      URGENT
                     </UI.Span>
                   </UrgentContainer>
 
@@ -496,7 +503,7 @@ export const IssuesOverview = () => {
                     {' '}
                     {issue.teamCount}
                     {' '}
-                    team(s)
+                    group(s)
                   </UI.Span>
                 </Table.Cell>
               </Table.Row>
@@ -514,9 +521,9 @@ export const IssuesOverview = () => {
             )}
           </UI.Flex>
         </UI.Div>
-        <Modal.Root onClose={() => setModalIsOpen({ isOpen: false, sessionId: '' })} open={modalIsOpen.isOpen}>
-          <InteractionModalCard
-            sessionId={modalIsOpen.sessionId}
+        <Modal.Root onClose={() => setModalIsOpen({ isOpen: false, issueId: '' })} open={modalIsOpen.isOpen}>
+          <IssueModalCard
+            issueId={modalIsOpen.issueId}
           />
         </Modal.Root>
       </UI.ViewBody>

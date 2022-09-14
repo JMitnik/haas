@@ -690,6 +690,7 @@ export type Customer = {
   sessionConnection?: Maybe<SessionConnection>;
   /** Workspace statistics */
   statistics?: Maybe<WorkspaceStatistics>;
+  issueConnection?: Maybe<IssueConnection>;
   issues?: Maybe<Array<Maybe<IssueModel>>>;
   issueTopics?: Maybe<Array<Maybe<Issue>>>;
   dialogueConnection?: Maybe<DialogueConnection>;
@@ -715,6 +716,11 @@ export type Customer = {
 
 export type CustomerSessionConnectionArgs = {
   filter?: Maybe<SessionConnectionFilterInput>;
+};
+
+
+export type CustomerIssueConnectionArgs = {
+  filter?: Maybe<IssueConnectionFilterInput>;
 };
 
 
@@ -1459,6 +1465,35 @@ export type Issue = {
   createdAt?: Maybe<Scalars['Date']>;
   updatedAt?: Maybe<Scalars['Date']>;
 };
+
+export type IssueConnection = ConnectionInterface & {
+  __typename?: 'IssueConnection';
+  totalPages?: Maybe<Scalars['Int']>;
+  pageInfo?: Maybe<PaginationPageInfo>;
+  issues?: Maybe<Array<Maybe<IssueModel>>>;
+};
+
+export type IssueConnectionFilterInput = {
+  label?: Maybe<Scalars['String']>;
+  search?: Maybe<Scalars['String']>;
+  startDate?: Maybe<Scalars['String']>;
+  endDate?: Maybe<Scalars['String']>;
+  topicStrings?: Maybe<Array<Scalars['String']>>;
+  orderBy?: Maybe<IssueConnectionOrderByInput>;
+  offset: Scalars['Int'];
+  perPage?: Scalars['Int'];
+};
+
+/** Sorting of IssueConnection */
+export type IssueConnectionOrderByInput = {
+  by: IssueConnectionOrderType;
+  desc?: Maybe<Scalars['Boolean']>;
+};
+
+/** Fields to order IssueConnection by. */
+export enum IssueConnectionOrderType {
+  Issue = 'issue'
+}
 
 /** Filter input for Issues */
 export type IssueFilterInput = {
@@ -4305,19 +4340,19 @@ export type GetIssueQuery = (
     & Pick<IssueModel, 'id' | 'topicId'>
     & { topic: (
       { __typename?: 'Topic' }
-      & Pick<Topic, 'name'>
+      & Pick<Topic, 'id' | 'name'>
     ), actionables: Array<Maybe<(
       { __typename?: 'Actionable' }
-      & Pick<Actionable, 'createdAt' | 'status'>
+      & Pick<Actionable, 'id' | 'createdAt' | 'isUrgent' | 'dialogueId' | 'status'>
       & { session?: Maybe<(
         { __typename?: 'Session' }
         & Pick<Session, 'id' | 'mainScore'>
       )>, dialogue?: Maybe<(
         { __typename?: 'Dialogue' }
-        & Pick<Dialogue, 'title'>
+        & Pick<Dialogue, 'id' | 'title' | 'slug'>
       )>, assignee?: Maybe<(
         { __typename?: 'UserType' }
-        & Pick<UserType, 'email'>
+        & Pick<UserType, 'id' | 'email'>
       )> }
     )>> }
   )> }
@@ -4325,7 +4360,7 @@ export type GetIssueQuery = (
 
 export type GetWorkspaceIssuesQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
-  filter?: Maybe<IssueFilterInput>;
+  filter?: Maybe<IssueConnectionFilterInput>;
 }>;
 
 
@@ -4333,10 +4368,17 @@ export type GetWorkspaceIssuesQuery = (
   { __typename?: 'Query' }
   & { customer?: Maybe<(
     { __typename?: 'Customer' }
-    & { issues?: Maybe<Array<Maybe<(
-      { __typename?: 'IssueModel' }
-      & IssueFragmentFragment
-    )>>> }
+    & { issueConnection?: Maybe<(
+      { __typename?: 'IssueConnection' }
+      & Pick<IssueConnection, 'totalPages'>
+      & { issues?: Maybe<Array<Maybe<(
+        { __typename?: 'IssueModel' }
+        & IssueFragmentFragment
+      )>>>, pageInfo?: Maybe<(
+        { __typename?: 'PaginationPageInfo' }
+        & Pick<PaginationPageInfo, 'hasNextPage' | 'hasPrevPage' | 'nextPageOffset' | 'pageIndex' | 'prevPageOffset'>
+      )> }
+    )> }
   )> }
 );
 
@@ -6814,19 +6856,26 @@ export const GetIssueDocument = gql`
     id
     topicId
     topic {
+      id
       name
     }
     actionables(input: $actionableFilter) {
+      id
       createdAt
+      isUrgent
+      dialogueId
       session {
         id
         mainScore
       }
       dialogue {
+        id
         title
+        slug
       }
       status
       assignee {
+        id
         email
       }
     }
@@ -6866,10 +6915,20 @@ export function refetchGetIssueQuery(variables?: GetIssueQueryVariables) {
       return { query: GetIssueDocument, variables: variables }
     }
 export const GetWorkspaceIssuesDocument = gql`
-    query GetWorkspaceIssues($workspaceId: ID!, $filter: IssueFilterInput) {
+    query GetWorkspaceIssues($workspaceId: ID!, $filter: IssueConnectionFilterInput) {
   customer(id: $workspaceId) {
-    issues(filter: $filter) {
-      ...IssueFragment
+    issueConnection(filter: $filter) {
+      issues {
+        ...IssueFragment
+      }
+      totalPages
+      pageInfo {
+        hasNextPage
+        hasPrevPage
+        nextPageOffset
+        pageIndex
+        prevPageOffset
+      }
     }
   }
 }
@@ -7839,7 +7898,9 @@ export namespace GetWorkspaceIssues {
   export type Variables = GetWorkspaceIssuesQueryVariables;
   export type Query = GetWorkspaceIssuesQuery;
   export type Customer = (NonNullable<GetWorkspaceIssuesQuery['customer']>);
-  export type Issues = NonNullable<(NonNullable<(NonNullable<GetWorkspaceIssuesQuery['customer']>)['issues']>)[number]>;
+  export type IssueConnection = (NonNullable<(NonNullable<GetWorkspaceIssuesQuery['customer']>)['issueConnection']>);
+  export type Issues = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceIssuesQuery['customer']>)['issueConnection']>)['issues']>)[number]>;
+  export type PageInfo = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceIssuesQuery['customer']>)['issueConnection']>)['pageInfo']>);
   export const Document = GetWorkspaceIssuesDocument;
 }
 
