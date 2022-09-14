@@ -27,7 +27,4 @@ export type IssueFilterInput = Modify<NexusGenInputs['IssueFilterInput'], {
   endDate: Date;
 }>;
 
-export type IssueConnectionFilterInput = Modify<NexusGenInputs['IssueConnectionFilterInput'], {
-  startDate: Date;
-  endDate: Date;
-}>;
+export type IssueConnectionFilterInput = NexusGenInputs['IssueConnectionFilterInput'];

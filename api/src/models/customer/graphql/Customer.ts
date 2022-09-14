@@ -22,6 +22,7 @@ import { Issue, IssueFilterInput, IssueModel, IssueConnectionFilterInput, IssueC
 import { IssueValidator } from '../../Issue/IssueValidator';
 import { SessionConnectionFilterInput } from '../../../models/session/graphql';
 import { SessionConnection } from '../../session/graphql/Session.graphql'
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -96,8 +97,8 @@ export const CustomerType = objectType({
       type: IssueConnection,
       args: { filter: IssueConnectionFilterInput },
       resolve: async (parent, args, { services }) => {
-        const filter = IssueValidator.resolveIssueConnectionFilter(args.filter);
-        return await services.issueService.paginatedIssues(parent.id, filter);
+        if (!args.filter) throw new GraphQLYogaError('No filter provided!');
+        return await services.issueService.paginatedIssues(parent.id, args.filter);
       },
     });
 

@@ -23,6 +23,8 @@ import { ChangeableEmailContainer, StatusBox } from './IssueOverview.styles';
 interface InteractionModalCardProps {
   issueId: string;
   userEntries: TargetEntry[];
+  startDate?: string;
+  endDate?: string;
 }
 
 const DateCell = ({ timestamp }: { timestamp: string }) => {
@@ -39,7 +41,7 @@ const DateCell = ({ timestamp }: { timestamp: string }) => {
   );
 };
 
-export const IssueModalCard = ({ issueId, userEntries }: InteractionModalCardProps) => {
+export const IssueModalCard = ({ issueId, userEntries, endDate, startDate }: InteractionModalCardProps) => {
   const { t } = useTranslation();
   const { formatScore } = useFormatter();
   const { parse, format: dateFormat, getStartOfWeek, getNWeekAgo, getEndOfWeek } = useDate();
@@ -47,8 +49,8 @@ export const IssueModalCard = ({ issueId, userEntries }: InteractionModalCardPro
   const [totalPages, setTotalPages] = useState<number>(0);
 
   const [filter, setFilter] = useQueryParams({
-    startDate: withDefault(StringParam, dateFormat(getStartOfWeek(getNWeekAgo(0)), DateFormat.DayTimeFormat)),
-    endDate: withDefault(StringParam, dateFormat(getEndOfWeek(new Date()), DateFormat.DayTimeFormat)),
+    startDate: withDefault(StringParam, startDate),
+    endDate: withDefault(StringParam, endDate),
     search: StringParam,
     pageIndex: withDefault(NumberParam, 0),
     perPage: withDefault(NumberParam, 2),
@@ -108,8 +110,8 @@ export const IssueModalCard = ({ issueId, userEntries }: InteractionModalCardPro
     } else {
       setFilter({
         ...filter,
-        startDate: null,
-        endDate: null,
+        startDate: undefined,
+        endDate: undefined,
         pageIndex: 0,
       });
     }

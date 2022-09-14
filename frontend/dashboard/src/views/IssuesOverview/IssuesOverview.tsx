@@ -3,7 +3,7 @@
 /* eslint-disable radix */
 import '@szhsin/react-menu/dist/index.css';
 import * as UI from '@haas/ui';
-import { AlertTriangle, AlignLeft, BarChart2, Calendar, Filter, Plus, Search, User } from 'react-feather';
+import { AlertTriangle, BarChart2, Calendar, Plus, Search } from 'react-feather';
 import {
   ArrayParam,
   BooleanParam,
@@ -17,63 +17,25 @@ import { isPresent } from 'ts-is-present';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
-import * as Menu from 'components/Common/Menu';
 import * as Modal from 'components/Common/Modal';
 import * as Table from 'components/Common/Table';
 import { DateFormat, useDate } from 'hooks/useDate';
 import {
-  GetWorkspaceIssuesQuery,
-  GetWorkspaceSessions, IssueConnectionOrderType, IssueFragmentFragment,
-  SessionConnectionOrder,
-  SessionFragmentFragment,
+  IssueConnectionOrderType, IssueFragmentFragment,
   useGetUsersAndRolesQuery,
   useGetWorkspaceIssuesQuery,
-  useGetWorkspaceSessionsQuery,
 } from 'types/generated-types';
 import { PickerButton } from 'components/Common/Picker/PickerButton';
 import { ScoreBox } from 'components/ScoreBox';
 import { TabbedMenu } from 'components/Common/TabMenu';
 import { View } from 'layouts/View';
-import { formatSimpleDate } from 'utils/dateUtils';
-import { getMainTopicValue } from 'components/Session/Session.helpers';
+import { mapToUserPickerEntries } from 'views/AddAutomationView/AutomationForm.helpers';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useFormatter } from 'hooks/useFormatter';
-import { useMenu } from 'components/Common/Menu/useMenu';
 import SearchBar from 'components/Common/SearchBar/SearchBar';
 
-import { mapToUserPickerEntries } from 'views/AddAutomationView/AutomationForm.helpers';
-import { ContactableUserCell } from './InteractionTableCells';
-import { InteractionModalCard } from '../InteractionsOverview/InteractionModalCard';
 import { IssueModalCard } from './IssueModalCard';
 import { UrgentContainer } from './IssueOverview.styles';
-
-const DateCell = ({ timestamp }: { timestamp: string }) => {
-  const date = new Date(parseInt(timestamp, 10));
-
-  const formattedDate = format(date, 'd MMM yyyy');
-  const formattedTimestamp = format(date, 'HH:mm');
-
-  return (
-    <UI.ColumnFlex>
-      <UI.Helper>{formattedDate}</UI.Helper>
-      <UI.Span color="gray.400" fontWeight={600}>{formattedTimestamp}</UI.Span>
-    </UI.ColumnFlex>
-  );
-};
-
-interface DistributionInnerCellProps {
-  session: SessionFragmentFragment;
-}
-
-const DistributionInnerCell = ({ session }: DistributionInnerCellProps) => (
-  <UI.Div>
-    <Table.InnerCell>
-      <UI.Helper color="gray.500">
-        {session.dialogue?.title}
-      </UI.Helper>
-    </Table.InnerCell>
-  </UI.Div>
-);
 
 export const IssuesOverview = () => {
   const { t } = useTranslation();
@@ -82,12 +44,11 @@ export const IssuesOverview = () => {
   const { formatScore } = useFormatter();
 
   const [modalIsOpen, setModalIsOpen] = useState({ isOpen: false, issueId: '' });
-  const [sessions, setSessions] = useState<SessionFragmentFragment[]>(() => []);
   const [issues, setIssues] = useState<IssueFragmentFragment[]>(() => []);
 
   const [filter, setFilter] = useQueryParams({
-    startDate: withDefault(StringParam, dateFormat(getStartOfWeek(getNWeekAgo(0)), DateFormat.DayTimeFormat)),
-    endDate: withDefault(StringParam, dateFormat(getEndOfWeek(new Date()), DateFormat.DayTimeFormat)),
+    startDate: StringParam,
+    endDate: StringParam,
     search: StringParam,
     pageIndex: withDefault(NumberParam, 0),
     perPage: withDefault(NumberParam, 10),
@@ -123,7 +84,6 @@ export const IssuesOverview = () => {
       console.log(e.message);
     },
     onCompleted: (fetchedData) => {
-      console.log('fetched: ', fetchedData?.customer?.issueConnection?.issues);
       setIssues(
         fetchedData?.customer?.issueConnection?.issues as IssueFragmentFragment[] || [],
       );
@@ -152,8 +112,8 @@ export const IssuesOverview = () => {
     } else {
       setFilter({
         ...filter,
-        startDate: null,
-        endDate: null,
+        startDate: undefined,
+        endDate: undefined,
         pageIndex: 0,
       });
     }
@@ -287,27 +247,7 @@ export const IssuesOverview = () => {
                 value={`${filter.startDate ? format(parse(filter.startDate, DateFormat.DayTimeFormat), DateFormat.DayFormat) : 'N/A'} - ${filter.endDate ? format(parse(filter.endDate, DateFormat.DayTimeFormat), DateFormat.DayFormat) : 'N/A'}`}
                 onClose={() => setFilter({ startDate: undefined, endDate: undefined })}
               />
-              <Table.FilterButton
-                condition={!!filter.dialogueIds?.length}
-                filterKey="team"
-                value={`${!!filter.dialogueIds?.length && filter?.dialogueIds?.length > 1
-                  ? 'Multiple teams'
-                  : sessions.find((session) => session.dialogueId === filter.dialogueIds?.[0])?.dialogue?.title}`}
-                onClose={() => setFilter({ dialogueIds: [] })}
-              />
-              <Table.FilterButton
-                condition={filter.minScore > 0 || filter.maxScore < 100}
-                filterKey="score"
-                value={`${formatScore(filter.minScore)} - ${formatScore(filter.maxScore)}`}
-                onClose={() => setFilter({ minScore: 0, maxScore: 100 })}
-              />
 
-              <Table.FilterButton
-                condition={filter.withFollowUpAction}
-                filterKey="show"
-                value="urgent only"
-                onClose={() => setFilter({ withFollowUpAction: false })}
-              />
             </UI.Stack>
 
           </UI.Flex>

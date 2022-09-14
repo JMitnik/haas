@@ -517,13 +517,13 @@ export interface NexusGenInputs {
     roleId: string; // String!
   }
   IssueConnectionFilterInput: { // input type
-    endDate?: string | null; // String
+    endDate?: NexusGenScalars['DateString'] | null; // DateString
     label?: string | null; // String
     offset: number; // Int!
     orderBy?: NexusGenInputs['IssueConnectionOrderByInput'] | null; // IssueConnectionOrderByInput
     perPage: number; // Int!
     search?: string | null; // String
-    startDate?: string | null; // String
+    startDate?: NexusGenScalars['DateString'] | null; // DateString
     topicStrings?: string[] | null; // [String!]
   }
   IssueConnectionOrderByInput: { // input type

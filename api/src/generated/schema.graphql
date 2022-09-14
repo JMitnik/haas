@@ -1295,13 +1295,13 @@ type IssueConnection implements ConnectionInterface {
 }
 
 input IssueConnectionFilterInput {
-  endDate: String
+  endDate: DateString
   label: String
   offset: Int!
   orderBy: IssueConnectionOrderByInput
   perPage: Int! = 10
   search: String
-  startDate: String
+  startDate: DateString
   topicStrings: [String!]
 }
 

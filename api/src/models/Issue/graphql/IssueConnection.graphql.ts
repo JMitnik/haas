@@ -26,8 +26,8 @@ export const IssueConnectionFilterInput = inputObjectType({
     // Pre-filter
     t.string('label');
     t.string('search')
-    t.string('startDate');
-    t.string('endDate');
+    t.dateString('startDate');
+    t.dateString('endDate');
 
     /** Fragments of the topic which should constitute the relevant filter */
     t.list.nonNull.string('topicStrings');
