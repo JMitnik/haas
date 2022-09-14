@@ -28,23 +28,14 @@ export class IssueService {
    * Retrieves all workspace issues. This can be filtered, based on the required filter (startDate, endDate).
    * @param workspaceId Workspace ID
    */
-  public async getProblemDialoguesByWorkspace(workspaceId: string, filter: IssueFilterInput): Promise<Issue[]> {
+  public async getProblemDialoguesByWorkspace(
+    workspaceId: string,
+    filter: IssueFilterInput,
+    userId: string): Promise<Issue[]> {
     const dialogues = await this.countNegativeInteractionsPerDialogue(
-      workspaceId, filter.startDate, filter.endDate, filter
+      workspaceId, filter.startDate, filter.endDate, userId, filter
     );
     const issues = orderBy(this.calculateDialogueIssueScore(dialogues), (topic) => topic.rankScore, 'desc');
-
-    // Filter out topics that are candidate issues.
-    return issues;
-  }
-
-  /**
-   * Retrieves all workspace issues. This can be filtered, based on the required filter (startDate, endDate).
-   * @param workspaceId Workspace ID
-   */
-  public async getWorkspaceIssues(workspaceId: string, filter: IssueFilterInput): Promise<Issue[]> {
-    const topics = await this.topicService.countWorkspaceTopics(workspaceId, filter.startDate, filter.endDate, filter);
-    const issues = orderBy(this.extractIssues(topics), (topic) => topic.rankScore, 'desc');
 
     // Filter out topics that are candidate issues.
     return issues;
@@ -69,17 +60,32 @@ export class IssueService {
   }
 
   /**
+   * Retrieves all workspace issues. This can be filtered, based on the required filter (startDate, endDate).
+   * @param workspaceId Workspace ID
+   */
+  public async getWorkspaceIssues(workspaceId: string, filter: IssueFilterInput, userId: string): Promise<Issue[]> {
+    const topics = await this.topicService.countWorkspaceTopics(
+      workspaceId, filter.startDate, filter.endDate, userId, filter
+    );
+    const issues = orderBy(this.extractIssues(topics), (topic) => topic.rankScore, 'desc');
+
+    // Filter out topics that are candidate issues.
+    return issues;
+  }
+
+  /**
    * Count negative interactions and their frequencies per dialogue within a workspace.
    */
   async countNegativeInteractionsPerDialogue(
     workspaceId: string,
     startDate: Date,
     endDate: Date,
+    userId: string,
     topicFilter?: TopicFilterInput
   ): Promise<TopicStatisticsByDialogueId> {
     const dialogueIds = (
       await this.workspaceService.getDialogues(
-        workspaceId, topicFilter?.dialogueStrings || undefined
+        workspaceId, userId, topicFilter?.dialogueStrings || undefined
       )
     ).map(dialogue => dialogue.id);
 

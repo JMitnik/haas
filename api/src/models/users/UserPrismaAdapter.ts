@@ -90,6 +90,33 @@ class UserPrismaAdapter {
    * @param input
    * @returns
    */
+  updateDialogueAssignmentOfUser = async (input: NexusGenInputs['AssignUserToDialogueInput']) => {
+    return this.prisma.user.update({
+      where: {
+        id: input?.userId,
+      },
+      data: {
+        isAssignedTo: {
+          disconnect: !input.state ? {
+            id: input.dialogueId,
+          } : undefined,
+          connect: input.state ? {
+            id: input.dialogueId,
+          } : undefined,
+        },
+      },
+      include: {
+        isAssignedTo: true,
+      },
+    });
+  }
+
+  /**
+   * Adjusts the dialogue privacy settings of a user based on the input. The input consits one list of dialogue ids
+   * which should be disconnected and another which should be connected to the user
+   * @param input
+   * @returns
+   */
   updateUserPrivateDialogues = async (input: NexusGenInputs['AssignUserToDialoguesInput']) => {
     const user = await this.prisma.user.findUnique({
       where: {

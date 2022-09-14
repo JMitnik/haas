@@ -334,4 +334,98 @@ describe('GenerateWorkspaceFromCSV resolver', () => {
       expect(admins).toHaveLength(1);
     });
   });
+
+  it('Generate workspace with private dialogues', async () => {
+    const user = await createSuperAdmin(prisma);
+
+    // Generate token for API access
+    const token = AuthService.createUserToken(user.id, 22);
+    const file = createReadStream(`${__dirname}/groupCsv.csv`);
+    file.addListener('end', async () => {
+      const res = await ctx.client.request(Mutation,
+        {
+          input: {
+            uploadedCsv: file,
+            workspaceSlug: 'newWorkspaceSlug',
+            workspaceTitle: 'newWorkspaceTitle',
+            managerCsv: undefined,
+            makeDialoguesPrivate: true,
+            type: DialogueTemplateType.SPORT_ENG,
+            generateDemoData: false,
+            isDemo: false,
+          },
+        },
+        {
+          'Authorization': `Bearer ${token}`,
+        }
+      );
+
+      // Verify whether demo workspace is generated or not
+      expect(res).toMatchObject({
+        generateWorkspaceFromCSV: {
+          slug: 'newWorkspaceSlug',
+          isDemo: true,
+        },
+      });
+
+      // Check if all 9 entries in group CSV are generated
+      const workspaceId = res.generateWorkspaceFromCSV.id;
+      const dialogues = await prisma.dialogue.findMany({
+        where: {
+          customerId: workspaceId,
+        },
+      });
+      expect(dialogues).toHaveLength(9);
+
+      // Check whether correct privacy settings are set for dialogues
+      expect(dialogues[0]?.isPrivate).toBeTruthy();
+    });
+  });
+
+  it('Generate workspace with public dialogues', async () => {
+    const user = await createSuperAdmin(prisma);
+
+    // Generate token for API access
+    const token = AuthService.createUserToken(user.id, 22);
+    const file = createReadStream(`${__dirname}/groupCsv.csv`);
+    file.addListener('end', async () => {
+      const res = await ctx.client.request(Mutation,
+        {
+          input: {
+            uploadedCsv: file,
+            workspaceSlug: 'newWorkspaceSlug',
+            workspaceTitle: 'newWorkspaceTitle',
+            managerCsv: undefined,
+            makeDialoguesPrivate: false,
+            type: DialogueTemplateType.SPORT_ENG,
+            generateDemoData: false,
+            isDemo: false,
+          },
+        },
+        {
+          'Authorization': `Bearer ${token}`,
+        }
+      );
+
+      // Verify whether demo workspace is generated or not
+      expect(res).toMatchObject({
+        generateWorkspaceFromCSV: {
+          slug: 'newWorkspaceSlug',
+          isDemo: true,
+        },
+      });
+
+      // Check if all 9 entries in group CSV are generated
+      const workspaceId = res.generateWorkspaceFromCSV.id;
+      const dialogues = await prisma.dialogue.findMany({
+        where: {
+          customerId: workspaceId,
+        },
+      });
+      expect(dialogues).toHaveLength(9);
+
+      // Check whether correct privacy settings are set for dialogues
+      expect(dialogues[0]?.isPrivate).toBe(false);
+    });
+  });
 })

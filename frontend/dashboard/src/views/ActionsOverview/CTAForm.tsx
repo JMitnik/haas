@@ -335,8 +335,6 @@ const CTAForm = ({
     onCancel?.();
   };
 
-  console.log('Errors: ', form.formState.errors);
-
   return (
     <FormProvider {...form}>
       <FormContainer expandedForm>

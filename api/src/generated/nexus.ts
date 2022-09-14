@@ -65,6 +65,12 @@ export interface NexusGenInputs {
     nodeId?: string | null; // String
     sessionId?: string | null; // ID
   }
+  AssignUserToDialogueInput: { // input type
+    dialogueId: string; // String!
+    state: boolean; // Boolean!
+    userId: string; // String!
+    workspaceId: string; // String!
+  }
   AssignUserToDialoguesInput: { // input type
     assignedDialogueIds?: string[] | null; // [String!]
     userId: string; // String!
@@ -455,6 +461,7 @@ export interface NexusGenInputs {
   GenerateWorkspaceCSVInputType: { // input type
     generateDemoData?: boolean | null; // Boolean
     isDemo: boolean; // Boolean!
+    makeDialoguesPrivate?: boolean | null; // Boolean
     managerCsv?: NexusGenScalars['Upload'] | null; // Upload
     type: string; // String!
     uploadedCsv?: NexusGenScalars['Upload'] | null; // Upload
@@ -1950,6 +1957,7 @@ export interface NexusGenFieldTypes {
   Mutation: { // field return type
     appendToInteraction: NexusGenRootTypes['Session'] | null; // Session
     assignTags: NexusGenRootTypes['Dialogue'] | null; // Dialogue
+    assignUserToDialogue: NexusGenRootTypes['UserType'] | null; // UserType
     assignUserToDialogues: NexusGenRootTypes['UserType'] | null; // UserType
     authenticateLambda: string | null; // String
     confirmCreateWorkspaceJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
@@ -2874,6 +2882,7 @@ export interface NexusGenFieldTypeNames {
   Mutation: { // field return type name
     appendToInteraction: 'Session'
     assignTags: 'Dialogue'
+    assignUserToDialogue: 'UserType'
     assignUserToDialogues: 'UserType'
     authenticateLambda: 'String'
     confirmCreateWorkspaceJob: 'CreateWorkspaceJobType'
@@ -3409,6 +3418,9 @@ export interface NexusGenArgTypes {
     assignTags: { // args
       dialogueId?: string | null; // String
       tags?: NexusGenInputs['TagsInputObjectType'] | null; // TagsInputObjectType
+    }
+    assignUserToDialogue: { // args
+      input?: NexusGenInputs['AssignUserToDialogueInput'] | null; // AssignUserToDialogueInput
     }
     assignUserToDialogues: { // args
       input?: NexusGenInputs['AssignUserToDialoguesInput'] | null; // AssignUserToDialoguesInput

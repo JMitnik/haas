@@ -49,6 +49,13 @@ export type AppendToInteractionInput = {
   data?: Maybe<NodeEntryDataInput>;
 };
 
+export type AssignUserToDialogueInput = {
+  userId: Scalars['String'];
+  workspaceId: Scalars['String'];
+  dialogueId: Scalars['String'];
+  state: Scalars['Boolean'];
+};
+
 export type AssignUserToDialoguesInput = {
   userId: Scalars['String'];
   workspaceId: Scalars['String'];
@@ -1323,6 +1330,7 @@ export type GenerateWorkspaceCsvInputType = {
   type?: Scalars['String'];
   generateDemoData?: Maybe<Scalars['Boolean']>;
   isDemo?: Scalars['Boolean'];
+  makeDialoguesPrivate?: Maybe<Scalars['Boolean']>;
 };
 
 export type GetAutomationInput = {
@@ -1583,6 +1591,7 @@ export type Mutation = {
   handleUserStateInWorkspace?: Maybe<UserCustomer>;
   editUser?: Maybe<UserType>;
   deleteUser?: Maybe<DeleteUserOutput>;
+  assignUserToDialogue?: Maybe<UserType>;
   assignUserToDialogues?: Maybe<UserType>;
   copyDialogue?: Maybe<Dialogue>;
   createDialogue?: Maybe<Dialogue>;
@@ -1832,6 +1841,11 @@ export type MutationEditUserArgs = {
 
 export type MutationDeleteUserArgs = {
   input?: Maybe<DeleteUserInput>;
+};
+
+
+export type MutationAssignUserToDialogueArgs = {
+  input?: Maybe<AssignUserToDialogueInput>;
 };
 
 
@@ -3934,6 +3948,19 @@ export type GetDialogueLinksQuery = (
   )> }
 );
 
+export type AssignUserToDialogueMutationVariables = Exact<{
+  input?: Maybe<AssignUserToDialogueInput>;
+}>;
+
+
+export type AssignUserToDialogueMutation = (
+  { __typename?: 'Mutation' }
+  & { assignUserToDialogue?: Maybe<(
+    { __typename?: 'UserType' }
+    & Pick<UserType, 'email'>
+  )> }
+);
+
 export type DeleteDialogueMutationVariables = Exact<{
   input?: Maybe<DeleteDialogueInputType>;
 }>;
@@ -3967,7 +3994,10 @@ export type DialogueConnectionQuery = (
       )>, dialogues?: Maybe<Array<Maybe<(
         { __typename?: 'Dialogue' }
         & Pick<Dialogue, 'id' | 'title' | 'isPrivate' | 'template' | 'language' | 'slug' | 'publicTitle' | 'creationDate' | 'updatedAt' | 'customerId' | 'averageScore'>
-        & { customer?: Maybe<(
+        & { assignees?: Maybe<Array<Maybe<(
+          { __typename?: 'UserType' }
+          & Pick<UserType, 'id' | 'firstName' | 'lastName'>
+        )>>>, customer?: Maybe<(
           { __typename?: 'Customer' }
           & Pick<Customer, 'slug'>
         )>, tags?: Maybe<Array<Maybe<(
@@ -3976,6 +4006,27 @@ export type DialogueConnectionQuery = (
         )>>> }
       )>>> }
     )> }
+  )> }
+);
+
+export type GetUsersQueryVariables = Exact<{
+  customerSlug: Scalars['String'];
+}>;
+
+
+export type GetUsersQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { users?: Maybe<Array<Maybe<(
+      { __typename?: 'UserType' }
+      & Pick<UserType, 'id' | 'firstName' | 'lastName'>
+      & { role?: Maybe<(
+        { __typename?: 'RoleType' }
+        & Pick<RoleType, 'id' | 'name'>
+      )> }
+    )>>> }
   )> }
 );
 
@@ -6141,6 +6192,39 @@ export type GetDialogueLinksQueryResult = Apollo.QueryResult<GetDialogueLinksQue
 export function refetchGetDialogueLinksQuery(variables?: GetDialogueLinksQueryVariables) {
       return { query: GetDialogueLinksDocument, variables: variables }
     }
+export const AssignUserToDialogueDocument = gql`
+    mutation assignUserToDialogue($input: AssignUserToDialogueInput) {
+  assignUserToDialogue(input: $input) {
+    email
+  }
+}
+    `;
+export type AssignUserToDialogueMutationFn = Apollo.MutationFunction<AssignUserToDialogueMutation, AssignUserToDialogueMutationVariables>;
+
+/**
+ * __useAssignUserToDialogueMutation__
+ *
+ * To run a mutation, you first call `useAssignUserToDialogueMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAssignUserToDialogueMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [assignUserToDialogueMutation, { data, loading, error }] = useAssignUserToDialogueMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useAssignUserToDialogueMutation(baseOptions?: Apollo.MutationHookOptions<AssignUserToDialogueMutation, AssignUserToDialogueMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AssignUserToDialogueMutation, AssignUserToDialogueMutationVariables>(AssignUserToDialogueDocument, options);
+      }
+export type AssignUserToDialogueMutationHookResult = ReturnType<typeof useAssignUserToDialogueMutation>;
+export type AssignUserToDialogueMutationResult = Apollo.MutationResult<AssignUserToDialogueMutation>;
+export type AssignUserToDialogueMutationOptions = Apollo.BaseMutationOptions<AssignUserToDialogueMutation, AssignUserToDialogueMutationVariables>;
 export const DeleteDialogueDocument = gql`
     mutation deleteDialogue($input: DeleteDialogueInputType) {
   deleteDialogue(input: $input) {
@@ -6201,6 +6285,11 @@ export const DialogueConnectionDocument = gql`
         updatedAt
         customerId
         averageScore
+        assignees {
+          id
+          firstName
+          lastName
+        }
         customer {
           slug
         }
@@ -6245,6 +6334,53 @@ export type DialogueConnectionLazyQueryHookResult = ReturnType<typeof useDialogu
 export type DialogueConnectionQueryResult = Apollo.QueryResult<DialogueConnectionQuery, DialogueConnectionQueryVariables>;
 export function refetchDialogueConnectionQuery(variables?: DialogueConnectionQueryVariables) {
       return { query: DialogueConnectionDocument, variables: variables }
+    }
+export const GetUsersDocument = gql`
+    query getUsers($customerSlug: String!) {
+  customer(slug: $customerSlug) {
+    id
+    users {
+      id
+      firstName
+      lastName
+      role {
+        id
+        name
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetUsersQuery__
+ *
+ * To run a query within a React component, call `useGetUsersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUsersQuery({
+ *   variables: {
+ *      customerSlug: // value for 'customerSlug'
+ *   },
+ * });
+ */
+export function useGetUsersQuery(baseOptions: Apollo.QueryHookOptions<GetUsersQuery, GetUsersQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUsersQuery, GetUsersQueryVariables>(GetUsersDocument, options);
+      }
+export function useGetUsersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUsersQuery, GetUsersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUsersQuery, GetUsersQueryVariables>(GetUsersDocument, options);
+        }
+export type GetUsersQueryHookResult = ReturnType<typeof useGetUsersQuery>;
+export type GetUsersLazyQueryHookResult = ReturnType<typeof useGetUsersLazyQuery>;
+export type GetUsersQueryResult = Apollo.QueryResult<GetUsersQuery, GetUsersQueryVariables>;
+export function refetchGetUsersQuery(variables?: GetUsersQueryVariables) {
+      return { query: GetUsersDocument, variables: variables }
     }
 export const SetDialoguePrivacyDocument = gql`
     mutation setDialoguePrivacy($input: SetDialoguePrivacyInput) {
@@ -7520,6 +7656,13 @@ export namespace GetDialogueLinks {
   export const Document = GetDialogueLinksDocument;
 }
 
+export namespace AssignUserToDialogue {
+  export type Variables = AssignUserToDialogueMutationVariables;
+  export type Mutation = AssignUserToDialogueMutation;
+  export type AssignUserToDialogue = (NonNullable<AssignUserToDialogueMutation['assignUserToDialogue']>);
+  export const Document = AssignUserToDialogueDocument;
+}
+
 export namespace DeleteDialogue {
   export type Variables = DeleteDialogueMutationVariables;
   export type Mutation = DeleteDialogueMutation;
@@ -7534,9 +7677,19 @@ export namespace DialogueConnection {
   export type DialogueConnection = (NonNullable<(NonNullable<DialogueConnectionQuery['customer']>)['dialogueConnection']>);
   export type PageInfo = (NonNullable<(NonNullable<(NonNullable<DialogueConnectionQuery['customer']>)['dialogueConnection']>)['pageInfo']>);
   export type Dialogues = NonNullable<(NonNullable<(NonNullable<(NonNullable<DialogueConnectionQuery['customer']>)['dialogueConnection']>)['dialogues']>)[number]>;
+  export type Assignees = NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<DialogueConnectionQuery['customer']>)['dialogueConnection']>)['dialogues']>)[number]>['assignees']>)[number]>;
   export type _Customer = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<DialogueConnectionQuery['customer']>)['dialogueConnection']>)['dialogues']>)[number]>['customer']>);
   export type Tags = NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<DialogueConnectionQuery['customer']>)['dialogueConnection']>)['dialogues']>)[number]>['tags']>)[number]>;
   export const Document = DialogueConnectionDocument;
+}
+
+export namespace GetUsers {
+  export type Variables = GetUsersQueryVariables;
+  export type Query = GetUsersQuery;
+  export type Customer = (NonNullable<GetUsersQuery['customer']>);
+  export type Users = NonNullable<(NonNullable<(NonNullable<GetUsersQuery['customer']>)['users']>)[number]>;
+  export type Role = (NonNullable<NonNullable<(NonNullable<(NonNullable<GetUsersQuery['customer']>)['users']>)[number]>['role']>);
+  export const Document = GetUsersDocument;
 }
 
 export namespace SetDialoguePrivacy {

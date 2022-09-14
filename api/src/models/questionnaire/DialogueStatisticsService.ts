@@ -69,13 +69,18 @@ class DialogueStatisticsService {
 
   findWorkspaceHealthScore = async (
     workspaceId: string,
+    userId: string,
     startDateTime: Date,
     endDateTime?: Date,
     topicFilter?: TopicFilterInput,
     threshold: number = 70,
   ) => {
     const endDateTimeSet = !endDateTime ? addDays(startDateTime, 7) : endDateTime;
-    const dialogues = await this.workspaceService.getDialogues(workspaceId, topicFilter?.dialogueStrings || undefined);
+    const dialogues = await this.workspaceService.getDialogues(
+      workspaceId,
+      userId,
+      topicFilter?.dialogueStrings || undefined
+    );
     const mappedDialogueIds = dialogues.map((dialogue) => dialogue.id);
 
     const scopedSessions = await this.sessionService.findSessionsForDialogues(
@@ -287,11 +292,12 @@ class DialogueStatisticsService {
    */
   findWorkspaceStatisticsSummary = async (
     customerId: string,
+    userId: string,
     impactScoreType: DialogueImpactScore,
     startDateTime: Date,
     endDateTime?: Date,
   ) => {
-    const dialogues = await this.dialogueService.findDialoguesByCustomerId(customerId);
+    const dialogues = await this.dialogueService.findDialoguesByCustomerId(customerId, userId);
     const dialogueIds = dialogues.map((dialogue) => dialogue.id);
     const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
 

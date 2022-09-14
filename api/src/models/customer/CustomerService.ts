@@ -43,8 +43,8 @@ export class CustomerService {
     this.templateService = new TemplateService(prismaClient);
   }
 
-  async getDialogues(workspaceId: string, dialogueFragments?: string[]) {
-    return this.customerPrismaAdapter.getDialogues(workspaceId, dialogueFragments);
+  async getDialogues(workspaceId: string, userId: string, dialogueFragments?: string[]) {
+    return this.customerPrismaAdapter.getDialogues(workspaceId, userId, dialogueFragments);
   }
 
   /**

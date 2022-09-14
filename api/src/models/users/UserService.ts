@@ -12,24 +12,28 @@ import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import UserOfCustomerPrismaAdapter from './UserOfCustomerPrismaAdapter';
 import { DeletedUserOutput, GenerateReportPayload, UserWithWorkspaces } from './UserServiceTypes';
 import { offsetPaginate } from '../general/PaginationHelpers';
+import CustomerService from '../../models/customer/CustomerService';
+import { assertNonNullish } from '../../utils/assertNonNullish';
 
 class UserService {
   prisma: PrismaClient;
   userPrismaAdapter: UserPrismaAdapter;
   customerPrismaAdapter: CustomerPrismaAdapter;
   userOfCustomerPrismaAdapter: UserOfCustomerPrismaAdapter;
+  customerService: CustomerService;
 
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
     this.userPrismaAdapter = new UserPrismaAdapter(prismaClient);
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
     this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
+    this.customerService = new CustomerService(prismaClient);
   };
 
   /**
    * Finds all users based on a AutomationAction payload
-   * @param workspaceSlug 
-   * @param targetIds 
+   * @param workspaceSlug
+   * @param targetIds
    * @returns a list of users
    */
   findTargetUsers = async (workspaceSlug: string, payload: GenerateReportPayload) => {
@@ -107,6 +111,35 @@ class UserService {
   }
 
   /**
+   * Assigns user to all private dialogues within a workspace
+   * @param userId
+   * @param workspaceId
+   */
+  public async assignUserToAllPrivateDialogues(userId: string, workspaceId: string) {
+    const workspace = await this.customerService.findPrivateDialoguesOfWorkspace(workspaceId);
+    assertNonNullish(workspace?.dialogues, 'No private dialogues found for workspace');
+
+    const dialogueIds = workspace.dialogues.map((dialogue) => dialogue.id);
+
+    await this.userPrismaAdapter.updateUserPrivateDialogues({
+      userId,
+      workspaceId,
+      assignedDialogueIds: dialogueIds,
+    });
+  }
+
+  /**
+   * Adjusts the dialogue privacy settings of a dialogue for a user based on the input.
+   * @param input
+   * @returns
+   */
+  public async assignUserToDialogue(input: NexusGenInputs['AssignUserToDialogueInput']) {
+    const updatedUser = await this.userPrismaAdapter.updateDialogueAssignmentOfUser(input);
+
+    return updatedUser;
+  };
+
+  /**
    * Adjusts the dialogue privacy settings of a user based on the input.
    * @param input
    * @returns
@@ -125,7 +158,7 @@ class UserService {
         privateWorkspaceDialogues: allPrivateDialoguesWorkspace?.dialogues || [],
       },
     }
-  }
+  };
 
   async deleteUser(userId: string, customerId: string): Promise<DeletedUserOutput> {
     const removedUser = await this.userOfCustomerPrismaAdapter.delete(userId, customerId);

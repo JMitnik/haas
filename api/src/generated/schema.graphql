@@ -24,6 +24,13 @@ input AppendToInteractionInput {
   sessionId: ID
 }
 
+input AssignUserToDialogueInput {
+  dialogueId: String!
+  state: Boolean!
+  userId: String!
+  workspaceId: String!
+}
+
 input AssignUserToDialoguesInput {
   assignedDialogueIds: [String!]
   userId: String!
@@ -1120,6 +1127,7 @@ input GenerateAutodeckInput {
 input GenerateWorkspaceCSVInputType {
   generateDemoData: Boolean = false
   isDemo: Boolean! = false
+  makeDialoguesPrivate: Boolean = false
   managerCsv: Upload
   type: String! = "DEFAULT"
   uploadedCsv: Upload
@@ -1335,6 +1343,7 @@ type MostTrendingTopic {
 type Mutation {
   appendToInteraction(input: AppendToInteractionInput): Session
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue
+  assignUserToDialogue(input: AssignUserToDialogueInput): UserType
   assignUserToDialogues(input: AssignUserToDialoguesInput): UserType
   authenticateLambda(input: AuthenticateLambdaInput): String
   confirmCreateWorkspaceJob(input: GenerateAutodeckInput): CreateWorkspaceJobType

@@ -48,8 +48,6 @@ const FormNodeForm = () => {
   const stepsFields = form.watch('formNode.steps');
   const preFormNode = form.watch('formNode.preFormNode');
 
-  console.log('Pre form node: ', preFormNode);
-
   return (
     <UI.FormSection id="form-node-form">
       <UI.Div>
@@ -84,35 +82,32 @@ const FormNodeForm = () => {
                       name="formNode.preFormNode"
                       control={form.control}
                       defaultValue={undefined}
-                      render={({ field }) => {
-                        console.log('field value: ', field);
-                        return (
-                          <UI.Div
-                            width="100%"
-                          >
-                            {field.value ? (
-                              <PreNodeFormCell
-                                onClick={() => setOpenPreFormModal(true)}
-                                onRemove={() => form.setValue('formNode.preFormNode', null)}
-                                node={field.value}
-                              />
-                            ) : (
-                              <UI.Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => setOpenPreFormModal(true)}
-                                variantColor="altGray"
-                              >
-                                <UI.Icon mr={1}>
-                                  <PlusCircle />
-                                </UI.Icon>
-                                {t('add_pre_form_node')}
-                              </UI.Button>
-                            )}
-                          </UI.Div>
+                      render={({ field }) => (
+                        <UI.Div
+                          width="100%"
+                        >
+                          {field.value ? (
+                            <PreNodeFormCell
+                              onClick={() => setOpenPreFormModal(true)}
+                              onRemove={() => form.setValue('formNode.preFormNode', null)}
+                              node={field.value}
+                            />
+                          ) : (
+                            <UI.Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setOpenPreFormModal(true)}
+                              variantColor="altGray"
+                            >
+                              <UI.Icon mr={1}>
+                                <PlusCircle />
+                              </UI.Icon>
+                              {t('add_pre_form_node')}
+                            </UI.Button>
+                          )}
+                        </UI.Div>
 
-                        );
-                      }}
+                      )}
                     />
                     <AnimatePresence>
                       <Modal.Root

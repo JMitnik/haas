@@ -23,6 +23,11 @@ query dialogueConnection($customerSlug: String, $filter: DialogueConnectionFilte
         updatedAt
         customerId
         averageScore
+        assignees {
+          id
+          firstName
+          lastName
+        }
         customer {
           slug
         }
