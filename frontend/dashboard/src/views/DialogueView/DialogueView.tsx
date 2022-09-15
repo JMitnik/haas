@@ -1,11 +1,10 @@
 import * as UI from '@haas/ui';
 import * as qs from 'qs';
 import {
-  AlertTriangle, Award, MessageCircle,
-  ThumbsDown, ThumbsUp, User,
+  AlertTriangle, Award, MessageCircle, User,
 } from 'react-feather';
 import { ProvidedZoom } from '@visx/zoom/lib/types';
-import { Tag, TagIcon, TagLabel } from '@chakra-ui/core';
+import { Tag, TagLabel } from '@chakra-ui/core';
 import { Zoom } from '@visx/zoom';
 import { endOfDay, startOfDay } from 'date-fns';
 import { useTranslation } from 'react-i18next';
@@ -273,12 +272,10 @@ const DialogueView = () => {
                       <>
                         {dialogue?.statistics?.mostPopularPath?.basicSentiment === 'positive' ? (
                           <Tag size="sm" variantColor="green">
-                            <TagIcon icon={() => <ThumbsUp />} size="10px" color="green.600" />
                             <TagLabel color="green.600">{dialogue?.statistics?.mostPopularPath?.quantity}</TagLabel>
                           </Tag>
                         ) : (
                           <Tag size="sm" variantColor="red">
-                            <TagIcon icon={() => <ThumbsDown />} size="10px" color="red.600" />
                             <TagLabel color="red.600">{dialogue?.statistics?.mostPopularPath?.quantity}</TagLabel>
                           </Tag>
                         )}

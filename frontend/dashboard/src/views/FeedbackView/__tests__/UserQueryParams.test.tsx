@@ -2,7 +2,7 @@ import { Route } from 'react-router-dom';
 import { Router } from 'react-router';
 import { createMemoryHistory } from 'history';
 import { debug } from 'jest-preview';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render } from '@testing-library/react';
 import React from 'react';
 
 import { NumberParam, QueryParamProvider, useQueryParams, withDefault } from 'use-query-params';
@@ -24,7 +24,7 @@ const UseQueryParamExample = () => {
 test('use query param example', async () => {
   const history = createMemoryHistory({ initialEntries: [{ search: '?x=3' }] });
 
-  const { queryByText, findByText } = render(
+  const { findByText } = render(
     <Router history={history}>
       <QueryParamProvider ReactRouterRoute={Route}>
         <UseQueryParamExample />

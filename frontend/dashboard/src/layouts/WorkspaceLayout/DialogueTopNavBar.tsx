@@ -27,10 +27,10 @@ import { useDialogue } from 'providers/DialogueProvider';
 import { useFormatter } from 'hooks/useFormatter';
 import { useGetDialogueLayoutDetailsQuery } from 'types/generated-types';
 import { useNavigator } from 'hooks/useNavigator';
+import useAuth from 'hooks/useAuth';
 
 import { ShareDialogue } from './ShareDialogue';
 import { TopSubNavBarContainer } from './TopSubNavBar.styles';
-import useAuth from 'hooks/useAuth';
 
 const Content = styled(Popover.Content)`
   transform-origin: var(--radix-popover-content-transform-origin);
