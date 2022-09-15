@@ -41,3 +41,4 @@ const prodCoreTemp = new CoreTempStack(app, 'ProdCoreTemp', {
 });
 
 const stagingAutomations = new Automations(app, 'StagingAutomationStack');
+const prodAutomations = new Automations(app, 'ProdAutomationStack');

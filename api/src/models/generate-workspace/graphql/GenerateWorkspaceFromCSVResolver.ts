@@ -28,6 +28,7 @@ export const GenerateWorkspaceCSVInputType = inputObjectType({
     t.string('type', { required: true, default: 'DEFAULT' });
     t.boolean('generateDemoData', { required: false, default: false });
     t.boolean('isDemo', { required: true, default: false });
+    t.boolean('makeDialoguesPrivate', { required: false, default: false });
   },
 });
 

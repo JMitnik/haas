@@ -195,7 +195,7 @@ it('dialogue follows negative flow, not share details, and goes back', () => {
 
   mockMutationAppendToInteraction((res) => ({ ...res }));
   // Submit button
-  cy.findByRole('button', { name: 'No, do not share' }).click();
+  cy.findByRole('button', { name: 'Stay anonymous' }).click();
 
   cy.wait('@gqlappendToInteractionMutation').then((req) => {
     const input = req.request.body.variables?.input as AppendToInteractionInput;

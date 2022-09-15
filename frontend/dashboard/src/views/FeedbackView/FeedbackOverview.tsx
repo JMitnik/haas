@@ -450,7 +450,6 @@ export const FeedbackOverview = () => {
                 isLoading={isLoading}
                 onClick={() => {
                   setModalIsOpen({ isOpen: true, sessionId: session.id });
-                  // openModal({ interactionId: session.id });
                 }}
                 gridTemplateColumns={columns}
                 key={session.id}

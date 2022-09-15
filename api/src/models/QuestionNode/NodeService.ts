@@ -13,7 +13,6 @@ import { CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType'
 import { CreateSliderNodeInput, UpdateQuestionInput } from './QuestionNodePrismaAdapterType';
 import UserOfCustomerPrismaAdapter from '../../models/users/UserOfCustomerPrismaAdapter';
 import { groupBy } from 'lodash';
-import { stringMap } from 'aws-sdk/clients/backup';
 
 export interface IdMapProps {
   [details: string]: string;
@@ -141,9 +140,9 @@ export class NodeService {
     const targetUsers = communicationUser?.userIds?.length
       ? await this.userOfCustomerPrismaAdapter.findTargetUsers(
         workspaceSlug, {
-        roleIds: communicationUser?.userIds.filter(isPresent),
-        userIds: communicationUser?.userIds.filter(isPresent),
-      }
+          roleIds: communicationUser?.userIds.filter(isPresent),
+          userIds: communicationUser?.userIds.filter(isPresent),
+        }
       )
       : [];
     const allUserIds = targetUsers.map((user) => ({ id: user.userId }));

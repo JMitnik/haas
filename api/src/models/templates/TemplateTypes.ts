@@ -61,7 +61,7 @@ export interface DemoWorkspaceTemplate extends WorkspaceTemplate {
 
 export const defaultStudentTextFieldForm: NexusGenInputs['FormNodeInputType'] = {
   preFormNode: {
-    header: 'We’re sorry to hear that.',
+    header: 'We are sorry to hear that.',
     helper: 'Click next to find out who you can talk to about this. Click finish to end the survey.',
     nextText: 'Next',
     finishText: 'Finish',
@@ -69,8 +69,8 @@ export const defaultStudentTextFieldForm: NexusGenInputs['FormNodeInputType'] = 
   steps: [
     {
       header: 'Your Choice',
-      helper: 'We would love to get you in touch with the right person.',
-      subHelper: 'Please select with whom you would prefer to discuss your issue',
+      helper: 'Let us get you in touch with the right person.',
+      subHelper: '',
       position: 1,
       type: FormNodeStepType.GENERIC_FIELDS,
       fields: [
@@ -93,7 +93,7 @@ export const defaultStudentTextFieldForm: NexusGenInputs['FormNodeInputType'] = 
 
 export const defaultTeacherTextFieldForm: NexusGenInputs['FormNodeInputType'] = {
   preFormNode: {
-    header: 'We’re sorry to hear that.',
+    header: 'We are sorry to hear that.',
     helper: 'Click next to find out who you can talk to about this. Click finish to end the survey.',
     nextText: 'Next',
     finishText: 'Finish',
@@ -126,7 +126,7 @@ export const defaultTeacherTextFieldForm: NexusGenInputs['FormNodeInputType'] = 
 
 export const defaultSportTextFieldForm: NexusGenInputs['FormNodeInputType'] = {
   preFormNode: {
-    header: 'We’re sorry to hear that.',
+    header: 'We are sorry to hear that.',
     helper: 'Click next to find out who you can talk to about this. Click finish to end the survey.',
     nextText: 'Next',
     finishText: 'Finish',

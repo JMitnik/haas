@@ -73,6 +73,16 @@ export const DialogueType = objectType({
     t.list.field('assignees', {
       nullable: true,
       type: UserType,
+      useParentResolve: true,
+      async resolve(parent, args, ctx) {
+        const assignees = await ctx.prisma.dialogue.findUnique({
+          where: {
+            id: parent.id,
+          },
+        }).assignees();
+
+        return assignees;
+      },
     })
 
     t.field('postLeafNode', {
@@ -95,9 +105,9 @@ export const DialogueType = objectType({
       nullable: true,
       args: { filter: IssueFilterInput },
 
-      resolve: async (parent, args, { services }) => {
+      resolve: async (parent, args, { services, session }) => {
         const filter = IssueValidator.resolveFilter(args.filter);
-        return await services.issueService.getProblemsByDialogue(parent.id, filter);
+        return await services.issueService.getProblemsByDialogue(parent.id, (session?.user?.id as string), filter);
       },
     });
 

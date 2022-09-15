@@ -81,6 +81,7 @@ class GenerateWorkspaceService {
     templateType: string,
     sessionsPerDay: number = 1,
     generateData: boolean = false,
+    makeDialoguePrivate: boolean = false,
   ) {
     const mappedDialogueInputData = generateCreateDialogueDataByTemplateLayers(templateType);
 
@@ -93,7 +94,7 @@ class GenerateWorkspaceService {
         title: title,
         description: '',
         customer: { id: workspace.id, create: false },
-        isPrivate: false,
+        isPrivate: makeDialoguePrivate,
         postLeafText: template?.postLeafText,
         language: template.language,
         template: Object.values(DialogueTemplateType).includes(templateType as any)
@@ -214,6 +215,7 @@ class GenerateWorkspaceService {
     records: any[],
     userId?: string,
     generateData = false,
+    makeDialoguePrivate = false,
   ) {
     const adminRole = workspace.roles.find((role) => role.type === RoleTypeEnum.ADMIN) as Role;
 
@@ -244,7 +246,7 @@ class GenerateWorkspaceService {
         title: dialogueTitle,
         description: '',
         customer: { id: workspace.id, create: false },
-        isPrivate: hasEmailAssignee,
+        isPrivate: makeDialoguePrivate || hasEmailAssignee,
         postLeafText: {
           header: overrideTemplate.postLeafText?.header,
           subHeader: overrideTemplate.postLeafText?.subHeader,
@@ -305,16 +307,21 @@ class GenerateWorkspaceService {
       // If exists => connect existing user when creating new userOfCustomer entry
       if (!hasEmailAssignee || !emailAssignee || !userRole) continue;
 
-      const user = await this.userOfCustomerPrismaAdapter.addUserToPrivateDialogue(
-        emailAssignee,
-        dialogue.id,
-        phoneAssignee
-      );
+      const limitedUser = await this.userService.upsertUserByEmail({
+        email: emailAssignee,
+        phone: phoneAssignee,
+      });
 
       const invitedUser = await this.userOfCustomerPrismaAdapter.upsertUserOfCustomer(
         workspace.id,
-        user.id,
-        user.id === userId ? adminRole?.id as string : userRole.id, // If user generating is upserted => give admin role
+        limitedUser.id,
+        limitedUser.id === userId ? adminRole?.id as string : userRole.id, // If user generating is upserted => give admin role
+      );
+
+      await this.userOfCustomerPrismaAdapter.addUserToPrivateDialogue(
+        emailAssignee,
+        dialogue.id,
+        phoneAssignee
       );
 
       void this.userService.sendInvitationMail(invitedUser, true);
@@ -341,7 +348,7 @@ class GenerateWorkspaceService {
    * @returns the created workspace
    */
   async generateWorkspace(input: GenerateWorkspaceCSVInput, userId?: string) {
-    const { uploadedCsv, workspaceSlug, workspaceTitle, type, managerCsv, isDemo } = input;
+    const { uploadedCsv, workspaceSlug, workspaceTitle, type, managerCsv, isDemo, makeDialoguesPrivate } = input;
 
     const template = getTemplate(type);
 
@@ -375,11 +382,19 @@ class GenerateWorkspaceService {
           records,
           userId,
           input.generateDemoData || undefined,
+          makeDialoguesPrivate || undefined,
         )
       } else {
-        await this.generateDialoguesByTemplateLayers(workspace, type, undefined, input.generateDemoData || undefined);
+        await this.generateDialoguesByTemplateLayers(
+          workspace,
+          type,
+          undefined,
+          input.generateDemoData || undefined,
+          makeDialoguesPrivate || undefined
+        );
       }
 
+      if (makeDialoguesPrivate) await this.userService.assignUserToAllPrivateDialogues(userId as string, workspace.id);
       if (managerCsv) await this.addManagersToWorkspace(managerCsv, workspace);
 
       try {

@@ -5,6 +5,10 @@ import {
 import { DialogueLinkSenderService } from './DialogueLinkSender/DialogueLinkSenderService';
 import { ReportCrawlerService } from './ReportCrawler/ReportCrawlerService';
 
+/**
+ * Preconditions:
+ * - A secret exists with the name AUTOMATION_API_KEY in secrets manager.
+ */
 export class Automations extends Stack {
   constructor(scope: App, id: string) {
     super(scope, id);

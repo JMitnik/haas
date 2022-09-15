@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import { isPresent } from 'ts-is-present';
-import React, { } from 'react';
+import React from 'react';
 
 import { DateFormat, useDate } from 'hooks/useDate';
 import { DialogueImpactScoreType, useGetIssuesQuery, useGetWorkspaceReportQuery } from 'types/generated-types';

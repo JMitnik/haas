@@ -1,5 +1,5 @@
 import * as UI from '@haas/ui';
-import { AtSign, FileText, Frown, Hash, Link2, Phone, Send, Type } from 'react-feather';
+import { AtSign, FileText, Hash, Link2, Phone, Send, Type } from 'react-feather';
 import { ClientButton } from 'components/Buttons/Buttons';
 import { Controller, useForm } from 'react-hook-form';
 import { Div } from '@haas/ui';
@@ -10,11 +10,12 @@ import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import * as RadioGroup from 'components/RadioGroup';
-
 import { FormNodeFieldTypeEnum } from 'types/generated-types';
 import { GenericQuestionNodeProps } from 'modules/Node/Node.types';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { SessionActionType } from 'types/core-types';
+
+import { ReactComponent as FormIcon } from '../../assets/images/icon-form.svg';
 import { ReactComponent as SliderIcon } from '../../../public/logo-haas.svg';
 
 type FormNodeProps = GenericQuestionNodeProps;
@@ -190,7 +191,7 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                 </UI.Flex>
               </UI.Flex>
               <UI.Div mt="1em">
-                <UI.Text textAlign="left" fontSize="1.2rem" color="main.400" fontWeight={350}>
+                <UI.Text textAlign="left" fontSize="1.2rem" color="main.400">
                   {step?.helper || t('leave_your_details')}
                 </UI.Text>
                 <UI.Text textAlign="left" fontSize="0.8rem" color="off.500">
@@ -275,7 +276,7 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                   <UI.Div mt={4}>
                     <UI.Flex flexWrap="wrap" justifyContent="space-between" alignItems="center">
 
-                      <UI.Button size="sm" variant="ghost" onClick={(e) => handleSubmit(e, true)}>
+                      <UI.Button size="sm" variant="outline" onClick={(e) => handleSubmit(e, true)}>
                         {t('do_not_share')}
                       </UI.Button>
                       <UI.Flex>
@@ -330,7 +331,7 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
               </UI.Text>
               <ButtonIconContainer mt={2}>
                 <UI.Icon stroke="main.400">
-                  <Frown />
+                  <FormIcon />
                 </UI.Icon>
               </ButtonIconContainer>
 
