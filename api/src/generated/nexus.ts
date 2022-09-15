@@ -1743,8 +1743,8 @@ export interface NexusGenFieldTypes {
     id: string | null; // ID
     isDemo: boolean | null; // Boolean
     issueConnection: NexusGenRootTypes['IssueConnection'] | null; // IssueConnection
+    issueDialogues: Array<NexusGenRootTypes['Issue'] | null> | null; // [Issue]
     issueTopics: Array<NexusGenRootTypes['Issue'] | null> | null; // [Issue]
-    issues: Array<NexusGenRootTypes['IssueModel'] | null> | null; // [IssueModel]
     name: string; // String!
     nestedDialogueStatisticsSummary: Array<NexusGenRootTypes['DialogueStatisticsSummaryModel'] | null> | null; // [DialogueStatisticsSummaryModel]
     nestedHealthScore: NexusGenRootTypes['HealthScore'] | null; // HealthScore
@@ -2711,8 +2711,8 @@ export interface NexusGenFieldTypeNames {
     id: 'ID'
     isDemo: 'Boolean'
     issueConnection: 'IssueConnection'
+    issueDialogues: 'Issue'
     issueTopics: 'Issue'
-    issues: 'IssueModel'
     name: 'String'
     nestedDialogueStatisticsSummary: 'DialogueStatisticsSummaryModel'
     nestedHealthScore: 'HealthScore'
@@ -3485,11 +3485,11 @@ export interface NexusGenArgTypes {
     issueConnection: { // args
       filter?: NexusGenInputs['IssueConnectionFilterInput'] | null; // IssueConnectionFilterInput
     }
+    issueDialogues: { // args
+      filter?: NexusGenInputs['IssueFilterInput'] | null; // IssueFilterInput
+    }
     issueTopics: { // args
       input?: NexusGenInputs['IssueFilterInput'] | null; // IssueFilterInput
-    }
-    issues: { // args
-      filter?: NexusGenInputs['IssueFilterInput'] | null; // IssueFilterInput
     }
     nestedDialogueStatisticsSummary: { // args
       input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput

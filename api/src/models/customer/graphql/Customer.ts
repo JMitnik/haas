@@ -107,13 +107,13 @@ export const CustomerType = objectType({
      *
      * TODO: Refactor to refer to this as issueDialogues
      */
-    t.list.field('issues', {
-      type: IssueModel,
+    t.list.field('issueDialogues', {
+      type: Issue,
       args: { filter: IssueFilterInput },
 
       resolve: async (parent, args, { services }) => {
         const filter = IssueValidator.resolveFilter(args.filter);
-        return await services.issueService.findIssuesByWorkspaceId(parent.id, filter);
+        return await services.issueService.getProblemDialoguesByWorkspace(parent.id, filter);
       },
     });
 

@@ -34,6 +34,7 @@ import { useCustomer } from 'providers/CustomerProvider';
 import { useFormatter } from 'hooks/useFormatter';
 import SearchBar from 'components/Common/SearchBar/SearchBar';
 
+import { countBy } from 'lodash';
 import { IssueModalCard } from './IssueModalCard';
 import { UrgentContainer } from './IssueOverview.styles';
 
@@ -119,24 +120,6 @@ export const IssuesOverview = () => {
     }
   };
 
-  const handleSingleDateFilterChange = (day: Date) => {
-    setFilter({
-      ...filter,
-      startDate: dateFormat(startOfDay(day), DateFormat.DayTimeFormat),
-      endDate: dateFormat(endOfDay(day), DateFormat.DayTimeFormat),
-      pageIndex: 0,
-    });
-  };
-
-  const handleMultiDateFilterChange = (newStartDate?: Date, newEndDate?: Date) => {
-    setFilter({
-      ...filter,
-      startDate: newStartDate ? dateFormat(newStartDate, DateFormat.DayTimeFormat) : undefined,
-      endDate: newEndDate ? dateFormat(newEndDate, DateFormat.DayTimeFormat) : undefined,
-      pageIndex: 0,
-    });
-  };
-
   const handleSearchTermChange = (search: string) => {
     setFilter((prevValues) => ({
       ...prevValues,
@@ -148,7 +131,7 @@ export const IssuesOverview = () => {
   const columns = '50px minmax(200px, 1fr) minmax(150px, 1fr) minmax(300px, 1fr) minmax(300px, 1fr)';
 
   return (
-    <View documentTitle="haas | Feedback">
+    <View documentTitle="haas | Issues">
       <UI.ViewBody>
         <UI.Div pb={4} position="relative" zIndex={10000}>
           <UI.Flex alignItems="center" justifyContent="space-between">

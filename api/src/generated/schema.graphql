@@ -668,8 +668,8 @@ type Customer {
   id: ID
   isDemo: Boolean
   issueConnection(filter: IssueConnectionFilterInput): IssueConnection
+  issueDialogues(filter: IssueFilterInput): [Issue]
   issueTopics(input: IssueFilterInput): [Issue]
-  issues(filter: IssueFilterInput): [IssueModel]
   name: String!
   nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel] @deprecated(reason: "Deprecated, see statistics")
   nestedHealthScore(input: HealthScoreInput): HealthScore @deprecated(reason: "Deprectaed, see statistics")

@@ -720,7 +720,7 @@ export type Customer = {
   /** Workspace statistics */
   statistics?: Maybe<WorkspaceStatistics>;
   issueConnection?: Maybe<IssueConnection>;
-  issues?: Maybe<Array<Maybe<IssueModel>>>;
+  issueDialogues?: Maybe<Array<Maybe<Issue>>>;
   issueTopics?: Maybe<Array<Maybe<Issue>>>;
   dialogueConnection?: Maybe<DialogueConnection>;
   automationConnection?: Maybe<AutomationConnection>;
@@ -753,7 +753,7 @@ export type CustomerIssueConnectionArgs = {
 };
 
 
-export type CustomerIssuesArgs = {
+export type CustomerIssueDialoguesArgs = {
   filter?: Maybe<IssueFilterInput>;
 };
 
@@ -1505,8 +1505,8 @@ export type IssueConnection = ConnectionInterface & {
 export type IssueConnectionFilterInput = {
   label?: Maybe<Scalars['String']>;
   search?: Maybe<Scalars['String']>;
-  startDate?: Maybe<Scalars['String']>;
-  endDate?: Maybe<Scalars['String']>;
+  startDate?: Maybe<Scalars['DateString']>;
+  endDate?: Maybe<Scalars['DateString']>;
   topicStrings?: Maybe<Array<Scalars['String']>>;
   orderBy?: Maybe<IssueConnectionOrderByInput>;
   offset: Scalars['Int'];
@@ -3362,6 +3362,38 @@ export type GetDialogueTopicsQuery = (
   )> }
 );
 
+export type GetProblemsPerDialogueQueryVariables = Exact<{
+  workspaceId: Scalars['ID'];
+  filter?: Maybe<IssueFilterInput>;
+}>;
+
+
+export type GetProblemsPerDialogueQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { issueDialogues?: Maybe<Array<Maybe<(
+      { __typename?: 'Issue' }
+      & Pick<Issue, 'id' | 'topic' | 'rankScore' | 'followUpAction' | 'actionRequiredCount'>
+      & { dialogue?: Maybe<(
+        { __typename?: 'Dialogue' }
+        & Pick<Dialogue, 'id' | 'title'>
+      )>, basicStats: (
+        { __typename?: 'BasicStatistics' }
+        & Pick<BasicStatistics, 'responseCount' | 'average'>
+      ), history: (
+        { __typename?: 'DateHistogram' }
+        & Pick<DateHistogram, 'id'>
+        & { items: Array<(
+          { __typename?: 'DateHistogramItem' }
+          & Pick<DateHistogramItem, 'id' | 'date' | 'frequency'>
+        )> }
+      ) }
+    )>>> }
+  )> }
+);
+
 export type GetSessionPathsQueryVariables = Exact<{
   dialogueId: Scalars['ID'];
   input: PathedSessionsInput;
@@ -4935,6 +4967,68 @@ export type GetDialogueTopicsLazyQueryHookResult = ReturnType<typeof useGetDialo
 export type GetDialogueTopicsQueryResult = Apollo.QueryResult<GetDialogueTopicsQuery, GetDialogueTopicsQueryVariables>;
 export function refetchGetDialogueTopicsQuery(variables?: GetDialogueTopicsQueryVariables) {
       return { query: GetDialogueTopicsDocument, variables: variables }
+    }
+export const GetProblemsPerDialogueDocument = gql`
+    query GetProblemsPerDialogue($workspaceId: ID!, $filter: IssueFilterInput) {
+  customer(id: $workspaceId) {
+    id
+    issueDialogues(filter: $filter) {
+      id
+      topic
+      rankScore
+      followUpAction
+      actionRequiredCount
+      dialogue {
+        id
+        title
+      }
+      basicStats {
+        responseCount
+        average
+      }
+      history {
+        id
+        items {
+          id
+          date
+          frequency
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetProblemsPerDialogueQuery__
+ *
+ * To run a query within a React component, call `useGetProblemsPerDialogueQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetProblemsPerDialogueQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetProblemsPerDialogueQuery({
+ *   variables: {
+ *      workspaceId: // value for 'workspaceId'
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useGetProblemsPerDialogueQuery(baseOptions: Apollo.QueryHookOptions<GetProblemsPerDialogueQuery, GetProblemsPerDialogueQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetProblemsPerDialogueQuery, GetProblemsPerDialogueQueryVariables>(GetProblemsPerDialogueDocument, options);
+      }
+export function useGetProblemsPerDialogueLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetProblemsPerDialogueQuery, GetProblemsPerDialogueQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetProblemsPerDialogueQuery, GetProblemsPerDialogueQueryVariables>(GetProblemsPerDialogueDocument, options);
+        }
+export type GetProblemsPerDialogueQueryHookResult = ReturnType<typeof useGetProblemsPerDialogueQuery>;
+export type GetProblemsPerDialogueLazyQueryHookResult = ReturnType<typeof useGetProblemsPerDialogueLazyQuery>;
+export type GetProblemsPerDialogueQueryResult = Apollo.QueryResult<GetProblemsPerDialogueQuery, GetProblemsPerDialogueQueryVariables>;
+export function refetchGetProblemsPerDialogueQuery(variables?: GetProblemsPerDialogueQueryVariables) {
+      return { query: GetProblemsPerDialogueDocument, variables: variables }
     }
 export const GetSessionPathsDocument = gql`
     query GetSessionPaths($dialogueId: ID!, $input: PathedSessionsInput!) {
@@ -7661,6 +7755,18 @@ export namespace GetDialogueTopics {
   export type Topic = (NonNullable<(NonNullable<GetDialogueTopicsQuery['dialogue']>)['topic']>);
   export type SubTopics = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueTopicsQuery['dialogue']>)['topic']>)['subTopics']>)[number]>;
   export const Document = GetDialogueTopicsDocument;
+}
+
+export namespace GetProblemsPerDialogue {
+  export type Variables = GetProblemsPerDialogueQueryVariables;
+  export type Query = GetProblemsPerDialogueQuery;
+  export type Customer = (NonNullable<GetProblemsPerDialogueQuery['customer']>);
+  export type IssueDialogues = NonNullable<(NonNullable<(NonNullable<GetProblemsPerDialogueQuery['customer']>)['issueDialogues']>)[number]>;
+  export type Dialogue = (NonNullable<NonNullable<(NonNullable<(NonNullable<GetProblemsPerDialogueQuery['customer']>)['issueDialogues']>)[number]>['dialogue']>);
+  export type BasicStats = (NonNullable<NonNullable<(NonNullable<(NonNullable<GetProblemsPerDialogueQuery['customer']>)['issueDialogues']>)[number]>['basicStats']>);
+  export type History = (NonNullable<NonNullable<(NonNullable<(NonNullable<GetProblemsPerDialogueQuery['customer']>)['issueDialogues']>)[number]>['history']>);
+  export type Items = NonNullable<(NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<GetProblemsPerDialogueQuery['customer']>)['issueDialogues']>)[number]>['history']>)['items']>)[number]>;
+  export const Document = GetProblemsPerDialogueDocument;
 }
 
 export namespace GetSessionPaths {

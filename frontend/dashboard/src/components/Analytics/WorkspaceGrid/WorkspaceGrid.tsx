@@ -16,6 +16,7 @@ import { DatePicker } from 'components/Common/DatePicker';
 import {
   DialogueImpactScoreType,
   useGetIssuesQuery,
+  useGetProblemsPerDialogueQuery,
   useGetWorkspaceSummaryDetailsQuery,
   useResetWorkspaceDataMutation,
 } from 'types/generated-types';
@@ -309,19 +310,19 @@ export const WorkspaceGrid = ({
 
   const summary = data?.customer?.statistics;
 
-  // const { data: issuesData, loading: issuesLoading } = useGetIssuesQuery({
-  //   fetchPolicy: 'no-cache',
-  //   variables: {
-  //     workspaceId: activeCustomer?.id || '',
-  //     filter: {
-  //       startDate: format(startOfDay(startDate), DateFormat.DayTimeFormat),
-  //       endDate: format(endOfDay(endDate), DateFormat.DayTimeFormat),
-  //       dialogueStrings: visitedDialogueFragments,
-  //     },
-  //   },
-  // });
+  const { data: issuesData, loading: issuesLoading } = useGetProblemsPerDialogueQuery({
+    fetchPolicy: 'no-cache',
+    variables: {
+      workspaceId: activeCustomer?.id || '',
+      filter: {
+        startDate: format(startOfDay(startDate), DateFormat.DayTimeFormat),
+        endDate: format(endOfDay(endDate), DateFormat.DayTimeFormat),
+        dialogueStrings: visitedDialogueFragments,
+      },
+    },
+  });
 
-  const issues: any[] = [];
+  const issues = issuesData?.customer?.issueDialogues || [];
   const issueStats = issues.reduce((acc, issue) => {
     acc.problems += (issue?.basicStats?.responseCount || 0);
     acc.actionsRequested += (issue?.actionRequiredCount || 0);
@@ -454,9 +455,9 @@ export const WorkspaceGrid = ({
                   inPreview
                   onResetFilter={() => popToIndex(0)}
                   isFilterEnabled={historyQueue.length > 0}
-                  issues={issues.filter(isPresent)}
+                  issues={issues?.filter(isPresent)}
                   onIssueClick={handleIssueClick}
-                  isLoading={false}
+                  isLoading={issuesLoading}
                   onOpenIssueModal={() => setIssuesModalIsOpen(true)}
                 />
               </UI.Div>
@@ -510,7 +511,7 @@ export const WorkspaceGrid = ({
       <Modal.Root open={issuesModalIsOpen} onClose={() => setIssuesModalIsOpen(false)}>
         <IssuesModal
           onResetFilters={() => popToIndex(0)}
-          issues={issues.filter(isPresent)}
+          issues={issues?.filter(isPresent)}
           onIssueClick={(issue) => {
             handleIssueClick(issue);
             setIssuesModalIsOpen(false);
