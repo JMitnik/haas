@@ -15,6 +15,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useState } from 'react';
 import Select from 'react-select';
 
+import { View } from 'layouts/View';
 import ServerError from 'components/ServerError';
 import boolToInt from 'utils/booleanToNumber';
 import editDialogueMutation from 'mutations/editDialogue';
@@ -110,7 +111,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
 
   const [editDialogue, { error: serverError, loading: isLoading }] = useMutation(editDialogueMutation, {
     onCompleted: () => {
-      history.push(`/dashboard/b/${customerSlug}/d`);
+      history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}`);
     },
     refetchQueries: [{
       query: getQuestionnairesCustomerQuery,
@@ -154,12 +155,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
   const { t } = useTranslation();
 
   return (
-    <>
-      <UI.ViewHead>
-        <UI.DeprecatedViewTitle>
-          {t('views:edit_dialogue_view')}
-        </UI.DeprecatedViewTitle>
-      </UI.ViewHead>
+    <View documentTitle="haas | Dialogue Configurations">
       <UI.ViewBody>
 
         <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
@@ -404,7 +400,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFor
           </FormContainer>
         </motion.div>
       </UI.ViewBody>
-    </>
+    </View>
   );
 };
 

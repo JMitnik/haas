@@ -21,17 +21,19 @@ import * as Menu from 'components/Common/Menu';
 import * as Modal from 'components/Common/Modal';
 import * as Table from 'components/Common/Table';
 import { DateFormat, useDate } from 'hooks/useDate';
-import { PickerButton } from 'components/Common/Picker/PickerButton';
-import { ScoreBox } from 'components/ScoreBox';
 import {
+  Dialogue,
   SessionConnectionOrder,
   SessionFragmentFragment, useGetWorkspaceSessionsQuery,
 } from 'types/generated-types';
+import { PickerButton } from 'components/Common/Picker/PickerButton';
+import { ScoreBox } from 'components/ScoreBox';
 import { TabbedMenu } from 'components/Common/TabMenu';
 import { View } from 'layouts/View';
 import { formatSimpleDate } from 'utils/dateUtils';
 import { getMainTopicValue } from 'components/Session/Session.helpers';
 import { useCustomer } from 'providers/CustomerProvider';
+import { useDialogue } from 'providers/DialogueProvider';
 import { useFormatter } from 'hooks/useFormatter';
 import { useMenu } from 'components/Common/Menu/useMenu';
 import SearchBar from 'components/Common/SearchBar/SearchBar';
@@ -67,11 +69,18 @@ const DistributionInnerCell = ({ session }: DistributionInnerCellProps) => (
   </UI.Div>
 );
 
+const setFilterDialogueIds = (activeDialogue?: Dialogue | null, dialogueIds?: (string | null)[] | null) => {
+  if (activeDialogue) return [activeDialogue?.id];
+
+  return dialogueIds?.filter(isPresent) || [];
+};
+
 export const FeedbackOverview = () => {
   const { t } = useTranslation();
   const { parse, format: dateFormat } = useDate();
   const { activeCustomer } = useCustomer();
   const { formatScore } = useFormatter();
+  const { activeDialogue } = useDialogue();
 
   const [modalIsOpen, setModalIsOpen] = useState({ isOpen: false, sessionId: '' });
   const [sessions, setSessions] = useState<SessionFragmentFragment[]>(() => []);
@@ -89,6 +98,7 @@ export const FeedbackOverview = () => {
     maxScore: withDefault(NumberParam, 100),
     withFollowUpAction: withDefault(BooleanParam, false),
   });
+
   const [totalPages, setTotalPages] = useState<number>(0);
 
   const { loading: isLoading } = useGetWorkspaceSessionsQuery({
@@ -105,7 +115,7 @@ export const FeedbackOverview = () => {
           desc: filter.orderByDescending,
         },
         search: filter.search,
-        dialogueIds: filter.dialogueIds?.filter(isPresent) || [],
+        dialogueIds: setFilterDialogueIds(activeDialogue, filter.dialogueIds),
         scoreRange: {
           min: filter.minScore,
           max: filter.maxScore,
@@ -114,6 +124,9 @@ export const FeedbackOverview = () => {
       },
     },
     errorPolicy: 'ignore',
+    onError: (e) => {
+      console.log('Error', e);
+    },
     onCompleted: (fetchedData) => {
       setSessions(
         fetchedData?.customer?.sessionConnection?.sessions || [],
@@ -277,6 +290,7 @@ export const FeedbackOverview = () => {
                   ? 'Multiple teams'
                   : sessions.find((session) => session.dialogueId === filter.dialogueIds?.[0])?.dialogue?.title}`}
                 onClose={() => setFilter({ dialogueIds: [] })}
+                disabled={!!activeDialogue}
               />
               <Table.FilterButton
                 condition={filter.minScore > 0 || filter.maxScore < 100}

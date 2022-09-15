@@ -59,12 +59,18 @@ class DialogueStatisticsService {
       endDateTimeSet
     );
 
+    const average = meanBy(scopedSessions, (session) => session.mainScore);
     const nrVotes = scopedSessions.length;
     const sessionsHigherThanTreshold = scopedSessions.filter((session) => session.mainScore >= threshold);
 
     const healthScore = nrVotes === 0 ? 0 : sessionsHigherThanTreshold.length / nrVotes * 100;
 
-    return { score: healthScore, nrVotes, negativeResponseCount: nrVotes - sessionsHigherThanTreshold.length };
+    return {
+      score: healthScore,
+      nrVotes,
+      negativeResponseCount: nrVotes - sessionsHigherThanTreshold.length,
+      average,
+    };
   };
 
   findWorkspaceHealthScore = async (
@@ -89,6 +95,7 @@ class DialogueStatisticsService {
       endDateTimeSet
     );
 
+    const average = meanBy(scopedSessions, (session) => session.mainScore);
     const nrVotes = scopedSessions.length;
     const sessionsHigherThanTreshold = scopedSessions.filter((session) => session.mainScore >= threshold);
 
@@ -98,6 +105,7 @@ class DialogueStatisticsService {
       score: healthScore,
       nrVotes,
       negativeResponseCount: nrVotes - sessionsHigherThanTreshold.length,
+      average,
     };
   };
 

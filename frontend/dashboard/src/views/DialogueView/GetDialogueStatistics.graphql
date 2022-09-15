@@ -1,30 +1,30 @@
-query GetDialogueStatistics($customerSlug: String!, $dialogueSlug: String!, $prevDateFilter: DialogueFilterInputType, $statisticsDateFilter: DialogueFilterInputType) {
+query GetDialogueStatistics(
+  $customerSlug: String!
+  $dialogueSlug: String!
+  $startDateTime: String!
+  $endDateTime: String
+  $issueFilter: IssueFilterInput
+  $healthInput: HealthScoreInput
+) {
   customer(slug: $customerSlug) {
     id
     dialogue(where: { slug: $dialogueSlug }) {
       id
       title
-      thisWeekAverageScore: averageScore(input: $statisticsDateFilter)
-      previousScore: averageScore(input: $prevDateFilter)
-      sessions(take: 3) {
-        id
-        createdAt
-        mainScore
-        nodeEntries {
-          relatedNode {
-            title
-            type
-          }
-          value {
-            sliderNodeEntry
-            textboxNodeEntry
-            registrationNodeEntry
-            choiceNodeEntry
-            linkNodeEntry
-          }
-        }
+      healthScore(input: $healthInput) {
+        nrVotes
+        negativeResponseCount
+        score
+        average
       }
-      statistics(input: $statisticsDateFilter) {
+      statistics(
+        input: {
+          startDateTime: $startDateTime
+          endDateTime: $endDateTime
+          impactType: AVERAGE
+          refresh: true
+        }
+      ) {
         nrInteractions
         topPositivePath {
           answer
@@ -47,6 +47,65 @@ query GetDialogueStatistics($customerSlug: String!, $dialogueSlug: String!, $pre
         history {
           x
           y
+        }
+      }
+      sessions(take: 3) {
+        id
+        createdAt
+        mainScore
+        nodeEntries {
+          relatedNode {
+            title
+            type
+          }
+          value {
+            sliderNodeEntry
+            textboxNodeEntry
+            registrationNodeEntry
+            choiceNodeEntry
+            linkNodeEntry
+          }
+        }
+      }
+      issues(filter: $issueFilter) {
+        id
+        topic
+        rankScore
+        followUpAction
+        actionRequiredCount
+        dialogue {
+          id
+          title
+        }
+        basicStats {
+          responseCount
+          average
+        }
+        history {
+          id
+          items {
+            id
+            date
+            frequency
+          }
+        }
+      }
+      dialogueStatisticsSummary(
+        input: {
+          startDateTime: $startDateTime
+          endDateTime: $endDateTime
+          impactType: AVERAGE
+          refresh: true
+        }
+      ) {
+        id
+        nrVotes
+        impactScore
+        updatedAt
+        title
+        dialogue {
+          title
+          id
         }
       }
     }

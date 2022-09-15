@@ -507,10 +507,10 @@ export class CustomerService {
 
   /**
    * Creates a user with the 'BOT' role and connects it to a workspace
-   * @param workspaceId 
-   * @param workspaceSlug 
-   * @param roles 
-   * @returns 
+   * @param workspaceId
+   * @param workspaceSlug
+   * @param roles
+   * @returns
    */
   createBotUser = async (workspaceId: string, workspaceSlug: string, roles: Role[]) => {
     const botRole = roles.find((role) => role.type === RoleTypeEnum.BOT);

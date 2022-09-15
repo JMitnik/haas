@@ -10,6 +10,7 @@ interface FilterButtonProps {
   value: string | undefined | null;
   condition: boolean;
   onClose: () => void;
+  disabled?: boolean;
 }
 
 const FilterButtonContainer = styled(UI.Span)`
@@ -43,7 +44,7 @@ const FilterButtonContainer = styled(UI.Span)`
   `}
 `;
 
-export const FilterButton = ({ filterKey, value, onClose, condition }: FilterButtonProps) => {
+export const FilterButton = ({ filterKey, value, onClose, condition, disabled }: FilterButtonProps) => {
   if (!condition) return null;
   const { t } = useTranslation();
 
@@ -59,6 +60,7 @@ export const FilterButton = ({ filterKey, value, onClose, condition }: FilterBut
         onClick={onClose}
         width={10}
         minWidth={10}
+        isDisabled={disabled}
       />
     </FilterButtonContainer>
   );
