@@ -10,7 +10,7 @@ query GetIssue($input: GetIssueResolverInput, $actionableFilter: ActionableConne
       actionables {
         id
         createdAt
-        isUrgent
+        isVerified
         dialogueId
         session {
           id

@@ -1,0 +1,17 @@
+query GetWorkspaceActionables($workspaceId: ID!, $filter: ActionableConnectionFilterInput) {
+	customer(id: $workspaceId) {
+    actionableConnection(input: $filter) {
+      actionables {
+        ...ActionableFragment
+      }
+      totalPages
+      pageInfo {
+        hasNextPage
+        hasPrevPage
+        nextPageOffset
+        pageIndex
+        prevPageOffset
+      }
+    }
+	}
+}

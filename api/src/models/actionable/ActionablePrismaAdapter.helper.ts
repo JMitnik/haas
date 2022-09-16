@@ -13,6 +13,23 @@ export const buildOrderByQuery = (filter?: ActionableConnectionFilterInput) => {
   return orderByQuery;
 };
 
+export const buildFindActionablesByWorkspaceWhereInput = (
+  workspaceId: string,
+  filter?: ActionableFilterInput
+): Prisma.ActionableWhereInput => {
+  return {
+    dialogue: {
+      customerId: workspaceId,
+    },
+    createdAt: {
+      gte: filter?.startDate,
+      lte: filter?.endDate,
+    },
+    assigneeId: filter?.assigneeId,
+    status: filter?.status || undefined,
+  }
+};
+
 export const buildFindActionablesWhereInput = (
   issueId: string,
   filter?: ActionableFilterInput

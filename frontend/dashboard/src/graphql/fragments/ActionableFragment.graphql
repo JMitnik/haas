@@ -1,8 +1,13 @@
 fragment ActionableFragment on Actionable {
   id
   createdAt
-  isUrgent
+  isVerified
   dialogueId
+  issue {
+    topic {
+      name
+    }
+  }
   session {
     id
     mainScore

@@ -1,7 +1,22 @@
 import * as UI from '@haas/ui';
 import { ActionableState } from 'types/generated-types';
+import { format } from 'date-fns';
 import React from 'react';
 import styled, { css } from 'styled-components';
+
+export const DateCell = ({ timestamp }: { timestamp: string }) => {
+  const date = new Date(parseInt(timestamp, 10));
+
+  const formattedDate = format(date, 'd MMM yyyy');
+  const formattedTimestamp = format(date, 'HH:mm');
+
+  return (
+    <UI.ColumnFlex>
+      <UI.Helper>{formattedDate}</UI.Helper>
+      <UI.Span color="gray.400" fontWeight={600}>{formattedTimestamp}</UI.Span>
+    </UI.ColumnFlex>
+  );
+};
 
 export const ChangeableEmailContainer = styled(UI.Div)`
  ${({ theme }) => css`
@@ -61,7 +76,7 @@ export const StatusContainer = styled(UI.Div) <StatusContainerProps>`
     padding: 5px;
     text-align: center;
 
-    ${(status === ActionableState.Unverified || status === ActionableState.Dropped) && css`
+    ${(status === ActionableState.Dropped) && css`
       background: ${theme.colors.gray[100]};
       color: ${theme.colors.gray[500]};
 

@@ -3,6 +3,7 @@ import { GraphQLError } from 'graphql';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import { arg, extendType, inputObjectType, mutationField, nonNull, objectType, scalarType } from 'nexus';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 import { WorkspaceStatistics } from './WorkspaceStatistics';
 import { CustomerSettingsType } from '../../settings/CustomerSettings';
@@ -22,7 +23,7 @@ import { Issue, IssueFilterInput, IssueModel, IssueConnectionFilterInput, IssueC
 import { IssueValidator } from '../../Issue/IssueValidator';
 import { SessionConnectionFilterInput } from '../../../models/session/graphql';
 import { SessionConnection } from '../../session/graphql/Session.graphql'
-import { GraphQLYogaError } from '@graphql-yoga/node';
+import { ActionableConnection, ActionableConnectionFilterInput } from '../../actionable/graphql';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -86,6 +87,22 @@ export const CustomerType = objectType({
 
       resolve: async (parent) => {
         return { id: parent.id }
+      },
+    });
+
+    /**
+     * ActionableConnection
+     */
+    t.field('actionableConnection', {
+      type: ActionableConnection,
+      args: {
+        input: ActionableConnectionFilterInput,
+      },
+      async resolve(parent, args, ctx) {
+        return ctx.services.actionableService.findPaginatedWorkspaceActionables(
+          parent.id as string,
+          args.input || undefined
+        );
       },
     });
 

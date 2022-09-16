@@ -16,7 +16,7 @@ type Actionable {
   dialogue: Dialogue
   dialogueId: String
   id: ID
-  isUrgent: Boolean!
+  isVerified: Boolean!
   issue: IssueModel
   issueId: String
   session: Session
@@ -65,7 +65,6 @@ enum ActionableState {
   DROPPED
   PENDING
   STALE
-  UNVERIFIED
 }
 
 """Basic statistics for actionables of an issue"""
@@ -658,6 +657,7 @@ type CustomFieldType {
 }
 
 type Customer {
+  actionableConnection(input: ActionableConnectionFilterInput): ActionableConnection
   automationConnection(filter: AutomationConnectionFilterInput): AutomationConnection
   automations: [AutomationModel]
   campaign(campaignId: String): CampaignType
@@ -1336,6 +1336,7 @@ type IssueModel {
   topic: Topic!
   topicId: String!
   updatedAt: Date
+  workspaceId: String!
 }
 
 """

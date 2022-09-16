@@ -1231,6 +1231,7 @@ export interface NexusGenObjects {
     topic: NexusGenRootTypes['Topic']; // Topic!
     topicId: string; // String!
     updatedAt?: NexusGenScalars['Date'] | null; // Date
+    workspaceId: string; // String!
   }
   JobObjectType: { // root type
     createWorkspaceJob?: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
@@ -1538,7 +1539,7 @@ export interface NexusGenFieldTypes {
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogueId: string | null; // String
     id: string | null; // ID
-    isUrgent: boolean; // Boolean!
+    isVerified: boolean; // Boolean!
     issue: NexusGenRootTypes['IssueModel'] | null; // IssueModel
     issueId: string | null; // String
     session: NexusGenRootTypes['Session'] | null; // Session
@@ -1733,6 +1734,7 @@ export interface NexusGenFieldTypes {
     value: string | null; // String
   }
   Customer: { // field return type
+    actionableConnection: NexusGenRootTypes['ActionableConnection'] | null; // ActionableConnection
     automationConnection: NexusGenRootTypes['AutomationConnection'] | null; // AutomationConnection
     automations: Array<NexusGenRootTypes['AutomationModel'] | null> | null; // [AutomationModel]
     campaign: NexusGenRootTypes['CampaignType'] | null; // CampaignType
@@ -1996,6 +1998,7 @@ export interface NexusGenFieldTypes {
     topic: NexusGenRootTypes['Topic']; // Topic!
     topicId: string; // String!
     updatedAt: NexusGenScalars['Date'] | null; // Date
+    workspaceId: string; // String!
   }
   JobObjectType: { // field return type
     createWorkspaceJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
@@ -2506,7 +2509,7 @@ export interface NexusGenFieldTypeNames {
     dialogue: 'Dialogue'
     dialogueId: 'String'
     id: 'ID'
-    isUrgent: 'Boolean'
+    isVerified: 'Boolean'
     issue: 'IssueModel'
     issueId: 'String'
     session: 'Session'
@@ -2701,6 +2704,7 @@ export interface NexusGenFieldTypeNames {
     value: 'String'
   }
   Customer: { // field return type name
+    actionableConnection: 'ActionableConnection'
     automationConnection: 'AutomationConnection'
     automations: 'AutomationModel'
     campaign: 'CampaignType'
@@ -2964,6 +2968,7 @@ export interface NexusGenFieldTypeNames {
     topic: 'Topic'
     topicId: 'String'
     updatedAt: 'Date'
+    workspaceId: 'String'
   }
   JobObjectType: { // field return type name
     createWorkspaceJob: 'CreateWorkspaceJobType'
@@ -3467,6 +3472,9 @@ export interface NexusGenArgTypes {
     }
   }
   Customer: {
+    actionableConnection: { // args
+      input?: NexusGenInputs['ActionableConnectionFilterInput'] | null; // ActionableConnectionFilterInput
+    }
     automationConnection: { // args
       filter?: NexusGenInputs['AutomationConnectionFilterInput'] | null; // AutomationConnectionFilterInput
     }

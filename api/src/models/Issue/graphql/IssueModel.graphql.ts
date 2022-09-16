@@ -18,6 +18,7 @@ export const IssueModel = objectType({
     t.date('createdAt');
     t.date('updatedAt');
     t.nonNull.string('topicId');
+    t.nonNull.string('workspaceId');
 
     t.nonNull.field('topic', {
       type: Topic,
@@ -54,7 +55,7 @@ export const IssueModel = objectType({
         return {
           average: _.meanBy(issue.actionables, (actionable) => actionable.session?.mainScore),
           responseCount: issue.actionables?.length || 0,
-          urgentCount: _.filter(issue.actionables, (actionable) => actionable.isUrgent)?.length,
+          urgentCount: _.filter(issue.actionables, (actionable) => actionable.isVerified)?.length,
         }
       },
     });

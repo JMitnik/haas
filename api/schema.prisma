@@ -32,7 +32,6 @@ model Comment {
 }
 
 enum ActionableState {
-  UNVERIFIED
   PENDING
   STALE
   COMPLETED
@@ -46,9 +45,9 @@ model Actionable {
   dialogueId String
   assigneeId String?
   issueId    String?
-  isUrgent   Boolean  @default(false)
+  isVerified Boolean  @default(false)
 
-  status ActionableState @default(UNVERIFIED)
+  status ActionableState @default(PENDING)
 
   assignee User?     @relation(fields: [assigneeId], references: [id])
   comments Comment[]

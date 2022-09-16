@@ -3,7 +3,7 @@ import {
   PrismaClient,
 } from '@prisma/client';
 import { ActionableConnectionFilterInput, ActionableFilterInput, AssignUserToActionableInput } from './Actionable.types';
-import { buildFindActionablesWhereInput, buildOrderByQuery, buildUpdateActionableAssignee } from './ActionablePrismaAdapter.helper';
+import { buildFindActionablesByWorkspaceWhereInput, buildFindActionablesWhereInput, buildOrderByQuery, buildUpdateActionableAssignee } from './ActionablePrismaAdapter.helper';
 
 export class ActionablePrismaAdapter {
   prisma: PrismaClient;
@@ -49,6 +49,32 @@ export class ActionablePrismaAdapter {
     return this.prisma.actionable.count({
       where: buildFindActionablesWhereInput(issueId, filter),
     })
+  };
+
+  public async countActionablesByWorkspace(workspaceId: string, filter?: ActionableConnectionFilterInput) {
+    return this.prisma.actionable.count({
+      where: buildFindActionablesByWorkspaceWhereInput(workspaceId, filter),
+    })
+  };
+
+  public async findPaginatedActionablesByWorkspace(workspaceId: string, filter?: ActionableConnectionFilterInput) {
+    return this.prisma.actionable.findMany({
+      where: buildFindActionablesByWorkspaceWhereInput(workspaceId, filter),
+      take: filter?.perPage,
+      skip: filter?.offset,
+      orderBy: buildOrderByQuery(filter),
+      include: {
+        assignee: true,
+        comments: true,
+        dialogue: true,
+        session: true,
+        issue: {
+          include: {
+            topic: true,
+          },
+        },
+      },
+    })
   }
 
   public async findPaginatedActionables(issueId: string, filter?: ActionableConnectionFilterInput) {
@@ -57,6 +83,18 @@ export class ActionablePrismaAdapter {
       take: filter?.perPage,
       skip: filter?.offset,
       orderBy: buildOrderByQuery(filter),
+      include: {
+        assignee: true,
+        comments: true,
+        dialogue: true,
+        session: true,
+      },
+    })
+  }
+
+  public async findActionablesByWorkspace(workspaceId: string, filter?: ActionableFilterInput) {
+    return this.prisma.actionable.findMany({
+      where: buildFindActionablesByWorkspaceWhereInput(workspaceId, filter),
       include: {
         assignee: true,
         comments: true,

@@ -111,7 +111,7 @@ class NodeEntryService {
       }
 
       if (actionableExists) {
-        await this.actionablePrismaAdapter.updateActionable(actionable.id, { ...actionableUpdateArgs, isUrgent: true });
+        await this.actionablePrismaAdapter.updateActionable(actionable.id, { ...actionableUpdateArgs });
       }
     }
 

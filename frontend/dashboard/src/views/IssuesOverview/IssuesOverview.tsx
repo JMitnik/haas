@@ -3,7 +3,6 @@
 /* eslint-disable radix */
 import '@szhsin/react-menu/dist/index.css';
 import * as UI from '@haas/ui';
-import { AlertTriangle, BarChart2, Calendar, Plus, Search } from 'react-feather';
 import {
   ArrayParam,
   BooleanParam,
@@ -12,40 +11,44 @@ import {
   useQueryParams,
   withDefault,
 } from 'use-query-params';
+import { BarChart2, Calendar, Plus, Search } from 'react-feather';
 import { endOfDay, format, startOfDay } from 'date-fns';
-import { isPresent } from 'ts-is-present';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
-import * as Modal from 'components/Common/Modal';
 import * as Table from 'components/Common/Table';
-import { DateFormat, useDate } from 'hooks/useDate';
 import {
-  IssueConnectionOrderType, IssueFragmentFragment,
+  ActionableConnectionOrderType,
+  ActionableFragmentFragment,
+  useAssignUserToActionableMutation,
   useGetUsersAndRolesQuery,
-  useGetWorkspaceIssuesQuery,
+  useGetWorkspaceActionablesQuery,
+  useSetActionableStatusMutation,
 } from 'types/generated-types';
+import { DateFormat, useDate } from 'hooks/useDate';
+import { ReactComponent as IconClose } from 'assets/icons/icon-close.svg';
 import { PickerButton } from 'components/Common/Picker/PickerButton';
-import { ScoreBox } from 'components/ScoreBox';
 import { TabbedMenu } from 'components/Common/TabMenu';
+import { UserNodePicker } from 'components/NodePicker/UserNodePicker';
 import { View } from 'layouts/View';
 import { mapToUserPickerEntries } from 'views/AddAutomationView/AutomationForm.helpers';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useFormatter } from 'hooks/useFormatter';
+import Dropdown from 'components/Dropdown';
 import SearchBar from 'components/Common/SearchBar/SearchBar';
 
-import { countBy } from 'lodash';
-import { IssueModalCard } from './IssueModalCard';
-import { UrgentContainer } from './IssueOverview.styles';
+import { CheckCircledIcon } from '@radix-ui/react-icons';
+import { ActionableStatusPicker } from './ActionableStatusPicker';
+import { ChangeableEmailContainer, DateCell } from './IssueOverview.styles';
 
 export const IssuesOverview = () => {
   const { t } = useTranslation();
-  const { parse, format: dateFormat, getStartOfWeek, getNWeekAgo, getEndOfWeek } = useDate();
   const { activeCustomer } = useCustomer();
   const { formatScore } = useFormatter();
 
-  const [modalIsOpen, setModalIsOpen] = useState({ isOpen: false, issueId: '' });
-  const [issues, setIssues] = useState<IssueFragmentFragment[]>(() => []);
+  const { parse, format: dateFormat } = useDate();
+  const [actionables, setActionables] = useState<ActionableFragmentFragment[]>(() => []);
+  const [totalPages, setTotalPages] = useState<number>(0);
 
   const [filter, setFilter] = useQueryParams({
     startDate: StringParam,
@@ -53,44 +56,46 @@ export const IssuesOverview = () => {
     search: StringParam,
     pageIndex: withDefault(NumberParam, 0),
     perPage: withDefault(NumberParam, 10),
-    orderByField: withDefault(StringParam, IssueConnectionOrderType.Issue),
-    orderByDescending: withDefault(BooleanParam, false),
+    orderByField: withDefault(StringParam, ActionableConnectionOrderType.CreatedAt),
+    orderByDescending: withDefault(BooleanParam, true),
     topicStrings: ArrayParam,
     dialogueIds: ArrayParam,
     minScore: withDefault(NumberParam, 0),
     maxScore: withDefault(NumberParam, 100),
     withFollowUpAction: withDefault(BooleanParam, false),
   });
-  const [totalPages, setTotalPages] = useState<number>(0);
 
-  const { loading: isIssuesLoading } = useGetWorkspaceIssuesQuery({
-    fetchPolicy: 'cache-and-network',
+  const { loading } = useGetWorkspaceActionablesQuery({
     variables: {
       workspaceId: activeCustomer?.id as string,
       filter: {
         perPage: filter.perPage,
         offset: filter.pageIndex * filter.perPage,
         orderBy: {
-          by: filter.orderByField as IssueConnectionOrderType,
+          by: filter.orderByField as ActionableConnectionOrderType,
           desc: filter.orderByDescending,
         },
         search: filter.search,
-        startDate: filter.startDate ? filter.startDate : undefined,
-        endDate: filter.endDate ? filter.endDate : undefined,
-        topicStrings: filter.topicStrings?.filter(isPresent) || [],
+        startDate: filter.startDate,
+        endDate: filter.endDate,
       },
     },
-    // errorPolicy: 'ignore',
-    onError(e) {
-      console.log(e.message);
-    },
+    errorPolicy: 'ignore',
     onCompleted: (fetchedData) => {
-      setIssues(
-        fetchedData?.customer?.issueConnection?.issues as IssueFragmentFragment[] || [],
+      setActionables(
+        fetchedData?.customer?.actionableConnection?.actionables as ActionableFragmentFragment[] || [],
       );
 
-      setTotalPages(fetchedData?.customer?.issueConnection?.totalPages || 0);
+      setTotalPages(fetchedData?.customer?.actionableConnection?.totalPages || 0);
     },
+  });
+
+  const [assignUserToActionable] = useAssignUserToActionableMutation({
+    refetchQueries: ['GetWorkspaceActionables'],
+  });
+
+  const [setActionableStatus] = useSetActionableStatusMutation({
+    refetchQueries: ['GetWorkspaceActionables'],
   });
 
   const { data: userRoleData } = useGetUsersAndRolesQuery({
@@ -128,7 +133,7 @@ export const IssuesOverview = () => {
     }));
   };
 
-  const columns = '50px minmax(200px, 1fr) minmax(150px, 1fr) minmax(300px, 1fr) minmax(300px, 1fr)';
+  const columns = '20px minmax(100px, 0.5fr) minmax(100px, 0.5fr) minmax(150px, 1fr) minmax(300px, 1fr) minmax(150px, 0.5fr)';
 
   return (
     <View documentTitle="haas | Issues">
@@ -230,7 +235,27 @@ export const IssuesOverview = () => {
                 value={`${filter.startDate ? format(parse(filter.startDate, DateFormat.DayTimeFormat), DateFormat.DayFormat) : 'N/A'} - ${filter.endDate ? format(parse(filter.endDate, DateFormat.DayTimeFormat), DateFormat.DayFormat) : 'N/A'}`}
                 onClose={() => setFilter({ startDate: undefined, endDate: undefined })}
               />
+              <Table.FilterButton
+                condition={!!filter.dialogueIds?.length}
+                filterKey="team"
+                value={`${!!filter.dialogueIds?.length && filter?.dialogueIds?.length > 1
+                  ? 'Multiple teams'
+                  : actionables?.find((actionable) => actionable?.dialogueId === filter.dialogueIds?.[0])?.dialogue?.title}`}
+                onClose={() => setFilter({ dialogueIds: [] })}
+              />
+              <Table.FilterButton
+                condition={filter.minScore > 0 || filter.maxScore < 100}
+                filterKey="score"
+                value={`${formatScore(filter.minScore)} - ${formatScore(filter.maxScore)}`}
+                onClose={() => setFilter({ minScore: 0, maxScore: 100 })}
+              />
 
+              <Table.FilterButton
+                condition={filter.withFollowUpAction}
+                filterKey="show"
+                value="urgent only"
+                onClose={() => setFilter({ withFollowUpAction: false })}
+              />
             </UI.Stack>
 
           </UI.Flex>
@@ -240,74 +265,133 @@ export const IssuesOverview = () => {
           />
         </UI.Flex>
         <UI.Div width="100%">
-          <Table.HeadingRow gridTemplateColumns={columns}>
-            <Table.HeadingCell>
-              {t('score')}
-            </Table.HeadingCell>
-            <Table.HeadingCell>
-              {t('issue')}
-            </Table.HeadingCell>
-            <Table.HeadingCell>
-              {t('total_actionables')}
-            </Table.HeadingCell>
-            <Table.HeadingCell>
-              {t('urgent')}
-            </Table.HeadingCell>
-            <Table.HeadingCell>
-              {t('groups')}
-            </Table.HeadingCell>
-          </Table.HeadingRow>
-          <UI.Div>
-            {issues.map((issue) => (
+          <UI.Div width="100%">
+            <Table.HeadingRow gridTemplateColumns={columns}>
+              <Table.HeadingCell>
+                <CheckCircledIcon />
+              </Table.HeadingCell>
+              <Table.HeadingCell>
+                {t('status')}
+              </Table.HeadingCell>
+              <Table.HeadingCell>
+                {t('topic')}
+              </Table.HeadingCell>
+              <Table.HeadingCell>
+                {t('assignee')}
+              </Table.HeadingCell>
+              <Table.HeadingCell>
+                {t('team')}
+              </Table.HeadingCell>
+              <Table.HeadingCell>
+                {t('when')}
+              </Table.HeadingCell>
+            </Table.HeadingRow>
+
+            {actionables?.map((actionable) => (
               <Table.Row
-                isLoading={isIssuesLoading}
-                onClick={() => {
-                  setModalIsOpen({ isOpen: true, issueId: issue.id as string });
-                }}
+                isLoading={loading}
                 gridTemplateColumns={columns}
-                key={issue.id}
+                key={actionable.id}
               >
-                <Table.Cell>
-                  <ScoreBox score={issue.basicStats?.average} />
+                <Table.Cell display="flex">
+                  {actionable.isVerified && (
+                    <UI.Icon stroke="#6a6d9e">
+                      <CheckCircledIcon />
+                    </UI.Icon>
+                  )}
+
                 </Table.Cell>
                 <Table.Cell maxWidth={300}>
                   <UI.ColumnFlex justifyContent="flex-start">
                     <UI.Flex alignItems="center">
-                      <UI.Span fontWeight={600} color="off.500">
-                        {issue.topic.name}
-                      </UI.Span>
+                      <ActionableStatusPicker
+                        actionableId={actionable.id as string}
+                        onChange={setActionableStatus}
+                        status={actionable.status}
+                      />
+                      {/* <StatusBox isSelected status={actionable.status} /> */}
                     </UI.Flex>
                   </UI.ColumnFlex>
                 </Table.Cell>
                 <Table.Cell>
                   <UI.Span fontWeight={600} color="off.500">
-                    {issue.basicStats?.responseCount}
-                    {' '}
-                    actionables
+                    {actionable.issue?.topic.name}
                   </UI.Span>
                 </Table.Cell>
                 <Table.Cell>
-                  <UrgentContainer hasUrgent={!!issue.basicStats?.urgentCount}>
-                    <UI.Icon>
-                      <AlertTriangle width="1.5em" />
-                    </UI.Icon>
+                  <Table.InnerCell>
+                    <Dropdown
+                      isRelative
+                      renderOverlay={({ onClose }) => (
+                        <UserNodePicker
+                          items={userPickerEntries}
+                          onClose={onClose}
+                          onChange={(user: any) => {
+                            assignUserToActionable({
+                              variables: {
+                                input: {
+                                  assigneeId: user?.value,
+                                  actionableId: actionable.id as string,
+                                },
+                              },
+                            });
+                            onClose();
+                          }}
+                        />
+                      )}
+                    >
+                      {({ onOpen }) => (
+                        <UI.Div
+                          width="100%"
+                          justifyContent="center"
+                          display="flex"
+                          alignItems="center"
+                        >
+                          {actionable.assignee?.email ? (
+                            <ChangeableEmailContainer onClick={onOpen}>
+                              <UI.Helper>
+                                {actionable.assignee?.email}
+                              </UI.Helper>
+                              <UI.IconButton
+                                aria-label="close"
+                                icon={() => <IconClose />}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  assignUserToActionable({
+                                    variables: {
+                                      input: {
+                                        assigneeId: null,
+                                        actionableId: actionable.id as string,
+                                      },
+                                    },
+                                  });
+                                }}
+                                width={10}
+                                minWidth={10}
+                              />
+                            </ChangeableEmailContainer>
+                          ) : (
+                            <UI.Div onClick={onOpen}>
+                              <UI.Helper>
+                                None
+                              </UI.Helper>
+                            </UI.Div>
+                          )}
+                        </UI.Div>
+                      )}
+                    </Dropdown>
 
-                    <UI.Span ml="0.5em" fontWeight={600}>
-                      {issue.basicStats?.urgentCount}
-                      {' '}
-                      URGENT
-                    </UI.Span>
-                  </UrgentContainer>
+                  </Table.InnerCell>
 
                 </Table.Cell>
                 <Table.Cell>
-                  <UI.Span ml="0.5em" color="off.500" fontWeight={600}>
-                    in
-                    {' '}
-                    {issue.teamCount}
-                    {' '}
-                    group(s)
+                  <UI.Span fontWeight={600} color="off.500">
+                    {actionable.dialogue?.title}
                   </UI.Span>
+
+                </Table.Cell>
+                <Table.Cell>
+                  <DateCell timestamp={actionable.createdAt as string} />
                 </Table.Cell>
               </Table.Row>
             ))}
@@ -318,18 +402,12 @@ export const IssuesOverview = () => {
                 pageIndex={filter.pageIndex}
                 maxPages={totalPages}
                 perPage={filter.perPage}
-                isLoading={isIssuesLoading}
+                isLoading={loading}
                 setPageIndex={(page) => setFilter((newFilter) => ({ ...newFilter, pageIndex: page - 1 }))}
               />
             )}
           </UI.Flex>
         </UI.Div>
-        <Modal.Root onClose={() => setModalIsOpen({ isOpen: false, issueId: '' })} open={modalIsOpen.isOpen}>
-          <IssueModalCard
-            userEntries={userPickerEntries}
-            issueId={modalIsOpen.issueId}
-          />
-        </Modal.Root>
       </UI.ViewBody>
     </View>
   );
