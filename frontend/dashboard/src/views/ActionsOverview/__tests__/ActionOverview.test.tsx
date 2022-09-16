@@ -52,7 +52,6 @@ describe('ActionOverview', () => {
     fireEvent.click(screen.getByText((text) => includesText(text, 'add call')));
     await new Promise((r) => setTimeout(r, 2000));
 
-    console.log(screen.getByTestId('editor'));
     const mdeShit = within(screen.getByTestId('editor')).getByRole('textbox');
     userEvent.type(mdeShit, 'hello');
 
@@ -160,8 +159,6 @@ describe('ActionOverview', () => {
     userEvent.type(finishField, 'Finish');
     expect(finishField).toHaveValue('Finish');
 
-    screen.debug(headerField.parentElement?.parentElement!.parentElement!);
-
     await new Promise((r) => setTimeout(r, 2000));
 
     // const savePreFormNodeButton = await within(
@@ -169,7 +166,6 @@ describe('ActionOverview', () => {
     // ).findByText('Save');
 
     const savePreFormNodeButton = await screen.findByText((text) => includesText(text, 'Save Pre'));
-    screen.debug(savePreFormNodeButton);
 
     expect(savePreFormNodeButton).not.toBeDisabled();
     fireEvent.click(savePreFormNodeButton);

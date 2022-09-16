@@ -2,7 +2,7 @@ import { render, screen, userEvent } from 'test';
 import React from 'react';
 
 import { AutomationForm } from '../AutomationForm';
-import { mockGetUsersAndRoles } from './helpers';
+import { mockGetUsersAndRoles, mockGetWorkspaceDialogues } from './helpers';
 
 const renderComponent = () => {
   render(<AutomationForm />);
@@ -10,6 +10,7 @@ const renderComponent = () => {
 
 test('render form and validate state of create button', async () => {
   mockGetUsersAndRoles((res) => ({ ...res }));
+  mockGetWorkspaceDialogues((res) => ({ ...res }));
   renderComponent();
 
   // Verify initially create button is disabled
@@ -50,14 +51,20 @@ test('render form and validate state of create button', async () => {
   const sendDialogueLinkChoice = await screen.findByText('Send dialogue link');
   userEvent.click(sendDialogueLinkChoice);
 
+  mockGetUsersAndRoles((res) => ({ ...res }));
+
   expect(screen.queryByText(/Schedule frequency/i)).not.toBeNull();
   expect(screen.queryByText('Create')).toBeDisabled();
+
+  userEvent.click(customizableChoice);
 
   // Add recipient
   const addTargetButton = await screen.findByText('Add target');
   userEvent.click(addTargetButton);
 
-  const userPickerEntry = await screen.findByText(/ADMIN User*/i);
+  await new Promise((r) => setTimeout(r, 2000));
+
+  const userPickerEntry = await screen.findByText((text) => text.toLowerCase().includes('admin user'.toLowerCase()));
   userEvent.click(userPickerEntry);
 
   // Verify that the create button is enabled now

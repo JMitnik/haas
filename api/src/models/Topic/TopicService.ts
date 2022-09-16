@@ -96,16 +96,17 @@ export class TopicService {
   }
 
   /**
-   * Count topics and their frequencies for a given topic.
-   */
+  * Count topics and their frequencies for a given topic.
+  */
   async countWorkspaceTopics(
     workspaceId: string,
     startDate: Date,
     endDate: Date,
+    userId: string,
     topicFilter?: TopicFilterInput
   ): Promise<TopicByString> {
     const dialogueIds = (
-      await this.workspaceService.getDialogues(workspaceId, topicFilter?.dialogueStrings || undefined)
+      await this.workspaceService.getDialogues(workspaceId, userId, topicFilter?.dialogueStrings || undefined)
     ).map(dialogue => dialogue.id);
 
     // Fetch all sessions for the dialogues.

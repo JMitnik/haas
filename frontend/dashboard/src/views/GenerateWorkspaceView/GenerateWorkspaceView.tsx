@@ -18,6 +18,7 @@ const schema = yup.object({
   workspaceSlug: yup.string().required(),
   dialogueType: yup.string().required(),
   generateDemoData: yup.number().required(),
+  makeDialoguesPrivate: yup.number().required(),
   isDemo: yup.number().required(),
 }).required();
 
@@ -94,12 +95,6 @@ export const GenerateWorkspaceView = () => {
     },
   });
 
-  const usesGeneratedData = useWatch({
-    control: form.control,
-    name: 'generateDemoData',
-    defaultValue: 0,
-  });
-
   const isDemoWatch = useWatch({
     control: form.control,
     name: 'isDemo',
@@ -129,9 +124,10 @@ export const GenerateWorkspaceView = () => {
   };
 
   const handleSubmit = (formData: FormProps) => {
-    const { workspaceTitle, workspaceSlug, dialogueType, generateDemoData, isDemo } = formData;
+    const { workspaceTitle, workspaceSlug, dialogueType, generateDemoData, isDemo, makeDialoguesPrivate } = formData;
     const generateDemoDataCheck = intToBool(generateDemoData);
     const isDemoCheck = intToBool(isDemo);
+    const makeDialoguesPrivateCheck = intToBool(makeDialoguesPrivate);
 
     importWorkspaceCSV({
       variables: {
@@ -143,6 +139,7 @@ export const GenerateWorkspaceView = () => {
           type: dialogueType as DialogueTemplateType,
           generateDemoData: generateDemoDataCheck,
           isDemo: isDemoCheck,
+          makeDialoguesPrivate: makeDialoguesPrivateCheck,
         },
       },
     });
@@ -259,6 +256,34 @@ export const GenerateWorkspaceView = () => {
                     render={({ field: { onChange, value, onBlur } }) => (
                       <UI.Toggle
                         isDisabled={isDemoWatch !== 1}
+                        isChecked={value === 1}
+                        size="lg"
+                        onChange={() => (value === 1 ? onChange(0) : onChange(1))}
+                        value={value}
+                        onBlur={onBlur}
+                      />
+                    )}
+                  />
+                </UI.Div>
+
+              </UI.Flex>
+
+            </UI.FormControl>
+
+            <UI.FormControl>
+              <UI.Flex alignItems="center">
+                <UI.Div>
+                  <UI.FormLabel>{t('make_dialogues_private')}</UI.FormLabel>
+                  <UI.InputHelper>{t('make_dialogues_private_helper')}</UI.InputHelper>
+                </UI.Div>
+
+                <UI.Div ml={120}>
+                  <Controller
+                    control={form.control}
+                    name="makeDialoguesPrivate"
+                    defaultValue={0}
+                    render={({ field: { onChange, value, onBlur } }) => (
+                      <UI.Toggle
                         isChecked={value === 1}
                         size="lg"
                         onChange={() => (value === 1 ? onChange(0) : onChange(1))}

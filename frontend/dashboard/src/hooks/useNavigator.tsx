@@ -7,6 +7,9 @@ export const ROUTES = {
   WORKSPACE_ROOT: '/dashboard/b/:customerSlug',
   DIALOGUES_VIEW: '/dashboard/b/:customerSlug/d',
   DIALOGUE_ROOT: '/dashboard/b/:customerSlug/d/:dialogueSlug',
+  DIALOGUE_FEEDBACK_OVERVIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/feedback',
+  DIALOGUE_CTA_OVERVIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/actions',
+  DIALOGUE_CONFIG_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/edit',
   INTERACTIONS_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/interactions',
   DASHBOARD_VIEW: '/dashboard/b/:customerSlug/dashboard',
   INTERACTION_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/interactions/:interactionId',
@@ -42,6 +45,10 @@ export const useNavigator = () => {
   const { customerSlug, dialogueSlug, campaignId } = useParams<DashboardParams>();
 
   const dashboardScopeMatch = useRouteMatch<{ customerSlug: string }>({ path: ROUTES.DASHBOARD_VIEW });
+  const dialogueScopeMatch = useRouteMatch<{ dialogueSlug: string }>({ path: ROUTES.DIALOGUE_ROOT });
+  const dialogueScopeFeedbackMatch = useRouteMatch<{ dialogueSlug: string }>(
+    { path: ROUTES.DIALOGUE_FEEDBACK_OVERVIEW },
+  );
   const dialogueMatch = useRouteMatch<{ dialogueSlug: string }>({ path: ROUTES.DIALOGUE_ROOT });
   const userOverviewMatch = useRouteMatch<{ dialogueSlug: string }>({ path: ROUTES.USERS_OVERVIEW });
   const dialoguesMatch = useRouteMatch({ path: ROUTES.DIALOGUES_VIEW });
@@ -50,6 +57,28 @@ export const useNavigator = () => {
   const history = useHistory();
   const location = useLocation();
 
+  const goToDialogueFeedbackOverview = (
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    dialogueSlug: string,
+    dialogueIds: string[],
+    startDate: string,
+    endDate: string,
+    maxScore?: number,
+    withFollowUpAction?: boolean,
+    search?: string,
+  ) => {
+    const path = generatePath(ROUTES.DIALOGUE_FEEDBACK_OVERVIEW, {
+      customerSlug, dialogueSlug,
+    });
+
+    const dialogueQueryParams = dialogueIds.length > 1 ? dialogueIds.join('&dialogueIds=') : `${dialogueIds?.[0] || ''}`;
+    let targetPath = `${path}?startDate=${startDate}&endDate=${endDate}&dialogueIds=${dialogueQueryParams}`;
+    if (maxScore) targetPath = `${targetPath}&maxScore=${maxScore}`;
+    if (search) targetPath = `${targetPath}&${search}`;
+    if (withFollowUpAction) targetPath = `${targetPath}&withFollowUpAction=1`;
+
+    history.push(targetPath + location.search);
+  };
   const goToEditAutomationView = (automationId: string) => {
     const path = generatePath(ROUTES.EDIT_AUTOMATION_VIEW, {
       customerSlug,
@@ -192,10 +221,43 @@ export const useNavigator = () => {
   const getUsersPath = () => generatePath(ROUTES.USERS_OVERVIEW, { customerSlug });
   const getDialoguesPath = () => generatePath(ROUTES.DIALOGUES_VIEW, { customerSlug });
   const getAlertsPath = () => generatePath(ROUTES.ALERTS_OVERVIEW, { customerSlug });
+  const getDialogueViewPath = (currCustomerSlug: string, currDialogueSlug: string) => currDialogueSlug
+    && currCustomerSlug
+    && generatePath(
+      ROUTES.DIALOGUE_ROOT, { customerSlug: currCustomerSlug, dialogueSlug: currDialogueSlug },
+    );
+  const getDialogueFeedbackOverviewPath = (currCustomerSlug: string, currDialogueSlug: string) => currDialogueSlug
+    && currCustomerSlug
+    && generatePath(
+      ROUTES.DIALOGUE_FEEDBACK_OVERVIEW, { customerSlug: currCustomerSlug, dialogueSlug: currDialogueSlug },
+    );
+
+  const getDialogueCTAOverviewPath = (currCustomerSlug: string, currDialogueSlug: string) => currDialogueSlug
+    && currCustomerSlug
+    && generatePath(
+      ROUTES.DIALOGUE_CTA_OVERVIEW, { customerSlug: currCustomerSlug, dialogueSlug: currDialogueSlug },
+    );
+
+  const getDialogueBuilderViewPath = (currCustomerSlug: string, currDialogueSlug: string) => currDialogueSlug
+    && currCustomerSlug
+    && generatePath(
+      ROUTES.DIALOGUE_BUILDER_OVERVIEW, { customerSlug: currCustomerSlug, dialogueSlug: currDialogueSlug },
+    );
+
+  const getDialogueConfigViewPath = (currCustomerSlug: string, currDialogueSlug: string) => currDialogueSlug
+    && currCustomerSlug
+    && generatePath(
+      ROUTES.DIALOGUE_CONFIG_VIEW, { customerSlug: currCustomerSlug, dialogueSlug: currDialogueSlug },
+    );
+
+  const dialoguePath = () => dialogueSlug && customerSlug && generatePath(
+    ROUTES.DIALOGUE_ROOT, { customerSlug, dialogueSlug },
+  );
 
   const dashboardPath = useMemo(() => customerSlug && generatePath(
     ROUTES.DASHBOARD_VIEW, { customerSlug },
   ), [customerSlug]);
+
   const workspaceInteractionsPath = useMemo(() => customerSlug && generatePath(
     ROUTES.WORKSPACE_INTERACTIONS_VIEW, { customerSlug },
   ), [customerSlug]);
@@ -208,11 +270,18 @@ export const useNavigator = () => {
 
   return {
     workspaceIssuesPath,
+    getDialogueConfigViewPath,
+    getDialogueBuilderViewPath,
+    getDialogueCTAOverviewPath,
+    getDialogueFeedbackOverviewPath,
+    getDialogueViewPath,
+    goToDialogueFeedbackOverview,
     goToAutomationOverview,
     goToNewAutomationView,
     goToEditAutomationView,
     goTo,
     dashboardPath,
+    dialoguePath,
     workspaceInteractionsPath,
     goToWorkspaceFeedbackOverview,
     goToGenerateWorkspaceOverview,
@@ -232,6 +301,8 @@ export const useNavigator = () => {
     dialoguesMatch,
     dialogueMatch,
     dashboardScopeMatch,
+    dialogueScopeMatch,
+    dialogueScopeFeedbackMatch,
     customerSlug,
     dialogueSlug,
     campaignId,

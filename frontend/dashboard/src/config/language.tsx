@@ -323,6 +323,14 @@ const language = {
       en: 'Prefil each generated dialogue with static data. This is useful for generating demo data for your workspace.',
       de: 'Generieren Sie Demodaten für Verkaufsgespräche',
     },
+    make_dialogues_private: {
+      en: 'Make dialogues/teams private',
+      de: 'Machen Sie Dialoge/Teams privat',
+    },
+    make_dialogues_private_helper: {
+      en: 'When dialogues are private, only assigned team members can access the data generated within the specific team.',
+      de: 'Wenn Dialoge privat sind, können nur zugewiesene Teammitglieder auf die innerhalb des jeweiligen Teams generierten Daten zugreifen.',
+    },
     snapshot: {
       en: 'Generate data',
       de: 'Daten generieren',

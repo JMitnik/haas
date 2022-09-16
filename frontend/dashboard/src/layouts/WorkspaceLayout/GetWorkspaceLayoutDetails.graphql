@@ -7,6 +7,7 @@ query GetWorkspaceLayoutDetails($workspaceId: ID!, $healthInput: HealthScoreInpu
         nrVotes
         negativeResponseCount
         score
+        average
       }
     }
   }

@@ -109,13 +109,18 @@ export const CompactEntriesPath = ({ nodeEntries }: { nodeEntries: NodeEntry[] }
   );
 };
 
-const InteractionFeedEntry = ({ interaction }: { interaction: Session }) => {
+interface InteractionFeedEntryProps {
+  onSessionIdChange: (value: React.SetStateAction<string | undefined>) => void;
+  interaction: Session;
+}
+
+const InteractionFeedEntry = ({ interaction, onSessionIdChange }: InteractionFeedEntryProps) => {
   const date = new Date(parseInt(interaction.createdAt, 10));
   const dist = formatDistanceToNow(date);
   const { t } = useTranslation();
 
   return (
-    <InteractionFeedEntryContainer>
+    <InteractionFeedEntryContainer onClick={() => onSessionIdChange(interaction.id)}>
       <Flex flexWrap="wrap" width="100%" justifyContent="space-between">
         <Flex>
           <InteractionFeedEntryValueContainer value={interaction.mainScore!}>

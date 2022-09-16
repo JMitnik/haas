@@ -15,6 +15,9 @@ export interface ButtonProps extends ChakraButtonProps {
 
 const ButtonContainer = styled.div<{ iconOnly?: boolean; }>`
   ${({ theme, iconOnly }) => css`
+    display: flex;
+    align-items: center;
+
     svg {
       width: 1rem;
       margin-right: ${theme.gutter / 4}px;

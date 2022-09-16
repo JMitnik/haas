@@ -1,4 +1,4 @@
-import { dialogueStatistics_customer_dialogue as Dialogue } from 'views/DialogueView/__generated__/dialogueStatistics';
+import { Dialogue } from 'types/generated-types';
 import React, { useContext, useState } from 'react';
 
 const DialogueContext = React.createContext({} as DialogueContextProps);
@@ -8,8 +8,13 @@ interface DialogueContextProps {
   setActiveDialogue: (dialogue: Dialogue | null) => void;
 }
 
-export const DialogueProvider = ({ children }: { children: React.ReactNode }) => {
-  const [activeDialogue, setActiveDialogue] = useState<null | Dialogue>(null);
+interface CustomerProviderProps {
+  children: React.ReactNode;
+  dialogueOverride?: Dialogue;
+}
+
+export const DialogueProvider = ({ children, dialogueOverride }: CustomerProviderProps) => {
+  const [activeDialogue, setActiveDialogue] = useState<null | Dialogue>(dialogueOverride || null);
 
   return (
     <DialogueContext.Provider value={{ activeDialogue, setActiveDialogue }}>

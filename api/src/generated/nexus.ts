@@ -90,6 +90,12 @@ export interface NexusGenInputs {
     actionableId: string; // String!
     assigneeId?: string | null; // String
   }
+  AssignUserToDialogueInput: { // input type
+    dialogueId: string; // String!
+    state: boolean; // Boolean!
+    userId: string; // String!
+    workspaceId: string; // String!
+  }
   AssignUserToDialoguesInput: { // input type
     assignedDialogueIds?: string[] | null; // [String!]
     userId: string; // String!
@@ -362,9 +368,9 @@ export interface NexusGenInputs {
     desc: boolean | null; // Boolean
   }
   DialogueFilterInputType: { // input type
-    endDate?: string | null; // String
+    endDateTime?: string | null; // String
     searchTerm?: string | null; // String
-    startDate?: string | null; // String
+    startDateTime?: string | null; // String
   }
   DialogueStatisticsSummaryFilterInput: { // input type
     cutoff?: number | null; // Int
@@ -480,6 +486,7 @@ export interface NexusGenInputs {
   GenerateWorkspaceCSVInputType: { // input type
     generateDemoData?: boolean | null; // Boolean
     isDemo: boolean; // Boolean!
+    makeDialoguesPrivate?: boolean | null; // Boolean
     managerCsv?: NexusGenScalars['Upload'] | null; // Upload
     type: string; // String!
     uploadedCsv?: NexusGenScalars['Upload'] | null; // Upload
@@ -1200,6 +1207,7 @@ export interface NexusGenObjects {
     steps?: NexusGenRootTypes['FormNodeStep'][] | null; // [FormNodeStep!]
   }
   HealthScore: { // root type
+    average: number; // Float!
     negativeResponseCount: number; // Int!
     nrVotes: number; // Int!
     score: number; // Float!
@@ -1829,6 +1837,7 @@ export interface NexusGenFieldTypes {
     id: string; // ID!
     isPrivate: boolean | null; // Boolean
     isWithoutGenData: boolean | null; // Boolean
+    issues: NexusGenRootTypes['Issue'] | null; // Issue
     language: NexusGenEnums['LanguageEnumType'] | null; // LanguageEnumType
     leafs: NexusGenRootTypes['QuestionNode'][] | null; // [QuestionNode!]
     mostChangedPath: NexusGenRootTypes['MostChangedPath'] | null; // MostChangedPath
@@ -1950,6 +1959,7 @@ export interface NexusGenFieldTypes {
     steps: NexusGenRootTypes['FormNodeStep'][] | null; // [FormNodeStep!]
   }
   HealthScore: { // field return type
+    average: number; // Float!
     negativeResponseCount: number; // Int!
     nrVotes: number; // Int!
     score: number; // Float!
@@ -2057,6 +2067,7 @@ export interface NexusGenFieldTypes {
     appendToInteraction: NexusGenRootTypes['Session'] | null; // Session
     assignTags: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     assignUserToActionable: NexusGenRootTypes['Actionable'] | null; // Actionable
+    assignUserToDialogue: NexusGenRootTypes['UserType'] | null; // UserType
     assignUserToDialogues: NexusGenRootTypes['UserType'] | null; // UserType
     authenticateLambda: string | null; // String
     confirmCreateWorkspaceJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
@@ -2799,6 +2810,7 @@ export interface NexusGenFieldTypeNames {
     id: 'ID'
     isPrivate: 'Boolean'
     isWithoutGenData: 'Boolean'
+    issues: 'Issue'
     language: 'LanguageEnumType'
     leafs: 'QuestionNode'
     mostChangedPath: 'MostChangedPath'
@@ -2920,6 +2932,7 @@ export interface NexusGenFieldTypeNames {
     steps: 'FormNodeStep'
   }
   HealthScore: { // field return type name
+    average: 'Float'
     negativeResponseCount: 'Int'
     nrVotes: 'Int'
     score: 'Float'
@@ -3027,6 +3040,7 @@ export interface NexusGenFieldTypeNames {
     appendToInteraction: 'Session'
     assignTags: 'Dialogue'
     assignUserToActionable: 'Actionable'
+    assignUserToDialogue: 'UserType'
     assignUserToDialogues: 'UserType'
     authenticateLambda: 'String'
     confirmCreateWorkspaceJob: 'CreateWorkspaceJobType'
@@ -3535,6 +3549,9 @@ export interface NexusGenArgTypes {
     healthScore: { // args
       input?: NexusGenInputs['HealthScoreInput'] | null; // HealthScoreInput
     }
+    issues: { // args
+      filter?: NexusGenInputs['IssueFilterInput'] | null; // IssueFilterInput
+    }
     leafs: { // args
       searchTerm?: string | null; // String
     }
@@ -3557,7 +3574,7 @@ export interface NexusGenArgTypes {
       take?: number | null; // Int
     }
     statistics: { // args
-      input?: NexusGenInputs['DialogueFilterInputType'] | null; // DialogueFilterInputType
+      input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
     }
     topic: { // args
       input?: NexusGenInputs['TopicInputType'] | null; // TopicInputType
@@ -3581,6 +3598,9 @@ export interface NexusGenArgTypes {
     }
     assignUserToActionable: { // args
       input: NexusGenInputs['AssignUserToActionableInput']; // AssignUserToActionableInput!
+    }
+    assignUserToDialogue: { // args
+      input?: NexusGenInputs['AssignUserToDialogueInput'] | null; // AssignUserToDialogueInput
     }
     assignUserToDialogues: { // args
       input?: NexusGenInputs['AssignUserToDialoguesInput'] | null; // AssignUserToDialoguesInput

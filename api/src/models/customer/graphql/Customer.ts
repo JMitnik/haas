@@ -24,6 +24,7 @@ import { IssueValidator } from '../../Issue/IssueValidator';
 import { SessionConnectionFilterInput } from '../../../models/session/graphql';
 import { SessionConnection } from '../../session/graphql/Session.graphql'
 import { ActionableConnection, ActionableConnectionFilterInput } from '../../actionable/graphql';
+import { assertNonNullish } from '../../../utils/assertNonNullish';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -67,8 +68,10 @@ export const CustomerType = objectType({
       async resolve(parent, args, ctx) {
         if (!parent.id) return null;
 
+        assertNonNullish(ctx.session?.user?.id, 'No user Id provided!');
         const sessionConnection = await ctx.services.sessionService.getWorkspaceSessionConnection(
           parent.id,
+          ctx.session.user.id,
           args.filter
         );
 
@@ -128,9 +131,11 @@ export const CustomerType = objectType({
       type: Issue,
       args: { filter: IssueFilterInput },
 
-      resolve: async (parent, args, { services }) => {
+      resolve: async (parent, args, { services, session }) => {
         const filter = IssueValidator.resolveFilter(args.filter);
-        return await services.issueService.getProblemDialoguesByWorkspace(parent.id, filter);
+        assertNonNullish(session?.user?.id, 'No user ID provided!');
+
+        return await services.issueService.getProblemDialoguesByWorkspace(parent.id, filter, session.user.id);
       },
     });
 
@@ -142,9 +147,11 @@ export const CustomerType = objectType({
       nullable: true,
       args: { input: IssueFilterInput },
 
-      resolve: async (parent, args, { services }) => {
+      resolve: async (parent, args, { services, session }) => {
         const filter = IssueValidator.resolveFilter(args.input);
-        return await services.issueService.getWorkspaceIssues(parent.id, filter);
+        assertNonNullish(session?.user?.id, 'No user ID provided!');
+
+        return await services.issueService.getWorkspaceIssues(parent.id, filter, session?.user.id);
       },
     });
 
@@ -219,6 +226,7 @@ export const CustomerType = objectType({
 
         return ctx.services.dialogueStatisticsService.findWorkspaceHealthScore(
           parent.id,
+          ctx.session?.user?.id as string,
           utcStartDateTime as Date,
           utcEndDateTime,
           undefined,

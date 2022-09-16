@@ -99,6 +99,13 @@ input AssignUserToActionableInput {
   assigneeId: String
 }
 
+input AssignUserToDialogueInput {
+  dialogueId: String!
+  state: Boolean!
+  userId: String!
+  workspaceId: String!
+}
+
 input AssignUserToDialoguesInput {
   assignedDialogueIds: [String!]
   userId: String!
@@ -858,6 +865,7 @@ type Dialogue {
   id: ID!
   isPrivate: Boolean
   isWithoutGenData: Boolean
+  issues(filter: IssueFilterInput): Issue
   language: LanguageEnumType
   leafs(searchTerm: String): [QuestionNode!]
   mostChangedPath(input: DialogueStatisticsSummaryFilterInput): MostChangedPath
@@ -871,7 +879,7 @@ type Dialogue {
   sessionConnection(filter: SessionConnectionFilterInput): SessionConnection
   sessions(take: Int): [Session]
   slug: String!
-  statistics(input: DialogueFilterInputType): DialogueStatistics
+  statistics(input: DialogueStatisticsSummaryFilterInput): DialogueStatistics
   tags: [Tag]
   template: String
   title: String!
@@ -923,9 +931,9 @@ input DialogueConnectionOrderByInput {
 }
 
 input DialogueFilterInputType {
-  endDate: String
+  endDateTime: String
   searchTerm: String
-  startDate: String
+  startDateTime: String
 }
 
 type DialogueFinisherObjectType {
@@ -1197,6 +1205,7 @@ input GenerateAutodeckInput {
 input GenerateWorkspaceCSVInputType {
   generateDemoData: Boolean = false
   isDemo: Boolean! = false
+  makeDialoguesPrivate: Boolean = false
   managerCsv: Upload
   type: String! = "DEFAULT"
   uploadedCsv: Upload
@@ -1229,6 +1238,7 @@ input HandleUserStateInWorkspaceInput {
 }
 
 type HealthScore {
+  average: Float!
   negativeResponseCount: Int!
   nrVotes: Int!
   score: Float!
@@ -1462,6 +1472,7 @@ type Mutation {
   appendToInteraction(input: AppendToInteractionInput): Session
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue
   assignUserToActionable(input: AssignUserToActionableInput!): Actionable
+  assignUserToDialogue(input: AssignUserToDialogueInput): UserType
   assignUserToDialogues(input: AssignUserToDialoguesInput): UserType
   authenticateLambda(input: AuthenticateLambdaInput): String
   confirmCreateWorkspaceJob(input: GenerateAutodeckInput): CreateWorkspaceJobType

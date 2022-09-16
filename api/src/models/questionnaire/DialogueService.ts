@@ -714,8 +714,8 @@ class DialogueService {
     return this.dialoguePrismaAdapter.getTagsByDialogueId(dialogueId);
   };
 
-  findDialoguesByCustomerId(customerId: string, searchTerm?: string) {
-    return this.dialoguePrismaAdapter.findDialoguesByCustomerId(customerId, searchTerm);
+  findDialoguesByCustomerId(customerId: string, userId?: string, searchTerm?: string) {
+    return this.dialoguePrismaAdapter.findDialoguesByCustomerId(customerId, userId as string, searchTerm);
   };
 
   async delete(dialogueId: string) {
@@ -1065,7 +1065,11 @@ class DialogueService {
   };
 
   // TODO: Offload all this work to redis for much better performance + Cache
-  static getStatistics = async (dialogueId: string, startDate?: Date | null, endDate?: Date | null): Promise<StatisticsProps> => {
+  static getStatistics = async (
+    dialogueId: string,
+    startDate?: Date | null,
+    endDate?: Date | null
+  ): Promise<StatisticsProps> => {
     // Fetch all relevant sessions
     const sessions = await SessionService.fetchSessionsByDialogue(dialogueId, { startDate, endDate });
     if (!sessions) { throw new Error('No sessions present'); }
