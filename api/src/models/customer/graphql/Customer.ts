@@ -135,7 +135,7 @@ export const CustomerType = objectType({
         const filter = IssueValidator.resolveFilter(args.filter);
         assertNonNullish(session?.user?.id, 'No user ID provided!');
 
-        return await services.issueService.getProblemDialoguesByWorkspace(parent.id, filter, session.user.id);
+        return await services.issueService.getProblemDialoguesByWorkspace(parent.id, filter, session.user.id) as any;
       },
     });
 
@@ -151,7 +151,7 @@ export const CustomerType = objectType({
         const filter = IssueValidator.resolveFilter(args.input);
         assertNonNullish(session?.user?.id, 'No user ID provided!');
 
-        return await services.issueService.getWorkspaceIssues(parent.id, filter, session?.user.id);
+        return await services.issueService.getWorkspaceIssues(parent.id, filter, session?.user.id) as any;
       },
     });
 

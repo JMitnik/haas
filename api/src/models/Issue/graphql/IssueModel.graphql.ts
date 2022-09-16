@@ -66,7 +66,7 @@ export const IssueModel = objectType({
         input: ActionableConnectionFilterInput,
       },
       async resolve(parent, args, ctx) {
-        return ctx.services.actionableService.findPaginatedActionables(parent.id as string, args.input);
+        return ctx.services.actionableService.findPaginatedActionables(parent.id as string, args.input || undefined);
       },
     });
 

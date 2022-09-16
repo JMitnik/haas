@@ -1,7 +1,7 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 import { ActionableFilterInput } from 'models/actionable/Actionable.types';
 import { IssueConnectionFilterInput, IssueFilterInput } from './Issue.types';
-import { buildFindIssuesWhereInput, buildOrderByQuery } from './IssuePrismaAdapter.helper';
+import { buildFindIssueConnectionWhereInput, buildFindIssuesWhereInput, buildOrderByQuery } from './IssuePrismaAdapter.helper';
 
 class IssuePrismaAdapter {
   prisma: PrismaClient;
@@ -12,13 +12,13 @@ class IssuePrismaAdapter {
 
   public async countIssues(workspaceId: string, filter: IssueConnectionFilterInput) {
     return this.prisma.issue.count({
-      where: buildFindIssuesWhereInput(workspaceId, filter),
+      where: buildFindIssueConnectionWhereInput(workspaceId, filter),
     })
   }
 
   public async findPaginatedIssues(workspaceId: string, filter: IssueConnectionFilterInput) {
     return this.prisma.issue.findMany({
-      where: buildFindIssuesWhereInput(workspaceId, filter),
+      where: buildFindIssueConnectionWhereInput(workspaceId, filter),
       take: filter.perPage,
       skip: filter.offset,
       orderBy: buildOrderByQuery(filter),

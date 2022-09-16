@@ -107,7 +107,7 @@ export const DialogueType = objectType({
 
       resolve: async (parent, args, { services, session }) => {
         const filter = IssueValidator.resolveFilter(args.filter);
-        return await services.issueService.getProblemsByDialogue(parent.id, (session?.user?.id as string), filter);
+        return await services.issueService.getProblemsByDialogue(parent.id, (session?.user?.id as string), filter) as any;
       },
     });
 

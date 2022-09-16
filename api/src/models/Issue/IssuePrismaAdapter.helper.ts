@@ -15,7 +15,32 @@ export const buildOrderByQuery = (filter: IssueConnectionFilterInput) => {
   return orderByQuery;
 };
 
-export const buildFindIssuesWhereInput = (workspaceId: string, filter?: IssueFilterInput): Prisma.IssueWhereInput => {
+export const buildFindIssueConnectionWhereInput = (
+  workspaceId: string,
+  filter?: IssueConnectionFilterInput
+): Prisma.IssueWhereInput => {
+  return {
+    workspaceId,
+    actionables: {
+      some: {
+        createdAt: {
+          gte: filter?.startDate,
+          lte: filter?.endDate,
+        },
+      },
+    },
+    topic: filter?.topicStrings?.length ? {
+      name: {
+        in: filter?.topicStrings || [],
+      },
+    } : undefined,
+  }
+}
+
+export const buildFindIssuesWhereInput = (
+  workspaceId: string,
+  filter?: IssueFilterInput
+): Prisma.IssueWhereInput => {
   return {
     workspaceId,
     actionables: {
