@@ -1,4 +1,5 @@
 import { Dialogue, LinkTypeEnum, NodeType } from '@prisma/client';
+import e from 'express';
 import { NexusGenInputs } from '../../generated/nexus';
 import { QuestionConditionProps } from '../questionnaire/Dialogue.types';
 
@@ -41,6 +42,7 @@ export interface EdgeNodeProps {
 
 export interface LeafNodeDataEntryProps {
   title: string;
+  leafMatchId?: string;
   type: NodeType;
   links: any[];
   form?: NexusGenInputs['FormNodeInputType'];
@@ -78,4 +80,14 @@ export type DialogueWithEdges = Dialogue & {
     parentNodeId: string;
     childNodeId: string;
   }[];
+}
+
+export interface SimpleQuestionInput {
+  id: string;
+  title: string;
+  type: NodeType;
+  extraContent?: string;
+  happyText?: string;
+  unhappyText?: string;
+  sliderNode?: { markers?: any[] | undefined | null };
 }

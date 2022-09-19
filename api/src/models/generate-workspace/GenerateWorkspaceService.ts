@@ -174,10 +174,10 @@ class GenerateWorkspaceService {
   }
 
   /**
-   * Creates 
-   * @param contactsEntry 
-   * @param workspace 
-   * @returns 
+   * Creates
+   * @param contactsEntry
+   * @param workspace
+   * @returns
    */
   private async upsertUsersWorkspace(emailAddresses: string[], workspace: Workspace) {
     const managerRole = workspace.roles.find((role) => role.type === RoleTypeEnum.MANAGER) as Role;
@@ -228,19 +228,20 @@ class GenerateWorkspaceService {
 
       const userEmailEntry = Object.entries(record).find((entry) => entry[0] === 'limited_access_assignee_email?');
       const userPhoneEntry = Object.entries(record).find((entry) => entry[0] === 'limited_access_assignee_phone?');
-      const customTemplateEntry = Object.entries(record).find((entry) => entry[0]?.toLowerCase() === 'template');
+      // const customTemplateEntry = Object.entries(record).find((entry) => entry[0]?.toLowerCase() === 'template');
 
       const hasEmailAssignee = !!userEmailEntry?.[1];
       const emailAssignee = userEmailEntry?.[1] as string;
       const phoneAssignee = userPhoneEntry?.[1] as string | undefined;
-      const customDialogueTemplate = customTemplateEntry?.[1] as DialogueTemplateType | undefined;
-      const hasValidCustomDialogueTemplate = (customDialogueTemplate
-        && Object.values(DialogueTemplateType).includes(customDialogueTemplate)
-      ) || false;
-      const validatedTemplateType = hasValidCustomDialogueTemplate ? customDialogueTemplate : type;
+      // const customDialogueTemplate = customTemplateEntry?.[1] as DialogueTemplateType | undefined;
+      // const hasValidCustomDialogueTemplate = (customDialogueTemplate
+      //   && Object.values(DialogueTemplateType).includes(customDialogueTemplate)
+      // ) || false;
+      // const validatedTemplateType = hasValidCustomDialogueTemplate ? customDialogueTemplate : type;
 
       const userRole = workspace.roles.find((role) => role.type === RoleTypeEnum.USER);
-      const overrideTemplate = this.templateService.findTemplate(validatedTemplateType as DialogueTemplateType)
+      // const overrideTemplate = this.templateService.findTemplate(validatedTemplateType as DialogueTemplateType)
+
       const dialogueInput: CreateDialogueInput = {
         slug: dialogueSlug,
         title: dialogueTitle,
@@ -248,15 +249,13 @@ class GenerateWorkspaceService {
         customer: { id: workspace.id, create: false },
         isPrivate: makeDialoguePrivate || hasEmailAssignee,
         postLeafText: {
-          header: overrideTemplate.postLeafText?.header,
-          subHeader: overrideTemplate.postLeafText?.subHeader,
+          header: template.postLeafText?.header,
+          subHeader: template.postLeafText?.subHeader,
         },
-        language: overrideTemplate.language,
-        template: Object.values(DialogueTemplateType).includes(validatedTemplateType as any)
-          ? validatedTemplateType as DialogueTemplateType
-          : (Object.values(DialogueTemplateType).includes(type as any)
-            ? type as DialogueTemplateType
-            : undefined),
+        language: template.language,
+        template: Object.values(DialogueTemplateType).includes(type as any)
+          ? type as DialogueTemplateType
+          : undefined,
       };
 
       // Create initial dialogue
@@ -273,8 +272,6 @@ class GenerateWorkspaceService {
       if (hasContacts) {
         contactIds = await this.upsertUsersWorkspace(contactEmails, workspace);
       }
-
-      // console.log('Contact IDS: ', contactIds);
 
       // Make the leafs
       const leafs = await this.templateService.createTemplateLeafNodes(type as NexusGenEnums['DialogueTemplateType'], dialogue.id, contactIds);
@@ -293,7 +290,7 @@ class GenerateWorkspaceService {
       if (generateData) {
         await this.dialogueService.massGenerateFakeData(
           dialogue.id,
-          overrideTemplate,
+          template,
           1,
           true,
           2,
@@ -400,14 +397,13 @@ class GenerateWorkspaceService {
       try {
         await this.createBotUser(workspace);
       } catch (error) {
-        throw new ApolloError('Something went wrong creating bot account.');
+        throw new GraphQLYogaError('Something went wrong creating bot account.');
       }
 
       return workspace;
     } catch (error) {
-      console.log('Error: ', (error as any)?.message);
       await this.customerService.deleteWorkspace(workspace.id);
-      throw new ApolloError('Something went wrong generating generating workspace. All changes have been reverted');
+      throw new GraphQLYogaError('Something went wrong generating generating workspace. All changes have been reverted');
     }
   };
 

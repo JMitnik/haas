@@ -4,13 +4,21 @@ import cuid from 'cuid';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import EdgeService from '../edge/EdgeService';
-import { QuestionOptionProps, CreateCTAInputProps, DialogueWithEdges, FormNodeInput, FormNodeStepInput } from './NodeServiceType';
+import {
+  QuestionOptionProps,
+  CreateCTAInputProps,
+  DialogueWithEdges,
+  FormNodeInput,
+  FormNodeStepInput,
+  SimpleQuestionInput,
+} from './NodeServiceType';
 import QuestionNodePrismaAdapter from './QuestionNodePrismaAdapter';
 import { findDifference } from '../../utils/findDifference';
 import EdgePrismaAdapter, { CreateEdgeInput } from '../edge/EdgePrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import { CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType';
 import { CreateSliderNodeInput, UpdateQuestionInput } from './QuestionNodePrismaAdapterType';
+import { QuestionNode as FullQuestionNode } from './QuestionNode.types';
 import UserOfCustomerPrismaAdapter from '../../models/users/UserOfCustomerPrismaAdapter';
 import { groupBy } from 'lodash';
 
@@ -205,11 +213,11 @@ export class NodeService {
         id: step.id || '-1',
       },
     }
-  }
+  };
 
   /**
    * Converts FormNode to Prisma-friendly format.
-   * */
+   */
   private async saveEditFormNodeInput(
     step: FormNodeStepInput,
     workspaceSlug: string,
@@ -271,11 +279,12 @@ export class NodeService {
         input?.form?.steps?.flatMap((step) => step.fields) as any
       );
 
+      // If fields are missing from input, remove the fields from database
       if (removedFields.length) {
-        const groupedByStepId = groupBy(removedFields, (field: any) => field.formNodeStepId);
-        for (const step of Object.entries(groupedByStepId)) {
-          const stepId = step[0];
-          const mappedFields = step[1]?.map((field) => ({ id: field?.id?.toString() || '' }))
+        const stepsByGroupId = groupBy(removedFields, (field: any) => field.formNodeStepId);
+
+        for (const [stepId, step] of Object.entries(stepsByGroupId)) {
+          const mappedFields = step.map((field) => ({ id: field?.id?.toString() || '' }))
           await this.questionNodePrismaAdapter.removeStepFields(stepId, mappedFields);
         }
       }
@@ -285,13 +294,14 @@ export class NodeService {
         input?.form?.steps as any,
       );
 
+      // If we removed fields, remove their steps as well from the database.
       if (removedSteps.length) {
         const mappedSteps = removedSteps.map((field) => ({ id: field?.id?.toString() || '' }))
         await this.questionNodePrismaAdapter.removeFormSteps(input.id, mappedSteps);
       }
 
+      // If the related node has a form, save the step and form data for each step.
       if (existingNode?.form) {
-
         await Promise.all(input.form.steps?.map(async (step) => {
           if (!step) return;
           const stepData = await this.saveEditFormStepInput(step, existingNode?.form?.id as string);
@@ -325,6 +335,7 @@ export class NodeService {
             },
           },
         })
+      // Else, create a new form node with the relevant fields
       } else {
         const fields = await this.createFormNodeInput(input.form, input.customerSlug);
         await this.questionNodePrismaAdapter.createFieldsOfForm({
@@ -343,8 +354,8 @@ export class NodeService {
   };
 
   /**
- * Find node belonging to a link.
- * **/
+  * Find node belonging to a link.
+  */
   findNodeByLinkId(linkId: string) {
     return this.questionNodePrismaAdapter.findNodeByLinkId(linkId);
   }
@@ -494,8 +505,8 @@ export class NodeService {
   };
 
   /**
-     * Save FormNodeInput when `creating`
-     */
+   * Save FormNodeInput when `creating`
+   */
   private async createFormNodeStepInput(
     input: FormNodeStepInput,
     workspaceSlug: string,
@@ -538,8 +549,8 @@ export class NodeService {
   };
 
   /**
-     * Save FormNodeInput when `creating`
-     */
+   * Save FormNodeInput when `creating`
+   */
   public async createFormNodeInput(
     input: FormNodeInput,
     workspaceSlug: string,
@@ -619,7 +630,7 @@ export class NodeService {
     options: Array<any> = [],
     isRoot: boolean = false,
     overrideLeafId: string = '',
-    isLeaf: boolean = false
+    isLeaf: boolean = false,
   ): Prisma.QuestionNodeCreateInput => {
     return {
       title,
@@ -654,11 +665,11 @@ export class NodeService {
     options: Array<any> = [],
     isRoot: boolean = false,
     overrideLeafId: string = '',
-    isLeaf: boolean = false
+    isLeaf: boolean = false,
+    topic?: Prisma.TopicCreateInput,
   ) => {
     const qOptions = options.length > 0 ? options : [];
-    const params: CreateQuestionInput =
-    {
+    const params: CreateQuestionInput = {
       isRoot,
       isLeaf,
       title,
@@ -666,7 +677,8 @@ export class NodeService {
       options: qOptions,
       overrideLeafId,
       dialogueId: questionnaireId,
-    }
+      topic,
+    };
 
     return this.questionNodePrismaAdapter.createQuestion(params);
   };
@@ -897,6 +909,7 @@ export class NodeService {
    * TODO: Rename to updateNode.
    * */
   updateQuestionFromBuilder = async (
+    workspaceId: string,
     questionId: string,
     title: string,
     type: NodeType,
@@ -908,78 +921,211 @@ export class NodeService {
     extraContent: string | null | undefined,
     happyText: string | null | undefined,
     unhappyText: string | null | undefined,
+    updateSameTemplate: boolean = false,
   ) => {
-    const activeQuestion = await this.questionNodePrismaAdapter.getDialogueBuilderNode(questionId);
+    const question = await this.questionNodePrismaAdapter.getDialogueBuilderNode(questionId) as FullQuestionNode;
+    const edge = await this.edgeService.getEdgeById(edgeId || '-1') as any;
 
-    const dbEdge = await this.edgeService.getEdgeById(edgeId || '-1');
+    // Find all questions in workspace with same template and topic
+    const templateQuestionNodes = updateSameTemplate && question?.topic?.name && question.questionDialogue?.template
+      ? await this.questionNodePrismaAdapter.getDialogueBuilderNodes(
+        workspaceId,
+        question.topic.name,
+        question.questionDialogue?.template
+      )
+      : [question]
 
-    const activeOptions = activeQuestion ? activeQuestion?.options?.map((option) => option.id) : [];
-    const currentOverrideLeafId = activeQuestion?.overrideLeafId || null;
-    const leaf = NodeService.constructUpdateLeafState(currentOverrideLeafId, overrideLeafId);
+    // Find all edges in the workspace with the same template, and where its childnode matches the topic.
+    const templateEdges = updateSameTemplate && question?.topic?.name
+      ? await this.questionNodePrismaAdapter.findDialogueBuilderEdges(
+        edge,
+        question.topic.name,
+        workspaceId
+      )
+      : [edge];
 
-    const existingEdgeCondition = dbEdge?.conditions && dbEdge.conditions[0];
+    const callToAction = overrideLeafId ? await this.findNodeById(overrideLeafId) : undefined;
 
-    try {
-      await this.removeNonExistingQuestionOptions(activeOptions, options);
-    } catch (e) {
-      console.log('Something went wrong removing options: ', e);
-    };
-
-    // Updating any question except root question should have this edge
-    if (existingEdgeCondition) {
-      try {
-        await this.updateEdge(existingEdgeCondition, edgeCondition);
-      } catch (e) {
-        // @ts-ignore
-        console.log('something went wrong updating edges: ', e.stack);
-      }
-    };
-
-    await this.updateStaleEdgeConditions(options, activeQuestion?.options, activeQuestion?.id);
-
-    const updateInput: UpdateQuestionInput = {
-      title,
-      type,
-      options,
-      overrideLeafId: overrideLeafId || undefined,
-      currentOverrideLeafId: currentOverrideLeafId,
-      videoEmbeddedNode: {
-        id: activeQuestion?.videoEmbeddedNodeId || undefined,
+    void await this.updateTemplateQuestionNodes(
+      {
+        id: questionId,
+        title,
+        type,
+        extraContent: extraContent || undefined,
+        happyText: happyText || undefined,
+        sliderNode: sliderNode || { markers: [] },
+        unhappyText: unhappyText || undefined,
       },
-    };
+      questionId,
+      templateQuestionNodes,
+      overrideLeafId || '',
+      callToAction?.title || '',
+      options,
+    );
 
-    const updatedNode = await this.questionNodePrismaAdapter.updateDialogueBuilderNode(questionId, updateInput);
 
-    if (type === NodeType.VIDEO_EMBEDDED) {
-      if (updatedNode?.videoEmbeddedNodeId) {
-        await this.questionNodePrismaAdapter.updateVideoNode(updatedNode.videoEmbeddedNodeId, {
-          videoUrl: extraContent,
-        });
-      } else {
-        await this.questionNodePrismaAdapter.createVideoNode({
-          videoUrl: extraContent,
-          parentNodeId: questionId,
-        });
-      }
-    } else if (type === NodeType.SLIDER) {
-      if (updatedNode?.sliderNodeId) {
-        await this.questionNodePrismaAdapter.updateSliderNode(updatedNode.sliderNodeId, {
-          happyText: happyText || null,
-          unhappyText: unhappyText || null,
-          markers: sliderNode?.markers?.filter(isPresent),
-        });
-      } else {
-        await this.questionNodePrismaAdapter.createSliderNode({
-          happyText: happyText || null,
-          unhappyText: unhappyText || null,
-          parentNodeId: questionId,
-          markers: sliderNode?.markers?.filter(isPresent),
-        });
+    for (const templateEdge of templateEdges) {
+      const existingEdgeCondition = templateEdge?.conditions && templateEdge.conditions[0];
+      // Updating any question except root question should have this edge
+      if (existingEdgeCondition) {
+        try {
+          await this.updateEdge(existingEdgeCondition, edgeCondition);
+        } catch (e) {
+        }
       };
-    };
+    }
 
-    return updatedNode;
+    return this.questionNodePrismaAdapter.findNodeById(questionId);
   };
+
+  /**
+   * Updates the template question nodes matching the `source` question node.
+   *
+   * @param sourceQuestionId - The `sourceQuestionId` is the question ID which was originally edited (
+   * and triggers the entire template updating).
+   * @param templateQuestionNodes - These are all the question nodes matching the "source".
+   * @param overrideLeafName - The overrideCallToAction name of the source node.
+   * @param optionInputs - Any potential new Options (created or updated.)
+   */
+  private async updateTemplateQuestionNodes(
+    questionInput: SimpleQuestionInput,
+    sourceQuestionId: string,
+    templateQuestionNodes: FullQuestionNode[],
+    sourceOverrideLeafId: string,
+    sourceOverrideLeafName: string,
+    optionInputs: QuestionOptionProps[],
+  ) {
+    // Loop over each template question-node, and update the connected relations.
+    for (const templateQuestion of templateQuestionNodes) {
+      const isSourceQuestion = templateQuestion.id === sourceQuestionId;
+      const targetOptionIds = templateQuestion?.options?.map((option) => option.id) || [];
+
+      let targetCallToAction: FullQuestionNode | undefined;
+
+      // Fetch the override leaf if we have a name
+      if (sourceOverrideLeafName) {
+        targetCallToAction = await this.questionNodePrismaAdapter.findCTAByTopic(
+          templateQuestion?.questionDialogueId as string,
+          sourceOverrideLeafName
+        ) || undefined;
+      }
+
+      /**
+       * Find matching options in matching template question, and update its values and possibly related
+       * call to aciton
+       */
+      const targetOptions = !isSourceQuestion ? await Promise.all(optionInputs.map(async (optionInput) => {
+        let targetOptionCallToAction;
+
+        /**
+         * If our optionInput has an override CallToAction, fetch it,
+         * and set the call-to-action of the template question to match
+         * its "local template" version (meaning, grab the same CTA, but exclusive to that dialogue).
+         */
+        if (optionInput.overrideLeafId) {
+          const sourceOptionCallToAction = optionInput.overrideLeafId
+            ? await this.findNodeById(optionInput.overrideLeafId)
+            : undefined;
+
+          targetOptionCallToAction = sourceOptionCallToAction?.topic?.name
+            ? await this.questionNodePrismaAdapter.findCTAByTopic(
+              templateQuestion?.questionDialogueId as string,
+              sourceOptionCallToAction?.topic?.name || ''
+            )
+            : undefined;
+        }
+
+        // Also grab target option
+        const targetOption = templateQuestion?.options.find(
+          (activeOption) => activeOption.value === optionInput.value
+        ) as QuestionOptionProps;
+
+        /**
+         * If no target option exists, return an option with no source id
+         */
+        if (!targetOption) return {
+          ...optionInput,
+          id: undefined,
+          overrideLeafId: targetOptionCallToAction?.id || undefined,
+        };
+
+        /**
+         * Else, return the option with the same id, new option input, and a potentially new call-to-action.
+         */
+        return {
+          ...optionInput,
+          id: targetOption.id,
+          overrideLeafId: targetOptionCallToAction?.id || undefined ,
+        }
+      }
+      ).filter(isPresent)) : optionInputs;
+
+      /**
+       * Try removing question options if we have more than one template question node (so not just self).
+       */
+      try {
+        await this.removeNonExistingQuestionOptions(
+          targetOptionIds,
+          templateQuestionNodes.length > 1 ? targetOptions : optionInputs
+        );
+      } catch (e) {};
+
+      /**
+       * If the template question has more template "clones", update potentially stale edge conditions.
+       */
+      await this.updateStaleEdgeConditions(
+        templateQuestionNodes.length > 1 ? targetOptions : optionInputs,
+        templateQuestion?.options,
+        templateQuestion?.id
+      );
+
+      // Define the input for the question node itself
+      const updateInput: UpdateQuestionInput = {
+        title: questionInput.title,
+        type: questionInput.type,
+        options: templateQuestionNodes.length > 1 ? targetOptions: optionInputs,
+        overrideLeafId: isSourceQuestion
+          ? sourceOverrideLeafId || undefined
+          : targetCallToAction?.id || undefined, // TODO: Add topic to all CTAs in templates
+        videoEmbeddedNode: {
+          id: templateQuestion?.videoEmbeddedNodeId || undefined,
+        },
+      };
+
+      const updatedNode = await this.questionNodePrismaAdapter.updateDialogueBuilderNode(
+        templateQuestion?.id as string,
+        updateInput
+      );
+
+      if (questionInput.type === NodeType.VIDEO_EMBEDDED) {
+        if (updatedNode?.videoEmbeddedNodeId) {
+          await this.questionNodePrismaAdapter.updateVideoNode(updatedNode.videoEmbeddedNodeId, {
+            videoUrl: questionInput.extraContent,
+          });
+        } else {
+          await this.questionNodePrismaAdapter.createVideoNode({
+            videoUrl: questionInput.extraContent,
+            parentNodeId: questionInput.id,
+          });
+        }
+      } else if (questionInput.type === NodeType.SLIDER) {
+        if (updatedNode?.sliderNodeId) {
+          await this.questionNodePrismaAdapter.updateSliderNode(updatedNode.sliderNodeId, {
+            happyText: questionInput.happyText || null,
+            unhappyText: questionInput.unhappyText || null,
+            markers: questionInput.sliderNode?.markers?.filter(isPresent),
+          });
+        } else {
+          await this.questionNodePrismaAdapter.createSliderNode({
+            happyText: questionInput.happyText || null,
+            unhappyText: questionInput.unhappyText || null,
+            parentNodeId: questionInput.id,
+            markers: questionInput.sliderNode?.markers?.filter(isPresent),
+          });
+        };
+      };
+    }
+  }
 
   /**
    * Remove non-existing question options.
