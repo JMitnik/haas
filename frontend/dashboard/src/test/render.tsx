@@ -29,7 +29,7 @@ export const TestProviders = ({ children, history }: TestProvidersProps) => (
     <QueryParamProvider ReactRouterRoute={Route}>
       <ApolloProvider client={client}>
         <UserProvider>
-          <CustomerProvider workspaceOverrideSlug="workspace_1" __test__>
+          <CustomerProvider workspaceOverrideSlug="workspace_1">
             <I18nextProvider i18n={lang}>
               <ThemeProvider>
                 <WorkspaceLayout>

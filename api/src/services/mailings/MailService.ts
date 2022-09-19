@@ -7,7 +7,7 @@ import { MailServiceType, MailSendInput } from './MailServiceTypes';
 class MailService implements MailServiceType {
   send(input: MailSendInput) {
     if (config.env !== 'local') this.sendWithSES(input);
-    if (config.env === 'local') this.sendToLog(input);
+    if (config.env === 'local' && !input.noConsole) this.sendToLog(input);
   }
 
   private sendToLog(input: MailSendInput) {

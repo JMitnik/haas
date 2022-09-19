@@ -126,7 +126,7 @@ describe('DialoguePrismaAdapter', () => {
         },
       },
     });
-    const dialogues = await dialoguePrismaAdapter.findDialoguesByCustomerId(targetDialogueOne.customerId);
+    const dialogues = await dialoguePrismaAdapter.findDialoguesByCustomerId(targetDialogueOne.customerId, '');
     expect(dialogues).toHaveLength(2);
     const dialogueSlugOne = dialogues.find((dialogue) => dialogue.slug === targetDialogueOne.slug);
     expect(dialogueSlugOne).not.toBeUndefined();

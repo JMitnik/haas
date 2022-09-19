@@ -24,6 +24,13 @@ input AppendToInteractionInput {
   sessionId: ID
 }
 
+input AssignUserToDialogueInput {
+  dialogueId: String!
+  state: Boolean!
+  userId: String!
+  workspaceId: String!
+}
+
 input AssignUserToDialoguesInput {
   assignedDialogueIds: [String!]
   userId: String!
@@ -781,6 +788,7 @@ type Dialogue {
   id: ID!
   isPrivate: Boolean
   isWithoutGenData: Boolean
+  issues(filter: IssueFilterInput): Issue
   language: LanguageEnumType
   leafs(searchTerm: String): [QuestionNode!]
   mostChangedPath(input: DialogueStatisticsSummaryFilterInput): MostChangedPath
@@ -794,7 +802,7 @@ type Dialogue {
   sessionConnection(filter: SessionConnectionFilterInput): SessionConnection
   sessions(take: Int): [Session]
   slug: String!
-  statistics(input: DialogueFilterInputType): DialogueStatistics
+  statistics(input: DialogueStatisticsSummaryFilterInput): DialogueStatistics
   tags: [Tag]
   template: String
   title: String!
@@ -846,9 +854,9 @@ input DialogueConnectionOrderByInput {
 }
 
 input DialogueFilterInputType {
-  endDate: String
+  endDateTime: String
   searchTerm: String
-  startDate: String
+  startDateTime: String
 }
 
 type DialogueFinisherObjectType {
@@ -899,7 +907,9 @@ enum DialogueTemplateType {
   SPORT_ENG
   SPORT_NL
   STUDENT_ENG
+  STUDENT_NL
   TEACHER_ENG
+  TEACHER_NL
 }
 
 input DialogueWhereUniqueInput {
@@ -998,6 +1008,7 @@ type FormNodeEntryType {
 }
 
 type FormNodeEntryValueType {
+  contacts: String
   email: String
   longText: String
   number: Int
@@ -1047,12 +1058,41 @@ input FormNodeInputType {
   fields: [FormNodeFieldInput!]
   helperText: String
   id: String
+  preFormNode: PreFormNodeInput
+  steps: [FormNodeStepInput!]
+}
+
+type FormNodeStep {
+  fields: [FormNodeField!]
+  header: String
+  helper: String
+  id: String!
+  position: Int!
+  subHelper: String
+  type: FormNodeStepType!
+}
+
+input FormNodeStepInput {
+  fields: [FormNodeFieldInput!]
+  header: String!
+  helper: String!
+  id: ID
+  position: Int!
+  subHelper: String!
+  type: FormNodeStepType!
+}
+
+enum FormNodeStepType {
+  GENERIC_FIELDS
+  INPUT_DATA
 }
 
 type FormNodeType {
   fields: [FormNodeField!]
   helperText: String
   id: String
+  preForm: PreFormNodeType
+  steps: [FormNodeStep!]
 }
 
 """Generate savales documents"""
@@ -1088,6 +1128,7 @@ input GenerateAutodeckInput {
 input GenerateWorkspaceCSVInputType {
   generateDemoData: Boolean = false
   isDemo: Boolean! = false
+  makeDialoguesPrivate: Boolean = false
   managerCsv: Upload
   type: String! = "DEFAULT"
   uploadedCsv: Upload
@@ -1114,6 +1155,7 @@ input HandleUserStateInWorkspaceInput {
 }
 
 type HealthScore {
+  average: Float!
   negativeResponseCount: Int!
   nrVotes: Int!
   score: Float!
@@ -1303,6 +1345,7 @@ type MostTrendingTopic {
 type Mutation {
   appendToInteraction(input: AppendToInteractionInput): Session
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue
+  assignUserToDialogue(input: AssignUserToDialogueInput): UserType
   assignUserToDialogues(input: AssignUserToDialoguesInput): UserType
   authenticateLambda(input: AuthenticateLambdaInput): String
   confirmCreateWorkspaceJob(input: GenerateAutodeckInput): CreateWorkspaceJobType
@@ -1569,6 +1612,21 @@ type PermssionType {
   description: String
   id: ID
   name: String
+}
+
+input PreFormNodeInput {
+  finishText: String!
+  header: String!
+  helper: String!
+  nextText: String!
+}
+
+type PreFormNodeType {
+  finishText: String!
+  header: String!
+  helper: String!
+  id: String!
+  nextText: String!
 }
 
 type PreviewDataType {

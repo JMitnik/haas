@@ -188,6 +188,28 @@ model Dialogue {
   @@unique([slug, customerId], map: "Dialogue.slug_customerId_unique")
 }
 
+enum FormNodeStepType {
+  CONTACT_PICKER
+  GENERIC_FIELDS
+}
+
+model FormNodeStep {
+  id        String           @id @default(cuid())
+  createdAt DateTime?        @default(now())
+  updatedAt DateTime?        @updatedAt
+  type      FormNodeStepType @default(GENERIC_FIELDS)
+
+  header    String
+  helper    String
+  subHelper String
+
+  position   Int // Determines in which order steps are shown
+  formNodeId String?
+
+  fields   FormNodeField[]
+  formNode FormNode?       @relation(fields: [formNodeId], references: [id])
+}
+
 model FormNodeField {
   id                     String                   @id @default(cuid())
   label                  String
@@ -199,12 +221,30 @@ model FormNodeField {
   formNodeId             String?
   FormNode               FormNode?                @relation(fields: [formNodeId], references: [id])
   FormNodeFieldEntryData FormNodeFieldEntryData[]
+  formNodeStep           FormNodeStep?            @relation(fields: [formNodeStepId], references: [id])
+  formNodeStepId         String?
+}
+
+model PreFormNode {
+  id String @id @default(cuid())
+
+  header     String?
+  helper     String?
+  nextText   String?
+  finishText String?
+
+  formNode FormNode?
 }
 
 model FormNode {
-  id           String          @id @default(cuid())
-  helperText   String?
-  createdAt    DateTime        @default(now())
+  id         String   @id @default(cuid())
+  helperText String?
+  createdAt  DateTime @default(now())
+
+  preFormNodeId String?      @unique
+  preForm       PreFormNode? @relation(fields: [preFormNodeId], references: [id])
+
+  steps        FormNodeStep[]
   fields       FormNodeField[]
   QuestionNode QuestionNode[]
 }
@@ -494,9 +534,8 @@ model User {
   customers          UserOfCustomer[]
   triggers           Trigger[]
 
-  isAssignedTo    Dialogue[]
-  FormNodeField   FormNodeField? @relation(fields: [formNodeFieldId], references: [id])
-  formNodeFieldId String?
+  isAssignedTo         Dialogue[]
+  isContactOfFormField FormNodeField[]
 }
 
 model UserOfCustomer {
@@ -792,16 +831,16 @@ model AutomationActionChannel {
 }
 
 model AutomationAction {
-  id                    String                    @id @default(cuid())
-  createdAt             DateTime                  @default(now())
-  updatedAt             DateTime?                 @updatedAt
-  type                  AutomationActionType
+  id        String               @id @default(cuid())
+  createdAt DateTime             @default(now())
+  updatedAt DateTime?            @updatedAt
+  type      AutomationActionType
 
   // TODO: What is APIKey for again?
-  apiKey                String?
+  apiKey String?
 
   // TODO: What is endpoint again?
-  endpoint              String?
+  endpoint String?
 
   // The channels defines the means of outputting the actions (slack, etc)
   channels              AutomationActionChannel[]
@@ -844,7 +883,7 @@ model AutomationScheduled {
   automations Automation[]
 
   // Which actions are related to this scheduled automation-type
-  actions     AutomationAction[]
+  actions AutomationAction[]
 }
 
 model Automation {
@@ -856,7 +895,7 @@ model Automation {
   description String?
   type        AutomationType
   workspaceId String
-  workspace   Customer @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspace   Customer       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   // Type A: Trigger automation (if X happens, do Y)
   automationTriggerId String?
@@ -868,6 +907,8 @@ model Automation {
 }
 
 enum DialogueTemplateType {
+  STUDENT_NL
+  TEACHER_NL
   STUDENT_ENG
   TEACHER_ENG
   SPORT_ENG

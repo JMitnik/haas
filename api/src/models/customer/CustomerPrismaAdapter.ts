@@ -15,8 +15,23 @@ export class CustomerPrismaAdapter {
   /**
    * Fetches all dialogues
    */
-  async getDialogues(workspaceId: string, dialogueFragments?: string[]) {
-    let query: Prisma.DialogueWhereInput = { customerId: workspaceId };
+  async getDialogues(workspaceId: string, userId: string, dialogueFragments?: string[]) {
+    let query: Prisma.DialogueWhereInput = {
+      customerId: workspaceId,
+      OR: [
+        {
+          isPrivate: true,
+          assignees: {
+            some: {
+              id: userId,
+            },
+          },
+        },
+        {
+          isPrivate: false,
+        },
+      ],
+    };
 
     if (dialogueFragments?.length) {
       query.title = { contains: dialogueFragments.join(' - ') };

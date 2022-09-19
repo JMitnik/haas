@@ -94,7 +94,7 @@ const schema = yup.object().shape({
     is: (questionType: string) => isChoiceType(questionType) || isVideoEmbeddedType(questionType),
     then: yup.array().min(1).of(yup.object({
       value: yup.string().required('form.value_required'),
-    })),
+    })).required(),
     otherwise: yup.array().notRequired(),
   }),
 });

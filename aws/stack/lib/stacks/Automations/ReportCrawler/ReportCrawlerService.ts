@@ -27,7 +27,8 @@ interface ReportCrawlerServiceProps {
  * Service for Report Crawler
  *
  * Prerequisites:
- * - We have a Lambda role in the workspace for automations.
+ * - A secret exists with the name "SecretOfAutomation" in secrets manager, and SECRETAUTOMATION_API_KEY
+ * - We have a Lambda role `AllowLambdaAccessToS3AndSQS` in the workspace for automations.
  */
 export class ReportCrawlerService extends BaseLambdaService {
   constructor(scope: Construct, id: string, props: ReportCrawlerServiceProps) {

@@ -1,7 +1,10 @@
 {
   "private": true,
   "jest": {
-    "verbose": true
+    "verbose": true,
+    "testEnvironmentOptions": {
+      "url": "http://localhost/"
+    }
   },
   "homepage": ".",
   "workspaces": {
@@ -29,6 +32,7 @@
     "aws:deploy:campaign": "cd aws/commands && bash deploy-campaign.bash",
     "aws:deploy:internal": "cd aws/stack && cdk deploy InternalNotifyStack --profile haas-prod",
     "aws:deploy:automations:staging": "cd aws/stack && cdk deploy StagingAutomationStack --profile haas-staging",
+    "aws:deploy:automations:prod": "cd aws/stack && cdk deploy ProdAutomationStack --profile haas-prod",
     "aws:deploy:core-fixed:staging": "(cd aws/stack && cdk deploy StagingCoreFixed --profile haas-staging)",
     "aws:deploy:core-temp:staging": "(cd aws/stack && cdk deploy StagingCoreTemp --profile haas-staging)",
     "aws:deploy:core-fixed:prod": "(cd aws/stack && cdk deploy ProdCoreFixed --profile haas-prod)",

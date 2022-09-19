@@ -1,4 +1,4 @@
-import { Customer, PrismaClient, CustomerSettings, DialogueImpactScore, ChoiceNodeEntry, NodeEntry, RoleTypeEnum, Role } from '@prisma/client';
+import { Customer, PrismaClient, CustomerSettings, DialogueImpactScore, ChoiceNodeEntry, NodeEntry, RoleTypeEnum, Role, DialogueTemplateType } from '@prisma/client';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import { clone, groupBy, maxBy, meanBy, orderBy, uniq } from 'lodash';
 import cuid from 'cuid';
@@ -18,7 +18,6 @@ import UserOfCustomerPrismaAdapter from '../users/UserOfCustomerPrismaAdapter';
 import { CreateDialogueInput } from '../questionnaire/DialoguePrismaAdapterType';
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import NodeEntryService from '../node-entry/NodeEntryService';
-import { DialogueTemplateType } from '../QuestionNode/NodeServiceType';
 import TemplateService from '../templates/TemplateService';
 
 export class CustomerService {
@@ -44,8 +43,8 @@ export class CustomerService {
     this.templateService = new TemplateService(prismaClient);
   }
 
-  async getDialogues(workspaceId: string, dialogueFragments?: string[]) {
-    return this.customerPrismaAdapter.getDialogues(workspaceId, dialogueFragments);
+  async getDialogues(workspaceId: string, userId: string, dialogueFragments?: string[]) {
+    return this.customerPrismaAdapter.getDialogues(workspaceId, userId, dialogueFragments);
   }
 
   /**
@@ -478,7 +477,7 @@ export class CustomerService {
 
     if (!dialogue) throw 'ERROR: No dialogue created!'
     // Step 2: Make the leafs
-    const leafs = await this.templateService.createTemplateLeafNodes(DialogueTemplateType.DEFAULT, dialogue.id);
+    const leafs = await this.templateService.createTemplateLeafNodes(DialogueTemplateType.DEFAULT, dialogue.id, []);
 
     // Step 3: Make nodes
     await this.templateService.createTemplateNodes(dialogue.id, customer.name, leafs, 'DEFAULT');
@@ -508,10 +507,10 @@ export class CustomerService {
 
   /**
    * Creates a user with the 'BOT' role and connects it to a workspace
-   * @param workspaceId 
-   * @param workspaceSlug 
-   * @param roles 
-   * @returns 
+   * @param workspaceId
+   * @param workspaceSlug
+   * @param roles
+   * @returns
    */
   createBotUser = async (workspaceId: string, workspaceSlug: string, roles: Role[]) => {
     const botRole = roles.find((role) => role.type === RoleTypeEnum.BOT);

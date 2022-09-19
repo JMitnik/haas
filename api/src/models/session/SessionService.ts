@@ -465,8 +465,12 @@ class SessionService {
     dialogueId: string,
     paginationOpts?: Nullable<PaginationProps>,
     take?: number | null,
+    showMostRecent?: boolean,
   ) {
     const sessions = await prisma.session.findMany({
+      orderBy: showMostRecent ? {
+        createdAt: 'desc',
+      } : undefined,
       take: take || undefined,
       where: {
         dialogueId,
@@ -546,6 +550,7 @@ class SessionService {
    */
   getWorkspaceSessionConnection = async (
     workspaceId: string,
+    userId: string,
     filter?: SessionConnectionFilterInput | null
   ): Promise<SessionConnection | null> => {
     const offset = filter?.offset ?? 0;
@@ -553,7 +558,7 @@ class SessionService {
     let dialogueIds = filter?.dialogueIds;
 
     if (!dialogueIds?.length) {
-      const dialogues = await this.workspaceService.getDialogues(workspaceId);
+      const dialogues = await this.workspaceService.getDialogues(workspaceId, userId);
       dialogueIds = dialogues.map((dialogue) => dialogue.id);
     }
 

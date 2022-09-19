@@ -332,9 +332,8 @@ class DialoguePrismaAdapter {
             } : undefined,
             form: question.form ? {
               create: {
-                fields: {
-                  create: question.form?.fields,
-                },
+                preForm: question.form.preForm,
+                steps: question.form?.steps,
               },
             } : undefined,
             sliderNode: question.sliderNode ? {
@@ -452,6 +451,22 @@ class DialoguePrismaAdapter {
       include: {
         form: {
           include: {
+            preForm: true,
+            steps: {
+              orderBy: {
+                position: 'asc',
+              },
+              include: {
+                fields: {
+                  orderBy: {
+                    position: 'asc',
+                  },
+                  include: {
+                    contacts: true,
+                  },
+                },
+              },
+            },
             fields: {
               include: {
                 contacts: true,
@@ -566,6 +581,16 @@ class DialoguePrismaAdapter {
             },
             form: {
               include: {
+                preForm: true,
+                steps: {
+                  include: {
+                    fields: {
+                      include: {
+                        contacts: true,
+                      },
+                    },
+                  },
+                },
                 fields: true,
               },
             },
@@ -783,9 +808,22 @@ class DialoguePrismaAdapter {
     });
   };
 
-  async findDialoguesByCustomerId(customerId: string, searchTerm?: string) {
+  async findDialoguesByCustomerId(customerId: string, userId: string, searchTerm?: string) {
     const whereInput: Prisma.DialogueWhereInput = {
       customerId,
+      OR: [
+        {
+          isPrivate: true,
+          assignees: {
+            some: {
+              id: userId,
+            },
+          },
+        },
+        {
+          isPrivate: false,
+        },
+      ],
     }
 
     if (searchTerm) {
@@ -850,6 +888,23 @@ class DialoguePrismaAdapter {
   * @param filter a filter containing information in regard to used search queries, date ranges and order based on column
   */
   buildFindDialoguesQuery = (workspaceSlug: string, userId: string, filter?: NexusGenInputs['DialogueConnectionFilterInput'] | null): Prisma.DialogueWhereInput => {
+    const searchQueries: Prisma.DialogueWhereInput = {
+      OR: [
+        { title: { contains: filter?.searchTerm!, mode: 'insensitive' } },
+        { description: { contains: filter?.searchTerm!, mode: 'insensitive' } },
+        {
+          tags: {
+            some: {
+              name: {
+                contains: filter?.searchTerm!,
+                mode: 'insensitive',
+              },
+            },
+          },
+        },
+      ],
+    }
+
     let dialogueWhereInput: Prisma.DialogueWhereInput = {
       customer: {
         slug: workspaceSlug,
@@ -862,31 +917,13 @@ class DialoguePrismaAdapter {
               id: userId,
             },
           },
+          AND: filter?.searchTerm ? searchQueries : undefined,
         },
         {
           isPrivate: false,
+          AND: filter?.searchTerm ? searchQueries : undefined,
         },
       ],
-    }
-
-    if (filter?.searchTerm) {
-      dialogueWhereInput = {
-        ...cloneDeep(dialogueWhereInput),
-        OR: [
-          { title: { contains: filter.searchTerm, mode: 'insensitive' } },
-          { description: { contains: filter.searchTerm, mode: 'insensitive' } },
-          {
-            tags: {
-              some: {
-                name: {
-                  contains: filter.searchTerm,
-                  mode: 'insensitive',
-                },
-              },
-            },
-          },
-        ],
-      }
     }
 
     return dialogueWhereInput;
@@ -902,7 +939,7 @@ class DialoguePrismaAdapter {
 
     if (filter?.orderBy?.by === 'createdAt') {
       orderByQuery.push({
-        updatedAt: filter.orderBy.desc ? 'desc' : 'asc',
+        creationDate: filter.orderBy.desc ? 'desc' : 'asc',
       });
     }
 

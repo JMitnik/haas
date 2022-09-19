@@ -7,7 +7,14 @@ import React, { useState } from 'react';
 
 import * as Popover from 'components/Common/Popover';
 import * as Table from 'components/Common/Table';
-import { DialogueConnection, DialogueConnectionOrder, useDialogueConnectionQuery } from 'types/generated-types';
+import {
+  DialogueConnection,
+  DialogueConnectionOrder,
+  UserType,
+  useDialogueConnectionQuery,
+  useGetUsersQuery,
+
+} from 'types/generated-types';
 import { ReactComponent as NoDataIll } from 'assets/images/undraw_no_data.svg';
 import { View } from 'layouts/View';
 import Searchbar from 'components/Common/SearchBar';
@@ -47,6 +54,12 @@ const DialogueOverview = () => {
     notifyOnNetworkStatusChange: true,
     onCompleted: (fetchedData) => {
       setDialogueConnection(fetchedData.customer?.dialogueConnection as DialogueConnection);
+    },
+  });
+
+  const { data: userData } = useGetUsersQuery({
+    variables: {
+      customerSlug: activeCustomer?.slug as string,
     },
   });
 
@@ -148,8 +161,8 @@ const DialogueOverview = () => {
           gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(350px, 1fr))']}
           gridAutoRows="minmax(200px, 1fr)"
         >
-          {filteredDialogues.map((dialogue: any, index: any) => dialogue && (
-            <DialogueCard key={index} dialogue={dialogue} />
+          {filteredDialogues.map((dialogue: any) => dialogue && (
+            <DialogueCard key={dialogue.id} users={userData?.customer?.users as UserType[]} dialogue={dialogue} />
           ))}
         </UI.Grid>
 

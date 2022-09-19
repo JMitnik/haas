@@ -22,6 +22,7 @@ export const FormNodeEntryValueType = objectType({
     t.string('url', { nullable: true });
     t.string('shortText', { nullable: true });
     t.string('longText', { nullable: true });
+    t.string('contacts', { nullable: true });
     t.int('number', { nullable: true });
   },
 });

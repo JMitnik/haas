@@ -1,7 +1,8 @@
 import * as UI from '@haas/ui';
-import { Zap } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
+
+import { View } from 'layouts/View';
 
 import { CTANode, QuestionEntryProps } from './DialogueBuilderInterfaces';
 import QuestionSection from './components/QuestionSection';
@@ -37,15 +38,17 @@ const DialogueBuilderView = ({ nodes, selectLeafs, ctaNodes, root }: DialogueBui
   })) || [];
 
   return (
-    <>
-      <UI.ViewHead>
-        <UI.DeprecatedViewTitle>
-          <UI.Icon as={Zap} mr={1} />
-          {t('views:builder_view')}
-        </UI.DeprecatedViewTitle>
-      </UI.ViewHead>
-
+    <View documentTitle="haas - Dialogue Builder">
       <UI.ViewBody>
+        <UI.Div pb={4} position="relative" zIndex={10000}>
+          <UI.Flex alignItems="center" justifyContent="space-between">
+            <UI.Div>
+              <UI.H4 fontSize="1.1rem" color="off.500">
+                {t('views:builder_view')}
+              </UI.H4>
+            </UI.Div>
+          </UI.Flex>
+        </UI.Div>
         <UI.ColumnFlex>
           {(nodes && nodes.length === 0) && (
             <UI.Div alignSelf="center">No question available...</UI.Div>
@@ -73,7 +76,7 @@ const DialogueBuilderView = ({ nodes, selectLeafs, ctaNodes, root }: DialogueBui
           )}
         </UI.ColumnFlex>
       </UI.ViewBody>
-    </>
+    </View>
   );
 };
 

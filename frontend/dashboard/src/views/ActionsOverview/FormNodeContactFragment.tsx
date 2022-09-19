@@ -1,5 +1,5 @@
 import * as UI from '@haas/ui';
-import { Controller } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 import {
   PlusCircle,
 } from 'react-feather';
@@ -14,8 +14,10 @@ import Dropdown from 'components/Dropdown/Dropdown';
 import { ContactsCell } from './ContactsCell';
 
 interface FormNodeContactsFragmentProps {
-  form: any;
+  form?: any;
   contacts: any;
+  stepIndex: number;
+  fieldIndex: number;
 }
 
 interface TargetEntry {
@@ -59,7 +61,8 @@ const mapToUserPickerEntries = (customer: Maybe<{
   return userPickerEntries;
 };
 
-const FormNodeContactsFragment = ({ form, contacts }: FormNodeContactsFragmentProps) => {
+const FormNodeContactsFragment = ({ contacts, stepIndex, fieldIndex }: FormNodeContactsFragmentProps) => {
+  const form = useFormContext();
   const { t } = useTranslation();
   const { customerSlug } = useNavigator();
 
@@ -102,7 +105,7 @@ const FormNodeContactsFragment = ({ form, contacts }: FormNodeContactsFragmentPr
               >
                 <UI.Div alignItems="center" display="flex">
                   <Controller
-                    name="contact.contacts"
+                    name={`formNode.steps.${stepIndex}.fields.${fieldIndex}.contact.contacts`}
                     control={form.control}
                     render={({ field: { value, onChange } }) => (
                       <Dropdown

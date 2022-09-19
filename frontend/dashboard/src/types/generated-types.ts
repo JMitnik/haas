@@ -49,6 +49,13 @@ export type AppendToInteractionInput = {
   data?: Maybe<NodeEntryDataInput>;
 };
 
+export type AssignUserToDialogueInput = {
+  userId: Scalars['String'];
+  workspaceId: Scalars['String'];
+  dialogueId: Scalars['String'];
+  state: Scalars['Boolean'];
+};
+
 export type AssignUserToDialoguesInput = {
   userId: Scalars['String'];
   workspaceId: Scalars['String'];
@@ -575,6 +582,13 @@ export type CreateQuestionNodeInputType = {
   edgeCondition?: Maybe<EdgeConditionInputType>;
 };
 
+/** Creates a topic (with subTopics) based on input */
+export type CreateTopicInput = {
+  name: Scalars['String'];
+  type?: Maybe<TopicEnumType>;
+  subTopics?: Maybe<Array<Maybe<CreateTopicInput>>>;
+};
+
 export type CreateTriggerInputType = {
   customerSlug?: Maybe<Scalars['String']>;
   recipients?: Maybe<RecipientsInputType>;
@@ -893,7 +907,7 @@ export type Dialogue = {
   title: Scalars['String'];
   slug: Scalars['String'];
   description: Scalars['String'];
-  template: Scalars['String'];
+  template?: Maybe<Scalars['String']>;
   isWithoutGenData?: Maybe<Scalars['Boolean']>;
   wasGeneratedWithGenData?: Maybe<Scalars['Boolean']>;
   language?: Maybe<LanguageEnumType>;
@@ -903,6 +917,7 @@ export type Dialogue = {
   updatedAt?: Maybe<Scalars['String']>;
   assignees?: Maybe<Array<Maybe<UserType>>>;
   postLeafNode?: Maybe<DialogueFinisherObjectType>;
+  issues?: Maybe<Issue>;
   healthScore?: Maybe<HealthScore>;
   pathedSessionsConnection?: Maybe<PathedSessionsType>;
   topic?: Maybe<TopicType>;
@@ -922,6 +937,11 @@ export type Dialogue = {
   questions?: Maybe<Array<QuestionNode>>;
   leafs?: Maybe<Array<QuestionNode>>;
   campaignVariants?: Maybe<Array<CampaignVariantType>>;
+};
+
+
+export type DialogueIssuesArgs = {
+  filter?: Maybe<IssueFilterInput>;
 };
 
 
@@ -971,7 +991,7 @@ export type DialogueSessionsArgs = {
 
 
 export type DialogueStatisticsArgs = {
-  input?: Maybe<DialogueFilterInputType>;
+  input?: Maybe<DialogueStatisticsSummaryFilterInput>;
 };
 
 
@@ -1030,8 +1050,8 @@ export type DialogueConnectionOrderByInput = {
 
 export type DialogueFilterInputType = {
   searchTerm?: Maybe<Scalars['String']>;
-  startDate?: Maybe<Scalars['String']>;
-  endDate?: Maybe<Scalars['String']>;
+  startDateTime?: Maybe<Scalars['String']>;
+  endDateTime?: Maybe<Scalars['String']>;
 };
 
 export type DialogueFinisherObjectType = {
@@ -1078,6 +1098,8 @@ export type DialogueStatisticsSummaryModel = {
 };
 
 export enum DialogueTemplateType {
+  TeacherNl = 'TEACHER_NL',
+  StudentNl = 'STUDENT_NL',
   TeacherEng = 'TEACHER_ENG',
   StudentEng = 'STUDENT_ENG',
   SportEng = 'SPORT_ENG',
@@ -1196,6 +1218,7 @@ export type FormNodeEntryValueType = {
   url?: Maybe<Scalars['String']>;
   shortText?: Maybe<Scalars['String']>;
   longText?: Maybe<Scalars['String']>;
+  contacts?: Maybe<Scalars['String']>;
   number?: Maybe<Scalars['Int']>;
 };
 
@@ -1235,14 +1258,44 @@ export enum FormNodeFieldTypeEnum {
 export type FormNodeInputType = {
   id?: Maybe<Scalars['String']>;
   helperText?: Maybe<Scalars['String']>;
+  preFormNode?: Maybe<PreFormNodeInput>;
+  fields?: Maybe<Array<FormNodeFieldInput>>;
+  steps?: Maybe<Array<FormNodeStepInput>>;
+};
+
+export type FormNodeStep = {
+  __typename?: 'FormNodeStep';
+  id: Scalars['String'];
+  position: Scalars['Int'];
+  header?: Maybe<Scalars['String']>;
+  helper?: Maybe<Scalars['String']>;
+  subHelper?: Maybe<Scalars['String']>;
+  type: FormNodeStepType;
+  fields?: Maybe<Array<FormNodeField>>;
+};
+
+export type FormNodeStepInput = {
+  id?: Maybe<Scalars['ID']>;
+  type: FormNodeStepType;
+  header: Scalars['String'];
+  helper: Scalars['String'];
+  subHelper: Scalars['String'];
+  position: Scalars['Int'];
   fields?: Maybe<Array<FormNodeFieldInput>>;
 };
+
+export enum FormNodeStepType {
+  GenericFields = 'GENERIC_FIELDS',
+  InputData = 'INPUT_DATA'
+}
 
 export type FormNodeType = {
   __typename?: 'FormNodeType';
   id?: Maybe<Scalars['String']>;
   helperText?: Maybe<Scalars['String']>;
+  preForm?: Maybe<PreFormNodeType>;
   fields?: Maybe<Array<FormNodeField>>;
+  steps?: Maybe<Array<FormNodeStep>>;
 };
 
 /** Generate savales documents */
@@ -1283,6 +1336,7 @@ export type GenerateWorkspaceCsvInputType = {
   type?: Scalars['String'];
   generateDemoData?: Maybe<Scalars['Boolean']>;
   isDemo?: Scalars['Boolean'];
+  makeDialoguesPrivate?: Maybe<Scalars['Boolean']>;
 };
 
 export type GetAutomationInput = {
@@ -1308,6 +1362,7 @@ export type HealthScore = {
   score: Scalars['Float'];
   negativeResponseCount: Scalars['Int'];
   nrVotes: Scalars['Int'];
+  average: Scalars['Float'];
 };
 
 export type HealthScoreInput = {
@@ -1515,6 +1570,9 @@ export type Mutation = {
   deleteTag?: Maybe<Tag>;
   /** Deselcting a topic implies that all question-options related to the topic string are disregarded as topic. */
   deselectTopic?: Maybe<Scalars['Boolean']>;
+  /** Creates a list of topics and its subtopics. */
+  createTopic?: Maybe<Scalars['Boolean']>;
+  revokeTopic?: Maybe<Topic>;
   /** Creates a new automation. */
   createAutomation?: Maybe<AutomationModel>;
   updateAutomation?: Maybe<AutomationModel>;
@@ -1540,6 +1598,7 @@ export type Mutation = {
   handleUserStateInWorkspace?: Maybe<UserCustomer>;
   editUser?: Maybe<UserType>;
   deleteUser?: Maybe<DeleteUserOutput>;
+  assignUserToDialogue?: Maybe<UserType>;
   assignUserToDialogues?: Maybe<UserType>;
   copyDialogue?: Maybe<Dialogue>;
   createDialogue?: Maybe<Dialogue>;
@@ -1652,6 +1711,16 @@ export type MutationDeleteTagArgs = {
 
 export type MutationDeselectTopicArgs = {
   input?: Maybe<DeselectTopicInput>;
+};
+
+
+export type MutationCreateTopicArgs = {
+  input?: Maybe<Array<CreateTopicInput>>;
+};
+
+
+export type MutationRevokeTopicArgs = {
+  input?: Maybe<RevokeTopicInput>;
 };
 
 
@@ -1779,6 +1848,11 @@ export type MutationEditUserArgs = {
 
 export type MutationDeleteUserArgs = {
   input?: Maybe<DeleteUserInput>;
+};
+
+
+export type MutationAssignUserToDialogueArgs = {
+  input?: Maybe<AssignUserToDialogueInput>;
 };
 
 
@@ -2086,6 +2160,22 @@ export type PermssionType = {
   name?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   customer?: Maybe<Customer>;
+};
+
+export type PreFormNodeInput = {
+  header: Scalars['String'];
+  helper: Scalars['String'];
+  nextText: Scalars['String'];
+  finishText: Scalars['String'];
+};
+
+export type PreFormNodeType = {
+  __typename?: 'PreFormNodeType';
+  id: Scalars['String'];
+  header: Scalars['String'];
+  helper: Scalars['String'];
+  nextText: Scalars['String'];
+  finishText: Scalars['String'];
 };
 
 export type PreviewDataType = {
@@ -2435,6 +2525,12 @@ export type RequestInviteOutput = {
   loginToken?: Maybe<Scalars['String']>;
 };
 
+/** Revokes a sub topic from a topic based on input */
+export type RevokeTopicInput = {
+  topic: Scalars['String'];
+  subTopic: Scalars['String'];
+};
+
 export type RoleConnection = DeprecatedConnectionInterface & {
   __typename?: 'RoleConnection';
   cursor?: Maybe<Scalars['String']>;
@@ -2702,6 +2798,19 @@ export type TextboxNodeEntryInput = {
   value?: Maybe<Scalars['String']>;
 };
 
+/** Model for topic */
+export type Topic = {
+  __typename?: 'Topic';
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  type: Scalars['String'];
+  subTopics?: Maybe<Array<Maybe<Topic>>>;
+  parentTopics?: Maybe<Array<Maybe<Topic>>>;
+  workspace?: Maybe<Customer>;
+  /** A list of question options to which this topic is assigned to. */
+  usedByOptions?: Maybe<Array<Maybe<QuestionOption>>>;
+};
+
 export type TopicDelta = {
   __typename?: 'TopicDelta';
   topic?: Maybe<Scalars['String']>;
@@ -2712,6 +2821,12 @@ export type TopicDelta = {
   percentageChanged?: Maybe<Scalars['Float']>;
   group?: Maybe<Scalars['String']>;
 };
+
+/** All the different types a topic can be. */
+export enum TopicEnumType {
+  System = 'SYSTEM',
+  Workspace = 'WORKSPACE'
+}
 
 /** Generic filter object for filtering topics */
 export type TopicFilterInput = {
@@ -3260,7 +3375,7 @@ export type NodeEntryFragmentFragment = (
       & Pick<FormNodeEntryType, 'id'>
       & { values?: Maybe<Array<Maybe<(
         { __typename?: 'FormNodeEntryValueType' }
-        & Pick<FormNodeEntryValueType, 'email' | 'phoneNumber' | 'url' | 'shortText' | 'longText' | 'number'>
+        & Pick<FormNodeEntryValueType, 'email' | 'phoneNumber' | 'url' | 'shortText' | 'longText' | 'number' | 'contacts'>
         & { relatedField?: Maybe<(
           { __typename?: 'FormNodeField' }
           & Pick<FormNodeField, 'id' | 'type'>
@@ -3291,6 +3406,30 @@ export type SessionFragmentFragment = (
   )> }
 );
 
+export type GetDialogueLayoutDetailsQueryVariables = Exact<{
+  workspaceId: Scalars['ID'];
+  dialogueId: Scalars['ID'];
+  healthInput: HealthScoreInput;
+  filter?: Maybe<DialogueFilterInputType>;
+}>;
+
+
+export type GetDialogueLayoutDetailsQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { dialogue?: Maybe<(
+      { __typename?: 'Dialogue' }
+      & Pick<Dialogue, 'id' | 'averageScore'>
+      & { healthScore?: Maybe<(
+        { __typename?: 'HealthScore' }
+        & Pick<HealthScore, 'nrVotes' | 'negativeResponseCount' | 'score' | 'average'>
+      )> }
+    )> }
+  )> }
+);
+
 export type GetWorkspaceLayoutDetailsQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
   healthInput: HealthScoreInput;
@@ -3307,7 +3446,7 @@ export type GetWorkspaceLayoutDetailsQuery = (
       & Pick<WorkspaceStatistics, 'id'>
       & { health?: Maybe<(
         { __typename?: 'HealthScore' }
-        & Pick<HealthScore, 'nrVotes' | 'negativeResponseCount' | 'score'>
+        & Pick<HealthScore, 'nrVotes' | 'negativeResponseCount' | 'score' | 'average'>
       )> }
     )> }
   )> }
@@ -3840,6 +3979,19 @@ export type GetDialogueLinksQuery = (
   )> }
 );
 
+export type AssignUserToDialogueMutationVariables = Exact<{
+  input?: Maybe<AssignUserToDialogueInput>;
+}>;
+
+
+export type AssignUserToDialogueMutation = (
+  { __typename?: 'Mutation' }
+  & { assignUserToDialogue?: Maybe<(
+    { __typename?: 'UserType' }
+    & Pick<UserType, 'email'>
+  )> }
+);
+
 export type DeleteDialogueMutationVariables = Exact<{
   input?: Maybe<DeleteDialogueInputType>;
 }>;
@@ -3873,7 +4025,10 @@ export type DialogueConnectionQuery = (
       )>, dialogues?: Maybe<Array<Maybe<(
         { __typename?: 'Dialogue' }
         & Pick<Dialogue, 'id' | 'title' | 'isPrivate' | 'template' | 'language' | 'slug' | 'publicTitle' | 'creationDate' | 'updatedAt' | 'customerId' | 'averageScore'>
-        & { customer?: Maybe<(
+        & { assignees?: Maybe<Array<Maybe<(
+          { __typename?: 'UserType' }
+          & Pick<UserType, 'id' | 'firstName' | 'lastName'>
+        )>>>, customer?: Maybe<(
           { __typename?: 'Customer' }
           & Pick<Customer, 'slug'>
         )>, tags?: Maybe<Array<Maybe<(
@@ -3882,6 +4037,27 @@ export type DialogueConnectionQuery = (
         )>>> }
       )>>> }
     )> }
+  )> }
+);
+
+export type GetUsersQueryVariables = Exact<{
+  customerSlug: Scalars['String'];
+}>;
+
+
+export type GetUsersQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { users?: Maybe<Array<Maybe<(
+      { __typename?: 'UserType' }
+      & Pick<UserType, 'id' | 'firstName' | 'lastName'>
+      & { role?: Maybe<(
+        { __typename?: 'RoleType' }
+        & Pick<RoleType, 'id' | 'name'>
+      )> }
+    )>>> }
   )> }
 );
 
@@ -3901,8 +4077,10 @@ export type SetDialoguePrivacyMutation = (
 export type GetDialogueStatisticsQueryVariables = Exact<{
   customerSlug: Scalars['String'];
   dialogueSlug: Scalars['String'];
-  prevDateFilter?: Maybe<DialogueFilterInputType>;
-  statisticsDateFilter?: Maybe<DialogueFilterInputType>;
+  startDateTime: Scalars['String'];
+  endDateTime?: Maybe<Scalars['String']>;
+  issueFilter?: Maybe<IssueFilterInput>;
+  healthInput?: Maybe<HealthScoreInput>;
 }>;
 
 
@@ -3914,21 +4092,10 @@ export type GetDialogueStatisticsQuery = (
     & { dialogue?: Maybe<(
       { __typename?: 'Dialogue' }
       & Pick<Dialogue, 'id' | 'title'>
-      & { thisWeekAverageScore: Dialogue['averageScore'], previousScore: Dialogue['averageScore'] }
-      & { sessions?: Maybe<Array<Maybe<(
-        { __typename?: 'Session' }
-        & Pick<Session, 'id' | 'createdAt' | 'mainScore'>
-        & { nodeEntries?: Maybe<Array<(
-          { __typename?: 'NodeEntry' }
-          & { relatedNode?: Maybe<(
-            { __typename?: 'QuestionNode' }
-            & Pick<QuestionNode, 'title' | 'type'>
-          )>, value?: Maybe<(
-            { __typename?: 'NodeEntryValue' }
-            & Pick<NodeEntryValue, 'sliderNodeEntry' | 'textboxNodeEntry' | 'registrationNodeEntry' | 'choiceNodeEntry' | 'linkNodeEntry'>
-          )> }
-        )>> }
-      )>>>, statistics?: Maybe<(
+      & { healthScore?: Maybe<(
+        { __typename?: 'HealthScore' }
+        & Pick<HealthScore, 'nrVotes' | 'negativeResponseCount' | 'score' | 'average'>
+      )>, statistics?: Maybe<(
         { __typename?: 'DialogueStatistics' }
         & Pick<DialogueStatistics, 'nrInteractions'>
         & { topPositivePath?: Maybe<Array<Maybe<(
@@ -3944,6 +4111,43 @@ export type GetDialogueStatisticsQuery = (
           { __typename?: 'lineChartDataType' }
           & Pick<LineChartDataType, 'x' | 'y'>
         )>>> }
+      )>, sessions?: Maybe<Array<Maybe<(
+        { __typename?: 'Session' }
+        & Pick<Session, 'id' | 'createdAt' | 'mainScore'>
+        & { nodeEntries?: Maybe<Array<(
+          { __typename?: 'NodeEntry' }
+          & { relatedNode?: Maybe<(
+            { __typename?: 'QuestionNode' }
+            & Pick<QuestionNode, 'title' | 'type'>
+          )>, value?: Maybe<(
+            { __typename?: 'NodeEntryValue' }
+            & Pick<NodeEntryValue, 'sliderNodeEntry' | 'textboxNodeEntry' | 'registrationNodeEntry' | 'choiceNodeEntry' | 'linkNodeEntry'>
+          )> }
+        )>> }
+      )>>>, issues?: Maybe<(
+        { __typename?: 'Issue' }
+        & Pick<Issue, 'id' | 'topic' | 'rankScore' | 'followUpAction' | 'actionRequiredCount'>
+        & { dialogue?: Maybe<(
+          { __typename?: 'Dialogue' }
+          & Pick<Dialogue, 'id' | 'title'>
+        )>, basicStats: (
+          { __typename?: 'BasicStatistics' }
+          & Pick<BasicStatistics, 'responseCount' | 'average'>
+        ), history: (
+          { __typename?: 'DateHistogram' }
+          & Pick<DateHistogram, 'id'>
+          & { items: Array<(
+            { __typename?: 'DateHistogramItem' }
+            & Pick<DateHistogramItem, 'id' | 'date' | 'frequency'>
+          )> }
+        ) }
+      )>, dialogueStatisticsSummary?: Maybe<(
+        { __typename?: 'DialogueStatisticsSummaryModel' }
+        & Pick<DialogueStatisticsSummaryModel, 'id' | 'nrVotes' | 'impactScore' | 'updatedAt' | 'title'>
+        & { dialogue?: Maybe<(
+          { __typename?: 'Dialogue' }
+          & Pick<Dialogue, 'title' | 'id'>
+        )> }
       )> }
     )> }
   )> }
@@ -4378,6 +4582,7 @@ export const NodeEntryFragmentFragmentDoc = gql`
         shortText
         longText
         number
+        contacts
       }
     }
   }
@@ -4776,6 +4981,57 @@ export type GetWorkspaceSummaryDetailsQueryResult = Apollo.QueryResult<GetWorksp
 export function refetchGetWorkspaceSummaryDetailsQuery(variables?: GetWorkspaceSummaryDetailsQueryVariables) {
       return { query: GetWorkspaceSummaryDetailsDocument, variables: variables }
     }
+export const GetDialogueLayoutDetailsDocument = gql`
+    query GetDialogueLayoutDetails($workspaceId: ID!, $dialogueId: ID!, $healthInput: HealthScoreInput!, $filter: DialogueFilterInputType) {
+  customer(id: $workspaceId) {
+    id
+    dialogue(where: {id: $dialogueId}) {
+      id
+      averageScore(input: $filter)
+      healthScore(input: $healthInput) {
+        nrVotes
+        negativeResponseCount
+        score
+        average
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetDialogueLayoutDetailsQuery__
+ *
+ * To run a query within a React component, call `useGetDialogueLayoutDetailsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDialogueLayoutDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDialogueLayoutDetailsQuery({
+ *   variables: {
+ *      workspaceId: // value for 'workspaceId'
+ *      dialogueId: // value for 'dialogueId'
+ *      healthInput: // value for 'healthInput'
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useGetDialogueLayoutDetailsQuery(baseOptions: Apollo.QueryHookOptions<GetDialogueLayoutDetailsQuery, GetDialogueLayoutDetailsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetDialogueLayoutDetailsQuery, GetDialogueLayoutDetailsQueryVariables>(GetDialogueLayoutDetailsDocument, options);
+      }
+export function useGetDialogueLayoutDetailsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDialogueLayoutDetailsQuery, GetDialogueLayoutDetailsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetDialogueLayoutDetailsQuery, GetDialogueLayoutDetailsQueryVariables>(GetDialogueLayoutDetailsDocument, options);
+        }
+export type GetDialogueLayoutDetailsQueryHookResult = ReturnType<typeof useGetDialogueLayoutDetailsQuery>;
+export type GetDialogueLayoutDetailsLazyQueryHookResult = ReturnType<typeof useGetDialogueLayoutDetailsLazyQuery>;
+export type GetDialogueLayoutDetailsQueryResult = Apollo.QueryResult<GetDialogueLayoutDetailsQuery, GetDialogueLayoutDetailsQueryVariables>;
+export function refetchGetDialogueLayoutDetailsQuery(variables?: GetDialogueLayoutDetailsQueryVariables) {
+      return { query: GetDialogueLayoutDetailsDocument, variables: variables }
+    }
 export const GetWorkspaceLayoutDetailsDocument = gql`
     query GetWorkspaceLayoutDetails($workspaceId: ID!, $healthInput: HealthScoreInput!) {
   customer(id: $workspaceId) {
@@ -4786,6 +5042,7 @@ export const GetWorkspaceLayoutDetailsDocument = gql`
         nrVotes
         negativeResponseCount
         score
+        average
       }
     }
   }
@@ -6046,6 +6303,39 @@ export type GetDialogueLinksQueryResult = Apollo.QueryResult<GetDialogueLinksQue
 export function refetchGetDialogueLinksQuery(variables?: GetDialogueLinksQueryVariables) {
       return { query: GetDialogueLinksDocument, variables: variables }
     }
+export const AssignUserToDialogueDocument = gql`
+    mutation assignUserToDialogue($input: AssignUserToDialogueInput) {
+  assignUserToDialogue(input: $input) {
+    email
+  }
+}
+    `;
+export type AssignUserToDialogueMutationFn = Apollo.MutationFunction<AssignUserToDialogueMutation, AssignUserToDialogueMutationVariables>;
+
+/**
+ * __useAssignUserToDialogueMutation__
+ *
+ * To run a mutation, you first call `useAssignUserToDialogueMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAssignUserToDialogueMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [assignUserToDialogueMutation, { data, loading, error }] = useAssignUserToDialogueMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useAssignUserToDialogueMutation(baseOptions?: Apollo.MutationHookOptions<AssignUserToDialogueMutation, AssignUserToDialogueMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AssignUserToDialogueMutation, AssignUserToDialogueMutationVariables>(AssignUserToDialogueDocument, options);
+      }
+export type AssignUserToDialogueMutationHookResult = ReturnType<typeof useAssignUserToDialogueMutation>;
+export type AssignUserToDialogueMutationResult = Apollo.MutationResult<AssignUserToDialogueMutation>;
+export type AssignUserToDialogueMutationOptions = Apollo.BaseMutationOptions<AssignUserToDialogueMutation, AssignUserToDialogueMutationVariables>;
 export const DeleteDialogueDocument = gql`
     mutation deleteDialogue($input: DeleteDialogueInputType) {
   deleteDialogue(input: $input) {
@@ -6106,6 +6396,11 @@ export const DialogueConnectionDocument = gql`
         updatedAt
         customerId
         averageScore
+        assignees {
+          id
+          firstName
+          lastName
+        }
         customer {
           slug
         }
@@ -6151,6 +6446,53 @@ export type DialogueConnectionQueryResult = Apollo.QueryResult<DialogueConnectio
 export function refetchDialogueConnectionQuery(variables?: DialogueConnectionQueryVariables) {
       return { query: DialogueConnectionDocument, variables: variables }
     }
+export const GetUsersDocument = gql`
+    query getUsers($customerSlug: String!) {
+  customer(slug: $customerSlug) {
+    id
+    users {
+      id
+      firstName
+      lastName
+      role {
+        id
+        name
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetUsersQuery__
+ *
+ * To run a query within a React component, call `useGetUsersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUsersQuery({
+ *   variables: {
+ *      customerSlug: // value for 'customerSlug'
+ *   },
+ * });
+ */
+export function useGetUsersQuery(baseOptions: Apollo.QueryHookOptions<GetUsersQuery, GetUsersQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUsersQuery, GetUsersQueryVariables>(GetUsersDocument, options);
+      }
+export function useGetUsersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUsersQuery, GetUsersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUsersQuery, GetUsersQueryVariables>(GetUsersDocument, options);
+        }
+export type GetUsersQueryHookResult = ReturnType<typeof useGetUsersQuery>;
+export type GetUsersLazyQueryHookResult = ReturnType<typeof useGetUsersLazyQuery>;
+export type GetUsersQueryResult = Apollo.QueryResult<GetUsersQuery, GetUsersQueryVariables>;
+export function refetchGetUsersQuery(variables?: GetUsersQueryVariables) {
+      return { query: GetUsersDocument, variables: variables }
+    }
 export const SetDialoguePrivacyDocument = gql`
     mutation setDialoguePrivacy($input: SetDialoguePrivacyInput) {
   setDialoguePrivacy(input: $input) {
@@ -6187,33 +6529,21 @@ export type SetDialoguePrivacyMutationHookResult = ReturnType<typeof useSetDialo
 export type SetDialoguePrivacyMutationResult = Apollo.MutationResult<SetDialoguePrivacyMutation>;
 export type SetDialoguePrivacyMutationOptions = Apollo.BaseMutationOptions<SetDialoguePrivacyMutation, SetDialoguePrivacyMutationVariables>;
 export const GetDialogueStatisticsDocument = gql`
-    query GetDialogueStatistics($customerSlug: String!, $dialogueSlug: String!, $prevDateFilter: DialogueFilterInputType, $statisticsDateFilter: DialogueFilterInputType) {
+    query GetDialogueStatistics($customerSlug: String!, $dialogueSlug: String!, $startDateTime: String!, $endDateTime: String, $issueFilter: IssueFilterInput, $healthInput: HealthScoreInput) {
   customer(slug: $customerSlug) {
     id
     dialogue(where: {slug: $dialogueSlug}) {
       id
       title
-      thisWeekAverageScore: averageScore(input: $statisticsDateFilter)
-      previousScore: averageScore(input: $prevDateFilter)
-      sessions(take: 3) {
-        id
-        createdAt
-        mainScore
-        nodeEntries {
-          relatedNode {
-            title
-            type
-          }
-          value {
-            sliderNodeEntry
-            textboxNodeEntry
-            registrationNodeEntry
-            choiceNodeEntry
-            linkNodeEntry
-          }
-        }
+      healthScore(input: $healthInput) {
+        nrVotes
+        negativeResponseCount
+        score
+        average
       }
-      statistics(input: $statisticsDateFilter) {
+      statistics(
+        input: {startDateTime: $startDateTime, endDateTime: $endDateTime, impactType: AVERAGE, refresh: true}
+      ) {
         nrInteractions
         topPositivePath {
           answer
@@ -6235,6 +6565,60 @@ export const GetDialogueStatisticsDocument = gql`
           y
         }
       }
+      sessions(take: 3) {
+        id
+        createdAt
+        mainScore
+        nodeEntries {
+          relatedNode {
+            title
+            type
+          }
+          value {
+            sliderNodeEntry
+            textboxNodeEntry
+            registrationNodeEntry
+            choiceNodeEntry
+            linkNodeEntry
+          }
+        }
+      }
+      issues(filter: $issueFilter) {
+        id
+        topic
+        rankScore
+        followUpAction
+        actionRequiredCount
+        dialogue {
+          id
+          title
+        }
+        basicStats {
+          responseCount
+          average
+        }
+        history {
+          id
+          items {
+            id
+            date
+            frequency
+          }
+        }
+      }
+      dialogueStatisticsSummary(
+        input: {startDateTime: $startDateTime, endDateTime: $endDateTime, impactType: AVERAGE, refresh: true}
+      ) {
+        id
+        nrVotes
+        impactScore
+        updatedAt
+        title
+        dialogue {
+          title
+          id
+        }
+      }
     }
   }
 }
@@ -6254,8 +6638,10 @@ export const GetDialogueStatisticsDocument = gql`
  *   variables: {
  *      customerSlug: // value for 'customerSlug'
  *      dialogueSlug: // value for 'dialogueSlug'
- *      prevDateFilter: // value for 'prevDateFilter'
- *      statisticsDateFilter: // value for 'statisticsDateFilter'
+ *      startDateTime: // value for 'startDateTime'
+ *      endDateTime: // value for 'endDateTime'
+ *      issueFilter: // value for 'issueFilter'
+ *      healthInput: // value for 'healthInput'
  *   },
  * });
  */
@@ -7178,6 +7564,15 @@ export namespace SessionFragment {
   export type Values = NonNullable<(NonNullable<(NonNullable<SessionFragmentFragment['followUpAction']>)['values']>)[number]>;
 }
 
+export namespace GetDialogueLayoutDetails {
+  export type Variables = GetDialogueLayoutDetailsQueryVariables;
+  export type Query = GetDialogueLayoutDetailsQuery;
+  export type Customer = (NonNullable<GetDialogueLayoutDetailsQuery['customer']>);
+  export type Dialogue = (NonNullable<(NonNullable<GetDialogueLayoutDetailsQuery['customer']>)['dialogue']>);
+  export type HealthScore = (NonNullable<(NonNullable<(NonNullable<GetDialogueLayoutDetailsQuery['customer']>)['dialogue']>)['healthScore']>);
+  export const Document = GetDialogueLayoutDetailsDocument;
+}
+
 export namespace GetWorkspaceLayoutDetails {
   export type Variables = GetWorkspaceLayoutDetailsQueryVariables;
   export type Query = GetWorkspaceLayoutDetailsQuery;
@@ -7425,6 +7820,13 @@ export namespace GetDialogueLinks {
   export const Document = GetDialogueLinksDocument;
 }
 
+export namespace AssignUserToDialogue {
+  export type Variables = AssignUserToDialogueMutationVariables;
+  export type Mutation = AssignUserToDialogueMutation;
+  export type AssignUserToDialogue = (NonNullable<AssignUserToDialogueMutation['assignUserToDialogue']>);
+  export const Document = AssignUserToDialogueDocument;
+}
+
 export namespace DeleteDialogue {
   export type Variables = DeleteDialogueMutationVariables;
   export type Mutation = DeleteDialogueMutation;
@@ -7439,9 +7841,19 @@ export namespace DialogueConnection {
   export type DialogueConnection = (NonNullable<(NonNullable<DialogueConnectionQuery['customer']>)['dialogueConnection']>);
   export type PageInfo = (NonNullable<(NonNullable<(NonNullable<DialogueConnectionQuery['customer']>)['dialogueConnection']>)['pageInfo']>);
   export type Dialogues = NonNullable<(NonNullable<(NonNullable<(NonNullable<DialogueConnectionQuery['customer']>)['dialogueConnection']>)['dialogues']>)[number]>;
+  export type Assignees = NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<DialogueConnectionQuery['customer']>)['dialogueConnection']>)['dialogues']>)[number]>['assignees']>)[number]>;
   export type _Customer = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<DialogueConnectionQuery['customer']>)['dialogueConnection']>)['dialogues']>)[number]>['customer']>);
   export type Tags = NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<DialogueConnectionQuery['customer']>)['dialogueConnection']>)['dialogues']>)[number]>['tags']>)[number]>;
   export const Document = DialogueConnectionDocument;
+}
+
+export namespace GetUsers {
+  export type Variables = GetUsersQueryVariables;
+  export type Query = GetUsersQuery;
+  export type Customer = (NonNullable<GetUsersQuery['customer']>);
+  export type Users = NonNullable<(NonNullable<(NonNullable<GetUsersQuery['customer']>)['users']>)[number]>;
+  export type Role = (NonNullable<NonNullable<(NonNullable<(NonNullable<GetUsersQuery['customer']>)['users']>)[number]>['role']>);
+  export const Document = GetUsersDocument;
 }
 
 export namespace SetDialoguePrivacy {
@@ -7456,15 +7868,23 @@ export namespace GetDialogueStatistics {
   export type Query = GetDialogueStatisticsQuery;
   export type Customer = (NonNullable<GetDialogueStatisticsQuery['customer']>);
   export type Dialogue = (NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>);
-  export type Sessions = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['sessions']>)[number]>;
-  export type NodeEntries = NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['sessions']>)[number]>['nodeEntries']>)[number]>;
-  export type RelatedNode = (NonNullable<NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['sessions']>)[number]>['nodeEntries']>)[number]>['relatedNode']>);
-  export type Value = (NonNullable<NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['sessions']>)[number]>['nodeEntries']>)[number]>['value']>);
+  export type HealthScore = (NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['healthScore']>);
   export type Statistics = (NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['statistics']>);
   export type TopPositivePath = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['statistics']>)['topPositivePath']>)[number]>;
   export type MostPopularPath = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['statistics']>)['mostPopularPath']>);
   export type TopNegativePath = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['statistics']>)['topNegativePath']>)[number]>;
   export type History = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['statistics']>)['history']>)[number]>;
+  export type Sessions = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['sessions']>)[number]>;
+  export type NodeEntries = NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['sessions']>)[number]>['nodeEntries']>)[number]>;
+  export type RelatedNode = (NonNullable<NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['sessions']>)[number]>['nodeEntries']>)[number]>['relatedNode']>);
+  export type Value = (NonNullable<NonNullable<(NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['sessions']>)[number]>['nodeEntries']>)[number]>['value']>);
+  export type Issues = (NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['issues']>);
+  export type _Dialogue = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['issues']>)['dialogue']>);
+  export type BasicStats = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['issues']>)['basicStats']>);
+  export type _History = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['issues']>)['history']>);
+  export type Items = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['issues']>)['history']>)['items']>)[number]>;
+  export type DialogueStatisticsSummary = (NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['dialogueStatisticsSummary']>);
+  export type __Dialogue = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['dialogueStatisticsSummary']>)['dialogue']>);
   export const Document = GetDialogueStatisticsDocument;
 }
 

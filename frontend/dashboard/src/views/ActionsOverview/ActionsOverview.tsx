@@ -1,5 +1,4 @@
 import * as UI from '@haas/ui';
-import { AnimateSharedLayout, Variants, motion } from 'framer-motion';
 import { Plus } from 'react-feather';
 import { debounce } from 'lodash';
 import { useLazyQuery } from '@apollo/client';
@@ -7,6 +6,7 @@ import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import React, { useCallback, useEffect, useState } from 'react';
 
+import { View } from 'layouts/View';
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
 import RegisterIcon from 'components/Icons/RegisterIcon';
@@ -15,18 +15,6 @@ import ShareIcon from 'components/Icons/ShareIcon';
 import getCTANodesQuery from 'queries/getCTANodes';
 
 import CallToActionCard from './CallToActionCard';
-
-const actionsAnimation: Variants = {
-  initial: {
-    opacity: 0,
-  },
-  animate: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.2,
-    },
-  },
-};
 
 const mapLeafs = (leafs: any) => leafs?.map((leaf: any) => {
   if (leaf.type === 'LINK') {
@@ -57,18 +45,28 @@ const mapLeafs = (leafs: any) => leafs?.map((leaf: any) => {
       type: 'FORM',
       icon: RegisterIcon,
       form: {
-        fields: leaf.form.fields.map((field: any) => ({
-          ...field,
-          contact: {
-            contacts: field.contacts.map(
-              (contact: {
-                id: string,
-                lastName?: string,
-                firstName?: string
-              }) => ({ label: `${contact?.firstName} ${contact?.lastName}`, value: contact.id, type: 'USER' }),
-            ),
-          },
-        })),
+        preFormNode: leaf?.form?.preForm ? {
+          header: leaf.form.preForm.header,
+          helper: leaf.form.preForm.helper,
+          nextText: leaf.form.preForm.nextText,
+          finishText: leaf.form.preForm.finishText,
+        } : undefined,
+        steps: leaf?.form?.steps?.map((step: any) => ({
+          ...step,
+          fields: step.fields.map((field: any) => ({
+            ...field,
+            contact: {
+              contacts: field.contacts.map(
+                (contact: {
+                  id: string,
+                  lastName?: string,
+                  firstName?: string
+                }) => ({ label: `${contact?.firstName} ${contact?.lastName}`, value: contact.id, type: 'USER' }),
+              ),
+            },
+          })),
+        })) || [],
+
       },
     };
   }
@@ -140,66 +138,59 @@ const ActionOverview = () => {
   const activeLeafs = mapLeafs(data?.customer?.dialogue?.leafs);
 
   return (
-    <>
-      <UI.ViewHead>
-        <UI.Flex justifyContent="space-between" width="100%">
-          <UI.Flex alignItems="center">
-            <UI.ViewTitle>
-              {t('views:cta_view')}
-            </UI.ViewTitle>
-
-            <UI.Button
-              leftIcon={() => <Plus />}
-              ml={4}
-              size="sm"
-              onClick={() => handleAddCTA()}
-            >
-              {t('add_call_to_action')}
-            </UI.Button>
-          </UI.Flex>
-
-          <SearchBar search={activeSearchTerm} onSearchChange={handleSearchTermChange} />
-        </UI.Flex>
-      </UI.ViewHead>
-
+    <View documentTitle="haas | Call-To-Actions">
       <UI.ViewBody>
-        <AnimateSharedLayout>
-          <motion.div variants={actionsAnimation} initial="initial" animate="animate">
-            <UI.Grid>
-              {newCTA && (
-                <CallToActionCard
-                  id="-1"
-                  activeCTA={activeCTA}
-                  onActiveCTAChange={setActiveCTA}
-                  Icon={RegisterIcon}
-                  title=""
-                  type={initializeCTAType('REGISTER')}
-                  links={[]}
-                  share={{ title: '', url: '', tooltip: '' }}
-                  onNewCTAChange={setNewCTA}
-                />
-              )}
+        <UI.Div pb={4} position="relative" zIndex={10000}>
+          <UI.Flex alignItems="center" justifyContent="space-between">
+            <UI.Flex>
+              <UI.H4 fontSize="1.1rem" color="off.500">
+                {t('views:cta_view')}
+              </UI.H4>
+              <UI.Button
+                leftIcon={() => <Plus />}
+                ml={4}
+                size="sm"
+                onClick={() => handleAddCTA()}
+              >
+                {t('add_call_to_action')}
+              </UI.Button>
+            </UI.Flex>
+            <SearchBar search={activeSearchTerm} onSearchChange={handleSearchTermChange} />
+          </UI.Flex>
+        </UI.Div>
+        <UI.Grid>
+          {newCTA && (
+            <CallToActionCard
+              id="-1"
+              activeCTA={activeCTA}
+              onActiveCTAChange={setActiveCTA}
+              Icon={RegisterIcon}
+              title=""
+              type={initializeCTAType('REGISTER')}
+              links={[]}
+              share={{ title: '', url: '', tooltip: '' }}
+              onNewCTAChange={setNewCTA}
+            />
+          )}
 
-              {activeLeafs && activeLeafs?.map((leaf: any, index: number) => (
-                <CallToActionCard
-                  key={index}
-                  activeCTA={activeCTA}
-                  onActiveCTAChange={setActiveCTA}
-                  id={leaf.id}
-                  Icon={leaf.icon}
-                  title={leaf.title}
-                  type={initializeCTAType(leaf.type)}
-                  links={leaf.links}
-                  share={leaf?.share}
-                  form={leaf?.form}
-                  onNewCTAChange={setNewCTA}
-                />
-              ))}
-            </UI.Grid>
-          </motion.div>
-        </AnimateSharedLayout>
+          {activeLeafs && activeLeafs?.map((leaf: any, index: number) => (
+            <CallToActionCard
+              key={index}
+              activeCTA={activeCTA}
+              onActiveCTAChange={setActiveCTA}
+              id={leaf.id}
+              Icon={leaf.icon}
+              title={leaf.title}
+              type={initializeCTAType(leaf.type)}
+              links={leaf.links}
+              share={leaf?.share}
+              form={leaf?.form}
+              onNewCTAChange={setNewCTA}
+            />
+          ))}
+        </UI.Grid>
       </UI.ViewBody>
-    </>
+    </View>
   );
 };
 

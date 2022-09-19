@@ -68,12 +68,30 @@ export interface CreateQuestionInput {
   }>;
   form?: {
     helperText?: string;
-    fields: Array<{
-      label: string;
-      type: FormNodeFieldType;
-      isRequired: boolean;
+    preForm?: {
+      header: string;
+      helper: string;
+      nextText: string;
+      finishText: string;
+    },
+    steps: {
+      header: string;
+      helper: string;
+      subHelper: string;
       position: number;
-    }>;
+      fields?: Array<{
+        label: string;
+        type: FormNodeFieldType;
+        isRequired: boolean;
+        position: number;
+      }>;
+    }[];
+    // fields: Array<{
+    //   label: string;
+    //   type: FormNodeFieldType;
+    //   isRequired: boolean;
+    //   position: number;
+    // }>;
   };
   share?: {
     url: string;

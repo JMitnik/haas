@@ -65,6 +65,12 @@ export interface NexusGenInputs {
     nodeId?: string | null; // String
     sessionId?: string | null; // ID
   }
+  AssignUserToDialogueInput: { // input type
+    dialogueId: string; // String!
+    state: boolean; // Boolean!
+    userId: string; // String!
+    workspaceId: string; // String!
+  }
   AssignUserToDialoguesInput: { // input type
     assignedDialogueIds?: string[] | null; // [String!]
     userId: string; // String!
@@ -337,9 +343,9 @@ export interface NexusGenInputs {
     desc: boolean | null; // Boolean
   }
   DialogueFilterInputType: { // input type
-    endDate?: string | null; // String
+    endDateTime?: string | null; // String
     searchTerm?: string | null; // String
-    startDate?: string | null; // String
+    startDateTime?: string | null; // String
   }
   DialogueStatisticsSummaryFilterInput: { // input type
     cutoff?: number | null; // Int
@@ -412,6 +418,17 @@ export interface NexusGenInputs {
     fields?: NexusGenInputs['FormNodeFieldInput'][] | null; // [FormNodeFieldInput!]
     helperText?: string | null; // String
     id?: string | null; // String
+    preFormNode?: NexusGenInputs['PreFormNodeInput'] | null; // PreFormNodeInput
+    steps?: NexusGenInputs['FormNodeStepInput'][] | null; // [FormNodeStepInput!]
+  }
+  FormNodeStepInput: { // input type
+    fields?: NexusGenInputs['FormNodeFieldInput'][] | null; // [FormNodeFieldInput!]
+    header: string; // String!
+    helper: string; // String!
+    id?: string | null; // ID
+    position: number; // Int!
+    subHelper: string; // String!
+    type: NexusGenEnums['FormNodeStepType']; // FormNodeStepType!
   }
   GenerateAutodeckInput: { // input type
     answer1?: string | null; // String
@@ -444,6 +461,7 @@ export interface NexusGenInputs {
   GenerateWorkspaceCSVInputType: { // input type
     generateDemoData?: boolean | null; // Boolean
     isDemo: boolean; // Boolean!
+    makeDialoguesPrivate?: boolean | null; // Boolean
     managerCsv?: NexusGenScalars['Upload'] | null; // Upload
     type: string; // String!
     uploadedCsv?: NexusGenScalars['Upload'] | null; // Upload
@@ -544,6 +562,12 @@ export interface NexusGenInputs {
     customerId?: string | null; // String
     description?: string | null; // String
     name?: string | null; // String
+  }
+  PreFormNodeInput: { // input type
+    finishText: string; // String!
+    header: string; // String!
+    helper: string; // String!
+    nextText: string; // String!
   }
   QuestionNodeWhereInputType: { // input type
     id?: string | null; // ID
@@ -805,6 +829,7 @@ export interface NexusGenEnums {
   DialogueImpactScoreType: "AVERAGE"
   DialogueTemplateType: prisma.DialogueTemplateType
   FormNodeFieldTypeEnum: "contacts" | "email" | "longText" | "number" | "phoneNumber" | "shortText" | "url"
+  FormNodeStepType: prisma.FormNodeStepType
   JobProcessLocationType: prisma.JobProcessLocationType
   JobStatusType: prisma.JobStatusType
   LanguageEnumType: "DUTCH" | "ENGLISH" | "GERMAN"
@@ -1101,6 +1126,7 @@ export interface NexusGenObjects {
     values?: Array<NexusGenRootTypes['FormNodeEntryValueType'] | null> | null; // [FormNodeEntryValueType]
   }
   FormNodeEntryValueType: { // root type
+    contacts?: string | null; // String
     email?: string | null; // String
     longText?: string | null; // String
     number?: number | null; // Int
@@ -1110,12 +1136,16 @@ export interface NexusGenObjects {
     url?: string | null; // String
   }
   FormNodeField: prisma.FormNodeField;
+  FormNodeStep: prisma.FormNodeStep;
   FormNodeType: { // root type
     fields?: NexusGenRootTypes['FormNodeField'][] | null; // [FormNodeField!]
     helperText?: string | null; // String
     id?: string | null; // String
+    preForm?: NexusGenRootTypes['PreFormNodeType'] | null; // PreFormNodeType
+    steps?: NexusGenRootTypes['FormNodeStep'][] | null; // [FormNodeStep!]
   }
   HealthScore: { // root type
+    average: number; // Float!
     negativeResponseCount: number; // Int!
     nrVotes: number; // Int!
     score: number; // Float!
@@ -1237,6 +1267,13 @@ export interface NexusGenObjects {
     description?: string | null; // String
     id?: string | null; // ID
     name?: string | null; // String
+  }
+  PreFormNodeType: { // root type
+    finishText: string; // String!
+    header: string; // String!
+    helper: string; // String!
+    id: string; // String!
+    nextText: string; // String!
   }
   PreviewDataType: { // root type
     colors?: Array<string | null> | null; // [String]
@@ -1711,6 +1748,7 @@ export interface NexusGenFieldTypes {
     id: string; // ID!
     isPrivate: boolean | null; // Boolean
     isWithoutGenData: boolean | null; // Boolean
+    issues: NexusGenRootTypes['Issue'] | null; // Issue
     language: NexusGenEnums['LanguageEnumType'] | null; // LanguageEnumType
     leafs: NexusGenRootTypes['QuestionNode'][] | null; // [QuestionNode!]
     mostChangedPath: NexusGenRootTypes['MostChangedPath'] | null; // MostChangedPath
@@ -1797,6 +1835,7 @@ export interface NexusGenFieldTypes {
     values: Array<NexusGenRootTypes['FormNodeEntryValueType'] | null> | null; // [FormNodeEntryValueType]
   }
   FormNodeEntryValueType: { // field return type
+    contacts: string | null; // String
     email: string | null; // String
     longText: string | null; // String
     number: number | null; // Int
@@ -1814,12 +1853,24 @@ export interface NexusGenFieldTypes {
     position: number | null; // Int
     type: NexusGenEnums['FormNodeFieldTypeEnum']; // FormNodeFieldTypeEnum!
   }
+  FormNodeStep: { // field return type
+    fields: NexusGenRootTypes['FormNodeField'][] | null; // [FormNodeField!]
+    header: string | null; // String
+    helper: string | null; // String
+    id: string; // String!
+    position: number; // Int!
+    subHelper: string | null; // String
+    type: NexusGenEnums['FormNodeStepType']; // FormNodeStepType!
+  }
   FormNodeType: { // field return type
     fields: NexusGenRootTypes['FormNodeField'][] | null; // [FormNodeField!]
     helperText: string | null; // String
     id: string | null; // String
+    preForm: NexusGenRootTypes['PreFormNodeType'] | null; // PreFormNodeType
+    steps: NexusGenRootTypes['FormNodeStep'][] | null; // [FormNodeStep!]
   }
   HealthScore: { // field return type
+    average: number; // Float!
     negativeResponseCount: number; // Int!
     nrVotes: number; // Int!
     score: number; // Float!
@@ -1909,6 +1960,7 @@ export interface NexusGenFieldTypes {
   Mutation: { // field return type
     appendToInteraction: NexusGenRootTypes['Session'] | null; // Session
     assignTags: NexusGenRootTypes['Dialogue'] | null; // Dialogue
+    assignUserToDialogue: NexusGenRootTypes['UserType'] | null; // UserType
     assignUserToDialogues: NexusGenRootTypes['UserType'] | null; // UserType
     authenticateLambda: string | null; // String
     confirmCreateWorkspaceJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
@@ -2027,6 +2079,13 @@ export interface NexusGenFieldTypes {
     description: string | null; // String
     id: string | null; // ID
     name: string | null; // String
+  }
+  PreFormNodeType: { // field return type
+    finishText: string; // String!
+    header: string; // String!
+    helper: string; // String!
+    id: string; // String!
+    nextText: string; // String!
   }
   PreviewDataType: { // field return type
     colors: Array<string | null> | null; // [String]
@@ -2616,6 +2675,7 @@ export interface NexusGenFieldTypeNames {
     id: 'ID'
     isPrivate: 'Boolean'
     isWithoutGenData: 'Boolean'
+    issues: 'Issue'
     language: 'LanguageEnumType'
     leafs: 'QuestionNode'
     mostChangedPath: 'MostChangedPath'
@@ -2702,6 +2762,7 @@ export interface NexusGenFieldTypeNames {
     values: 'FormNodeEntryValueType'
   }
   FormNodeEntryValueType: { // field return type name
+    contacts: 'String'
     email: 'String'
     longText: 'String'
     number: 'Int'
@@ -2719,12 +2780,24 @@ export interface NexusGenFieldTypeNames {
     position: 'Int'
     type: 'FormNodeFieldTypeEnum'
   }
+  FormNodeStep: { // field return type name
+    fields: 'FormNodeField'
+    header: 'String'
+    helper: 'String'
+    id: 'String'
+    position: 'Int'
+    subHelper: 'String'
+    type: 'FormNodeStepType'
+  }
   FormNodeType: { // field return type name
     fields: 'FormNodeField'
     helperText: 'String'
     id: 'String'
+    preForm: 'PreFormNodeType'
+    steps: 'FormNodeStep'
   }
   HealthScore: { // field return type name
+    average: 'Float'
     negativeResponseCount: 'Int'
     nrVotes: 'Int'
     score: 'Float'
@@ -2814,6 +2887,7 @@ export interface NexusGenFieldTypeNames {
   Mutation: { // field return type name
     appendToInteraction: 'Session'
     assignTags: 'Dialogue'
+    assignUserToDialogue: 'UserType'
     assignUserToDialogues: 'UserType'
     authenticateLambda: 'String'
     confirmCreateWorkspaceJob: 'CreateWorkspaceJobType'
@@ -2932,6 +3006,13 @@ export interface NexusGenFieldTypeNames {
     description: 'String'
     id: 'ID'
     name: 'String'
+  }
+  PreFormNodeType: { // field return type name
+    finishText: 'String'
+    header: 'String'
+    helper: 'String'
+    id: 'String'
+    nextText: 'String'
   }
   PreviewDataType: { // field return type name
     colors: 'String'
@@ -3307,6 +3388,9 @@ export interface NexusGenArgTypes {
     healthScore: { // args
       input?: NexusGenInputs['HealthScoreInput'] | null; // HealthScoreInput
     }
+    issues: { // args
+      filter?: NexusGenInputs['IssueFilterInput'] | null; // IssueFilterInput
+    }
     leafs: { // args
       searchTerm?: string | null; // String
     }
@@ -3329,7 +3413,7 @@ export interface NexusGenArgTypes {
       take?: number | null; // Int
     }
     statistics: { // args
-      input?: NexusGenInputs['DialogueFilterInputType'] | null; // DialogueFilterInputType
+      input?: NexusGenInputs['DialogueStatisticsSummaryFilterInput'] | null; // DialogueStatisticsSummaryFilterInput
     }
     topic: { // args
       input?: NexusGenInputs['TopicInputType'] | null; // TopicInputType
@@ -3342,6 +3426,9 @@ export interface NexusGenArgTypes {
     assignTags: { // args
       dialogueId?: string | null; // String
       tags?: NexusGenInputs['TagsInputObjectType'] | null; // TagsInputObjectType
+    }
+    assignUserToDialogue: { // args
+      input?: NexusGenInputs['AssignUserToDialogueInput'] | null; // AssignUserToDialogueInput
     }
     assignUserToDialogues: { // args
       input?: NexusGenInputs['AssignUserToDialoguesInput'] | null; // AssignUserToDialoguesInput

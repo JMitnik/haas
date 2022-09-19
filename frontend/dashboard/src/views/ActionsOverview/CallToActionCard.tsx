@@ -110,65 +110,63 @@ const CallToActionCard = ({
   const isActive = activeCTA === id;
 
   return (
-    <Ani.FadeFromTop>
-      <UI.Card opacity={isMuted ? 0.5 : 1}>
-        <UI.CardBody>
-          <UI.Flex justifyContent="space-between" flexDirection="row" width="100%">
-            <UI.Flex>
-              <CTAIcon type={type} Icon={Icon} />
+    <UI.Card opacity={isMuted ? 0.5 : 1}>
+      <UI.CardBody>
+        <UI.Flex justifyContent="space-between" flexDirection="row" width="100%">
+          <UI.Flex>
+            <CTAIcon type={type} Icon={Icon} />
 
-              <UI.Flex flexDirection="column">
-                <motion.span>
-                  <UI.Text style={{ textTransform: 'uppercase' }} color="gray.400" fontWeight="500" fontSize="0.8rem">
-                    {t('title')}
-                  </UI.Text>
-                </motion.span>
-                <>
-                  <UI.Text fontWeight="600" color="gray.600">
-                    <ReactMarkdown>
-                      {title || t('none') || ''}
-                    </ReactMarkdown>
-                  </UI.Text>
-                </>
-              </UI.Flex>
-            </UI.Flex>
-
-            <UI.Flex alignItems="center" justifyContent="center">
-              <UI.Button
-                ml={4}
-                mr={4}
-                variant="outline"
-                variantColor="teal"
-                size="sm"
-                leftIcon={() => <Edit3 />}
-                isDisabled={(activeCTA && activeCTA !== id) || false}
-                onClick={() => onActiveCTAChange(id)}
-              >
-                <UI.Span>
-                  {t('edit')}
-                </UI.Span>
-              </UI.Button>
+            <UI.Flex flexDirection="column">
+              <motion.span>
+                <UI.Text style={{ textTransform: 'uppercase' }} color="gray.400" fontWeight="500" fontSize="0.8rem">
+                  {t('title')}
+                </UI.Text>
+              </motion.span>
+              <>
+                <UI.Text fontWeight="600" color="gray.600">
+                  <ReactMarkdown>
+                    {title || t('none') || ''}
+                  </ReactMarkdown>
+                </UI.Text>
+              </>
             </UI.Flex>
           </UI.Flex>
 
-          {isActive && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <CTAForm
-                id={id}
-                form={form}
-                title={title}
-                type={type}
-                links={links}
-                share={share}
-                onDeleteCTA={deleteCTA}
-                onActiveCTAChange={onActiveCTAChange}
-                onNewCTAChange={onNewCTAChange}
-              />
-            </motion.div>
-          )}
-        </UI.CardBody>
-      </UI.Card>
-    </Ani.FadeFromTop>
+          <UI.Flex alignItems="center" justifyContent="center">
+            <UI.Button
+              ml={4}
+              mr={4}
+              variant="outline"
+              variantColor="teal"
+              size="sm"
+              leftIcon={() => <Edit3 />}
+              isDisabled={(activeCTA && activeCTA !== id) || false}
+              onClick={() => onActiveCTAChange(id)}
+            >
+              <UI.Span>
+                {t('edit')}
+              </UI.Span>
+            </UI.Button>
+          </UI.Flex>
+        </UI.Flex>
+
+        {isActive && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <CTAForm
+              id={id}
+              form={form}
+              title={title}
+              type={type}
+              links={links}
+              share={share}
+              onDeleteCTA={deleteCTA}
+              onActiveCTAChange={onActiveCTAChange}
+              onNewCTAChange={onNewCTAChange}
+            />
+          </motion.div>
+        )}
+      </UI.CardBody>
+    </UI.Card>
   );
 };
 

@@ -8,7 +8,12 @@ import { Session } from 'types/generated-types';
 import { InteractionFeedEntriesContainer } from './InteractionFeedModuleStyles';
 import InteractionFeedEntry from './InteractionFeedEntry';
 
-const InteractionFeedModule = ({ interactions }: { interactions: Session[] }) => {
+interface InteractionFeedModuleProps {
+  onSessionIdChange: (value: React.SetStateAction<string | undefined>) => void;
+  interactions: Session[];
+}
+
+const InteractionFeedModule = ({ interactions, onSessionIdChange }: InteractionFeedModuleProps) => {
   const { t } = useTranslation();
 
   return (
@@ -19,6 +24,7 @@ const InteractionFeedModule = ({ interactions }: { interactions: Session[] }) =>
         <InteractionFeedEntriesContainer>
           {interactions?.length > 0 && interactions?.map((interaction, index) => (
             <InteractionFeedEntry
+              onSessionIdChange={onSessionIdChange}
               key={index}
               interaction={interaction}
             />

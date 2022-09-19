@@ -5,6 +5,7 @@ import {
 } from 'views/DialogueView/__generated__/dialogueStatistics';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
+import theme from 'config/theme';
 
 const ScoreGraphModule = ({ chartData }: { chartData: SessionHistory[] }) => {
   const { t } = useTranslation();
@@ -42,7 +43,7 @@ const ScoreGraphModule = ({ chartData }: { chartData: SessionHistory[] }) => {
           axisRight={null}
           enableArea
           axisBottom={null}
-          colors={{ scheme: 'spectral' }}
+          colors={[theme.colors.main['500']]}
           pointSize={10}
           pointBorderWidth={2}
           pointBorderColor={{ from: 'serieColor' }}

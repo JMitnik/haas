@@ -1,4 +1,4 @@
-import { PrismaClient, Role, RoleTypeEnum } from '@prisma/client';
+import { DialogueTemplateType, PrismaClient, Role, RoleTypeEnum } from '@prisma/client';
 import { ApolloError } from 'apollo-server-express';
 
 import TemplateService from '../templates/TemplateService';
@@ -13,10 +13,10 @@ import { generateCreateDialogueDataByTemplateLayers, getTemplate } from './Gener
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import DialogueService from '../questionnaire/DialogueService';
 import { DemoWorkspaceTemplate } from '../templates/TemplateTypes';
-import CustomerService from '../customer/CustomerService';
-import { DialogueTemplateType } from '../QuestionNode/NodeServiceType';
 import UserService from '../../models/users/UserService';
 import { GenerateWorkspaceCSVInput, Workspace } from './GenerateWorkspace.types';
+import CustomerService from '../../models/customer/CustomerService';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 class GenerateWorkspaceService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -81,6 +81,7 @@ class GenerateWorkspaceService {
     templateType: string,
     sessionsPerDay: number = 1,
     generateData: boolean = false,
+    makeDialoguePrivate: boolean = false,
   ) {
     const mappedDialogueInputData = generateCreateDialogueDataByTemplateLayers(templateType);
 
@@ -93,7 +94,7 @@ class GenerateWorkspaceService {
         title: title,
         description: '',
         customer: { id: workspace.id, create: false },
-        isPrivate: false,
+        isPrivate: makeDialoguePrivate,
         postLeafText: template?.postLeafText,
         language: template.language,
         template: Object.values(DialogueTemplateType).includes(templateType as any)
@@ -106,13 +107,20 @@ class GenerateWorkspaceService {
 
       if (!dialogue) throw new ApolloError('ERROR: No dialogue created! aborting...');
       // Make post leaf node if data specified in template
-      await this.templateService.createTemplatePostLeafNode(templateType as NexusGenEnums['DialogueTemplateType'], dialogue.id);
+      await this.templateService.createTemplatePostLeafNode(template, dialogue.id);
 
       // Make the leafs
-      const leafs = await this.templateService.createTemplateLeafNodes(templateType as NexusGenEnums['DialogueTemplateType'], dialogue.id);
+      const leafs = await this.templateService.createTemplateLeafNodes(templateType as NexusGenEnums['DialogueTemplateType'], dialogue.id, []);
 
       // Make nodes
-      await this.templateService.createTemplateNodes(dialogue.id, workspace.name, leafs, templateType);
+      if (!template.structure) throw new GraphQLYogaError('Now dialogue structure provided in template. abort.');
+      await this.templateService.createDialogueStructure(
+        template,
+        null,
+        template.structure || [],
+        dialogue.id,
+        leafs
+      );
 
       // Generate data
       if (generateData) {
@@ -161,8 +169,34 @@ class GenerateWorkspaceService {
 
       await this.userService.connectPrivateDialoguesToUser(user.id, workspace.id);
 
-      void this.userService.sendInvitationMail(invitedUser);
+      void this.userService.sendInvitationMail(invitedUser, true);
     }
+  }
+
+  /**
+   * Creates 
+   * @param contactsEntry 
+   * @param workspace 
+   * @returns 
+   */
+  private async upsertUsersWorkspace(emailAddresses: string[], workspace: Workspace) {
+    const managerRole = workspace.roles.find((role) => role.type === RoleTypeEnum.MANAGER) as Role;
+
+    const userIds = await Promise.all(emailAddresses.map(async (contact) => {
+      const user = await this.userService.upsertUserByEmail({
+        email: contact,
+      })
+
+      await this.userOfCustomerPrismaAdapter.upsertUserOfCustomer(
+        workspace.id,
+        user.id,
+        managerRole.id,
+      );
+
+      return user.id;
+    }));
+
+    return userIds;
   }
 
   /**
@@ -181,6 +215,7 @@ class GenerateWorkspaceService {
     records: any[],
     userId?: string,
     generateData = false,
+    makeDialoguePrivate = false,
   ) {
     const adminRole = workspace.roles.find((role) => role.type === RoleTypeEnum.ADMIN) as Role;
 
@@ -211,7 +246,7 @@ class GenerateWorkspaceService {
         title: dialogueTitle,
         description: '',
         customer: { id: workspace.id, create: false },
-        isPrivate: hasEmailAssignee,
+        isPrivate: makeDialoguePrivate || hasEmailAssignee,
         postLeafText: {
           header: overrideTemplate.postLeafText?.header,
           subHeader: overrideTemplate.postLeafText?.subHeader,
@@ -228,15 +263,30 @@ class GenerateWorkspaceService {
       const dialogue = await this.dialoguePrismaAdapter.createTemplate(dialogueInput);
 
       if (!dialogue) throw new ApolloError('ERROR: No dialogue created! aborting...');
+
+      const contactsEntry = Object.entries(record).find((entry) => entry[0] === 'contacts');
+      const hasContacts = !!contactsEntry?.[1];
+
+      const contactEmails = hasContacts ? (contactsEntry?.[1] as string)?.trim().replaceAll(' ', '').split(',') : [];
+      let contactIds: string[] = [];
+
+      if (hasContacts) {
+        contactIds = await this.upsertUsersWorkspace(contactEmails, workspace);
+      }
+
+      // console.log('Contact IDS: ', contactIds);
+
       // Make the leafs
-      const leafs = await this.templateService.createTemplateLeafNodes(validatedTemplateType as NexusGenEnums['DialogueTemplateType'], dialogue.id);
+      const leafs = await this.templateService.createTemplateLeafNodes(type as NexusGenEnums['DialogueTemplateType'], dialogue.id, contactIds);
 
       // Make nodes
-      await this.templateService.createTemplateNodes(
+      if (!template.structure) throw new GraphQLYogaError('Now dialogue structure provided in template. abort.');
+      await this.templateService.createDialogueStructure(
+        template,
+        null,
+        template.structure || [],
         dialogue.id,
-        workspace.name,
-        leafs,
-        validatedTemplateType as string
+        leafs
       );
 
       // Generate data
@@ -257,19 +307,24 @@ class GenerateWorkspaceService {
       // If exists => connect existing user when creating new userOfCustomer entry
       if (!hasEmailAssignee || !emailAssignee || !userRole) continue;
 
-      const user = await this.userOfCustomerPrismaAdapter.addUserToPrivateDialogue(
+      const limitedUser = await this.userService.upsertUserByEmail({
+        email: emailAssignee,
+        phone: phoneAssignee,
+      });
+
+      const invitedUser = await this.userOfCustomerPrismaAdapter.upsertUserOfCustomer(
+        workspace.id,
+        limitedUser.id,
+        limitedUser.id === userId ? adminRole?.id as string : userRole.id, // If user generating is upserted => give admin role
+      );
+
+      await this.userOfCustomerPrismaAdapter.addUserToPrivateDialogue(
         emailAssignee,
         dialogue.id,
         phoneAssignee
       );
 
-      const invitedUser = await this.userOfCustomerPrismaAdapter.upsertUserOfCustomer(
-        workspace.id,
-        user.id,
-        user.id === userId ? adminRole?.id as string : userRole.id, // If user generating is upserted => give admin role
-      );
-
-      void this.userService.sendInvitationMail(invitedUser);
+      void this.userService.sendInvitationMail(invitedUser, true);
     };
   };
 
@@ -293,7 +348,7 @@ class GenerateWorkspaceService {
    * @returns the created workspace
    */
   async generateWorkspace(input: GenerateWorkspaceCSVInput, userId?: string) {
-    const { uploadedCsv, workspaceSlug, workspaceTitle, type, managerCsv, isDemo } = input;
+    const { uploadedCsv, workspaceSlug, workspaceTitle, type, managerCsv, isDemo, makeDialoguesPrivate } = input;
 
     const template = getTemplate(type);
 
@@ -327,11 +382,19 @@ class GenerateWorkspaceService {
           records,
           userId,
           input.generateDemoData || undefined,
+          makeDialoguesPrivate || undefined,
         )
       } else {
-        await this.generateDialoguesByTemplateLayers(workspace, type, undefined, input.generateDemoData || undefined);
+        await this.generateDialoguesByTemplateLayers(
+          workspace,
+          type,
+          undefined,
+          input.generateDemoData || undefined,
+          makeDialoguesPrivate || undefined
+        );
       }
 
+      if (makeDialoguesPrivate) await this.userService.assignUserToAllPrivateDialogues(userId as string, workspace.id);
       if (managerCsv) await this.addManagersToWorkspace(managerCsv, workspace);
 
       try {
@@ -341,7 +404,8 @@ class GenerateWorkspaceService {
       }
 
       return workspace;
-    } catch {
+    } catch (error) {
+      console.log('Error: ', (error as any)?.message);
       await this.customerService.deleteWorkspace(workspace.id);
       throw new ApolloError('Something went wrong generating generating workspace. All changes have been reverted');
     }

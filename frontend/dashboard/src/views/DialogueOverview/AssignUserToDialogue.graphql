@@ -1,0 +1,5 @@
+mutation assignUserToDialogue($input: AssignUserToDialogueInput){
+	assignUserToDialogue(input: $input) {
+		email
+	}
+}
