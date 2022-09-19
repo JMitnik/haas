@@ -182,7 +182,6 @@ export const constructValidUpdateAutomationInputData = (
   const sendSmsAction = actions.find((action) => action.type === 'SEND_EMAIL');
   const generateReportAction = actions.find((action) => action.type === 'WEEK_REPORT');
 
-  const condition = conditionBuilder.conditions?.[0];
 
   return {
     'id': automation.id,

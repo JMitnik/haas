@@ -1,9 +1,7 @@
-import { Prisma, PrismaClient, Edge, QuestionOption, VideoEmbeddedNode, NodeType, Link, Share, QuestionNode as BaseQuestionNode, DialogueTemplateType } from '@prisma/client';
-import { NexusGenInputs } from 'generated/nexus';
+import { Prisma, PrismaClient, QuestionOption, VideoEmbeddedNode, NodeType, Link, Share, QuestionNode as BaseQuestionNode, DialogueTemplateType } from '@prisma/client';
 
 import { questionNode, QuestionNode } from './QuestionNode.types';
 import { CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType';
-import NodeService from './NodeService';
 import { QuestionOptionProps } from './NodeServiceType';
 import { CreateFormFieldsInput, UpdateFormFieldsInput, CreateCTAInput, UpdateQuestionInput, CreateLinkInput, UpdateLinkInput, CreateShareInput, UpdateShareInput, UpdateSliderNodeInput, CreateSliderNodeInput, CreateVideoEmbeddedNodeInput } from './QuestionNodePrismaAdapterType';
 import { EdgeWithConditions } from './QuestionNodePrismaAdapter.types';
@@ -390,7 +388,11 @@ class QuestionNodePrismaAdapter {
     });
   };
 
-  upsertQuestionOption(id: number, create: Prisma.QuestionOptionCreateInput, update: Prisma.QuestionOptionUpdateInput): Promise<QuestionOption> {
+  upsertQuestionOption(
+    id: number,
+    create: Prisma.QuestionOptionCreateInput,
+    update: Prisma.QuestionOptionUpdateInput
+  ): Promise<QuestionOption> {
     return this.prisma.questionOption.upsert({
       where: { id },
       create,
@@ -440,8 +442,7 @@ class QuestionNodePrismaAdapter {
   );
 
   async updateDialogueBuilderNode(nodeId: string, data: UpdateQuestionInput) {
-    const { title, type, options, currentOverrideLeafId, overrideLeafId, videoEmbeddedNode } = data;
-    const leaf = NodeService.constructUpdateLeafState(currentOverrideLeafId || null, overrideLeafId || null);
+    const { title, type, options, overrideLeafId, videoEmbeddedNode } = data;
     const updatedOptionIds = await this.updateQuestionOptions(options || []);
 
     // Remove videoEmbeddedNode if updated to different type
@@ -632,7 +633,7 @@ class QuestionNodePrismaAdapter {
     });
   }
 
-  create(data: Prisma.QuestionNodeCreateInput): Promise<QuestionNode> {
+  create(data: Prisma.QuestionNodeCreateInput): Promise<BaseQuestionNode> {
     return this.prisma.questionNode.create({
       data,
     });
@@ -735,7 +736,7 @@ class QuestionNodePrismaAdapter {
     });
   };
 
-  update(nodeId: string, data: Prisma.QuestionNodeUpdateInput): Promise<QuestionNode> {
+  update(nodeId: string, data: Prisma.QuestionNodeUpdateInput): Promise<BaseQuestionNode> {
     return this.prisma.questionNode.update({
       where: {
         id: nodeId,

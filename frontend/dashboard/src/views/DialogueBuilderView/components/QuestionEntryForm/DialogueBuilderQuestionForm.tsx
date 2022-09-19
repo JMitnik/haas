@@ -23,6 +23,7 @@ import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useNavigator } from 'hooks/useNavigator';
 import Dropdown from 'components/Dropdown';
+import intToBool from 'utils/intToBool';
 import updateQuestionMutation from 'mutations/updateQuestion';
 
 import {
@@ -64,6 +65,7 @@ interface FormDataProps {
   unhappyText: string;
   happyText: string;
   useCustomerSatisfactionTexts: number;
+  updateSameTemplate: number;
   range: number[];
 }
 
@@ -79,6 +81,7 @@ const isChoiceType = (questionType: string) => {
 const schema = yup.object().shape({
   title: yup.string().required(),
   questionType: yup.string().required(),
+  updateSameTemplate: yup.number().required(),
   conditionType: yup.string().notRequired(),
   videoEmbedded: yup.string().when(['questionType'], {
     is: (questionType: string) => questionType === 'VIDEO_EMBEDDED',
@@ -181,17 +184,6 @@ const DialogueBuilderQuestionForm = ({
       optionsFull: options,
       range: [condition?.renderMin ?? 30, condition?.renderMax ?? 70],
       questionType: type?.value,
-      // optionsFull: options.map((option) => ({
-      //   id: option.id,
-      //   position: option.position,
-      //   value: option.value,
-      //   publicValue: option.publicValue,
-      //   overrideLeaf: {
-      //     label: option.overrideLeaf?.title,
-      //     value: option.overrideLeaf?.id,
-      //     type: option.overrideLeaf?.type,
-      //   },
-      // })),
     },
   });
 
@@ -285,10 +277,7 @@ const DialogueBuilderQuestionForm = ({
         dialogueSlug,
       },
     }],
-    onError: (serverError: any) => {
-      // eslint-disable-next-line no-console
-      console.log(serverError);
-
+    onError: () => {
       toast({
         title: 'Something went wrong',
         description: 'There was a problem saving the node. Please try again',
@@ -319,9 +308,7 @@ const DialogueBuilderQuestionForm = ({
         dialogueSlug,
       },
     }],
-    onError: (serverError: any) => {
-      // eslint-disable-next-line no-console
-      console.log(serverError);
+    onError: () => {
       toast({
         title: 'Something went wrong',
         description: 'There was a problem in saving the node. Please try again',
@@ -345,8 +332,11 @@ const DialogueBuilderQuestionForm = ({
   };
 
   const onSubmit = (formData: FormDataProps) => {
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     const { title } = formData;
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     const type = formData.questionType;
+    const updateSameTemplate = intToBool(formData.updateSameTemplate);
     const overrideLeafId = formData.overrideLeaf?.value;
     const edgeCondition: EdgeConditionProps = {
       id: activeCondition?.id,
@@ -369,6 +359,7 @@ const DialogueBuilderQuestionForm = ({
         variables: {
           input: {
             id,
+            updateSameTemplate,
             unhappyText,
             happyText,
             extraContent: formData.videoEmbedded,
@@ -758,17 +749,42 @@ const DialogueBuilderQuestionForm = ({
         </UI.Div>
 
         <UI.Flex justifyContent="space-between">
-          <ButtonGroup display="flex">
-            <UI.Button
-              isLoading={createLoading || updateLoading}
-              isDisabled={!form.formState.isValid}
-              variantColor="teal"
-              type="submit"
-            >
-              {t('save')}
-            </UI.Button>
-            <UI.Button variant="outline" onClick={() => handleCancelQuestion()}>Cancel</UI.Button>
-          </ButtonGroup>
+          <UI.Flex alignItems="center">
+            <ButtonGroup mr="0.5rem" display="flex">
+              <UI.Button
+                isLoading={createLoading || updateLoading}
+                isDisabled={!form.formState.isValid}
+                variantColor="teal"
+                type="submit"
+              >
+                {t('save')}
+              </UI.Button>
+              <UI.Button variant="outline" onClick={() => handleCancelQuestion()}>Cancel</UI.Button>
+            </ButtonGroup>
+            <UI.Div>
+              <Controller
+                control={form.control}
+                name="updateSameTemplate"
+                defaultValue={0}
+                render={({ field: { onChange, value, onBlur } }) => (
+                  <UI.Flex alignItems="center">
+                    <UI.Div mt="5px">
+                      <UI.Toggle
+                        isChecked={value === 1}
+                        size="lg"
+                        onChange={() => (value === 1 ? onChange(0) : onChange(1))}
+                        value={value}
+                        onBlur={onBlur}
+                      />
+                    </UI.Div>
+
+                    <UI.Text ml="0.5rem">Save for template-related questions?</UI.Text>
+                  </UI.Flex>
+
+                )}
+              />
+            </UI.Div>
+          </UI.Flex>
           <UI.Span onClick={(e) => e.stopPropagation()}>
             <Popover
               usePortal
