@@ -59,7 +59,7 @@ class DialogueStatisticsService {
       endDateTimeSet
     );
 
-    const average = meanBy(scopedSessions, (session) => session.mainScore);
+    const average = meanBy(scopedSessions, (session) => session.mainScore || 0);
     const nrVotes = scopedSessions.length;
     const sessionsHigherThanTreshold = scopedSessions.filter((session) => session.mainScore >= threshold);
 
