@@ -43,7 +43,9 @@ export const UpdateQuestionNode = mutationField('updateQuestion', {
     if (!args?.input) throw new UserInputError('No input provided');
     validateUpdateQuestion(args.input);
 
+    // TODO: Cast to object instead of separate input parameters
     return ctx.services.nodeService.updateQuestionFromBuilder(
+      args.input.customerId as string,
       args.input.id as string,
       args.input.title as string,
       args.input.type as NodeType,
@@ -55,6 +57,7 @@ export const UpdateQuestionNode = mutationField('updateQuestion', {
       args.input.extraContent,
       args.input.happyText,
       args.input.unhappyText,
+      args.input.updateSameTemplate || false,
     );
   },
 });
