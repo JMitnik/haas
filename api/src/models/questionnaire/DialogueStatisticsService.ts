@@ -59,10 +59,7 @@ class DialogueStatisticsService {
       endDateTimeSet
     );
 
-    console.log({ scopedSessions });
-
-    const average = meanBy(scopedSessions, (session) => session.mainScore || 0);
-    console.log({ average });
+    const average = meanBy(scopedSessions, (session) => session.mainScore || 0) || 0;
     const nrVotes = scopedSessions.length;
     const sessionsHigherThanTreshold = scopedSessions.filter((session) => session.mainScore >= threshold);
 
@@ -237,9 +234,6 @@ class DialogueStatisticsService {
       endDateTime,
       refresh
     );
-
-    console.log(statisticSummaries);
-
 
     // Get all statistic summaries, and sum them up
     const cumulativeStats = statisticSummaries.reduce((acc, summary) => {
