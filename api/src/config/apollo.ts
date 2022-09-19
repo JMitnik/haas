@@ -69,7 +69,7 @@ export const makeApollo = async (prisma: PrismaClient) => {
       useValidationCache(),
       useParserCache(),
       useSentry({
-        skip: () => config.env !== 'production',
+        skipError: () => config.env !== 'production',
       }),
       // useResponseCache({
       //   includeExtensionMetadata: true,
