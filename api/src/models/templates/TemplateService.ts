@@ -566,19 +566,23 @@ class TemplateService {
     const hrWillContactCTA = TemplateService.findLeafIdContainingText(leafs, 'unless you want to talk to someone');
 
     // Very Positive Sub child 1 (Great to hear! What are you most satisfied about?)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const greatToHear = await this.nodeService.createQuestionNode(
       'What\'s going well?', dialogueId, NodeType.CHOICE, sportOptionsEng, false);
 
     // Positive Sub child 2
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const notCompletelySatisfied = await this.nodeService.createQuestionNode(
       'What\'s going well, but can be improved?', dialogueId, NodeType.CHOICE, sportOptionsEng, false, hrWillContactCTA);
 
     // Negative Sub child 3
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const negative = await this.nodeService.createQuestionNode(
       'What went wrong?', dialogueId, NodeType.CHOICE, sportOptionsEng, false, hrWillContactCTA
     );
 
     // Very Negative Sub child 4
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const veryNegative = await this.nodeService.createQuestionNode(
       'What went wrong?', dialogueId, NodeType.CHOICE, sportOptionsEng, false, hrWillContactCTA
     );

@@ -770,7 +770,12 @@ export class NodeService {
       foundEdgeIds.push(edgeToDeleteQuestion.id);
     }
 
-    const { edgeIds, questionIds } = NodeService.getDeleteIDs(dialogue.edges, dialogue.questions, foundEdgeIds, foundQuestionIds);
+    const { edgeIds, questionIds } = NodeService.getDeleteIDs(
+      dialogue.edges,
+      dialogue.questions,
+      foundEdgeIds,
+      foundQuestionIds
+    );
 
     await this.edgePrismaAdapter.deleteMany(edgeIds);
 
@@ -958,9 +963,8 @@ export class NodeService {
       },
       questionId,
       templateQuestionNodes,
-      overrideLeafId || '',
-      callToAction?.title || '',
       options,
+      callToAction
     );
 
 
@@ -984,16 +988,15 @@ export class NodeService {
    * @param sourceQuestionId - The `sourceQuestionId` is the question ID which was originally edited (
    * and triggers the entire template updating).
    * @param templateQuestionNodes - These are all the question nodes matching the "source".
-   * @param overrideLeafName - The overrideCallToAction name of the source node.
    * @param optionInputs - Any potential new Options (created or updated.)
+   * @param sourceOverrideLeaf - The Call-to-Action that is set on the `source question`.
    */
   private async updateTemplateQuestionNodes(
     questionInput: SimpleQuestionInput,
     sourceQuestionId: string,
     templateQuestionNodes: FullQuestionNode[],
-    sourceOverrideLeafId: string,
-    sourceOverrideLeafName: string,
     optionInputs: QuestionOptionProps[],
+    sourceOverrideLeaf?: FullQuestionNode | null,
   ) {
     // Loop over each template question-node, and update the connected relations.
     for (const templateQuestion of templateQuestionNodes) {
@@ -1003,10 +1006,10 @@ export class NodeService {
       let targetCallToAction: FullQuestionNode | undefined;
 
       // Fetch the override leaf if we have a name
-      if (sourceOverrideLeafName) {
+      if (sourceOverrideLeaf?.topic?.name) {
         targetCallToAction = await this.questionNodePrismaAdapter.findCTAByTopic(
           templateQuestion?.questionDialogueId as string,
-          sourceOverrideLeafName
+          sourceOverrideLeaf.topic?.name,
         ) || undefined;
       }
 
@@ -1085,7 +1088,7 @@ export class NodeService {
         type: questionInput.type,
         options: templateQuestionNodes.length > 1 ? targetOptions: optionInputs,
         overrideLeafId: isSourceQuestion
-          ? sourceOverrideLeafId || undefined
+          ? sourceOverrideLeaf?.id || undefined
           : targetCallToAction?.id || undefined, // TODO: Add topic to all CTAs in templates
         videoEmbeddedNode: {
           id: templateQuestion?.videoEmbeddedNodeId || undefined,

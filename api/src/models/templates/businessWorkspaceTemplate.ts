@@ -26,6 +26,9 @@ const businessWorkspaceTemplate: DemoWorkspaceTemplate = {
       children: [
         {
           title: 'What\'s going well?',
+          topic: {
+            name: 'VERY_POSITIVE',
+          },
           type: NodeType.CHOICE,
           edge: {
             conditionType: 'valueBoundary',
@@ -38,6 +41,9 @@ const businessWorkspaceTemplate: DemoWorkspaceTemplate = {
         },
         {
           title: 'You\'re not completely satisfied. What can be improved?',
+          topic: {
+            name: 'POSITIVE',
+          },
           type: NodeType.CHOICE,
           edge: {
             conditionType: 'valueBoundary',
@@ -50,6 +56,9 @@ const businessWorkspaceTemplate: DemoWorkspaceTemplate = {
         },
         {
           title: 'That\'s unfortunate! What went wrong?',
+          topic: {
+            name: 'NEGATIVE',
+          },
           type: NodeType.CHOICE,
           edge: {
             conditionType: 'valueBoundary',
@@ -62,6 +71,9 @@ const businessWorkspaceTemplate: DemoWorkspaceTemplate = {
         },
         {
           title: 'That\'s unfortunate! What went wrong?',
+          topic: {
+            name: 'VERY_NEGATIVE',
+          },
           type: NodeType.CHOICE,
           edge: {
             conditionType: 'valueBoundary',
