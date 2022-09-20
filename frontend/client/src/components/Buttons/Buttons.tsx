@@ -8,8 +8,8 @@ export const ButtonBody = styled.span``;
 export const OutlineButton = styled(Button)`
   ${({ theme }) => css`
     color: ${Color(theme.colors.primary).isDark()
-    ? Color(theme.colors.primary).mix(Color('white'), 0.9).saturate(1).hex()
-    : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
+      ? Color(theme.colors.primary).mix(Color('white'), 0.9).saturate(1).hex()
+      : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
     background: transparent;
     border-radius: 10px;
     border: none;
@@ -21,15 +21,15 @@ export const OutlineButton = styled(Button)`
 
 type Size = 'sm' | 'md' | 'lg';
 
-export const ClientButton = styled(Button)<{ usePulse?: boolean, size?: Size }>`
-  ${({ isActive = true, theme, usePulse = false, size }) => css`
+export const ClientButton = styled(Button) <{ usePulse?: boolean, size?: Size }>`
+  ${({ isActive = true, theme, usePulse = false, size, display }) => css`
     width: 100%;
     grid-column: 1 / 2;
     justify-content: flex-start;
     border: none;
     max-width: 100%;
     background: none;
-    display: flex;
+    display: ${display || 'flex'};
     align-items: stretch;
     box-shadow: 0px 3px 1px 1px rgba(0, 0, 0, 0.10);
     position: relative;
@@ -44,7 +44,7 @@ export const ClientButton = styled(Button)<{ usePulse?: boolean, size?: Size }>`
     background: linear-gradient(45deg, ${Color(theme.colors.primary).lighten(0.3).hex()}, ${Color(theme.colors.primary).lighten(0.3).saturate(1).hex()});
     font-family: 'Inter', sans-serif;
     color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.8).saturate(1).hex()
-    : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()} !important;
+      : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()} !important;
     white-space: normal !important;
 
     &:disabled {

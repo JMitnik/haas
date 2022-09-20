@@ -39,13 +39,14 @@ enum ActionableState {
 }
 
 model Actionable {
-  id         String   @id @default(cuid())
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  dialogueId String
-  assigneeId String?
-  issueId    String?
-  isVerified Boolean  @default(false)
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  dialogueId   String
+  assigneeId   String?
+  issueId      String?
+  requestEmail String?
+  isVerified   Boolean  @default(false)
 
   status ActionableState @default(PENDING)
 

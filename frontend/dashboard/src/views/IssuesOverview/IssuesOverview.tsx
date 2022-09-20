@@ -133,7 +133,7 @@ export const IssuesOverview = () => {
     }));
   };
 
-  const columns = '20px minmax(100px, 0.5fr) minmax(100px, 0.5fr) minmax(150px, 1fr) minmax(300px, 1fr) minmax(150px, 0.5fr)';
+  const columns = 'minmax(50px, 0.15fr) minmax(100px, 0.35fr) minmax(150px, 1fr) minmax(100px, 0.5fr) minmax(150px, 1fr) minmax(150px, 1fr) minmax(150px, 0.5fr)';
 
   return (
     <View documentTitle="haas | Issues">
@@ -268,10 +268,13 @@ export const IssuesOverview = () => {
           <UI.Div width="100%">
             <Table.HeadingRow gridTemplateColumns={columns}>
               <Table.HeadingCell>
-                <CheckCircledIcon />
+                {t('verified')}
               </Table.HeadingCell>
               <Table.HeadingCell>
                 {t('status')}
+              </Table.HeadingCell>
+              <Table.HeadingCell>
+                {t('contacted_by')}
               </Table.HeadingCell>
               <Table.HeadingCell>
                 {t('topic')}
@@ -293,10 +296,10 @@ export const IssuesOverview = () => {
                 gridTemplateColumns={columns}
                 key={actionable.id}
               >
-                <Table.Cell display="flex">
+                <Table.Cell display="flex" justifyContent="center">
                   {actionable.isVerified && (
                     <UI.Icon stroke="#6a6d9e">
-                      <CheckCircledIcon />
+                      <CheckCircledIcon width="20px" height="20px" />
                     </UI.Icon>
                   )}
 
@@ -309,9 +312,15 @@ export const IssuesOverview = () => {
                         onChange={setActionableStatus}
                         status={actionable.status}
                       />
-                      {/* <StatusBox isSelected status={actionable.status} /> */}
                     </UI.Flex>
                   </UI.ColumnFlex>
+                </Table.Cell>
+                <Table.Cell>
+                  <Table.InnerCell>
+                    <UI.Helper>
+                      {actionable.requestEmail || 'None'}
+                    </UI.Helper>
+                  </Table.InnerCell>
                 </Table.Cell>
                 <Table.Cell>
                   <UI.Span fontWeight={600} color="off.500">

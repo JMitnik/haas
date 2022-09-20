@@ -76,6 +76,7 @@ class NodeEntryService {
     const createNodeEntryFragment = NodeEntryService.constructCreateNodeEntryFragment(nodeEntryInput);
     const emergencyContact = nodeEntryInput.data?.form?.values?.find((value) => value?.contacts);
     const emergencyComment = nodeEntryInput.data?.form?.values?.find((value) => value?.longText);
+    const emergencyEmail = nodeEntryInput.data?.form?.values?.find((value) => value?.email);
     const nodeEntry = await this.nodeEntryPrismaAdapter.create({
       session: { connect: { id: sessionId } },
       ...createNodeEntryFragment,
@@ -110,8 +111,13 @@ class NodeEntryService {
         }
       }
 
+      if (emergencyEmail) {
+        // TODO: Send confirmation email to requestor + add check to only send email when session is negative
+        actionableUpdateArgs = { ...actionableUpdateArgs, requestEmail: emergencyEmail.email }
+      }
+
       if (actionableExists) {
-        await this.actionablePrismaAdapter.updateActionable(actionable.id, { ...actionableUpdateArgs });
+        await this.actionablePrismaAdapter.updateActionable(actionable.id, actionableUpdateArgs);
       }
     }
 

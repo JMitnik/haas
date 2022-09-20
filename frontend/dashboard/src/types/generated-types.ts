@@ -42,6 +42,7 @@ export type Actionable = {
   dialogueId?: Maybe<Scalars['String']>;
   assigneeId?: Maybe<Scalars['String']>;
   issueId?: Maybe<Scalars['String']>;
+  requestEmail?: Maybe<Scalars['String']>;
   isVerified: Scalars['Boolean'];
   status: ActionableState;
   assignee?: Maybe<UserType>;
@@ -3517,7 +3518,7 @@ export type GetWorkspaceSummaryDetailsQuery = (
 
 export type ActionableFragmentFragment = (
   { __typename?: 'Actionable' }
-  & Pick<Actionable, 'id' | 'createdAt' | 'isVerified' | 'dialogueId' | 'status'>
+  & Pick<Actionable, 'id' | 'createdAt' | 'isVerified' | 'requestEmail' | 'dialogueId' | 'status'>
   & { issue?: Maybe<(
     { __typename?: 'IssueModel' }
     & { topic: (
@@ -4891,6 +4892,7 @@ export const ActionableFragmentFragmentDoc = gql`
   id
   createdAt
   isVerified
+  requestEmail
   dialogueId
   issue {
     topic {

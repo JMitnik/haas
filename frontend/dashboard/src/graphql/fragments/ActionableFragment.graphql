@@ -2,6 +2,7 @@ fragment ActionableFragment on Actionable {
   id
   createdAt
   isVerified
+  requestEmail
   dialogueId
   issue {
     topic {

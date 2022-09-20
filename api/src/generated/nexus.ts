@@ -1550,6 +1550,7 @@ export interface NexusGenFieldTypes {
     isVerified: boolean; // Boolean!
     issue: NexusGenRootTypes['IssueModel'] | null; // IssueModel
     issueId: string | null; // String
+    requestEmail: string | null; // String
     session: NexusGenRootTypes['Session'] | null; // Session
     status: NexusGenEnums['ActionableState']; // ActionableState!
     updatedAt: string | null; // String
@@ -2523,6 +2524,7 @@ export interface NexusGenFieldTypeNames {
     isVerified: 'Boolean'
     issue: 'IssueModel'
     issueId: 'String'
+    requestEmail: 'String'
     session: 'Session'
     status: 'ActionableState'
     updatedAt: 'String'

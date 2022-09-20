@@ -16,6 +16,11 @@ export const ActionableType = objectType({
     t.string('dialogueId');
     t.string('assigneeId');
     t.string('issueId');
+    t.string('requestEmail', {
+      resolve(parent) {
+        return parent.requestEmail
+      },
+    });
     t.nonNull.boolean('isVerified');
 
     t.nonNull.field('status', {

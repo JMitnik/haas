@@ -19,6 +19,7 @@ type Actionable {
   isVerified: Boolean!
   issue: IssueModel
   issueId: String
+  requestEmail: String
   session: Session
   status: ActionableState!
   updatedAt: String
