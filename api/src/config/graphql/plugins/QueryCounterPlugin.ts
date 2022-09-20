@@ -19,6 +19,7 @@ export const QueryCounterPlugin = plugin({
   onCreateFieldResolver(test) {
     return async (root, args, ctx, info, next) => {
       const isTest = process.env.NODE_ENV === 'test';
+      const isProd = process.env.NODE_ENV === 'production';
       const useQueryCounter = test.fieldConfig.extensions?.nexus?.config?.useQueryCounter;
 
       let nrQueriesStart = global.nrQueries;
@@ -27,7 +28,7 @@ export const QueryCounterPlugin = plugin({
 
       // Reset nrQueries
       global.nrQueries = 0;
-      if (!isTest && useQueryCounter && global && global.nrQueries !== undefined) {
+      if (!isProd && !isTest && useQueryCounter && global && global.nrQueries !== undefined) {
         if (test.parentTypeConfig.name === 'Mutation') {
           console.log(`Nr Queries ran for operation ${info.operation.name?.value} : ${nrQueriesEnd - nrQueriesStart}`);
         } else {
