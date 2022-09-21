@@ -39,9 +39,9 @@ import SearchBar from 'components/Common/SearchBar/SearchBar';
 import useAuth from 'hooks/useAuth';
 
 import { ActionableStatusPicker } from './ActionableStatusPicker';
-import { ChangeableEmailContainer, DateCell } from './IssueOverview.styles';
+import { ChangeableEmailContainer, DateCell } from './ActionableOverview.styles';
 
-export const IssuesOverview = () => {
+export const ActionableOverview = () => {
   const { t } = useTranslation();
   const { activeCustomer } = useCustomer();
   const { canAccessAllActionRequests } = useAuth();

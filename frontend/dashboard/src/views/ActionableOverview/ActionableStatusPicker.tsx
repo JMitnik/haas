@@ -2,13 +2,14 @@ import * as Popover from '@radix-ui/react-popover';
 import * as UI from '@haas/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ApolloCache, DefaultContext, FetchResult, MutationFunctionOptions } from '@apollo/client';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { ActionableState, Exact, SetActionableStatusInput, SetActionableStatusMutation } from 'types/generated-types';
 import { slideUpFadeMotion } from 'components/animation/config';
+import { useCustomer } from 'providers/CustomerProvider';
 
-import { StatusBox } from './IssueOverview.styles';
+import { StatusBox } from './ActionableOverview.styles';
 
 export const WorkspaceSwitcherContainer = styled(UI.Div)`
   ${({ theme }) => css`
@@ -57,6 +58,7 @@ export const ActionableStatusPickerContent = (
     onClose,
   }: ActionableStatusPickerProps,
 ) => {
+  const { activeCustomer } = useCustomer();
   const [selected, setSelected] = useState<ActionableState>(value);
 
   const handleStatusChange = (entry: ActionableState) => {
@@ -64,6 +66,7 @@ export const ActionableStatusPickerContent = (
     onChange({
       variables: {
         input: {
+          workspaceId: activeCustomer?.id as string,
           status: entry,
           actionableId,
         },
