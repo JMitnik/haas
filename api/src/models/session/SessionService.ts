@@ -298,7 +298,7 @@ class SessionService {
     const nodeEntry = nodeEntries.find((nodeEntry) => nodeEntry.formNodeEntry);
 
     // @ts-ignore
-    return nodeEntry?.formNodeEntry || null;
+    return nodeEntry?.formNodeEntry?.values.find((value) => value.email) ? nodeEntry?.formNodeEntry : null;
   }
 
   /**
