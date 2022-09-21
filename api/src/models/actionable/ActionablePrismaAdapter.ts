@@ -101,18 +101,6 @@ export class ActionablePrismaAdapter {
     })
   }
 
-  public async findActionablesByWorkspace(workspaceId: string, filter?: ActionableFilterInput) {
-    return this.prisma.actionable.findMany({
-      where: buildFindActionablesByWorkspaceWhereInput(workspaceId, filter),
-      include: {
-        assignee: true,
-        comments: true,
-        dialogue: true,
-        session: true,
-      },
-    })
-  }
-
   public async findActionablesByIssue(issueId: string, filter?: ActionableFilterInput) {
     return this.prisma.actionable.findMany({
       where: buildFindActionablesWhereInput(issueId, filter),

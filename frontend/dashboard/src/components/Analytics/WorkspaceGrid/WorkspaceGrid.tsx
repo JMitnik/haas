@@ -15,7 +15,6 @@ import { DateFormat, useDate } from 'hooks/useDate';
 import { DatePicker } from 'components/Common/DatePicker';
 import {
   DialogueImpactScoreType,
-  useGetIssuesQuery,
   useGetProblemsPerDialogueQuery,
   useGetWorkspaceSummaryDetailsQuery,
   useResetWorkspaceDataMutation,

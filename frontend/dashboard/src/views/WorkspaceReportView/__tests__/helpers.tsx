@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 
-import { GetIssuesQuery, GetIssuesQueryVariables, GetWorkspaceReportQuery, GetWorkspaceReportQueryVariables } from 'types/generated-types';
+import { GetProblemsPerDialogueQuery, GetProblemsPerDialogueQueryVariables, GetWorkspaceReportQuery, GetWorkspaceReportQueryVariables } from 'types/generated-types';
 import { graphql, server } from 'test';
 
 /**
@@ -28,12 +28,12 @@ export const mockGetWorkspaceReportQuery = (
  */
 const GetIssuesResponse = JSON.parse('{"customer":{"id":"cl6v0w1ig02615w3qr5xzcoga","issues":[],"__typename":"Customer"}}');
 
-export const mockGetIssuesQuery = (
-  createResponse: (res: GetWorkspaceReportQuery) => GetWorkspaceReportQuery,
+export const mockGetProblemsPerDialogueQuery = (
+  createResponse: (res: GetProblemsPerDialogueQuery) => GetProblemsPerDialogueQuery,
 ) => (
   server.use(
-    graphql.query<GetIssuesQuery, GetIssuesQueryVariables>(
-      'GetIssues',
+    graphql.query<GetProblemsPerDialogueQuery, GetProblemsPerDialogueQueryVariables>(
+      'GetProblemsPerDialogue',
       (req, res, ctx) => res(ctx.data(createResponse(GetIssuesResponse))),
     ),
   )
