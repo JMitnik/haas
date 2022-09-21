@@ -372,6 +372,7 @@ export const IssuesOverview = () => {
                                   assignUserToActionable({
                                     variables: {
                                       input: {
+                                        workspaceId: activeCustomer?.id as string,
                                         assigneeId: user?.value,
                                         actionableId: actionable.id as string,
                                       },
@@ -403,6 +404,7 @@ export const IssuesOverview = () => {
                                           assignUserToActionable({
                                             variables: {
                                               input: {
+                                                workspaceId: activeCustomer?.id as string,
                                                 assigneeId: null,
                                                 actionableId: actionable.id as string,
                                               },

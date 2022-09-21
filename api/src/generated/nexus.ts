@@ -93,6 +93,7 @@ export interface NexusGenInputs {
   AssignUserToActionableInput: { // input type
     actionableId: string; // String!
     assigneeId?: string | null; // String
+    workspaceId: string; // String!
   }
   AssignUserToDialogueInput: { // input type
     dialogueId: string; // String!
@@ -724,6 +725,7 @@ export interface NexusGenInputs {
   SetActionableStatusInput: { // input type
     actionableId: string; // String!
     status: NexusGenEnums['ActionableState']; // ActionableState!
+    workspaceId: string; // String!
   }
   SetDialoguePrivacyInput: { // input type
     customerId: string; // String!

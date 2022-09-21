@@ -7,6 +7,7 @@ export const SetActionableStatusInput = inputObjectType({
   definition(t) {
     t.nonNull.field('status', { type: ActionableState });
     t.nonNull.string('actionableId');
+    t.nonNull.string('workspaceId');
   },
 })
 

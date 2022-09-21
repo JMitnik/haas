@@ -4,6 +4,7 @@ import { ActionableType } from './Actionable.graphql';
 export const AssignUserToActionableInput = inputObjectType({
   name: 'AssignUserToActionableInput',
   definition(t) {
+    t.nonNull.string('workspaceId');
     t.string('assigneeId');
     t.nonNull.string('actionableId');
   },

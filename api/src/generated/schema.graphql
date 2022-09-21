@@ -102,6 +102,7 @@ input AppendToInteractionInput {
 input AssignUserToActionableInput {
   actionableId: String!
   assigneeId: String
+  workspaceId: String!
 }
 
 input AssignUserToDialogueInput {
@@ -2106,6 +2107,7 @@ input SessionWhereUniqueInput {
 input SetActionableStatusInput {
   actionableId: String!
   status: ActionableState!
+  workspaceId: String!
 }
 
 input SetDialoguePrivacyInput {

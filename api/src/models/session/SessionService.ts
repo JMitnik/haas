@@ -53,7 +53,6 @@ class SessionService {
     dialogueId: string,
   ) {
     const entry = session.nodeEntries.find((nodeEntry) => nodeEntry.choiceNodeEntry);
-    const formEntry = session.nodeEntries.find((nodeEntry) => nodeEntry.formNodeEntry);
 
     if (entry?.choiceNodeEntry?.value) {
       const optionValue = entry?.choiceNodeEntry?.value;

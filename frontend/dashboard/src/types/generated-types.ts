@@ -126,6 +126,7 @@ export type AppendToInteractionInput = {
 };
 
 export type AssignUserToActionableInput = {
+  workspaceId: Scalars['String'];
   assigneeId?: Maybe<Scalars['String']>;
   actionableId: Scalars['String'];
 };
@@ -2842,6 +2843,7 @@ export type SessionWhereUniqueInput = {
 export type SetActionableStatusInput = {
   status: ActionableState;
   actionableId: Scalars['String'];
+  workspaceId: Scalars['String'];
 };
 
 export type SetDialoguePrivacyInput = {
