@@ -36,6 +36,7 @@ import { mapToUserPickerEntries } from 'views/AddAutomationView/AutomationForm.h
 import { useCustomer } from 'providers/CustomerProvider';
 import Dropdown from 'components/Dropdown';
 import SearchBar from 'components/Common/SearchBar/SearchBar';
+import useAuth from 'hooks/useAuth';
 
 import { ActionableStatusPicker } from './ActionableStatusPicker';
 import { ChangeableEmailContainer, DateCell } from './IssueOverview.styles';
@@ -43,7 +44,7 @@ import { ChangeableEmailContainer, DateCell } from './IssueOverview.styles';
 export const IssuesOverview = () => {
   const { t } = useTranslation();
   const { activeCustomer } = useCustomer();
-
+  const { canAccessAllActionRequests } = useAuth();
   const { parse, format: dateFormat } = useDate();
   const [actionables, setActionables] = useState<ActionableFragmentFragment[]>(() => []);
   const [totalPages, setTotalPages] = useState<number>(0);
@@ -110,7 +111,7 @@ export const IssuesOverview = () => {
     },
   });
 
-  const userPickerEntries = mapToUserPickerEntries(userRoleData?.customer as any);
+  const userPickerEntries = mapToUserPickerEntries(userRoleData?.customer as any, true);
 
   const handleDateChange = (dates: Date[] | null) => {
     if (dates) {
@@ -175,13 +176,13 @@ export const IssuesOverview = () => {
   minmax(150px, 1fr) minmax(150px, 1fr) minmax(150px, 0.5fr)`;
 
   return (
-    <View documentTitle="haas | Issues">
+    <View documentTitle="haas | Action Requests">
       <UI.ViewBody>
         <UI.Div pb={4} position="relative" zIndex={10000}>
           <UI.Flex alignItems="center" justifyContent="space-between">
             <UI.Div>
               <UI.H4 fontSize="1.1rem" color="off.500">
-                {t('issues')}
+                {t('action_requests')}
               </UI.H4>
             </UI.Div>
           </UI.Flex>
@@ -337,6 +338,7 @@ export const IssuesOverview = () => {
                         <UI.ColumnFlex justifyContent="flex-start">
                           <UI.Flex alignItems="center">
                             <ActionableStatusPicker
+                              isDisabled={!canAccessAllActionRequests}
                               actionableId={actionable.id as string}
                               onChange={setActionableStatus}
                               status={actionable.status}
@@ -346,7 +348,7 @@ export const IssuesOverview = () => {
                         </UI.ColumnFlex>
                       </Table.Cell>
                       <Table.Cell>
-                        <Table.InnerCell>
+                        <Table.InnerCell isDisabled>
                           <UI.Helper>
                             {actionable.requestEmail || 'No Information'}
                           </UI.Helper>
@@ -358,12 +360,13 @@ export const IssuesOverview = () => {
                         </UI.Span>
                       </Table.Cell>
                       <Table.Cell>
-                        <Table.InnerCell>
+                        <Table.InnerCell isDisabled={!canAccessAllActionRequests}>
                           <Dropdown
                             isRelative
                             renderOverlay={({ onClose }) => (
                               <UserNodePicker
                                 items={userPickerEntries}
+                                noRoles
                                 onClose={onClose}
                                 onChange={(user: any) => {
                                   assignUserToActionable({
@@ -391,23 +394,26 @@ export const IssuesOverview = () => {
                                     <UI.Helper>
                                       {actionable.assignee?.email}
                                     </UI.Helper>
-                                    <UI.IconButton
-                                      aria-label="close"
-                                      icon={() => <IconClose />}
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        assignUserToActionable({
-                                          variables: {
-                                            input: {
-                                              assigneeId: null,
-                                              actionableId: actionable.id as string,
+                                    {canAccessAllActionRequests && (
+                                      <UI.IconButton
+                                        aria-label="close"
+                                        icon={() => <IconClose />}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          assignUserToActionable({
+                                            variables: {
+                                              input: {
+                                                assigneeId: null,
+                                                actionableId: actionable.id as string,
+                                              },
                                             },
-                                          },
-                                        });
-                                      }}
-                                      width={10}
-                                      minWidth={10}
-                                    />
+                                          });
+                                        }}
+                                        width={10}
+                                        minWidth={10}
+                                      />
+                                    )}
+
                                   </ChangeableEmailContainer>
                                 ) : (
                                   <UI.Div onClick={onOpen}>

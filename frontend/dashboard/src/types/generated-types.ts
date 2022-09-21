@@ -2925,6 +2925,8 @@ export enum StatusType {
 }
 
 export enum SystemPermission {
+  CanViewActionRequests = 'CAN_VIEW_ACTION_REQUESTS',
+  CanAccessAllActionRequests = 'CAN_ACCESS_ALL_ACTION_REQUESTS',
   CanResetWorkspaceData = 'CAN_RESET_WORKSPACE_DATA',
   CanAccessAdminPanel = 'CAN_ACCESS_ADMIN_PANEL',
   CanGenerateWorkspaceFromCsv = 'CAN_GENERATE_WORKSPACE_FROM_CSV',

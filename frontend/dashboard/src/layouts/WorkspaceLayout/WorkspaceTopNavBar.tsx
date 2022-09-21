@@ -22,10 +22,13 @@ import { useFormatter } from 'hooks/useFormatter';
 import { useGetWorkspaceLayoutDetailsQuery } from 'types/generated-types';
 import { useNavigator } from 'hooks/useNavigator';
 
+import { NavLinkContainer } from './WorkpaceLayout.styles';
 import { TopSubNavBarContainer } from './TopSubNavBar.styles';
+import useAuth from 'hooks/useAuth';
 
 export const WorkspaceTopNavBar = () => {
   const { t } = useTranslation();
+  const { canViewActionRequests, canAccessAllActionRequests } = useAuth();
   const { activeCustomer } = useCustomer();
   const { formatFractionToPercentage } = useFormatter();
   const { getNWeekAgo, format, getTomorrow } = useDate();
@@ -77,6 +80,11 @@ export const WorkspaceTopNavBar = () => {
                         {formatFractionToPercentage(score / 100)}
                       </>
                     )}
+                    {score === 0 && (
+                      <>
+                        0%
+                      </>
+                    )}
                   </UI.Text>
                 </ProgressCircle>
               </UI.Div>
@@ -120,9 +128,12 @@ export const WorkspaceTopNavBar = () => {
               </UI.Span>
 
               <UI.Span>
-                <NavLink to={workspaceActionRequestsPath}>
+                <NavLinkContainer
+                  $isDisabled={!canViewActionRequests && !canAccessAllActionRequests}
+                  to={workspaceActionRequestsPath}
+                >
                   {t('action_requests')}
-                </NavLink>
+                </NavLinkContainer>
               </UI.Span>
             </UI.Div>
           </UI.Div>

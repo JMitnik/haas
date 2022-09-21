@@ -49,7 +49,14 @@ interface ActionableStatusPickerProps {
   onClose: () => void;
 }
 
-export const ActionableStatusPickerContent = ({ value, onChange, actionableId, onClose }: ActionableStatusPickerProps) => {
+export const ActionableStatusPickerContent = (
+  {
+    value,
+    onChange,
+    actionableId,
+    onClose,
+  }: ActionableStatusPickerProps,
+) => {
   const [selected, setSelected] = useState<ActionableState>(value);
 
   const handleStatusChange = (entry: ActionableState) => {
@@ -67,12 +74,11 @@ export const ActionableStatusPickerContent = ({ value, onChange, actionableId, o
 
   return (
     <UI.Card style={{ borderRadius: '5px' }}>
-      <UI.Grid padding="0.5em">
+      <UI.Grid gridGap="6px" padding="0.5em">
         {Object.values(ActionableState).map((status) => (
           <UI.Div onClick={() => handleStatusChange(status)}>
-            <StatusBox isSelected={selected === status} status={status} />
+            <StatusBox isVerified={false} isSelected={selected === status} status={status} />
           </UI.Div>
-
         ))}
       </UI.Grid>
     </UI.Card>
@@ -87,14 +93,23 @@ interface ActionableStatusSelectProps {
   status: ActionableState;
   actionableId: string;
   isVerified: boolean;
+  isDisabled: boolean;
 }
 
-export const ActionableStatusPicker = ({ onChange, status, actionableId, isVerified }: ActionableStatusSelectProps) => {
+export const ActionableStatusPicker = (
+  {
+    onChange,
+    status,
+    actionableId,
+    isVerified,
+    isDisabled,
+  }: ActionableStatusSelectProps,
+) => {
   const [open, setOpen] = React.useState(false);
 
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
-      <Popover.Trigger>
+      <Popover.Trigger disabled={isDisabled}>
         <StatusBox isVerified={isVerified} isSelected status={status} />
       </Popover.Trigger>
 

@@ -30,7 +30,9 @@ export const buildFindActionablesByWorkspaceWhereInput = (
     isVerified: filter?.isVerified || undefined,
     dialogueId: filter?.dialogueId || undefined,
     requestEmail: filter?.requestEmail,
-    assigneeId: filter?.assigneeId || canAccessAllActionables ? undefined : userId,
+    assigneeId: filter?.assigneeId
+      ? filter?.assigneeId
+      : canAccessAllActionables ? undefined : userId,
     issue: filter?.topic ? {
       topic: {
         name: filter?.topic,

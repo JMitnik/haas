@@ -10,7 +10,7 @@ export const WorkspaceValidator = {
       (customer) => customer.id === workspaceId)?.permissions;
 
     if (userWorkspacePermissions && userWorkspacePermissions.find(
-      (permission) => permission === SystemPermissionEnum.CAN_ACCESS_ALL_ACTIONABLES
+      (permission) => permission === SystemPermissionEnum.CAN_ACCESS_ALL_ACTION_REQUESTS
     )) return true;
 
     if (session.globalPermissions.find(

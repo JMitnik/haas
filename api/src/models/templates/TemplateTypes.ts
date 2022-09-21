@@ -244,6 +244,8 @@ export const defaultAdminRole: Prisma.RoleCreateInput = {
   isPrivate: true,
   permissions: {
     set: [
+      'CAN_ACCESS_ALL_ACTION_REQUESTS',
+      'CAN_VIEW_ACTION_REQUESTS',
       'CAN_VIEW_USERS',
       'CAN_ADD_USERS',
       'CAN_BUILD_DIALOGUE',
@@ -269,6 +271,7 @@ export const defaultManagerRole: Prisma.RoleCreateInput = {
   type: 'MANAGER',
   permissions: {
     set: [
+      'CAN_VIEW_ACTION_REQUESTS',
       'CAN_VIEW_USERS',
       'CAN_ADD_USERS',
       'CAN_BUILD_DIALOGUE',

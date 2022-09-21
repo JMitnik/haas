@@ -105,7 +105,6 @@ export const CustomerType = objectType({
       async resolve(parent, args, ctx) {
         const canAccessAllActionables = WorkspaceValidator.canAccessAllActionables(parent.id, ctx.session);
         const userId = ctx.session?.user?.id as string;
-        console.log('Can access all actionables: ', canAccessAllActionables);
 
         return ctx.services.actionableService.findPaginatedWorkspaceActionables(
           parent.id as string,
