@@ -1,4 +1,4 @@
-import { ColourSettings, Customer, CustomerSettings } from '@prisma/client';
+import { ColourSettings, Customer, CustomerSettings, SystemPermissionEnum } from '@prisma/client';
 import { GraphQLError } from 'graphql';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import { arg, extendType, inputObjectType, mutationField, nonNull, objectType, scalarType } from 'nexus';
@@ -19,12 +19,13 @@ import { DialogueStatisticsSummaryFilterInput, DialogueStatisticsSummaryModel, M
 import { DialogueConnection, DialogueConnectionFilterInput } from '../../questionnaire';
 import { HealthScore, HealthScoreInput } from './HealthScore';
 import { Organization } from '../../Organization/graphql/OrganizationModel';
-import { Issue, IssueFilterInput, IssueModel, IssueConnectionFilterInput, IssueConnection } from '../../Issue/graphql';
+import { Issue, IssueFilterInput, IssueConnectionFilterInput, IssueConnection } from '../../Issue/graphql';
 import { IssueValidator } from '../../Issue/IssueValidator';
 import { SessionConnectionFilterInput } from '../../../models/session/graphql';
 import { SessionConnection } from '../../session/graphql/Session.graphql'
 import { ActionableConnection, ActionableConnectionFilterInput } from '../../actionable/graphql';
 import { assertNonNullish } from '../../../utils/assertNonNullish';
+import { WorkspaceValidator } from '../WorkspaceValidator';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -102,8 +103,14 @@ export const CustomerType = objectType({
         input: ActionableConnectionFilterInput,
       },
       async resolve(parent, args, ctx) {
+        const canAccessAllActionables = WorkspaceValidator.canAccessAllActionables(parent.id, ctx.session);
+        const userId = ctx.session?.user?.id as string;
+        console.log('Can access all actionables: ', canAccessAllActionables);
+
         return ctx.services.actionableService.findPaginatedWorkspaceActionables(
           parent.id as string,
+          userId,
+          canAccessAllActionables,
           args.input || undefined
         );
       },
@@ -125,7 +132,6 @@ export const CustomerType = objectType({
     /**
      * Issues (by dialogue)
      *
-     * TODO: Refactor to refer to this as issueDialogues
      */
     t.list.field('issueDialogues', {
       type: Issue,

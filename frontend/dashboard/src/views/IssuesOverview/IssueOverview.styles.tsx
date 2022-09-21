@@ -1,5 +1,6 @@
 import * as UI from '@haas/ui';
 import { ActionableState } from 'types/generated-types';
+import { CheckCircledIcon } from '@radix-ui/react-icons';
 import { format } from 'date-fns';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -117,10 +118,17 @@ export const StatusContainer = styled(UI.Div) <StatusContainerProps>`
 interface StatusBoxProps {
   isSelected?: boolean;
   status: ActionableState;
+  isVerified: boolean;
 }
 
-export const StatusBox = ({ status, isSelected }: StatusBoxProps) => (
+export const StatusBox = ({ status, isSelected, isVerified }: StatusBoxProps) => (
   <StatusContainer isSelected={isSelected} status={status}>
     {status}
+    {isVerified && status === ActionableState.Pending && (
+      <UI.Icon ml={1} stroke="orange.500">
+        <CheckCircledIcon width="20px" height="20px" />
+      </UI.Icon>
+    )}
+
   </StatusContainer>
 );

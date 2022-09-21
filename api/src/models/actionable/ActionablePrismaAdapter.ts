@@ -51,15 +51,24 @@ export class ActionablePrismaAdapter {
     })
   };
 
-  public async countActionablesByWorkspace(workspaceId: string, filter?: ActionableConnectionFilterInput) {
+  public async countActionablesByWorkspace(
+    workspaceId: string,
+    userId: string,
+    canAccessAllActionables: boolean,
+    filter?: ActionableConnectionFilterInput
+  ) {
     return this.prisma.actionable.count({
-      where: buildFindActionablesByWorkspaceWhereInput(workspaceId, filter),
+      where: buildFindActionablesByWorkspaceWhereInput(workspaceId, userId, canAccessAllActionables, filter),
     })
   };
 
-  public async findPaginatedActionablesByWorkspace(workspaceId: string, filter?: ActionableConnectionFilterInput) {
+  public async findPaginatedActionablesByWorkspace(
+    workspaceId: string,
+    userId: string,
+    canAccessAllActionables: boolean,
+    filter?: ActionableConnectionFilterInput) {
     return this.prisma.actionable.findMany({
-      where: buildFindActionablesByWorkspaceWhereInput(workspaceId, filter),
+      where: buildFindActionablesByWorkspaceWhereInput(workspaceId, userId, canAccessAllActionables, filter),
       take: filter?.perPage,
       skip: filter?.offset,
       orderBy: buildOrderByQuery(filter),

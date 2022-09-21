@@ -28,7 +28,10 @@ export const ActionableConnectionFilterInput = inputObjectType({
     t.dateString('startDate');
     t.dateString('endDate');
     t.string('assigneeId');
-
+    t.string('requestEmail');
+    t.boolean('isVerified');
+    t.string('topic');
+    t.string('dialogueId');
     t.field('status', {
       type: 'ActionableState',
     });

@@ -55,13 +55,17 @@ declare global {
 export interface NexusGenInputs {
   ActionableConnectionFilterInput: { // input type
     assigneeId?: string | null; // String
+    dialogueId?: string | null; // String
     endDate?: NexusGenScalars['DateString'] | null; // DateString
+    isVerified?: boolean | null; // Boolean
     offset: number; // Int!
     orderBy?: NexusGenInputs['ActionableConnectionOrderByInput'] | null; // ActionableConnectionOrderByInput
     perPage: number; // Int!
+    requestEmail?: string | null; // String
     search?: string | null; // String
     startDate?: NexusGenScalars['DateString'] | null; // DateString
     status?: NexusGenEnums['ActionableState'] | null; // ActionableState
+    topic?: string | null; // String
   }
   ActionableConnectionOrderByInput: { // input type
     by: NexusGenEnums['ActionableConnectionOrderType']; // ActionableConnectionOrderType!
@@ -897,7 +901,7 @@ export interface NexusGenEnums {
   SessionConnectionOrder: "createdAt" | "dialogueId"
   SessionDeliveryType: "campaigns" | "noCampaigns"
   StatusType: "CLOSED" | "IN_PROGRESS" | "OPEN"
-  SystemPermission: "CAN_ACCESS_ADMIN_PANEL" | "CAN_ACCESS_REPORT_PAGE" | "CAN_ADD_USERS" | "CAN_ASSIGN_USERS_TO_DIALOGUE" | "CAN_BUILD_DIALOGUE" | "CAN_CREATE_AUTOMATIONS" | "CAN_CREATE_CAMPAIGNS" | "CAN_CREATE_DELIVERIES" | "CAN_CREATE_TRIGGERS" | "CAN_DELETE_DIALOGUE" | "CAN_DELETE_TRIGGERS" | "CAN_DELETE_USERS" | "CAN_DELETE_WORKSPACE" | "CAN_DOWNLOAD_REPORTS" | "CAN_EDIT_DIALOGUE" | "CAN_EDIT_USERS" | "CAN_EDIT_WORKSPACE" | "CAN_GENERATE_WORKSPACE_FROM_CSV" | "CAN_RESET_WORKSPACE_DATA" | "CAN_UPDATE_AUTOMATIONS" | "CAN_VIEW_AUTOMATIONS" | "CAN_VIEW_CAMPAIGNS" | "CAN_VIEW_DIALOGUE" | "CAN_VIEW_DIALOGUE_ANALYTICS" | "CAN_VIEW_USERS"
+  SystemPermission: "CAN_ACCESS_ADMIN_PANEL" | "CAN_ACCESS_ALL_ACTIONABLES" | "CAN_ACCESS_REPORT_PAGE" | "CAN_ADD_USERS" | "CAN_ASSIGN_USERS_TO_DIALOGUE" | "CAN_BUILD_DIALOGUE" | "CAN_CREATE_AUTOMATIONS" | "CAN_CREATE_CAMPAIGNS" | "CAN_CREATE_DELIVERIES" | "CAN_CREATE_TRIGGERS" | "CAN_DELETE_DIALOGUE" | "CAN_DELETE_TRIGGERS" | "CAN_DELETE_USERS" | "CAN_DELETE_WORKSPACE" | "CAN_DOWNLOAD_REPORTS" | "CAN_EDIT_DIALOGUE" | "CAN_EDIT_USERS" | "CAN_EDIT_WORKSPACE" | "CAN_GENERATE_WORKSPACE_FROM_CSV" | "CAN_RESET_WORKSPACE_DATA" | "CAN_UPDATE_AUTOMATIONS" | "CAN_VIEW_AUTOMATIONS" | "CAN_VIEW_CAMPAIGNS" | "CAN_VIEW_DIALOGUE" | "CAN_VIEW_DIALOGUE_ANALYTICS" | "CAN_VIEW_USERS"
   TagTypeEnum: "AGENT" | "DEFAULT" | "LOCATION"
   TopicEnumType: "SYSTEM" | "WORKSPACE"
   TriggerConditionEnum: prisma.TriggerConditionEnum

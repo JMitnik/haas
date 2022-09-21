@@ -83,9 +83,13 @@ const language = {
       en: 'Pulse',
       de: 'Pulse',
     },
+    requested_by: {
+      en: 'Requested By',
+      de: 'Angefordert von',
+    },
     action_requests: {
-      en: 'Action requests',
-      de: 'Action requests',
+      en: 'Action Requests',
+      de: 'Action Requests',
     },
     total_responses: {
       en: 'Total responses',
@@ -618,6 +622,10 @@ const language = {
     reset: {
       en: 'Reset',
       de: 'Zurücksetzen',
+    },
+    filter_by_search_issue_helper: {
+      en: 'Search by team, topic, assignee, etc',
+      de: 'Suche nach Team, Thema, Verantwortlichem usw',
     },
     filter_by_search_helper: {
       en: 'Search by questions, answers, delivery name, etc',

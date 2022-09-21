@@ -14,7 +14,7 @@ export const ROUTES = {
   DASHBOARD_VIEW: '/dashboard/b/:customerSlug/dashboard',
   INTERACTION_VIEW: '/dashboard/b/:customerSlug/d/:dialogueSlug/interactions/:interactionId',
   WORKSPACE_INTERACTIONS_VIEW: '/dashboard/b/:customerSlug/dashboard/feedback',
-  WORKSPACE_ISSUES_VIEW: '/dashboard/b/:customerSlug/dashboard/issues',
+  WORKSPACE_ACTION_REQUESTS_VIEW: '/dashboard/b/:customerSlug/dashboard/action_requests',
   WORKSPACE_INTERACTION_VIEW: '/dashboard/b/:customerSlug/dashboard/feedback/:interactionId',
   CAMPAIGNS_VIEW: '/dashboard/b/:customerSlug/campaigns',
   CAMPAIGN_VIEW: '/dashboard/b/:customerSlug/campaign/:campaignId',
@@ -262,14 +262,14 @@ export const useNavigator = () => {
     ROUTES.WORKSPACE_INTERACTIONS_VIEW, { customerSlug },
   ), [customerSlug]);
 
-  const workspaceIssuesPath = useMemo(() => customerSlug && generatePath(
-    ROUTES.WORKSPACE_ISSUES_VIEW, { customerSlug },
+  const workspaceActionRequestsPath = useMemo(() => customerSlug && generatePath(
+    ROUTES.WORKSPACE_ACTION_REQUESTS_VIEW, { customerSlug },
   ), [customerSlug]);
 
   const goTo = (path: string) => history.push(path);
 
   return {
-    workspaceIssuesPath,
+    workspaceActionRequestsPath,
     getDialogueConfigViewPath,
     getDialogueBuilderViewPath,
     getDialogueCTAOverviewPath,

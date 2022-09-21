@@ -30,7 +30,7 @@ export const WorkspaceTopNavBar = () => {
   const { formatFractionToPercentage } = useFormatter();
   const { getNWeekAgo, format, getTomorrow } = useDate();
 
-  const { dashboardPath, workspaceInteractionsPath, workspaceIssuesPath } = useNavigator();
+  const { dashboardPath, workspaceInteractionsPath, workspaceActionRequestsPath } = useNavigator();
 
   const { data } = useGetWorkspaceLayoutDetailsQuery({
     fetchPolicy: 'no-cache',
@@ -120,8 +120,8 @@ export const WorkspaceTopNavBar = () => {
               </UI.Span>
 
               <UI.Span>
-                <NavLink to={workspaceIssuesPath}>
-                  {t('issues')}
+                <NavLink to={workspaceActionRequestsPath}>
+                  {t('action_requests')}
                 </NavLink>
               </UI.Span>
             </UI.Div>

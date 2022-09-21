@@ -86,15 +86,16 @@ interface ActionableStatusSelectProps {
   ) => Promise<FetchResult<SetActionableStatusMutation, Record<string, any>, Record<string, any>>>;
   status: ActionableState;
   actionableId: string;
+  isVerified: boolean;
 }
 
-export const ActionableStatusPicker = ({ onChange, status, actionableId }: ActionableStatusSelectProps) => {
+export const ActionableStatusPicker = ({ onChange, status, actionableId, isVerified }: ActionableStatusSelectProps) => {
   const [open, setOpen] = React.useState(false);
 
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger>
-        <StatusBox isSelected status={status} />
+        <StatusBox isVerified={isVerified} isSelected status={status} />
       </Popover.Trigger>
 
       <AnimatePresence>

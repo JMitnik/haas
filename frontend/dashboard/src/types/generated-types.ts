@@ -63,6 +63,10 @@ export type ActionableConnectionFilterInput = {
   startDate?: Maybe<Scalars['DateString']>;
   endDate?: Maybe<Scalars['DateString']>;
   assigneeId?: Maybe<Scalars['String']>;
+  requestEmail?: Maybe<Scalars['String']>;
+  isVerified?: Maybe<Scalars['Boolean']>;
+  topic?: Maybe<Scalars['String']>;
+  dialogueId?: Maybe<Scalars['String']>;
   status?: Maybe<ActionableState>;
   orderBy?: Maybe<ActionableConnectionOrderByInput>;
   offset: Scalars['Int'];

@@ -38,12 +38,21 @@ class ActionableService {
     return this.actionablePrismaAdapter.findActionablesByIssue(issueId, filter);
   }
 
-  public async findPaginatedWorkspaceActionables(workspaceId: string, filter?: ActionableConnectionFilterInput) {
+  public async findPaginatedWorkspaceActionables(
+    workspaceId: string,
+    userId: string,
+    canAccessAllActionables: boolean,
+    filter?: ActionableConnectionFilterInput,
+  ) {
     const offset = filter?.offset ?? 0;
     const perPage = filter?.perPage ?? 5;
 
-    const actionables = await this.actionablePrismaAdapter.findPaginatedActionablesByWorkspace(workspaceId, filter);
-    const totalActionables = await this.actionablePrismaAdapter.countActionablesByWorkspace(workspaceId, filter);
+    const actionables = await this.actionablePrismaAdapter.findPaginatedActionablesByWorkspace(
+      workspaceId, userId, canAccessAllActionables, filter,
+    );
+    const totalActionables = await this.actionablePrismaAdapter.countActionablesByWorkspace(
+      workspaceId, userId, canAccessAllActionables, filter
+    );
 
     const { totalPages, ...pageInfo } = offsetPaginate(totalActionables, offset, perPage);
 

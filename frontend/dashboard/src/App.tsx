@@ -200,7 +200,7 @@ const CustomerRoutes = () => (
                     />
 
                     <GuardedRoute
-                      path="/dashboard/b/:customerSlug/dashboard/issues"
+                      path="/dashboard/b/:customerSlug/dashboard/action_requests"
                       render={() => <IssuesOverview />}
                     />
 

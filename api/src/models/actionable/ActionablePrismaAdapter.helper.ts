@@ -15,9 +15,11 @@ export const buildOrderByQuery = (filter?: ActionableConnectionFilterInput) => {
 
 export const buildFindActionablesByWorkspaceWhereInput = (
   workspaceId: string,
-  filter?: ActionableFilterInput
+  userId: string,
+  canAccessAllActionables: boolean,
+  filter?: ActionableConnectionFilterInput
 ): Prisma.ActionableWhereInput => {
-  return {
+  const whereInput: Prisma.ActionableWhereInput = {
     dialogue: {
       customerId: workspaceId,
     },
@@ -25,9 +27,57 @@ export const buildFindActionablesByWorkspaceWhereInput = (
       gte: filter?.startDate,
       lte: filter?.endDate,
     },
-    assigneeId: filter?.assigneeId,
+    isVerified: filter?.isVerified || undefined,
+    dialogueId: filter?.dialogueId || undefined,
+    requestEmail: filter?.requestEmail,
+    assigneeId: filter?.assigneeId || canAccessAllActionables ? undefined : userId,
+    issue: filter?.topic ? {
+      topic: {
+        name: filter?.topic,
+      },
+    } : undefined,
     status: filter?.status || undefined,
   }
+
+  if (filter?.search) {
+    whereInput.AND = {
+      OR: [
+        {
+          assignee: {
+            email: {
+              mode: 'insensitive',
+              contains: filter.search,
+            },
+          },
+        },
+        {
+          requestEmail: {
+            mode: 'insensitive',
+            contains: filter.search,
+          },
+        },
+        {
+          dialogue: {
+            title: {
+              mode: 'insensitive',
+              contains: filter.search,
+            },
+          },
+        },
+        {
+          issue: {
+            topic: {
+              name: {
+                mode: 'insensitive',
+                contains: filter.search,
+              },
+            },
+          },
+        },
+      ],
+    }
+  }
+  return whereInput;
 };
 
 export const buildFindActionablesWhereInput = (

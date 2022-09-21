@@ -4,22 +4,23 @@
 import '@szhsin/react-menu/dist/index.css';
 import * as UI from '@haas/ui';
 import {
-  ArrayParam,
   BooleanParam,
   NumberParam,
   StringParam,
   useQueryParams,
   withDefault,
 } from 'use-query-params';
-import { BarChart2, Calendar, Plus, Search } from 'react-feather';
+import { Calendar, Plus, Search } from 'react-feather';
 import { endOfDay, format, startOfDay } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
+import * as ContextMenu from 'components/Common/ContextMenu';
 import * as Table from 'components/Common/Table';
 import {
   ActionableConnectionOrderType,
   ActionableFragmentFragment,
+  ActionableState,
   useAssignUserToActionableMutation,
   useGetUsersAndRolesQuery,
   useGetWorkspaceActionablesQuery,
@@ -33,18 +34,15 @@ import { UserNodePicker } from 'components/NodePicker/UserNodePicker';
 import { View } from 'layouts/View';
 import { mapToUserPickerEntries } from 'views/AddAutomationView/AutomationForm.helpers';
 import { useCustomer } from 'providers/CustomerProvider';
-import { useFormatter } from 'hooks/useFormatter';
 import Dropdown from 'components/Dropdown';
 import SearchBar from 'components/Common/SearchBar/SearchBar';
 
-import { CheckCircledIcon } from '@radix-ui/react-icons';
 import { ActionableStatusPicker } from './ActionableStatusPicker';
 import { ChangeableEmailContainer, DateCell } from './IssueOverview.styles';
 
 export const IssuesOverview = () => {
   const { t } = useTranslation();
   const { activeCustomer } = useCustomer();
-  const { formatScore } = useFormatter();
 
   const { parse, format: dateFormat } = useDate();
   const [actionables, setActionables] = useState<ActionableFragmentFragment[]>(() => []);
@@ -54,14 +52,16 @@ export const IssuesOverview = () => {
     startDate: StringParam,
     endDate: StringParam,
     search: StringParam,
+    status: StringParam,
+    isVerified: BooleanParam,
+    assigneeId: StringParam,
+    requestEmail: StringParam,
     pageIndex: withDefault(NumberParam, 0),
     perPage: withDefault(NumberParam, 10),
     orderByField: withDefault(StringParam, ActionableConnectionOrderType.CreatedAt),
     orderByDescending: withDefault(BooleanParam, true),
-    topicStrings: ArrayParam,
-    dialogueIds: ArrayParam,
-    minScore: withDefault(NumberParam, 0),
-    maxScore: withDefault(NumberParam, 100),
+    topic: StringParam,
+    dialogueId: StringParam,
     withFollowUpAction: withDefault(BooleanParam, false),
   });
 
@@ -71,6 +71,12 @@ export const IssuesOverview = () => {
       filter: {
         perPage: filter.perPage,
         offset: filter.pageIndex * filter.perPage,
+        isVerified: filter.isVerified || undefined,
+        requestEmail: filter.requestEmail || undefined,
+        assigneeId: filter.assigneeId || undefined,
+        dialogueId: filter.dialogueId || undefined,
+        topic: filter.topic || undefined,
+        status: filter.status as ActionableState || undefined,
         orderBy: {
           by: filter.orderByField as ActionableConnectionOrderType,
           desc: filter.orderByDescending,
@@ -125,6 +131,25 @@ export const IssuesOverview = () => {
     }
   };
 
+  const handleGroupChange = (dialogueId: string) => {
+    setFilter({ dialogueId, pageIndex: 0 });
+  };
+
+  const handleTopicChange = (topic: string) => {
+    setFilter({ topic, pageIndex: 0 });
+  };
+
+  const handleAssigneeChange = (assigneeId: string) => {
+    setFilter({ assigneeId, pageIndex: 0 });
+  };
+
+  const handleRequestEmailChange = (requestEmail: string) => {
+    setFilter(() => ({
+      requestEmail,
+      pageIndex: 0,
+    }));
+  };
+
   const handleSearchTermChange = (search: string) => {
     setFilter((prevValues) => ({
       ...prevValues,
@@ -133,7 +158,21 @@ export const IssuesOverview = () => {
     }));
   };
 
-  const columns = 'minmax(50px, 0.15fr) minmax(100px, 0.35fr) minmax(150px, 1fr) minmax(100px, 0.5fr) minmax(150px, 1fr) minmax(150px, 1fr) minmax(150px, 0.5fr)';
+  const handleStatusChange = (status: ActionableState) => {
+    setFilter(() => ({
+      status,
+      pageIndex: 0,
+    }));
+  };
+
+  const handleIsVerifiedChange = () => {
+    setFilter(() => ({
+      isVerified: true,
+    }));
+  };
+
+  const columns = `minmax(100px, 0.35fr) minmax(150px, 1fr) minmax(100px, 0.5fr) 
+  minmax(150px, 1fr) minmax(150px, 1fr) minmax(150px, 0.5fr)`;
 
   return (
     <View documentTitle="haas | Issues">
@@ -156,7 +195,6 @@ export const IssuesOverview = () => {
                   tabs={[
                     { label: t('search'), icon: <Search /> },
                     { label: t('date'), icon: <Calendar /> },
-                    { label: t('score'), icon: <BarChart2 /> },
                   ]}
                 >
                   <UI.Div id="searchFilter">
@@ -165,7 +203,7 @@ export const IssuesOverview = () => {
                         {t('filter_by_search')}
                       </UI.RadioHeader>
                       <UI.Div mb={1}>
-                        <UI.Muted>{t('filter_by_search_helper')}</UI.Muted>
+                        <UI.Muted>{t('filter_by_search_issue_helper')}</UI.Muted>
                       </UI.Div>
                       <SearchBar
                         search={filter.search}
@@ -195,34 +233,35 @@ export const IssuesOverview = () => {
                       <UI.Button size="sm" onClick={() => handleDateChange(null)}>{t('reset')}</UI.Button>
                     </UI.Stack>
                   </UI.Div>
-
-                  <UI.Div id="scoreFilter">
-                    <UI.Stack spacing={2}>
-                      <UI.RadioHeader>
-                        {t('filter_by_score')}
-                      </UI.RadioHeader>
-                      <UI.Div mb={1}>
-                        <UI.Muted>{t('show_interactions_between')}</UI.Muted>
-                      </UI.Div>
-                      <UI.Div>
-                        <UI.RangeSlider
-                          stepSize={1}
-                          defaultValue={[filter.minScore || 0, filter.maxScore || 100]}
-                          min={0}
-                          max={100}
-                          onChange={(e: any) => setFilter({ pageIndex: 0, minScore: e[0], maxScore: e[1] })}
-                        />
-                      </UI.Div>
-                      <UI.Button size="sm" onClick={() => setFilter({ pageIndex: 0, minScore: 0, maxScore: 100 })}>
-                        {t('reset')}
-                      </UI.Button>
-                    </UI.Stack>
-                  </UI.Div>
                 </TabbedMenu>
               )}
             </PickerButton>
 
             <UI.Stack ml={4} isInline spacing={4} alignItems="center">
+              <Table.FilterButton
+                condition={!!filter.assigneeId}
+                filterKey="assignee"
+                value={actionables.find((actionable) => actionable.assignee?.id === filter.assigneeId)?.assignee?.email}
+                onClose={() => setFilter({ assigneeId: undefined })}
+              />
+              <Table.FilterButton
+                condition={!!filter.isVerified}
+                filterKey="show"
+                value="only verified"
+                onClose={() => setFilter({ isVerified: undefined })}
+              />
+              <Table.FilterButton
+                condition={!!filter.status}
+                filterKey="status"
+                value={filter.status}
+                onClose={() => setFilter({ status: '' })}
+              />
+              <Table.FilterButton
+                condition={!!filter.topic}
+                filterKey="topic"
+                value={filter.topic}
+                onClose={() => setFilter({ topic: undefined })}
+              />
               <Table.FilterButton
                 condition={!!filter.search}
                 filterKey="search"
@@ -236,18 +275,16 @@ export const IssuesOverview = () => {
                 onClose={() => setFilter({ startDate: undefined, endDate: undefined })}
               />
               <Table.FilterButton
-                condition={!!filter.dialogueIds?.length}
-                filterKey="team"
-                value={`${!!filter.dialogueIds?.length && filter?.dialogueIds?.length > 1
-                  ? 'Multiple teams'
-                  : actionables?.find((actionable) => actionable?.dialogueId === filter.dialogueIds?.[0])?.dialogue?.title}`}
-                onClose={() => setFilter({ dialogueIds: [] })}
+                condition={!!filter.dialogueId}
+                filterKey="group"
+                value={actionables?.find((actionable) => actionable?.dialogueId === filter.dialogueId)?.dialogue?.title}
+                onClose={() => setFilter({ dialogueId: undefined })}
               />
               <Table.FilterButton
-                condition={filter.minScore > 0 || filter.maxScore < 100}
-                filterKey="score"
-                value={`${formatScore(filter.minScore)} - ${formatScore(filter.maxScore)}`}
-                onClose={() => setFilter({ minScore: 0, maxScore: 100 })}
+                condition={!!filter.requestEmail}
+                filterKey="requested by"
+                value={filter.requestEmail}
+                onClose={() => setFilter({ requestEmail: undefined })}
               />
 
               <Table.FilterButton
@@ -268,13 +305,10 @@ export const IssuesOverview = () => {
           <UI.Div width="100%">
             <Table.HeadingRow gridTemplateColumns={columns}>
               <Table.HeadingCell>
-                {t('verified')}
-              </Table.HeadingCell>
-              <Table.HeadingCell>
                 {t('status')}
               </Table.HeadingCell>
               <Table.HeadingCell>
-                {t('contacted_by')}
+                {t('requested_by')}
               </Table.HeadingCell>
               <Table.HeadingCell>
                 {t('topic')}
@@ -291,118 +325,156 @@ export const IssuesOverview = () => {
             </Table.HeadingRow>
 
             {actionables?.map((actionable) => (
-              <Table.Row
-                isLoading={loading}
-                gridTemplateColumns={columns}
-                key={actionable.id}
-              >
-                <Table.Cell display="flex" justifyContent="center">
-                  {actionable.isVerified && (
-                    <UI.Icon stroke="#6a6d9e">
-                      <CheckCircledIcon width="20px" height="20px" />
-                    </UI.Icon>
-                  )}
-
-                </Table.Cell>
-                <Table.Cell maxWidth={300}>
-                  <UI.ColumnFlex justifyContent="flex-start">
-                    <UI.Flex alignItems="center">
-                      <ActionableStatusPicker
-                        actionableId={actionable.id as string}
-                        onChange={setActionableStatus}
-                        status={actionable.status}
-                      />
-                    </UI.Flex>
-                  </UI.ColumnFlex>
-                </Table.Cell>
-                <Table.Cell>
-                  <Table.InnerCell>
-                    <UI.Helper>
-                      {actionable.requestEmail || 'None'}
-                    </UI.Helper>
-                  </Table.InnerCell>
-                </Table.Cell>
-                <Table.Cell>
-                  <UI.Span fontWeight={600} color="off.500">
-                    {actionable.issue?.topic.name}
-                  </UI.Span>
-                </Table.Cell>
-                <Table.Cell>
-                  <Table.InnerCell>
-                    <Dropdown
-                      isRelative
-                      renderOverlay={({ onClose }) => (
-                        <UserNodePicker
-                          items={userPickerEntries}
-                          onClose={onClose}
-                          onChange={(user: any) => {
-                            assignUserToActionable({
-                              variables: {
-                                input: {
-                                  assigneeId: user?.value,
-                                  actionableId: actionable.id as string,
-                                },
-                              },
-                            });
-                            onClose();
-                          }}
-                        />
-                      )}
+              <UI.Div>
+                <ContextMenu.Root>
+                  <ContextMenu.Trigger>
+                    <Table.Row
+                      isLoading={loading}
+                      gridTemplateColumns={columns}
+                      key={actionable.id}
                     >
-                      {({ onOpen }) => (
-                        <UI.Div
-                          width="100%"
-                          justifyContent="center"
-                          display="flex"
-                          alignItems="center"
-                        >
-                          {actionable.assignee?.email ? (
-                            <ChangeableEmailContainer onClick={onOpen}>
-                              <UI.Helper>
-                                {actionable.assignee?.email}
-                              </UI.Helper>
-                              <UI.IconButton
-                                aria-label="close"
-                                icon={() => <IconClose />}
-                                onClick={(e) => {
-                                  e.stopPropagation();
+                      <Table.Cell maxWidth={300}>
+                        <UI.ColumnFlex justifyContent="flex-start">
+                          <UI.Flex alignItems="center">
+                            <ActionableStatusPicker
+                              actionableId={actionable.id as string}
+                              onChange={setActionableStatus}
+                              status={actionable.status}
+                              isVerified={actionable.isVerified}
+                            />
+                          </UI.Flex>
+                        </UI.ColumnFlex>
+                      </Table.Cell>
+                      <Table.Cell>
+                        <Table.InnerCell>
+                          <UI.Helper>
+                            {actionable.requestEmail || 'No Information'}
+                          </UI.Helper>
+                        </Table.InnerCell>
+                      </Table.Cell>
+                      <Table.Cell>
+                        <UI.Span fontWeight={600} color="off.500">
+                          {actionable.issue?.topic.name}
+                        </UI.Span>
+                      </Table.Cell>
+                      <Table.Cell>
+                        <Table.InnerCell>
+                          <Dropdown
+                            isRelative
+                            renderOverlay={({ onClose }) => (
+                              <UserNodePicker
+                                items={userPickerEntries}
+                                onClose={onClose}
+                                onChange={(user: any) => {
                                   assignUserToActionable({
                                     variables: {
                                       input: {
-                                        assigneeId: null,
+                                        assigneeId: user?.value,
                                         actionableId: actionable.id as string,
                                       },
                                     },
                                   });
+                                  onClose();
                                 }}
-                                width={10}
-                                minWidth={10}
                               />
-                            </ChangeableEmailContainer>
-                          ) : (
-                            <UI.Div onClick={onOpen}>
-                              <UI.Helper>
-                                None
-                              </UI.Helper>
-                            </UI.Div>
-                          )}
-                        </UI.Div>
-                      )}
-                    </Dropdown>
+                            )}
+                          >
+                            {({ onOpen }) => (
+                              <UI.Div
+                                width="100%"
+                                justifyContent="center"
+                                display="flex"
+                                alignItems="center"
+                              >
+                                {actionable.assignee?.email ? (
+                                  <ChangeableEmailContainer onClick={onOpen}>
+                                    <UI.Helper>
+                                      {actionable.assignee?.email}
+                                    </UI.Helper>
+                                    <UI.IconButton
+                                      aria-label="close"
+                                      icon={() => <IconClose />}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        assignUserToActionable({
+                                          variables: {
+                                            input: {
+                                              assigneeId: null,
+                                              actionableId: actionable.id as string,
+                                            },
+                                          },
+                                        });
+                                      }}
+                                      width={10}
+                                      minWidth={10}
+                                    />
+                                  </ChangeableEmailContainer>
+                                ) : (
+                                  <UI.Div onClick={onOpen}>
+                                    <UI.Helper>
+                                      None
+                                    </UI.Helper>
+                                  </UI.Div>
+                                )}
+                              </UI.Div>
+                            )}
+                          </Dropdown>
 
-                  </Table.InnerCell>
+                        </Table.InnerCell>
 
-                </Table.Cell>
-                <Table.Cell>
-                  <UI.Span fontWeight={600} color="off.500">
-                    {actionable.dialogue?.title}
-                  </UI.Span>
+                      </Table.Cell>
+                      <Table.Cell>
+                        <UI.Span fontWeight={600} color="off.500">
+                          {actionable.dialogue?.title}
+                        </UI.Span>
 
-                </Table.Cell>
-                <Table.Cell>
-                  <DateCell timestamp={actionable.createdAt as string} />
-                </Table.Cell>
-              </Table.Row>
+                      </Table.Cell>
+                      <Table.Cell>
+                        <DateCell timestamp={actionable.createdAt as string} />
+                      </Table.Cell>
+                    </Table.Row>
+                  </ContextMenu.Trigger>
+                  <ContextMenu.Content>
+                    <ContextMenu.Item onClick={() => handleStatusChange(actionable.status)}>
+                      Show all with status
+                      {' '}
+                      <UI.Span fontWeight="bold" ml="2px" mr="2px">{actionable.status}</UI.Span>
+                    </ContextMenu.Item>
+                    <ContextMenu.Item onClick={() => handleIsVerifiedChange()} disabled={!actionable.isVerified}>
+                      Show all
+                      {' '}
+                      <UI.Span fontWeight="bold" ml="2px" mr="2px">verified</UI.Span>
+                      {' '}
+                      action requests
+                    </ContextMenu.Item>
+                    {actionable.assignee?.email && (
+                      <ContextMenu.Item onClick={() => handleAssigneeChange(actionable.assignee?.id as string)}>
+                        Show all assigned to
+                        {' '}
+                        <UI.Span fontWeight="bold" ml="2px" mr="2px">{actionable.assignee?.email}</UI.Span>
+                      </ContextMenu.Item>
+                    )}
+                    {actionable.requestEmail && (
+                      <ContextMenu.Item onClick={() => handleRequestEmailChange(actionable.requestEmail as string)}>
+                        Show all requested by
+                        <UI.Span fontWeight="bold" ml="2px" mr="2px">{actionable.requestEmail}</UI.Span>
+                      </ContextMenu.Item>
+                    )}
+                    <ContextMenu.Item onClick={() => handleTopicChange(actionable.issue?.topic.name as string)}>
+                      Show all with topic
+                      {' '}
+                      <UI.Span fontWeight="bold" ml="2px" mr="2px">{actionable.issue?.topic.name}</UI.Span>
+                    </ContextMenu.Item>
+                    <ContextMenu.Item onClick={() => handleGroupChange(actionable.dialogue?.id as string)}>
+                      Show all from
+                      {' '}
+                      <UI.Span fontWeight="bold" ml="2px" mr="2px">{actionable.dialogue?.title}</UI.Span>
+                    </ContextMenu.Item>
+                  </ContextMenu.Content>
+                </ContextMenu.Root>
+
+              </UI.Div>
+
             ))}
           </UI.Div>
           <UI.Flex justifyContent="flex-end" mt={4}>

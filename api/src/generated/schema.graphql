@@ -33,13 +33,17 @@ type ActionableConnection implements ConnectionInterface {
 
 input ActionableConnectionFilterInput {
   assigneeId: String
+  dialogueId: String
   endDate: DateString
+  isVerified: Boolean
   offset: Int!
   orderBy: ActionableConnectionOrderByInput
   perPage: Int! = 10
+  requestEmail: String
   search: String
   startDate: DateString
   status: ActionableState
+  topic: String
 }
 
 """Sorting of ActionableConnection"""
@@ -2182,6 +2186,7 @@ enum StatusType {
 
 enum SystemPermission {
   CAN_ACCESS_ADMIN_PANEL
+  CAN_ACCESS_ALL_ACTIONABLES
   CAN_ACCESS_REPORT_PAGE
   CAN_ADD_USERS
   CAN_ASSIGN_USERS_TO_DIALOGUE
