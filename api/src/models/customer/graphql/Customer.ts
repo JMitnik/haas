@@ -137,8 +137,6 @@ export const CustomerType = objectType({
         const canAccessAllDialogues = DialogueValidator.canAccessAllDialogues(parent.id, ctx.session);
         const userId = ctx.session.user.id;
 
-        console.log('Can access all dialogues: ', canAccessAllDialogues);
-
         let dialogues = await ctx.services.dialogueService.paginatedDialogues(
           parent.slug,
           canAccessAllDialogues,
