@@ -23,6 +23,7 @@ import { IssueValidator } from '../../Issue/IssueValidator';
 import { SessionConnectionFilterInput } from '../../../models/session/graphql';
 import { SessionConnection } from '../../session/graphql/Session.graphql'
 import { assertNonNullish } from '../../../utils/assertNonNullish';
+import { DialogueValidator } from '../../questionnaire/DialogueValidator';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -133,9 +134,15 @@ export const CustomerType = objectType({
       async resolve(parent, args, ctx) {
         if (!ctx.session?.user?.id) throw new ApolloError('No user in session found!');
 
+        const canAccessAllDialogues = DialogueValidator.canAccessAllDialogues(parent.id, ctx.session);
+        const userId = ctx.session.user.id;
+
+        console.log('Can access all dialogues: ', canAccessAllDialogues);
+
         let dialogues = await ctx.services.dialogueService.paginatedDialogues(
           parent.slug,
-          ctx.session?.user?.id,
+          canAccessAllDialogues,
+          userId,
           args.filter
         );
         return dialogues;
