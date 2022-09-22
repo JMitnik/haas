@@ -141,6 +141,76 @@ describe('DialogueConnection resolver', () => {
 
   });
 
+  test('Private dialogues are shown if you have CAN_ACCESS_ALL_DIALOGUES permission', async () => {
+    const { user, workspace, userRole } = await prepDefaultCreateData(prisma);
+    await seedDialogue(prisma, workspace.id, 'dialogue_two');
+    await seedDialogue(prisma, workspace.id, 'dialogue_three', true);
+    const token = AuthService.createUserToken(user.id, 22);
+
+    let res = await ctx.client.request(Query, {
+      customerSlug: workspace.slug,
+      filter: { offset: 0, perPage: 2 },
+    }, { 'Authorization': `Bearer ${token}` });
+
+    // Although 3 dialogues created, only 2 should show up and therefore there is
+    // only 1 page available dialogue connection
+    expect(res.customer.dialogueConnection.totalPages).toBe(1);
+
+    await prisma.role.update({
+      where: {
+        id: userRole.id,
+      },
+      data: {
+        permissions: ['CAN_ACCESS_ALL_DIALOGUES', 'CAN_VIEW_DIALOGUE'],
+      },
+    });
+
+    let resWithRightPermission = await ctx.client.request(Query, {
+      customerSlug: workspace.slug,
+      filter: { offset: 0, perPage: 2 },
+    }, { 'Authorization': `Bearer ${token}` });
+
+    // Now that user has permission to see private dialogues without being assigned to them it should appear in connection
+    // and therefor there will be 2 pages now
+    expect(resWithRightPermission.customer.dialogueConnection.totalPages).toBe(2);
+
+  });
+
+  test('Private dialogues are shown if you have super admin rights', async () => {
+    const { user, workspace } = await prepDefaultCreateData(prisma);
+    await seedDialogue(prisma, workspace.id, 'dialogue_two');
+    await seedDialogue(prisma, workspace.id, 'dialogue_three', true);
+    const token = AuthService.createUserToken(user.id, 22);
+
+    let res = await ctx.client.request(Query, {
+      customerSlug: workspace.slug,
+      filter: { offset: 0, perPage: 2 },
+    }, { 'Authorization': `Bearer ${token}` });
+
+    // Although 3 dialogues created, only 2 should show up and therefore there is
+    // only 1 page available dialogue connection
+    expect(res.customer.dialogueConnection.totalPages).toBe(1);
+
+    await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        globalPermissions: ['CAN_ACCESS_ADMIN_PANEL'],
+      },
+    });
+
+    let resWithRightPermission = await ctx.client.request(Query, {
+      customerSlug: workspace.slug,
+      filter: { offset: 0, perPage: 2 },
+    }, { 'Authorization': `Bearer ${token}` });
+
+    // Now that user has permission to see private dialogues without being assigned to them it should appear in connection
+    // and therefor there will be 2 pages now
+    expect(resWithRightPermission.customer.dialogueConnection.totalPages).toBe(2);
+
+  });
+
   test('user can filter dialogue-connection by generic search', async () => {
     const { user, workspace } = await prepDefaultCreateData(prisma);
     await seedDialogue(prisma, workspace.id, 'dialogue_two', false, 'sear');
