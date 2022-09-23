@@ -46,8 +46,6 @@ export const RangeDatePicker = ({ startDate, endDate, onChange, changeWhenFullRa
   useEffect(() => {
     if (isEqual(localStartDate, startDate) && isEqual(localEndDate, endDate)) return;
 
-    console.log(localStartDate, localEndDate, onChange, changeWhenFullRange);
-
     if (!changeWhenFullRange) {
       onChange([localStartDate, localEndDate]);
       return;
@@ -84,7 +82,6 @@ export const RangeDatePicker = ({ startDate, endDate, onChange, changeWhenFullRa
 type DatePickerProps = SingleDatePickerProps | RangeDatePickerProps;
 
 export const DatePicker = (props: DatePickerProps) => {
-  console.log('date picker props: ', props);
   switch (props.type) {
     case 'single': {
       return <SingleDatePicker {...props} />;

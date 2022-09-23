@@ -78,7 +78,7 @@ const setFilterDialogueIds = (activeDialogue?: Dialogue | null, dialogueIds?: (s
 
 export const FeedbackOverview = () => {
   const { t } = useTranslation();
-  const { parse, format: dateFormat, getOneWeekAgo, getEndOfToday } = useDate();
+  const { format: dateFormat, getOneWeekAgo, getEndOfToday } = useDate();
   const { activeCustomer } = useCustomer();
   const { formatScore } = useFormatter();
   const { activeDialogue } = useDialogue();
@@ -144,29 +144,6 @@ export const FeedbackOverview = () => {
       setTotalPages(fetchedData?.customer?.sessionConnection?.totalPages || 0);
     },
   });
-
-  const handleDateChange = (dates: Date[] | null) => {
-    if (dates) {
-      const [newStartDate, newEndDate] = dates;
-      setDateRange([newStartDate, newEndDate]);
-      setFilter({
-        ...filter,
-        startDate: dateFormat(startOfDay(newStartDate), DateFormat.DayTimeFormat),
-        endDate: dateFormat(endOfDay(newEndDate), DateFormat.DayTimeFormat),
-        pageIndex: 0,
-      });
-    } else {
-      const resetStartDate = getOneWeekAgo();
-      const resetEndDate = getEndOfToday();
-      setDateRange([resetStartDate, resetEndDate]);
-      setFilter({
-        ...filter,
-        startDate: dateFormat(resetStartDate, DateFormat.DayTimeFormat),
-        endDate: dateFormat(resetEndDate, DateFormat.DayTimeFormat),
-        pageIndex: 0,
-      });
-    }
-  };
 
   const handleSingleDateFilterChange = (day: Date) => {
     setFilter({
