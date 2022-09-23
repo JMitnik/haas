@@ -12,7 +12,6 @@ import { DialogueProvider } from 'providers/DialogueProvider';
 import { FeedbackOverview } from 'views/FeedbackView/index';
 import { FirstTimeView } from 'views/FirstTimeView';
 import { GenerateWorkspaceView } from 'views/GenerateWorkspaceView';
-import { InteractionsOverview } from 'views/InteractionsOverview';
 import { ROUTES } from 'hooks/useNavigator';
 import { SystemPermission } from 'types/generated-types';
 import { VerifyTokenView } from 'views/VerifyTokenView';
@@ -81,11 +80,6 @@ const CustomerRoutes = () => (
                         allowedPermission={SystemPermission.CanEditDialogue}
                         path="/dashboard/b/:customerSlug/d/:dialogueSlug/edit"
                         render={() => <EditDialogueView />}
-                      />
-
-                      <GuardedRoute
-                        path="/dashboard/b/:customerSlug/d/:dialogueSlug/interactions"
-                        render={() => <InteractionsOverview />}
                       />
 
                       <GuardedRoute

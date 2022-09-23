@@ -8,7 +8,7 @@ import { NodeEntryFragmentFragment, QuestionNodeTypeEnum, SessionFragmentFragmen
 import { QuestionNodeIcon } from 'components/Dialogue/QuestionNodeIcon';
 import { Timeline, TimelineItem } from 'components/Common/Timeline';
 import { formatSliderValue } from 'components/Dialogue/utils/formatSliderValue';
-import FormNodeEntry from 'views/InteractionsOverview/FormNodeEntry';
+import FormNodeEntry from 'views/FeedbackView/FormNodeEntry';
 
 interface Interaction extends SessionFragmentFragment { }
 

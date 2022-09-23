@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import { BooleanParam, DateTimeParam, NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
-import { Calendar, Filter, Search, User } from 'react-feather';
+import { Filter, Search, User } from 'react-feather';
 import { endOfDay, startOfDay } from 'date-fns';
 import { useHistory } from 'react-router-dom';
 import { useToast } from '@chakra-ui/core';
@@ -269,132 +269,116 @@ const UsersOverview = () => {
               </InviteUserButton>
             </UI.Div>
           </UI.Flex>
-
-          <UI.Div>
-            <SearchBar
-              search={filter.search}
-              onSearchChange={handleSearchTermChange}
-            />
-          </UI.Div>
-
         </UI.Flex>
       </UI.ViewHead>
 
       <UI.ViewBody>
         <UI.Div>
           <UI.Flex mb={2} justifyContent="space-between">
-            <PickerButton label={t('filter_users')} icon={(<Filter />)}>
-              {() => (
-                <TabbedMenu
-                  menuHeader={t('filter_users')}
-                  tabs={[
-                    { label: t('search'), icon: <Search /> },
-                    { label: t('date'), icon: <Calendar /> },
-                    { label: t('recipient'), icon: <User /> },
-                  ]}
-                >
-                  <UI.Div>
-                    <UI.RadioHeader>
-                      {t('filter_by_search')}
-                    </UI.RadioHeader>
-                    <Searchbar
-                      search={filter.search}
-                      onSearchChange={handleSearchChange}
-                    />
-                  </UI.Div>
+            <UI.Flex>
+              <PickerButton label={t('filter_users')} icon={(<Filter />)}>
+                {() => (
+                  <TabbedMenu
+                    menuHeader={t('filter_users')}
+                    tabs={[
+                      { label: t('search'), icon: <Search /> },
+                      { label: t('recipient'), icon: <User /> },
+                    ]}
+                  >
+                    <UI.Div>
+                      <UI.RadioHeader>
+                        {t('filter_by_search')}
+                      </UI.RadioHeader>
+                      <Searchbar
+                        search={filter.search}
+                        onSearchChange={handleSearchChange}
+                      />
+                    </UI.Div>
 
-                  <UI.Div>
-                    <UI.RadioHeader>
-                      {t('filter_by_date')}
-                    </UI.RadioHeader>
-                    <UI.SectionSubHeader mb={2}>
-                      {t('filter_by_updated_date_description')}
-                    </UI.SectionSubHeader>
-                    <UI.DatePicker
-                      value={[filter.startDate, filter.endDate]}
-                      onChange={handleDateChange}
-                      range
-                    />
-                  </UI.Div>
+                    <UI.Div>
+                      <UI.Stack spacing={4}>
+                        <UI.Div>
+                          <UI.RadioHeader>
+                            {t('filter_by_recipient_first_name')}
+                          </UI.RadioHeader>
+                          <Searchbar
+                            search={filter.firstName}
+                            onSearchChange={handleRecipientFirstName}
+                          />
+                        </UI.Div>
+                        <UI.Div>
+                          <UI.RadioHeader>
+                            {t('filter_by_recipient_last_name')}
+                          </UI.RadioHeader>
+                          <Searchbar
+                            search={filter.lastName}
+                            onSearchChange={handleRecipientLastName}
+                          />
+                        </UI.Div>
+                        <UI.Div>
+                          <UI.RadioHeader>
+                            {t('filter_by_recipient_email')}
+                          </UI.RadioHeader>
+                          <Searchbar
+                            search={filter.email}
+                            onSearchChange={handleRecipientEmail}
+                          />
+                        </UI.Div>
+                        <UI.Div>
+                          <UI.RadioHeader>
+                            {t('filter_by_role_name')}
+                          </UI.RadioHeader>
+                          <Searchbar
+                            search={filter.role}
+                            onSearchChange={handleRole}
+                          />
+                        </UI.Div>
+                      </UI.Stack>
+                    </UI.Div>
+                  </TabbedMenu>
+                )}
+              </PickerButton>
 
-                  <UI.Div>
-                    <UI.Stack spacing={4}>
-                      <UI.Div>
-                        <UI.RadioHeader>
-                          {t('filter_by_recipient_first_name')}
-                        </UI.RadioHeader>
-                        <Searchbar
-                          search={filter.firstName}
-                          onSearchChange={handleRecipientFirstName}
-                        />
-                      </UI.Div>
-                      <UI.Div>
-                        <UI.RadioHeader>
-                          {t('filter_by_recipient_last_name')}
-                        </UI.RadioHeader>
-                        <Searchbar
-                          search={filter.lastName}
-                          onSearchChange={handleRecipientLastName}
-                        />
-                      </UI.Div>
-                      <UI.Div>
-                        <UI.RadioHeader>
-                          {t('filter_by_recipient_email')}
-                        </UI.RadioHeader>
-                        <Searchbar
-                          search={filter.email}
-                          onSearchChange={handleRecipientEmail}
-                        />
-                      </UI.Div>
-                      <UI.Div>
-                        <UI.RadioHeader>
-                          {t('filter_by_role_name')}
-                        </UI.RadioHeader>
-                        <Searchbar
-                          search={filter.role}
-                          onSearchChange={handleRole}
-                        />
-                      </UI.Div>
-                    </UI.Stack>
-                  </UI.Div>
-                </TabbedMenu>
-              )}
-            </PickerButton>
+              <UI.Stack ml={4} isInline spacing={4} alignItems="center">
+                <Table.FilterButton
+                  condition={!!filter.search}
+                  filterKey="search"
+                  value={filter.search}
+                  onClose={() => handleSearchChange('')}
+                />
+                <Table.FilterButton
+                  condition={!!filter.firstName}
+                  filterKey="recipientFirstName"
+                  value={filter.firstName}
+                  onClose={() => handleRecipientFirstName('')}
+                />
+                <Table.FilterButton
+                  condition={!!filter.lastName}
+                  filterKey="recipientLastName"
+                  value={filter.lastName}
+                  onClose={() => handleRecipientLastName('')}
+                />
+                <Table.FilterButton
+                  condition={!!(filter.startDate || filter.endDate)}
+                  filterKey="updatedAt"
+                  value={`${formatSimpleDate(filter.startDate?.toISOString())} - ${formatSimpleDate(filter.endDate?.toISOString())}`}
+                  onClose={() => handleMultiDateFilterChange(undefined, undefined)}
+                />
+                <Table.FilterButton
+                  condition={!!filter.email}
+                  filterKey="recipientEmail"
+                  value={filter.email}
+                  onClose={() => handleRecipientEmail('')}
+                />
+              </UI.Stack>
+            </UI.Flex>
 
-            <UI.Separator bg="gray.200" />
-
-            <UI.Stack spacing={2} isInline>
-              <Table.FilterButton
-                condition={!!filter.search}
-                filterKey="search"
-                value={filter.search}
-                onClose={() => handleSearchChange('')}
+            <UI.Div>
+              <SearchBar
+                search={filter.search}
+                onSearchChange={handleSearchTermChange}
               />
-              <Table.FilterButton
-                condition={!!filter.firstName}
-                filterKey="recipientFirstName"
-                value={filter.firstName}
-                onClose={() => handleRecipientFirstName('')}
-              />
-              <Table.FilterButton
-                condition={!!filter.lastName}
-                filterKey="recipientLastName"
-                value={filter.lastName}
-                onClose={() => handleRecipientLastName('')}
-              />
-              <Table.FilterButton
-                condition={!!(filter.startDate || filter.endDate)}
-                filterKey="updatedAt"
-                value={`${formatSimpleDate(filter.startDate?.toISOString())} - ${formatSimpleDate(filter.endDate?.toISOString())}`}
-                onClose={() => handleMultiDateFilterChange(undefined, undefined)}
-              />
-              <Table.FilterButton
-                condition={!!filter.email}
-                filterKey="recipientEmail"
-                value={filter.email}
-                onClose={() => handleRecipientEmail('')}
-              />
-            </UI.Stack>
+            </UI.Div>
 
           </UI.Flex>
 
