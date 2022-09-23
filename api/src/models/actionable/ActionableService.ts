@@ -23,21 +23,40 @@ class ActionableService {
     this.issuePrismaAdapter = new IssuePrismaAdapter(prisma);
   }
 
+  /**
+   * Sets the status of an actionable
+   */
   public async setActionableStatus(input: SetActionableStatusInput) {
     const updateArgs: Prisma.ActionableUpdateInput = { status: input.status };
     const result = await this.actionablePrismaAdapter.updateActionable(input.actionableId, updateArgs);
     return result;
   };
 
+  /**
+   * Assigns a user to an actionable
+   */
   public async assignUserToActionable(input: AssignUserToActionableInput) {
     const result = await this.actionablePrismaAdapter.assignUserToActionable(input);
     return result;
   };
 
+  /**
+   * Finds all actionables of an specific issue based on a filter
+   * @param issueId 
+   * @param filter 
+   */
   public async findActionablesByIssueId(issueId: string, filter?: ActionableFilterInput) {
     return this.actionablePrismaAdapter.findActionablesByIssue(issueId, filter);
   }
 
+  /**
+   * Finds all actionables assigned to a user within a workspace.
+   * @param workspaceId 
+   * @param userId - id of the user requesting the function
+   * @param canAccessAllActionables - if set to true, can see all actionables no matter whether you are assigned
+   * @param filter 
+   * @returns a paginated subset of actionables
+   */
   public async findPaginatedWorkspaceActionables(
     workspaceId: string,
     userId: string,
@@ -63,6 +82,10 @@ class ActionableService {
     };
   }
 
+  /**
+   * Finds all actionables of a specific issue based on a filter.
+   * @returns a paginated subset of actionables
+   */
   public async findPaginatedActionables(issueId: string, filter?: ActionableConnectionFilterInput) {
     const offset = filter?.offset ?? 0;
     const perPage = filter?.perPage ?? 5;
