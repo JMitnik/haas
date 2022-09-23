@@ -1,4 +1,5 @@
 import { DateFormat } from 'hooks/useDate';
+import { isEqual } from 'date-fns';
 import React, { useEffect, useState } from 'react';
 import ReactDatePicker from 'react-datepicker';
 
@@ -43,7 +44,10 @@ export const RangeDatePicker = ({ startDate, endDate, onChange, changeWhenFullRa
    * This is a workaround to prevent the onChange handle from pushing any "unfinished" calendar events.
    */
   useEffect(() => {
-    // If `changeWhenFullRange` is disabled, always synchronize with local datepicker.
+    if (isEqual(localStartDate, startDate) && isEqual(localEndDate, endDate)) return;
+
+    console.log(localStartDate, localEndDate, onChange, changeWhenFullRange);
+
     if (!changeWhenFullRange) {
       onChange([localStartDate, localEndDate]);
       return;
@@ -80,6 +84,7 @@ export const RangeDatePicker = ({ startDate, endDate, onChange, changeWhenFullRa
 type DatePickerProps = SingleDatePickerProps | RangeDatePickerProps;
 
 export const DatePicker = (props: DatePickerProps) => {
+  console.log('date picker props: ', props);
   switch (props.type) {
     case 'single': {
       return <SingleDatePicker {...props} />;
