@@ -40,7 +40,7 @@ import { useMenu } from 'components/Common/Menu/useMenu';
 import SearchBar from 'components/Common/SearchBar/SearchBar';
 
 import { ContactableUserCell } from './InteractionTableCells';
-import { InteractionModalCard } from '../InteractionsOverview/InteractionModalCard';
+import { InteractionModalCard } from './InteractionModalCard';
 
 const DateCell = ({ timestamp }: { timestamp: string }) => {
   const date = new Date(parseInt(timestamp, 10));

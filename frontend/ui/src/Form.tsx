@@ -774,14 +774,6 @@ export const DatePickerContainer = styled.div`
   `}
 `;
 
-// export const PureDatePickerWrapper = (props: PureDatePickerProps) => (
-//   <AntdDatepicker
-//     // @ts-ignore
-//     getPopupContainer={triggerNode => triggerNode.parentNode}
-//     {...props}
-//   />
-// );
-
 const useDebouncedEffect = (
   callback: () => any, delay = 250, dependencies?: any[],
 ) => useEffect(() => {
