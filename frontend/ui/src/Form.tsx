@@ -1,8 +1,6 @@
 import React, { forwardRef, Ref, ReactNode, useState, useEffect, useRef, useMemo } from 'react';
 import 'antd/dist/antd.css'; // Slider,
 import 'easymde/dist/easymde.min.css'; // Markdown
-import AntdDatePickerGenerate from 'rc-picker/es/generate/dateFns';
-import generatePicker from 'antd/es/date-picker/generatePicker';
 import {
   Slider as AntdSlider,
 } from 'antd';
@@ -38,10 +36,6 @@ import { Flex, Grid } from './Container';
 import { Card } from './Cards';
 import { Span } from './Span';
 import { Helper, Text } from './Type';
-
-const AntdDatepicker = generatePicker<Date>(AntdDatePickerGenerate);
-const { RangePicker: AntdRangePicker } = AntdDatepicker;
-
 interface FormContainerProps {
   expandedForm?: boolean;
 }
@@ -780,13 +774,13 @@ export const DatePickerContainer = styled.div`
   `}
 `;
 
-export const PureDatePickerWrapper = (props: PureDatePickerProps) => (
-  <AntdDatepicker
-    // @ts-ignore
-    getPopupContainer={triggerNode => triggerNode.parentNode}
-    {...props}
-  />
-);
+// export const PureDatePickerWrapper = (props: PureDatePickerProps) => (
+//   <AntdDatepicker
+//     // @ts-ignore
+//     getPopupContainer={triggerNode => triggerNode.parentNode}
+//     {...props}
+//   />
+// );
 
 const useDebouncedEffect = (
   callback: () => any, delay = 250, dependencies?: any[],
@@ -824,30 +818,6 @@ export const DebouncedInput = ({ value, onChange }: { value: any, onChange: (val
     />
   )
 }
-
-export const RangeDatePickerWrapper = (props: RangePickerProps) => (
-  <AntdRangePicker
-    // @ts-ignore
-    getPopupContainer={triggerNode => triggerNode.parentNode}
-    {...props} />
-);
-
-export const DatePicker = ({ range, ...restProps }: RangePickerProps | PureDatePickerProps) => (
-  <DatePickerContainer>
-    {range !== undefined ? (
-      <RangeDatePickerWrapper
-        {...range}
-        format={'dd-MM-yyyy'}
-        {...restProps as RangePickerProps}
-      />
-    ) : (
-      <PureDatePickerWrapper
-        {...restProps as PureDatePickerProps}
-        format={'dd-MM-yyyy'}
-      />
-    )}
-  </DatePickerContainer>
-);
 
 export const Switch = styled.div`
   ${({ theme }) => css`
