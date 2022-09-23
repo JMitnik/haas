@@ -173,20 +173,6 @@ export const FeedbackOverview = () => {
   const { menuProps, openMenu, closeMenu, activeItem: contextInteraction } = useMenu<SessionFragmentFragment>();
   const columns = '50px minmax(200px, 1fr) minmax(150px, 1fr) minmax(300px, 1fr) minmax(300px, 1fr)';
 
-  // useEffect(() => {
-  //   if (filter.startDate && filter.endDate) {
-  //     setDateRange([
-  //       endOfDay(parse(filter.startDate, DateFormat.DayTimeFormat)),
-  //       startOfDay(parse(filter.endDate, DateFormat.DayTimeFormat)),
-  //     ]);
-  //   } else {
-  //     setDateRange([
-  //       undefined,
-  //       undefined,
-  //     ]);
-  //   }
-  // }, [filter.startDate, filter.endDate]);
-
   return (
     <View documentTitle="haas | Feedback">
       <UI.ViewBody>
