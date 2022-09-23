@@ -19,7 +19,7 @@ import {
   useGetWorkspaceSummaryDetailsQuery,
   useResetWorkspaceDataMutation,
 } from 'types/generated-types';
-import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModalCard';
+import { InteractionModalCard } from 'views/FeedbackView/InteractionModalCard';
 import { SimpleIssueTable } from 'components/Analytics/Issues/SimpleIssueTable';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useNavigator } from 'hooks/useNavigator';

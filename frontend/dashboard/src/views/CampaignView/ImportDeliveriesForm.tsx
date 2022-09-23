@@ -97,7 +97,8 @@ export const ImportDeliveriesForm = ({ onClose, onComplete }: ImportDeliveriesFo
           />
         </UI.FormControl>
 
-        <UI.FormControl isRequired>
+        {/* TODO: implement new date picker as this antd variant is not supported anymore */}
+        {/* <UI.FormControl isRequired>
           <UI.FormLabel>{t('scheduled_at')}</UI.FormLabel>
           <UI.FormLabelHelper>{t('scheduled_at_helper')}</UI.FormLabelHelper>
           <UI.Div>
@@ -118,7 +119,7 @@ export const ImportDeliveriesForm = ({ onClose, onComplete }: ImportDeliveriesFo
               )}
             />
           </UI.Div>
-        </UI.FormControl>
+        </UI.FormControl> */}
 
       </UI.InputGrid>
       <UI.Button

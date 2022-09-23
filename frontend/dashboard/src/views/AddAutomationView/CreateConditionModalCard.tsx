@@ -521,7 +521,8 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                       <UI.ErrorMessage>{form.formState.errors.scopeType?.message}</UI.ErrorMessage>
                     </UI.FormControl>
 
-                    <UI.FormControl display="none">
+                    {/* TODO: implement new date picker as this antd variant is not supported anymore */}
+                    {/* <UI.FormControl display="none">
                       <UI.FormLabel>{t('automation:date_range')}</UI.FormLabel>
                       <UI.FormLabelHelper>{t('automation:date_range_helper')}</UI.FormLabelHelper>
                       <UI.Div>
@@ -538,7 +539,7 @@ export const CreateConditionModalCard = ({ onClose, onSuccess }: NewCTAModalCard
                           )}
                         />
                       </UI.Div>
-                    </UI.FormControl>
+                    </UI.FormControl> */}
 
                     <UI.FormControl isRequired isInvalid={!!form.formState.errors.latest}>
                       <UI.FormLabel htmlFor="latest">

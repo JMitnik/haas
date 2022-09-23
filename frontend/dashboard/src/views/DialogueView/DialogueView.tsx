@@ -24,7 +24,7 @@ import { HexagonGrid } from 'components/Analytics/WorkspaceGrid/HexagonGrid';
 import {
   HexagonNode, HexagonNodeType, HexagonSessionNode,
 } from 'components/Analytics/WorkspaceGrid/WorkspaceGrid.types';
-import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModalCard';
+import { InteractionModalCard } from 'views/FeedbackView/InteractionModalCard';
 import { PatternCircles } from '@visx/pattern';
 import { Statistic } from 'components/Analytics/WorkspaceGrid/Statistic';
 import { View } from 'layouts/View';
