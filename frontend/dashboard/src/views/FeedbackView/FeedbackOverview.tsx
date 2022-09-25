@@ -15,12 +15,13 @@ import {
 import { endOfDay, format, startOfDay } from 'date-fns';
 import { isPresent } from 'ts-is-present';
 import { useTranslation } from 'react-i18next';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import * as Menu from 'components/Common/Menu';
 import * as Modal from 'components/Common/Modal';
 import * as Table from 'components/Common/Table';
 import { DateFormat, useDate } from 'hooks/useDate';
+import { DatePicker } from 'components/Common/DatePicker';
 import {
   Dialogue,
   SessionConnectionOrder,
@@ -39,7 +40,7 @@ import { useMenu } from 'components/Common/Menu/useMenu';
 import SearchBar from 'components/Common/SearchBar/SearchBar';
 
 import { ContactableUserCell } from './InteractionTableCells';
-import { InteractionModalCard } from '../InteractionsOverview/InteractionModalCard';
+import { InteractionModalCard } from './InteractionModalCard';
 
 const DateCell = ({ timestamp }: { timestamp: string }) => {
   const date = new Date(parseInt(timestamp, 10));
@@ -77,17 +78,25 @@ const setFilterDialogueIds = (activeDialogue?: Dialogue | null, dialogueIds?: (s
 
 export const FeedbackOverview = () => {
   const { t } = useTranslation();
-  const { parse, format: dateFormat } = useDate();
+  const { format: dateFormat, getOneWeekAgo, getEndOfToday } = useDate();
   const { activeCustomer } = useCustomer();
   const { formatScore } = useFormatter();
   const { activeDialogue } = useDialogue();
 
   const [modalIsOpen, setModalIsOpen] = useState({ isOpen: false, sessionId: '' });
   const [sessions, setSessions] = useState<SessionFragmentFragment[]>(() => []);
+  const [dateRange, setDateRange] = useState<[Date, Date]>(() => {
+    const startDate = getOneWeekAgo();
+    const endDate = getEndOfToday();
+
+    return [startDate, endDate];
+  });
+
+  const [startDate, endDate] = dateRange;
 
   const [filter, setFilter] = useQueryParams({
-    startDate: StringParam,
-    endDate: StringParam,
+    startDate: withDefault(StringParam, dateFormat(startDate, DateFormat.DayTimeFormat)),
+    endDate: withDefault(StringParam, dateFormat(endDate, DateFormat.DayTimeFormat)),
     search: StringParam,
     pageIndex: withDefault(NumberParam, 0),
     perPage: withDefault(NumberParam, 10),
@@ -107,9 +116,9 @@ export const FeedbackOverview = () => {
       workspaceId: activeCustomer?.id as string,
       filter: {
         offset: filter.pageIndex * filter.perPage,
-        startDate: filter.startDate ? filter.startDate : undefined,
+        startDate: startDate ? dateFormat(startOfDay(startDate), DateFormat.DayTimeFormat) : undefined,
         perPage: filter.perPage,
-        endDate: filter.endDate ? filter.endDate : undefined,
+        endDate: endDate ? dateFormat(endOfDay(endDate), DateFormat.DayTimeFormat) : undefined,
         orderBy: {
           by: filter.orderByField as SessionConnectionOrder,
           desc: filter.orderByDescending,
@@ -135,25 +144,6 @@ export const FeedbackOverview = () => {
       setTotalPages(fetchedData?.customer?.sessionConnection?.totalPages || 0);
     },
   });
-
-  const handleDateChange = (dates: Date[] | null) => {
-    if (dates) {
-      const [newStartDate, newEndDate] = dates;
-      setFilter({
-        ...filter,
-        startDate: dateFormat(startOfDay(newStartDate), DateFormat.DayTimeFormat),
-        endDate: dateFormat(endOfDay(newEndDate), DateFormat.DayTimeFormat),
-        pageIndex: 0,
-      });
-    } else {
-      setFilter({
-        ...filter,
-        startDate: null,
-        endDate: null,
-        pageIndex: 0,
-      });
-    }
-  };
 
   const handleSingleDateFilterChange = (day: Date) => {
     setFilter({
@@ -196,14 +186,13 @@ export const FeedbackOverview = () => {
           </UI.Flex>
         </UI.Div>
         <UI.Flex mb={2} justifyContent="space-between" alignItems="center">
-          <UI.Flex mb={2} justifyContent="flex-start">
+          <UI.Flex alignItems="center" justifyContent="flex-start">
             <PickerButton label={t('add_filter')} icon={<Plus />}>
               {() => (
                 <TabbedMenu
                   menuHeader={t('add_filter')}
                   tabs={[
                     { label: t('search'), icon: <Search /> },
-                    { label: t('date'), icon: <Calendar /> },
                     { label: t('score'), icon: <BarChart2 /> },
                   ]}
                 >
@@ -219,28 +208,6 @@ export const FeedbackOverview = () => {
                         search={filter.search}
                         onSearchChange={handleSearchTermChange}
                       />
-                    </UI.Stack>
-                  </UI.Div>
-
-                  <UI.Div id="dateFilter">
-                    <UI.Stack spacing={2}>
-                      <UI.RadioHeader>
-                        {t('filter_by_date')}
-                      </UI.RadioHeader>
-                      <UI.Div mb={1}>
-                        <UI.Muted>{t('show_interactions_between')}</UI.Muted>
-                      </UI.Div>
-                      <UI.Div>
-                        <UI.DatePicker
-                          value={[
-                            filter.startDate ? parse(filter.startDate, DateFormat.DayTimeFormat) : undefined,
-                            filter.endDate ? parse(filter.endDate, DateFormat.DayTimeFormat) : undefined,
-                          ]}
-                          onChange={handleDateChange}
-                          range
-                        />
-                      </UI.Div>
-                      <UI.Button size="sm" onClick={() => handleDateChange(null)}>{t('reset')}</UI.Button>
                     </UI.Stack>
                   </UI.Div>
 
@@ -278,12 +245,6 @@ export const FeedbackOverview = () => {
                 onClose={() => setFilter({ search: '' })}
               />
               <Table.FilterButton
-                condition={!!(filter.startDate || filter.endDate)}
-                filterKey="date"
-                value={`${filter.startDate ? format(parse(filter.startDate, DateFormat.DayTimeFormat), DateFormat.DayFormat) : 'N/A'} - ${filter.endDate ? format(parse(filter.endDate, DateFormat.DayTimeFormat), DateFormat.DayFormat) : 'N/A'}`}
-                onClose={() => setFilter({ startDate: undefined, endDate: undefined })}
-              />
-              <Table.FilterButton
                 condition={!!filter.dialogueIds?.length}
                 filterKey="team"
                 value={`${!!filter.dialogueIds?.length && filter?.dialogueIds?.length > 1
@@ -308,10 +269,23 @@ export const FeedbackOverview = () => {
             </UI.Stack>
 
           </UI.Flex>
-          <SearchBar
-            search={filter.search}
-            onSearchChange={handleSearchTermChange}
-          />
+          <UI.Flex alignItems="center">
+            <DatePicker
+              type="range"
+              format={DateFormat.DayTimeFormat}
+              startDate={startDate}
+              endDate={endDate}
+              onChange={setDateRange}
+            />
+            <UI.Div ml={2}>
+              <SearchBar
+                search={filter.search}
+                onSearchChange={handleSearchTermChange}
+              />
+            </UI.Div>
+
+          </UI.Flex>
+
         </UI.Flex>
         <UI.Div width="100%">
           <Table.HeadingRow gridTemplateColumns={columns}>
