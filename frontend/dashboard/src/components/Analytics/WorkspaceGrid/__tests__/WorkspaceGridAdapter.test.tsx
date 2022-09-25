@@ -5,7 +5,7 @@ import { WorkspaceGridAdapter } from '../WorkspaceGridAdapter';
 import { mockGetWorkspaceDialogueStatistics, mockQueryDialogueConnection } from './helpers';
 
 const renderComponent = () => {
-  render(<WorkspaceGridAdapter backgroundColor="red" height={100} width={100} />);
+  render(<WorkspaceGridAdapter backgroundColor="red" />);
 };
 
 test('render layers', async () => {

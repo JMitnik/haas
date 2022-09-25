@@ -467,6 +467,14 @@ export const WorkspaceGrid = ({
             <Zoom<SVGElement>
               width={width}
               height={height}
+              initialTransformMatrix={{
+                translateX: width / 2.5,
+                translateY: height / 2,
+                scaleX: 1,
+                scaleY: 1,
+                skewX: 0,
+                skewY: 0,
+              }}
               scaleYMax={1.5}
               scaleYMin={0.5}
             >
