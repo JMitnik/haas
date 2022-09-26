@@ -11,6 +11,10 @@ const language = {
     },
   },
   general: {
+    save_template_related_questions: {
+      en: 'Save for template-related questions?',
+      de: 'Für vorlagenbezogene Fragen speichern?',
+    },
     save_pre_form: {
       en: 'Save Pre-Form',
       de: 'Save Pre-Form',

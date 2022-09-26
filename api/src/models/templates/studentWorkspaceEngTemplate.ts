@@ -1,5 +1,5 @@
 import { LanguageEnum, NodeType } from '@prisma/client';
-import { defaultAdminRole, defaultBotRole, defaultManagerRole, defaultSportTextFieldForm, defaultStudentTextFieldForm, defaultUserRole, DemoWorkspaceTemplate } from './TemplateTypes';
+import { defaultAdminRole, defaultBotRole, defaultManagerRole, defaultStudentTextFieldForm, defaultUserRole, DemoWorkspaceTemplate } from './TemplateTypes';
 
 const studentOptions = [
   { value: 'Physical & Mental', position: 1 },
@@ -21,6 +21,9 @@ const studentWorkspaceTemplate: DemoWorkspaceTemplate = {
       children: [
         {
           title: 'What\'s going well?',
+          topic: {
+            name: 'VERY_POSITIVE',
+          },
           type: NodeType.CHOICE,
           edge: {
             conditionType: 'valueBoundary',
@@ -33,6 +36,9 @@ const studentWorkspaceTemplate: DemoWorkspaceTemplate = {
         },
         {
           title: 'What\'s going well, but can be improved?',
+          topic: {
+            name: 'POSITIVE',
+          },
           type: NodeType.CHOICE,
           edge: {
             conditionType: 'valueBoundary',
@@ -45,6 +51,9 @@ const studentWorkspaceTemplate: DemoWorkspaceTemplate = {
         },
         {
           title: 'What is bothering you?',
+          topic: {
+            name: 'NEGATIVE',
+          },
           type: NodeType.CHOICE,
           edge: {
             conditionType: 'valueBoundary',
@@ -57,6 +66,9 @@ const studentWorkspaceTemplate: DemoWorkspaceTemplate = {
         },
         {
           title: 'What is bothering you?',
+          topic: {
+            name: 'VERY_NEGATIVE',
+          },
           type: NodeType.CHOICE,
           edge: {
             conditionType: 'valueBoundary',

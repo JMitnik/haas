@@ -2,6 +2,7 @@ import { extendType } from 'nexus';
 import { UserInputError } from 'apollo-server';
 
 import { UserCustomerType } from '../../users/graphql/User';
+import { assertNonNullish } from '../../../utils/assertNonNullish';
 
 export const GetUserCustomerOfCustomer = extendType({
   type: 'Customer',
@@ -13,6 +14,7 @@ export const GetUserCustomerOfCustomer = extendType({
       nullable: true,
 
       async resolve(parent, args, ctx) {
+        assertNonNullish(parent.id, 'Cannot find workspace id!');
         if (!args.userId) throw new UserInputError('No valid user id provided');
 
         const customerWithUsers = await ctx.prisma.customer.findUnique({

@@ -1,3 +1,4 @@
+import { GraphQLYogaError } from '@graphql-yoga/node';
 import { inputObjectType, objectType } from 'nexus';
 
 import { FormNodeField, QuestionNodeType } from '../QuestionNode/QuestionNode';
@@ -55,16 +56,11 @@ export const NodeEntryType = objectType({
   name: 'NodeEntry',
 
   definition(t) {
-    t.string('creationDate');
+    t.date('creationDate');
 
     // TODO: Make non-nullable in schema
     t.int('depth', {
       nullable: true,
-      resolve(parent) {
-        if (!parent.depth) return 0;
-
-        return parent.depth;
-      },
     });
 
     t.id('id', { nullable: true });
@@ -90,6 +86,7 @@ export const NodeEntryType = objectType({
       nullable: true,
 
       async resolve(parent, args, ctx) {
+        if (!parent.id) throw new GraphQLYogaError('Cant find parent node entry')
         const nodeEntryValues = await ctx.services.nodeEntryService.findNodeEntryValues(parent.id);
         return nodeEntryValues;
       },
