@@ -99,7 +99,7 @@ export const buildFindActionablesWhereInput = (
 
 export const buildUpdateActionableAssignee = (
   input: AssignUserToActionableInput
-): Prisma.UserUpdateOneWithoutActionablesInput => {
+): Prisma.UserUpdateOneWithoutActionablesNestedInput => {
   return {
     disconnect: input.assigneeId ? undefined : true,
     connect: input.assigneeId ? {

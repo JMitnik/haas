@@ -12,7 +12,7 @@ type AWSImageType {
 type Actionable {
   assignee: UserType
   assigneeId: String
-  createdAt: String
+  createdAt: Date
   dialogue: Dialogue
   dialogueId: String
   id: ID
@@ -22,7 +22,7 @@ type Actionable {
   requestEmail: String
   session: Session
   status: ActionableState!
-  updatedAt: String
+  updatedAt: Date
 }
 
 type ActionableConnection implements ConnectionInterface {
