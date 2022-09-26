@@ -298,6 +298,7 @@ class DialoguePrismaAdapter {
         questions: {
           create: questions.map((question) => ({
             id: question.id,
+            topic: question.topic,
             isRoot: question.isRoot,
             isLeaf: question.isLeaf,
             title: question.title,
@@ -363,7 +364,11 @@ class DialoguePrismaAdapter {
     return dialogue.questions;
   };
 
-  async update(dialogueId: string, updateArgs: Prisma.DialogueUpdateInput, include?: Prisma.DialogueInclude | null | undefined): Promise<Dialogue> {
+  async update(
+    dialogueId: string,
+    updateArgs: Prisma.DialogueUpdateInput,
+    include?: Prisma.DialogueInclude | null | undefined
+  ): Promise<Dialogue> {
     return this.prisma.dialogue.update({
       where: {
         id: dialogueId,
@@ -755,6 +760,7 @@ class DialoguePrismaAdapter {
     edges: {
       parentNodeId: string;
       childNodeId: string;
+      // eslint-disable-next-line max-len
       conditions: Array<{ conditionType: string; matchValue: string | null; renderMin: number | null; renderMax: number | null }>;
     }[]
   ) {

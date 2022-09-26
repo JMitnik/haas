@@ -1,5 +1,5 @@
 import { LanguageEnum, NodeType } from '@prisma/client';
-import WorkspaceTemplate, { defaultAdminRole, defaultBotRole, defaultForm, defaultManagerRole, defaultUserRole, DemoWorkspaceTemplate } from './TemplateTypes';
+import { defaultAdminRole, defaultBotRole, defaultForm, defaultManagerRole, defaultUserRole, DemoWorkspaceTemplate } from './TemplateTypes';
 
 const teacherOptionsNl = [
   { value: 'Lichaam & Geest', position: 1 },
@@ -21,6 +21,9 @@ const sportWorkspaceTemplate: DemoWorkspaceTemplate = {
       children: [
         {
           title: 'Fijn om te horen! Waar ben je het meest tevreden over?',
+          topic: {
+            name: 'VERY_POSITIVE',
+          },
           type: NodeType.CHOICE,
           edge: {
             conditionType: 'valueBoundary',
@@ -33,6 +36,9 @@ const sportWorkspaceTemplate: DemoWorkspaceTemplate = {
         },
         {
           title: 'Je bent niet helemaal tevreden dus. Wat kan er beter?',
+          topic: {
+            name: 'POSITIVE',
+          },
           type: NodeType.CHOICE,
           edge: {
             conditionType: 'valueBoundary',
@@ -45,6 +51,9 @@ const sportWorkspaceTemplate: DemoWorkspaceTemplate = {
         },
         {
           title: 'Wat vervelend! Wat is er aan de hand?',
+          topic: {
+            name: 'NEGATIVE',
+          },
           type: NodeType.CHOICE,
           edge: {
             conditionType: 'valueBoundary',
@@ -57,6 +66,9 @@ const sportWorkspaceTemplate: DemoWorkspaceTemplate = {
         },
         {
           title: 'Wat vervelend! Wat is er aan de hand?',
+          topic: {
+            name: 'VERY_NEGATIVE',
+          },
           type: NodeType.CHOICE,
           edge: {
             conditionType: 'valueBoundary',
