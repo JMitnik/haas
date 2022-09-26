@@ -866,7 +866,7 @@ export interface NexusGenInputs {
 
 export interface NexusGenEnums {
   ActionableConnectionOrderType: "createdAt"
-  ActionableState: "COMPLETED" | "DROPPED" | "PENDING" | "STALE"
+  ActionableState: prisma.ActionableState
   AutomationActionChannelType: prisma.AutomationActionChannelType
   AutomationActionType: prisma.AutomationActionType
   AutomationConditionBuilderType: prisma.AutomationConditionBuilderType
@@ -903,7 +903,7 @@ export interface NexusGenEnums {
   SessionConnectionOrder: "createdAt" | "dialogueId"
   SessionDeliveryType: "campaigns" | "noCampaigns"
   StatusType: "CLOSED" | "IN_PROGRESS" | "OPEN"
-  SystemPermission: "CAN_ACCESS_ADMIN_PANEL" | "CAN_ACCESS_REPORT_PAGE" | "CAN_ADD_USERS" | "CAN_ASSIGN_USERS_TO_DIALOGUE" | "CAN_BUILD_DIALOGUE" | "CAN_CREATE_AUTOMATIONS" | "CAN_CREATE_CAMPAIGNS" | "CAN_CREATE_DELIVERIES" | "CAN_CREATE_TRIGGERS" | "CAN_DELETE_DIALOGUE" | "CAN_DELETE_TRIGGERS" | "CAN_DELETE_USERS" | "CAN_DELETE_WORKSPACE" | "CAN_DOWNLOAD_REPORTS" | "CAN_EDIT_DIALOGUE" | "CAN_EDIT_USERS" | "CAN_EDIT_WORKSPACE" | "CAN_GENERATE_WORKSPACE_FROM_CSV" | "CAN_RESET_WORKSPACE_DATA" | "CAN_UPDATE_AUTOMATIONS" | "CAN_VIEW_AUTOMATIONS" | "CAN_VIEW_CAMPAIGNS" | "CAN_VIEW_DIALOGUE" | "CAN_VIEW_DIALOGUE_ANALYTICS" | "CAN_VIEW_USERS"
+  SystemPermission: "CAN_ACCESS_ADMIN_PANEL" | "CAN_ACCESS_ALL_ACTION_REQUESTS" | "CAN_ACCESS_REPORT_PAGE" | "CAN_ADD_USERS" | "CAN_ASSIGN_USERS_TO_DIALOGUE" | "CAN_BUILD_DIALOGUE" | "CAN_CREATE_AUTOMATIONS" | "CAN_CREATE_CAMPAIGNS" | "CAN_CREATE_DELIVERIES" | "CAN_CREATE_TRIGGERS" | "CAN_DELETE_DIALOGUE" | "CAN_DELETE_TRIGGERS" | "CAN_DELETE_USERS" | "CAN_DELETE_WORKSPACE" | "CAN_DOWNLOAD_REPORTS" | "CAN_EDIT_DIALOGUE" | "CAN_EDIT_USERS" | "CAN_EDIT_WORKSPACE" | "CAN_GENERATE_WORKSPACE_FROM_CSV" | "CAN_RESET_WORKSPACE_DATA" | "CAN_UPDATE_AUTOMATIONS" | "CAN_VIEW_ACTION_REQUESTS" | "CAN_VIEW_AUTOMATIONS" | "CAN_VIEW_CAMPAIGNS" | "CAN_VIEW_DIALOGUE" | "CAN_VIEW_DIALOGUE_ANALYTICS" | "CAN_VIEW_USERS"
   TagTypeEnum: "AGENT" | "DEFAULT" | "LOCATION"
   TopicEnumType: "SYSTEM" | "WORKSPACE"
   TriggerConditionEnum: prisma.TriggerConditionEnum
@@ -933,20 +933,7 @@ export interface NexusGenObjects {
     mimetype?: string | null; // String
     url?: string | null; // String
   }
-  Actionable: { // root type
-    assignee?: NexusGenRootTypes['UserType'] | null; // UserType
-    assigneeId?: string | null; // String
-    createdAt?: string | null; // String
-    dialogue?: NexusGenRootTypes['Dialogue'] | null; // Dialogue
-    dialogueId?: string | null; // String
-    id?: string | null; // ID
-    isVerified: boolean; // Boolean!
-    issue?: NexusGenRootTypes['IssueModel'] | null; // IssueModel
-    issueId?: string | null; // String
-    session?: NexusGenRootTypes['Session'] | null; // Session
-    status: NexusGenEnums['ActionableState']; // ActionableState!
-    updatedAt?: string | null; // String
-  }
+  Actionable: prisma.Actionable;
   ActionableConnection: { // root type
     actionables?: Array<NexusGenRootTypes['Actionable'] | null> | null; // [Actionable]
     pageInfo?: NexusGenRootTypes['PaginationPageInfo'] | null; // PaginationPageInfo
@@ -1246,14 +1233,7 @@ export interface NexusGenObjects {
     didAlreadyExist?: boolean | null; // Boolean
     didInvite?: boolean | null; // Boolean
   }
-  Issue: { // root type
-    createdAt?: NexusGenScalars['Date'] | null; // Date
-    followUpAction?: NexusGenEnums['SessionActionType'] | null; // SessionActionType
-    id?: string | null; // ID
-    rankScore?: number | null; // Float
-    topic?: string | null; // String
-    updatedAt?: NexusGenScalars['Date'] | null; // Date
-  }
+  Issue: prisma.Issue;
   IssueConnection: { // root type
     issues?: Array<NexusGenRootTypes['IssueModel'] | null> | null; // [IssueModel]
     pageInfo?: NexusGenRootTypes['PaginationPageInfo'] | null; // PaginationPageInfo

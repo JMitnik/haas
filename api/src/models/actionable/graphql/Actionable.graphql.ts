@@ -17,7 +17,7 @@ export const ActionableType = objectType({
     t.string('assigneeId');
     t.string('issueId');
     t.string('requestEmail', {
-      resolve(parent) {
+      resolve(parent: any) {
         return parent.requestEmail
       },
     });
