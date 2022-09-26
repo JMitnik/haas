@@ -5,8 +5,6 @@ import _, { groupBy } from 'lodash';
 import { Topic } from '../../Topic/graphql';
 import { ActionableType } from '../../actionable/graphql/Actionable.graphql';
 import { ActionableStatistics } from './ActionableStats.graphql';
-import { ActionableValidator } from '../../actionable/ActionableValidator';
-import { ActionableFilterInput } from '../../actionable/Actionable.types';
 import { IssueWithActionables } from '../Issue.types';
 import { ActionableConnection, ActionableConnectionFilterInput } from '../../actionable/graphql';
 
