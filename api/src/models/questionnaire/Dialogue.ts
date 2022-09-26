@@ -47,15 +47,11 @@ export const DialogueFinisherType = objectType({
 export const DialogueType = objectType({
   name: 'Dialogue',
   definition(t) {
-    t.nonNull.id('id');
+    t.nonNull.string('id');
     t.nonNull.string('title');
     t.nonNull.string('slug');
     t.nonNull.string('description');
-    t.string('template', {
-      resolve(parent) {
-        return parent.template;
-      },
-    });
+    t.string('template');
 
     // Placeholder data related properties
     t.boolean('isWithoutGenData');
@@ -67,8 +63,8 @@ export const DialogueType = objectType({
     t.boolean('isPrivate');
 
     t.string('publicTitle', { nullable: true });
-    t.string('creationDate', { nullable: true });
-    t.string('updatedAt', { nullable: true });
+    t.date('creationDate', { nullable: true });
+    t.date('updatedAt', { nullable: true });
 
     t.list.field('assignees', {
       nullable: true,
@@ -84,6 +80,8 @@ export const DialogueType = objectType({
         return assignees;
       },
     })
+
+    t.string('postLeafNodeId');
 
     t.field('postLeafNode', {
       type: DialogueFinisherType,

@@ -1,7 +1,7 @@
 generator client {
   provider        = "prisma-client-js"
-  output          = "./node_modules/@prisma/client"
-  previewFeatures = ["orderByRelation"]
+  output          = "./node_modules/.prisma/client"
+  previewFeatures = []
 }
 
 datasource postgresql {
@@ -189,7 +189,6 @@ model Dialogue {
 }
 
 enum FormNodeStepType {
-  CONTACT_PICKER
   GENERIC_FIELDS
 }
 
@@ -917,7 +916,6 @@ enum DialogueTemplateType {
   BUSINESS_NL
   DEFAULT
   MASS_SEED
-  TEST
 }
 
 enum QuestionImpactScore {

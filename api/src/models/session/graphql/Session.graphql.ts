@@ -14,7 +14,7 @@ export const SessionType = objectType({
 
     t.float('mainScore');
 
-    t.string('browser', { resolve: (parent) => parent?.browser || '' });
+    t.string('browser');
 
     t.int('paths', {
       async resolve(parent, args, ctx) {
@@ -38,21 +38,19 @@ export const SessionType = objectType({
     t.field('dialogue', {
       nullable: true,
       type: 'Dialogue',
-      resolve: ({ dialogueId }, _, { services }) => services.dialogueService.getDialogueById(dialogueId),
+      resolve: ({ dialogueId }, _, { services }) => services.dialogueService.getDialogueById(dialogueId as string),
     });
 
     t.int('totalTimeInSec', {
       nullable: true,
-      resolve: (parent) => parent.totalTimeInSec || null,
     });
 
     t.string('originUrl', {
       nullable: true,
-      resolve: (parent) => parent.originUrl || '',
     });
 
     t.string('device', { nullable: true });
-    t.string('deliveryId', { nullable: true, resolve: (parent) => parent.deliveryId });
+    t.string('deliveryId', { nullable: true });
 
     t.field('delivery', {
       type: 'DeliveryType',
