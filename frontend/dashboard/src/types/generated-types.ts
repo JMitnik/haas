@@ -3137,6 +3137,7 @@ export type UpdateQuestionNodeInputType = {
   extraContent?: Maybe<Scalars['String']>;
   unhappyText?: Maybe<Scalars['String']>;
   happyText?: Maybe<Scalars['String']>;
+  updateSameTemplate?: Maybe<Scalars['Boolean']>;
   sliderNode?: Maybe<SliderNodeInputType>;
   optionEntries?: Maybe<OptionsInputType>;
   edgeCondition?: Maybe<EdgeConditionInputType>;

@@ -1,11 +1,10 @@
-import { Prisma, PrismaClient, Edge, QuestionNode, QuestionOption, VideoEmbeddedNode, NodeType, Link, Share } from '@prisma/client';
-import { NexusGenInputs } from 'generated/nexus';
-import { Topic } from 'models/Topic/graphql';
+import { Prisma, PrismaClient, QuestionOption, VideoEmbeddedNode, NodeType, Link, Share, QuestionNode as BaseQuestionNode, DialogueTemplateType } from '@prisma/client';
 
+import { questionNode, QuestionNode } from './QuestionNode.types';
 import { CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType';
-import NodeService from './NodeService';
 import { QuestionOptionProps } from './NodeServiceType';
 import { CreateFormFieldsInput, UpdateFormFieldsInput, CreateCTAInput, UpdateQuestionInput, CreateLinkInput, UpdateLinkInput, CreateShareInput, UpdateShareInput, UpdateSliderNodeInput, CreateSliderNodeInput, CreateVideoEmbeddedNodeInput } from './QuestionNodePrismaAdapterType';
+import { EdgeWithConditions } from './QuestionNodePrismaAdapter.types';
 
 class QuestionNodePrismaAdapter {
   prisma: PrismaClient;
@@ -381,7 +380,7 @@ class QuestionNodePrismaAdapter {
     });
   }
 
-  delete(id: string): Promise<QuestionNode> {
+  delete(id: string): Promise<BaseQuestionNode> {
     return this.prisma.questionNode.delete({
       where: {
         id,
@@ -389,7 +388,11 @@ class QuestionNodePrismaAdapter {
     });
   };
 
-  upsertQuestionOption(id: number, create: Prisma.QuestionOptionCreateInput, update: Prisma.QuestionOptionUpdateInput): Promise<QuestionOption> {
+  upsertQuestionOption(
+    id: number,
+    create: Prisma.QuestionOptionCreateInput,
+    update: Prisma.QuestionOptionUpdateInput
+  ): Promise<QuestionOption> {
     return this.prisma.questionOption.upsert({
       where: { id },
       create,
@@ -415,21 +418,23 @@ class QuestionNodePrismaAdapter {
 
   updateQuestionOptions = async (options: QuestionOptionProps[]): Promise<{ id: number }[]> => Promise.all(
     options?.map(async (option) => {
-      const optionId = option.id ? option.id : -1
+      const optionId = option.id ? option.id : -1;
       const optionCreateInput = {
         value: option.value,
         publicValue: option.publicValue,
         overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : undefined,
         position: option.position,
         isTopic: option.isTopic,
-      }
+      };
+
       const optionUpdateInput = {
         value: option.value,
         publicValue: option.publicValue,
         overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : { disconnect: true },
         position: option.position,
         isTopic: option.isTopic,
-      }
+      };
+
       const updatedQOption = await this.upsertQuestionOption(optionId, optionCreateInput, optionUpdateInput);
 
       return { id: updatedQOption.id };
@@ -437,8 +442,7 @@ class QuestionNodePrismaAdapter {
   );
 
   async updateDialogueBuilderNode(nodeId: string, data: UpdateQuestionInput) {
-    const { title, type, options, currentOverrideLeafId, overrideLeafId, videoEmbeddedNode } = data;
-    const leaf = NodeService.constructUpdateLeafState(currentOverrideLeafId || null, overrideLeafId || null);
+    const { title, type, options, overrideLeafId, videoEmbeddedNode } = data;
     const updatedOptionIds = await this.updateQuestionOptions(options || []);
 
     // Remove videoEmbeddedNode if updated to different type
@@ -455,7 +459,13 @@ class QuestionNodePrismaAdapter {
         options: {
           connect: updatedOptionIds,
         },
-        overrideLeaf: leaf || undefined,
+        overrideLeaf: overrideLeafId ? {
+          connect: {
+            id: overrideLeafId,
+          },
+        } : {
+          disconnect: true,
+        },
         videoEmbeddedNode: embedVideoInput,
       },
       include: {
@@ -464,26 +474,91 @@ class QuestionNodePrismaAdapter {
     })
   }
 
-  getDialogueBuilderNode(nodeId: string): Promise<(QuestionNode & { videoEmbeddedNode: VideoEmbeddedNode | null; children: Edge[]; options: QuestionOption[]; questionDialogue: { id: string } | null; overrideLeaf: { id: string } | null }) | null> {
+
+  getDialogueBuilderNodes(workspaceId: string, topic: string, template: DialogueTemplateType) {
+    return this.prisma.questionNode.findMany({
+      where: {
+        questionDialogue: {
+          customerId: workspaceId,
+          template: template,
+        },
+        topic: {
+          name: topic,
+        },
+      },
+      include: {
+        topic: true,
+        videoEmbeddedNode: true,
+        children: true,
+        options: true,
+        questionDialogue: true,
+        overrideLeaf: true,
+      },
+    })
+  }
+
+  getDialogueBuilderNode(nodeId: string): Promise<QuestionNode | null> {
     return this.prisma.questionNode.findUnique({
       where: { id: nodeId },
       include: {
         videoEmbeddedNode: true,
+        topic: true,
         children: true,
         options: true,
-        questionDialogue: {
-          select: {
-            id: true,
-          },
-        },
-        overrideLeaf: {
-          select: {
-            id: true,
-          },
-        },
+        questionDialogue: true,
+        overrideLeaf: true,
       },
     });
   }
+
+  public findCTAByTopic(dialogueId: string, topic: string) {
+    return this.prisma.questionNode.findFirst({
+      include: questionNode.include,
+      where: {
+        questionDialogueId: dialogueId,
+        topic: {
+          name: topic,
+        },
+      },
+    })
+  };
+
+  public findDialogueBuilderEdges(edge: EdgeWithConditions, topic: string, workspaceId: string) {
+    return this.prisma.edge.findMany({
+      where: {
+        dialogue: {
+          customerId: workspaceId,
+        },
+        childNode: {
+          topic: {
+            name: topic,
+          },
+        },
+        OR: [
+          {
+            conditions: {
+              some: {
+                matchValue: edge.conditions[0].matchValue,
+                conditionType: edge.conditions[0].conditionType,
+              },
+            },
+          },
+          {
+            conditions: {
+              some: {
+                conditionType: edge.conditions[0].conditionType,
+                renderMin: edge.conditions[0]?.renderMin,
+                renderMax: edge.conditions[0]?.renderMax,
+              },
+            },
+          },
+        ],
+      },
+      include: {
+        conditions: true,
+      },
+    });
+  };
 
   createQuestion(question: CreateQuestionInput) {
     return this.prisma.questionNode.create({
@@ -492,6 +567,16 @@ class QuestionNodePrismaAdapter {
         isLeaf: question.isLeaf,
         title: question.title,
         type: question.type,
+        topic: question.topic?.name ? {
+          connectOrCreate: {
+            create: {
+              name: question.topic.name,
+            },
+            where: {
+              name: question.topic.name,
+            },
+          },
+        } : undefined,
         questionDialogue: question.dialogueId ? {
           connect: {
             id: question.dialogueId,
@@ -558,7 +643,7 @@ class QuestionNodePrismaAdapter {
     });
   }
 
-  create(data: Prisma.QuestionNodeCreateInput): Promise<QuestionNode> {
+  create(data: Prisma.QuestionNodeCreateInput): Promise<BaseQuestionNode> {
     return this.prisma.questionNode.create({
       data,
     });
@@ -627,9 +712,9 @@ class QuestionNodePrismaAdapter {
 
   /**
    * Disconnects fields from a FormNodeStep entry based on id array provided
-   * @param stepId 
-   * @param fields 
-   * @returns 
+   * @param stepId
+   * @param fields
+   * @returns
    */
   removeStepFields(stepId: string, fields: Array<{ id: string }>) {
     return this.prisma.formNodeStep.update({
@@ -661,7 +746,7 @@ class QuestionNodePrismaAdapter {
     });
   };
 
-  update(nodeId: string, data: Prisma.QuestionNodeUpdateInput): Promise<QuestionNode> {
+  update(nodeId: string, data: Prisma.QuestionNodeUpdateInput): Promise<BaseQuestionNode> {
     return this.prisma.questionNode.update({
       where: {
         id: nodeId,
@@ -690,12 +775,11 @@ class QuestionNodePrismaAdapter {
     return this.prisma.questionNode.findUnique({
       where: { id: nodeId },
       include: {
-        options: true,
-        videoEmbeddedNode: true,
-        isOverrideLeafOf: true,
+        ...questionNode.include,
+        isOverrideLeafOf: true, // TODO: Do we need to put this in the standard include?
       },
     });
-  }
+  };
 
   async deleteMany(questionIds: string[]): Promise<Prisma.BatchPayload> {
     return this.prisma.questionNode.deleteMany(
@@ -707,8 +791,7 @@ class QuestionNodePrismaAdapter {
         },
       },
     );
-  }
-
+  };
 }
 
 export default QuestionNodePrismaAdapter;

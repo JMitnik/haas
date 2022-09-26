@@ -818,6 +818,7 @@ export interface NexusGenInputs {
     title?: string | null; // String
     type?: string | null; // String
     unhappyText?: string | null; // String
+    updateSameTemplate?: boolean | null; // Boolean
   }
   UploadSellImageInputType: { // input type
     file?: NexusGenScalars['Upload'] | null; // Upload
