@@ -22,9 +22,9 @@ export const getCustomerOfUserResponse: GetCustomerOfUserQuery = {
       slug: 'cl1vs0dcr0000xczg6gmj6dfn',
       settings:
       {
-        id: '2',
+        id: 2,
         logoUrl: null,
-        colourSettings: { id: '2', primary: '#f47373', __typename: 'ColourSettings' },
+        colourSettings: { id: 2, primary: '#f47373', __typename: 'ColourSettings' },
         __typename: 'CustomerSettings',
       },
       campaigns: [],

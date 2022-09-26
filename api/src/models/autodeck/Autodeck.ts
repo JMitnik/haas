@@ -4,6 +4,7 @@ import { enumType, inputObjectType, mutationField, objectType, queryField } from
 import AutodeckService from './AutodeckService';
 import { PaginationWhereInput } from '../general/Pagination';
 import { NexusGenFieldTypes } from '../../generated/nexus';
+import { assertNonNullish } from '../../utils/assertNonNullish';
 
 export const JobProcessLocationType = enumType({
   name: 'JobProcessLocationType',
@@ -35,6 +36,7 @@ export const JobProcessLocation = objectType({
     t.list.field('customFields', {
       type: CustomFieldType,
       resolve(parent, args, ctx) {
+        assertNonNullish(parent.id, 'Cannot find autodeck id!');
         return ctx.services.autodeckService.getCustomFieldsOfJobProcessLocation(parent.id);
       },
     })

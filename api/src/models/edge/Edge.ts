@@ -21,8 +21,8 @@ export const EdgeType = objectType({
   name: 'Edge',
   definition(t) {
     t.id('id');
-    t.string('createdAt');
-    t.string('updatedAt');
+    t.date('createdAt');
+    t.date('updatedAt');
     t.string('parentNodeId');
     t.string('childNodeId');
 
@@ -43,7 +43,7 @@ export const EdgeType = objectType({
       nullable: true,
 
       async resolve(parent, args, ctx) {
-        if (!parent.parentNodeId) return null;
+        if (!parent.parentNodeId || !parent.childNodeId) return null;
 
         const childNode = await ctx.services.nodeService.findNodeById(parent.childNodeId);
 
@@ -55,6 +55,8 @@ export const EdgeType = objectType({
       nullable: true,
 
       async resolve(parent, args, ctx) {
+        if (!parent.id) return [];
+
         const edgeConditions = await ctx.services.edgeService.getConditionsById(parent.id);
 
         return edgeConditions || [];
