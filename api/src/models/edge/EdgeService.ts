@@ -1,4 +1,4 @@
-import { Prisma, QuestionNode, PrismaClient, QuestionCondition } from '@prisma/client';
+import { Prisma, QuestionNode, PrismaClient, QuestionCondition } from 'prisma/prisma-client';
 
 import { EdgeChildProps } from './EdgeServiceType';
 import EdgePrismaAdapter from './EdgePrismaAdapter';

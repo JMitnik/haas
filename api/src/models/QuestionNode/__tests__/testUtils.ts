@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from 'prisma/prisma-client';
 import cuid from 'cuid';
 
 export const createQuestionCreateInputs = (

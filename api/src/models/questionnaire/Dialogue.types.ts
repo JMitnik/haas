@@ -1,4 +1,4 @@
-import { NodeType, LanguageEnum, NodeEntry, QuestionOption, Session, ChoiceNodeEntry } from '@prisma/client';
+import { NodeType, LanguageEnum, NodeEntry, QuestionOption, Session, ChoiceNodeEntry } from 'prisma/prisma-client';
 
 import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';

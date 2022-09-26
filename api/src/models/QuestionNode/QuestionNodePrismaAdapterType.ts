@@ -1,4 +1,4 @@
-import { Prisma, LinkTypeEnum } from '@prisma/client'
+import { Prisma, LinkTypeEnum } from 'prisma/prisma-client'
 
 import { CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType'
 import { FormNodeInput } from './NodeServiceType';

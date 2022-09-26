@@ -1,4 +1,4 @@
-import { Customer, Role, User, UserOfCustomer } from '@prisma/client';
+import { Customer, Role, User, UserOfCustomer } from 'prisma/prisma-client';
 
 export interface DeletedUserOutput {
   deletedUser: boolean;

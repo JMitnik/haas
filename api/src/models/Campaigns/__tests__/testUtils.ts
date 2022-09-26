@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from 'prisma/prisma-client';
 
 export const prepData = async (
   prisma: PrismaClient,
@@ -68,7 +68,7 @@ export const prepDefaultData = async (prisma: PrismaClient) => {
 
   await prisma.userOfCustomer.create({
     data: {
-      customer: { connect: {  id: workspace.id } },
+      customer: { connect: { id: workspace.id } },
       user: { connect: { id: user.id } },
       role: { connect: { id: userRole.id } }
     }
@@ -77,7 +77,7 @@ export const prepDefaultData = async (prisma: PrismaClient) => {
   const campaign = await prisma.campaign.create({
     data: {
       label: 'Hmm',
-      workspace: { connect: { id: workspace.id }  },
+      workspace: { connect: { id: workspace.id } },
       variantsEdges: {
         create: [
           {

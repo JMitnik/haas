@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from 'prisma/prisma-client';
 import { orderBy } from 'lodash';
 import { isPresent } from 'ts-is-present';
 

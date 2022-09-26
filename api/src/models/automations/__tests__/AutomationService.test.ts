@@ -1,5 +1,5 @@
 import { clearDatabase } from './testUtils';
-import { AutomationConditionBuilderType, AutomationType, NodeType, PrismaClient } from '@prisma/client';
+import { AutomationConditionBuilderType, AutomationType, NodeType, PrismaClient } from 'prisma/prisma-client';
 import { sample } from 'lodash';
 
 import { prisma } from '../../../test/setup/singletonDeps';

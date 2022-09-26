@@ -1,4 +1,4 @@
-import { AutomationActionType, AutomationConditionBuilderType, AutomationEventType, Customer, Dialogue, QuestionNode } from '@prisma/client';
+import { AutomationActionType, AutomationConditionBuilderType, AutomationEventType, Customer, Dialogue, QuestionNode } from 'prisma/prisma-client';
 import { NexusGenInputs } from '../../../generated/nexus';
 import { AutomationCondition, AutomationTrigger, FullAutomationWithRels, SetupQuestionCompareDataInput } from '../AutomationTypes';
 

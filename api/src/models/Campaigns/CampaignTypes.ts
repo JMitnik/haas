@@ -1,4 +1,4 @@
-import { DeliveryStatusTypeEnum, Prisma } from '@prisma/client';
+import { DeliveryStatusTypeEnum, Prisma } from 'prisma/prisma-client';
 
 
 const campaignVariant = Prisma.validator<Prisma.CampaignVariantArgs>()({

@@ -5,7 +5,7 @@ import {
   User,
   PrismaClient,
   Dialogue,
-} from '@prisma/client';
+} from 'prisma/prisma-client';
 import { isAfter, subSeconds } from 'date-fns';
 import { isPresent } from 'ts-is-present';
 import _ from 'lodash';

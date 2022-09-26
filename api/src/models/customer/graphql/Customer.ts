@@ -1,4 +1,4 @@
-import { ColourSettings, Customer, CustomerSettings } from '@prisma/client';
+import { ColourSettings, Customer, CustomerSettings } from 'prisma/prisma-client';
 import { graphql, GraphQLError } from 'graphql';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import { arg, extendType, inputObjectType, mutationField, nonNull, objectType, scalarType } from 'nexus';

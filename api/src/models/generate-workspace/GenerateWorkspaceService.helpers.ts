@@ -1,4 +1,4 @@
-import { DialogueTemplateType } from '@prisma/client';
+import { DialogueTemplateType } from 'prisma/prisma-client';
 import templates from '../../models/templates';
 import { DemoWorkspaceTemplate } from '../../models/templates/TemplateTypes';
 

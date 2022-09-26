@@ -4,7 +4,7 @@ import { makeTestContext } from '../../../test/utils/makeTestContext';
 import AuthService from '../../auth/AuthService';
 import { prisma } from '../../../test/setup/singletonDeps';
 import { clearDatabase, createSuperAdmin, createUserWithAllRoles } from './testUtils';
-import { DialogueTemplateType, RoleTypeEnum } from '@prisma/client';
+import { DialogueTemplateType, RoleTypeEnum } from 'prisma/prisma-client';
 import businessWorkspaceTemplate from '../../../models/templates/businessWorkspaceTemplate';
 import englishSportWorkspaceTemplate from '../../../models/templates/sportWorkspaceEngTemplate';
 import dutchSportWorkspaceTemplate from '../../../models/templates/sportWorkspaceNlTemplate';

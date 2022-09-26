@@ -2,7 +2,7 @@
 import {
   AutomationActionChannelType,
   Prisma, PrismaClient,
-} from '@prisma/client';
+} from 'prisma/prisma-client';
 import { isPresent } from 'ts-is-present';
 
 import {

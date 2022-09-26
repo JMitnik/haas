@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from 'prisma/prisma-client';
 
 export const clearDatabase = async (prisma: PrismaClient) => {
   // const delUsers = prisma.user.deleteMany({});

@@ -1,7 +1,7 @@
 import {
   Prisma,
   TriggerEnum,
-} from '@prisma/client';
+} from 'prisma/prisma-client';
 import { enumType, extendType, inputObjectType, objectType } from 'nexus';
 import { UserInputError } from 'apollo-server-express';
 import { isPresent } from 'ts-is-present';

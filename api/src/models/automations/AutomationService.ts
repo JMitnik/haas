@@ -2,7 +2,7 @@ import {
   PrismaClient,
   AutomationType,
   AutomationScheduled,
-} from '@prisma/client';
+} from 'prisma/prisma-client';
 import * as AWS from 'aws-sdk';
 
 import { offsetPaginate } from '../general/PaginationHelpers';

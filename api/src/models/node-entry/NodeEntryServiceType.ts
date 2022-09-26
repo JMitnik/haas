@@ -5,7 +5,7 @@ import {
   Prisma,
   FormNodeEntry,
   FormNodeFieldEntryData,
-} from '@prisma/client';
+} from 'prisma/prisma-client';
 
 const question = Prisma.validator<Prisma.QuestionNodeArgs>()({
   include: {

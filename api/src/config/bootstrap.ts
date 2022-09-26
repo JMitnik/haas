@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient, Prisma } from 'prisma/prisma-client';
 
 import { AutomationActionService } from '../models/automations/AutomationActionService';
 import { redis } from './redis';

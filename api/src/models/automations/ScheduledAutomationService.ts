@@ -2,7 +2,7 @@ import {
   AutomationAction,
   PrismaClient,
   AutomationActionType,
-} from '@prisma/client';
+} from 'prisma/prisma-client';
 import * as AWS from 'aws-sdk';
 
 import { AWSServiceMap } from '../Common/Mappings/AWSServiceMap';

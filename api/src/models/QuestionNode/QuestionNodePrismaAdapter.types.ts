@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from 'prisma/prisma-client';
 
 const edge = Prisma.validator<Prisma.EdgeArgs>()({
   include: {

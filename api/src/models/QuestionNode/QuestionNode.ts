@@ -1,4 +1,4 @@
-import { PrismaClient, NodeType } from '@prisma/client';
+import { PrismaClient, NodeType } from 'prisma/prisma-client';
 import { enumType, extendType, inputObjectType, objectType, queryField } from 'nexus';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 

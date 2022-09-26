@@ -4,7 +4,7 @@ import { UserInputError } from 'apollo-server-express';
 import prisma from '../../config/prisma';
 import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import { FindManyCallBackProps, PaginateProps, paginate } from '../Common/Pagination/pagination';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from 'prisma/prisma-client';
 import { CampaignPrismaAdapter } from './CampaignPrismaAdapter';
 import { CampaignVariant, CampaignWithVariants, CSVDeliveryRow, DeliveryCSVProcessRecord, DeliveryInput, DeliveryOptionsProps, DeliveryUpdateItemProps, ErroredRecord, ValidateDeliveryRecordsResults } from './CampaignTypes';
 import { nanoid } from 'nanoid';

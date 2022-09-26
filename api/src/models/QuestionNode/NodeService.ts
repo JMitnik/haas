@@ -1,4 +1,4 @@
-import { Prisma, Link, NodeType, QuestionCondition, QuestionNode, PrismaClient, Edge, QuestionOption, VideoEmbeddedNode } from '@prisma/client';
+import { Prisma, Link, NodeType, QuestionCondition, QuestionNode, PrismaClient, Edge, QuestionOption, VideoEmbeddedNode } from 'prisma/prisma-client';
 import { isPresent } from 'ts-is-present';
 import cuid from 'cuid';
 
@@ -148,9 +148,9 @@ export class NodeService {
     const targetUsers = communicationUser?.userIds?.length
       ? await this.userOfCustomerPrismaAdapter.findTargetUsers(
         workspaceSlug, {
-          roleIds: communicationUser?.userIds.filter(isPresent),
-          userIds: communicationUser?.userIds.filter(isPresent),
-        }
+        roleIds: communicationUser?.userIds.filter(isPresent),
+        userIds: communicationUser?.userIds.filter(isPresent),
+      }
       )
       : [];
     const allUserIds = targetUsers.map((user) => ({ id: user.userId }));
@@ -335,7 +335,7 @@ export class NodeService {
             },
           },
         })
-      // Else, create a new form node with the relevant fields
+        // Else, create a new form node with the relevant fields
       } else {
         const fields = await this.createFormNodeInput(input.form, input.customerSlug);
         await this.questionNodePrismaAdapter.createFieldsOfForm({
@@ -1058,7 +1058,7 @@ export class NodeService {
         return {
           ...optionInput,
           id: targetOption.id,
-          overrideLeafId: targetOptionCallToAction?.id || undefined ,
+          overrideLeafId: targetOptionCallToAction?.id || undefined,
         }
       }
       ).filter(isPresent)) : optionInputs;
@@ -1071,7 +1071,7 @@ export class NodeService {
           targetOptionIds,
           templateQuestionNodes.length > 1 ? targetOptions : optionInputs
         );
-      } catch (e) {};
+      } catch (e) { };
 
       /**
        * If the template question has more template "clones", update potentially stale edge conditions.
@@ -1086,7 +1086,7 @@ export class NodeService {
       const updateInput: UpdateQuestionInput = {
         title: questionInput.title,
         type: questionInput.type,
-        options: templateQuestionNodes.length > 1 ? targetOptions: optionInputs,
+        options: templateQuestionNodes.length > 1 ? targetOptions : optionInputs,
         overrideLeafId: isSourceQuestion
           ? sourceOverrideLeaf?.id || undefined
           : targetCallToAction?.id || undefined, // TODO: Add topic to all CTAs in templates

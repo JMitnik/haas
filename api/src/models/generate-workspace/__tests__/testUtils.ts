@@ -1,4 +1,4 @@
-import { PrismaClient, SystemPermissionEnum } from '@prisma/client';
+import { PrismaClient, SystemPermissionEnum } from 'prisma/prisma-client';
 
 export const createUserWithAllRoles = async (prisma: PrismaClient) => {
   return prisma.userOfCustomer.create({

@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from 'prisma/prisma-client';
 
 const workspace = Prisma.validator<Prisma.CustomerArgs>()({
   include: {

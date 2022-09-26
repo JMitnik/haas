@@ -1,4 +1,4 @@
-import { FormNodeStepType, LanguageEnum, Link, NodeType, Prisma, TagEnum } from '@prisma/client';
+import { FormNodeStepType, LanguageEnum, Link, NodeType, Prisma, TagEnum } from 'prisma/prisma-client';
 import { NexusGenInputs } from '../../generated/nexus';
 
 export interface Tag {
