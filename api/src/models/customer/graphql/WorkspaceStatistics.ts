@@ -1,6 +1,6 @@
 import { objectType } from 'nexus';
 import { UserInputError } from 'apollo-server-express';
-import { DialogueImpactScore } from '@prisma/client';
+import { DialogueImpactScore } from 'prisma/prisma-client';
 
 import { BasicStatistics } from './BasicStatistics';
 import {

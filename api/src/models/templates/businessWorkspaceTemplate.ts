@@ -1,5 +1,5 @@
 
-import { LanguageEnum, NodeType } from '@prisma/client';
+import { LanguageEnum, NodeType } from 'prisma/prisma-client';
 import { defaultAdminRole, defaultBotRole, defaultBusinessTextFieldForm, defaultManagerRole, defaultUserRole, DemoWorkspaceTemplate } from './TemplateTypes';
 
 export type rootTopics = 'Physical & Mental' | 'Management' | 'Home Situation' | 'Colleagues'

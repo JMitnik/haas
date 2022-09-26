@@ -1,4 +1,4 @@
-import { DialogueTemplateType, PrismaClient, Role, RoleTypeEnum } from '@prisma/client';
+import { DialogueTemplateType, PrismaClient, Role, RoleTypeEnum } from 'prisma/prisma-client';
 import { ApolloError } from 'apollo-server-express';
 
 import TemplateService from '../templates/TemplateService';

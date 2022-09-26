@@ -1,5 +1,5 @@
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from 'prisma/prisma-client';
 
 import { OrganizationService } from '../models/Organization/OrganizationService';
 import { ContextSessionType } from '../models/auth/ContextSessionType';

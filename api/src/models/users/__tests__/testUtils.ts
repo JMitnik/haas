@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from 'prisma/prisma-client';
 
 export const clearDatabase = async (prisma: PrismaClient) => {
   if (!(process.env.NODE_ENV === 'test')) return;

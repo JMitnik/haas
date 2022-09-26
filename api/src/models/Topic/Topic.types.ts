@@ -1,7 +1,7 @@
 import { SessionActionType } from '../session/Session.types';
 import { NexusGenInputs } from '../../generated/nexus';
 import { Nullable } from '../../types/generic';
-import { Prisma } from '@prisma/client';
+import { Prisma } from 'prisma/prisma-client';
 
 export type DeselectTopicInput = NexusGenInputs['DeselectTopicInput'];
 export type TopicFilterInput = NexusGenInputs['TopicFilterInput'];

@@ -1,4 +1,4 @@
-import { Customer, Dialogue, PrismaClient } from '@prisma/client';
+import { Customer, Dialogue, PrismaClient } from 'prisma/prisma-client';
 import { range } from 'lodash';
 
 import { clearDatabase, prepDefaultCreateData, seedAutomation } from './testUtils';

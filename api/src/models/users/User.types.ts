@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from 'prisma/prisma-client';
 
 const defaultUserFields = Prisma.validator<Prisma.UserArgs>()({
   include: {

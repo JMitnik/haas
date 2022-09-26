@@ -1,7 +1,7 @@
 import { UserInputError } from 'apollo-server-express';
 import { applyMiddleware } from 'graphql-middleware';
 import { GraphQLError } from 'graphql';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from 'prisma/prisma-client';
 import { createServer } from '@graphql-yoga/node'
 import { useApolloServerErrors } from '@envelop/apollo-server-errors'
 import { useResponseCache } from '@envelop/response-cache'

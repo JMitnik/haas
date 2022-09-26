@@ -1,6 +1,6 @@
 import { GraphQLYogaError } from '@graphql-yoga/node';
 import { ContextSessionType } from '../auth/ContextSessionType';
-import { SystemPermissionEnum } from '@prisma/client';
+import { SystemPermissionEnum } from 'prisma/prisma-client';
 
 
 export const DialogueValidator = {

@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from 'prisma/prisma-client';
 import fs from 'fs';
 import https from 'https';
 import cookieParser from 'cookie-parser';

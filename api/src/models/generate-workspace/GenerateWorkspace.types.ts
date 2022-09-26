@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from 'prisma/prisma-client';
 import { NexusGenInputs } from '../../generated/nexus';
 
 export type GenerateWorkspaceCSVInput = NexusGenInputs['GenerateWorkspaceCSVInputType'];

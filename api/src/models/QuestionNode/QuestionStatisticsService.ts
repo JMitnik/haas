@@ -1,4 +1,4 @@
-import { ChoiceNodeEntry, DialogueImpactScore, NodeEntry, PrismaClient, QuestionImpactScore, Session, VideoNodeEntry } from '@prisma/client';
+import { ChoiceNodeEntry, DialogueImpactScore, NodeEntry, PrismaClient, QuestionImpactScore, Session, VideoNodeEntry } from 'prisma/prisma-client';
 import { isPresent } from 'ts-is-present';
 import { mean, countBy } from 'lodash';
 

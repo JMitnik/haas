@@ -2,7 +2,7 @@
 import { allow, or, rule, shield } from 'graphql-shield';
 
 import { ApolloError } from 'apollo-server-express';
-import { SystemPermissionEnum } from '@prisma/client';
+import { SystemPermissionEnum } from 'prisma/prisma-client';
 
 import { APIContext } from '../types/APIContext';
 import config from './config';
