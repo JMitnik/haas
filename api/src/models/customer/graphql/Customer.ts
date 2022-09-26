@@ -1,5 +1,5 @@
-import { ColourSettings, Customer, CustomerSettings, SystemPermissionEnum } from '@prisma/client';
-import { GraphQLError } from 'graphql';
+import { ColourSettings, Customer, CustomerSettings } from '@prisma/client';
+import { graphql, GraphQLError } from 'graphql';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import { arg, extendType, inputObjectType, mutationField, nonNull, objectType, scalarType } from 'nexus';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
@@ -55,7 +55,8 @@ export const CustomerType = objectType({
       type: CustomerSettingsType,
       nullable: true,
 
-      async resolve(parent: Customer, args, ctx) {
+      async resolve(parent, args, ctx) {
+        assertNonNullish(parent.id, 'Cannot find workspace id!');
         const customerSettings = await ctx.services.customerService.getCustomerSettingsByCustomerId(parent.id);
         return customerSettings;
       },
@@ -103,6 +104,7 @@ export const CustomerType = objectType({
         input: ActionableConnectionFilterInput,
       },
       async resolve(parent, args, ctx) {
+        assertNonNullish(parent.id, 'Cannot find actionable ID!');
         const canAccessAllActionables = WorkspaceValidator.canAccessAllActionables(parent.id, ctx.session);
         const userId = ctx.session?.user?.id as string;
 
@@ -123,6 +125,7 @@ export const CustomerType = objectType({
       type: IssueConnection,
       args: { filter: IssueConnectionFilterInput },
       resolve: async (parent, args, { services }) => {
+        assertNonNullish(parent.id, 'Cannot find actionable ID!');
         if (!args.filter) throw new GraphQLYogaError('No filter provided!');
         return await services.issueService.paginatedIssues(parent.id, args.filter);
       },
@@ -138,6 +141,7 @@ export const CustomerType = objectType({
 
       resolve: async (parent, args, { services, session }) => {
         const filter = IssueValidator.resolveFilter(args.filter);
+        assertNonNullish(parent.id, 'Cannot find workspace id!');
         assertNonNullish(session?.user?.id, 'No user ID provided!');
 
         return await services.issueService.getProblemDialoguesByWorkspace(parent.id, filter, session.user.id) as any;
@@ -154,6 +158,7 @@ export const CustomerType = objectType({
 
       resolve: async (parent, args, { services, session }) => {
         const filter = IssueValidator.resolveFilter(args.input);
+        assertNonNullish(parent.id, 'Cannot find workspace id!');
         assertNonNullish(session?.user?.id, 'No user ID provided!');
 
         return await services.issueService.getWorkspaceIssues(parent.id, filter, session?.user.id) as any;
@@ -204,6 +209,7 @@ export const CustomerType = objectType({
       nullable: true,
       type: AutomationModel,
       async resolve(parent, args, ctx) {
+        assertNonNullish(parent.id, 'Cannot find workspace id!');
         return ctx.services.automationService.findAutomationsByWorkspace(parent.id);
       },
     });
@@ -216,7 +222,8 @@ export const CustomerType = objectType({
         input: HealthScoreInput,
       },
       async resolve(parent, args, ctx) {
-        if (!args.input) throw new UserInputError('Not input object!');
+        assertNonNullish(parent.id, 'Cannot find workspace id!');
+        if (!args.input) throw new GraphQLYogaError('Not input object!');
         const { startDateTime, endDateTime, threshold } = args.input;
         let utcStartDateTime: Date | undefined;
         let utcEndDateTime: Date | undefined;
@@ -247,8 +254,9 @@ export const CustomerType = objectType({
         input: DialogueStatisticsSummaryFilterInput,
       },
       async resolve(parent, args, ctx) {
-        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
-        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+        assertNonNullish(parent.id, 'Cannot find workspace id!');
+        if (!args.input) throw new GraphQLYogaError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new GraphQLYogaError('No impact type provided dialogue statistics summary!');
 
         let utcStartDateTime: Date | undefined;
         let utcEndDateTime: Date | undefined;
@@ -280,8 +288,9 @@ export const CustomerType = objectType({
       useParentResolve: true,
       useTimeResolve: true,
       async resolve(parent, args, ctx) {
-        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
-        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+        assertNonNullish(parent.id, 'Cannot find workspace id!');
+        if (!args.input) throw new GraphQLYogaError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new GraphQLYogaError('No impact type provided dialogue statistics summary!');
         if (args?.input?.cutoff && args.input.cutoff < 1) throw new UserInputError('Cutoff cannot be a negative number!');
 
         let utcStartDateTime: Date | undefined;
@@ -315,8 +324,9 @@ export const CustomerType = objectType({
       useParentResolve: true,
       useTimeResolve: true,
       async resolve(parent, args, ctx) {
-        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
-        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+        assertNonNullish(parent.id, 'Cannot find workspace id!');
+        if (!args.input) throw new GraphQLYogaError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new GraphQLYogaError('No impact type provided dialogue statistics summary!');
 
         let utcStartDateTime: Date | undefined;
         let utcEndDateTime: Date | undefined;
@@ -351,8 +361,9 @@ export const CustomerType = objectType({
       // useQueryCounter: true,
       useTimeResolve: true,
       async resolve(parent, args, ctx) {
-        if (!args.input) throw new UserInputError('No input provided for dialogue statistics summary!');
-        if (!args.input.impactType) throw new UserInputError('No impact type provided dialogue statistics summary!');
+        assertNonNullish(parent.id, 'Cannot find workspace id!');
+        if (!args.input) throw new GraphQLYogaError('No input provided for dialogue statistics summary!');
+        if (!args.input.impactType) throw new GraphQLYogaError('No impact type provided dialogue statistics summary!');
 
         let utcStartDateTime: Date | undefined;
         let utcEndDateTime: Date | undefined;
@@ -381,6 +392,7 @@ export const CustomerType = objectType({
       args: { where: DialogueWhereUniqueInput },
 
       async resolve(parent, args, ctx) {
+        assertNonNullish(parent.id, 'Cannot find workspace id!');
         if (args?.where?.slug) {
           const dialogueSlug: string = args.where.slug;
 
@@ -407,7 +419,9 @@ export const CustomerType = objectType({
       },
       useQueryCounter: true,
       useTimeResolve: true,
-      async resolve(parent: Customer, args, ctx) {
+      async resolve(parent, args, ctx) {
+        assertNonNullish(parent.id, 'Cannot find workspace id!');
+
         let dialogues = await ctx.services.dialogueService.findDialoguesByCustomerId(
           parent.id,
           args.filter?.searchTerm || undefined,
@@ -422,6 +436,7 @@ export const CustomerType = objectType({
       nullable: true,
 
       async resolve(parent, args, ctx) {
+        assertNonNullish(parent.id, 'Cannot find workspace id!');
         const customer = await ctx.prisma.customer.findUnique({
           where: { id: parent.id },
           include: {
@@ -450,6 +465,7 @@ export const CustomerType = objectType({
     t.list.field('campaigns', {
       type: CampaignModel,
       resolve: async (parent, args, ctx) => {
+        assertNonNullish(parent.id, 'Cannot find workspace id!');
         const workspaceWithCampaigns = await ctx.services.campaignService.findCampaignsOfWorkspace(parent.id);
         if (!workspaceWithCampaigns) throw new UserInputError('Can\'t find workspace!');
 

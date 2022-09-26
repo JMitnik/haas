@@ -37,8 +37,8 @@ export type AwsImageType = {
 export type Actionable = {
   __typename?: 'Actionable';
   id?: Maybe<Scalars['ID']>;
-  createdAt?: Maybe<Scalars['String']>;
-  updatedAt?: Maybe<Scalars['String']>;
+  createdAt?: Maybe<Scalars['Date']>;
+  updatedAt?: Maybe<Scalars['Date']>;
   dialogueId?: Maybe<Scalars['String']>;
   assigneeId?: Maybe<Scalars['String']>;
   issueId?: Maybe<Scalars['String']>;
@@ -498,7 +498,7 @@ export enum CloudReferenceType {
 
 export type ColourSettings = {
   __typename?: 'ColourSettings';
-  id?: Maybe<Scalars['ID']>;
+  id?: Maybe<Scalars['Int']>;
   primary?: Maybe<Scalars['String']>;
   secondary?: Maybe<Scalars['String']>;
   primaryAlt?: Maybe<Scalars['String']>;
@@ -843,10 +843,12 @@ export type CustomerUserCustomerArgs = {
 
 export type CustomerSettings = {
   __typename?: 'CustomerSettings';
-  id?: Maybe<Scalars['ID']>;
+  id?: Maybe<Scalars['Int']>;
   logoUrl?: Maybe<Scalars['String']>;
   logoOpacity?: Maybe<Scalars['Int']>;
+  colourSettingsId?: Maybe<Scalars['Int']>;
   colourSettings?: Maybe<ColourSettings>;
+  fontSettingsId?: Maybe<Scalars['Int']>;
   fontSettings?: Maybe<FontSettings>;
 };
 
@@ -997,7 +999,7 @@ export type DeselectTopicInput = {
 
 export type Dialogue = {
   __typename?: 'Dialogue';
-  id: Scalars['ID'];
+  id: Scalars['String'];
   title: Scalars['String'];
   slug: Scalars['String'];
   description: Scalars['String'];
@@ -1007,9 +1009,10 @@ export type Dialogue = {
   language?: Maybe<LanguageEnumType>;
   isPrivate?: Maybe<Scalars['Boolean']>;
   publicTitle?: Maybe<Scalars['String']>;
-  creationDate?: Maybe<Scalars['String']>;
-  updatedAt?: Maybe<Scalars['String']>;
+  creationDate?: Maybe<Scalars['Date']>;
+  updatedAt?: Maybe<Scalars['Date']>;
   assignees?: Maybe<Array<Maybe<UserType>>>;
+  postLeafNodeId?: Maybe<Scalars['String']>;
   postLeafNode?: Maybe<DialogueFinisherObjectType>;
   issues?: Maybe<Issue>;
   healthScore?: Maybe<HealthScore>;
@@ -1212,8 +1215,8 @@ export type DialogueWhereUniqueInput = {
 export type Edge = {
   __typename?: 'Edge';
   id?: Maybe<Scalars['ID']>;
-  createdAt?: Maybe<Scalars['String']>;
-  updatedAt?: Maybe<Scalars['String']>;
+  createdAt?: Maybe<Scalars['Date']>;
+  updatedAt?: Maybe<Scalars['Date']>;
   parentNodeId?: Maybe<Scalars['String']>;
   childNodeId?: Maybe<Scalars['String']>;
   parentNode?: Maybe<QuestionNode>;
@@ -1278,7 +1281,7 @@ export type FindRoleInput = {
 
 export type FontSettings = {
   __typename?: 'FontSettings';
-  id?: Maybe<Scalars['ID']>;
+  id?: Maybe<Scalars['Int']>;
 };
 
 /** FormNodeEntryInput */
@@ -1379,8 +1382,7 @@ export type FormNodeStepInput = {
 };
 
 export enum FormNodeStepType {
-  GenericFields = 'GENERIC_FIELDS',
-  InputData = 'INPUT_DATA'
+  GenericFields = 'GENERIC_FIELDS'
 }
 
 export type FormNodeType = {
@@ -2142,7 +2144,7 @@ export type MutationUpdateQuestionArgs = {
 
 export type NodeEntry = {
   __typename?: 'NodeEntry';
-  creationDate?: Maybe<Scalars['String']>;
+  creationDate?: Maybe<Scalars['Date']>;
   depth?: Maybe<Scalars['Int']>;
   id?: Maybe<Scalars['ID']>;
   relatedEdgeId?: Maybe<Scalars['String']>;
@@ -2559,8 +2561,9 @@ export type QuestionNode = {
   isRoot?: Maybe<Scalars['Boolean']>;
   title: Scalars['String'];
   updatedAt?: Maybe<Scalars['String']>;
+  videoEmbeddedNodeId?: Maybe<Scalars['String']>;
   extraContent?: Maybe<Scalars['String']>;
-  creationDate?: Maybe<Scalars['String']>;
+  creationDate?: Maybe<Scalars['Date']>;
   type?: Maybe<QuestionNodeTypeEnum>;
   overrideLeafId?: Maybe<Scalars['String']>;
   indepthQuestionStatisticsSummary?: Maybe<Array<Maybe<IndepthQuestionStatisticsSummary>>>;
@@ -2617,6 +2620,7 @@ export type QuestionOption = {
   isTopic?: Maybe<Scalars['Boolean']>;
   questionId?: Maybe<Scalars['String']>;
   publicValue?: Maybe<Scalars['String']>;
+  overrideLeafId?: Maybe<Scalars['String']>;
   overrideLeaf?: Maybe<QuestionNode>;
   position?: Maybe<Scalars['Int']>;
 };
@@ -3802,6 +3806,128 @@ export type MeQuery = (
   )> }
 );
 
+export type AssignUserToActionableMutationVariables = Exact<{
+  input: AssignUserToActionableInput;
+}>;
+
+
+export type AssignUserToActionableMutation = (
+  { __typename?: 'Mutation' }
+  & { assignUserToActionable?: Maybe<(
+    { __typename?: 'Actionable' }
+    & Pick<Actionable, 'createdAt' | 'status'>
+    & { session?: Maybe<(
+      { __typename?: 'Session' }
+      & Pick<Session, 'id' | 'mainScore'>
+    )>, dialogue?: Maybe<(
+      { __typename?: 'Dialogue' }
+      & Pick<Dialogue, 'title'>
+    )>, assignee?: Maybe<(
+      { __typename?: 'UserType' }
+      & Pick<UserType, 'email'>
+    )> }
+  )> }
+);
+
+export type GetIssueQueryVariables = Exact<{
+  input?: Maybe<GetIssueResolverInput>;
+  actionableFilter?: Maybe<ActionableConnectionFilterInput>;
+}>;
+
+
+export type GetIssueQuery = (
+  { __typename?: 'Query' }
+  & { issue?: Maybe<(
+    { __typename?: 'IssueModel' }
+    & Pick<IssueModel, 'id' | 'topicId'>
+    & { topic: (
+      { __typename?: 'Topic' }
+      & Pick<Topic, 'id' | 'name'>
+    ), actionableConnection?: Maybe<(
+      { __typename?: 'ActionableConnection' }
+      & Pick<ActionableConnection, 'totalPages'>
+      & { actionables?: Maybe<Array<Maybe<(
+        { __typename?: 'Actionable' }
+        & Pick<Actionable, 'id' | 'createdAt' | 'isVerified' | 'dialogueId' | 'status'>
+        & { session?: Maybe<(
+          { __typename?: 'Session' }
+          & Pick<Session, 'id' | 'mainScore'>
+        )>, dialogue?: Maybe<(
+          { __typename?: 'Dialogue' }
+          & Pick<Dialogue, 'id' | 'title' | 'slug'>
+        )>, assignee?: Maybe<(
+          { __typename?: 'UserType' }
+          & Pick<UserType, 'id' | 'email'>
+        )> }
+      )>>>, pageInfo?: Maybe<(
+        { __typename?: 'PaginationPageInfo' }
+        & Pick<PaginationPageInfo, 'hasNextPage' | 'hasPrevPage' | 'nextPageOffset' | 'pageIndex' | 'prevPageOffset'>
+      )> }
+    )> }
+  )> }
+);
+
+export type GetWorkspaceActionablesQueryVariables = Exact<{
+  workspaceId: Scalars['ID'];
+  filter?: Maybe<ActionableConnectionFilterInput>;
+}>;
+
+
+export type GetWorkspaceActionablesQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & { actionableConnection?: Maybe<(
+      { __typename?: 'ActionableConnection' }
+      & Pick<ActionableConnection, 'totalPages'>
+      & { actionables?: Maybe<Array<Maybe<(
+        { __typename?: 'Actionable' }
+        & ActionableFragmentFragment
+      )>>>, pageInfo?: Maybe<(
+        { __typename?: 'PaginationPageInfo' }
+        & Pick<PaginationPageInfo, 'hasNextPage' | 'hasPrevPage' | 'nextPageOffset' | 'pageIndex' | 'prevPageOffset'>
+      )> }
+    )> }
+  )> }
+);
+
+export type GetWorkspaceIssuesQueryVariables = Exact<{
+  workspaceId: Scalars['ID'];
+  filter?: Maybe<IssueConnectionFilterInput>;
+}>;
+
+
+export type GetWorkspaceIssuesQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & { issueConnection?: Maybe<(
+      { __typename?: 'IssueConnection' }
+      & Pick<IssueConnection, 'totalPages'>
+      & { issues?: Maybe<Array<Maybe<(
+        { __typename?: 'IssueModel' }
+        & IssueFragmentFragment
+      )>>>, pageInfo?: Maybe<(
+        { __typename?: 'PaginationPageInfo' }
+        & Pick<PaginationPageInfo, 'hasNextPage' | 'hasPrevPage' | 'nextPageOffset' | 'pageIndex' | 'prevPageOffset'>
+      )> }
+    )> }
+  )> }
+);
+
+export type SetActionableStatusMutationVariables = Exact<{
+  input: SetActionableStatusInput;
+}>;
+
+
+export type SetActionableStatusMutation = (
+  { __typename?: 'Mutation' }
+  & { setActionableStatus?: Maybe<(
+    { __typename?: 'Actionable' }
+    & Pick<Actionable, 'id' | 'status'>
+  )> }
+);
+
 export type UploadUpsellImageMutationVariables = Exact<{
   input?: Maybe<UploadSellImageInputType>;
 }>;
@@ -4512,165 +4638,6 @@ export type GenerateWorkspaceFromCsvMutation = (
   & { generateWorkspaceFromCSV?: Maybe<(
     { __typename?: 'Customer' }
     & Pick<Customer, 'id' | 'slug'>
-  )> }
-);
-
-export type GetInteractionsQueryQueryVariables = Exact<{
-  customerSlug?: Maybe<Scalars['String']>;
-  dialogueSlug?: Maybe<Scalars['String']>;
-  sessionsFilter?: Maybe<SessionConnectionFilterInput>;
-}>;
-
-
-export type GetInteractionsQueryQuery = (
-  { __typename?: 'Query' }
-  & { customer?: Maybe<(
-    { __typename?: 'Customer' }
-    & Pick<Customer, 'id'>
-    & { dialogue?: Maybe<(
-      { __typename?: 'Dialogue' }
-      & Pick<Dialogue, 'id'>
-      & { campaignVariants?: Maybe<Array<(
-        { __typename?: 'CampaignVariantType' }
-        & Pick<CampaignVariantType, 'id' | 'label'>
-        & { campaign?: Maybe<(
-          { __typename?: 'CampaignType' }
-          & Pick<CampaignType, 'id' | 'label'>
-        )> }
-      )>>, sessionConnection?: Maybe<(
-        { __typename?: 'SessionConnection' }
-        & Pick<SessionConnection, 'totalPages'>
-        & { sessions: Array<(
-          { __typename?: 'Session' }
-          & SessionFragmentFragment
-        )>, pageInfo?: Maybe<(
-          { __typename?: 'PaginationPageInfo' }
-          & Pick<PaginationPageInfo, 'hasPrevPage' | 'hasNextPage' | 'pageIndex' | 'nextPageOffset' | 'prevPageOffset'>
-        )> }
-      )> }
-    )> }
-  )> }
-);
-
-export type AssignUserToActionableMutationVariables = Exact<{
-  input: AssignUserToActionableInput;
-}>;
-
-
-export type AssignUserToActionableMutation = (
-  { __typename?: 'Mutation' }
-  & { assignUserToActionable?: Maybe<(
-    { __typename?: 'Actionable' }
-    & Pick<Actionable, 'createdAt' | 'status'>
-    & { session?: Maybe<(
-      { __typename?: 'Session' }
-      & Pick<Session, 'id' | 'mainScore'>
-    )>, dialogue?: Maybe<(
-      { __typename?: 'Dialogue' }
-      & Pick<Dialogue, 'title'>
-    )>, assignee?: Maybe<(
-      { __typename?: 'UserType' }
-      & Pick<UserType, 'email'>
-    )> }
-  )> }
-);
-
-export type GetIssueQueryVariables = Exact<{
-  input?: Maybe<GetIssueResolverInput>;
-  actionableFilter?: Maybe<ActionableConnectionFilterInput>;
-}>;
-
-
-export type GetIssueQuery = (
-  { __typename?: 'Query' }
-  & { issue?: Maybe<(
-    { __typename?: 'IssueModel' }
-    & Pick<IssueModel, 'id' | 'topicId'>
-    & { topic: (
-      { __typename?: 'Topic' }
-      & Pick<Topic, 'id' | 'name'>
-    ), actionableConnection?: Maybe<(
-      { __typename?: 'ActionableConnection' }
-      & Pick<ActionableConnection, 'totalPages'>
-      & { actionables?: Maybe<Array<Maybe<(
-        { __typename?: 'Actionable' }
-        & Pick<Actionable, 'id' | 'createdAt' | 'isVerified' | 'dialogueId' | 'status'>
-        & { session?: Maybe<(
-          { __typename?: 'Session' }
-          & Pick<Session, 'id' | 'mainScore'>
-        )>, dialogue?: Maybe<(
-          { __typename?: 'Dialogue' }
-          & Pick<Dialogue, 'id' | 'title' | 'slug'>
-        )>, assignee?: Maybe<(
-          { __typename?: 'UserType' }
-          & Pick<UserType, 'id' | 'email'>
-        )> }
-      )>>>, pageInfo?: Maybe<(
-        { __typename?: 'PaginationPageInfo' }
-        & Pick<PaginationPageInfo, 'hasNextPage' | 'hasPrevPage' | 'nextPageOffset' | 'pageIndex' | 'prevPageOffset'>
-      )> }
-    )> }
-  )> }
-);
-
-export type GetWorkspaceActionablesQueryVariables = Exact<{
-  workspaceId: Scalars['ID'];
-  filter?: Maybe<ActionableConnectionFilterInput>;
-}>;
-
-
-export type GetWorkspaceActionablesQuery = (
-  { __typename?: 'Query' }
-  & { customer?: Maybe<(
-    { __typename?: 'Customer' }
-    & { actionableConnection?: Maybe<(
-      { __typename?: 'ActionableConnection' }
-      & Pick<ActionableConnection, 'totalPages'>
-      & { actionables?: Maybe<Array<Maybe<(
-        { __typename?: 'Actionable' }
-        & ActionableFragmentFragment
-      )>>>, pageInfo?: Maybe<(
-        { __typename?: 'PaginationPageInfo' }
-        & Pick<PaginationPageInfo, 'hasNextPage' | 'hasPrevPage' | 'nextPageOffset' | 'pageIndex' | 'prevPageOffset'>
-      )> }
-    )> }
-  )> }
-);
-
-export type GetWorkspaceIssuesQueryVariables = Exact<{
-  workspaceId: Scalars['ID'];
-  filter?: Maybe<IssueConnectionFilterInput>;
-}>;
-
-
-export type GetWorkspaceIssuesQuery = (
-  { __typename?: 'Query' }
-  & { customer?: Maybe<(
-    { __typename?: 'Customer' }
-    & { issueConnection?: Maybe<(
-      { __typename?: 'IssueConnection' }
-      & Pick<IssueConnection, 'totalPages'>
-      & { issues?: Maybe<Array<Maybe<(
-        { __typename?: 'IssueModel' }
-        & IssueFragmentFragment
-      )>>>, pageInfo?: Maybe<(
-        { __typename?: 'PaginationPageInfo' }
-        & Pick<PaginationPageInfo, 'hasNextPage' | 'hasPrevPage' | 'nextPageOffset' | 'pageIndex' | 'prevPageOffset'>
-      )> }
-    )> }
-  )> }
-);
-
-export type SetActionableStatusMutationVariables = Exact<{
-  input: SetActionableStatusInput;
-}>;
-
-
-export type SetActionableStatusMutation = (
-  { __typename?: 'Mutation' }
-  & { setActionableStatus?: Maybe<(
-    { __typename?: 'Actionable' }
-    & Pick<Actionable, 'id' | 'status'>
   )> }
 );
 
@@ -5727,6 +5694,260 @@ export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
 export function refetchMeQuery(variables?: MeQueryVariables) {
       return { query: MeDocument, variables: variables }
     }
+export const AssignUserToActionableDocument = gql`
+    mutation assignUserToActionable($input: AssignUserToActionableInput!) {
+  assignUserToActionable(input: $input) {
+    createdAt
+    session {
+      id
+      mainScore
+    }
+    dialogue {
+      title
+    }
+    status
+    assignee {
+      email
+    }
+  }
+}
+    `;
+export type AssignUserToActionableMutationFn = Apollo.MutationFunction<AssignUserToActionableMutation, AssignUserToActionableMutationVariables>;
+
+/**
+ * __useAssignUserToActionableMutation__
+ *
+ * To run a mutation, you first call `useAssignUserToActionableMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAssignUserToActionableMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [assignUserToActionableMutation, { data, loading, error }] = useAssignUserToActionableMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useAssignUserToActionableMutation(baseOptions?: Apollo.MutationHookOptions<AssignUserToActionableMutation, AssignUserToActionableMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AssignUserToActionableMutation, AssignUserToActionableMutationVariables>(AssignUserToActionableDocument, options);
+      }
+export type AssignUserToActionableMutationHookResult = ReturnType<typeof useAssignUserToActionableMutation>;
+export type AssignUserToActionableMutationResult = Apollo.MutationResult<AssignUserToActionableMutation>;
+export type AssignUserToActionableMutationOptions = Apollo.BaseMutationOptions<AssignUserToActionableMutation, AssignUserToActionableMutationVariables>;
+export const GetIssueDocument = gql`
+    query GetIssue($input: GetIssueResolverInput, $actionableFilter: ActionableConnectionFilterInput) {
+  issue(input: $input) {
+    id
+    topicId
+    topic {
+      id
+      name
+    }
+    actionableConnection(input: $actionableFilter) {
+      actionables {
+        id
+        createdAt
+        isVerified
+        dialogueId
+        session {
+          id
+          mainScore
+        }
+        dialogue {
+          id
+          title
+          slug
+        }
+        status
+        assignee {
+          id
+          email
+        }
+      }
+      totalPages
+      pageInfo {
+        hasNextPage
+        hasPrevPage
+        nextPageOffset
+        pageIndex
+        prevPageOffset
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetIssueQuery__
+ *
+ * To run a query within a React component, call `useGetIssueQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetIssueQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetIssueQuery({
+ *   variables: {
+ *      input: // value for 'input'
+ *      actionableFilter: // value for 'actionableFilter'
+ *   },
+ * });
+ */
+export function useGetIssueQuery(baseOptions?: Apollo.QueryHookOptions<GetIssueQuery, GetIssueQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetIssueQuery, GetIssueQueryVariables>(GetIssueDocument, options);
+      }
+export function useGetIssueLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetIssueQuery, GetIssueQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetIssueQuery, GetIssueQueryVariables>(GetIssueDocument, options);
+        }
+export type GetIssueQueryHookResult = ReturnType<typeof useGetIssueQuery>;
+export type GetIssueLazyQueryHookResult = ReturnType<typeof useGetIssueLazyQuery>;
+export type GetIssueQueryResult = Apollo.QueryResult<GetIssueQuery, GetIssueQueryVariables>;
+export function refetchGetIssueQuery(variables?: GetIssueQueryVariables) {
+      return { query: GetIssueDocument, variables: variables }
+    }
+export const GetWorkspaceActionablesDocument = gql`
+    query GetWorkspaceActionables($workspaceId: ID!, $filter: ActionableConnectionFilterInput) {
+  customer(id: $workspaceId) {
+    actionableConnection(input: $filter) {
+      actionables {
+        ...ActionableFragment
+      }
+      totalPages
+      pageInfo {
+        hasNextPage
+        hasPrevPage
+        nextPageOffset
+        pageIndex
+        prevPageOffset
+      }
+    }
+  }
+}
+    ${ActionableFragmentFragmentDoc}`;
+
+/**
+ * __useGetWorkspaceActionablesQuery__
+ *
+ * To run a query within a React component, call `useGetWorkspaceActionablesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetWorkspaceActionablesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetWorkspaceActionablesQuery({
+ *   variables: {
+ *      workspaceId: // value for 'workspaceId'
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useGetWorkspaceActionablesQuery(baseOptions: Apollo.QueryHookOptions<GetWorkspaceActionablesQuery, GetWorkspaceActionablesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetWorkspaceActionablesQuery, GetWorkspaceActionablesQueryVariables>(GetWorkspaceActionablesDocument, options);
+      }
+export function useGetWorkspaceActionablesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceActionablesQuery, GetWorkspaceActionablesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetWorkspaceActionablesQuery, GetWorkspaceActionablesQueryVariables>(GetWorkspaceActionablesDocument, options);
+        }
+export type GetWorkspaceActionablesQueryHookResult = ReturnType<typeof useGetWorkspaceActionablesQuery>;
+export type GetWorkspaceActionablesLazyQueryHookResult = ReturnType<typeof useGetWorkspaceActionablesLazyQuery>;
+export type GetWorkspaceActionablesQueryResult = Apollo.QueryResult<GetWorkspaceActionablesQuery, GetWorkspaceActionablesQueryVariables>;
+export function refetchGetWorkspaceActionablesQuery(variables?: GetWorkspaceActionablesQueryVariables) {
+      return { query: GetWorkspaceActionablesDocument, variables: variables }
+    }
+export const GetWorkspaceIssuesDocument = gql`
+    query GetWorkspaceIssues($workspaceId: ID!, $filter: IssueConnectionFilterInput) {
+  customer(id: $workspaceId) {
+    issueConnection(filter: $filter) {
+      issues {
+        ...IssueFragment
+      }
+      totalPages
+      pageInfo {
+        hasNextPage
+        hasPrevPage
+        nextPageOffset
+        pageIndex
+        prevPageOffset
+      }
+    }
+  }
+}
+    ${IssueFragmentFragmentDoc}`;
+
+/**
+ * __useGetWorkspaceIssuesQuery__
+ *
+ * To run a query within a React component, call `useGetWorkspaceIssuesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetWorkspaceIssuesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetWorkspaceIssuesQuery({
+ *   variables: {
+ *      workspaceId: // value for 'workspaceId'
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useGetWorkspaceIssuesQuery(baseOptions: Apollo.QueryHookOptions<GetWorkspaceIssuesQuery, GetWorkspaceIssuesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetWorkspaceIssuesQuery, GetWorkspaceIssuesQueryVariables>(GetWorkspaceIssuesDocument, options);
+      }
+export function useGetWorkspaceIssuesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceIssuesQuery, GetWorkspaceIssuesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetWorkspaceIssuesQuery, GetWorkspaceIssuesQueryVariables>(GetWorkspaceIssuesDocument, options);
+        }
+export type GetWorkspaceIssuesQueryHookResult = ReturnType<typeof useGetWorkspaceIssuesQuery>;
+export type GetWorkspaceIssuesLazyQueryHookResult = ReturnType<typeof useGetWorkspaceIssuesLazyQuery>;
+export type GetWorkspaceIssuesQueryResult = Apollo.QueryResult<GetWorkspaceIssuesQuery, GetWorkspaceIssuesQueryVariables>;
+export function refetchGetWorkspaceIssuesQuery(variables?: GetWorkspaceIssuesQueryVariables) {
+      return { query: GetWorkspaceIssuesDocument, variables: variables }
+    }
+export const SetActionableStatusDocument = gql`
+    mutation setActionableStatus($input: SetActionableStatusInput!) {
+  setActionableStatus(input: $input) {
+    id
+    status
+  }
+}
+    `;
+export type SetActionableStatusMutationFn = Apollo.MutationFunction<SetActionableStatusMutation, SetActionableStatusMutationVariables>;
+
+/**
+ * __useSetActionableStatusMutation__
+ *
+ * To run a mutation, you first call `useSetActionableStatusMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetActionableStatusMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [setActionableStatusMutation, { data, loading, error }] = useSetActionableStatusMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useSetActionableStatusMutation(baseOptions?: Apollo.MutationHookOptions<SetActionableStatusMutation, SetActionableStatusMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SetActionableStatusMutation, SetActionableStatusMutationVariables>(SetActionableStatusDocument, options);
+      }
+export type SetActionableStatusMutationHookResult = ReturnType<typeof useSetActionableStatusMutation>;
+export type SetActionableStatusMutationResult = Apollo.MutationResult<SetActionableStatusMutation>;
+export type SetActionableStatusMutationOptions = Apollo.BaseMutationOptions<SetActionableStatusMutation, SetActionableStatusMutationVariables>;
 export const UploadUpsellImageDocument = gql`
     mutation uploadUpsellImage($input: UploadSellImageInputType) {
   uploadUpsellImage(input: $input) {
@@ -7349,324 +7570,6 @@ export function useGenerateWorkspaceFromCsvMutation(baseOptions?: Apollo.Mutatio
 export type GenerateWorkspaceFromCsvMutationHookResult = ReturnType<typeof useGenerateWorkspaceFromCsvMutation>;
 export type GenerateWorkspaceFromCsvMutationResult = Apollo.MutationResult<GenerateWorkspaceFromCsvMutation>;
 export type GenerateWorkspaceFromCsvMutationOptions = Apollo.BaseMutationOptions<GenerateWorkspaceFromCsvMutation, GenerateWorkspaceFromCsvMutationVariables>;
-export const GetInteractionsQueryDocument = gql`
-    query GetInteractionsQuery($customerSlug: String, $dialogueSlug: String, $sessionsFilter: SessionConnectionFilterInput) {
-  customer(slug: $customerSlug) {
-    id
-    dialogue(where: {slug: $dialogueSlug}) {
-      id
-      campaignVariants {
-        id
-        label
-        campaign {
-          id
-          label
-        }
-      }
-      sessionConnection(filter: $sessionsFilter) {
-        sessions {
-          ...SessionFragment
-        }
-        totalPages
-        pageInfo {
-          hasPrevPage
-          hasNextPage
-          pageIndex
-          nextPageOffset
-          prevPageOffset
-        }
-      }
-    }
-  }
-}
-    ${SessionFragmentFragmentDoc}`;
-
-/**
- * __useGetInteractionsQueryQuery__
- *
- * To run a query within a React component, call `useGetInteractionsQueryQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetInteractionsQueryQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetInteractionsQueryQuery({
- *   variables: {
- *      customerSlug: // value for 'customerSlug'
- *      dialogueSlug: // value for 'dialogueSlug'
- *      sessionsFilter: // value for 'sessionsFilter'
- *   },
- * });
- */
-export function useGetInteractionsQueryQuery(baseOptions?: Apollo.QueryHookOptions<GetInteractionsQueryQuery, GetInteractionsQueryQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetInteractionsQueryQuery, GetInteractionsQueryQueryVariables>(GetInteractionsQueryDocument, options);
-      }
-export function useGetInteractionsQueryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetInteractionsQueryQuery, GetInteractionsQueryQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetInteractionsQueryQuery, GetInteractionsQueryQueryVariables>(GetInteractionsQueryDocument, options);
-        }
-export type GetInteractionsQueryQueryHookResult = ReturnType<typeof useGetInteractionsQueryQuery>;
-export type GetInteractionsQueryLazyQueryHookResult = ReturnType<typeof useGetInteractionsQueryLazyQuery>;
-export type GetInteractionsQueryQueryResult = Apollo.QueryResult<GetInteractionsQueryQuery, GetInteractionsQueryQueryVariables>;
-export function refetchGetInteractionsQueryQuery(variables?: GetInteractionsQueryQueryVariables) {
-      return { query: GetInteractionsQueryDocument, variables: variables }
-    }
-export const AssignUserToActionableDocument = gql`
-    mutation assignUserToActionable($input: AssignUserToActionableInput!) {
-  assignUserToActionable(input: $input) {
-    createdAt
-    session {
-      id
-      mainScore
-    }
-    dialogue {
-      title
-    }
-    status
-    assignee {
-      email
-    }
-  }
-}
-    `;
-export type AssignUserToActionableMutationFn = Apollo.MutationFunction<AssignUserToActionableMutation, AssignUserToActionableMutationVariables>;
-
-/**
- * __useAssignUserToActionableMutation__
- *
- * To run a mutation, you first call `useAssignUserToActionableMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useAssignUserToActionableMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [assignUserToActionableMutation, { data, loading, error }] = useAssignUserToActionableMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useAssignUserToActionableMutation(baseOptions?: Apollo.MutationHookOptions<AssignUserToActionableMutation, AssignUserToActionableMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<AssignUserToActionableMutation, AssignUserToActionableMutationVariables>(AssignUserToActionableDocument, options);
-      }
-export type AssignUserToActionableMutationHookResult = ReturnType<typeof useAssignUserToActionableMutation>;
-export type AssignUserToActionableMutationResult = Apollo.MutationResult<AssignUserToActionableMutation>;
-export type AssignUserToActionableMutationOptions = Apollo.BaseMutationOptions<AssignUserToActionableMutation, AssignUserToActionableMutationVariables>;
-export const GetIssueDocument = gql`
-    query GetIssue($input: GetIssueResolverInput, $actionableFilter: ActionableConnectionFilterInput) {
-  issue(input: $input) {
-    id
-    topicId
-    topic {
-      id
-      name
-    }
-    actionableConnection(input: $actionableFilter) {
-      actionables {
-        id
-        createdAt
-        isVerified
-        dialogueId
-        session {
-          id
-          mainScore
-        }
-        dialogue {
-          id
-          title
-          slug
-        }
-        status
-        assignee {
-          id
-          email
-        }
-      }
-      totalPages
-      pageInfo {
-        hasNextPage
-        hasPrevPage
-        nextPageOffset
-        pageIndex
-        prevPageOffset
-      }
-    }
-  }
-}
-    `;
-
-/**
- * __useGetIssueQuery__
- *
- * To run a query within a React component, call `useGetIssueQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetIssueQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetIssueQuery({
- *   variables: {
- *      input: // value for 'input'
- *      actionableFilter: // value for 'actionableFilter'
- *   },
- * });
- */
-export function useGetIssueQuery(baseOptions?: Apollo.QueryHookOptions<GetIssueQuery, GetIssueQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetIssueQuery, GetIssueQueryVariables>(GetIssueDocument, options);
-      }
-export function useGetIssueLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetIssueQuery, GetIssueQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetIssueQuery, GetIssueQueryVariables>(GetIssueDocument, options);
-        }
-export type GetIssueQueryHookResult = ReturnType<typeof useGetIssueQuery>;
-export type GetIssueLazyQueryHookResult = ReturnType<typeof useGetIssueLazyQuery>;
-export type GetIssueQueryResult = Apollo.QueryResult<GetIssueQuery, GetIssueQueryVariables>;
-export function refetchGetIssueQuery(variables?: GetIssueQueryVariables) {
-      return { query: GetIssueDocument, variables: variables }
-    }
-export const GetWorkspaceActionablesDocument = gql`
-    query GetWorkspaceActionables($workspaceId: ID!, $filter: ActionableConnectionFilterInput) {
-  customer(id: $workspaceId) {
-    actionableConnection(input: $filter) {
-      actionables {
-        ...ActionableFragment
-      }
-      totalPages
-      pageInfo {
-        hasNextPage
-        hasPrevPage
-        nextPageOffset
-        pageIndex
-        prevPageOffset
-      }
-    }
-  }
-}
-    ${ActionableFragmentFragmentDoc}`;
-
-/**
- * __useGetWorkspaceActionablesQuery__
- *
- * To run a query within a React component, call `useGetWorkspaceActionablesQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetWorkspaceActionablesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetWorkspaceActionablesQuery({
- *   variables: {
- *      workspaceId: // value for 'workspaceId'
- *      filter: // value for 'filter'
- *   },
- * });
- */
-export function useGetWorkspaceActionablesQuery(baseOptions: Apollo.QueryHookOptions<GetWorkspaceActionablesQuery, GetWorkspaceActionablesQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetWorkspaceActionablesQuery, GetWorkspaceActionablesQueryVariables>(GetWorkspaceActionablesDocument, options);
-      }
-export function useGetWorkspaceActionablesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceActionablesQuery, GetWorkspaceActionablesQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetWorkspaceActionablesQuery, GetWorkspaceActionablesQueryVariables>(GetWorkspaceActionablesDocument, options);
-        }
-export type GetWorkspaceActionablesQueryHookResult = ReturnType<typeof useGetWorkspaceActionablesQuery>;
-export type GetWorkspaceActionablesLazyQueryHookResult = ReturnType<typeof useGetWorkspaceActionablesLazyQuery>;
-export type GetWorkspaceActionablesQueryResult = Apollo.QueryResult<GetWorkspaceActionablesQuery, GetWorkspaceActionablesQueryVariables>;
-export function refetchGetWorkspaceActionablesQuery(variables?: GetWorkspaceActionablesQueryVariables) {
-      return { query: GetWorkspaceActionablesDocument, variables: variables }
-    }
-export const GetWorkspaceIssuesDocument = gql`
-    query GetWorkspaceIssues($workspaceId: ID!, $filter: IssueConnectionFilterInput) {
-  customer(id: $workspaceId) {
-    issueConnection(filter: $filter) {
-      issues {
-        ...IssueFragment
-      }
-      totalPages
-      pageInfo {
-        hasNextPage
-        hasPrevPage
-        nextPageOffset
-        pageIndex
-        prevPageOffset
-      }
-    }
-  }
-}
-    ${IssueFragmentFragmentDoc}`;
-
-/**
- * __useGetWorkspaceIssuesQuery__
- *
- * To run a query within a React component, call `useGetWorkspaceIssuesQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetWorkspaceIssuesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetWorkspaceIssuesQuery({
- *   variables: {
- *      workspaceId: // value for 'workspaceId'
- *      filter: // value for 'filter'
- *   },
- * });
- */
-export function useGetWorkspaceIssuesQuery(baseOptions: Apollo.QueryHookOptions<GetWorkspaceIssuesQuery, GetWorkspaceIssuesQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetWorkspaceIssuesQuery, GetWorkspaceIssuesQueryVariables>(GetWorkspaceIssuesDocument, options);
-      }
-export function useGetWorkspaceIssuesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceIssuesQuery, GetWorkspaceIssuesQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetWorkspaceIssuesQuery, GetWorkspaceIssuesQueryVariables>(GetWorkspaceIssuesDocument, options);
-        }
-export type GetWorkspaceIssuesQueryHookResult = ReturnType<typeof useGetWorkspaceIssuesQuery>;
-export type GetWorkspaceIssuesLazyQueryHookResult = ReturnType<typeof useGetWorkspaceIssuesLazyQuery>;
-export type GetWorkspaceIssuesQueryResult = Apollo.QueryResult<GetWorkspaceIssuesQuery, GetWorkspaceIssuesQueryVariables>;
-export function refetchGetWorkspaceIssuesQuery(variables?: GetWorkspaceIssuesQueryVariables) {
-      return { query: GetWorkspaceIssuesDocument, variables: variables }
-    }
-export const SetActionableStatusDocument = gql`
-    mutation setActionableStatus($input: SetActionableStatusInput!) {
-  setActionableStatus(input: $input) {
-    id
-    status
-  }
-}
-    `;
-export type SetActionableStatusMutationFn = Apollo.MutationFunction<SetActionableStatusMutation, SetActionableStatusMutationVariables>;
-
-/**
- * __useSetActionableStatusMutation__
- *
- * To run a mutation, you first call `useSetActionableStatusMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useSetActionableStatusMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [setActionableStatusMutation, { data, loading, error }] = useSetActionableStatusMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useSetActionableStatusMutation(baseOptions?: Apollo.MutationHookOptions<SetActionableStatusMutation, SetActionableStatusMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<SetActionableStatusMutation, SetActionableStatusMutationVariables>(SetActionableStatusDocument, options);
-      }
-export type SetActionableStatusMutationHookResult = ReturnType<typeof useSetActionableStatusMutation>;
-export type SetActionableStatusMutationResult = Apollo.MutationResult<SetActionableStatusMutation>;
-export type SetActionableStatusMutationOptions = Apollo.BaseMutationOptions<SetActionableStatusMutation, SetActionableStatusMutationVariables>;
 export const RequestInviteDocument = gql`
     mutation RequestInvite($input: RequestInviteInput) {
   requestInvite(input: $input) {
@@ -8315,6 +8218,57 @@ export namespace Me {
   export const Document = MeDocument;
 }
 
+export namespace AssignUserToActionable {
+  export type Variables = AssignUserToActionableMutationVariables;
+  export type Mutation = AssignUserToActionableMutation;
+  export type AssignUserToActionable = (NonNullable<AssignUserToActionableMutation['assignUserToActionable']>);
+  export type Session = (NonNullable<(NonNullable<AssignUserToActionableMutation['assignUserToActionable']>)['session']>);
+  export type Dialogue = (NonNullable<(NonNullable<AssignUserToActionableMutation['assignUserToActionable']>)['dialogue']>);
+  export type Assignee = (NonNullable<(NonNullable<AssignUserToActionableMutation['assignUserToActionable']>)['assignee']>);
+  export const Document = AssignUserToActionableDocument;
+}
+
+export namespace GetIssue {
+  export type Variables = GetIssueQueryVariables;
+  export type Query = GetIssueQuery;
+  export type Issue = (NonNullable<GetIssueQuery['issue']>);
+  export type Topic = (NonNullable<(NonNullable<GetIssueQuery['issue']>)['topic']>);
+  export type ActionableConnection = (NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionableConnection']>);
+  export type Actionables = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionableConnection']>)['actionables']>)[number]>;
+  export type Session = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionableConnection']>)['actionables']>)[number]>['session']>);
+  export type Dialogue = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionableConnection']>)['actionables']>)[number]>['dialogue']>);
+  export type Assignee = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionableConnection']>)['actionables']>)[number]>['assignee']>);
+  export type PageInfo = (NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionableConnection']>)['pageInfo']>);
+  export const Document = GetIssueDocument;
+}
+
+export namespace GetWorkspaceActionables {
+  export type Variables = GetWorkspaceActionablesQueryVariables;
+  export type Query = GetWorkspaceActionablesQuery;
+  export type Customer = (NonNullable<GetWorkspaceActionablesQuery['customer']>);
+  export type ActionableConnection = (NonNullable<(NonNullable<GetWorkspaceActionablesQuery['customer']>)['actionableConnection']>);
+  export type Actionables = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceActionablesQuery['customer']>)['actionableConnection']>)['actionables']>)[number]>;
+  export type PageInfo = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceActionablesQuery['customer']>)['actionableConnection']>)['pageInfo']>);
+  export const Document = GetWorkspaceActionablesDocument;
+}
+
+export namespace GetWorkspaceIssues {
+  export type Variables = GetWorkspaceIssuesQueryVariables;
+  export type Query = GetWorkspaceIssuesQuery;
+  export type Customer = (NonNullable<GetWorkspaceIssuesQuery['customer']>);
+  export type IssueConnection = (NonNullable<(NonNullable<GetWorkspaceIssuesQuery['customer']>)['issueConnection']>);
+  export type Issues = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceIssuesQuery['customer']>)['issueConnection']>)['issues']>)[number]>;
+  export type PageInfo = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceIssuesQuery['customer']>)['issueConnection']>)['pageInfo']>);
+  export const Document = GetWorkspaceIssuesDocument;
+}
+
+export namespace SetActionableStatus {
+  export type Variables = SetActionableStatusMutationVariables;
+  export type Mutation = SetActionableStatusMutation;
+  export type SetActionableStatus = (NonNullable<SetActionableStatusMutation['setActionableStatus']>);
+  export const Document = SetActionableStatusDocument;
+}
+
 export namespace UploadUpsellImage {
   export type Variables = UploadUpsellImageMutationVariables;
   export type Mutation = UploadUpsellImageMutation;
@@ -8624,70 +8578,6 @@ export namespace GenerateWorkspaceFromCsv {
   export type Mutation = GenerateWorkspaceFromCsvMutation;
   export type GenerateWorkspaceFromCsv = (NonNullable<GenerateWorkspaceFromCsvMutation['generateWorkspaceFromCSV']>);
   export const Document = GenerateWorkspaceFromCsvDocument;
-}
-
-export namespace GetInteractionsQuery {
-  export type Variables = GetInteractionsQueryQueryVariables;
-  export type Query = GetInteractionsQueryQuery;
-  export type Customer = (NonNullable<GetInteractionsQueryQuery['customer']>);
-  export type Dialogue = (NonNullable<(NonNullable<GetInteractionsQueryQuery['customer']>)['dialogue']>);
-  export type CampaignVariants = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetInteractionsQueryQuery['customer']>)['dialogue']>)['campaignVariants']>)[number]>;
-  export type Campaign = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetInteractionsQueryQuery['customer']>)['dialogue']>)['campaignVariants']>)[number]>['campaign']>);
-  export type SessionConnection = (NonNullable<(NonNullable<(NonNullable<GetInteractionsQueryQuery['customer']>)['dialogue']>)['sessionConnection']>);
-  export type Sessions = NonNullable<(NonNullable<(NonNullable<(NonNullable<(NonNullable<GetInteractionsQueryQuery['customer']>)['dialogue']>)['sessionConnection']>)['sessions']>)[number]>;
-  export type PageInfo = (NonNullable<(NonNullable<(NonNullable<(NonNullable<GetInteractionsQueryQuery['customer']>)['dialogue']>)['sessionConnection']>)['pageInfo']>);
-  export const Document = GetInteractionsQueryDocument;
-}
-
-export namespace AssignUserToActionable {
-  export type Variables = AssignUserToActionableMutationVariables;
-  export type Mutation = AssignUserToActionableMutation;
-  export type AssignUserToActionable = (NonNullable<AssignUserToActionableMutation['assignUserToActionable']>);
-  export type Session = (NonNullable<(NonNullable<AssignUserToActionableMutation['assignUserToActionable']>)['session']>);
-  export type Dialogue = (NonNullable<(NonNullable<AssignUserToActionableMutation['assignUserToActionable']>)['dialogue']>);
-  export type Assignee = (NonNullable<(NonNullable<AssignUserToActionableMutation['assignUserToActionable']>)['assignee']>);
-  export const Document = AssignUserToActionableDocument;
-}
-
-export namespace GetIssue {
-  export type Variables = GetIssueQueryVariables;
-  export type Query = GetIssueQuery;
-  export type Issue = (NonNullable<GetIssueQuery['issue']>);
-  export type Topic = (NonNullable<(NonNullable<GetIssueQuery['issue']>)['topic']>);
-  export type ActionableConnection = (NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionableConnection']>);
-  export type Actionables = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionableConnection']>)['actionables']>)[number]>;
-  export type Session = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionableConnection']>)['actionables']>)[number]>['session']>);
-  export type Dialogue = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionableConnection']>)['actionables']>)[number]>['dialogue']>);
-  export type Assignee = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionableConnection']>)['actionables']>)[number]>['assignee']>);
-  export type PageInfo = (NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionableConnection']>)['pageInfo']>);
-  export const Document = GetIssueDocument;
-}
-
-export namespace GetWorkspaceActionables {
-  export type Variables = GetWorkspaceActionablesQueryVariables;
-  export type Query = GetWorkspaceActionablesQuery;
-  export type Customer = (NonNullable<GetWorkspaceActionablesQuery['customer']>);
-  export type ActionableConnection = (NonNullable<(NonNullable<GetWorkspaceActionablesQuery['customer']>)['actionableConnection']>);
-  export type Actionables = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceActionablesQuery['customer']>)['actionableConnection']>)['actionables']>)[number]>;
-  export type PageInfo = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceActionablesQuery['customer']>)['actionableConnection']>)['pageInfo']>);
-  export const Document = GetWorkspaceActionablesDocument;
-}
-
-export namespace GetWorkspaceIssues {
-  export type Variables = GetWorkspaceIssuesQueryVariables;
-  export type Query = GetWorkspaceIssuesQuery;
-  export type Customer = (NonNullable<GetWorkspaceIssuesQuery['customer']>);
-  export type IssueConnection = (NonNullable<(NonNullable<GetWorkspaceIssuesQuery['customer']>)['issueConnection']>);
-  export type Issues = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceIssuesQuery['customer']>)['issueConnection']>)['issues']>)[number]>;
-  export type PageInfo = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceIssuesQuery['customer']>)['issueConnection']>)['pageInfo']>);
-  export const Document = GetWorkspaceIssuesDocument;
-}
-
-export namespace SetActionableStatus {
-  export type Variables = SetActionableStatusMutationVariables;
-  export type Mutation = SetActionableStatusMutation;
-  export type SetActionableStatus = (NonNullable<SetActionableStatusMutation['setActionableStatus']>);
-  export const Document = SetActionableStatusDocument;
 }
 
 export namespace RequestInvite {

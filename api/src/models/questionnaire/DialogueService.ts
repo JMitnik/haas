@@ -810,7 +810,7 @@ class DialogueService {
     dbPostLeaf: PostLeafNode | null | undefined,
     heading: string | null | undefined,
     subHeading: string | null | undefined,
-  ): Prisma.PostLeafNodeUpdateOneWithoutDialogueInput | undefined {
+  ): Prisma.PostLeafNodeUpdateOneWithoutDialogueNestedInput | undefined {
     if (!dbPostLeaf && !heading && !subHeading) {
       return undefined;
     } else if (dbPostLeaf && !heading && !subHeading) {

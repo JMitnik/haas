@@ -3,7 +3,7 @@
  * Do not make changes to this file directly
  */
 
-import type * as prisma from "@prisma/client"
+
 import type { APIContext } from "./../types/APIContext"
 import type { core } from "nexus"
 declare global {
@@ -867,39 +867,39 @@ export interface NexusGenInputs {
 
 export interface NexusGenEnums {
   ActionableConnectionOrderType: "createdAt"
-  ActionableState: prisma.ActionableState
-  AutomationActionChannelType: prisma.AutomationActionChannelType
-  AutomationActionType: prisma.AutomationActionType
-  AutomationConditionBuilderType: prisma.AutomationConditionBuilderType
-  AutomationConditionOperatorType: prisma.AutomationConditionOperatorType
-  AutomationConditionScopeType: prisma.AutomationConditionScopeType
+  ActionableState: "COMPLETED" | "DROPPED" | "PENDING" | "STALE"
+  AutomationActionChannelType: "EMAIL" | "SLACK" | "SMS"
+  AutomationActionType: "API_CALL" | "CUSTOM_REPORT" | "MONTH_REPORT" | "SEND_DIALOGUE_LINK" | "SEND_EMAIL" | "SEND_SMS" | "WEBHOOK" | "WEEK_REPORT" | "YEAR_REPORT"
+  AutomationConditionBuilderType: "AND" | "OR"
+  AutomationConditionOperatorType: "EVERY_N_TH_TIME" | "GREATER_OR_EQUAL_THAN" | "GREATER_THAN" | "INNER_RANGE" | "IS_EQUAL" | "IS_FALSE" | "IS_NOT_EQUAL" | "IS_TRUE" | "OUTER_RANGE" | "SMALLER_OR_EQUAL_THAN" | "SMALLER_THAN"
+  AutomationConditionScopeType: "DIALOGUE" | "QUESTION" | "WORKSPACE"
   AutomationConnectionOrderType: "createdAt" | "type" | "updatedAt"
-  AutomationEventType: prisma.AutomationEventType
-  AutomationType: prisma.AutomationType
+  AutomationEventType: "API_CALL" | "NEW_INTERACTION_DIALOGUE" | "NEW_INTERACTION_QUESTION" | "RECURRING"
+  AutomationType: "CAMPAIGN" | "SCHEDULED" | "TRIGGER"
   CampaignVariantEnum: "EMAIL" | "QUEUE" | "SMS"
-  CloudReferenceType: prisma.CloudReferenceType
-  ConditionPropertyAggregateType: prisma.ConditionPropertyAggregateType
+  CloudReferenceType: "AWS" | "Azure" | "GCP" | "IBM"
+  ConditionPropertyAggregateType: "AVG" | "COUNT" | "MAX" | "MIN"
   DeliveryConnectionOrder: "createdAt"
   DeliveryStatusEnum: "DELIVERED" | "DEPLOYED" | "FAILED" | "FINISHED" | "OPENED" | "SCHEDULED" | "SENT"
   DialogueAspectType: "GENERAL_SCORE" | "LATEST_SCORE" | "NR_INTERACTIONS" | "NR_VISITORS"
   DialogueConnectionOrder: "createdAt"
   DialogueImpactScoreType: "AVERAGE"
-  DialogueTemplateType: prisma.DialogueTemplateType
+  DialogueTemplateType: "BUSINESS_ENG" | "BUSINESS_NL" | "DEFAULT" | "MASS_SEED" | "SPORT_ENG" | "SPORT_NL" | "STUDENT_ENG" | "STUDENT_NL" | "TEACHER_ENG" | "TEACHER_NL"
   FormNodeFieldTypeEnum: "contacts" | "email" | "longText" | "number" | "phoneNumber" | "shortText" | "url"
-  FormNodeStepType: prisma.FormNodeStepType
+  FormNodeStepType: "GENERIC_FIELDS"
   IssueConnectionOrderType: "issue"
-  JobProcessLocationType: prisma.JobProcessLocationType
-  JobStatusType: prisma.JobStatusType
+  JobProcessLocationType: "BROCHURE" | "ONE_PAGER" | "PITCHDECK"
+  JobStatusType: "COMPLETED" | "COMPRESSING_SALES_MATERIAL" | "FAILED" | "IN_PHOTOSHOP_QUEUE" | "PENDING" | "PHOTOSHOP_PROCESSING" | "PRE_PROCESSING" | "PRE_PROCESSING_LOGO" | "PRE_PROCESSING_WEBSITE_SCREENSHOT" | "PROCESSING" | "READY_FOR_PROCESSING" | "STITCHING_SLIDES" | "TRANSFORMING_PSDS_TO_PNGS" | "WRAPPING_UP"
   LanguageEnumType: "DUTCH" | "ENGLISH" | "GERMAN"
   LinkTypeEnumType: "API" | "FACEBOOK" | "INSTAGRAM" | "LINKEDIN" | "SINGLE" | "SOCIAL" | "TWITTER" | "WHATSAPP"
-  OperandType: prisma.OperandType
+  OperandType: "DATE_TIME" | "INT" | "STRING"
   OrganizationLayerType: "DIALOGUE" | "GROUP" | "INTERACTION"
   PaginationSearchEnum: "email" | "firstName" | "lastName" | "name" | "publicTitle" | "title"
   PaginationSortByEnum: "createdAt" | "email" | "firstName" | "id" | "lastName" | "medium" | "name" | "paths" | "role" | "scheduledAt" | "score" | "type" | "updatedAt" | "user" | "when"
   QuestionAspectType: "ANSWER_SPEED" | "NODE_VALUE"
   QuestionImpactScoreType: "PERCENTAGE"
   QuestionNodeTypeEnum: "CHOICE" | "FORM" | "GENERIC" | "LINK" | "REGISTRATION" | "SHARE" | "SLIDER" | "TEXTBOX" | "VIDEO_EMBEDDED"
-  RecurringPeriodType: prisma.RecurringPeriodType
+  RecurringPeriodType: "CUSTOM" | "END_OF_DAY" | "END_OF_WEEK" | "EVERY_DAY" | "EVERY_MONTH" | "EVERY_WEEK" | "EVERY_YEAR" | "START_OF_DAY" | "START_OF_WEEK"
   SessionActionType: "CONTACT"
   SessionConnectionOrder: "createdAt" | "dialogueId"
   SessionDeliveryType: "campaigns" | "noCampaigns"
@@ -907,7 +907,7 @@ export interface NexusGenEnums {
   SystemPermission: "CAN_ACCESS_ADMIN_PANEL" | "CAN_ACCESS_ALL_ACTION_REQUESTS" | "CAN_ACCESS_REPORT_PAGE" | "CAN_ADD_USERS" | "CAN_ASSIGN_USERS_TO_DIALOGUE" | "CAN_BUILD_DIALOGUE" | "CAN_CREATE_AUTOMATIONS" | "CAN_CREATE_CAMPAIGNS" | "CAN_CREATE_DELIVERIES" | "CAN_CREATE_TRIGGERS" | "CAN_DELETE_DIALOGUE" | "CAN_DELETE_TRIGGERS" | "CAN_DELETE_USERS" | "CAN_DELETE_WORKSPACE" | "CAN_DOWNLOAD_REPORTS" | "CAN_EDIT_DIALOGUE" | "CAN_EDIT_USERS" | "CAN_EDIT_WORKSPACE" | "CAN_GENERATE_WORKSPACE_FROM_CSV" | "CAN_RESET_WORKSPACE_DATA" | "CAN_UPDATE_AUTOMATIONS" | "CAN_VIEW_ACTION_REQUESTS" | "CAN_VIEW_AUTOMATIONS" | "CAN_VIEW_CAMPAIGNS" | "CAN_VIEW_DIALOGUE" | "CAN_VIEW_DIALOGUE_ANALYTICS" | "CAN_VIEW_USERS"
   TagTypeEnum: "AGENT" | "DEFAULT" | "LOCATION"
   TopicEnumType: "SYSTEM" | "WORKSPACE"
-  TriggerConditionEnum: prisma.TriggerConditionEnum
+  TriggerConditionEnum: "HIGH_THRESHOLD" | "INNER_RANGE" | "LOW_THRESHOLD" | "OUTER_RANGE" | "TEXT_MATCH"
   TriggerMediumEnum: "BOTH" | "EMAIL" | "PHONE"
   TriggerTypeEnum: "QUESTION" | "SCHEDULED"
   UploadImageEnumType: "LOGO" | "WEBSITE_SCREENSHOT"
@@ -934,7 +934,20 @@ export interface NexusGenObjects {
     mimetype?: string | null; // String
     url?: string | null; // String
   }
-  Actionable: prisma.Actionable;
+  Actionable: { // root type
+    assignee?: NexusGenRootTypes['UserType'] | null; // UserType
+    assigneeId?: string | null; // String
+    createdAt?: NexusGenScalars['Date'] | null; // Date
+    dialogue?: NexusGenRootTypes['Dialogue'] | null; // Dialogue
+    dialogueId?: string | null; // String
+    id?: string | null; // ID
+    isVerified: boolean; // Boolean!
+    issue?: NexusGenRootTypes['IssueModel'] | null; // IssueModel
+    issueId?: string | null; // String
+    session?: NexusGenRootTypes['Session'] | null; // Session
+    status: NexusGenEnums['ActionableState']; // ActionableState!
+    updatedAt?: NexusGenScalars['Date'] | null; // Date
+  }
   ActionableConnection: { // root type
     actionables?: Array<NexusGenRootTypes['Actionable'] | null> | null; // [Actionable]
     pageInfo?: NexusGenRootTypes['PaginationPageInfo'] | null; // PaginationPageInfo
@@ -958,7 +971,13 @@ export interface NexusGenObjects {
     pageInfo?: NexusGenRootTypes['DeprecatedPaginationPageInfo'] | null; // DeprecatedPaginationPageInfo
     startDate?: string | null; // String
   }
-  AutomationActionChannel: prisma.AutomationActionChannel;
+  AutomationActionChannel: { // root type
+    createdAt?: NexusGenScalars['Date'] | null; // Date
+    id?: string | null; // ID
+    payload?: NexusGenScalars['JSONObject'] | null; // JSONObject
+    type?: NexusGenEnums['AutomationActionChannelType'] | null; // AutomationActionChannelType
+    updatedAt?: NexusGenScalars['Date'] | null; // Date
+  }
   AutomationActionModel: { // root type
     createdAt?: NexusGenScalars['Date'] | null; // Date
     id?: string | null; // ID
@@ -1069,8 +1088,20 @@ export interface NexusGenObjects {
     type?: NexusGenEnums['CampaignVariantEnum'] | null; // CampaignVariantEnum
     weight?: number | null; // Int
   }
-  ColourSettings: prisma.ColourSettings;
-  ConditionPropertyAggregate: prisma.ConditionPropertyAggregate;
+  ColourSettings: { // root type
+    id?: number | null; // Int
+    primary?: string | null; // String
+    primaryAlt?: string | null; // String
+    secondary?: string | null; // String
+  }
+  ConditionPropertyAggregate: { // root type
+    createdAt?: string | null; // String
+    endDate?: string | null; // String
+    id?: string | null; // ID
+    latest?: number | null; // Int
+    startDate?: string | null; // String
+    type?: NexusGenEnums['ConditionPropertyAggregateType'] | null; // ConditionPropertyAggregateType
+  }
   CreateBatchDeliveriesOutputType: { // root type
     failedDeliveries?: Array<NexusGenRootTypes['FailedDeliveryModel'] | null> | null; // [FailedDeliveryModel]
     nrDeliveries?: number | null; // Int
@@ -1096,8 +1127,18 @@ export interface NexusGenObjects {
     key?: string | null; // String
     value?: string | null; // String
   }
-  Customer: prisma.Customer;
-  CustomerSettings: prisma.CustomerSettings;
+  Customer: { // root type
+    id?: string | null; // ID
+    isDemo?: boolean | null; // Boolean
+    name: string; // String!
+    slug: string; // String!
+  }
+  CustomerSettings: { // root type
+    colourSettingsId?: number | null; // Int
+    fontSettingsId?: number | null; // Int
+    id?: number | null; // Int
+    logoUrl?: string | null; // String
+  }
   DateHistogram: { // root type
     id?: string | null; // ID
     items: NexusGenRootTypes['DateHistogramItem'][]; // [DateHistogramItem!]!
@@ -1141,7 +1182,22 @@ export interface NexusGenObjects {
     nrPages?: number | null; // Int
     pageIndex?: number | null; // Int
   }
-  Dialogue: prisma.Dialogue;
+  Dialogue: { // root type
+    creationDate?: NexusGenScalars['Date'] | null; // Date
+    customerId?: string | null; // String
+    description: string; // String!
+    id: string; // String!
+    isPrivate?: boolean | null; // Boolean
+    isWithoutGenData?: boolean | null; // Boolean
+    language?: NexusGenEnums['LanguageEnumType'] | null; // LanguageEnumType
+    postLeafNodeId?: string | null; // String
+    publicTitle?: string | null; // String
+    slug: string; // String!
+    template?: string | null; // String
+    title: string; // String!
+    updatedAt?: NexusGenScalars['Date'] | null; // Date
+    wasGeneratedWithGenData?: boolean | null; // Boolean
+  }
   DialogueConditionScopeModel: { // root type
     aggregate?: NexusGenRootTypes['ConditionPropertyAggregate'] | null; // ConditionPropertyAggregate
     aspect?: NexusGenEnums['DialogueAspectType'] | null; // DialogueAspectType
@@ -1176,7 +1232,13 @@ export interface NexusGenObjects {
     startDateTime?: NexusGenScalars['Date'] | null; // Date
     updatedAt?: NexusGenScalars['Date'] | null; // Date
   }
-  Edge: prisma.Edge;
+  Edge: { // root type
+    childNodeId?: string | null; // String
+    createdAt?: NexusGenScalars['Date'] | null; // Date
+    id?: string | null; // ID
+    parentNodeId?: string | null; // String
+    updatedAt?: NexusGenScalars['Date'] | null; // Date
+  }
   EdgeCondition: { // root type
     conditionType?: string | null; // String
     edgeId?: string | null; // String
@@ -1189,7 +1251,9 @@ export interface NexusGenObjects {
     error?: string | null; // String
     record?: string | null; // String
   }
-  FontSettings: prisma.FontSettings;
+  FontSettings: { // root type
+    id?: number | null; // Int
+  }
   FormNodeEntryType: { // root type
     id?: number | null; // Int
     values?: Array<NexusGenRootTypes['FormNodeEntryValueType'] | null> | null; // [FormNodeEntryValueType]
@@ -1204,8 +1268,24 @@ export interface NexusGenObjects {
     shortText?: string | null; // String
     url?: string | null; // String
   }
-  FormNodeField: prisma.FormNodeField;
-  FormNodeStep: prisma.FormNodeStep;
+  FormNodeField: { // root type
+    contacts?: Array<NexusGenRootTypes['UserType'] | null> | null; // [UserType]
+    id?: string | null; // ID
+    isRequired?: boolean | null; // Boolean
+    label?: string | null; // String
+    placeholder?: string | null; // String
+    position?: number | null; // Int
+    type: NexusGenEnums['FormNodeFieldTypeEnum']; // FormNodeFieldTypeEnum!
+  }
+  FormNodeStep: { // root type
+    fields?: NexusGenRootTypes['FormNodeField'][] | null; // [FormNodeField!]
+    header?: string | null; // String
+    helper?: string | null; // String
+    id: string; // String!
+    position: number; // Int!
+    subHelper?: string | null; // String
+    type: NexusGenEnums['FormNodeStepType']; // FormNodeStepType!
+  }
   FormNodeType: { // root type
     fields?: NexusGenRootTypes['FormNodeField'][] | null; // [FormNodeField!]
     helperText?: string | null; // String
@@ -1234,7 +1314,14 @@ export interface NexusGenObjects {
     didAlreadyExist?: boolean | null; // Boolean
     didInvite?: boolean | null; // Boolean
   }
-  Issue: prisma.Issue;
+  Issue: { // root type
+    createdAt?: NexusGenScalars['Date'] | null; // Date
+    followUpAction?: NexusGenEnums['SessionActionType'] | null; // SessionActionType
+    id?: string | null; // ID
+    rankScore?: number | null; // Float
+    topic?: string | null; // String
+    updatedAt?: NexusGenScalars['Date'] | null; // Date
+  }
   IssueConnection: { // root type
     issues?: Array<NexusGenRootTypes['IssueModel'] | null> | null; // [IssueModel]
     pageInfo?: NexusGenRootTypes['PaginationPageInfo'] | null; // PaginationPageInfo
@@ -1255,7 +1342,14 @@ export interface NexusGenObjects {
     id?: string | null; // String
     updatedAt?: string | null; // String
   }
-  JobProcessLocation: prisma.JobProcessLocation;
+  JobProcessLocation: { // root type
+    id?: string | null; // String
+    name?: string | null; // String
+    path?: string | null; // String
+    type?: NexusGenEnums['JobProcessLocationType'] | null; // JobProcessLocationType
+    xMaterialDimension?: number | null; // Int
+    yMaterialDimension?: number | null; // Int
+  }
   JobProcessLocations: { // root type
     jobProcessLocations?: Array<NexusGenRootTypes['JobProcessLocation'] | null> | null; // [JobProcessLocation]
   }
@@ -1293,7 +1387,13 @@ export interface NexusGenObjects {
     path?: Array<string | null> | null; // [String]
   }
   Mutation: {};
-  NodeEntry: prisma.NodeEntry;
+  NodeEntry: { // root type
+    creationDate?: NexusGenScalars['Date'] | null; // Date
+    depth?: number | null; // Int
+    id?: string | null; // ID
+    relatedEdgeId?: string | null; // String
+    relatedNodeId?: string | null; // String
+  }
   NodeEntryValue: { // root type
     choiceNodeEntry?: string | null; // String
     formNodeEntry?: NexusGenRootTypes['FormNodeEntryType'] | null; // FormNodeEntryType
@@ -1368,8 +1468,26 @@ export interface NexusGenObjects {
     createdAt?: NexusGenScalars['Date'] | null; // Date
     id?: string | null; // ID
   }
-  QuestionNode: prisma.QuestionNode;
-  QuestionOption: prisma.QuestionOption;
+  QuestionNode: { // root type
+    creationDate?: NexusGenScalars['Date'] | null; // Date
+    id: string; // ID!
+    isLeaf: boolean; // Boolean!
+    isRoot?: boolean | null; // Boolean
+    overrideLeafId?: string | null; // String
+    questionDialogueId?: string | null; // String
+    title: string; // String!
+    type?: NexusGenEnums['QuestionNodeTypeEnum'] | null; // QuestionNodeTypeEnum
+    videoEmbeddedNodeId?: string | null; // String
+  }
+  QuestionOption: { // root type
+    id?: number | null; // Int
+    isTopic?: boolean | null; // Boolean
+    overrideLeafId?: string | null; // String
+    position?: number | null; // Int
+    publicValue?: string | null; // String
+    questionId?: string | null; // String
+    value?: string | null; // String
+  }
   QuestionStatisticsSummary: { // root type
     dialogueId?: string | null; // String
     endDateTime?: NexusGenScalars['Date'] | null; // Date
@@ -1402,7 +1520,17 @@ export interface NexusGenObjects {
     permissions?: Array<NexusGenEnums['SystemPermission'] | null> | null; // [SystemPermission]
     roleId?: string | null; // String
   }
-  Session: prisma.Session;
+  Session: { // root type
+    browser?: string | null; // String
+    createdAt?: NexusGenScalars['Date'] | null; // Date
+    deliveryId?: string | null; // String
+    device?: string | null; // String
+    dialogueId?: string | null; // String
+    id: string; // ID!
+    mainScore?: number | null; // Float
+    originUrl?: string | null; // String
+    totalTimeInSec?: number | null; // Int
+  }
   SessionConnection: { // root type
     pageInfo?: NexusGenRootTypes['PaginationPageInfo'] | null; // PaginationPageInfo
     sessions: NexusGenRootTypes['Session'][]; // [Session!]!
@@ -1431,8 +1559,21 @@ export interface NexusGenObjects {
     id?: string | null; // ID
     unhappyText?: string | null; // String
   }
-  Tag: prisma.Tag;
-  Topic: prisma.Topic;
+  Tag: { // root type
+    customerId?: string | null; // String
+    id?: string | null; // ID
+    name?: string | null; // String
+    type?: NexusGenEnums['TagTypeEnum'] | null; // TagTypeEnum
+  }
+  Topic: { // root type
+    id: string; // ID!
+    name: string; // String!
+    parentTopics?: Array<NexusGenRootTypes['Topic'] | null> | null; // [Topic]
+    subTopics?: Array<NexusGenRootTypes['Topic'] | null> | null; // [Topic]
+    type: string; // String!
+    usedByOptions?: Array<NexusGenRootTypes['QuestionOption'] | null> | null; // [QuestionOption]
+    workspace?: NexusGenRootTypes['Customer'] | null; // Customer
+  }
   TopicDelta: { // root type
     averageCurrent?: number | null; // Float
     averagePrevious?: number | null; // Float
@@ -1448,7 +1589,12 @@ export interface NexusGenObjects {
     nodeEntryId?: string | null; // String
     value?: string | null; // String
   }
-  TopicType: prisma.TopicType;
+  TopicType: { // root type
+    basicStats?: NexusGenRootTypes['BasicStatistics'] | null; // BasicStatistics
+    impactScore?: number | null; // Float
+    nrVotes?: number | null; // Int
+    subTopics?: Array<NexusGenRootTypes['TopicType'] | null> | null; // [TopicType]
+  }
   TriggerConditionType: { // root type
     id?: number | null; // Int
     maxValue?: number | null; // Int
@@ -1550,7 +1696,7 @@ export interface NexusGenFieldTypes {
   Actionable: { // field return type
     assignee: NexusGenRootTypes['UserType'] | null; // UserType
     assigneeId: string | null; // String
-    createdAt: string | null; // String
+    createdAt: NexusGenScalars['Date'] | null; // Date
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogueId: string | null; // String
     id: string | null; // ID
@@ -1560,7 +1706,7 @@ export interface NexusGenFieldTypes {
     requestEmail: string | null; // String
     session: NexusGenRootTypes['Session'] | null; // Session
     status: NexusGenEnums['ActionableState']; // ActionableState!
-    updatedAt: string | null; // String
+    updatedAt: NexusGenScalars['Date'] | null; // Date
   }
   ActionableConnection: { // field return type
     actionables: Array<NexusGenRootTypes['Actionable'] | null> | null; // [Actionable]
@@ -1710,7 +1856,7 @@ export interface NexusGenFieldTypes {
     workspace: NexusGenRootTypes['Customer'] | null; // Customer
   }
   ColourSettings: { // field return type
-    id: string | null; // ID
+    id: number | null; // Int
     primary: string | null; // String
     primaryAlt: string | null; // String
     secondary: string | null; // String
@@ -1781,8 +1927,10 @@ export interface NexusGenFieldTypes {
   }
   CustomerSettings: { // field return type
     colourSettings: NexusGenRootTypes['ColourSettings'] | null; // ColourSettings
+    colourSettingsId: number | null; // Int
     fontSettings: NexusGenRootTypes['FontSettings'] | null; // FontSettings
-    id: string | null; // ID
+    fontSettingsId: number | null; // Int
+    id: number | null; // Int
     logoOpacity: number | null; // Int
     logoUrl: string | null; // String
   }
@@ -1835,14 +1983,14 @@ export interface NexusGenFieldTypes {
     assignees: Array<NexusGenRootTypes['UserType'] | null> | null; // [UserType]
     averageScore: number | null; // Float
     campaignVariants: NexusGenRootTypes['CampaignVariantType'][] | null; // [CampaignVariantType!]
-    creationDate: string | null; // String
+    creationDate: NexusGenScalars['Date'] | null; // Date
     customer: NexusGenRootTypes['Customer'] | null; // Customer
     customerId: string | null; // String
     description: string; // String!
     dialogueStatisticsSummary: NexusGenRootTypes['DialogueStatisticsSummaryModel'] | null; // DialogueStatisticsSummaryModel
     edges: Array<NexusGenRootTypes['Edge'] | null> | null; // [Edge]
     healthScore: NexusGenRootTypes['HealthScore'] | null; // HealthScore
-    id: string; // ID!
+    id: string; // String!
     isPrivate: boolean | null; // Boolean
     isWithoutGenData: boolean | null; // Boolean
     issues: NexusGenRootTypes['Issue'] | null; // Issue
@@ -1853,6 +2001,7 @@ export interface NexusGenFieldTypes {
     mostTrendingTopic: NexusGenRootTypes['MostTrendingTopic'] | null; // MostTrendingTopic
     pathedSessionsConnection: NexusGenRootTypes['PathedSessionsType'] | null; // PathedSessionsType
     postLeafNode: NexusGenRootTypes['DialogueFinisherObjectType'] | null; // DialogueFinisherObjectType
+    postLeafNodeId: string | null; // String
     publicTitle: string | null; // String
     questions: NexusGenRootTypes['QuestionNode'][] | null; // [QuestionNode!]
     rootQuestion: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
@@ -1864,7 +2013,7 @@ export interface NexusGenFieldTypes {
     template: string | null; // String
     title: string; // String!
     topic: NexusGenRootTypes['TopicType'] | null; // TopicType
-    updatedAt: string | null; // String
+    updatedAt: NexusGenScalars['Date'] | null; // Date
     wasGeneratedWithGenData: boolean | null; // Boolean
   }
   DialogueConditionScopeModel: { // field return type
@@ -1906,11 +2055,11 @@ export interface NexusGenFieldTypes {
     childNode: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     childNodeId: string | null; // String
     conditions: NexusGenRootTypes['EdgeCondition'][] | null; // [EdgeCondition!]
-    createdAt: string | null; // String
+    createdAt: NexusGenScalars['Date'] | null; // Date
     id: string | null; // ID
     parentNode: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     parentNodeId: string | null; // String
-    updatedAt: string | null; // String
+    updatedAt: NexusGenScalars['Date'] | null; // Date
   }
   EdgeCondition: { // field return type
     conditionType: string | null; // String
@@ -1925,7 +2074,7 @@ export interface NexusGenFieldTypes {
     record: string | null; // String
   }
   FontSettings: { // field return type
-    id: string | null; // ID
+    id: number | null; // Int
   }
   FormNodeEntryType: { // field return type
     id: number | null; // Int
@@ -2141,7 +2290,7 @@ export interface NexusGenFieldTypes {
     whitifyImage: NexusGenRootTypes['AWSImageType'] | null; // AWSImageType
   }
   NodeEntry: { // field return type
-    creationDate: string | null; // String
+    creationDate: NexusGenScalars['Date'] | null; // Date
     depth: number | null; // Int
     id: string | null; // ID
     relatedEdgeId: string | null; // String
@@ -2258,7 +2407,7 @@ export interface NexusGenFieldTypes {
   }
   QuestionNode: { // field return type
     children: NexusGenRootTypes['Edge'][] | null; // [Edge!]
-    creationDate: string | null; // String
+    creationDate: NexusGenScalars['Date'] | null; // Date
     extraContent: string | null; // String
     form: NexusGenRootTypes['FormNodeType'] | null; // FormNodeType
     id: string; // ID!
@@ -2277,11 +2426,13 @@ export interface NexusGenFieldTypes {
     title: string; // String!
     type: NexusGenEnums['QuestionNodeTypeEnum'] | null; // QuestionNodeTypeEnum
     updatedAt: string | null; // String
+    videoEmbeddedNodeId: string | null; // String
   }
   QuestionOption: { // field return type
     id: number | null; // Int
     isTopic: boolean | null; // Boolean
     overrideLeaf: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
+    overrideLeafId: string | null; // String
     position: number | null; // Int
     publicValue: string | null; // String
     questionId: string | null; // String
@@ -2524,7 +2675,7 @@ export interface NexusGenFieldTypeNames {
   Actionable: { // field return type name
     assignee: 'UserType'
     assigneeId: 'String'
-    createdAt: 'String'
+    createdAt: 'Date'
     dialogue: 'Dialogue'
     dialogueId: 'String'
     id: 'ID'
@@ -2534,7 +2685,7 @@ export interface NexusGenFieldTypeNames {
     requestEmail: 'String'
     session: 'Session'
     status: 'ActionableState'
-    updatedAt: 'String'
+    updatedAt: 'Date'
   }
   ActionableConnection: { // field return type name
     actionables: 'Actionable'
@@ -2684,7 +2835,7 @@ export interface NexusGenFieldTypeNames {
     workspace: 'Customer'
   }
   ColourSettings: { // field return type name
-    id: 'ID'
+    id: 'Int'
     primary: 'String'
     primaryAlt: 'String'
     secondary: 'String'
@@ -2755,8 +2906,10 @@ export interface NexusGenFieldTypeNames {
   }
   CustomerSettings: { // field return type name
     colourSettings: 'ColourSettings'
+    colourSettingsId: 'Int'
     fontSettings: 'FontSettings'
-    id: 'ID'
+    fontSettingsId: 'Int'
+    id: 'Int'
     logoOpacity: 'Int'
     logoUrl: 'String'
   }
@@ -2809,14 +2962,14 @@ export interface NexusGenFieldTypeNames {
     assignees: 'UserType'
     averageScore: 'Float'
     campaignVariants: 'CampaignVariantType'
-    creationDate: 'String'
+    creationDate: 'Date'
     customer: 'Customer'
     customerId: 'String'
     description: 'String'
     dialogueStatisticsSummary: 'DialogueStatisticsSummaryModel'
     edges: 'Edge'
     healthScore: 'HealthScore'
-    id: 'ID'
+    id: 'String'
     isPrivate: 'Boolean'
     isWithoutGenData: 'Boolean'
     issues: 'Issue'
@@ -2827,6 +2980,7 @@ export interface NexusGenFieldTypeNames {
     mostTrendingTopic: 'MostTrendingTopic'
     pathedSessionsConnection: 'PathedSessionsType'
     postLeafNode: 'DialogueFinisherObjectType'
+    postLeafNodeId: 'String'
     publicTitle: 'String'
     questions: 'QuestionNode'
     rootQuestion: 'QuestionNode'
@@ -2838,7 +2992,7 @@ export interface NexusGenFieldTypeNames {
     template: 'String'
     title: 'String'
     topic: 'TopicType'
-    updatedAt: 'String'
+    updatedAt: 'Date'
     wasGeneratedWithGenData: 'Boolean'
   }
   DialogueConditionScopeModel: { // field return type name
@@ -2880,11 +3034,11 @@ export interface NexusGenFieldTypeNames {
     childNode: 'QuestionNode'
     childNodeId: 'String'
     conditions: 'EdgeCondition'
-    createdAt: 'String'
+    createdAt: 'Date'
     id: 'ID'
     parentNode: 'QuestionNode'
     parentNodeId: 'String'
-    updatedAt: 'String'
+    updatedAt: 'Date'
   }
   EdgeCondition: { // field return type name
     conditionType: 'String'
@@ -2899,7 +3053,7 @@ export interface NexusGenFieldTypeNames {
     record: 'String'
   }
   FontSettings: { // field return type name
-    id: 'ID'
+    id: 'Int'
   }
   FormNodeEntryType: { // field return type name
     id: 'Int'
@@ -3115,7 +3269,7 @@ export interface NexusGenFieldTypeNames {
     whitifyImage: 'AWSImageType'
   }
   NodeEntry: { // field return type name
-    creationDate: 'String'
+    creationDate: 'Date'
     depth: 'Int'
     id: 'ID'
     relatedEdgeId: 'String'
@@ -3232,7 +3386,7 @@ export interface NexusGenFieldTypeNames {
   }
   QuestionNode: { // field return type name
     children: 'Edge'
-    creationDate: 'String'
+    creationDate: 'Date'
     extraContent: 'String'
     form: 'FormNodeType'
     id: 'ID'
@@ -3251,11 +3405,13 @@ export interface NexusGenFieldTypeNames {
     title: 'String'
     type: 'QuestionNodeTypeEnum'
     updatedAt: 'String'
+    videoEmbeddedNodeId: 'String'
   }
   QuestionOption: { // field return type name
     id: 'Int'
     isTopic: 'Boolean'
     overrideLeaf: 'QuestionNode'
+    overrideLeafId: 'String'
     position: 'Int'
     publicValue: 'String'
     questionId: 'String'

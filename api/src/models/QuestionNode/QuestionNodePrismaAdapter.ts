@@ -446,7 +446,7 @@ class QuestionNodePrismaAdapter {
     const updatedOptionIds = await this.updateQuestionOptions(options || []);
 
     // Remove videoEmbeddedNode if updated to different type
-    let embedVideoInput: Prisma.VideoEmbeddedNodeUpdateOneWithoutQuestionNodeInput | undefined;
+    let embedVideoInput: Prisma.VideoEmbeddedNodeUpdateOneWithoutQuestionNodeNestedInput | undefined;
     if (type !== NodeType.VIDEO_EMBEDDED && videoEmbeddedNode?.id) {
       embedVideoInput = { delete: true };
     }
