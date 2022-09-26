@@ -31,28 +31,75 @@ describe('groupsFromDialogues', () => {
     ).toBe('Male - U8 - Team1');
   });
 
-  test('group fragments appropriately', () => {
+  test('groups top-groups with different layer sizes appropriately', () => {
+    const topNodes = groupsFromDialogues([
+      ...dialogues,
+      {
+        id: '_',
+        dialogue: {
+          id: '_D',
+          title: 'Neutral - Happy',
+        },
+        impactScore: 0,
+        nrVotes: 10,
+        title: 'Neutral - Happy',
+        updatedAt: '1656506578366',
+      },
+    ]);
+
+    expect(topNodes.length).toBe(3);
+    expect((topNodes[0]).type).toBe('Group');
+    expect((topNodes[1]).type).toBe('Group');
+    expect((topNodes[2]).type).toBe('Group');
+    expect((topNodes[0] as HexagonGroupNode).label).toBe('Male');
+    expect((topNodes[1] as HexagonGroupNode).label).toBe('Female');
+    expect((topNodes[2] as HexagonGroupNode).label).toBe('Neutral');
+  });
+});
+describe('parseDialogueGroup', () => {
+  test('group fragments appropriately for three height', () => {
     const groups = parseDialogueGroup({
       dialogueTitle: 'Male - U8 - Team1',
       groupFragments: ['Male', 'U8', 'Team1'],
     });
 
-    expect(groups[0].groupName).toBe('Male');
-    expect(groups[0].groupFragments).toBe('Male');
-    expect(groups[0].height).toBe(2);
+    expect(groups[0].parentGroupName).toBe('Male');
+    expect(groups[0].parentGroupFragments).toBe('Male');
+    expect(groups[0].height).toBe(0);
     expect(groups[0].childGroupName).toBe('U8');
     expect(groups[0].childGroupFragments).toBe('Male - U8');
 
-    expect(groups[1].groupName).toBe('U8');
-    expect(groups[1].groupFragments).toBe('Male - U8');
+    expect(groups[1].parentGroupName).toBe('U8');
+    expect(groups[1].parentGroupFragments).toBe('Male - U8');
     expect(groups[1].height).toBe(1);
     expect(groups[1].childGroupName).toBe('Team1');
     expect(groups[1].childGroupFragments).toBe('Male - U8 - Team1');
 
-    expect(groups[2].groupName).toBe('Team1');
-    expect(groups[2].groupFragments).toBe('Male - U8 - Team1');
-    expect(groups[2].height).toBe(0);
+    expect(groups[2].parentGroupName).toBe('Team1');
+    expect(groups[2].parentGroupFragments).toBe('Male - U8 - Team1');
+    expect(groups[2].height).toBe(2);
     expect(groups[2].childGroupName).toBe(null);
     expect(groups[2].childGroupFragments).toBe(null);
+  });
+
+  test('group fragments appropriately for two high', () => {
+    const groups = parseDialogueGroup({
+      dialogueTitle: 'Neutral - Happy',
+      groupFragments: ['Neutral', 'Happy'],
+    });
+
+    expect(groups.length).toBe(2);
+
+    expect(groups[0].parentGroupName).toBe('Neutral');
+    expect(groups[0].parentGroupFragments).toBe('Neutral');
+    expect(groups[0].height).toBe(0);
+    expect(groups[0].childGroupName).toBe('Happy');
+    expect(groups[0].childGroupFragments).toBe('Neutral - Happy');
+
+    expect(groups[1].parentGroupName).toBe('Happy');
+    expect(groups[1].parentGroupFragments).toBe('Neutral - Happy');
+    expect(groups[1].height).toBe(1);
+    expect(groups[1].childGroupName).toBe(null);
+    expect(groups[1].childGroupFragments).toBe(null);
   });
 });
