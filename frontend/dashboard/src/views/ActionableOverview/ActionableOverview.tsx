@@ -27,6 +27,7 @@ import {
   useSetActionableStatusMutation,
 } from 'types/generated-types';
 import { DateFormat, useDate } from 'hooks/useDate';
+import { DatePicker } from 'components/Common/DatePicker';
 import { ReactComponent as IconClose } from 'assets/icons/icon-close.svg';
 import { PickerButton } from 'components/Common/Picker/PickerButton';
 import { TabbedMenu } from 'components/Common/TabMenu';
@@ -113,25 +114,6 @@ export const ActionableOverview = () => {
 
   const userPickerEntries = mapToUserPickerEntries(userRoleData?.customer as any, true);
 
-  const handleDateChange = (dates: Date[] | null) => {
-    if (dates) {
-      const [newStartDate, newEndDate] = dates;
-      setFilter({
-        ...filter,
-        startDate: dateFormat(startOfDay(newStartDate), DateFormat.DayTimeFormat),
-        endDate: dateFormat(endOfDay(newEndDate), DateFormat.DayTimeFormat),
-        pageIndex: 0,
-      });
-    } else {
-      setFilter({
-        ...filter,
-        startDate: undefined,
-        endDate: undefined,
-        pageIndex: 0,
-      });
-    }
-  };
-
   const handleGroupChange = (dialogueId: string) => {
     setFilter({ dialogueId, pageIndex: 0 });
   };
@@ -195,7 +177,6 @@ export const ActionableOverview = () => {
                   menuHeader={t('add_filter')}
                   tabs={[
                     { label: t('search'), icon: <Search /> },
-                    { label: t('date'), icon: <Calendar /> },
                   ]}
                 >
                   <UI.Div id="searchFilter">
@@ -210,28 +191,6 @@ export const ActionableOverview = () => {
                         search={filter.search}
                         onSearchChange={handleSearchTermChange}
                       />
-                    </UI.Stack>
-                  </UI.Div>
-
-                  <UI.Div id="dateFilter">
-                    <UI.Stack spacing={2}>
-                      <UI.RadioHeader>
-                        {t('filter_by_date')}
-                      </UI.RadioHeader>
-                      <UI.Div mb={1}>
-                        <UI.Muted>{t('show_interactions_between')}</UI.Muted>
-                      </UI.Div>
-                      <UI.Div>
-                        <UI.DatePicker
-                          value={[
-                            filter.startDate ? parse(filter.startDate, DateFormat.DayTimeFormat) : undefined,
-                            filter.endDate ? parse(filter.endDate, DateFormat.DayTimeFormat) : undefined,
-                          ]}
-                          onChange={handleDateChange}
-                          range
-                        />
-                      </UI.Div>
-                      <UI.Button size="sm" onClick={() => handleDateChange(null)}>{t('reset')}</UI.Button>
                     </UI.Stack>
                   </UI.Div>
                 </TabbedMenu>
