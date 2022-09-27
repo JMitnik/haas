@@ -937,9 +937,9 @@ const language = {
     },
     upload_workspace_csv_helper: {
       en:
-        'Upload a CSV file with details about your workspace. \n - The appropriate format is to use ";" as delimiter \n - Use layer_0;layer_1;layer_etc;emailAssignee;phoneAssignee as your columns \n - Prefix the phone numbers with their country code: for example +49 30901820',
+        'Upload a CSV file with details about your workspace. \n - The appropriate format is to use ";" as delimiter \n - Use layer_0;layer_1;layer_etc;template;limited_access_assignee_email?;limited_access_assignee_phone?;contacts as your columns \n - Enter email addresses separated by a comma (e.g. email1@haas.live,email2@haas.live etc.) in the contacts column \n - Current options to override a template in the template column are: STUDENT_NL, TEACHER_NL, STUDENT_ENG, TEACHER_ENG, SPORT_ENG, SPORT_NL, BUSINESS_ENG & BUSINESS_NL',
       de:
-        'Laden Sie eine CSV-Datei mit Details zu Ihrem Arbeitsbereich hoch. \n - Das geeignete Format ist ";" als Trennzeichen zu verwenden. \n - Verwenden Sie Layer_0;Layer_1;Layer_etc;emailAssignee;phoneAssignee als Ihre Spalten. \n - Stellen Sie den Telefonnummern die Ländervorwahl voran: zum Beispiel +49 30901820',
+        'Laden Sie eine CSV-Datei mit Details zu Ihrem Arbeitsbereich hoch. \n - Das geeignete Format ist ";" als Trennzeichen zu verwenden. \n - Verwenden Sie layer_0;layer_1;layer_etc;template;limited_access_assignee_email?;limited_access_assignee_phone?;contacts als Ihre Spalten. \n - Geben Sie E-Mail-Adressen getrennt durch ein Komma (z. B. email1@haas.live,email2@haas.live usw.) in die Spalte Kontakte ein  \n Geben Sie die E-Mail-Adressen durch ein Komma getrennt ein \n - Aktuelle Vorlagenoptionen zum Überschreiben sind: STUDENT_NL, TEACHER_NL, STUDENT_ENG, TEACHER_ENG, SPORT_ENG, SPORT_NL, BUSINESS_ENG & BUSINESS_NL',
     },
     upload_deliveries_helper: {
       en:
