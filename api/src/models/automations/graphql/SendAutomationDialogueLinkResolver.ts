@@ -16,7 +16,7 @@ export const SendAutomationDialogueLinkResolver = mutationField('sendAutomationD
   },
   nullable: true,
   async resolve(parent, args, ctx) {
-    if (!args.input) throw new GraphQLYogaError('No input object provided for createAutomation Resolver');
+    if (!args.input) throw new GraphQLYogaError('No input object provided for resolver');
 
     const { workspaceSlug, automationActionId } = args.input;
 

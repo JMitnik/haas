@@ -5,7 +5,6 @@ import { RegisterUserInput } from './UserPrismaAdapterType';
 import RoleService from '../role/RoleService';
 import { NexusGenInputs } from '../../generated/nexus';
 
-
 class UserPrismaAdapter {
   prisma: PrismaClient;
   roleService: RoleService;
@@ -13,6 +12,13 @@ class UserPrismaAdapter {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
     this.roleService = new RoleService(prismaClient);
+  }
+
+  findMany = async (where: Prisma.UserWhereInput, include: Prisma.UserInclude) => {
+    return this.prisma.user.findMany({
+      where,
+      include,
+    })
   }
 
   /**

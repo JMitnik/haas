@@ -187,7 +187,16 @@ export const schema = yup.object({
         channelId: yup.string(),
         id: yup.string(),
         type: yup.mixed<AutomationActionType>().oneOf(Object.values(AutomationActionType)),
-        targets: yup.array().required().of(
+        targets: yup.array().when('type', {
+          is: (actionType) => actionType !== AutomationActionType.SendDialogueLink,
+          then: yup.array().required().of(
+            yup.object().required().shape({
+              label: yup.string().required(),
+              type: yup.string().required(),
+              value: yup.string().required(),
+            }),
+          ),
+        }).of(
           yup.object().shape({
             label: yup.string(),
             type: yup.string(),

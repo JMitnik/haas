@@ -10,7 +10,7 @@ import makeRoleUpdateTemplate from '../../services/mailings/templates/makeRoleUp
 import UserPrismaAdapter from './UserPrismaAdapter';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import UserOfCustomerPrismaAdapter from './UserOfCustomerPrismaAdapter';
-import { DeletedUserOutput, GenerateReportPayload, UserWithWorkspaces } from './UserServiceTypes';
+import { DeletedUserOutput, GenerateReportPayload, UserWithAssignedDialogues, UserWithWorkspaces } from './UserServiceTypes';
 import { offsetPaginate } from '../general/PaginationHelpers';
 import CustomerService from '../../models/customer/CustomerService';
 import { assertNonNullish } from '../../utils/assertNonNullish';
@@ -29,6 +29,24 @@ class UserService {
     this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
     this.customerService = new CustomerService(prismaClient);
   };
+
+  public async findAllAssignedUsers(workspaceSlug: string) {
+    const whereInput: Prisma.UserWhereInput = {
+      isAssignedTo: {
+        some: {
+          customer: {
+            slug: workspaceSlug,
+          },
+        },
+      },
+    };
+
+    const users = await this.userPrismaAdapter.findMany(whereInput, {
+      isAssignedTo: true,
+    }) as UserWithAssignedDialogues[];
+
+    return users;
+  }
 
   /**
    * Finds all users based on a AutomationAction payload

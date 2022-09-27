@@ -50,11 +50,7 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
   });
 
   const [deleteAutomation] = useDeleteAutomationMutation({
-    refetchQueries: [
-      refetchAutomationConnectionQuery({
-        customerSlug,
-      }),
-    ],
+    refetchQueries: ['automationConnection'],
     onCompleted: () => {
       toast({
         title: 'Automation deleted',

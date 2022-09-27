@@ -4,7 +4,7 @@ import { uniqBy } from 'lodash';
 import UserService from '../users/UserService';
 import config from '../../config/config';
 import { ReportLambdaInput, ReportService } from './ReportService';
-import { GenerateReportPayload } from '../../models/users/UserServiceTypes';
+import { GenerateReportPayload, UserWithAssignedDialogues } from '../../models/users/UserServiceTypes';
 import makeDialogueLinkReminderTemplate from '../../services/mailings/templates/makeDialogueLinkReminderTemplate';
 import makeReportMailTemplate from '../../services/mailings/templates/makeReportTemplate';
 import { mailService } from '../../services/mailings/MailService';
@@ -110,8 +110,6 @@ export class AutomationActionService {
 
   /**
    * Sends an email with a url to all users (who have an assigned dialogue) provided in an automation action
-   * @param automationScheduleId
-   * @param workspaceSlug
    * @returns a boolean indicating whether the call was a succes or not
    */
   public async sendDialogueLink(
@@ -167,7 +165,7 @@ export class AutomationActionService {
   ) {
     switch (channel.type) {
       case AutomationActionChannelType.EMAIL:
-        await this.handleSendDialogueEmailChannel(channel, workspaceSlug);
+        await this.handleSendDialogueEmailChannel(workspaceSlug);
         break;
       case AutomationActionChannelType.SMS:
         // TODO: Implement
@@ -176,7 +174,7 @@ export class AutomationActionService {
         // TODO: Implement
         break;
       default:
-        await this.handleSendDialogueEmailChannel(channel, workspaceSlug);
+        await this.handleSendDialogueEmailChannel(workspaceSlug);
         break;
     }
   }
@@ -252,17 +250,41 @@ export class AutomationActionService {
   };
 
   /**
+   * Send mails out to each recipient of the actions.
+   * @param recipients List of users who receive the mail
+   * @param workspaceSlug Workspace slug
+   */
+  public async dispatchMailToTeamAssignees(
+    users: UserWithAssignedDialogues[],
+    workspaceSlug: string
+  ): Promise<void[]> {
+    return await Promise.all(users.map(async (user) => {
+      // TODO: Add support for multiple client URLs if a user is assinged to multipled dialogues
+      const assignedDialogues = user?.isAssignedTo;
+      if (!assignedDialogues?.length) { return };
+
+      const targetDialogue = assignedDialogues[0];
+
+      mailService.send({
+        body: makeDialogueLinkReminderTemplate({
+          recipientMail: user.firstName || 'User',
+          dialogueClientUrl: `${config.clientUrl}/${workspaceSlug}/${targetDialogue.slug}`,
+        }),
+        recipient: user.email,
+        subject: 'A new HAAS survey has been released for your team',
+      });
+    }));
+  }
+
+  /**
    * Sends an email containing a dialogue client link to all recipients in the channel's payload
-   * @param channel
    * @param workspaceSlug
    */
   private async handleSendDialogueEmailChannel(
-    channel: AutomationActionChannel,
     workspaceSlug: string,
   ) {
-    const payload = (channel.payload as unknown) as GenerateReportPayload;
-    const recipients = await this.userService.findTargetUsers(workspaceSlug, payload);
-    await this.dispatchReminderMailJobs(recipients, workspaceSlug);
+    const usersWithAssignedTeams = await this.userService.findAllAssignedUsers(workspaceSlug);
+    await this.dispatchMailToTeamAssignees(usersWithAssignedTeams, workspaceSlug);
   }
 
   /**

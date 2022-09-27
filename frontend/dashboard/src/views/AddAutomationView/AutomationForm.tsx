@@ -7,7 +7,9 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import React from 'react';
 
 import {
-  AutomationEventType, AutomationType,
+  AutomationActionType,
+  AutomationEventType,
+  AutomationType,
   CreateAutomationInput,
   RecurringPeriodType,
   useGetUsersAndRolesQuery,
@@ -107,6 +109,11 @@ export const AutomationForm = ({
 
   const watchSchedule = useWatch({
     name: 'schedule',
+    control: form.control,
+  });
+
+  const watchActionType = useWatch({
+    name: `actions.${0}.action.type`,
     control: form.control,
   });
 
@@ -256,7 +263,9 @@ export const AutomationForm = ({
             </UI.FormSection>
           )}
 
-          <RecipientsFragment recipientEntries={userPickerEntries} />
+          {watchActionType && watchActionType !== AutomationActionType.SendDialogueLink && (
+            <RecipientsFragment recipientEntries={userPickerEntries} />
+          )}
 
           <UI.Flex>
             <UI.Button
