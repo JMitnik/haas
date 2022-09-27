@@ -150,12 +150,11 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
               )}
             </TypeBadge>
             <Switch
+              as="div"
               isDisabled={!canUpdateAutomations && !canAccessAdmin}
               isChecked={automation.isActive || false}
               onClick={(e) => {
-                if (canUpdateAutomations || canAccessAdmin) {
-                  handleEnableChange(e);
-                }
+                handleEnableChange(e);
               }}
               size="lg"
             />
