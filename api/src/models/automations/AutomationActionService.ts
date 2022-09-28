@@ -147,6 +147,8 @@ export class AutomationActionService {
         body: makeDialogueLinkReminderTemplate({
           recipientMail: user.firstName || 'User',
           dialogueClientUrl: `${config.clientUrl}/${workspaceSlug}/${targetDialogue.slug}`,
+          dialogues: privateDialogues,
+          workspaceSlug,
         }),
         recipient: user.email,
         subject: 'A new HAAS survey has been released for your team',
@@ -269,9 +271,11 @@ export class AutomationActionService {
         body: makeDialogueLinkReminderTemplate({
           recipientMail: user.firstName || 'User',
           dialogueClientUrl: `${config.clientUrl}/${workspaceSlug}/${targetDialogue.slug}`,
+          dialogues: assignedDialogues,
+          workspaceSlug,
         }),
         recipient: user.email,
-        subject: 'A new HAAS survey has been released for your team',
+        subject: 'A new HAAS survey has been released for your team(s)',
       });
     }));
   }
