@@ -262,7 +262,7 @@ export const AutomationForm = ({
               </UI.InputGrid>
             </UI.FormSection>
           )}
-          {/* Retry */}
+
           {watchActionType && watchActionType !== AutomationActionType.SendDialogueLink && (
             <RecipientsFragment recipientEntries={userPickerEntries} />
           )}
