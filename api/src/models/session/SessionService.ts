@@ -325,6 +325,7 @@ class SessionService {
     });
 
     if (session.mainScore <= 55) {
+      console.log('Should create actionable')
       await this.createSessionActionable(session, dialogueId);
     }
 

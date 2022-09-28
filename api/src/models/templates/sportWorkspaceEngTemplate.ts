@@ -2,12 +2,12 @@ import { LanguageEnum, NodeType } from '@prisma/client';
 import { defaultAdminRole, defaultBotRole, defaultManagerRole, defaultSportTextFieldForm, defaultUserRole, DemoWorkspaceTemplate } from './TemplateTypes';
 
 const sportOptionsEng = [
-  { value: 'Physical & Mental', position: 1 },
-  { value: 'Coaching', position: 2 },
-  { value: 'Home', position: 3 },
-  { value: 'School', position: 4 },
-  { value: 'Team Members', position: 5 },
-  { value: 'Own Performance', position: 6 },
+  { value: 'Physical & Mental', position: 1, topic: 'Physical & Mental' },
+  { value: 'Coaching', position: 2, topic: 'Coaching' },
+  { value: 'Home', position: 3, topic: 'Home' },
+  { value: 'School', position: 4, topic: 'School' },
+  { value: 'Team Members', position: 5, topic: 'Team Members' },
+  { value: 'Own Performance', position: 6, topic: 'Own Performance' },
 ];
 
 const sportWorkspaceTemplate: DemoWorkspaceTemplate = {

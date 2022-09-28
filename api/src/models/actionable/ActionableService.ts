@@ -7,7 +7,7 @@ import QuestionNodePrismaAdapter from '../QuestionNode/QuestionNodePrismaAdapter
 import { ActionablePrismaAdapter } from './ActionablePrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import IssuePrismaAdapter from '../Issue/IssuePrismaAdapter';
-import { ActionableConnectionFilterInput, ActionableFilterInput, AssignUserToActionableInput, SetActionableStatusInput } from './Actionable.types';
+import { ActionableConnectionFilterInput, ActionableFilterInput, AssignUserToActionableInput, SetActionableStatusInput, VerifyActionableInput } from './Actionable.types';
 import { offsetPaginate } from '../general/PaginationHelpers';
 
 class ActionableService {
@@ -21,6 +21,15 @@ class ActionableService {
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prisma);
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prisma);
     this.issuePrismaAdapter = new IssuePrismaAdapter(prisma);
+  }
+
+  public async verifyActionable(input: VerifyActionableInput) {
+    const actionable = await this.actionablePrismaAdapter.findById(input.actionableId);
+
+    if (!actionable) return null;
+
+    const updateArgs: Prisma.ActionableUpdateInput = { isVerified: !!input.actionableId ? true : false };
+    return this.actionablePrismaAdapter.updateActionable(input.actionableId, updateArgs);
   }
 
   /**

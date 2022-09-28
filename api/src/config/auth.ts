@@ -98,6 +98,7 @@ const authShield = shield({
   },
   Mutation: {
     '*': isSuperAdmin,
+    verifyActionable: allow,
     logout: allow,
     createSession: allow,
     updateCreateWorkspaceJob: allow,

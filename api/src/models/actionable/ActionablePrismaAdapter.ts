@@ -12,6 +12,14 @@ export class ActionablePrismaAdapter {
     this.prisma = prisma;
   }
 
+  public async findById(actionableId: string) {
+    return this.prisma.actionable.findUnique({
+      where: {
+        id: actionableId,
+      },
+    });
+  };
+
   public async updateActionable(actionableId: string, update: Prisma.ActionableUpdateInput) {
     return this.prisma.actionable.update({
       data: update,

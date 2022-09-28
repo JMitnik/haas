@@ -15,6 +15,14 @@ class UserPrismaAdapter {
     this.roleService = new RoleService(prismaClient);
   }
 
+  findUniqueByEmail = async (email: string) => {
+    return this.prisma.user.findUnique({
+      where: {
+        email,
+      },
+    })
+  }
+
   /**
    * Upserts a user by checking if the email already exists or not
    * @param input

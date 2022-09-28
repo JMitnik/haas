@@ -1558,6 +1558,7 @@ type Mutation {
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType
   uploadJobImage(disapproved: Boolean, file: Upload, jobId: String, type: UploadImageEnumType): AWSImageType
   uploadUpsellImage(input: UploadSellImageInputType): ImageType
+  verifyActionable(input: VerifyActionableInput!): Actionable
 
   """
   Given a token, checks in the database whether token has been set and has not expired yet
@@ -2504,6 +2505,11 @@ type UserType {
   role: RoleType
   roleId: String
   userCustomers: [UserCustomer]
+}
+
+input VerifyActionableInput {
+  actionableId: String!
+  workspaceId: String!
 }
 
 type VerifyUserTokenOutput {

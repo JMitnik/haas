@@ -855,6 +855,10 @@ export interface NexusGenInputs {
     userId?: string | null; // String
     workspaceId?: string | null; // String
   }
+  VerifyActionableInput: { // input type
+    actionableId: string; // String!
+    workspaceId: string; // String!
+  }
   VideoNodeEntryInput: { // input type
     value?: string | null; // String
   }
@@ -2286,6 +2290,7 @@ export interface NexusGenFieldTypes {
     updateRoles: NexusGenRootTypes['RoleType'] | null; // RoleType
     uploadJobImage: NexusGenRootTypes['AWSImageType'] | null; // AWSImageType
     uploadUpsellImage: NexusGenRootTypes['ImageType'] | null; // ImageType
+    verifyActionable: NexusGenRootTypes['Actionable'] | null; // Actionable
     verifyUserToken: NexusGenRootTypes['VerifyUserTokenOutput'] | null; // VerifyUserTokenOutput
     whitifyImage: NexusGenRootTypes['AWSImageType'] | null; // AWSImageType
   }
@@ -3265,6 +3270,7 @@ export interface NexusGenFieldTypeNames {
     updateRoles: 'RoleType'
     uploadJobImage: 'AWSImageType'
     uploadUpsellImage: 'ImageType'
+    verifyActionable: 'Actionable'
     verifyUserToken: 'VerifyUserTokenOutput'
     whitifyImage: 'AWSImageType'
   }
@@ -3971,6 +3977,9 @@ export interface NexusGenArgTypes {
     }
     uploadUpsellImage: { // args
       input?: NexusGenInputs['UploadSellImageInputType'] | null; // UploadSellImageInputType
+    }
+    verifyActionable: { // args
+      input: NexusGenInputs['VerifyActionableInput']; // VerifyActionableInput!
     }
     verifyUserToken: { // args
       token?: string | null; // String

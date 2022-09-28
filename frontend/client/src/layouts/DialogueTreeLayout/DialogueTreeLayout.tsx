@@ -50,7 +50,7 @@ const DialogueTreeLayout = ({ children, node, isAtLeaf }: DialogueTreeLayoutProp
   return (
     <DialogueTreeContainer as={motion.div} animate={{ opacity: 1 }} exit={{ opacity: 0 }} initial={{ opacity: 0 }}>
       {/* TODO: Enable consistent animation */}
-      {!node.isRoot && !isFinished && !isAtLeaf && (
+      {!node?.isRoot && !isFinished && !isAtLeaf && (
         <GoBackContainer variants={routerNavigationAnimation} animate="animate" initial="initial" exit="exit">
           <GoBackButton onClick={() => navigate(-1)}>
             <ChevronLeft />

@@ -4,3 +4,4 @@ export * from './ActionableFilterInput.graphql';
 export * from './AssignUserToActionableResolver';
 export * from './ActionableConnection.graphql';
 export * from './SetActionableStatusResolver';
+export * from './VerifyActionableResolver';
