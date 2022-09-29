@@ -5,6 +5,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 
 import { Dialogue, SystemPermission } from 'types/generated-types';
+import { debug } from 'jest-preview';
 import {
   mockAssignUserToDialogue,
   mockCustomerOfUser,
@@ -193,6 +194,8 @@ describe('DialogueOverview', () => {
     fireEvent.click(await screen.findByText((text) => text.toLowerCase().includes('only assignees')));
 
     await new Promise((r) => setTimeout(r, 2000));
+
+    debug();
 
     const privateBadge = screen.getByText((text) => text.toLowerCase().includes('private'));
     expect(privateBadge).toBeInTheDocument();

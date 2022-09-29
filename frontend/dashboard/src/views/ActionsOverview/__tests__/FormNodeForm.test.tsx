@@ -43,7 +43,6 @@ describe('FormNodeForm', () => {
     await new Promise((r) => setTimeout(r, 2000));
     fireEvent.click(screen.getByText((text) => text.toLowerCase().includes('add step')));
     await new Promise((r) => setTimeout(r, 2000));
-    debug();
     expect(screen.queryByText((text) => text.toLowerCase().includes('page 1')));
   });
 
@@ -69,7 +68,6 @@ describe('FormNodeForm', () => {
     fireEvent.click(window.document);
     expect(screen.queryByText((text) => includesText(text, `Page 1: ${headerTestString}`))).toBeInTheDocument();
     expect(screen.queryByText((text) => includesText(text, '1 field'))).toBeInTheDocument();
-    debug();
   });
 
   test('Can change position of Form Node Steps', async () => {
@@ -109,7 +107,6 @@ describe('FormNodeForm', () => {
     // Move second row up
     fireEvent.click(moveUpButtons[0]);
     expect(screen.queryByText((text) => includesText(text, `Page 1: ${headerTestString}`))).toBeInTheDocument();
-    debug();
   });
 
   test('Can delete a Form Node Step', async () => {
@@ -122,8 +119,6 @@ describe('FormNodeForm', () => {
 
     expect(screen.queryByText((text) => includesText(text, 'Page 1'))).not.toBeInTheDocument();
     expect(screen.queryByText((text) => includesText(text, 'first step'))).toBeInTheDocument();
-
-    debug();
   });
 });
 
