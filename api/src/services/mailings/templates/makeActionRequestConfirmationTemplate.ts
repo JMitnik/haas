@@ -9,7 +9,7 @@ interface makeActionRequestConfirmationTemplateProps {
   bgColor?: string;
 }
 
-const makeActionRequestConfirmationTemplate = ({ recipientMail, dialogueTitle, verifyUrl, bgColor = '#0059f8', assigneeName }: makeActionRequestConfirmationTemplateProps) => {
+const makeActionRequestConfirmationTemplate = ({ recipientMail, verifyUrl, bgColor = '#0059f8', assigneeName }: makeActionRequestConfirmationTemplateProps) => {
   const lighterBg = Color(bgColor).darken(0.1).hex();
 
   return mjml2html(`
@@ -43,9 +43,9 @@ const makeActionRequestConfirmationTemplate = ({ recipientMail, dialogueTitle, v
       <mj-column width="100%">
       <mj-text>
       ${assigneeName ? `
-      Hi ${recipientMail}, please confirm you have requested to communicate with ${assigneeName}.
+      Hi ${recipientMail}, please confirm you have requested to talk to ${assigneeName}.
       ` : `
-      Hi ${recipientMail}, please confirm you have requested to communicate with someone.
+      Hi ${recipientMail}, please confirm you have requested to talk with someone.
       `}
       </mj-text>
         
