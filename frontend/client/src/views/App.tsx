@@ -6,8 +6,8 @@ import React, { useLayoutEffect } from 'react';
 import { Dialogue } from 'modules/Dialogue/Dialogue';
 import AppProviders from 'config/AppProviders';
 import GlobalAppLayout from 'layouts/GlobalAppLayout';
-
 import VerifyActionableNode from 'modules/VerifyActionableNode/VerifyActionableNode';
+
 import { CampaignRedirectView } from './CampaignRedirectView/CampaignRedirectView';
 import { DialogueNodelessView } from './DialogueNodelessView';
 import { LandingView } from './LandingView';
