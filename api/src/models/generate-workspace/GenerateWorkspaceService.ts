@@ -82,6 +82,8 @@ class GenerateWorkspaceService {
     sessionsPerDay: number = 1,
     generateData: boolean = false,
     makeDialoguePrivate: boolean = false,
+    minScore: number = 70,
+    maxScore: number = 80
   ) {
     const mappedDialogueInputData = generateCreateDialogueDataByTemplateLayers(templateType);
 
@@ -124,7 +126,9 @@ class GenerateWorkspaceService {
 
       // Generate data
       if (generateData) {
-        await this.dialogueService.massGenerateFakeData(dialogue.id, template, sessionsPerDay, true, 2, 70, 80);
+        await this.dialogueService.massGenerateFakeData(
+          dialogue.id, template, sessionsPerDay, true, 2, minScore, maxScore
+        );
       }
     }
   }
