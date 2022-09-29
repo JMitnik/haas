@@ -29,7 +29,7 @@ const routerNavigationAnimation: Variants = {
 
 interface DialogueTreeLayoutProps {
   children: ReactNode;
-  node: QuestionNode;
+  node?: QuestionNode;
   isAtLeaf: boolean;
 }
 

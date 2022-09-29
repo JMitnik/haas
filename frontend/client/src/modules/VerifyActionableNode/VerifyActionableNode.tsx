@@ -1,31 +1,18 @@
 import * as Sentry from '@sentry/react';
 import * as UI from '@haas/ui';
+import { AnimatePresence } from 'framer-motion';
+import { useParams } from 'react-router-dom';
 import React, { useEffect } from 'react';
 
-import { MainHeader, SubHeader, Text } from 'components/Type/Headers';
-import { QuestionNode, QuestionNodeTypeEnum } from 'types/core-types';
-import { useDialogueState } from 'modules/Dialogue/DialogueState';
-
-import { AnimatePresence } from 'framer-motion';
+import { FullScreenLayout } from 'layouts/FullScreenLayout';
 import { LanguageEnumType, useVerifyActionableMutation } from 'types/generated-types';
-import { useParams } from 'react-router-dom';
+import { MainHeader, SubHeader, Text } from 'components/Type/Headers';
+import { useDialogueState } from 'modules/Dialogue/DialogueState';
 import DialogueTreeLayout from 'layouts/DialogueTreeLayout';
+import Loader from 'components/Loader';
 import NodeLayout from 'layouts/NodeLayout';
 
 import { VerifyActionableNodeContainer } from './VerifyActionableNodeStyles';
-
-export const POSTLEAFNODE_ID = '-1';
-
-export const defaultPostLeafNode: QuestionNode = {
-  id: POSTLEAFNODE_ID,
-  title: '',
-  type: QuestionNodeTypeEnum.Generic,
-  isLeaf: true,
-  isRoot: false,
-  links: [],
-  options: [],
-  children: [],
-};
 
 const getCloseText = (language?: LanguageEnumType) => {
   switch (language) {
@@ -40,17 +27,40 @@ const getCloseText = (language?: LanguageEnumType) => {
   }
 };
 
+const getHeaderText = (language?: LanguageEnumType) => {
+  switch (language) {
+    case LanguageEnumType.Dutch:
+      return 'Bedankt voor uw bevestiging';
+    case LanguageEnumType.English:
+      return 'Thank you for your confirmation';
+    case LanguageEnumType.German:
+      return 'Danke für deine Bestätigung';
+    default:
+      return 'Thank you for your confirmation';
+  }
+};
+
+const getSubHeaderText = (language?: LanguageEnumType) => {
+  switch (language) {
+    case LanguageEnumType.Dutch:
+      return 'We komen zo snel mogelijk bij u terug';
+    case LanguageEnumType.English:
+      return 'We get back to you soon';
+    case LanguageEnumType.German:
+      return 'Wir melden uns schnellstmöglich bei Ihnen zurück';
+    default:
+      return 'We get back to you soon';
+  }
+};
+
 const VerifyActionableNode = () => {
   const { dialogue } = useDialogueState();
   const { actionableId } = useParams();
-  console.log('Params:', actionableId);
 
-  const header = dialogue?.postLeafNode?.header || 'Thank you for participating!';
-  const subHeader = dialogue?.postLeafNode?.subtext || 'Life should be fulfilling';
+  const header = getHeaderText(dialogue?.language || undefined);
+  const subHeader = getSubHeaderText(dialogue?.language || undefined);
 
   const [verifyActionable] = useVerifyActionableMutation({
-    onCompleted: () => {
-    },
     onError: (error) => {
       Sentry.captureException(error);
     },
@@ -70,19 +80,26 @@ const VerifyActionableNode = () => {
   }, [actionableId]);
 
   return (
-    <DialogueTreeLayout isAtLeaf node={null as any}>
+    <DialogueTreeLayout isAtLeaf>
       <AnimatePresence exitBeforeEnter>
-        <NodeLayout>
-          <VerifyActionableNodeContainer>
-            <MainHeader>{header}</MainHeader>
-            <UI.Div>
-              <SubHeader textAlign="center">
-                {subHeader}
-              </SubHeader>
-              <Text>{getCloseText(dialogue?.language || undefined)}</Text>
-            </UI.Div>
-          </VerifyActionableNodeContainer>
-        </NodeLayout>
+        {dialogue ? (
+          <NodeLayout>
+            <VerifyActionableNodeContainer>
+              <MainHeader>{header}</MainHeader>
+              <UI.Div>
+                <SubHeader textAlign="center">
+                  {subHeader}
+                </SubHeader>
+                <Text>{getCloseText(dialogue?.language || undefined)}</Text>
+              </UI.Div>
+            </VerifyActionableNodeContainer>
+          </NodeLayout>
+        ) : (
+          <FullScreenLayout>
+            <Loader />
+          </FullScreenLayout>
+        )}
+
       </AnimatePresence>
     </DialogueTreeLayout>
 
