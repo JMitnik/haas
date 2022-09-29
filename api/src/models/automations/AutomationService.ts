@@ -200,16 +200,25 @@ class AutomationService {
 
     const createdAutomation = await this.automationPrismaAdapter.createAutomation(validatedInput);
 
-    if (createdAutomation.type === AutomationType.SCHEDULED
-      && createdAutomation.automationScheduled
-    ) {
-      await this.upsertEventBridge(
-        input.workspaceId as string,
-        createdAutomation.automationScheduled,
-        createdAutomation,
-        input.schedule?.dialogueId || undefined,
-      );
+    try {
+      if (createdAutomation.type === AutomationType.SCHEDULED
+        && createdAutomation.automationScheduled
+      ) {
+        await this.upsertEventBridge(
+          input.workspaceId as string,
+          createdAutomation.automationScheduled,
+          createdAutomation,
+          input.schedule?.dialogueId || undefined,
+        );
+      }
+    } catch {
+      await this.automationPrismaAdapter.deleteAutomation({
+        automationId: createdAutomation.id,
+        workspaceId: createdAutomation.workspaceId,
+      });
+      throw new GraphQLYogaError('Failed to create an automation in cloud');
     }
+
 
     return createdAutomation;
   }

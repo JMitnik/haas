@@ -6,7 +6,6 @@ import {
 } from '@chakra-ui/core';
 
 import { formatDistance } from 'date-fns';
-import { useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import React, { useRef, useState } from 'react';
 
@@ -15,7 +14,6 @@ import {
   AutomationType,
   DeleteAutomationInput,
   EnableAutomationInput,
-  refetchAutomationConnectionQuery,
   useDeleteAutomationMutation,
   useEnableAutomationMutation,
 } from 'types/generated-types';
@@ -28,7 +26,6 @@ import useAuth from 'hooks/useAuth';
 import { TypeBadge } from './AutomationOverviewStyles';
 
 const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel, isCompact?: boolean }) => {
-  const { customerSlug } = useParams<{ customerSlug: string }>();
   const { activeCustomer } = useCustomer();
   const { canAccessAdmin, canUpdateAutomations } = useAuth();
   const [openDropdown, setIsOpenDropdown] = useState(false);
@@ -51,9 +48,7 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
 
   const [deleteAutomation] = useDeleteAutomationMutation({
     refetchQueries: [
-      refetchAutomationConnectionQuery({
-        customerSlug,
-      }),
+      'automationConnection',
     ],
     onCompleted: () => {
       toast({
@@ -150,12 +145,11 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
               )}
             </TypeBadge>
             <Switch
+              as="div"
               isDisabled={!canUpdateAutomations && !canAccessAdmin}
               isChecked={automation.isActive || false}
               onClick={(e) => {
-                if (canUpdateAutomations || canAccessAdmin) {
-                  handleEnableChange(e);
-                }
+                handleEnableChange(e);
               }}
               size="lg"
             />
@@ -189,23 +183,25 @@ const AutomationCard = ({ automation, isCompact }: { automation: AutomationModel
                   </UI.Div>
                 )}
 
-              {(automation.type === AutomationType.Scheduled
-                && automation.automationScheduled?.activeDialogue?.slug) && (
-                  <UI.Div mb={1}>
-                    <UI.Label size="sm">
-                      <UI.Flex alignItems="center">
-                        <UI.Icon stroke="#718096" verticalAlign="middle" mt="4px">
-                          <Briefcase />
-                        </UI.Icon>
-                        <UI.Span ml={1} mt={1}>
-                          <UI.Helper>
-                            {automation.automationScheduled?.activeDialogue?.slug}
-                          </UI.Helper>
-                        </UI.Span>
-                      </UI.Flex>
-                    </UI.Label>
-                  </UI.Div>
-                )}
+              {(
+                automation.type === AutomationType.Scheduled
+                && automation.automationScheduled?.activeDialogue?.slug
+              ) && (
+                <UI.Div mb={1}>
+                  <UI.Label size="sm">
+                    <UI.Flex alignItems="center">
+                      <UI.Icon stroke="#718096" verticalAlign="middle" mt="4px">
+                        <Briefcase />
+                      </UI.Icon>
+                      <UI.Span ml={1} mt={1}>
+                        <UI.Helper>
+                          {automation.automationScheduled?.activeDialogue?.slug}
+                        </UI.Helper>
+                      </UI.Span>
+                    </UI.Flex>
+                  </UI.Label>
+                </UI.Div>
+              )}
 
               {automation.type === AutomationType.Trigger && automation.automationTrigger?.actions?.length
                 && automation.automationTrigger?.actions.map((action) => (
