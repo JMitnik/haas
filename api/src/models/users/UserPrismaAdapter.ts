@@ -1,4 +1,4 @@
-import { PrismaClient, User, Prisma, UserOfCustomer } from '@prisma/client';
+import { PrismaClient, User, Prisma, UserOfCustomer } from 'prisma/prisma-client';
 import _, { cloneDeep, reject } from 'lodash';
 
 import { RegisterUserInput } from './UserPrismaAdapterType';

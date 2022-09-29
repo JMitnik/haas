@@ -1,6 +1,6 @@
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import { extendType, inputObjectType, mutationField, objectType, queryField, scalarType } from 'nexus';
-import { Prisma } from '@prisma/client';
+import { Prisma } from 'prisma/prisma-client';
 import { Kind } from 'graphql';
 
 import { ConnectionInterface } from '../../general/Pagination';

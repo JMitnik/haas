@@ -1,4 +1,4 @@
-import { Dialogue, LinkTypeEnum, NodeType } from '@prisma/client';
+import { Dialogue, LinkTypeEnum, NodeType } from 'prisma/prisma-client';
 import e from 'express';
 import { NexusGenInputs } from '../../generated/nexus';
 import { QuestionConditionProps } from '../questionnaire/Dialogue.types';

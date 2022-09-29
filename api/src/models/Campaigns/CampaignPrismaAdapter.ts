@@ -1,4 +1,4 @@
-import { DeliveryStatusTypeEnum, Prisma, PrismaClient } from '@prisma/client';
+import { DeliveryStatusTypeEnum, Prisma, PrismaClient } from 'prisma/prisma-client';
 import { cloneDeep } from 'lodash';
 import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 

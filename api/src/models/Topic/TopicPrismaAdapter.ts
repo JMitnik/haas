@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient, TopicType } from '@prisma/client';
+import { Prisma, PrismaClient, TopicType } from 'prisma/prisma-client';
 import { isPresent } from 'ts-is-present';
 
 import { CreateTopicInput, RevokeTopicInput } from './Topic.types';

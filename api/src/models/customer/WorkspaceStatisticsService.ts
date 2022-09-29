@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from 'prisma/prisma-client';
 
 import { convertDatesToHistogramItems } from '../Common/Analytics/Analytics.helpers';
 import { DateHistogram } from '../Common/Analytics/Analytics.types';

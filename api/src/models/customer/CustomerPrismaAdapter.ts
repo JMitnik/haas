@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient, Dialogue, Customer, Tag, CustomerSettings, ColourSettings, FontSettings } from '@prisma/client';
+import { Prisma, PrismaClient, Dialogue, Customer, Tag, CustomerSettings, ColourSettings, FontSettings } from 'prisma/prisma-client';
 import WorkspaceTemplate, { DemoWorkspaceTemplate } from '..//templates/TemplateTypes';
 
 import { NexusGenInputs } from '../../generated/nexus';

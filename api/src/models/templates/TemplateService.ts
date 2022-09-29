@@ -1,4 +1,4 @@
-import { DialogueTemplateType, NodeType, PrismaClient, QuestionNode, Prisma } from '@prisma/client';
+import { DialogueTemplateType, NodeType, PrismaClient, QuestionNode, Prisma } from 'prisma/prisma-client';
 
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import { NexusGenEnums } from '../../generated/nexus';

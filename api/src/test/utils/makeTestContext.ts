@@ -1,6 +1,6 @@
 import { Server } from 'http';
 import getPort, { makeRange } from 'get-port';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from 'prisma/prisma-client';
 import { GraphQLClient } from 'graphql-request';
 
 import { makeServer } from '../../config/server';

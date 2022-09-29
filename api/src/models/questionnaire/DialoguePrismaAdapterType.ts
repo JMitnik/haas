@@ -1,4 +1,4 @@
-import { DialogueImpactScore, DialogueTemplateType, FormNodeFieldType, LanguageEnum, LinkTypeEnum, NodeType, Prisma } from '@prisma/client';
+import { DialogueImpactScore, DialogueTemplateType, FormNodeFieldType, LanguageEnum, LinkTypeEnum, NodeType, Prisma } from 'prisma/prisma-client';
 
 export interface UpsertDialogueTopicCacheInput {
   id?: string;

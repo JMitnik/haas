@@ -2,7 +2,7 @@ import {
   NodeEntry,
   PrismaClient,
   Prisma,
-} from '@prisma/client';
+} from 'prisma/prisma-client';
 import _ from 'lodash';
 
 import { NexusGenInputs } from '../../generated/nexus';

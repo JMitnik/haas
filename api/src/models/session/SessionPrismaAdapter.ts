@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient, Session } from '@prisma/client';
+import { Prisma, PrismaClient, Session } from 'prisma/prisma-client';
 import { cloneDeep } from 'lodash';
 import { NexusGenInputs } from '../../generated/nexus';
 

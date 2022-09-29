@@ -4,7 +4,7 @@ import {
   Dialogue,
   Edge,
   DialogueImpactScore,
-} from '@prisma/client';
+} from 'prisma/prisma-client';
 import { cloneDeep } from 'lodash';
 
 import { CreateDialogueInput, CreateQuestionsInput, UpsertDialogueStatisticsInput, UpsertDialogueTopicCacheInput } from './DialoguePrismaAdapterType';

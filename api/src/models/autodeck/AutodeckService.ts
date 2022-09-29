@@ -6,7 +6,7 @@ import request from 'request';
 
 import config from '../../config/config';
 import { NexusGenInputs } from '../../generated/nexus';
-import { CustomField, Prisma, PrismaClient } from '@prisma/client';
+import { CustomField, Prisma, PrismaClient } from 'prisma/prisma-client';
 import { FindManyCallBackProps, PaginateProps, paginate } from '../Common/Pagination/pagination';
 import CustomerService from '../customer/CustomerService';
 import JobProcessLocationPrismaAdapter from './JobProcessLocationPrismaAdapter';

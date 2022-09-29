@@ -1,6 +1,6 @@
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 import jwt from 'jsonwebtoken';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from 'prisma/prisma-client';
 
 import { ContextSessionType } from './ContextSessionType';
 import config from '../../config/config';

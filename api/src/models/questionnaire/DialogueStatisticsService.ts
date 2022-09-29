@@ -1,4 +1,4 @@
-import { DialogueImpactScore, DialogueStatisticsSummaryCache, NodeEntry, PrismaClient, Session, SliderNodeEntry } from '@prisma/client';
+import { DialogueImpactScore, DialogueStatisticsSummaryCache, NodeEntry, PrismaClient, Session, SliderNodeEntry } from 'prisma/prisma-client';
 import { isPresent } from 'ts-is-present';
 import { groupBy, mean, meanBy } from 'lodash';
 import { addDays, differenceInHours } from 'date-fns';

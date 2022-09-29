@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from 'prisma/prisma-client';
 
 import DialogueService from '../models/questionnaire/DialogueService';
 import { defaultAdminRole, defaultBotRole, defaultManagerRole, defaultUserRole } from '../models/templates/TemplateTypes';

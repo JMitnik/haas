@@ -1,4 +1,4 @@
-import { UserOfCustomer, PrismaClient, Customer, Prisma, User } from '@prisma/client';
+import { UserOfCustomer, PrismaClient, Customer, Prisma, User } from 'prisma/prisma-client';
 import { UserInputError } from 'apollo-server';
 import _ from 'lodash';
 

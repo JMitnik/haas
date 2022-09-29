@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma, NodeEntry } from '@prisma/client';
+import { PrismaClient, Prisma, NodeEntry } from 'prisma/prisma-client';
 
 class NodeEntryPrismaAdapter {
   prisma: PrismaClient;

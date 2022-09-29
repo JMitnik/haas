@@ -3,7 +3,7 @@ import {
   AutomationConditionScopeType, AutomationEvent, AutomationType, ConditionPropertyAggregate, Prisma,
   Customer, Dialogue, DialogueConditionScope, NodeType, QuestionAspect, QuestionConditionScope, QuestionNode,
   WorkspaceConditionScope, AutomationCondition as PrismaAutomationCondition, AutomationConditionBuilderType,
-} from '@prisma/client';
+} from 'prisma/prisma-client';
 
 import { NexusGenEnums } from '../../generated/nexus';
 

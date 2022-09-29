@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from 'prisma/prisma-client';
 
 export const questionNode = Prisma.validator<Prisma.QuestionNodeArgs>()({
   include: {

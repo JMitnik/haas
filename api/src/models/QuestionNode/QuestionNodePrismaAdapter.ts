@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient, QuestionOption, VideoEmbeddedNode, NodeType, Link, Share, QuestionNode as BaseQuestionNode, DialogueTemplateType } from '@prisma/client';
+import { Prisma, PrismaClient, QuestionOption, VideoEmbeddedNode, NodeType, Link, Share, QuestionNode as BaseQuestionNode, DialogueTemplateType } from 'prisma/prisma-client';
 
 import { questionNode, QuestionNode } from './QuestionNode.types';
 import { CreateQuestionInput } from '../questionnaire/DialoguePrismaAdapterType';

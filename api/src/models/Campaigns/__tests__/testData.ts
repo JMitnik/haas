@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from 'prisma/prisma-client';
 
 export const SAMPLE_WORKSPACE: Prisma.CustomerCreateInput = {
   id: 'TEST_WORKSPACE',

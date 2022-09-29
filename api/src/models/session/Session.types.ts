@@ -1,4 +1,4 @@
-import { Prisma, Session } from '@prisma/client';
+import { Prisma, Session } from 'prisma/prisma-client';
 import { NexusGenEnums, NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 
 import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';

@@ -1,6 +1,6 @@
 import {
   NodeEntry, Session, Prisma, PrismaClient, ChoiceNodeEntry, QuestionNode, SliderNodeEntry, VideoNodeEntry, Dialogue,
-} from '@prisma/client';
+} from 'prisma/prisma-client';
 import { isPresent } from 'ts-is-present';
 import { sortBy } from 'lodash';
 import { addDays, differenceInHours } from 'date-fns';

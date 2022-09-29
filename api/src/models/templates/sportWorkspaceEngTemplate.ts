@@ -1,4 +1,4 @@
-import { LanguageEnum, NodeType } from '@prisma/client';
+import { LanguageEnum, NodeType } from 'prisma/prisma-client';
 import { defaultAdminRole, defaultBotRole, defaultManagerRole, defaultSportTextFieldForm, defaultUserRole, DemoWorkspaceTemplate } from './TemplateTypes';
 
 const sportOptionsEng = [

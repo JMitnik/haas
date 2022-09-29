@@ -1,4 +1,4 @@
-import { PrismaClient, Role, SystemPermissionEnum } from '@prisma/client';
+import { PrismaClient, Role, SystemPermissionEnum } from 'prisma/prisma-client';
 
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import RolePrismaAdapter from './RolePrismaAdapter';

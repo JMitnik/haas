@@ -1,4 +1,4 @@
-import { AutomationAction, AutomationActionChannel, AutomationActionChannelType, AutomationActionType, PrismaClient, UserOfCustomer } from '@prisma/client';
+import { AutomationAction, AutomationActionChannel, AutomationActionChannelType, AutomationActionType, PrismaClient, UserOfCustomer } from 'prisma/prisma-client';
 import { uniqBy } from 'lodash';
 
 import UserService from '../users/UserService';
@@ -104,7 +104,7 @@ export class AutomationActionService {
    * @param automationActionId
    * @returns
    */
-  public async findChannelsByActionId (automationActionId: string) {
+  public async findChannelsByActionId(automationActionId: string) {
     return this.scheduledAutomationPrismaAdapter.findChannelsByAutomationActionId(automationActionId);
   }
 
@@ -256,7 +256,7 @@ export class AutomationActionService {
    * @param channel
    * @param workspaceSlug
    */
-  private async handleSendDialogueEmailChannel (
+  private async handleSendDialogueEmailChannel(
     channel: AutomationActionChannel,
     workspaceSlug: string,
   ) {

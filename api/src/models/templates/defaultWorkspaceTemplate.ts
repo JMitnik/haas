@@ -1,4 +1,4 @@
-import { LanguageEnum, NodeType, Prisma } from '@prisma/client';
+import { LanguageEnum, NodeType, Prisma } from 'prisma/prisma-client';
 import WorkspaceTemplate, { Tag, defaultAdminRole, defaultBotRole, defaultForm, defaultLinks, defaultManagerRole, defaultUserRole, DemoWorkspaceTemplate, singleLink } from './TemplateTypes';
 
 export type rootTopics = 'Facilities' | 'Website/Mobile app' | 'Product/Services' | 'Customer Support'
