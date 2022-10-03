@@ -10,6 +10,9 @@ import DeliveryWebhookRoute from '../routes/webhooks/DeliveryWebhookRoute';
 import { makeApollo } from './apollo';
 import config from './config';
 import { logger } from './logger';
+import { initializeTracing } from './tracing';
+
+initializeTracing('apollo-graphql')
 
 export const makeServer = async (port: number, prismaClient: PrismaClient) => {
   logger.logLifeCycle('Starting application');
