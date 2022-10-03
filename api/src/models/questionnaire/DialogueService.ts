@@ -166,7 +166,7 @@ class DialogueService {
     const topicOccurences = Object.entries(groupedTargetDepthEntries).map((entry) => {
       const topic = entry[0];
       const occurences = entry[1]?.length;
-      const impactScore = meanBy(entry[1], (entry) => entry.sessionMainScore);
+      const impactScore = meanBy(entry[1], (entry) => entry.sessionMainScore) || 0;
       return { topic, occurences, impactScore };
     });
 
@@ -246,8 +246,8 @@ class DialogueService {
       }
 
       const nrVotes = groupedDeepEntrySessions[key].length;
-      const averageCurrent = meanBy(optionSessionArray, (entry) => entry.mainScore);
-      const averagePrevious = meanBy(optionPrevSessionArray, (entry) => entry.mainScore);
+      const averageCurrent = meanBy(optionSessionArray, (entry) => entry.mainScore) || 0;
+      const averagePrevious = meanBy(optionPrevSessionArray, (entry) => entry.mainScore) || 0;
       const delta = Math.max(averageCurrent, averagePrevious) - Math.min(averageCurrent, averagePrevious);
       const percentageChanged = ((averageCurrent - averagePrevious) / averagePrevious) * 100;
 
@@ -332,7 +332,7 @@ class DialogueService {
       return entry[1].length;
     })
 
-    const averageScore = meanBy(mostPrevalent?.[1], (entry) => entry.mainScore);
+    const averageScore = meanBy(mostPrevalent?.[1], (entry) => entry.mainScore) || 0;
     const nrVotes = mostPrevalent?.[1].length;
     const path: string[] = [mostPrevalent?.[0] as string]
     const group = dialogueTitle;
@@ -358,7 +358,7 @@ class DialogueService {
       case DialogueImpactScore.AVERAGE:
         const subTopicScores = Object.entries(groupedNodeEntries).map((entry) => {
           const option = entry[0];
-          const average = meanBy(entry[1], (data) => data?.mainScore);
+          const average = meanBy(entry[1], (data) => data?.mainScore) || 0;
           return { name: option, impactScore: average, nrVotes: entry[1].length };
         });
         return subTopicScores;
@@ -535,7 +535,7 @@ class DialogueService {
     const topicImpactScore = meanBy(
       sessions,
       (session) => session.mainScore, //choiceNodeEntry.nodeEntry.session?.mainScore
-    );
+    ) || 0;
     const topicName = '';
 
     const options = rootNode.children.flatMap(
@@ -608,7 +608,7 @@ class DialogueService {
     const topicImpactScore = meanBy(
       sessions,
       (session) => session.mainScore,
-    );
+    ) || 0;
     const topicName = topic;
 
     const subTopicScores = await this.findSubTopicsOfNodeEntries(sessions, dialogueId, impactScoreType, topic);
@@ -1520,7 +1520,7 @@ class DialogueService {
       return 0;
     }
 
-    const average = _.meanBy(sessions, (session) => session.mainScore);
+    const average = _.meanBy(sessions, (session) => session.mainScore) || 0;
     return average;
   }
 

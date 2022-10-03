@@ -95,7 +95,7 @@ class DialogueStatisticsService {
       endDateTimeSet
     );
 
-    const average = meanBy(scopedSessions, (session) => session.mainScore);
+    const average = meanBy(scopedSessions, (session) => session.mainScore) || 0;
     const nrVotes = scopedSessions.length;
     const sessionsHigherThanTreshold = scopedSessions.filter((session) => session.mainScore >= threshold);
 
@@ -203,7 +203,7 @@ class DialogueStatisticsService {
   ) => {
     switch (type) {
       case DialogueImpactScore.AVERAGE:
-        const average = meanBy(nodeEntries, (entry) => entry?.sliderNodeEntry?.value);
+        const average = meanBy(nodeEntries, (entry) => entry?.sliderNodeEntry?.value) || 0;
         return average;
 
       default:
