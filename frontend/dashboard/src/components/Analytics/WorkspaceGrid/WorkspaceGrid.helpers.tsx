@@ -75,7 +75,7 @@ export const calcGroupAverage = (group: HexagonGroupNode): number => {
     }
 
     return 0;
-  });
+  }) || 0;
 };
 
 export const calcGroupTotal = (group: HexagonGroupNode): number => {
@@ -113,7 +113,7 @@ export const calcGroupStatistics = (dialogues: Dialogue[]): HexagonGroupNodeStat
     && dialogue?.impactScore > 0);
 
   const average = voteCount > 0
-    ? meanBy(filteredDialogues, (dialogue) => dialogue?.impactScore)
+    ? meanBy(filteredDialogues, (dialogue) => dialogue?.impactScore) || 0
     : 0;
 
   return {
