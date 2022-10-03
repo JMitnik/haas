@@ -4,7 +4,7 @@ import { makeTestContext } from '../../../test/utils/makeTestContext';
 import AuthService from '../../auth/AuthService';
 import { prisma } from '../../../test/setup/singletonDeps';
 import { clearDatabase, createSuperAdmin, createUserWithAllRoles } from './testUtils';
-import { DialogueTemplateType, RoleTypeEnum } from 'prisma/prisma-client';
+import { DialogueTemplateType, FormNodeFieldType, RoleTypeEnum } from 'prisma/prisma-client';
 import businessWorkspaceTemplate from '../../../models/templates/businessWorkspaceTemplate';
 import englishSportWorkspaceTemplate from '../../../models/templates/sportWorkspaceEngTemplate';
 import dutchSportWorkspaceTemplate from '../../../models/templates/sportWorkspaceNlTemplate';
@@ -426,6 +426,143 @@ describe('GenerateWorkspaceFromCSV resolver', () => {
 
       // Check whether correct privacy settings are set for dialogues
       expect(dialogues[0]?.isPrivate).toBe(false);
+    });
+  });
+
+  it('Generates with contact persons for a team', async () => {
+    const user = await createSuperAdmin(prisma);
+
+    // Generate token for API access
+    const token = AuthService.createUserToken(user.id, 22);
+    const file = createReadStream(`${__dirname}/groupCsv.csv`);
+    file.addListener('end', async () => {
+      const res = await ctx.client.request(Mutation,
+        {
+          input: {
+            uploadedCsv: file,
+            workspaceSlug: 'newWorkspaceSlug',
+            workspaceTitle: 'newWorkspaceTitle',
+            managerCsv: undefined,
+            makeDialoguesPrivate: false,
+            type: DialogueTemplateType.SPORT_ENG,
+            generateDemoData: false,
+            isDemo: false,
+          },
+        },
+        {
+          'Authorization': `Bearer ${token}`,
+        }
+      );
+
+      // Expect user to be used as a contact person for 2 different form nodes (as per CSV)
+      const user = await prisma.user.findUnique({
+        where: {
+          email: 'account1@haas.live',
+        },
+        include: {
+          isContactOfFormField: {
+            include: {
+              FormNode: {
+                include: {
+                  fields: {
+                    include: {
+                      contacts: true,
+                    },
+                  },
+                  QuestionNode: {
+                    include: {
+                      questionDialogue: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+
+      expect(user?.isContactOfFormField).toHaveLength(2);
+
+      // Check whether the person is attached to the right team (as per CSV)
+      const targetDialogueFormField = user?.isContactOfFormField.find(
+        (formField) => formField.FormNode?.QuestionNode[0].questionDialogue?.slug === 'seniors-male-h2'
+      )
+
+      expect(targetDialogueFormField).not.toBeUndefined();
+
+      const userTwo = await prisma.user.findUnique({
+        where: {
+          email: 'account2@haas.live',
+        },
+        include: {
+          isContactOfFormField: true,
+        },
+      });
+
+      expect(userTwo?.isContactOfFormField).toHaveLength(1);
+
+      // Expects form node of senios-male-h2 to have 3 contact options (as per CSV)
+      const contactsField = targetDialogueFormField?.FormNode?.fields.find(
+        (field) => field.type === FormNodeFieldType.contacts
+      );
+      expect(contactsField?.contacts).toHaveLength(3);
+    });
+  });
+
+  it('Generate workspace with overriding template types', async () => {
+    const user = await createSuperAdmin(prisma);
+
+    // Generate token for API access
+    const token = AuthService.createUserToken(user.id, 22);
+    const file = createReadStream(`${__dirname}/overrideCsv.csv`);
+    file.addListener('end', async () => {
+      const res = await ctx.client.request(Mutation,
+        {
+          input: {
+            uploadedCsv: file,
+            workspaceSlug: 'newWorkspaceSlug',
+            workspaceTitle: 'newWorkspaceTitle',
+            managerCsv: undefined,
+            makeDialoguesPrivate: false,
+            type: DialogueTemplateType.SPORT_ENG,
+            generateDemoData: false,
+            isDemo: false,
+          },
+        },
+        {
+          'Authorization': `Bearer ${token}`,
+        }
+      );
+
+      // Verify whether demo workspace is generated or not
+      expect(res).toMatchObject({
+        generateWorkspaceFromCSV: {
+          slug: 'newWorkspaceSlug',
+          isDemo: true,
+        },
+      });
+
+      // Check if all 9 entries in group CSV are generated
+      const workspaceId = res.generateWorkspaceFromCSV.id;
+      const dialogues = await prisma.dialogue.findMany({
+        where: {
+          customerId: workspaceId,
+        },
+      });
+      expect(dialogues).toHaveLength(9);
+
+      const dialoguesWithEngTemplate = dialogues.filter(
+        (dialogue) => dialogue.template === DialogueTemplateType.SPORT_ENG
+      );
+
+      expect(dialoguesWithEngTemplate).toHaveLength(2);
+
+      const dialoguesWithNlTemplate = dialogues.filter(
+        (dialogue) => dialogue.template === DialogueTemplateType.SPORT_NL
+      );
+
+      expect(dialoguesWithNlTemplate).toHaveLength(7);
+
     });
   });
 })

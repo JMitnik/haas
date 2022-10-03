@@ -1,10 +1,10 @@
-layer_0;layer_1;layer_2;limited_access_assignee_email?;limited_access_assignee_phone?;;
+layer_0;layer_1;layer_2;template;limited_access_assignee_email?;limited_access_assignee_phone?;contacts
 Seniors;Male;H1;;;;
-Seniors;Male;H2;;;;
+Seniors;Male;H2;;;;account1@haas.live,account3@haas.live,account4@haas.live
 Seniors;Male;H3;;;;
 Juniors Male;A;A1;;;;
 Juniors Male;A;A2;;;;
 Juniors Male;B;B1;;;;
 Juniors Female;C;C4;;;;
-Juniors Female;D;D1;;;;
+Juniors Female;D;D1;;;;account1@haas.live,account2@haas.live
 Juniors Female;D;D2;;;;
