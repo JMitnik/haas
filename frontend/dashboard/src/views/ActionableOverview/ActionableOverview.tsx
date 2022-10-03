@@ -10,8 +10,8 @@ import {
   useQueryParams,
   withDefault,
 } from 'use-query-params';
-import { Calendar, Plus, Search } from 'react-feather';
-import { endOfDay, format, startOfDay } from 'date-fns';
+import { Plus, Search } from 'react-feather';
+import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
@@ -27,7 +27,6 @@ import {
   useSetActionableStatusMutation,
 } from 'types/generated-types';
 import { DateFormat, useDate } from 'hooks/useDate';
-import { DatePicker } from 'components/Common/DatePicker';
 import { ReactComponent as IconClose } from 'assets/icons/icon-close.svg';
 import { PickerButton } from 'components/Common/Picker/PickerButton';
 import { TabbedMenu } from 'components/Common/TabMenu';
@@ -46,7 +45,7 @@ export const ActionableOverview = () => {
   const { t } = useTranslation();
   const { activeCustomer } = useCustomer();
   const { canAccessAllActionRequests } = useAuth();
-  const { parse, format: dateFormat } = useDate();
+  const { parse } = useDate();
   const [actionables, setActionables] = useState<ActionableFragmentFragment[]>(() => []);
   const [totalPages, setTotalPages] = useState<number>(0);
 
@@ -154,13 +153,13 @@ export const ActionableOverview = () => {
     }));
   };
 
-  const columns = `minmax(100px, 0.35fr) minmax(150px, 1fr) minmax(100px, 0.5fr) 
+  const columns = `minmax(100px, 0.35fr) minmax(150px, 1fr) minmax(100px, 0.5fr)
   minmax(150px, 1fr) minmax(150px, 1fr) minmax(150px, 0.5fr)`;
 
   return (
     <View documentTitle="haas | Action Requests">
       <UI.ViewBody>
-        <UI.Div pb={4} position="relative" zIndex={10000}>
+        <UI.Div mb={4} position="relative" zIndex={10000}>
           <UI.Flex alignItems="center" justifyContent="space-between">
             <UI.Div>
               <UI.H4 fontSize="1.1rem" color="off.500">
@@ -386,15 +385,12 @@ export const ActionableOverview = () => {
                               </UI.Div>
                             )}
                           </Dropdown>
-
                         </Table.InnerCell>
-
                       </Table.Cell>
                       <Table.Cell>
                         <UI.Span fontWeight={600} color="off.500">
                           {actionable.dialogue?.title}
                         </UI.Span>
-
                       </Table.Cell>
                       <Table.Cell>
                         <DateCell timestamp={actionable.createdAt as string} />
@@ -439,11 +435,10 @@ export const ActionableOverview = () => {
                     </ContextMenu.Item>
                   </ContextMenu.Content>
                 </ContextMenu.Root>
-
               </UI.Div>
-
             ))}
           </UI.Div>
+
           <UI.Flex justifyContent="flex-end" mt={4}>
             {totalPages > 1 && (
               <Table.Pagination

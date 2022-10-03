@@ -24,22 +24,21 @@ export const ChangeableEmailContainer = styled(UI.Div)`
     display: flex;
     align-items: center;
     color: ${theme.colors.off[500]};
-    
+
     button {
-        margin-left: 10px;
-        max-width: 20px !important;
-        max-height: 20px;
+      margin-left: 10px;
+      max-width: 20px !important;
+      max-height: 20px;
 
-        min-width: auto;
-        min-height: auto;
+      min-width: auto;
+      min-height: auto;
 
-        svg {
-          width: 80%;
-          height: 100%;
-        }
+      svg {
+        width: 80%;
+        height: 100%;
       }
+    }
  `}
-  
 `;
 
 export const UrgentContainer = styled(UI.Div) <{ hasUrgent?: boolean }>`
@@ -51,7 +50,7 @@ export const UrgentContainer = styled(UI.Div) <{ hasUrgent?: boolean }>`
     font-weight: 700;
     padding: 0.5em;
     text-align: center;
-    
+
     background: ${theme.colors.off[100]};
     color: ${theme.colors.off[500]};
 
@@ -68,49 +67,43 @@ interface StatusContainerProps {
 }
 
 export const StatusContainer = styled(UI.Div) <StatusContainerProps>`
-  ${({ theme, status, isSelected }) => css`
+  ${({ theme, status }) => css`
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: ${theme.borderRadiuses.sm}px;
+
     font-weight: 700;
-    padding: 5px;
     text-align: center;
+
+    padding: 2px 6px;
+    border: 1px solid transparent;
+
+    border-radius: ${theme.borderRadiuses.md}px;
+    box-shadow: ${theme.boxShadows.sm};
+
+    &:hover {
+      box-shadow: ${theme.boxShadows.md};
+      transition: all ${theme.transitions.normal};
+    }
 
     ${(status === ActionableState.Dropped) && css`
       background: ${theme.colors.gray[100]};
       color: ${theme.colors.gray[500]};
-
-      ${isSelected && css`
-        border: 1px solid ${theme.colors.gray[500]};
-      `}
     `}
 
     ${status === ActionableState.Pending && css`
       background: ${theme.colors.orange[100]};
       color: ${theme.colors.orange[500]};
-      
-      ${isSelected && css`
-        border: 1px solid ${theme.colors.orange[500]};
-      `}
     `}
 
     ${status === ActionableState.Completed && css`
       background: ${theme.colors.green[100]};
       color: ${theme.colors.green[500]};
-
-      ${isSelected && css`
-        border: 1px solid ${theme.colors.green[500]};
-      `}
     `}
 
     ${status === ActionableState.Stale && css`
       background: ${theme.colors.red[100]};
       color: ${theme.colors.red[500]};
-
-      ${isSelected && css`
-        border: 1px solid ${theme.colors.red[500]};
-      `}
     `}
   `}
 `;
@@ -123,12 +116,12 @@ interface StatusBoxProps {
 
 export const StatusBox = ({ status, isSelected, isVerified }: StatusBoxProps) => (
   <StatusContainer isSelected={isSelected} status={status}>
-    {status}
     {isVerified && status === ActionableState.Pending && (
-      <UI.Icon ml={1} stroke="orange.500">
+      <UI.Icon mr={1} stroke="orange.500">
         <CheckCircledIcon width="20px" height="20px" />
       </UI.Icon>
     )}
 
+    {status}
   </StatusContainer>
 );
