@@ -51,8 +51,8 @@ class ActionableService {
 
   /**
    * Finds all actionables of an specific issue based on a filter
-   * @param issueId 
-   * @param filter 
+   * @param issueId
+   * @param filter
    */
   public async findActionablesByIssueId(issueId: string, filter?: ActionableFilterInput) {
     return this.actionablePrismaAdapter.findActionablesByIssue(issueId, filter);
@@ -60,10 +60,10 @@ class ActionableService {
 
   /**
    * Finds all actionables assigned to a user within a workspace.
-   * @param workspaceId 
+   * @param workspaceId
    * @param userId - id of the user requesting the function
    * @param canAccessAllActionables - if set to true, can see all actionables no matter whether you are assigned
-   * @param filter 
+   * @param filter
    * @returns a paginated subset of actionables
    */
   public async findPaginatedWorkspaceActionables(
@@ -110,7 +110,6 @@ class ActionableService {
       pageInfo,
     };
   }
-
 }
 
 export default ActionableService;
