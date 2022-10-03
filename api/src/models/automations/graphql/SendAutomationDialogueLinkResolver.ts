@@ -1,5 +1,4 @@
-import { GraphQLYogaError } from '@graphql-yoga/node';
-import { inputObjectType, mutationField } from 'nexus';
+import { inputObjectType, mutationField, nonNull } from 'nexus';
 
 export const SendAutomationDialogueLinkInput = inputObjectType({
   name: 'SendAutomationDialogueLinkInput',
@@ -12,16 +11,12 @@ export const SendAutomationDialogueLinkInput = inputObjectType({
 export const SendAutomationDialogueLinkResolver = mutationField('sendAutomationDialogueLink', {
   type: 'Boolean',
   args: {
-    input: SendAutomationDialogueLinkInput,
+    input: nonNull(SendAutomationDialogueLinkInput),
   },
   nullable: true,
-  async resolve(parent, args, ctx) {
-    if (!args.input) throw new GraphQLYogaError('No input object provided for resolver');
-
-    const { workspaceSlug, automationActionId } = args.input;
-
+  resolve: async (parent, args, ctx) => {
     return ctx.services.automationActionService.sendDialogueLink(
-      workspaceSlug, automationActionId
+      args.input.workspaceSlug, args.input.automationActionId
     );
   },
 });

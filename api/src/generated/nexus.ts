@@ -3722,7 +3722,7 @@ export interface NexusGenArgTypes {
       input?: NexusGenInputs['SandboxInput'] | null; // SandboxInput
     }
     sendAutomationDialogueLink: { // args
-      input?: NexusGenInputs['SendAutomationDialogueLinkInput'] | null; // SendAutomationDialogueLinkInput
+      input: NexusGenInputs['SendAutomationDialogueLinkInput']; // SendAutomationDialogueLinkInput!
     }
     sendAutomationReport: { // args
       input?: NexusGenInputs['SendAutomationReportInput'] | null; // SendAutomationReportInput
