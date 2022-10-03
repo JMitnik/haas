@@ -13,8 +13,5 @@ query GetWorkspaceIssues($workspaceId: ID!, $filter: IssueConnectionFilterInput)
         prevPageOffset
       }
     }
-		# issues(filter: $filter) {
-		# 	...IssueFragment
-	  # }
 	}
 }
