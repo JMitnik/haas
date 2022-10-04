@@ -4,7 +4,7 @@ import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 const issue = Prisma.validator<Prisma.IssueArgs>()({
   include: {
     topic: true,
-    actionables: {
+    actionRequests: {
       include: {
         assignee: true,
         comments: true,

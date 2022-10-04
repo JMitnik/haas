@@ -21,7 +21,7 @@ import SessionPrismaAdapter from './SessionPrismaAdapter';
 import { CreateSessionInput } from './SessionPrismaAdapterType';
 import { CustomerService } from '../customer/CustomerService';
 import { logger } from '../../config/logger';
-import { ActionablePrismaAdapter } from '../actionable/ActionablePrismaAdapter';
+import { ActionRequestPrismaAdapter } from '../ActionRequest/ActionRequestPrismaAdapter';
 import IssuePrismaAdapter from '../Issue/IssuePrismaAdapter';
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 
@@ -29,7 +29,7 @@ class SessionService {
   private sessionPrismaAdapter: SessionPrismaAdapter;
   private triggerService: TriggerService;
   private workspaceService: CustomerService;
-  private actionablePrismaAdapter: ActionablePrismaAdapter;
+  private ActionRequestPrismaAdapter: ActionRequestPrismaAdapter;
   private issuePrismaAdapter: IssuePrismaAdapter;
   private dialoguePrismaAdapter: DialoguePrismaAdapter;
 
@@ -37,7 +37,7 @@ class SessionService {
     this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
     this.triggerService = new TriggerService(prismaClient);
     this.workspaceService = new CustomerService(prismaClient);
-    this.actionablePrismaAdapter = new ActionablePrismaAdapter(prismaClient);
+    this.ActionRequestPrismaAdapter = new ActionRequestPrismaAdapter(prismaClient);
     this.issuePrismaAdapter = new IssuePrismaAdapter(prismaClient);
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
   };
@@ -48,7 +48,7 @@ class SessionService {
    * @param entries 
    * @param dialogueId 
    */
-  public async createSessionActionable(
+  public async createSessionActionRequest(
     session: SessionWithNodeEntries,
     dialogueId: string,
   ) {
@@ -69,7 +69,7 @@ class SessionService {
 
       const dialogue = await this.dialoguePrismaAdapter.getDialogueById(dialogueId) as Dialogue;
       const issue = await this.issuePrismaAdapter.upsertIssueByTopicId(dialogue.customerId, topicId);
-      await this.actionablePrismaAdapter.createActionable(dialogueId, issue.id, session.id);
+      await this.ActionRequestPrismaAdapter.createActionRequest(dialogueId, issue.id, session.id);
     }
   }
 
@@ -326,7 +326,7 @@ class SessionService {
 
     if (session.mainScore <= 55) {
       console.log('Should create actionable')
-      await this.createSessionActionable(session, dialogueId);
+      await this.createSessionActionRequest(session, dialogueId);
     }
 
     try {

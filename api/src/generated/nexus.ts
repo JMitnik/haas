@@ -53,29 +53,29 @@ declare global {
 }
 
 export interface NexusGenInputs {
-  ActionableConnectionFilterInput: { // input type
+  ActionRequestConnectionFilterInput: { // input type
     assigneeId?: string | null; // String
     dialogueId?: string | null; // String
     endDate?: NexusGenScalars['DateString'] | null; // DateString
     isVerified?: boolean | null; // Boolean
     offset: number; // Int!
-    orderBy?: NexusGenInputs['ActionableConnectionOrderByInput'] | null; // ActionableConnectionOrderByInput
+    orderBy?: NexusGenInputs['ActionRequestConnectionOrderByInput'] | null; // ActionRequestConnectionOrderByInput
     perPage: number; // Int!
     requestEmail?: string | null; // String
     search?: string | null; // String
     startDate?: NexusGenScalars['DateString'] | null; // DateString
-    status?: NexusGenEnums['ActionableState'] | null; // ActionableState
+    status?: NexusGenEnums['ActionRequestState'] | null; // ActionRequestState
     topic?: string | null; // String
   }
-  ActionableConnectionOrderByInput: { // input type
-    by: NexusGenEnums['ActionableConnectionOrderType']; // ActionableConnectionOrderType!
+  ActionRequestConnectionOrderByInput: { // input type
+    by: NexusGenEnums['ActionRequestConnectionOrderType']; // ActionRequestConnectionOrderType!
     desc: boolean | null; // Boolean
   }
-  ActionableFilterInput: { // input type
+  ActionRequestFilterInput: { // input type
     assigneeId?: string | null; // String
     endDate?: NexusGenScalars['DateString'] | null; // DateString
     startDate?: NexusGenScalars['DateString'] | null; // DateString
-    status?: NexusGenEnums['ActionableState'] | null; // ActionableState
+    status?: NexusGenEnums['ActionRequestState'] | null; // ActionRequestState
     withFollowUpAction?: boolean | null; // Boolean
   }
   AdjustedImageInput: { // input type
@@ -90,8 +90,8 @@ export interface NexusGenInputs {
     nodeId?: string | null; // String
     sessionId?: string | null; // ID
   }
-  AssignUserToActionableInput: { // input type
-    actionableId: string; // String!
+  AssignUserToActionRequestInput: { // input type
+    actionRequestId: string; // String!
     assigneeId?: string | null; // String
     workspaceId: string; // String!
   }
@@ -722,9 +722,9 @@ export interface NexusGenInputs {
     dialogueId?: string | null; // ID
     id?: string | null; // ID
   }
-  SetActionableStatusInput: { // input type
-    actionableId: string; // String!
-    status: NexusGenEnums['ActionableState']; // ActionableState!
+  SetActionRequestStatusInput: { // input type
+    actionRequestId: string; // String!
+    status: NexusGenEnums['ActionRequestState']; // ActionRequestState!
     workspaceId: string; // String!
   }
   SetDialoguePrivacyInput: { // input type
@@ -855,8 +855,8 @@ export interface NexusGenInputs {
     userId?: string | null; // String
     workspaceId?: string | null; // String
   }
-  VerifyActionableInput: { // input type
-    actionableId: string; // String!
+  VerifyActionRequestInput: { // input type
+    actionRequestId: string; // String!
     workspaceId: string; // String!
   }
   VideoNodeEntryInput: { // input type
@@ -870,8 +870,8 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
-  ActionableConnectionOrderType: "createdAt"
-  ActionableState: "COMPLETED" | "DROPPED" | "PENDING" | "STALE"
+  ActionRequestConnectionOrderType: "createdAt"
+  ActionRequestState: "COMPLETED" | "DROPPED" | "PENDING" | "STALE"
   AutomationActionChannelType: "EMAIL" | "SLACK" | "SMS"
   AutomationActionType: "API_CALL" | "CUSTOM_REPORT" | "MONTH_REPORT" | "SEND_DIALOGUE_LINK" | "SEND_EMAIL" | "SEND_SMS" | "WEBHOOK" | "WEEK_REPORT" | "YEAR_REPORT"
   AutomationConditionBuilderType: "AND" | "OR"
@@ -938,7 +938,7 @@ export interface NexusGenObjects {
     mimetype?: string | null; // String
     url?: string | null; // String
   }
-  Actionable: { // root type
+  ActionRequest: { // root type
     assignee?: NexusGenRootTypes['UserType'] | null; // UserType
     assigneeId?: string | null; // String
     createdAt?: NexusGenScalars['Date'] | null; // Date
@@ -949,11 +949,11 @@ export interface NexusGenObjects {
     issue?: NexusGenRootTypes['IssueModel'] | null; // IssueModel
     issueId?: string | null; // String
     session?: NexusGenRootTypes['Session'] | null; // Session
-    status: NexusGenEnums['ActionableState']; // ActionableState!
+    status: NexusGenEnums['ActionRequestState']; // ActionRequestState!
     updatedAt?: NexusGenScalars['Date'] | null; // Date
   }
-  ActionableConnection: { // root type
-    actionables?: Array<NexusGenRootTypes['Actionable'] | null> | null; // [Actionable]
+  ActionRequestConnection: { // root type
+    actionRequests?: Array<NexusGenRootTypes['ActionRequest'] | null> | null; // [ActionRequest]
     pageInfo?: NexusGenRootTypes['PaginationPageInfo'] | null; // PaginationPageInfo
     totalPages?: number | null; // Int
   }
@@ -1679,7 +1679,7 @@ export interface NexusGenObjects {
 }
 
 export interface NexusGenInterfaces {
-  ConnectionInterface: NexusGenRootTypes['ActionableConnection'] | NexusGenRootTypes['AutomationConnection'] | NexusGenRootTypes['DeliveryConnectionType'] | NexusGenRootTypes['DialogueConnection'] | NexusGenRootTypes['IssueConnection'] | NexusGenRootTypes['PublicDialogueConnection'] | NexusGenRootTypes['SessionConnection'] | NexusGenRootTypes['UserConnection'];
+  ConnectionInterface: NexusGenRootTypes['ActionRequestConnection'] | NexusGenRootTypes['AutomationConnection'] | NexusGenRootTypes['DeliveryConnectionType'] | NexusGenRootTypes['DialogueConnection'] | NexusGenRootTypes['IssueConnection'] | NexusGenRootTypes['PublicDialogueConnection'] | NexusGenRootTypes['SessionConnection'] | NexusGenRootTypes['UserConnection'];
   DeprecatedConnectionInterface: NexusGenRootTypes['AutodeckConnectionType'] | NexusGenRootTypes['RoleConnection'] | NexusGenRootTypes['TriggerConnectionType'];
 }
 
@@ -1697,7 +1697,7 @@ export interface NexusGenFieldTypes {
     mimetype: string | null; // String
     url: string | null; // String
   }
-  Actionable: { // field return type
+  ActionRequest: { // field return type
     assignee: NexusGenRootTypes['UserType'] | null; // UserType
     assigneeId: string | null; // String
     createdAt: NexusGenScalars['Date'] | null; // Date
@@ -1709,11 +1709,11 @@ export interface NexusGenFieldTypes {
     issueId: string | null; // String
     requestEmail: string | null; // String
     session: NexusGenRootTypes['Session'] | null; // Session
-    status: NexusGenEnums['ActionableState']; // ActionableState!
+    status: NexusGenEnums['ActionRequestState']; // ActionRequestState!
     updatedAt: NexusGenScalars['Date'] | null; // Date
   }
-  ActionableConnection: { // field return type
-    actionables: Array<NexusGenRootTypes['Actionable'] | null> | null; // [Actionable]
+  ActionRequestConnection: { // field return type
+    actionRequests: Array<NexusGenRootTypes['ActionRequest'] | null> | null; // [ActionRequest]
     pageInfo: NexusGenRootTypes['PaginationPageInfo'] | null; // PaginationPageInfo
     totalPages: number | null; // Int
   }
@@ -1900,7 +1900,7 @@ export interface NexusGenFieldTypes {
     value: string | null; // String
   }
   Customer: { // field return type
-    actionableConnection: NexusGenRootTypes['ActionableConnection'] | null; // ActionableConnection
+    actionRequestConnection: NexusGenRootTypes['ActionRequestConnection'] | null; // ActionRequestConnection
     automationConnection: NexusGenRootTypes['AutomationConnection'] | null; // AutomationConnection
     automations: Array<NexusGenRootTypes['AutomationModel'] | null> | null; // [AutomationModel]
     campaign: NexusGenRootTypes['CampaignType'] | null; // CampaignType
@@ -2160,8 +2160,8 @@ export interface NexusGenFieldTypes {
     totalPages: number | null; // Int
   }
   IssueModel: { // field return type
-    actionableConnection: NexusGenRootTypes['ActionableConnection'] | null; // ActionableConnection
-    actionables: Array<NexusGenRootTypes['Actionable'] | null>; // [Actionable]!
+    actionRequestConnection: NexusGenRootTypes['ActionRequestConnection'] | null; // ActionRequestConnection
+    actionRequests: Array<NexusGenRootTypes['ActionRequest'] | null>; // [ActionRequest]!
     basicStats: NexusGenRootTypes['ActionableStatistics'] | null; // ActionableStatistics
     createdAt: NexusGenScalars['Date'] | null; // Date
     id: string | null; // ID
@@ -2227,7 +2227,7 @@ export interface NexusGenFieldTypes {
   Mutation: { // field return type
     appendToInteraction: NexusGenRootTypes['Session'] | null; // Session
     assignTags: NexusGenRootTypes['Dialogue'] | null; // Dialogue
-    assignUserToActionable: NexusGenRootTypes['Actionable'] | null; // Actionable
+    assignUserToActionRequest: NexusGenRootTypes['ActionRequest'] | null; // ActionRequest
     assignUserToDialogue: NexusGenRootTypes['UserType'] | null; // UserType
     assignUserToDialogues: NexusGenRootTypes['UserType'] | null; // UserType
     authenticateLambda: string | null; // String
@@ -2278,7 +2278,7 @@ export interface NexusGenFieldTypes {
     sandbox: string | null; // String
     sendAutomationDialogueLink: boolean | null; // Boolean
     sendAutomationReport: boolean | null; // Boolean
-    setActionableStatus: NexusGenRootTypes['Actionable'] | null; // Actionable
+    setActionRequestStatus: NexusGenRootTypes['ActionRequest'] | null; // ActionRequest
     setDialoguePrivacy: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     singleUpload: NexusGenRootTypes['ImageType'] | null; // ImageType
     updateAutomation: NexusGenRootTypes['AutomationModel'] | null; // AutomationModel
@@ -2290,7 +2290,7 @@ export interface NexusGenFieldTypes {
     updateRoles: NexusGenRootTypes['RoleType'] | null; // RoleType
     uploadJobImage: NexusGenRootTypes['AWSImageType'] | null; // AWSImageType
     uploadUpsellImage: NexusGenRootTypes['ImageType'] | null; // ImageType
-    verifyActionable: NexusGenRootTypes['Actionable'] | null; // Actionable
+    verifyActionRequest: NexusGenRootTypes['ActionRequest'] | null; // ActionRequest
     verifyUserToken: NexusGenRootTypes['VerifyUserTokenOutput'] | null; // VerifyUserTokenOutput
     whitifyImage: NexusGenRootTypes['AWSImageType'] | null; // AWSImageType
   }
@@ -2677,7 +2677,7 @@ export interface NexusGenFieldTypeNames {
     mimetype: 'String'
     url: 'String'
   }
-  Actionable: { // field return type name
+  ActionRequest: { // field return type name
     assignee: 'UserType'
     assigneeId: 'String'
     createdAt: 'Date'
@@ -2689,11 +2689,11 @@ export interface NexusGenFieldTypeNames {
     issueId: 'String'
     requestEmail: 'String'
     session: 'Session'
-    status: 'ActionableState'
+    status: 'ActionRequestState'
     updatedAt: 'Date'
   }
-  ActionableConnection: { // field return type name
-    actionables: 'Actionable'
+  ActionRequestConnection: { // field return type name
+    actionRequests: 'ActionRequest'
     pageInfo: 'PaginationPageInfo'
     totalPages: 'Int'
   }
@@ -2880,7 +2880,7 @@ export interface NexusGenFieldTypeNames {
     value: 'String'
   }
   Customer: { // field return type name
-    actionableConnection: 'ActionableConnection'
+    actionRequestConnection: 'ActionRequestConnection'
     automationConnection: 'AutomationConnection'
     automations: 'AutomationModel'
     campaign: 'CampaignType'
@@ -3140,8 +3140,8 @@ export interface NexusGenFieldTypeNames {
     totalPages: 'Int'
   }
   IssueModel: { // field return type name
-    actionableConnection: 'ActionableConnection'
-    actionables: 'Actionable'
+    actionRequestConnection: 'ActionRequestConnection'
+    actionRequests: 'ActionRequest'
     basicStats: 'ActionableStatistics'
     createdAt: 'Date'
     id: 'ID'
@@ -3207,7 +3207,7 @@ export interface NexusGenFieldTypeNames {
   Mutation: { // field return type name
     appendToInteraction: 'Session'
     assignTags: 'Dialogue'
-    assignUserToActionable: 'Actionable'
+    assignUserToActionRequest: 'ActionRequest'
     assignUserToDialogue: 'UserType'
     assignUserToDialogues: 'UserType'
     authenticateLambda: 'String'
@@ -3258,7 +3258,7 @@ export interface NexusGenFieldTypeNames {
     sandbox: 'String'
     sendAutomationDialogueLink: 'Boolean'
     sendAutomationReport: 'Boolean'
-    setActionableStatus: 'Actionable'
+    setActionRequestStatus: 'ActionRequest'
     setDialoguePrivacy: 'Dialogue'
     singleUpload: 'ImageType'
     updateAutomation: 'AutomationModel'
@@ -3270,7 +3270,7 @@ export interface NexusGenFieldTypeNames {
     updateRoles: 'RoleType'
     uploadJobImage: 'AWSImageType'
     uploadUpsellImage: 'ImageType'
-    verifyActionable: 'Actionable'
+    verifyActionRequest: 'ActionRequest'
     verifyUserToken: 'VerifyUserTokenOutput'
     whitifyImage: 'AWSImageType'
   }
@@ -3657,8 +3657,8 @@ export interface NexusGenArgTypes {
     }
   }
   Customer: {
-    actionableConnection: { // args
-      input?: NexusGenInputs['ActionableConnectionFilterInput'] | null; // ActionableConnectionFilterInput
+    actionRequestConnection: { // args
+      input?: NexusGenInputs['ActionRequestConnectionFilterInput'] | null; // ActionRequestConnectionFilterInput
     }
     automationConnection: { // args
       filter?: NexusGenInputs['AutomationConnectionFilterInput'] | null; // AutomationConnectionFilterInput
@@ -3752,11 +3752,11 @@ export interface NexusGenArgTypes {
     }
   }
   IssueModel: {
-    actionableConnection: { // args
-      input?: NexusGenInputs['ActionableConnectionFilterInput'] | null; // ActionableConnectionFilterInput
+    actionRequestConnection: { // args
+      input?: NexusGenInputs['ActionRequestConnectionFilterInput'] | null; // ActionRequestConnectionFilterInput
     }
-    actionables: { // args
-      input?: NexusGenInputs['ActionableFilterInput'] | null; // ActionableFilterInput
+    actionRequests: { // args
+      input?: NexusGenInputs['ActionRequestFilterInput'] | null; // ActionRequestFilterInput
     }
   }
   Mutation: {
@@ -3767,8 +3767,8 @@ export interface NexusGenArgTypes {
       dialogueId?: string | null; // String
       tags?: NexusGenInputs['TagsInputObjectType'] | null; // TagsInputObjectType
     }
-    assignUserToActionable: { // args
-      input: NexusGenInputs['AssignUserToActionableInput']; // AssignUserToActionableInput!
+    assignUserToActionRequest: { // args
+      input: NexusGenInputs['AssignUserToActionRequestInput']; // AssignUserToActionRequestInput!
     }
     assignUserToDialogue: { // args
       input?: NexusGenInputs['AssignUserToDialogueInput'] | null; // AssignUserToDialogueInput
@@ -3933,8 +3933,8 @@ export interface NexusGenArgTypes {
     sendAutomationReport: { // args
       input?: NexusGenInputs['SendAutomationReportInput'] | null; // SendAutomationReportInput
     }
-    setActionableStatus: { // args
-      input: NexusGenInputs['SetActionableStatusInput']; // SetActionableStatusInput!
+    setActionRequestStatus: { // args
+      input: NexusGenInputs['SetActionRequestStatusInput']; // SetActionRequestStatusInput!
     }
     setDialoguePrivacy: { // args
       input?: NexusGenInputs['SetDialoguePrivacyInput'] | null; // SetDialoguePrivacyInput
@@ -3978,8 +3978,8 @@ export interface NexusGenArgTypes {
     uploadUpsellImage: { // args
       input?: NexusGenInputs['UploadSellImageInputType'] | null; // UploadSellImageInputType
     }
-    verifyActionable: { // args
-      input: NexusGenInputs['VerifyActionableInput']; // VerifyActionableInput!
+    verifyActionRequest: { // args
+      input: NexusGenInputs['VerifyActionRequestInput']; // VerifyActionRequestInput!
     }
     verifyUserToken: { // args
       token?: string | null; // String
@@ -4031,7 +4031,7 @@ export interface NexusGenArgTypes {
       id?: string | null; // String
     }
     issue: { // args
-      actionableFilter?: NexusGenInputs['ActionableFilterInput'] | null; // ActionableFilterInput
+      actionableFilter?: NexusGenInputs['ActionRequestFilterInput'] | null; // ActionRequestFilterInput
       input?: NexusGenInputs['GetIssueResolverInput'] | null; // GetIssueResolverInput
     }
     question: { // args
@@ -4119,12 +4119,12 @@ export interface NexusGenArgTypes {
 }
 
 export interface NexusGenAbstractTypeMembers {
-  ConnectionInterface: "ActionableConnection" | "AutomationConnection" | "DeliveryConnectionType" | "DialogueConnection" | "IssueConnection" | "PublicDialogueConnection" | "SessionConnection" | "UserConnection"
+  ConnectionInterface: "ActionRequestConnection" | "AutomationConnection" | "DeliveryConnectionType" | "DialogueConnection" | "IssueConnection" | "PublicDialogueConnection" | "SessionConnection" | "UserConnection"
   DeprecatedConnectionInterface: "AutodeckConnectionType" | "RoleConnection" | "TriggerConnectionType"
 }
 
 export interface NexusGenTypeInterfaces {
-  ActionableConnection: "ConnectionInterface"
+  ActionRequestConnection: "ConnectionInterface"
   AutodeckConnectionType: "DeprecatedConnectionInterface"
   AutomationConnection: "ConnectionInterface"
   DeliveryConnectionType: "ConnectionInterface"

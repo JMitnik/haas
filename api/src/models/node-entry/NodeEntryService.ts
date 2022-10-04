@@ -17,14 +17,14 @@ import makeEmergencyTemplate from '../../services/mailings/templates/makeEmergen
 import makeActionRequestConfirmationTemplate from '../../services/mailings/templates/makeActionRequestConfirmationTemplate';
 import config from '../../config/config';
 import MailService from '../../services/mailings/MailService';
-import { ActionablePrismaAdapter } from '../actionable/ActionablePrismaAdapter';
+import { ActionRequestPrismaAdapter } from '../ActionRequest/ActionRequestPrismaAdapter';
 import UserPrismaAdapter from '../users/UserPrismaAdapter';
 
 class NodeEntryService {
   nodeEntryPrismaAdapter: NodeEntryPrismaAdapter;
   sessionPrismaAdapter: SessionPrismaAdapter;
   dialoguePrismaAdapter: DialoguePrismaAdapter;
-  actionablePrismaAdapter: ActionablePrismaAdapter;
+  actionRequestPrismaAdapter: ActionRequestPrismaAdapter;
   userPrismaAdapter: UserPrismaAdapter;
   mailService: MailService;
 
@@ -32,7 +32,7 @@ class NodeEntryService {
     this.nodeEntryPrismaAdapter = new NodeEntryPrismaAdapter(prismaClient);
     this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
-    this.actionablePrismaAdapter = new ActionablePrismaAdapter(prismaClient);
+    this.actionRequestPrismaAdapter = new ActionRequestPrismaAdapter(prismaClient);
     this.userPrismaAdapter = new UserPrismaAdapter(prismaClient);
     this.mailService = new MailService();
   };
@@ -117,11 +117,11 @@ class NodeEntryService {
       ...createNodeEntryFragment,
     });
 
-    const actionable = await this.actionablePrismaAdapter.findActionableBySessionId(sessionId);
+    const actionable = await this.actionRequestPrismaAdapter.findActionRequestBySessionId(sessionId);
     const actionableExists = !!actionable?.id
 
     if (nodeEntryInput.data?.form?.values?.length && actionableExists) {
-      const actionableUpdateArgs: Prisma.ActionableUpdateInput = {
+      const actionableUpdateArgs: Prisma.ActionRequestUpdateInput = {
         assignee: emergencyContact ? {
           connect: {
             email: emergencyContact,
@@ -139,7 +139,7 @@ class NodeEntryService {
         )
       }
 
-      await this.actionablePrismaAdapter.updateActionable(actionable.id, actionableUpdateArgs);
+      await this.actionRequestPrismaAdapter.updateActionRequest(actionable.id, actionableUpdateArgs);
     }
 
     return nodeEntry;

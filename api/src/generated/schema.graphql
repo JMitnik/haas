@@ -9,7 +9,7 @@ type AWSImageType {
   url: String
 }
 
-type Actionable {
+type ActionRequest {
   assignee: UserType
   assigneeId: String
   createdAt: Date
@@ -21,58 +21,58 @@ type Actionable {
   issueId: String
   requestEmail: String
   session: Session
-  status: ActionableState!
+  status: ActionRequestState!
   updatedAt: Date
 }
 
-type ActionableConnection implements ConnectionInterface {
-  actionables: [Actionable]
+type ActionRequestConnection implements ConnectionInterface {
+  actionRequests: [ActionRequest]
   pageInfo: PaginationPageInfo
   totalPages: Int
 }
 
-input ActionableConnectionFilterInput {
+input ActionRequestConnectionFilterInput {
   assigneeId: String
   dialogueId: String
   endDate: DateString
   isVerified: Boolean
   offset: Int!
-  orderBy: ActionableConnectionOrderByInput
+  orderBy: ActionRequestConnectionOrderByInput
   perPage: Int! = 10
   requestEmail: String
   search: String
   startDate: DateString
-  status: ActionableState
+  status: ActionRequestState
   topic: String
 }
 
 """Sorting of ActionableConnection"""
-input ActionableConnectionOrderByInput {
-  by: ActionableConnectionOrderType!
+input ActionRequestConnectionOrderByInput {
+  by: ActionRequestConnectionOrderType!
   desc: Boolean = true
 }
 
 """Fields to order ActionableConnection by."""
-enum ActionableConnectionOrderType {
+enum ActionRequestConnectionOrderType {
   createdAt
 }
 
-input ActionableFilterInput {
+input ActionRequestFilterInput {
   assigneeId: String
   endDate: DateString
   startDate: DateString
-  status: ActionableState
+  status: ActionRequestState
   withFollowUpAction: Boolean
 }
 
-enum ActionableState {
+enum ActionRequestState {
   COMPLETED
   DROPPED
   PENDING
   STALE
 }
 
-"""Basic statistics for actionables of an issue"""
+"""Basic statistics for actionRequests of an issue"""
 type ActionableStatistics {
   """Average value of summarizable statistic"""
   average: Float!
@@ -80,7 +80,7 @@ type ActionableStatistics {
   """Number of responses"""
   responseCount: Int!
 
-  """Number of urgent actionables """
+  """Number of urgent actionRequests """
   urgentCount: Int!
 }
 
@@ -99,8 +99,8 @@ input AppendToInteractionInput {
   sessionId: ID
 }
 
-input AssignUserToActionableInput {
-  actionableId: String!
+input AssignUserToActionRequestInput {
+  actionRequestId: String!
   assigneeId: String
   workspaceId: String!
 }
@@ -670,7 +670,7 @@ type CustomFieldType {
 }
 
 type Customer {
-  actionableConnection(input: ActionableConnectionFilterInput): ActionableConnection
+  actionRequestConnection(input: ActionRequestConnectionFilterInput): ActionRequestConnection
   automationConnection(filter: AutomationConnectionFilterInput): AutomationConnection
   automations: [AutomationModel]
   campaign(campaignId: String): CampaignType
@@ -1343,8 +1343,8 @@ input IssueFilterInput {
 }
 
 type IssueModel {
-  actionableConnection(input: ActionableConnectionFilterInput): ActionableConnection
-  actionables(input: ActionableFilterInput): [Actionable]!
+  actionRequestConnection(input: ActionRequestConnectionFilterInput): ActionRequestConnection
+  actionRequests(input: ActionRequestFilterInput): [ActionRequest]!
   basicStats: ActionableStatistics
   createdAt: Date
   id: ID
@@ -1479,7 +1479,7 @@ type MostTrendingTopic {
 type Mutation {
   appendToInteraction(input: AppendToInteractionInput): Session
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue
-  assignUserToActionable(input: AssignUserToActionableInput!): Actionable
+  assignUserToActionRequest(input: AssignUserToActionRequestInput!): ActionRequest
   assignUserToDialogue(input: AssignUserToDialogueInput): UserType
   assignUserToDialogues(input: AssignUserToDialoguesInput): UserType
   authenticateLambda(input: AuthenticateLambdaInput): String
@@ -1546,7 +1546,7 @@ type Mutation {
   sandbox(input: SandboxInput): String
   sendAutomationDialogueLink(input: SendAutomationDialogueLinkInput): Boolean
   sendAutomationReport(input: SendAutomationReportInput): Boolean
-  setActionableStatus(input: SetActionableStatusInput!): Actionable
+  setActionRequestStatus(input: SetActionRequestStatusInput!): ActionRequest
   setDialoguePrivacy(input: SetDialoguePrivacyInput): Dialogue
   singleUpload(file: Upload!): ImageType
   updateAutomation(input: CreateAutomationInput): AutomationModel
@@ -1558,7 +1558,7 @@ type Mutation {
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType
   uploadJobImage(disapproved: Boolean, file: Upload, jobId: String, type: UploadImageEnumType): AWSImageType
   uploadUpsellImage(input: UploadSellImageInputType): ImageType
-  verifyActionable(input: VerifyActionableInput!): Actionable
+  verifyActionRequest(input: VerifyActionRequestInput!): ActionRequest
 
   """
   Given a token, checks in the database whether token has been set and has not expired yet
@@ -1801,7 +1801,7 @@ type Query {
   getJob(id: String): CreateWorkspaceJobType
   getJobProcessLocations: JobProcessLocations
   getPreviewData(id: String): PreviewDataType
-  issue(actionableFilter: ActionableFilterInput, input: GetIssueResolverInput): IssueModel
+  issue(actionableFilter: ActionRequestFilterInput, input: GetIssueResolverInput): IssueModel
   me: UserType
   question(where: QuestionWhereUniqueInput): QuestionNode
   refreshAccessToken: RefreshAccessTokenOutput
@@ -2109,9 +2109,9 @@ input SessionWhereUniqueInput {
   id: ID
 }
 
-input SetActionableStatusInput {
-  actionableId: String!
-  status: ActionableState!
+input SetActionRequestStatusInput {
+  actionRequestId: String!
+  status: ActionRequestState!
   workspaceId: String!
 }
 
@@ -2507,8 +2507,8 @@ type UserType {
   userCustomers: [UserCustomer]
 }
 
-input VerifyActionableInput {
-  actionableId: String!
+input VerifyActionRequestInput {
+  actionRequestId: String!
   workspaceId: String!
 }
 

@@ -11,7 +11,7 @@ fragment IssueFragment on IssueModel {
     responseCount
     urgentCount
   }
-  actionables {
+  actionRequests {
     id
     createdAt
     session {

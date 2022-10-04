@@ -63,7 +63,7 @@ describe('Create Session Resolver', () => {
         id: sessionId,
       },
       include: {
-        actionable: {
+        actionRequest: {
           include: {
             issue: {
               include: {
@@ -75,8 +75,8 @@ describe('Create Session Resolver', () => {
       },
     });
 
-    expect(session?.actionableId).not.toBeNull();
-    expect(session?.actionable?.issue?.topic.name).toBe('Home');
+    expect(session?.actionRequestId).not.toBeNull();
+    expect(session?.actionRequest?.issue?.topic.name).toBe('Home');
   });
 
 });

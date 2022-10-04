@@ -1,6 +1,0 @@
-mutation setActionableStatus($input: SetActionableStatusInput!) {
-	setActionableStatus (input: $input) {
-		id
-		status
-	}
-}

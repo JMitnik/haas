@@ -21,7 +21,7 @@ export const buildFindIssueConnectionWhereInput = (
 ): Prisma.IssueWhereInput => {
   return {
     workspaceId,
-    actionables: {
+    actionRequests: {
       some: {
         createdAt: {
           gte: filter?.startDate,
@@ -43,7 +43,7 @@ export const buildFindIssuesWhereInput = (
 ): Prisma.IssueWhereInput => {
   return {
     workspaceId,
-    actionables: {
+    actionRequests: {
       some: {
         createdAt: {
           gte: filter?.startDate,

@@ -42,20 +42,6 @@ import SearchBar from 'components/Common/SearchBar/SearchBar';
 import { ContactableUserCell } from './InteractionTableCells';
 import { InteractionModalCard } from './InteractionModalCard';
 
-const DateCell = ({ timestamp }: { timestamp: string }) => {
-  const date = new Date(parseInt(timestamp, 10));
-
-  const formattedDate = format(date, 'd MMM yyyy');
-  const formattedTimestamp = format(date, 'HH:mm');
-
-  return (
-    <UI.ColumnFlex>
-      <UI.Helper>{formattedDate}</UI.Helper>
-      <UI.Span color="gray.400" fontWeight={600}>{formattedTimestamp}</UI.Span>
-    </UI.ColumnFlex>
-  );
-};
-
 interface DistributionInnerCellProps {
   session: SessionFragmentFragment;
 }
@@ -454,7 +440,7 @@ export const FeedbackOverview = () => {
                   <DistributionInnerCell session={session} />
                 </Table.Cell>
                 <Table.Cell>
-                  <DateCell timestamp={session.createdAt} />
+                  <Table.DateCell timestamp={session.createdAt} />
                 </Table.Cell>
               </Table.Row>
             ))}

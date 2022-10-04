@@ -16,29 +16,29 @@ model Issue {
   topicId     String   @unique
   workspaceId String
 
-  topic       Topic        @relation(fields: [topicId], references: [id])
-  workspace   Customer     @relation(fields: [workspaceId], references: [id])
-  actionables Actionable[]
+  topic          Topic           @relation(fields: [topicId], references: [id])
+  workspace      Customer        @relation(fields: [workspaceId], references: [id])
+  actionRequests ActionRequest[]
 }
 
 model Comment {
-  id           String   @id @default(cuid())
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  data         String
-  actionableId String
+  id              String   @id @default(cuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  data            String
+  actionRequestId String
 
-  actionable Actionable @relation(fields: [actionableId], references: [id])
+  actionRequest ActionRequest @relation(fields: [actionRequestId], references: [id])
 }
 
-enum ActionableState {
+enum ActionRequestState {
   PENDING
   STALE
   COMPLETED
   DROPPED
 }
 
-model Actionable {
+model ActionRequest {
   id           String   @id @default(cuid())
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -48,7 +48,7 @@ model Actionable {
   requestEmail String?
   isVerified   Boolean  @default(false)
 
-  status ActionableState @default(PENDING)
+  status ActionRequestState @default(PENDING)
 
   assignee User?     @relation(fields: [assigneeId], references: [id])
   comments Comment[]
@@ -232,7 +232,7 @@ model Dialogue {
   assignees                   User[]
   sessions                    Session[]
   tags                        Tag[]
-  actionables                 Actionable[]
+  actionRequests              ActionRequest[]
 
   AutomationScheduled AutomationScheduled[]
 
@@ -465,18 +465,18 @@ model QuestionOption {
 }
 
 model Session {
-  createdAt      DateTime @default(now())
-  id             String   @id @default(cuid())
-  dialogueId     String
-  deliveryId     String?
-  originUrl      String?
-  totalTimeInSec Int?
-  device         String?
-  browser        String?
-  mainScore      Float    @default(0)
-  actionableId   String?  @unique
+  createdAt       DateTime @default(now())
+  id              String   @id @default(cuid())
+  dialogueId      String
+  deliveryId      String?
+  originUrl       String?
+  totalTimeInSec  Int?
+  device          String?
+  browser         String?
+  mainScore       Float    @default(0)
+  actionRequestId String?  @unique
 
-  actionable               Actionable?           @relation(fields: [actionableId], references: [id])
+  actionRequest            ActionRequest?        @relation(fields: [actionRequestId], references: [id])
   delivery                 Delivery?             @relation(fields: [deliveryId], references: [id])
   dialogue                 Dialogue              @relation(fields: [dialogueId], references: [id], onDelete: Cascade)
   nodeEntries              NodeEntry[]
@@ -590,7 +590,7 @@ model User {
 
   isAssignedTo         Dialogue[]
   isContactOfFormField FormNodeField[]
-  actionables          Actionable[]
+  actionRequests       ActionRequest[]
 }
 
 model UserOfCustomer {

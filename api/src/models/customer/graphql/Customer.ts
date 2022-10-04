@@ -23,7 +23,7 @@ import { Issue, IssueFilterInput, IssueConnectionFilterInput, IssueConnection } 
 import { IssueValidator } from '../../Issue/IssueValidator';
 import { SessionConnectionFilterInput } from '../../../models/session/graphql';
 import { SessionConnection } from '../../session/graphql/Session.graphql'
-import { ActionableConnection, ActionableConnectionFilterInput } from '../../actionable/graphql';
+import { ActionRequestConnection, ActionRequestConnectionFilterInput } from '../../ActionRequest/graphql';
 import { assertNonNullish } from '../../../utils/assertNonNullish';
 import { WorkspaceValidator } from '../WorkspaceValidator';
 
@@ -98,17 +98,17 @@ export const CustomerType = objectType({
     /**
      * ActionableConnection
      */
-    t.field('actionableConnection', {
-      type: ActionableConnection,
+    t.field('actionRequestConnection', {
+      type: ActionRequestConnection,
       args: {
-        input: ActionableConnectionFilterInput,
+        input: ActionRequestConnectionFilterInput,
       },
       async resolve(parent, args, ctx) {
         assertNonNullish(parent.id, 'Cannot find actionable ID!');
         const canAccessAllActionables = WorkspaceValidator.canAccessAllActionables(parent.id, ctx.session);
         const userId = ctx.session?.user?.id as string;
 
-        return ctx.services.actionableService.findPaginatedWorkspaceActionables(
+        return ctx.services.actionRequestService.findPaginatedWorkspaceActionables(
           parent.id as string,
           userId,
           canAccessAllActionables,

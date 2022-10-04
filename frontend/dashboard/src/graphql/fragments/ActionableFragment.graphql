@@ -1,4 +1,4 @@
-fragment ActionableFragment on Actionable {
+fragment ActionRequestFragment on ActionRequest {
   id
   createdAt
   isVerified

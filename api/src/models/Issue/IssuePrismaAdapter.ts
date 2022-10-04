@@ -1,5 +1,4 @@
-import { Prisma, PrismaClient } from '@prisma/client';
-import { ActionableFilterInput } from 'models/actionable/Actionable.types';
+import { PrismaClient } from '@prisma/client';
 import { IssueConnectionFilterInput, IssueFilterInput } from './Issue.types';
 import { buildFindIssueConnectionWhereInput, buildFindIssuesWhereInput, buildOrderByQuery } from './IssuePrismaAdapter.helper';
 
@@ -24,7 +23,7 @@ class IssuePrismaAdapter {
       orderBy: buildOrderByQuery(filter),
       include: {
         topic: true,
-        actionables: {
+        actionRequests: {
           where: {
             createdAt: {
               gte: filter?.startDate,
@@ -55,7 +54,7 @@ class IssuePrismaAdapter {
       where: buildFindIssuesWhereInput(workspaceId, filter),
       include: {
         topic: true,
-        actionables: {
+        actionRequests: {
           where: {
             createdAt: {
               gte: filter?.startDate,
@@ -88,7 +87,7 @@ class IssuePrismaAdapter {
       },
       include: {
         topic: true,
-        actionables: {
+        actionRequests: {
           include: {
             assignee: true,
             comments: true,
@@ -107,7 +106,7 @@ class IssuePrismaAdapter {
       },
       include: {
         topic: true,
-        actionables: {
+        actionRequests: {
           include: {
             assignee: true,
             comments: true,

@@ -34,8 +34,8 @@ export type AwsImageType = {
   url?: Maybe<Scalars['String']>;
 };
 
-export type Actionable = {
-  __typename?: 'Actionable';
+export type ActionRequest = {
+  __typename?: 'ActionRequest';
   id?: Maybe<Scalars['ID']>;
   createdAt?: Maybe<Scalars['Date']>;
   updatedAt?: Maybe<Scalars['Date']>;
@@ -44,21 +44,21 @@ export type Actionable = {
   issueId?: Maybe<Scalars['String']>;
   requestEmail?: Maybe<Scalars['String']>;
   isVerified: Scalars['Boolean'];
-  status: ActionableState;
+  status: ActionRequestState;
   assignee?: Maybe<UserType>;
   dialogue?: Maybe<Dialogue>;
   issue?: Maybe<IssueModel>;
   session?: Maybe<Session>;
 };
 
-export type ActionableConnection = ConnectionInterface & {
-  __typename?: 'ActionableConnection';
+export type ActionRequestConnection = ConnectionInterface & {
+  __typename?: 'ActionRequestConnection';
   totalPages?: Maybe<Scalars['Int']>;
   pageInfo?: Maybe<PaginationPageInfo>;
-  actionables?: Maybe<Array<Maybe<Actionable>>>;
+  actionRequests?: Maybe<Array<Maybe<ActionRequest>>>;
 };
 
-export type ActionableConnectionFilterInput = {
+export type ActionRequestConnectionFilterInput = {
   search?: Maybe<Scalars['String']>;
   startDate?: Maybe<Scalars['DateString']>;
   endDate?: Maybe<Scalars['DateString']>;
@@ -67,46 +67,46 @@ export type ActionableConnectionFilterInput = {
   isVerified?: Maybe<Scalars['Boolean']>;
   topic?: Maybe<Scalars['String']>;
   dialogueId?: Maybe<Scalars['String']>;
-  status?: Maybe<ActionableState>;
-  orderBy?: Maybe<ActionableConnectionOrderByInput>;
+  status?: Maybe<ActionRequestState>;
+  orderBy?: Maybe<ActionRequestConnectionOrderByInput>;
   offset: Scalars['Int'];
   perPage?: Scalars['Int'];
 };
 
 /** Sorting of ActionableConnection */
-export type ActionableConnectionOrderByInput = {
-  by: ActionableConnectionOrderType;
+export type ActionRequestConnectionOrderByInput = {
+  by: ActionRequestConnectionOrderType;
   desc?: Maybe<Scalars['Boolean']>;
 };
 
 /** Fields to order ActionableConnection by. */
-export enum ActionableConnectionOrderType {
+export enum ActionRequestConnectionOrderType {
   CreatedAt = 'createdAt'
 }
 
-export type ActionableFilterInput = {
+export type ActionRequestFilterInput = {
   startDate?: Maybe<Scalars['DateString']>;
   endDate?: Maybe<Scalars['DateString']>;
   assigneeId?: Maybe<Scalars['String']>;
   withFollowUpAction?: Maybe<Scalars['Boolean']>;
-  status?: Maybe<ActionableState>;
+  status?: Maybe<ActionRequestState>;
 };
 
-export enum ActionableState {
+export enum ActionRequestState {
   Pending = 'PENDING',
   Stale = 'STALE',
   Completed = 'COMPLETED',
   Dropped = 'DROPPED'
 }
 
-/** Basic statistics for actionables of an issue */
+/** Basic statistics for actionRequests of an issue */
 export type ActionableStatistics = {
   __typename?: 'ActionableStatistics';
   /** Number of responses */
   responseCount: Scalars['Int'];
   /** Average value of summarizable statistic */
   average: Scalars['Float'];
-  /** Number of urgent actionables  */
+  /** Number of urgent actionRequests  */
   urgentCount: Scalars['Int'];
 };
 
@@ -125,10 +125,10 @@ export type AppendToInteractionInput = {
   data?: Maybe<NodeEntryDataInput>;
 };
 
-export type AssignUserToActionableInput = {
+export type AssignUserToActionRequestInput = {
   workspaceId: Scalars['String'];
   assigneeId?: Maybe<Scalars['String']>;
-  actionableId: Scalars['String'];
+  actionRequestId: Scalars['String'];
 };
 
 export type AssignUserToDialogueInput = {
@@ -731,7 +731,7 @@ export type Customer = {
   sessionConnection?: Maybe<SessionConnection>;
   /** Workspace statistics */
   statistics?: Maybe<WorkspaceStatistics>;
-  actionableConnection?: Maybe<ActionableConnection>;
+  actionRequestConnection?: Maybe<ActionRequestConnection>;
   issueConnection?: Maybe<IssueConnection>;
   issueDialogues?: Maybe<Array<Maybe<Issue>>>;
   issueTopics?: Maybe<Array<Maybe<Issue>>>;
@@ -761,8 +761,8 @@ export type CustomerSessionConnectionArgs = {
 };
 
 
-export type CustomerActionableConnectionArgs = {
-  input?: Maybe<ActionableConnectionFilterInput>;
+export type CustomerActionRequestConnectionArgs = {
+  input?: Maybe<ActionRequestConnectionFilterInput>;
 };
 
 
@@ -1571,18 +1571,18 @@ export type IssueModel = {
   /** Number of different teams issue exists for */
   teamCount: Scalars['Int'];
   basicStats?: Maybe<ActionableStatistics>;
-  actionableConnection?: Maybe<ActionableConnection>;
-  actionables: Array<Maybe<Actionable>>;
+  actionRequestConnection?: Maybe<ActionRequestConnection>;
+  actionRequests: Array<Maybe<ActionRequest>>;
 };
 
 
-export type IssueModelActionableConnectionArgs = {
-  input?: Maybe<ActionableConnectionFilterInput>;
+export type IssueModelActionRequestConnectionArgs = {
+  input?: Maybe<ActionRequestConnectionFilterInput>;
 };
 
 
-export type IssueModelActionablesArgs = {
-  input?: Maybe<ActionableFilterInput>;
+export type IssueModelActionRequestsArgs = {
+  input?: Maybe<ActionRequestFilterInput>;
 };
 
 
@@ -1710,8 +1710,9 @@ export type MostTrendingTopic = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  assignUserToActionable?: Maybe<Actionable>;
-  setActionableStatus?: Maybe<Actionable>;
+  assignUserToActionRequest?: Maybe<ActionRequest>;
+  setActionRequestStatus?: Maybe<ActionRequest>;
+  verifyActionRequest?: Maybe<ActionRequest>;
   sandbox?: Maybe<Scalars['String']>;
   generateWorkspaceFromCSV?: Maybe<Customer>;
   resetWorkspaceData?: Maybe<Scalars['Boolean']>;
@@ -1787,13 +1788,18 @@ export type Mutation = {
 };
 
 
-export type MutationAssignUserToActionableArgs = {
-  input: AssignUserToActionableInput;
+export type MutationAssignUserToActionRequestArgs = {
+  input: AssignUserToActionRequestInput;
 };
 
 
-export type MutationSetActionableStatusArgs = {
-  input: SetActionableStatusInput;
+export type MutationSetActionRequestStatusArgs = {
+  input: SetActionRequestStatusInput;
+};
+
+
+export type MutationVerifyActionRequestArgs = {
+  input: VerifyActionRequestInput;
 };
 
 
@@ -2431,7 +2437,7 @@ export type QueryTagsArgs = {
 
 export type QueryIssueArgs = {
   input?: Maybe<GetIssueResolverInput>;
-  actionableFilter?: Maybe<ActionableFilterInput>;
+  actionableFilter?: Maybe<ActionRequestFilterInput>;
 };
 
 
@@ -2844,9 +2850,9 @@ export type SessionWhereUniqueInput = {
   dialogueId?: Maybe<Scalars['ID']>;
 };
 
-export type SetActionableStatusInput = {
-  status: ActionableState;
-  actionableId: Scalars['String'];
+export type SetActionRequestStatusInput = {
+  status: ActionRequestState;
+  actionRequestId: Scalars['String'];
   workspaceId: Scalars['String'];
 };
 
@@ -3258,6 +3264,11 @@ export type UserTypeAssignedDialoguesArgs = {
   input?: Maybe<UserOfCustomerInput>;
 };
 
+export type VerifyActionRequestInput = {
+  workspaceId: Scalars['String'];
+  actionRequestId: Scalars['String'];
+};
+
 export type VerifyUserTokenOutput = {
   __typename?: 'VerifyUserTokenOutput';
   accessToken?: Maybe<Scalars['String']>;
@@ -3529,9 +3540,9 @@ export type GetWorkspaceSummaryDetailsQuery = (
   )> }
 );
 
-export type ActionableFragmentFragment = (
-  { __typename?: 'Actionable' }
-  & Pick<Actionable, 'id' | 'createdAt' | 'isVerified' | 'requestEmail' | 'dialogueId' | 'status'>
+export type ActionRequestFragmentFragment = (
+  { __typename?: 'ActionRequest' }
+  & Pick<ActionRequest, 'id' | 'createdAt' | 'isVerified' | 'requestEmail' | 'dialogueId' | 'status'>
   & { issue?: Maybe<(
     { __typename?: 'IssueModel' }
     & { topic: (
@@ -3577,9 +3588,9 @@ export type IssueFragmentFragment = (
   ), basicStats?: Maybe<(
     { __typename?: 'ActionableStatistics' }
     & Pick<ActionableStatistics, 'average' | 'responseCount' | 'urgentCount'>
-  )>, actionables: Array<Maybe<(
-    { __typename?: 'Actionable' }
-    & Pick<Actionable, 'id' | 'createdAt' | 'status'>
+  )>, actionRequests: Array<Maybe<(
+    { __typename?: 'ActionRequest' }
+    & Pick<ActionRequest, 'id' | 'createdAt' | 'status'>
     & { session?: Maybe<(
       { __typename?: 'Session' }
       & Pick<Session, 'id' | 'mainScore'>
@@ -3806,16 +3817,16 @@ export type MeQuery = (
   )> }
 );
 
-export type AssignUserToActionableMutationVariables = Exact<{
-  input: AssignUserToActionableInput;
+export type AssignUserToActionRequestMutationVariables = Exact<{
+  input: AssignUserToActionRequestInput;
 }>;
 
 
-export type AssignUserToActionableMutation = (
+export type AssignUserToActionRequestMutation = (
   { __typename?: 'Mutation' }
-  & { assignUserToActionable?: Maybe<(
-    { __typename?: 'Actionable' }
-    & Pick<Actionable, 'createdAt' | 'status'>
+  & { assignUserToActionRequest?: Maybe<(
+    { __typename?: 'ActionRequest' }
+    & Pick<ActionRequest, 'createdAt' | 'status'>
     & { session?: Maybe<(
       { __typename?: 'Session' }
       & Pick<Session, 'id' | 'mainScore'>
@@ -3831,7 +3842,7 @@ export type AssignUserToActionableMutation = (
 
 export type GetIssueQueryVariables = Exact<{
   input?: Maybe<GetIssueResolverInput>;
-  actionableFilter?: Maybe<ActionableConnectionFilterInput>;
+  actionableFilter?: Maybe<ActionRequestConnectionFilterInput>;
 }>;
 
 
@@ -3843,12 +3854,12 @@ export type GetIssueQuery = (
     & { topic: (
       { __typename?: 'Topic' }
       & Pick<Topic, 'id' | 'name'>
-    ), actionableConnection?: Maybe<(
-      { __typename?: 'ActionableConnection' }
-      & Pick<ActionableConnection, 'totalPages'>
-      & { actionables?: Maybe<Array<Maybe<(
-        { __typename?: 'Actionable' }
-        & Pick<Actionable, 'id' | 'createdAt' | 'isVerified' | 'dialogueId' | 'status'>
+    ), actionRequestConnection?: Maybe<(
+      { __typename?: 'ActionRequestConnection' }
+      & Pick<ActionRequestConnection, 'totalPages'>
+      & { actionRequests?: Maybe<Array<Maybe<(
+        { __typename?: 'ActionRequest' }
+        & Pick<ActionRequest, 'id' | 'createdAt' | 'isVerified' | 'dialogueId' | 'status'>
         & { session?: Maybe<(
           { __typename?: 'Session' }
           & Pick<Session, 'id' | 'mainScore'>
@@ -3867,22 +3878,22 @@ export type GetIssueQuery = (
   )> }
 );
 
-export type GetWorkspaceActionablesQueryVariables = Exact<{
+export type GetWorkspaceActionRequestsQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
-  filter?: Maybe<ActionableConnectionFilterInput>;
+  filter?: Maybe<ActionRequestConnectionFilterInput>;
 }>;
 
 
-export type GetWorkspaceActionablesQuery = (
+export type GetWorkspaceActionRequestsQuery = (
   { __typename?: 'Query' }
   & { customer?: Maybe<(
     { __typename?: 'Customer' }
-    & { actionableConnection?: Maybe<(
-      { __typename?: 'ActionableConnection' }
-      & Pick<ActionableConnection, 'totalPages'>
-      & { actionables?: Maybe<Array<Maybe<(
-        { __typename?: 'Actionable' }
-        & ActionableFragmentFragment
+    & { actionRequestConnection?: Maybe<(
+      { __typename?: 'ActionRequestConnection' }
+      & Pick<ActionRequestConnection, 'totalPages'>
+      & { actionRequests?: Maybe<Array<Maybe<(
+        { __typename?: 'ActionRequest' }
+        & ActionRequestFragmentFragment
       )>>>, pageInfo?: Maybe<(
         { __typename?: 'PaginationPageInfo' }
         & Pick<PaginationPageInfo, 'hasNextPage' | 'hasPrevPage' | 'nextPageOffset' | 'pageIndex' | 'prevPageOffset'>
@@ -3915,16 +3926,16 @@ export type GetWorkspaceIssuesQuery = (
   )> }
 );
 
-export type SetActionableStatusMutationVariables = Exact<{
-  input: SetActionableStatusInput;
+export type SetActionRequestStatusMutationVariables = Exact<{
+  input: SetActionRequestStatusInput;
 }>;
 
 
-export type SetActionableStatusMutation = (
+export type SetActionRequestStatusMutation = (
   { __typename?: 'Mutation' }
-  & { setActionableStatus?: Maybe<(
-    { __typename?: 'Actionable' }
-    & Pick<Actionable, 'id' | 'status'>
+  & { setActionRequestStatus?: Maybe<(
+    { __typename?: 'ActionRequest' }
+    & Pick<ActionRequest, 'id' | 'status'>
   )> }
 );
 
@@ -4863,8 +4874,8 @@ export type GetWorkspaceReportQuery = (
   )> }
 );
 
-export const ActionableFragmentFragmentDoc = gql`
-    fragment ActionableFragment on Actionable {
+export const ActionRequestFragmentFragmentDoc = gql`
+    fragment ActionRequestFragment on ActionRequest {
   id
   createdAt
   isVerified
@@ -4913,7 +4924,7 @@ export const IssueFragmentFragmentDoc = gql`
     responseCount
     urgentCount
   }
-  actionables {
+  actionRequests {
     id
     createdAt
     session {
@@ -5694,9 +5705,9 @@ export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
 export function refetchMeQuery(variables?: MeQueryVariables) {
       return { query: MeDocument, variables: variables }
     }
-export const AssignUserToActionableDocument = gql`
-    mutation assignUserToActionable($input: AssignUserToActionableInput!) {
-  assignUserToActionable(input: $input) {
+export const AssignUserToActionRequestDocument = gql`
+    mutation AssignUserToActionRequest($input: AssignUserToActionRequestInput!) {
+  assignUserToActionRequest(input: $input) {
     createdAt
     session {
       id
@@ -5712,34 +5723,34 @@ export const AssignUserToActionableDocument = gql`
   }
 }
     `;
-export type AssignUserToActionableMutationFn = Apollo.MutationFunction<AssignUserToActionableMutation, AssignUserToActionableMutationVariables>;
+export type AssignUserToActionRequestMutationFn = Apollo.MutationFunction<AssignUserToActionRequestMutation, AssignUserToActionRequestMutationVariables>;
 
 /**
- * __useAssignUserToActionableMutation__
+ * __useAssignUserToActionRequestMutation__
  *
- * To run a mutation, you first call `useAssignUserToActionableMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useAssignUserToActionableMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useAssignUserToActionRequestMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAssignUserToActionRequestMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [assignUserToActionableMutation, { data, loading, error }] = useAssignUserToActionableMutation({
+ * const [assignUserToActionRequestMutation, { data, loading, error }] = useAssignUserToActionRequestMutation({
  *   variables: {
  *      input: // value for 'input'
  *   },
  * });
  */
-export function useAssignUserToActionableMutation(baseOptions?: Apollo.MutationHookOptions<AssignUserToActionableMutation, AssignUserToActionableMutationVariables>) {
+export function useAssignUserToActionRequestMutation(baseOptions?: Apollo.MutationHookOptions<AssignUserToActionRequestMutation, AssignUserToActionRequestMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<AssignUserToActionableMutation, AssignUserToActionableMutationVariables>(AssignUserToActionableDocument, options);
+        return Apollo.useMutation<AssignUserToActionRequestMutation, AssignUserToActionRequestMutationVariables>(AssignUserToActionRequestDocument, options);
       }
-export type AssignUserToActionableMutationHookResult = ReturnType<typeof useAssignUserToActionableMutation>;
-export type AssignUserToActionableMutationResult = Apollo.MutationResult<AssignUserToActionableMutation>;
-export type AssignUserToActionableMutationOptions = Apollo.BaseMutationOptions<AssignUserToActionableMutation, AssignUserToActionableMutationVariables>;
+export type AssignUserToActionRequestMutationHookResult = ReturnType<typeof useAssignUserToActionRequestMutation>;
+export type AssignUserToActionRequestMutationResult = Apollo.MutationResult<AssignUserToActionRequestMutation>;
+export type AssignUserToActionRequestMutationOptions = Apollo.BaseMutationOptions<AssignUserToActionRequestMutation, AssignUserToActionRequestMutationVariables>;
 export const GetIssueDocument = gql`
-    query GetIssue($input: GetIssueResolverInput, $actionableFilter: ActionableConnectionFilterInput) {
+    query GetIssue($input: GetIssueResolverInput, $actionableFilter: ActionRequestConnectionFilterInput) {
   issue(input: $input) {
     id
     topicId
@@ -5747,8 +5758,8 @@ export const GetIssueDocument = gql`
       id
       name
     }
-    actionableConnection(input: $actionableFilter) {
-      actionables {
+    actionRequestConnection(input: $actionableFilter) {
+      actionRequests {
         id
         createdAt
         isVerified
@@ -5812,12 +5823,12 @@ export type GetIssueQueryResult = Apollo.QueryResult<GetIssueQuery, GetIssueQuer
 export function refetchGetIssueQuery(variables?: GetIssueQueryVariables) {
       return { query: GetIssueDocument, variables: variables }
     }
-export const GetWorkspaceActionablesDocument = gql`
-    query GetWorkspaceActionables($workspaceId: ID!, $filter: ActionableConnectionFilterInput) {
+export const GetWorkspaceActionRequestsDocument = gql`
+    query GetWorkspaceActionRequests($workspaceId: ID!, $filter: ActionRequestConnectionFilterInput) {
   customer(id: $workspaceId) {
-    actionableConnection(input: $filter) {
-      actionables {
-        ...ActionableFragment
+    actionRequestConnection(input: $filter) {
+      actionRequests {
+        ...ActionRequestFragment
       }
       totalPages
       pageInfo {
@@ -5830,38 +5841,38 @@ export const GetWorkspaceActionablesDocument = gql`
     }
   }
 }
-    ${ActionableFragmentFragmentDoc}`;
+    ${ActionRequestFragmentFragmentDoc}`;
 
 /**
- * __useGetWorkspaceActionablesQuery__
+ * __useGetWorkspaceActionRequestsQuery__
  *
- * To run a query within a React component, call `useGetWorkspaceActionablesQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetWorkspaceActionablesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetWorkspaceActionRequestsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetWorkspaceActionRequestsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetWorkspaceActionablesQuery({
+ * const { data, loading, error } = useGetWorkspaceActionRequestsQuery({
  *   variables: {
  *      workspaceId: // value for 'workspaceId'
  *      filter: // value for 'filter'
  *   },
  * });
  */
-export function useGetWorkspaceActionablesQuery(baseOptions: Apollo.QueryHookOptions<GetWorkspaceActionablesQuery, GetWorkspaceActionablesQueryVariables>) {
+export function useGetWorkspaceActionRequestsQuery(baseOptions: Apollo.QueryHookOptions<GetWorkspaceActionRequestsQuery, GetWorkspaceActionRequestsQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetWorkspaceActionablesQuery, GetWorkspaceActionablesQueryVariables>(GetWorkspaceActionablesDocument, options);
+        return Apollo.useQuery<GetWorkspaceActionRequestsQuery, GetWorkspaceActionRequestsQueryVariables>(GetWorkspaceActionRequestsDocument, options);
       }
-export function useGetWorkspaceActionablesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceActionablesQuery, GetWorkspaceActionablesQueryVariables>) {
+export function useGetWorkspaceActionRequestsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceActionRequestsQuery, GetWorkspaceActionRequestsQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetWorkspaceActionablesQuery, GetWorkspaceActionablesQueryVariables>(GetWorkspaceActionablesDocument, options);
+          return Apollo.useLazyQuery<GetWorkspaceActionRequestsQuery, GetWorkspaceActionRequestsQueryVariables>(GetWorkspaceActionRequestsDocument, options);
         }
-export type GetWorkspaceActionablesQueryHookResult = ReturnType<typeof useGetWorkspaceActionablesQuery>;
-export type GetWorkspaceActionablesLazyQueryHookResult = ReturnType<typeof useGetWorkspaceActionablesLazyQuery>;
-export type GetWorkspaceActionablesQueryResult = Apollo.QueryResult<GetWorkspaceActionablesQuery, GetWorkspaceActionablesQueryVariables>;
-export function refetchGetWorkspaceActionablesQuery(variables?: GetWorkspaceActionablesQueryVariables) {
-      return { query: GetWorkspaceActionablesDocument, variables: variables }
+export type GetWorkspaceActionRequestsQueryHookResult = ReturnType<typeof useGetWorkspaceActionRequestsQuery>;
+export type GetWorkspaceActionRequestsLazyQueryHookResult = ReturnType<typeof useGetWorkspaceActionRequestsLazyQuery>;
+export type GetWorkspaceActionRequestsQueryResult = Apollo.QueryResult<GetWorkspaceActionRequestsQuery, GetWorkspaceActionRequestsQueryVariables>;
+export function refetchGetWorkspaceActionRequestsQuery(variables?: GetWorkspaceActionRequestsQueryVariables) {
+      return { query: GetWorkspaceActionRequestsDocument, variables: variables }
     }
 export const GetWorkspaceIssuesDocument = gql`
     query GetWorkspaceIssues($workspaceId: ID!, $filter: IssueConnectionFilterInput) {
@@ -5914,40 +5925,40 @@ export type GetWorkspaceIssuesQueryResult = Apollo.QueryResult<GetWorkspaceIssue
 export function refetchGetWorkspaceIssuesQuery(variables?: GetWorkspaceIssuesQueryVariables) {
       return { query: GetWorkspaceIssuesDocument, variables: variables }
     }
-export const SetActionableStatusDocument = gql`
-    mutation setActionableStatus($input: SetActionableStatusInput!) {
-  setActionableStatus(input: $input) {
+export const SetActionRequestStatusDocument = gql`
+    mutation SetActionRequestStatus($input: SetActionRequestStatusInput!) {
+  setActionRequestStatus(input: $input) {
     id
     status
   }
 }
     `;
-export type SetActionableStatusMutationFn = Apollo.MutationFunction<SetActionableStatusMutation, SetActionableStatusMutationVariables>;
+export type SetActionRequestStatusMutationFn = Apollo.MutationFunction<SetActionRequestStatusMutation, SetActionRequestStatusMutationVariables>;
 
 /**
- * __useSetActionableStatusMutation__
+ * __useSetActionRequestStatusMutation__
  *
- * To run a mutation, you first call `useSetActionableStatusMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useSetActionableStatusMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useSetActionRequestStatusMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetActionRequestStatusMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [setActionableStatusMutation, { data, loading, error }] = useSetActionableStatusMutation({
+ * const [setActionRequestStatusMutation, { data, loading, error }] = useSetActionRequestStatusMutation({
  *   variables: {
  *      input: // value for 'input'
  *   },
  * });
  */
-export function useSetActionableStatusMutation(baseOptions?: Apollo.MutationHookOptions<SetActionableStatusMutation, SetActionableStatusMutationVariables>) {
+export function useSetActionRequestStatusMutation(baseOptions?: Apollo.MutationHookOptions<SetActionRequestStatusMutation, SetActionRequestStatusMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<SetActionableStatusMutation, SetActionableStatusMutationVariables>(SetActionableStatusDocument, options);
+        return Apollo.useMutation<SetActionRequestStatusMutation, SetActionRequestStatusMutationVariables>(SetActionRequestStatusDocument, options);
       }
-export type SetActionableStatusMutationHookResult = ReturnType<typeof useSetActionableStatusMutation>;
-export type SetActionableStatusMutationResult = Apollo.MutationResult<SetActionableStatusMutation>;
-export type SetActionableStatusMutationOptions = Apollo.BaseMutationOptions<SetActionableStatusMutation, SetActionableStatusMutationVariables>;
+export type SetActionRequestStatusMutationHookResult = ReturnType<typeof useSetActionRequestStatusMutation>;
+export type SetActionRequestStatusMutationResult = Apollo.MutationResult<SetActionRequestStatusMutation>;
+export type SetActionRequestStatusMutationOptions = Apollo.BaseMutationOptions<SetActionRequestStatusMutation, SetActionRequestStatusMutationVariables>;
 export const UploadUpsellImageDocument = gql`
     mutation uploadUpsellImage($input: UploadSellImageInputType) {
   uploadUpsellImage(input: $input) {
@@ -8104,13 +8115,13 @@ export namespace GetWorkspaceSummaryDetails {
   export const Document = GetWorkspaceSummaryDetailsDocument;
 }
 
-export namespace ActionableFragment {
-  export type Fragment = ActionableFragmentFragment;
-  export type Issue = (NonNullable<ActionableFragmentFragment['issue']>);
-  export type Topic = (NonNullable<(NonNullable<ActionableFragmentFragment['issue']>)['topic']>);
-  export type Session = (NonNullable<ActionableFragmentFragment['session']>);
-  export type Dialogue = (NonNullable<ActionableFragmentFragment['dialogue']>);
-  export type Assignee = (NonNullable<ActionableFragmentFragment['assignee']>);
+export namespace ActionRequestFragment {
+  export type Fragment = ActionRequestFragmentFragment;
+  export type Issue = (NonNullable<ActionRequestFragmentFragment['issue']>);
+  export type Topic = (NonNullable<(NonNullable<ActionRequestFragmentFragment['issue']>)['topic']>);
+  export type Session = (NonNullable<ActionRequestFragmentFragment['session']>);
+  export type Dialogue = (NonNullable<ActionRequestFragmentFragment['dialogue']>);
+  export type Assignee = (NonNullable<ActionRequestFragmentFragment['assignee']>);
 }
 
 export namespace DeliveryEventFragment {
@@ -8127,10 +8138,10 @@ export namespace IssueFragment {
   export type Fragment = IssueFragmentFragment;
   export type Topic = (NonNullable<IssueFragmentFragment['topic']>);
   export type BasicStats = (NonNullable<IssueFragmentFragment['basicStats']>);
-  export type Actionables = NonNullable<(NonNullable<IssueFragmentFragment['actionables']>)[number]>;
-  export type Session = (NonNullable<NonNullable<(NonNullable<IssueFragmentFragment['actionables']>)[number]>['session']>);
-  export type Dialogue = (NonNullable<NonNullable<(NonNullable<IssueFragmentFragment['actionables']>)[number]>['dialogue']>);
-  export type Assignee = (NonNullable<NonNullable<(NonNullable<IssueFragmentFragment['actionables']>)[number]>['assignee']>);
+  export type ActionRequests = NonNullable<(NonNullable<IssueFragmentFragment['actionRequests']>)[number]>;
+  export type Session = (NonNullable<NonNullable<(NonNullable<IssueFragmentFragment['actionRequests']>)[number]>['session']>);
+  export type Dialogue = (NonNullable<NonNullable<(NonNullable<IssueFragmentFragment['actionRequests']>)[number]>['dialogue']>);
+  export type Assignee = (NonNullable<NonNullable<(NonNullable<IssueFragmentFragment['actionRequests']>)[number]>['assignee']>);
 }
 
 export namespace NodeEntryFragment {
@@ -8218,14 +8229,14 @@ export namespace Me {
   export const Document = MeDocument;
 }
 
-export namespace AssignUserToActionable {
-  export type Variables = AssignUserToActionableMutationVariables;
-  export type Mutation = AssignUserToActionableMutation;
-  export type AssignUserToActionable = (NonNullable<AssignUserToActionableMutation['assignUserToActionable']>);
-  export type Session = (NonNullable<(NonNullable<AssignUserToActionableMutation['assignUserToActionable']>)['session']>);
-  export type Dialogue = (NonNullable<(NonNullable<AssignUserToActionableMutation['assignUserToActionable']>)['dialogue']>);
-  export type Assignee = (NonNullable<(NonNullable<AssignUserToActionableMutation['assignUserToActionable']>)['assignee']>);
-  export const Document = AssignUserToActionableDocument;
+export namespace AssignUserToActionRequest {
+  export type Variables = AssignUserToActionRequestMutationVariables;
+  export type Mutation = AssignUserToActionRequestMutation;
+  export type AssignUserToActionRequest = (NonNullable<AssignUserToActionRequestMutation['assignUserToActionRequest']>);
+  export type Session = (NonNullable<(NonNullable<AssignUserToActionRequestMutation['assignUserToActionRequest']>)['session']>);
+  export type Dialogue = (NonNullable<(NonNullable<AssignUserToActionRequestMutation['assignUserToActionRequest']>)['dialogue']>);
+  export type Assignee = (NonNullable<(NonNullable<AssignUserToActionRequestMutation['assignUserToActionRequest']>)['assignee']>);
+  export const Document = AssignUserToActionRequestDocument;
 }
 
 export namespace GetIssue {
@@ -8233,23 +8244,23 @@ export namespace GetIssue {
   export type Query = GetIssueQuery;
   export type Issue = (NonNullable<GetIssueQuery['issue']>);
   export type Topic = (NonNullable<(NonNullable<GetIssueQuery['issue']>)['topic']>);
-  export type ActionableConnection = (NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionableConnection']>);
-  export type Actionables = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionableConnection']>)['actionables']>)[number]>;
-  export type Session = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionableConnection']>)['actionables']>)[number]>['session']>);
-  export type Dialogue = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionableConnection']>)['actionables']>)[number]>['dialogue']>);
-  export type Assignee = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionableConnection']>)['actionables']>)[number]>['assignee']>);
-  export type PageInfo = (NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionableConnection']>)['pageInfo']>);
+  export type ActionRequestConnection = (NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionRequestConnection']>);
+  export type ActionRequests = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionRequestConnection']>)['actionRequests']>)[number]>;
+  export type Session = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionRequestConnection']>)['actionRequests']>)[number]>['session']>);
+  export type Dialogue = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionRequestConnection']>)['actionRequests']>)[number]>['dialogue']>);
+  export type Assignee = (NonNullable<NonNullable<(NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionRequestConnection']>)['actionRequests']>)[number]>['assignee']>);
+  export type PageInfo = (NonNullable<(NonNullable<(NonNullable<GetIssueQuery['issue']>)['actionRequestConnection']>)['pageInfo']>);
   export const Document = GetIssueDocument;
 }
 
-export namespace GetWorkspaceActionables {
-  export type Variables = GetWorkspaceActionablesQueryVariables;
-  export type Query = GetWorkspaceActionablesQuery;
-  export type Customer = (NonNullable<GetWorkspaceActionablesQuery['customer']>);
-  export type ActionableConnection = (NonNullable<(NonNullable<GetWorkspaceActionablesQuery['customer']>)['actionableConnection']>);
-  export type Actionables = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceActionablesQuery['customer']>)['actionableConnection']>)['actionables']>)[number]>;
-  export type PageInfo = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceActionablesQuery['customer']>)['actionableConnection']>)['pageInfo']>);
-  export const Document = GetWorkspaceActionablesDocument;
+export namespace GetWorkspaceActionRequests {
+  export type Variables = GetWorkspaceActionRequestsQueryVariables;
+  export type Query = GetWorkspaceActionRequestsQuery;
+  export type Customer = (NonNullable<GetWorkspaceActionRequestsQuery['customer']>);
+  export type ActionRequestConnection = (NonNullable<(NonNullable<GetWorkspaceActionRequestsQuery['customer']>)['actionRequestConnection']>);
+  export type ActionRequests = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceActionRequestsQuery['customer']>)['actionRequestConnection']>)['actionRequests']>)[number]>;
+  export type PageInfo = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceActionRequestsQuery['customer']>)['actionRequestConnection']>)['pageInfo']>);
+  export const Document = GetWorkspaceActionRequestsDocument;
 }
 
 export namespace GetWorkspaceIssues {
@@ -8262,11 +8273,11 @@ export namespace GetWorkspaceIssues {
   export const Document = GetWorkspaceIssuesDocument;
 }
 
-export namespace SetActionableStatus {
-  export type Variables = SetActionableStatusMutationVariables;
-  export type Mutation = SetActionableStatusMutation;
-  export type SetActionableStatus = (NonNullable<SetActionableStatusMutation['setActionableStatus']>);
-  export const Document = SetActionableStatusDocument;
+export namespace SetActionRequestStatus {
+  export type Variables = SetActionRequestStatusMutationVariables;
+  export type Mutation = SetActionRequestStatusMutation;
+  export type SetActionRequestStatus = (NonNullable<SetActionRequestStatusMutation['setActionRequestStatus']>);
+  export const Document = SetActionRequestStatusDocument;
 }
 
 export namespace UploadUpsellImage {

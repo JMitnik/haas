@@ -3,10 +3,10 @@ import { GraphQLYogaError } from '@graphql-yoga/node';
 import _, { groupBy } from 'lodash';
 
 import { Topic } from '../../Topic/graphql';
-import { ActionableType } from '../../actionable/graphql/Actionable.graphql';
+import { ActionRequestType } from '../../ActionRequest/graphql/ActionRequest.graphql';
 import { ActionableStatistics } from './ActionableStats.graphql';
 import { IssueWithActionables } from '../Issue.types';
-import { ActionableConnection, ActionableConnectionFilterInput } from '../../actionable/graphql';
+import { ActionRequestConnection, ActionRequestConnectionFilterInput, ActionRequestFilterInput } from '../../ActionRequest/graphql';
 
 
 export const IssueModel = objectType({
@@ -26,7 +26,7 @@ export const IssueModel = objectType({
       description: 'Number of different teams issue exists for',
       async resolve(parent, _, ctx) {
         let issue: IssueWithActionables
-        if ((parent as any)?.actionables?.length) {
+        if ((parent as any)?.actionRequests?.length) {
           issue = parent as any;
         } else {
           issue = await ctx.services.issueService.findIssueById(
@@ -34,7 +34,7 @@ export const IssueModel = objectType({
           ) as IssueWithActionables;
         }
 
-        const teamCount = groupBy(issue.actionables, (actionable) => actionable.dialogueId);
+        const teamCount = groupBy(issue.actionRequests, (actionable) => actionable.dialogueId);
         return Object.keys(teamCount)?.length || 0;
       },
     });
@@ -43,7 +43,7 @@ export const IssueModel = objectType({
       type: ActionableStatistics,
       async resolve(parent, args, ctx) {
         let issue: IssueWithActionables
-        if ((parent as any)?.actionables?.length) {
+        if ((parent as any)?.actionRequests?.length) {
           issue = parent as any;
         } else {
           issue = await ctx.services.issueService.findIssueById(
@@ -51,26 +51,26 @@ export const IssueModel = objectType({
           ) as IssueWithActionables;
         }
         return {
-          average: _.meanBy(issue.actionables, (actionable) => actionable.session?.mainScore),
-          responseCount: issue.actionables?.length || 0,
-          urgentCount: _.filter(issue.actionables, (actionable) => actionable.isVerified)?.length,
+          average: _.meanBy(issue.actionRequests, (actionable) => actionable.session?.mainScore),
+          responseCount: issue.actionRequests?.length || 0,
+          urgentCount: _.filter(issue.actionRequests, (actionable) => actionable.isVerified)?.length,
         }
       },
     });
 
-    t.field('actionableConnection', {
-      type: ActionableConnection,
+    t.field('actionRequestConnection', {
+      type: ActionRequestConnection,
       args: {
-        input: ActionableConnectionFilterInput,
+        input: ActionRequestConnectionFilterInput,
       },
       async resolve(parent, args, ctx) {
-        return ctx.services.actionableService.findPaginatedActionables(parent.id as string, args.input || undefined);
+        return ctx.services.actionRequestService.findPaginatedActionables(parent.id as string, args.input || undefined);
       },
     });
 
-    t.nonNull.list.field('actionables', {
+    t.nonNull.list.field('actionRequests', {
       args: {
-        input: 'ActionableFilterInput',
+        input: ActionRequestFilterInput,
       },
       async resolve(parent, args, ctx) {
         const issueId = parent.id;
@@ -78,13 +78,12 @@ export const IssueModel = objectType({
         if (!issueId) throw new GraphQLYogaError('No Issue id found for actionable!');
 
         if (!args.input) {
-          console.dir((parent as any)?.actionables?.map((actionable: any) => actionable.session.nodeEntries.length));
-          return (parent as any)?.actionables || [];
+          return (parent as any)?.actionRequests || [];
         }
 
-        return ctx.services.actionableService.findActionablesByIssueId(issueId, args.input) || [];
+        return ctx.services.actionRequestService.findActionablesByIssueId(issueId, args.input) || [];
       },
-      type: ActionableType,
+      type: ActionRequestType,
     });
   },
 })
