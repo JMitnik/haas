@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { sessionWithFormNodes } from '../session/Session.types';
 import { defaultIssueFields, IssueConnectionFilterInput, IssueFilterInput } from './Issue.types';
-import { buildFindIssueConnectionWhereInput, buildFindIssuesWhereInput, buildOrderByQuery } from './IssuePrismaAdapter.helper';
+import { buildFindIssueConnectionWhereInput, buildFindIssuesWhereInput, buildOrderByQuery } from './IssuePrismaAdapter.helpers';
 
 class IssuePrismaAdapter {
   prisma: PrismaClient;

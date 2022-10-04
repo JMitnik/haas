@@ -4,7 +4,7 @@ import _, { groupBy } from 'lodash';
 
 import { Topic } from '../../Topic/graphql';
 import { ActionRequestType } from '../../ActionRequest/graphql/ActionRequest.graphql';
-import { ActionableStatistics } from './ActionableStats.graphql';
+import { ActionRequestStatistics } from '../../ActionRequest/graphql/ActionRequestStats.graphql';
 import { IssueWithActionables } from '../Issue.types';
 import { ActionRequestConnection, ActionRequestConnectionFilterInput, ActionRequestFilterInput } from '../../ActionRequest/graphql';
 
@@ -40,7 +40,7 @@ export const IssueModel = objectType({
     });
 
     t.field('basicStats', {
-      type: ActionableStatistics,
+      type: ActionRequestStatistics,
       async resolve(parent, args, ctx) {
         let issue: IssueWithActionables
         if ((parent as any)?.actionRequests?.length) {

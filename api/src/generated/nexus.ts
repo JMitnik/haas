@@ -957,7 +957,7 @@ export interface NexusGenObjects {
     pageInfo?: NexusGenRootTypes['PaginationPageInfo'] | null; // PaginationPageInfo
     totalPages?: number | null; // Int
   }
-  ActionableStatistics: { // root type
+  ActionRequestStatistics: { // root type
     average: number; // Float!
     responseCount: number; // Int!
     urgentCount: number; // Int!
@@ -1717,7 +1717,7 @@ export interface NexusGenFieldTypes {
     pageInfo: NexusGenRootTypes['PaginationPageInfo'] | null; // PaginationPageInfo
     totalPages: number | null; // Int
   }
-  ActionableStatistics: { // field return type
+  ActionRequestStatistics: { // field return type
     average: number; // Float!
     responseCount: number; // Int!
     urgentCount: number; // Int!
@@ -2162,7 +2162,7 @@ export interface NexusGenFieldTypes {
   IssueModel: { // field return type
     actionRequestConnection: NexusGenRootTypes['ActionRequestConnection'] | null; // ActionRequestConnection
     actionRequests: Array<NexusGenRootTypes['ActionRequest'] | null>; // [ActionRequest]!
-    basicStats: NexusGenRootTypes['ActionableStatistics'] | null; // ActionableStatistics
+    basicStats: NexusGenRootTypes['ActionRequestStatistics'] | null; // ActionRequestStatistics
     createdAt: NexusGenScalars['Date'] | null; // Date
     id: string | null; // ID
     teamCount: number; // Int!
@@ -2697,7 +2697,7 @@ export interface NexusGenFieldTypeNames {
     pageInfo: 'PaginationPageInfo'
     totalPages: 'Int'
   }
-  ActionableStatistics: { // field return type name
+  ActionRequestStatistics: { // field return type name
     average: 'Float'
     responseCount: 'Int'
     urgentCount: 'Int'
@@ -3142,7 +3142,7 @@ export interface NexusGenFieldTypeNames {
   IssueModel: { // field return type name
     actionRequestConnection: 'ActionRequestConnection'
     actionRequests: 'ActionRequest'
-    basicStats: 'ActionableStatistics'
+    basicStats: 'ActionRequestStatistics'
     createdAt: 'Date'
     id: 'ID'
     teamCount: 'Int'
@@ -4032,7 +4032,7 @@ export interface NexusGenArgTypes {
     }
     issue: { // args
       actionableFilter?: NexusGenInputs['ActionRequestFilterInput'] | null; // ActionRequestFilterInput
-      input?: NexusGenInputs['GetIssueResolverInput'] | null; // GetIssueResolverInput
+      input: NexusGenInputs['GetIssueResolverInput']; // GetIssueResolverInput!
     }
     question: { // args
       where?: NexusGenInputs['QuestionWhereUniqueInput'] | null; // QuestionWhereUniqueInput

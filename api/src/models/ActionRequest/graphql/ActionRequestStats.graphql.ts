@@ -1,8 +1,8 @@
 import { objectType } from 'nexus';
 
-export const ActionableStatistics = objectType({
-  name: 'ActionableStatistics',
-  description: 'Basic statistics for actionRequests of an issue',
+export const ActionRequestStatistics = objectType({
+  name: 'ActionRequestStatistics',
+  description: 'Basic statistics for action requests of an issue',
 
   definition(t) {
     t.nonNull.int('responseCount', { description: 'Number of responses' });

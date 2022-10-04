@@ -1,6 +1,6 @@
 import { GraphQLYogaError } from '@graphql-yoga/node';
 import { ActionRequestFilterInput } from '../../ActionRequest/graphql';
-import { inputObjectType, queryField } from 'nexus';
+import { inputObjectType, nonNull, queryField } from 'nexus';
 import { IssueModel } from './IssueModel.graphql'
 
 export const GetIssueResolverInput = inputObjectType({
@@ -16,12 +16,10 @@ export const GetIssueResolver = queryField('issue', {
   type: IssueModel,
   nullable: true,
   args: {
-    input: GetIssueResolverInput,
+    input: nonNull(GetIssueResolverInput),
     actionableFilter: ActionRequestFilterInput,
   },
   async resolve(parent, args, ctx) {
-    if (!args.input) throw new GraphQLYogaError('No input provided!');
-
     return ctx.services.issueService.findIssueById(args.input);
   },
 })

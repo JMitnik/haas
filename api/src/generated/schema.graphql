@@ -72,8 +72,8 @@ enum ActionRequestState {
   STALE
 }
 
-"""Basic statistics for actionRequests of an issue"""
-type ActionableStatistics {
+"""Basic statistics for action requests of an issue"""
+type ActionRequestStatistics {
   """Average value of summarizable statistic"""
   average: Float!
 
@@ -1345,7 +1345,7 @@ input IssueFilterInput {
 type IssueModel {
   actionRequestConnection(input: ActionRequestConnectionFilterInput): ActionRequestConnection
   actionRequests(input: ActionRequestFilterInput): [ActionRequest]!
-  basicStats: ActionableStatistics
+  basicStats: ActionRequestStatistics
   createdAt: Date
   id: ID
 
@@ -1801,7 +1801,7 @@ type Query {
   getJob(id: String): CreateWorkspaceJobType
   getJobProcessLocations: JobProcessLocations
   getPreviewData(id: String): PreviewDataType
-  issue(actionableFilter: ActionRequestFilterInput, input: GetIssueResolverInput): IssueModel
+  issue(actionableFilter: ActionRequestFilterInput, input: GetIssueResolverInput!): IssueModel
   me: UserType
   question(where: QuestionWhereUniqueInput): QuestionNode
   refreshAccessToken: RefreshAccessTokenOutput

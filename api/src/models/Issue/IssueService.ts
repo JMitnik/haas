@@ -43,7 +43,6 @@ export class IssueService {
 
     const issues = await this.issuePrismaAdapter.findPaginatedIssues(workspaceId, filter);
     const totalIssues = await this.issuePrismaAdapter.countIssues(workspaceId, filter);
-    console.log('Total issues: ', totalIssues);
     const { totalPages, ...pageInfo } = offsetPaginate(totalIssues, offset, perPage);
 
     return {
@@ -54,16 +53,9 @@ export class IssueService {
   };
 
   /**
-  * Finds all issues by a workspace ID
-  */
-  public async findIssuesByWorkspaceId(workspaceId: string, filter: IssueFilterInput) {
-    return this.issuePrismaAdapter.findIssuesByWorkspaceId(workspaceId, filter);
-  }
-
-  /**
   * Finds an issue be either the issue or topic ID
   */
-  public async findIssueById(input: GetIssueResolverInput) {
+  public async findIssue(input: GetIssueResolverInput) {
     if (input.issueId) {
       return this.issuePrismaAdapter.findIssueById(input.issueId);
     }
@@ -73,10 +65,6 @@ export class IssueService {
     }
 
     return null;
-  }
-
-  public async createIssueIfNotExists(workspaceId: string, topicId: string) {
-    return this.issuePrismaAdapter.upsertIssueByTopicId(workspaceId, topicId);
   }
 
   /**

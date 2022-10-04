@@ -99,9 +99,9 @@ export enum ActionRequestState {
   Dropped = 'DROPPED'
 }
 
-/** Basic statistics for actionRequests of an issue */
-export type ActionableStatistics = {
-  __typename?: 'ActionableStatistics';
+/** Basic statistics for action requests of an issue */
+export type ActionRequestStatistics = {
+  __typename?: 'ActionRequestStatistics';
   /** Number of responses */
   responseCount: Scalars['Int'];
   /** Average value of summarizable statistic */
@@ -1570,7 +1570,7 @@ export type IssueModel = {
   topic: Topic;
   /** Number of different teams issue exists for */
   teamCount: Scalars['Int'];
-  basicStats?: Maybe<ActionableStatistics>;
+  basicStats?: Maybe<ActionRequestStatistics>;
   actionRequestConnection?: Maybe<ActionRequestConnection>;
   actionRequests: Array<Maybe<ActionRequest>>;
 };
@@ -3586,8 +3586,8 @@ export type IssueFragmentFragment = (
     { __typename?: 'Topic' }
     & Pick<Topic, 'id' | 'name'>
   ), basicStats?: Maybe<(
-    { __typename?: 'ActionableStatistics' }
-    & Pick<ActionableStatistics, 'average' | 'responseCount' | 'urgentCount'>
+    { __typename?: 'ActionRequestStatistics' }
+    & Pick<ActionRequestStatistics, 'average' | 'responseCount' | 'urgentCount'>
   )>, actionRequests: Array<Maybe<(
     { __typename?: 'ActionRequest' }
     & Pick<ActionRequest, 'id' | 'createdAt' | 'status'>
