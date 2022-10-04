@@ -153,7 +153,7 @@ export const ActionRequestOverview = () => {
     }));
   };
 
-  const columns = `minmax(100px, 0.35fr) minmax(150px, 1fr) minmax(100px, 0.5fr) 
+  const columns = `minmax(100px, 0.35fr) minmax(150px, 1fr) minmax(100px, 0.5fr)
   minmax(150px, 1fr) minmax(150px, 1fr) minmax(150px, 0.5fr)`;
 
   return (
@@ -389,15 +389,12 @@ export const ActionRequestOverview = () => {
                               </UI.Div>
                             )}
                           </Dropdown>
-
                         </Table.InnerCell>
-
                       </Table.Cell>
                       <Table.Cell>
                         <UI.Span fontWeight={600} color="off.500">
                           {actionRequest.dialogue?.title}
                         </UI.Span>
-
                       </Table.Cell>
                       <Table.Cell>
                         <Table.DateCell timestamp={actionRequest.createdAt as string} />
@@ -442,11 +439,10 @@ export const ActionRequestOverview = () => {
                     </ContextMenu.Item>
                   </ContextMenu.Content>
                 </ContextMenu.Root>
-
               </UI.Div>
-
             ))}
           </UI.Div>
+
           <UI.Flex justifyContent="flex-end" mt={4}>
             {totalPages > 1 && (
               <Table.Pagination

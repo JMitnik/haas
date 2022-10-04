@@ -20,7 +20,17 @@ const session = Prisma.validator<Prisma.SessionArgs>()({
       },
     },
   },
-})
+});
+
+export const sessionWithFormNodes = Prisma.validator<Prisma.SessionArgs>()({
+  include: {
+    nodeEntries: {
+      include: {
+        formNodeEntry: { include: { values: true } },
+      },
+    },
+  },
+});
 
 export type SessionWithNodeEntries = Prisma.SessionGetPayload<typeof session>;
 

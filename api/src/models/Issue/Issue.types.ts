@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 
-const issue = Prisma.validator<Prisma.IssueArgs>()({
+export const defaultIssueFields = Prisma.validator<Prisma.IssueArgs>()({
   include: {
     topic: true,
     actionRequests: {
@@ -15,7 +15,7 @@ const issue = Prisma.validator<Prisma.IssueArgs>()({
   },
 })
 
-export type IssueWithActionables = Prisma.IssueGetPayload<typeof issue>;
+export type IssueWithActionables = Prisma.IssueGetPayload<typeof defaultIssueFields>;
 
 type Modify<T, R> = Omit<T, keyof R> & R;
 

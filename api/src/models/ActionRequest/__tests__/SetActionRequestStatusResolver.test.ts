@@ -101,8 +101,5 @@ describe('SetactionRequestStatus Resolver', () => {
         expect(error.message).toContain('Not Authorised!');
       } else { throw new Error(); }
     }
-
-
   });
-
 });

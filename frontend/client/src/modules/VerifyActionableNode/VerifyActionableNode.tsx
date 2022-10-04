@@ -53,6 +53,10 @@ const getSubHeaderText = (language?: LanguageEnumType) => {
   }
 };
 
+/**
+ * This Node is rendered in case a User has received an email with the
+ * prompt to confirm their actionable mail.
+ */
 const VerifyActionableNode = () => {
   const { dialogue } = useDialogueState();
   const { actionableId } = useParams();
@@ -99,10 +103,8 @@ const VerifyActionableNode = () => {
             <Loader />
           </FullScreenLayout>
         )}
-
       </AnimatePresence>
     </DialogueTreeLayout>
-
   );
 };
 export default VerifyActionableNode;

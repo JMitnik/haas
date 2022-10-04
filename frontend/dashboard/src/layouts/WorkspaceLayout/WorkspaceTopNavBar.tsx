@@ -21,10 +21,10 @@ import { useCustomer } from 'providers/CustomerProvider';
 import { useFormatter } from 'hooks/useFormatter';
 import { useGetWorkspaceLayoutDetailsQuery } from 'types/generated-types';
 import { useNavigator } from 'hooks/useNavigator';
+import useAuth from 'hooks/useAuth';
 
 import { NavLinkContainer } from './WorkpaceLayout.styles';
 import { TopSubNavBarContainer } from './TopSubNavBar.styles';
-import useAuth from 'hooks/useAuth';
 
 export const WorkspaceTopNavBar = () => {
   const { t } = useTranslation();

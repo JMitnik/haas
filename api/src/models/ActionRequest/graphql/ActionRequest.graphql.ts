@@ -21,6 +21,7 @@ export const ActionRequestType = objectType({
         return parent.requestEmail
       },
     });
+
     t.nonNull.boolean('isVerified');
 
     t.nonNull.field('status', {
@@ -42,6 +43,5 @@ export const ActionRequestType = objectType({
     t.field('session', {
       type: SessionType,
     });
-
   },
 })

@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import { IssueConnectionFilterInput, IssueFilterInput } from './Issue.types';
+import { sessionWithFormNodes } from '../session/Session.types';
+import { defaultIssueFields, IssueConnectionFilterInput, IssueFilterInput } from './Issue.types';
 import { buildFindIssueConnectionWhereInput, buildFindIssuesWhereInput, buildOrderByQuery } from './IssuePrismaAdapter.helper';
 
 class IssuePrismaAdapter {
@@ -31,16 +32,10 @@ class IssuePrismaAdapter {
             },
           },
           include: {
-            assignee: true,
-            comments: true,
-            dialogue: true,
+            ...defaultIssueFields.include.actionRequests.include,
             session: {
               include: {
-                nodeEntries: {
-                  include: {
-                    formNodeEntry: true,
-                  },
-                },
+                ...sessionWithFormNodes.include,
               },
             },
           },
@@ -138,9 +133,6 @@ class IssuePrismaAdapter {
       update: {},
     })
   }
-
 };
-
-
 
 export default IssuePrismaAdapter;
