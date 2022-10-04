@@ -10,25 +10,25 @@ jest.setTimeout(30000);
 const ctx = makeTestContext(prisma);
 
 const Mutation = `
-mutation SetActionableStatus($input: SetActionableStatusInput!) {
-	setActionableStatus (input: $input) {
+mutation SetActionRequestStatus($input: SetActionRequestStatusInput!) {
+	setActionRequestStatus(input: $input) {
 		id
 		status
 	}
 }
 `;
 
-describe('SetActionableStatus Resolver', () => {
+describe('SetactionRequestStatus Resolver', () => {
   afterEach(async () => {
     await clearDatabase(prisma);
     await prisma.$disconnect();
   });
 
-  it('Can set status of actionable', async () => {
+  it('Can set status of actionRequest', async () => {
     const { workspace, dialogue } = await seedWorkspace(prisma);
     const issue = await seedIssue(prisma, workspace.id);
 
-    const actionable = await prisma.actionRequest.create({
+    const actionRequest = await prisma.actionRequest.create({
       data: {
         dialogue: {
           connect: {
@@ -43,7 +43,7 @@ describe('SetActionableStatus Resolver', () => {
       },
     });
 
-    expect(actionable.status).toBe(ActionRequestState.PENDING);
+    expect(actionRequest.status).toBe(ActionRequestState.PENDING);
 
     const { user } = await seedUser(prisma, workspace.id, {
       name: 'Reader',
@@ -55,7 +55,7 @@ describe('SetActionableStatus Resolver', () => {
       {
         input: {
           workspaceId: workspace.id,
-          actionableId: actionable.id,
+          actionRequestId: actionRequest.id,
           status: ActionRequestState.COMPLETED,
         },
       },
@@ -64,13 +64,13 @@ describe('SetActionableStatus Resolver', () => {
       }
     );
 
-    const actionableWithNewStatus = await prisma.actionRequest.findUnique({
+    const actionRequestWithNewStatus = await prisma.actionRequest.findUnique({
       where: {
-        id: actionable.id,
+        id: actionRequest.id,
       },
     });
 
-    expect(actionableWithNewStatus?.status).toBe(ActionRequestState.COMPLETED);
+    expect(actionRequestWithNewStatus?.status).toBe(ActionRequestState.COMPLETED);
 
   });
 
@@ -88,7 +88,7 @@ describe('SetActionableStatus Resolver', () => {
         {
           input: {
             workspaceId: workspace.id,
-            actionableId: 'actionable.id',
+            actionRequestId: 'actionRequest.id',
             status: ActionRequestState.COMPLETED,
           },
         },

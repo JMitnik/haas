@@ -9,7 +9,7 @@ const ctx = makeTestContext(prisma);
 
 const Mutation = `
 mutation AssignUserToActionRequest($input: AssignUserToActionRequestInput!) {
-	assignUserToActionRequest (input: $input) {
+	assignUserToActionRequest(input: $input) {
 		createdAt
     session {
       id
@@ -26,7 +26,7 @@ mutation AssignUserToActionRequest($input: AssignUserToActionRequestInput!) {
 }
 `;
 
-describe('AssignUserToActionable Resolver', () => {
+describe('AssignUserToActionRequest Resolver', () => {
   afterEach(async () => {
     await clearDatabase(prisma);
     await prisma.$disconnect();
@@ -37,7 +37,7 @@ describe('AssignUserToActionable Resolver', () => {
     const issue = await seedIssue(prisma, workspace.id);
     await seedActionables(prisma, issue.id, dialogue.id, 10);
 
-    const actionable = await prisma.actionRequest.create({
+    const actionRequest = await prisma.actionRequest.create({
       data: {
         dialogue: {
           connect: {
@@ -62,7 +62,7 @@ describe('AssignUserToActionable Resolver', () => {
       {
         input: {
           workspaceId: workspace.id,
-          actionableId: actionable.id,
+          actionRequestId: actionRequest.id,
           assigneeId: user.id,
         },
       },
@@ -71,19 +71,19 @@ describe('AssignUserToActionable Resolver', () => {
       }
     );
 
-    const actionableWithAssignee = await prisma.actionRequest.findUnique({
+    const actionRequestWithAssignee = await prisma.actionRequest.findUnique({
       where: {
-        id: actionable.id,
+        id: actionRequest.id,
       },
     });
 
-    expect(actionableWithAssignee?.assigneeId).toBe(user.id);
+    expect(actionRequestWithAssignee?.assigneeId).toBe(user.id);
 
     await ctx.client.request(Mutation,
       {
         input: {
           workspaceId: workspace.id,
-          actionableId: actionable.id,
+          actionRequestId: actionRequest.id,
           assigneeId: null,
         },
       },
@@ -94,7 +94,7 @@ describe('AssignUserToActionable Resolver', () => {
 
     const actionableWithoutAssignee = await prisma.actionRequest.findUnique({
       where: {
-        id: actionable.id,
+        id: actionRequest.id,
       },
     });
 
@@ -117,7 +117,7 @@ describe('AssignUserToActionable Resolver', () => {
         {
           input: {
             workspaceId: workspace.id,
-            actionableId: 'actionable.id',
+            actionRequestId: 'actionRequest.id',
             assigneeId: user.id,
           },
         },

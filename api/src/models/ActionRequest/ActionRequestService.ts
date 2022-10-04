@@ -21,16 +21,16 @@ class ActionRequestService {
   }
 
   public async verifyActionRequest(input: VerifyActionRequestInput) {
-    const actionable = await this.actionRequestPrismaAdapter.findById(input.actionRequestId);
+    const actionRequest = await this.actionRequestPrismaAdapter.findById(input.actionRequestId);
 
-    if (!actionable) return null;
+    if (!actionRequest) return null;
 
     const updateArgs: Prisma.ActionRequestUpdateInput = { isVerified: !!input.actionRequestId ? true : false };
     return this.actionRequestPrismaAdapter.updateActionRequest(input.actionRequestId, updateArgs);
   }
 
   /**
-   * Sets the status of an actionable
+   * Sets the status of an actionRequest
    */
   public async setActionRequestStatus(input: SetActionRequestStatusInput) {
     const updateArgs: Prisma.ActionRequestUpdateInput = { status: input.status };
@@ -39,7 +39,7 @@ class ActionRequestService {
   };
 
   /**
-   * Assigns a user to an actionable
+   * Assigns a user to an actionRequest
    */
   public async assignUserToActionRequest(input: AssignUserToActionRequestInput) {
     const result = await this.actionRequestPrismaAdapter.assignUserToActionRequest(input);
@@ -51,7 +51,7 @@ class ActionRequestService {
    * @param issueId 
    * @param filter 
    */
-  public async findActionablesByIssueId(issueId: string, filter?: ActionRequestFilterInput) {
+  public async findActionRequestsByIssueId(issueId: string, filter?: ActionRequestFilterInput) {
     return this.actionRequestPrismaAdapter.findActionRequestsByIssue(issueId, filter);
   }
 
@@ -59,27 +59,27 @@ class ActionRequestService {
    * Finds all actionRequests assigned to a user within a workspace.
    * @param workspaceId 
    * @param userId - id of the user requesting the function
-   * @param canAccessAllActionables - if set to true, can see all actionRequests no matter whether you are assigned
+   * @param canAccessAllactionRequests - if set to true, can see all actionRequests no matter whether you are assigned
    * @param filter 
    * @returns a paginated subset of actionRequests
    */
-  public async findPaginatedWorkspaceActionables(
+  public async findPaginatedWorkspaceActionRequests(
     workspaceId: string,
     userId: string,
-    canAccessAllActionables: boolean,
+    canAccessAllactionRequests: boolean,
     filter?: ActionRequestConnectionFilterInput,
   ) {
     const offset = filter?.offset ?? 0;
     const perPage = filter?.perPage ?? 5;
 
     const actionRequests = await this.actionRequestPrismaAdapter.findPaginatedActionRequestsByWorkspace(
-      workspaceId, userId, canAccessAllActionables, filter,
+      workspaceId, userId, canAccessAllactionRequests, filter,
     );
-    const totalActionables = await this.actionRequestPrismaAdapter.countActionRequestsByWorkspace(
-      workspaceId, userId, canAccessAllActionables, filter
+    const totalactionRequests = await this.actionRequestPrismaAdapter.countActionRequestsByWorkspace(
+      workspaceId, userId, canAccessAllactionRequests, filter
     );
 
-    const { totalPages, ...pageInfo } = offsetPaginate(totalActionables, offset, perPage);
+    const { totalPages, ...pageInfo } = offsetPaginate(totalactionRequests, offset, perPage);
 
     return {
       actionRequests: actionRequests,
@@ -92,14 +92,14 @@ class ActionRequestService {
    * Finds all actionRequests of a specific issue based on a filter.
    * @returns a paginated subset of actionRequests
    */
-  public async findPaginatedActionables(issueId: string, filter?: ActionRequestConnectionFilterInput) {
+  public async findPaginatedactionRequests(issueId: string, filter?: ActionRequestConnectionFilterInput) {
     const offset = filter?.offset ?? 0;
     const perPage = filter?.perPage ?? 5;
 
     const actionRequests = await this.actionRequestPrismaAdapter.findPaginatedActionRequests(issueId, filter);
-    const totalActionables = await this.actionRequestPrismaAdapter.countActionRequests(issueId, filter);
+    const totalactionRequests = await this.actionRequestPrismaAdapter.countActionRequests(issueId, filter);
 
-    const { totalPages, ...pageInfo } = offsetPaginate(totalActionables, offset, perPage);
+    const { totalPages, ...pageInfo } = offsetPaginate(totalactionRequests, offset, perPage);
 
     return {
       actionRequests: actionRequests,

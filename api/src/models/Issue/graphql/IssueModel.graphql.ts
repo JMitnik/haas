@@ -64,7 +64,9 @@ export const IssueModel = objectType({
         input: ActionRequestConnectionFilterInput,
       },
       async resolve(parent, args, ctx) {
-        return ctx.services.actionRequestService.findPaginatedActionables(parent.id as string, args.input || undefined);
+        return ctx.services.actionRequestService.findPaginatedactionRequests(
+          parent.id as string, args.input || undefined
+        );
       },
     });
 
@@ -81,7 +83,7 @@ export const IssueModel = objectType({
           return (parent as any)?.actionRequests || [];
         }
 
-        return ctx.services.actionRequestService.findActionablesByIssueId(issueId, args.input) || [];
+        return ctx.services.actionRequestService.findActionRequestsByIssueId(issueId, args.input) || [];
       },
       type: ActionRequestType,
     });

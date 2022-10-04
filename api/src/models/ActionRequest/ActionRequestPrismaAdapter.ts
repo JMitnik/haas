@@ -20,11 +20,11 @@ export class ActionRequestPrismaAdapter {
     });
   };
 
-  public async updateActionRequest(actionableId: string, update: Prisma.ActionRequestUpdateInput) {
+  public async updateActionRequest(actionRequestId: string, update: Prisma.ActionRequestUpdateInput) {
     return this.prisma.actionRequest.update({
       data: update,
       where: {
-        id: actionableId,
+        id: actionRequestId,
       },
     })
   }

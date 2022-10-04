@@ -108,7 +108,7 @@ export const CustomerType = objectType({
         const canAccessAllActionables = WorkspaceValidator.canAccessAllActionables(parent.id, ctx.session);
         const userId = ctx.session?.user?.id as string;
 
-        return ctx.services.actionRequestService.findPaginatedWorkspaceActionables(
+        return ctx.services.actionRequestService.findPaginatedWorkspaceActionRequests(
           parent.id as string,
           userId,
           canAccessAllActionables,
