@@ -87,9 +87,13 @@ const language = {
       en: 'Pulse',
       de: 'Pulse',
     },
+    requested_by: {
+      en: 'Requested By',
+      de: 'Angefordert von',
+    },
     action_requests: {
-      en: 'Action requests',
-      de: 'Action requests',
+      en: 'Action Requests',
+      de: 'Action Requests',
     },
     total_responses: {
       en: 'Total responses',
@@ -274,6 +278,10 @@ const language = {
     teams_with_problems: {
       en: 'Teams with problems',
       de: 'Mannschaften mit Problemen',
+    },
+    issue: {
+      en: 'Issue',
+      de: 'Issue',
     },
     issues: {
       en: 'Issues',
@@ -468,8 +476,8 @@ const language = {
       de: 'Zurück',
     },
     observable_insights: {
-      en: 'Actionable insights',
-      de: 'Actionable insights',
+      en: 'ActionRequest insights',
+      de: 'ActionRequest insights',
     },
     observable_insights_description: {
       en: 'The haas dashboard makes observing and maintaining the happiness of your accessible and observable.',
@@ -618,6 +626,10 @@ const language = {
     reset: {
       en: 'Reset',
       de: 'Zurücksetzen',
+    },
+    filter_by_search_issue_helper: {
+      en: 'Search by team, topic, assignee, etc',
+      de: 'Suche nach Team, Thema, Verantwortlichem usw',
     },
     filter_by_search_helper: {
       en: 'Search by questions, answers, delivery name, etc',
@@ -937,9 +949,9 @@ const language = {
     },
     upload_workspace_csv_helper: {
       en:
-        'Upload a CSV file with details about your workspace. \n - The appropriate format is to use ";" as delimiter \n - Use layer_0;layer_1;layer_etc;emailAssignee;phoneAssignee as your columns \n - Prefix the phone numbers with their country code: for example +49 30901820',
+        'Upload a CSV file with details about your workspace. \n - The appropriate format is to use ";" as delimiter \n - Use layer_0;layer_1;layer_etc;template;limited_access_assignee_email?;limited_access_assignee_phone?;contacts as your columns \n - Enter email addresses separated by a comma (e.g. email1@haas.live,email2@haas.live etc.) in the contacts column \n - Current options to override a template in the template column are: STUDENT_NL, TEACHER_NL, STUDENT_ENG, TEACHER_ENG, SPORT_ENG, SPORT_NL, BUSINESS_ENG & BUSINESS_NL',
       de:
-        'Laden Sie eine CSV-Datei mit Details zu Ihrem Arbeitsbereich hoch. \n - Das geeignete Format ist ";" als Trennzeichen zu verwenden. \n - Verwenden Sie Layer_0;Layer_1;Layer_etc;emailAssignee;phoneAssignee als Ihre Spalten. \n - Stellen Sie den Telefonnummern die Ländervorwahl voran: zum Beispiel +49 30901820',
+        'Laden Sie eine CSV-Datei mit Details zu Ihrem Arbeitsbereich hoch. \n - Das geeignete Format ist ";" als Trennzeichen zu verwenden. \n - Verwenden Sie layer_0;layer_1;layer_etc;template;limited_access_assignee_email?;limited_access_assignee_phone?;contacts als Ihre Spalten. \n - Geben Sie E-Mail-Adressen getrennt durch ein Komma (z. B. email1@haas.live,email2@haas.live usw.) in die Spalte Kontakte ein  \n Geben Sie die E-Mail-Adressen durch ein Komma getrennt ein \n - Aktuelle Vorlagenoptionen zum Überschreiben sind: STUDENT_NL, TEACHER_NL, STUDENT_ENG, TEACHER_ENG, SPORT_ENG, SPORT_NL, BUSINESS_ENG & BUSINESS_NL',
     },
     upload_deliveries_helper: {
       en:

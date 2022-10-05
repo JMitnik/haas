@@ -168,7 +168,8 @@ export const InteractionTimeline = ({ interaction }: InteractionTimelineProps) =
             )}
           </Circle>
           <UI.Div>
-            {nodeEntry.relatedNode?.type === QuestionNodeTypeEnum.Form ? (
+            {nodeEntry.relatedNode?.type === QuestionNodeTypeEnum.Form
+              && nodeEntry.value?.formNodeEntry?.values?.find((value) => !!value?.email) ? (
               <UI.Flex justifyContent="space-between">
                 <UI.Helper color="blue.400">{nodeEntry.relatedNode?.type}</UI.Helper>
 

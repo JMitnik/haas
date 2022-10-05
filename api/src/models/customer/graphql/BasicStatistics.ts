@@ -6,7 +6,6 @@ export const BasicStatistics = objectType({
 
   definition(t) {
     t.nonNull.int('responseCount', { description: 'Number of responses' });
-
     t.nonNull.float('average', { description: 'Average value of summarizable statistic' });
   },
 });

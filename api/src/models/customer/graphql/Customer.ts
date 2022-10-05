@@ -19,12 +19,14 @@ import { DialogueStatisticsSummaryFilterInput, DialogueStatisticsSummaryModel, M
 import { DialogueConnection, DialogueConnectionFilterInput } from '../../questionnaire';
 import { HealthScore, HealthScoreInput } from './HealthScore';
 import { Organization } from '../../Organization/graphql/OrganizationModel';
-import { Issue, IssueFilterInput } from '../../Issue/graphql';
+import { Issue, IssueFilterInput, IssueConnectionFilterInput, IssueConnection } from '../../Issue/graphql';
 import { IssueValidator } from '../../Issue/IssueValidator';
 import { SessionConnectionFilterInput } from '../../../models/session/graphql';
 import { SessionConnection } from '../../session/graphql/Session.graphql'
+import { ActionRequestConnection, ActionRequestConnectionFilterInput } from '../../ActionRequest/graphql';
 import { assertNonNullish } from '../../../utils/assertNonNullish';
 import { DialogueValidator } from '../../questionnaire/DialogueValidator';
+import { WorkspaceValidator } from '../WorkspaceValidator';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -95,13 +97,47 @@ export const CustomerType = objectType({
     });
 
     /**
+     * ActionableConnection
+     */
+    t.field('actionRequestConnection', {
+      type: ActionRequestConnection,
+      args: {
+        input: ActionRequestConnectionFilterInput,
+      },
+      async resolve(parent, args, ctx) {
+        assertNonNullish(parent.id, 'Cannot find actionable ID!');
+        const canAccessAllActionables = WorkspaceValidator.canAccessAllActionables(parent.id, ctx.session);
+        const userId = ctx.session?.user?.id as string;
+
+        return ctx.services.actionRequestService.findPaginatedWorkspaceActionRequests(
+          parent.id as string,
+          userId,
+          canAccessAllActionables,
+          args.input || undefined
+        );
+      },
+    });
+
+    /**
+     * Issues Connection
+     *
+     */
+    t.field('issueConnection', {
+      type: IssueConnection,
+      args: { filter: IssueConnectionFilterInput },
+      resolve: async (parent, args, { services }) => {
+        assertNonNullish(parent.id, 'Cannot find actionable ID!');
+        if (!args.filter) throw new GraphQLYogaError('No filter provided!');
+        return await services.issueService.paginatedIssues(parent.id, args.filter);
+      },
+    });
+
+    /**
      * Issues (by dialogue)
      *
-     * TODO: Refactor to refer to this as issueDialogues
      */
-    t.list.field('issues', {
+    t.list.field('issueDialogues', {
       type: Issue,
-      nullable: true,
       args: { filter: IssueFilterInput },
 
       resolve: async (parent, args, { services, session }) => {
@@ -109,7 +145,7 @@ export const CustomerType = objectType({
         assertNonNullish(parent.id, 'Cannot find workspace id!');
         assertNonNullish(session?.user?.id, 'No user ID provided!');
 
-        return await services.issueService.getProblemDialoguesByWorkspace(parent.id, filter, session.user.id);
+        return await services.issueService.getProblemDialoguesByWorkspace(parent.id, filter, session.user.id) as any;
       },
     });
 
@@ -126,7 +162,7 @@ export const CustomerType = objectType({
         assertNonNullish(parent.id, 'Cannot find workspace id!');
         assertNonNullish(session?.user?.id, 'No user ID provided!');
 
-        return await services.issueService.getWorkspaceIssues(parent.id, filter, session?.user.id);
+        return await services.issueService.getWorkspaceIssues(parent.id, filter, session?.user.id) as any;
       },
     });
 

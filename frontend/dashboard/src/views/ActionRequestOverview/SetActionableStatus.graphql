@@ -1,0 +1,6 @@
+mutation SetActionRequestStatus($input: SetActionRequestStatusInput!) {
+	setActionRequestStatus(input: $input) {
+		id
+		status
+	}
+}

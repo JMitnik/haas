@@ -1,0 +1,16 @@
+mutation AssignUserToActionRequest($input: AssignUserToActionRequestInput!) {
+	assignUserToActionRequest(input: $input) {
+		createdAt
+    session {
+      id
+      mainScore
+    }
+    dialogue {
+      title
+    }
+    status
+    assignee {
+      email
+    }
+	}
+}

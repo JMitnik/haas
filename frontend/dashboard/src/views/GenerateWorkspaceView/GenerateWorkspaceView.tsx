@@ -307,9 +307,9 @@ export const GenerateWorkspaceView = () => {
               />
             </UI.FormControl>
 
-            <UI.FormControl>
+            <UI.FormControl gridColumn="1 / -1">
               <UI.FormLabel>{t('upload_workspace_csv')}</UI.FormLabel>
-              <UI.FormLabelHelper>{t('upload_workspace_csv_helper')}</UI.FormLabelHelper>
+              <UI.FormLabelHelper style={{ maxWidth: '1200px' }}>{t('upload_workspace_csv_helper')}</UI.FormLabelHelper>
               <FileDropInput
                 onDrop={handleDrop}
                 onCancel={handleGroupsCancel}

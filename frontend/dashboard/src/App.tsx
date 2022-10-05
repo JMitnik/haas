@@ -3,6 +3,7 @@ import { Redirect, Route, Switch } from 'react-router-dom';
 import { ViewContainer } from '@haas/ui';
 import React, { FC } from 'react';
 
+import { ActionRequestOverview } from 'views/ActionRequestOverview/ActionRequestOverview';
 import { AppProviders } from 'config/AppProviders';
 import { CampaignView } from 'views/CampaignView/CampaignView';
 import { DashboardView } from 'views/DashboardView';
@@ -190,6 +191,11 @@ const CustomerRoutes = () => (
                     <GuardedRoute
                       path="/dashboard/b/:customerSlug/d"
                       render={() => <DialogueOverview />}
+                    />
+
+                    <GuardedRoute
+                      path="/dashboard/b/:customerSlug/dashboard/action_requests"
+                      render={() => <ActionRequestOverview />}
                     />
 
                     <GuardedRoute

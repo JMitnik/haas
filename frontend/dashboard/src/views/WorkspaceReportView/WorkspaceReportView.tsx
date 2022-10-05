@@ -3,7 +3,11 @@ import { isPresent } from 'ts-is-present';
 import React from 'react';
 
 import { DateFormat, useDate } from 'hooks/useDate';
-import { DialogueImpactScoreType, useGetIssuesQuery, useGetWorkspaceReportQuery } from 'types/generated-types';
+import {
+  DialogueImpactScoreType,
+  useGetProblemsPerDialogueQuery,
+  useGetWorkspaceReportQuery,
+} from 'types/generated-types';
 import { EventBars } from 'components/Analytics/Common/EventBars';
 import { ReportsHeader, ReportsLayout } from 'layouts/ReportsLayout/ReportsLayout';
 import { ScoreBox } from 'components/ScoreBox';
@@ -53,7 +57,7 @@ export const WorkspaceReportView = ({
     },
   });
 
-  const { data: issuesData, loading: loadingIssues } = useGetIssuesQuery({
+  const { data: issuesData, loading: loadingIssues } = useGetProblemsPerDialogueQuery({
     variables: {
       workspaceId: activeCustomer?.id || '',
       filter: {
@@ -71,7 +75,7 @@ export const WorkspaceReportView = ({
 
   const issuesCount = sumBy(d?.customer?.statistics?.issueHistogram?.items, (item) => item.frequency);
 
-  const issues = issuesData?.customer?.issues || [];
+  const issues = issuesData?.customer?.issueDialogues || [];
   const topics = d?.customer?.issueTopics || [];
 
   const isLoading = loadingReport || loadingIssues;
