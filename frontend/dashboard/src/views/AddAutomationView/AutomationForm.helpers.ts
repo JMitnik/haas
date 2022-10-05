@@ -186,16 +186,19 @@ export const mapToUserPickerEntries = (customer: Maybe<{
   roles?: Maybe<({
     __typename?: 'RoleType' | undefined;
   } & Pick<RoleType, 'id' | 'name'>)[]> | undefined;
-}> | undefined) => {
+}> | undefined,
+  noRoles?: boolean) => {
   const userPickerEntries: TargetEntry[] = [];
 
-  customer?.roles?.forEach((role) => {
-    userPickerEntries.push({
-      label: role.name!,
-      value: role.id!,
-      type: TargetTypeEnum.Role,
+  if (!noRoles) {
+    customer?.roles?.forEach((role) => {
+      userPickerEntries.push({
+        label: role.name!,
+        value: role.id!,
+        type: TargetTypeEnum.Role,
+      });
     });
-  });
+  }
 
   customer?.users?.forEach((user) => {
     userPickerEntries.push({

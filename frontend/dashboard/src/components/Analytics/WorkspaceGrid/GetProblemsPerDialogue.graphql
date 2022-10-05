@@ -1,7 +1,7 @@
-query GetIssues($workspaceId: ID!, $filter: IssueFilterInput) {
+query GetProblemsPerDialogue($workspaceId: ID!, $filter: IssueFilterInput) {
   customer(id: $workspaceId) {
 		id
-		issues(filter: $filter) {
+		issueDialogues(filter: $filter) {
 			id
 			topic
 			rankScore

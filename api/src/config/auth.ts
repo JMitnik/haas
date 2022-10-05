@@ -81,6 +81,7 @@ const authShield = shield({
     user: or(isSelf, containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_USERS)),
   },
   Customer: {
+    actionRequestConnection: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_ACTION_REQUESTS)),
     dialogueConnection: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_DIALOGUE)),
     automationConnection: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_AUTOMATIONS)),
     usersConnection: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_USERS)),
@@ -97,6 +98,7 @@ const authShield = shield({
   },
   Mutation: {
     '*': isSuperAdmin,
+    verifyActionRequest: allow,
     logout: allow,
     createSession: allow,
     updateCreateWorkspaceJob: allow,
@@ -104,6 +106,8 @@ const authShield = shield({
     verifyUserToken: allow,
     requestInvite: allow,
     authenticateLambda: allow,
+    assignUserToActionRequest: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_ACCESS_ALL_ACTION_REQUESTS)),
+    setActionRequestStatus: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_ACCESS_ALL_ACTION_REQUESTS)),
     sendAutomationDialogueLink: or(isSuperAdmin, isVerifiedUser, containsWorkspacePermission(SystemPermissionEnum.CAN_ACCESS_REPORT_PAGE)),
     sendAutomationReport: or(isSuperAdmin, isVerifiedUser, containsWorkspacePermission(SystemPermissionEnum.CAN_ACCESS_REPORT_PAGE)),
     resetWorkspaceData: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_RESET_WORKSPACE_DATA)),

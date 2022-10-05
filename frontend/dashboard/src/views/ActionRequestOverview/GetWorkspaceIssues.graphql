@@ -1,0 +1,17 @@
+query GetWorkspaceIssues($workspaceId: ID!, $filter: IssueConnectionFilterInput) {
+	customer(id: $workspaceId) {
+    issueConnection (filter: $filter) {
+      issues {
+        ...IssueFragment
+      }
+      totalPages
+      pageInfo {
+        hasNextPage
+        hasPrevPage
+        nextPageOffset
+        pageIndex
+        prevPageOffset
+      }
+    }
+	}
+}

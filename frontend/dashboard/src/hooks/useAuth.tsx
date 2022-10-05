@@ -3,6 +3,8 @@ import { useCustomer } from 'providers/CustomerProvider';
 import { useUser } from 'providers/UserProvider';
 
 interface UseAuthProps {
+  canViewActionRequests: boolean;
+  canAccessAllActionRequests: boolean;
   canCreateAutomations: boolean;
   canUpdateAutomations: boolean;
   canViewAutomations: boolean;
@@ -81,6 +83,8 @@ const useAuth = (): UseAuthProps => {
   );
 
   return {
+    canViewActionRequests: hasPermission(SystemPermission.CanViewActionRequests),
+    canAccessAllActionRequests: hasPermission(SystemPermission.CanAccessAllActionRequests),
     canCreateAutomations: hasPermission(SystemPermission.CanCreateAutomations),
     canUpdateAutomations: hasPermission(SystemPermission.CanUpdateAutomations),
     canViewAutomations: hasPermission(SystemPermission.CanViewAutomations),

@@ -87,9 +87,13 @@ const language = {
       en: 'Pulse',
       de: 'Pulse',
     },
+    requested_by: {
+      en: 'Requested By',
+      de: 'Angefordert von',
+    },
     action_requests: {
-      en: 'Action requests',
-      de: 'Action requests',
+      en: 'Action Requests',
+      de: 'Action Requests',
     },
     total_responses: {
       en: 'Total responses',
@@ -274,6 +278,10 @@ const language = {
     teams_with_problems: {
       en: 'Teams with problems',
       de: 'Mannschaften mit Problemen',
+    },
+    issue: {
+      en: 'Issue',
+      de: 'Issue',
     },
     issues: {
       en: 'Issues',
@@ -468,8 +476,8 @@ const language = {
       de: 'Zurück',
     },
     observable_insights: {
-      en: 'Actionable insights',
-      de: 'Actionable insights',
+      en: 'ActionRequest insights',
+      de: 'ActionRequest insights',
     },
     observable_insights_description: {
       en: 'The haas dashboard makes observing and maintaining the happiness of your accessible and observable.',
@@ -618,6 +626,10 @@ const language = {
     reset: {
       en: 'Reset',
       de: 'Zurücksetzen',
+    },
+    filter_by_search_issue_helper: {
+      en: 'Search by team, topic, assignee, etc',
+      de: 'Suche nach Team, Thema, Verantwortlichem usw',
     },
     filter_by_search_helper: {
       en: 'Search by questions, answers, delivery name, etc',

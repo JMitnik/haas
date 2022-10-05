@@ -1,0 +1,17 @@
+query GetWorkspaceActionRequests($workspaceId: ID!, $filter: ActionRequestConnectionFilterInput) {
+	customer(id: $workspaceId) {
+    actionRequestConnection(input: $filter) {
+      actionRequests {
+        ...ActionRequestFragment
+      }
+      totalPages
+      pageInfo {
+        hasNextPage
+        hasPrevPage
+        nextPageOffset
+        pageIndex
+        prevPageOffset
+      }
+    }
+	}
+}

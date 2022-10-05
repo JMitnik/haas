@@ -142,10 +142,10 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
 
     onRunAction({
       startTimestamp: new Date(Date.now()),
-      action: {
+      action: !ignoreFields ? {
         type: SessionActionType.FormAction,
         form: { values: formFieldValues },
-      },
+      } : undefined,
       reward: {
         overrideCallToActionId: node.overrideLeaf?.id,
         toEdge: childEdge,
@@ -335,10 +335,12 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                 </UI.Icon>
               </ButtonIconContainer>
 
-              <UI.Div mt={2}>
+              <UI.Flex flexDirection="column" mt={2}>
                 <ClientButton
                   // @ts-ignore
+                  flexGrow={1}
                   flexBasis="200px"
+                  display="block"
                   width="100%"
                   type="button"
                   onClick={() => setWantsToShare(true)}
@@ -348,7 +350,7 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
                 <UI.Button width="100%" mt={1} size="sm" variant="ghost" onClick={(e) => handleSubmit(e, true)}>
                   {node.form?.preForm?.finishText || 'Finish'}
                 </UI.Button>
-              </UI.Div>
+              </UI.Flex>
 
             </UI.Div>
           )}
