@@ -1,5 +1,5 @@
-import { ColourSettings, Customer, CustomerSettings } from 'prisma/prisma-client';
-import { graphql, GraphQLError } from 'graphql';
+import { ColourSettings, Customer, CustomerSettings } from 'prisma/prisma-client'
+import { GraphQLError } from 'graphql';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import { arg, extendType, inputObjectType, mutationField, nonNull, objectType, scalarType } from 'nexus';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
@@ -25,6 +25,7 @@ import { SessionConnectionFilterInput } from '../../../models/session/graphql';
 import { SessionConnection } from '../../session/graphql/Session.graphql'
 import { ActionRequestConnection, ActionRequestConnectionFilterInput } from '../../ActionRequest/graphql';
 import { assertNonNullish } from '../../../utils/assertNonNullish';
+import { DialogueValidator } from '../../questionnaire/DialogueValidator';
 import { WorkspaceValidator } from '../WorkspaceValidator';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
@@ -171,11 +172,16 @@ export const CustomerType = objectType({
       args: { filter: DialogueConnectionFilterInput },
       nullable: true,
       async resolve(parent, args, ctx) {
+        assertNonNullish(parent.id, 'Cannot find workspace id!');
         if (!ctx.session?.user?.id) throw new ApolloError('No user in session found!');
+
+        const canAccessAllDialogues = DialogueValidator.canAccessAllDialogues(parent.id, ctx.session);
+        const userId = ctx.session.user.id;
 
         let dialogues = await ctx.services.dialogueService.paginatedDialogues(
           parent.slug,
-          ctx.session?.user?.id,
+          canAccessAllDialogues,
+          userId,
           args.filter
         );
         return dialogues;

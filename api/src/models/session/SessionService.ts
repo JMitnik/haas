@@ -11,7 +11,14 @@ import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';
 import { Nullable, PaginationProps } from '../../types/generic';
-import { FollowUpAction, SessionActionType, SessionConnection, SessionConnectionFilterInput, SessionWithEntries, SessionWithNodeEntries } from './Session.types';
+import {
+  FollowUpAction,
+  SessionActionType,
+  SessionConnection,
+  SessionConnectionFilterInput,
+  SessionWithEntries,
+  SessionWithNodeEntries,
+} from './Session.types';
 import { TopicByString, TopicStatistics, TopicStatisticsByDialogueId } from '../Topic/Topic.types';
 import TriggerService from '../trigger/TriggerService';
 import prisma from '../../config/prisma';
@@ -43,10 +50,10 @@ class SessionService {
   };
 
   /**
-   * Creates an actionable (and potentially topic) for the first choice of a session 
+   * Creates an actionable (and potentially topic) for the first choice of a session
    * NOTE: only supports creation of actionable based on first choice layer
-   * @param entries 
-   * @param dialogueId 
+   * @param entries
+   * @param dialogueId
    */
   public async createSessionActionRequest(
     session: SessionWithNodeEntries,
@@ -61,7 +68,7 @@ class SessionService {
 
       if (!topicId) {
         logger.log(
-          `Trying to create actionable with topic value ${optionValue} 
+          `Trying to create actionable with topic value ${optionValue}
             for dialogue ${dialogueId}, but no option(s) with such a topic found in database`
         );
         return;

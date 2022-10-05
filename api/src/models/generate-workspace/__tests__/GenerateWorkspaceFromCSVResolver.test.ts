@@ -436,7 +436,7 @@ describe('GenerateWorkspaceFromCSV resolver', () => {
     const token = AuthService.createUserToken(user.id, 22);
     const file = createReadStream(`${__dirname}/groupCsv.csv`);
     file.addListener('end', async () => {
-      const res = await ctx.client.request(Mutation,
+      await ctx.client.request(Mutation,
         {
           input: {
             uploadedCsv: file,
