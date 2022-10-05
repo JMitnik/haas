@@ -442,9 +442,13 @@ class UserPrismaAdapter {
         customers: {
           create: {
             customer: { connect: { id: registerUserInput.workspaceId || undefined } },
-            role: { connect: { id: (
-              await this.roleService.fetchDefaultRoleForCustomer(registerUserInput.workspaceId)
-            ).id || undefined } },
+            role: {
+              connect: {
+                id: (
+                  await this.roleService.fetchDefaultRoleForCustomer(registerUserInput.workspaceId)
+                ).id || undefined,
+              },
+            },
           },
         },
       },

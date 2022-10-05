@@ -112,7 +112,7 @@ export const AutomationForm = ({
     control: form.control,
   });
 
-  const watchActionType = useWatch({
+  const activeActionType = useWatch({
     name: `actions.${0}.action.type`,
     control: form.control,
   });
@@ -263,7 +263,7 @@ export const AutomationForm = ({
             </UI.FormSection>
           )}
 
-          {watchActionType && watchActionType !== AutomationActionType.SendDialogueLink && (
+          {activeActionType && activeActionType !== AutomationActionType.SendDialogueLink && (
             <RecipientsFragment recipientEntries={userPickerEntries} />
           )}
 

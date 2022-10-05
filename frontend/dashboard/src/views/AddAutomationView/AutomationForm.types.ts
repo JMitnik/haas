@@ -104,7 +104,9 @@ export const schema = yup.object({
                 type: yup.string().required(),
               }).required(),
               aspect: yup.string().required(),
-              aggregate: yup.mixed<ConditionPropertyAggregateType>().oneOf(Object.values(ConditionPropertyAggregateType)),
+              aggregate: yup.mixed<ConditionPropertyAggregateType>().oneOf(
+                Object.values(ConditionPropertyAggregateType),
+              ),
               latest: yup.number().required(),
               questionOption: yup.string().notRequired().nullable(false),
             }).required(),

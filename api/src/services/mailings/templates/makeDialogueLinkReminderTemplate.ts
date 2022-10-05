@@ -5,14 +5,13 @@ import { Dialogue } from 'prisma/prisma-client';
 import config from '../../../config/config';
 
 interface makeDialogueLinkReminderProps {
-  recipientMail: string;
-  dialogueClientUrl?: string;
+  recipientName: string;
   bgColor?: string;
   dialogues: Dialogue[];
   workspaceSlug: string;
 }
 
-const makeDialogueLinkReminderTemplate = ({ workspaceSlug, dialogues, recipientMail, dialogueClientUrl, bgColor = '#0059f8' }: makeDialogueLinkReminderProps) => {
+const makeDialogueLinkReminderTemplate = ({ workspaceSlug, dialogues, recipientName, bgColor = '#0059f8' }: makeDialogueLinkReminderProps) => {
   const lighterBg = Color(bgColor).darken(0.1).hex();
 
   return mjml2html(`
@@ -45,9 +44,9 @@ const makeDialogueLinkReminderTemplate = ({ workspaceSlug, dialogues, recipientM
             <mj-section background-color="#eef1f5">
             <mj-column width="100%">
             <mj-text>
-            Hi ${recipientMail}, a new haas survey is ready for your team members.
+            Hi ${recipientName}, a new haas survey is ready for your team members.
             </mj-text>
-            
+
             ${dialogues.length === 1 ? `
               <mj-text>
               To access it, please click on the following link:

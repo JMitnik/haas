@@ -30,7 +30,7 @@ class UserService {
     this.customerService = new CustomerService(prismaClient);
   };
 
-  public async findAllAssignedUsers(workspaceSlug: string) {
+  public async findAssignedUsers(workspaceSlug: string) {
     const whereInput: Prisma.UserWhereInput = {
       isAssignedTo: {
         some: {
@@ -404,7 +404,11 @@ class UserService {
   };
 
   async inviteExistingUserToCustomer(userId: string, newRoleId: string, workspaceId: string) {
-    const invitedUser = await this.userOfCustomerPrismaAdapter.createExistingUserForInvitingWorkspace(workspaceId, newRoleId, userId);
+    const invitedUser = await this.userOfCustomerPrismaAdapter.createExistingUserForInvitingWorkspace(
+      workspaceId,
+      newRoleId,
+      userId
+    );
 
     // TODO: Make instance
     const inviteLoginToken = AuthService.createUserToken(userId);

@@ -141,12 +141,9 @@ export class AutomationActionService {
       const privateDialogues = user?.isAssignedTo;
       if (!privateDialogues?.length) { return };
 
-      const targetDialogue = privateDialogues[0];
-
       mailService.send({
         body: makeDialogueLinkReminderTemplate({
-          recipientMail: user.firstName || 'User',
-          dialogueClientUrl: `${config.clientUrl}/${workspaceSlug}/${targetDialogue.slug}`,
+          recipientName: user.firstName || 'User',
           dialogues: privateDialogues,
           workspaceSlug,
         }),
@@ -167,7 +164,7 @@ export class AutomationActionService {
   ) {
     switch (channel.type) {
       case AutomationActionChannelType.EMAIL:
-        await this.handleSendDialogueEmailChannel(workspaceSlug);
+        await this.sendDialogueEmails(workspaceSlug);
         break;
       case AutomationActionChannelType.SMS:
         // TODO: Implement
@@ -176,7 +173,7 @@ export class AutomationActionService {
         // TODO: Implement
         break;
       default:
-        await this.handleSendDialogueEmailChannel(workspaceSlug);
+        await this.sendDialogueEmails(workspaceSlug);
         break;
     }
   }
@@ -256,7 +253,7 @@ export class AutomationActionService {
    * @param recipients List of users who receive the mail
    * @param workspaceSlug Workspace slug
    */
-  public async dispatchMailToTeamAssignees(
+  public async dispatchDialogueEmails(
     users: UserWithAssignedDialogues[],
     workspaceSlug: string
   ): Promise<void[]> {
@@ -265,12 +262,9 @@ export class AutomationActionService {
       const assignedDialogues = user?.isAssignedTo;
       if (!assignedDialogues?.length) { return };
 
-      const targetDialogue = assignedDialogues[0];
-
       mailService.send({
         body: makeDialogueLinkReminderTemplate({
-          recipientMail: user.firstName || 'User',
-          dialogueClientUrl: `${config.clientUrl}/${workspaceSlug}/${targetDialogue.slug}`,
+          recipientName: user.firstName || 'User',
           dialogues: assignedDialogues,
           workspaceSlug,
         }),
@@ -284,11 +278,11 @@ export class AutomationActionService {
    * Sends an email containing a dialogue client link to all recipients in the channel's payload
    * @param workspaceSlug
    */
-  private async handleSendDialogueEmailChannel(
+  private async sendDialogueEmails(
     workspaceSlug: string,
   ) {
-    const usersWithAssignedTeams = await this.userService.findAllAssignedUsers(workspaceSlug);
-    await this.dispatchMailToTeamAssignees(usersWithAssignedTeams, workspaceSlug);
+    const users = await this.userService.findAssignedUsers(workspaceSlug);
+    await this.dispatchDialogueEmails(users, workspaceSlug);
   }
 
   /**
