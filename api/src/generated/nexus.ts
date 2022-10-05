@@ -847,9 +847,10 @@ export interface NexusGenEnums {
   SessionConnectionOrder: "createdAt" | "dialogueId"
   SessionDeliveryType: "campaigns" | "noCampaigns"
   StatusType: "CLOSED" | "IN_PROGRESS" | "OPEN"
-  SystemPermission: "CAN_ACCESS_ADMIN_PANEL" | "CAN_ACCESS_ALL_ACTION_REQUESTS" | "CAN_ACCESS_REPORT_PAGE" | "CAN_ADD_USERS" | "CAN_ASSIGN_USERS_TO_DIALOGUE" | "CAN_BUILD_DIALOGUE" | "CAN_CREATE_AUTOMATIONS" | "CAN_CREATE_CAMPAIGNS" | "CAN_CREATE_DELIVERIES" | "CAN_CREATE_TRIGGERS" | "CAN_DELETE_DIALOGUE" | "CAN_DELETE_TRIGGERS" | "CAN_DELETE_USERS" | "CAN_DELETE_WORKSPACE" | "CAN_DOWNLOAD_REPORTS" | "CAN_EDIT_DIALOGUE" | "CAN_EDIT_USERS" | "CAN_EDIT_WORKSPACE" | "CAN_GENERATE_WORKSPACE_FROM_CSV" | "CAN_RESET_WORKSPACE_DATA" | "CAN_UPDATE_AUTOMATIONS" | "CAN_VIEW_ACTION_REQUESTS" | "CAN_VIEW_AUTOMATIONS" | "CAN_VIEW_CAMPAIGNS" | "CAN_VIEW_DIALOGUE" | "CAN_VIEW_DIALOGUE_ANALYTICS" | "CAN_VIEW_USERS"
+  SystemPermission: "CAN_ACCESS_ADMIN_PANEL" | "CAN_ACCESS_REPORT_PAGE" | "CAN_ADD_USERS" | "CAN_ASSIGN_USERS_TO_DIALOGUE" | "CAN_BUILD_DIALOGUE" | "CAN_CREATE_AUTOMATIONS" | "CAN_CREATE_CAMPAIGNS" | "CAN_CREATE_DELIVERIES" | "CAN_CREATE_TRIGGERS" | "CAN_DELETE_DIALOGUE" | "CAN_DELETE_TRIGGERS" | "CAN_DELETE_USERS" | "CAN_DELETE_WORKSPACE" | "CAN_DOWNLOAD_REPORTS" | "CAN_EDIT_DIALOGUE" | "CAN_EDIT_USERS" | "CAN_EDIT_WORKSPACE" | "CAN_GENERATE_WORKSPACE_FROM_CSV" | "CAN_RESET_WORKSPACE_DATA" | "CAN_UPDATE_AUTOMATIONS" | "CAN_VIEW_AUTOMATIONS" | "CAN_VIEW_CAMPAIGNS" | "CAN_VIEW_DIALOGUE" | "CAN_VIEW_DIALOGUE_ANALYTICS" | "CAN_VIEW_USERS"
   TagTypeEnum: "AGENT" | "DEFAULT" | "LOCATION"
   TopicEnumType: "SYSTEM" | "WORKSPACE"
+  TourType: "GUIDE" | "RELEASE"
   TriggerConditionEnum: "HIGH_THRESHOLD" | "INNER_RANGE" | "LOW_THRESHOLD" | "OUTER_RANGE" | "TEXT_MATCH"
   TriggerMediumEnum: "BOTH" | "EMAIL" | "PHONE"
   TriggerTypeEnum: "QUESTION" | "SCHEDULED"
@@ -1506,6 +1507,21 @@ export interface NexusGenObjects {
     nrVotes?: number | null; // Int
     subTopics?: Array<NexusGenRootTypes['TopicType'] | null> | null; // [TopicType]
   }
+  TourOfUser: { // root type
+    createdAt: NexusGenScalars['Date']; // Date!
+    seenAt?: NexusGenScalars['Date'] | null; // Date
+    updatedAt: NexusGenScalars['Date']; // Date!
+    userId: string; // String!
+    userTourId: string; // String!
+  }
+  TourStep: { // root type
+    createdAt: NexusGenScalars['Date']; // Date!
+    id: string; // String!
+    imageUrl?: string | null; // String
+    translationHelper: string; // String!
+    translationTitle: string; // String!
+    updatedAt: NexusGenScalars['Date']; // Date!
+  }
   TriggerConditionType: { // root type
     id?: number | null; // Int
     maxValue?: number | null; // Int
@@ -1547,6 +1563,14 @@ export interface NexusGenObjects {
     isActive?: boolean | null; // Boolean
     role?: NexusGenRootTypes['RoleType'] | null; // RoleType
     user?: NexusGenRootTypes['UserType'] | null; // UserType
+  }
+  UserTour: { // root type
+    createdAt: NexusGenScalars['Date']; // Date!
+    id: string; // String!
+    steps?: Array<NexusGenRootTypes['TourStep'] | null> | null; // [TourStep]
+    type: NexusGenEnums['TourType']; // TourType!
+    updatedAt: NexusGenScalars['Date']; // Date!
+    usersOfTour?: Array<NexusGenRootTypes['TourOfUser'] | null> | null; // [TourOfUser]
   }
   UserType: { // root type
     email?: string | null; // String
@@ -2419,6 +2443,22 @@ export interface NexusGenFieldTypes {
     nrVotes: number | null; // Int
     subTopics: Array<NexusGenRootTypes['TopicType'] | null> | null; // [TopicType]
   }
+  TourOfUser: { // field return type
+    createdAt: NexusGenScalars['Date']; // Date!
+    seenAt: NexusGenScalars['Date'] | null; // Date
+    updatedAt: NexusGenScalars['Date']; // Date!
+    user: NexusGenRootTypes['UserType'] | null; // UserType
+    userId: string; // String!
+    userTourId: string; // String!
+  }
+  TourStep: { // field return type
+    createdAt: NexusGenScalars['Date']; // Date!
+    id: string; // String!
+    imageUrl: string | null; // String
+    translationHelper: string; // String!
+    translationTitle: string; // String!
+    updatedAt: NexusGenScalars['Date']; // Date!
+  }
   TriggerConditionType: { // field return type
     id: number | null; // Int
     maxValue: number | null; // Int
@@ -2465,6 +2505,14 @@ export interface NexusGenFieldTypes {
     isActive: boolean | null; // Boolean
     role: NexusGenRootTypes['RoleType'] | null; // RoleType
     user: NexusGenRootTypes['UserType'] | null; // UserType
+  }
+  UserTour: { // field return type
+    createdAt: NexusGenScalars['Date']; // Date!
+    id: string; // String!
+    steps: Array<NexusGenRootTypes['TourStep'] | null> | null; // [TourStep]
+    type: NexusGenEnums['TourType']; // TourType!
+    updatedAt: NexusGenScalars['Date']; // Date!
+    usersOfTour: Array<NexusGenRootTypes['TourOfUser'] | null> | null; // [TourOfUser]
   }
   UserType: { // field return type
     assignedDialogues: NexusGenRootTypes['AssignedDialogues'] | null; // AssignedDialogues
@@ -3351,6 +3399,22 @@ export interface NexusGenFieldTypeNames {
     nrVotes: 'Int'
     subTopics: 'TopicType'
   }
+  TourOfUser: { // field return type name
+    createdAt: 'Date'
+    seenAt: 'Date'
+    updatedAt: 'Date'
+    user: 'UserType'
+    userId: 'String'
+    userTourId: 'String'
+  }
+  TourStep: { // field return type name
+    createdAt: 'Date'
+    id: 'String'
+    imageUrl: 'String'
+    translationHelper: 'String'
+    translationTitle: 'String'
+    updatedAt: 'Date'
+  }
   TriggerConditionType: { // field return type name
     id: 'Int'
     maxValue: 'Int'
@@ -3397,6 +3461,14 @@ export interface NexusGenFieldTypeNames {
     isActive: 'Boolean'
     role: 'RoleType'
     user: 'UserType'
+  }
+  UserTour: { // field return type name
+    createdAt: 'Date'
+    id: 'String'
+    steps: 'TourStep'
+    type: 'TourType'
+    updatedAt: 'Date'
+    usersOfTour: 'TourOfUser'
   }
   UserType: { // field return type name
     assignedDialogues: 'AssignedDialogues'

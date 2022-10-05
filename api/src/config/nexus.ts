@@ -27,8 +27,10 @@ import * as RoleAPI from '../models/role';
 import tagNexus from '../models/tag/Tag';
 import triggerNexus from '../models/trigger/Trigger';
 import uploadNexus from '../models/link/graphql/UploadUpsellFileResolver';
+import * as UserTourAPI from '../models/UserTour'
 
 const nexus = [
+  ...Array(UserTourAPI),
   ...Array(OrganizationAPI),
   ...Array(CommonAnalyticsAPI),
   ...Array(DateAPI),

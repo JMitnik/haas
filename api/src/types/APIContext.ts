@@ -31,8 +31,10 @@ import { AutomationActionService } from '../models/automations/AutomationActionS
 import { IssueService } from '../models/Issue/IssueService';
 import ScheduledAutomationService from '../models/automations/ScheduledAutomationService';
 import { WorkspaceStatisticsService } from '../models/customer/WorkspaceStatisticsService';
+import { UserTourService } from '../models/UserTour/UserTourService';
 
 export interface APIServiceContainer {
+  userTourService: UserTourService;
   scheduledAutomationService: ScheduledAutomationService;
   automationActionService: AutomationActionService;
   organizationService: OrganizationService;
