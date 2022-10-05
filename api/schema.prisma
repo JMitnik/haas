@@ -9,6 +9,54 @@ datasource postgresql {
   url      = env("DB_STRING")
 }
 
+model Issue {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  topicId     String   @unique
+  workspaceId String
+
+  topic          Topic           @relation(fields: [topicId], references: [id])
+  workspace      Customer        @relation(fields: [workspaceId], references: [id])
+  actionRequests ActionRequest[]
+}
+
+model Comment {
+  id              String   @id @default(cuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  data            String
+  actionRequestId String
+
+  actionRequest ActionRequest @relation(fields: [actionRequestId], references: [id])
+}
+
+enum ActionRequestState {
+  PENDING
+  STALE
+  COMPLETED
+  DROPPED
+}
+
+model ActionRequest {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  dialogueId   String
+  assigneeId   String?
+  issueId      String?
+  requestEmail String?
+  isVerified   Boolean  @default(false)
+
+  status ActionRequestState @default(PENDING)
+
+  assignee User?     @relation(fields: [assigneeId], references: [id])
+  comments Comment[]
+  dialogue Dialogue  @relation(fields: [dialogueId], references: [id])
+  issue    Issue?    @relation(fields: [issueId], references: [id])
+  session  Session?
+}
+
 enum TopicType {
   SYSTEM
   WORKSPACE
@@ -28,6 +76,7 @@ model Topic {
   workspace     Customer?        @relation(fields: [workspaceId], references: [id])
   usedByOptions QuestionOption[]
   QuestionNode  QuestionNode[]
+  issue         Issue?
 }
 
 model DialogueTopicCache {
@@ -136,6 +185,7 @@ model Customer {
   triggers        Trigger[]
   users           UserOfCustomer[]
   topics          Topic[]
+  issues          Issue[]
 }
 
 model Tag {
@@ -182,6 +232,7 @@ model Dialogue {
   assignees                   User[]
   sessions                    Session[]
   tags                        Tag[]
+  actionRequests              ActionRequest[]
 
   AutomationScheduled AutomationScheduled[]
 
@@ -414,15 +465,18 @@ model QuestionOption {
 }
 
 model Session {
-  createdAt                DateTime              @default(now())
-  id                       String                @id @default(cuid())
-  dialogueId               String
-  deliveryId               String?
-  originUrl                String?
-  totalTimeInSec           Int?
-  device                   String?
-  browser                  String?
-  mainScore                Float                 @default(0)
+  createdAt       DateTime @default(now())
+  id              String   @id @default(cuid())
+  dialogueId      String
+  deliveryId      String?
+  originUrl       String?
+  totalTimeInSec  Int?
+  device          String?
+  browser         String?
+  mainScore       Float    @default(0)
+  actionRequestId String?  @unique
+
+  actionRequest            ActionRequest?        @relation(fields: [actionRequestId], references: [id])
   delivery                 Delivery?             @relation(fields: [deliveryId], references: [id])
   dialogue                 Dialogue              @relation(fields: [dialogueId], references: [id], onDelete: Cascade)
   nodeEntries              NodeEntry[]
@@ -522,6 +576,7 @@ model User {
   phone             String?
   firstName         String?
   lastName          String?
+  jobDescription    String?
   globalPermissions SystemPermissionEnum[]
 
   loginToken         String?
@@ -535,6 +590,7 @@ model User {
 
   isAssignedTo         Dialogue[]
   isContactOfFormField FormNodeField[]
+  actionRequests       ActionRequest[]
 }
 
 model UserOfCustomer {
@@ -977,6 +1033,8 @@ enum InputSource {
 }
 
 enum SystemPermissionEnum {
+  CAN_VIEW_ACTION_REQUESTS
+  CAN_ACCESS_ALL_ACTION_REQUESTS
   CAN_RESET_WORKSPACE_DATA
   CAN_ACCESS_ADMIN_PANEL
   CAN_GENERATE_WORKSPACE_FROM_CSV

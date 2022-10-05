@@ -14,10 +14,18 @@ class UserPrismaAdapter {
     this.roleService = new RoleService(prismaClient);
   }
 
-  findMany = async (where: Prisma.UserWhereInput, include: Prisma.UserInclude) => {
+  public async findMany(where: Prisma.UserWhereInput, include: Prisma.UserInclude) {
     return this.prisma.user.findMany({
       where,
       include,
+    })
+  };
+
+  public async findUniqueByEmail(email: string) {
+    return this.prisma.user.findUnique({
+      where: {
+        email,
+      },
     })
   }
 
@@ -434,7 +442,9 @@ class UserPrismaAdapter {
         customers: {
           create: {
             customer: { connect: { id: registerUserInput.workspaceId || undefined } },
-            role: { connect: { id: (await this.roleService.fetchDefaultRoleForCustomer(registerUserInput.workspaceId)).id || undefined } },
+            role: { connect: { id: (
+              await this.roleService.fetchDefaultRoleForCustomer(registerUserInput.workspaceId)
+            ).id || undefined } },
           },
         },
       },

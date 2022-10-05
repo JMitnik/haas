@@ -3,10 +3,9 @@ import { AlertTriangle } from 'react-feather';
 import React from 'react';
 
 import { Issue } from 'components/Analytics/WorkspaceGrid/WorkspaceGrid.types';
-
-import { ActionType } from './SimpleIssueTable.types';
-import { ContactActionLabel } from './IssueActionLabels.styles';
 import { SessionActionType } from 'types/generated-types';
+
+import { ContactActionLabel } from './IssueActionLabels.styles';
 
 interface IssueActionLabelsProps {
   issue: Issue;

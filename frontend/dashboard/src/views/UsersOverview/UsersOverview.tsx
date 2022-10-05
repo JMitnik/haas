@@ -1,7 +1,6 @@
 import * as UI from '@haas/ui';
 import { BooleanParam, DateTimeParam, NumberParam, StringParam, useQueryParams, withDefault } from 'use-query-params';
 import { Filter, Search, User } from 'react-feather';
-import { endOfDay, startOfDay } from 'date-fns';
 import { useHistory } from 'react-router-dom';
 import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
@@ -11,7 +10,6 @@ import * as Menu from 'components/Common/Menu';
 import * as Modal from 'components/Common/Modal';
 import * as Table from 'components/Common/Table';
 import { Avatar } from 'components/Common/Avatar';
-import { FormatTimestamp } from 'components/Common/DateAndTime';
 import {
   GetPaginatedUsersQuery,
   PaginationSortByEnum,
@@ -183,25 +181,6 @@ const UsersOverview = () => {
       search,
       pageIndex: 0,
     }));
-  };
-
-  const handleDateChange = (dates: Date[] | null) => {
-    if (dates) {
-      const [newStartDate, newEndDate] = dates;
-      setFilter({
-        ...filter,
-        startDate: startOfDay(newStartDate),
-        endDate: endOfDay(newEndDate),
-        pageIndex: 0,
-      });
-    } else {
-      setFilter({
-        ...filter,
-        startDate: null,
-        endDate: null,
-        pageIndex: 0,
-      });
-    }
   };
 
   const handleMultiDateFilterChange = (newStartDate?: Date, newEndDate?: Date) => {
@@ -517,11 +496,11 @@ const UsersOverview = () => {
               </Table.Cell>
 
               <Table.Cell>
-                <FormatTimestamp timestamp={user.createdAt} />
+                <Table.DateCell timestamp={user.createdAt} />
               </Table.Cell>
 
               <Table.Cell>
-                {user.lastActivity ? <FormatTimestamp timestamp={user.lastActivity} /> : <UI.Helper>-</UI.Helper>}
+                {user.lastActivity ? <Table.DateCell timestamp={user.lastActivity} /> : <UI.Helper>-</UI.Helper>}
               </Table.Cell>
 
               <Table.Cell onClick={(e) => e.stopPropagation()}>

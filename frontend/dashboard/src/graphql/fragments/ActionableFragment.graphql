@@ -1,0 +1,26 @@
+fragment ActionRequestFragment on ActionRequest {
+  id
+  createdAt
+  isVerified
+  requestEmail
+  dialogueId
+  issue {
+    topic {
+      name
+    }
+  }
+  session {
+    id
+    mainScore
+  }
+  dialogue {
+    id
+    title
+    slug
+  }
+  status
+  assignee {
+    id
+    email
+  }		
+}
