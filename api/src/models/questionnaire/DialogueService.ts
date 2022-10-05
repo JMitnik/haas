@@ -646,14 +646,19 @@ class DialogueService {
    */
   public paginatedDialogues = async (
     workspaceSlug: string,
+    canAccessAllDialogues: boolean,
     userId: string,
     filter?: NexusGenInputs['DialogueConnectionFilterInput'] | null,
   ) => {
     const offset = filter?.offset ?? 0;
     const perPage = filter?.perPage ?? 15;
 
-    const dialogues = await this.dialoguePrismaAdapter.findPaginatedDialogues(workspaceSlug, userId, filter);
-    const totalDialogues = await this.dialoguePrismaAdapter.countDialogues(workspaceSlug, userId, filter);
+    const dialogues = await this.dialoguePrismaAdapter.findPaginatedDialogues(
+      workspaceSlug, canAccessAllDialogues, userId, filter
+    );
+    const totalDialogues = await this.dialoguePrismaAdapter.countDialogues(
+      workspaceSlug, canAccessAllDialogues, userId, filter
+    );
 
     const { totalPages, ...pageInfo } = offsetPaginate(totalDialogues, offset, perPage);
 
