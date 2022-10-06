@@ -1,13 +1,17 @@
 import Color from 'color';
 import mjml2html from 'mjml';
+import { Dialogue } from 'prisma/prisma-client';
+
+import config from '../../../config/config';
 
 interface makeDialogueLinkReminderProps {
-  recipientMail: string;
-  dialogueClientUrl?: string;
+  recipientName: string;
   bgColor?: string;
+  dialogues: Dialogue[];
+  workspaceSlug: string;
 }
 
-const makeDialogueLinkReminderTemplate = ({ recipientMail, dialogueClientUrl, bgColor = '#0059f8' }: makeDialogueLinkReminderProps) => {
+const makeDialogueLinkReminderTemplate = ({ workspaceSlug, dialogues, recipientName, bgColor = '#0059f8' }: makeDialogueLinkReminderProps) => {
   const lighterBg = Color(bgColor).darken(0.1).hex();
 
   return mjml2html(`
@@ -33,23 +37,32 @@ const makeDialogueLinkReminderTemplate = ({ recipientMail, dialogueClientUrl, bg
             <mj-section border-radius="5px 5px 0 0"  background-color=${lighterBg}>
                 <mj-column>
                     <mj-text font-size="20px" color="white" align="left">
-                        ✨ Your Report link is ready!
+                        ✨ Your team link is ready!
                     </mj-text>
                 </mj-column>
             </mj-section>
             <mj-section background-color="#eef1f5">
             <mj-column width="100%">
             <mj-text>
-            Hi ${recipientMail}, a new haas survey is ready for your team members.
+            Hi ${recipientName}, a new haas survey is ready for your team members.
             </mj-text>
 
-            ${dialogueClientUrl && `
-                <mj-text>
-                To access it, please click on the following link:
-                </mj-text>
-                <mj-button href="${dialogueClientUrl}" background-color="#36d399">
-                ✨ haas survey link
-                </mj-button>
+            ${dialogues.length === 1 ? `
+              <mj-text>
+              To access it, please click on the following link:
+              </mj-text>
+              <mj-button href="${config.clientUrl}/${workspaceSlug}/${dialogues?.[0]?.slug}" background-color="#36d399">
+              ✨ haas survey link
+              </mj-button>
+            ` : `
+              ${dialogues.map((dialogue) => `
+              <mj-text>
+                <div>
+                ${dialogue.title}
+                </div>
+                <a href="${config.clientUrl}/${workspaceSlug}/${dialogue.slug}" target="_blank">${dialogue.title} link</a>
+              </mj-text>
+              `)}
             `}
                 </mj-column>
             </mj-section>
