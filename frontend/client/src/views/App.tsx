@@ -6,6 +6,7 @@ import React, { useLayoutEffect } from 'react';
 import { Dialogue } from 'modules/Dialogue/Dialogue';
 import AppProviders from 'config/AppProviders';
 import GlobalAppLayout from 'layouts/GlobalAppLayout';
+import VerifyActionableNode from 'modules/VerifyActionableNode/VerifyActionableNode';
 
 import { CampaignRedirectView } from './CampaignRedirectView/CampaignRedirectView';
 import { DialogueNodelessView } from './DialogueNodelessView';
@@ -26,6 +27,7 @@ const AppRoutes = () => {
       <Route path="/_r" element={<CampaignRedirectView />} />
       <Route path="/:workspaceSlug/:dialogueSlug">
         <Route path="n/:nodeId" element={<Dialogue />} />
+        <Route path="v/:actionableId" element={<VerifyActionableNode />} />
         <Route index element={<DialogueNodelessView />} />
       </Route>
       <Route index element={<LandingView />} />

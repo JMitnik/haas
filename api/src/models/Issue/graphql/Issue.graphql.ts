@@ -23,24 +23,50 @@ export const Issue = objectType({
     t.string('topic');
 
     /** Each issue has an associated dialogue  */
-    t.nonNull.string('dialogueId');
+    t.nonNull.string('dialogueId', {
+      resolve(parent: any) {
+        if (parent?.dialogue) return parent?.dialogue?.id;
+        return '';
+      },
+    });
+
     t.field('dialogue', {
       type: Dialogue,
       nullable: true,
-      resolve: async ({ dialogueId }, _, { services }) => services.dialogueService.getDialogueById(dialogueId),
+      resolve: async (parent: any, _, { services }) => services.dialogueService.getDialogueById(parent?.dialogueId),
     });
 
     /** An issue might have a history over time (rising / falling) */
-    t.nonNull.field('history', { type: DateHistogram });
+    t.nonNull.field('history', {
+      type: DateHistogram,
+      resolve(parent: any) {
+        return parent?.history;
+      },
+    });
 
     /** Basic statistics (such as average/total count) */
-    t.nonNull.field('basicStats', { type: BasicStatistics });
+    t.nonNull.field('basicStats', {
+      type: BasicStatistics,
+      resolve(parent: any) {
+        return parent?.basicStats;
+      },
+    });
 
     /** The status of the current issue. */
-    t.nonNull.field('status', { type: StatusType });
+    t.nonNull.field('status', {
+      type: StatusType,
+      resolve(parent: any) {
+        return parent?.status;
+      },
+    });
 
     t.field('followUpAction', { type: SessionActionType });
-    t.nonNull.int('actionRequiredCount', { description: 'Number of actions required' });
+    t.nonNull.int('actionRequiredCount', {
+      description: 'Number of actions required',
+      resolve(parent: any) {
+        return parent?.actionRequiredCount;
+      },
+    });
 
     /** Timestamps */
     t.date('createdAt');

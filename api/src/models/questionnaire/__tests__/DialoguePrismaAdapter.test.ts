@@ -1,6 +1,6 @@
 import DialoguePrismaAdapter from '../DialoguePrismaAdapter';
 import { clearDialogueDatabase } from './testUtils';
-import { Prisma } from '@prisma/client';
+import { Prisma } from 'prisma/prisma-client';
 import cuid from 'cuid';
 import { CreateDialogueInput } from '../DialoguePrismaAdapterType';
 import { prisma } from '../../../test/setup/singletonDeps';

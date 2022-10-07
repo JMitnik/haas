@@ -240,7 +240,8 @@ export const CampaignView = () => {
                     />
                   </UI.Div>
 
-                  <UI.Div>
+                  {/* TODO: implement new date picker as this antd variant is not supported anymore */}
+                  {/* <UI.Div>
                     <UI.RadioHeader>
                       {t('filter_by_date')}
                     </UI.RadioHeader>
@@ -252,7 +253,7 @@ export const CampaignView = () => {
                       onChange={handleDateChange}
                       range
                     />
-                  </UI.Div>
+                  </UI.Div> */}
 
                   <UI.Div>
                     <UI.Stack>
@@ -518,7 +519,7 @@ export const CampaignView = () => {
               {campaign && (
                 <CreateCampaignForm
                   onClose={() => setIsOpenSettingsModal(false)}
-                      // @ts-ignore
+                  // @ts-ignore
                   campaign={campaignToForm(campaign)}
                   isReadOnly
                 />

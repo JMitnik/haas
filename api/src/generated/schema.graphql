@@ -9,6 +9,81 @@ type AWSImageType {
   url: String
 }
 
+type ActionRequest {
+  assignee: UserType
+  assigneeId: String
+  createdAt: Date
+  dialogue: Dialogue
+  dialogueId: String
+  id: ID
+  isVerified: Boolean!
+  issue: IssueModel
+  issueId: String
+  requestEmail: String
+  session: Session
+  status: ActionRequestState!
+  updatedAt: Date
+}
+
+type ActionRequestConnection implements ConnectionInterface {
+  actionRequests: [ActionRequest]
+  pageInfo: PaginationPageInfo
+  totalPages: Int
+}
+
+input ActionRequestConnectionFilterInput {
+  assigneeId: String
+  dialogueId: String
+  endDate: DateString
+  isVerified: Boolean
+  offset: Int!
+  orderBy: ActionRequestConnectionOrderByInput
+  perPage: Int! = 10
+  requestEmail: String
+  search: String
+  startDate: DateString
+  status: ActionRequestState
+  topic: String
+}
+
+"""Sorting of ActionableConnection"""
+input ActionRequestConnectionOrderByInput {
+  by: ActionRequestConnectionOrderType!
+  desc: Boolean = true
+}
+
+"""Fields to order ActionableConnection by."""
+enum ActionRequestConnectionOrderType {
+  createdAt
+}
+
+input ActionRequestFilterInput {
+  assigneeId: String
+  endDate: DateString
+  startDate: DateString
+  status: ActionRequestState
+  withFollowUpAction: Boolean
+}
+
+enum ActionRequestState {
+  COMPLETED
+  DROPPED
+  PENDING
+  STALE
+}
+
+"""Basic statistics for action requests of an issue"""
+type ActionRequestStatistics {
+  """Average value of summarizable statistic"""
+  average: Float!
+
+  """Number of responses"""
+  responseCount: Int!
+
+  """Number of urgent actionRequests """
+  urgentCount: Int!
+}
+
 input AdjustedImageInput {
   bucket: String
   id: String
@@ -22,6 +97,12 @@ input AppendToInteractionInput {
   edgeId: String
   nodeId: String
   sessionId: ID
+}
+
+input AssignUserToActionRequestInput {
+  actionRequestId: String!
+  assigneeId: String
+  workspaceId: String!
 }
 
 input AssignUserToDialogueInput {
@@ -369,7 +450,7 @@ enum CloudReferenceType {
 }
 
 type ColourSettings {
-  id: ID
+  id: Int
   primary: String
   primaryAlt: String
   secondary: String
@@ -589,6 +670,7 @@ type CustomFieldType {
 }
 
 type Customer {
+  actionRequestConnection(input: ActionRequestConnectionFilterInput): ActionRequestConnection
   automationConnection(filter: AutomationConnectionFilterInput): AutomationConnection
   automations: [AutomationModel]
   campaign(campaignId: String): CampaignType
@@ -598,8 +680,9 @@ type Customer {
   dialogues(filter: DialogueFilterInputType): [Dialogue]
   id: ID
   isDemo: Boolean
+  issueConnection(filter: IssueConnectionFilterInput): IssueConnection
+  issueDialogues(filter: IssueFilterInput): [Issue]
   issueTopics(input: IssueFilterInput): [Issue]
-  issues(filter: IssueFilterInput): [Issue]
   name: String!
   nestedDialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): [DialogueStatisticsSummaryModel] @deprecated(reason: "Deprecated, see statistics")
   nestedHealthScore(input: HealthScoreInput): HealthScore @deprecated(reason: "Deprectaed, see statistics")
@@ -621,8 +704,10 @@ type Customer {
 
 type CustomerSettings {
   colourSettings: ColourSettings
+  colourSettingsId: Int
   fontSettings: FontSettings
-  id: ID
+  fontSettingsId: Int
+  id: Int
   logoOpacity: Int
   logoUrl: String
 }
@@ -778,14 +863,14 @@ type Dialogue {
   assignees: [UserType]
   averageScore(input: DialogueFilterInputType): Float
   campaignVariants: [CampaignVariantType!]
-  creationDate: String
+  creationDate: Date
   customer: Customer
   customerId: String
   description: String!
   dialogueStatisticsSummary(input: DialogueStatisticsSummaryFilterInput): DialogueStatisticsSummaryModel
   edges: [Edge]
   healthScore(input: HealthScoreInput): HealthScore
-  id: ID!
+  id: String!
   isPrivate: Boolean
   isWithoutGenData: Boolean
   issues(filter: IssueFilterInput): Issue
@@ -796,6 +881,7 @@ type Dialogue {
   mostTrendingTopic(input: DialogueStatisticsSummaryFilterInput): MostTrendingTopic
   pathedSessionsConnection(input: PathedSessionsInput): PathedSessionsType
   postLeafNode: DialogueFinisherObjectType
+  postLeafNodeId: String
   publicTitle: String
   questions: [QuestionNode!]
   rootQuestion: QuestionNode
@@ -807,7 +893,7 @@ type Dialogue {
   template: String
   title: String!
   topic(input: TopicInputType): TopicType
-  updatedAt: String
+  updatedAt: Date
   wasGeneratedWithGenData: Boolean
 }
 
@@ -921,11 +1007,11 @@ type Edge {
   childNode: QuestionNode
   childNodeId: String
   conditions: [EdgeCondition!]
-  createdAt: String
+  createdAt: Date
   id: ID
   parentNode: QuestionNode
   parentNodeId: String
-  updatedAt: String
+  updatedAt: Date
 }
 
 type EdgeCondition {
@@ -982,7 +1068,7 @@ input FindRoleInput {
 }
 
 type FontSettings {
-  id: ID
+  id: Int
 }
 
 """FormNodeEntryInput"""
@@ -1084,7 +1170,6 @@ input FormNodeStepInput {
 
 enum FormNodeStepType {
   GENERIC_FIELDS
-  INPUT_DATA
 }
 
 type FormNodeType {
@@ -1146,6 +1231,12 @@ input GetAutomationsByWorkspaceInput {
 
 input GetCampaignsInput {
   customerSlug: String
+}
+
+input GetIssueResolverInput {
+  issueId: String
+  topicId: String
+  workspaceId: String
 }
 
 input HandleUserStateInWorkspaceInput {
@@ -1215,12 +1306,55 @@ type Issue {
   updatedAt: Date
 }
 
+type IssueConnection implements ConnectionInterface {
+  issues: [IssueModel]
+  pageInfo: PaginationPageInfo
+  totalPages: Int
+}
+
+input IssueConnectionFilterInput {
+  endDate: DateString
+  label: String
+  offset: Int!
+  orderBy: IssueConnectionOrderByInput
+  perPage: Int! = 10
+  search: String
+  startDate: DateString
+  topicStrings: [String!]
+}
+
+"""Sorting of IssueConnection"""
+input IssueConnectionOrderByInput {
+  by: IssueConnectionOrderType!
+  desc: Boolean = true
+}
+
+"""Fields to order IssueConnection by."""
+enum IssueConnectionOrderType {
+  issue
+}
+
 """Filter input for Issues"""
 input IssueFilterInput {
   dialogueStrings: [String!]
   endDate: String
   startDate: String
   topicStrings: [String!]
+}
+
+type IssueModel {
+  actionRequestConnection(input: ActionRequestConnectionFilterInput): ActionRequestConnection
+  actionRequests(input: ActionRequestFilterInput): [ActionRequest]!
+  basicStats: ActionRequestStatistics
+  createdAt: Date
+  id: ID
+
+  """Number of different teams issue exists for"""
+  teamCount: Int!
+  topic: Topic!
+  topicId: String!
+  updatedAt: Date
+  workspaceId: String!
 }
 
 """
@@ -1345,6 +1479,7 @@ type MostTrendingTopic {
 type Mutation {
   appendToInteraction(input: AppendToInteractionInput): Session
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue
+  assignUserToActionRequest(input: AssignUserToActionRequestInput!): ActionRequest
   assignUserToDialogue(input: AssignUserToDialogueInput): UserType
   assignUserToDialogues(input: AssignUserToDialoguesInput): UserType
   authenticateLambda(input: AuthenticateLambdaInput): String
@@ -1409,8 +1544,9 @@ type Mutation {
   retryAutodeckJob(jobId: String): CreateWorkspaceJobType
   revokeTopic(input: RevokeTopicInput): Topic
   sandbox(input: SandboxInput): String
-  sendAutomationDialogueLink(input: SendAutomationDialogueLinkInput): Boolean
+  sendAutomationDialogueLink(input: SendAutomationDialogueLinkInput!): Boolean
   sendAutomationReport(input: SendAutomationReportInput): Boolean
+  setActionRequestStatus(input: SetActionRequestStatusInput!): ActionRequest
   setDialoguePrivacy(input: SetDialoguePrivacyInput): Dialogue
   singleUpload(file: Upload!): ImageType
   updateAutomation(input: CreateAutomationInput): AutomationModel
@@ -1422,6 +1558,7 @@ type Mutation {
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType
   uploadJobImage(disapproved: Boolean, file: Upload, jobId: String, type: UploadImageEnumType): AWSImageType
   uploadUpsellImage(input: UploadSellImageInputType): ImageType
+  verifyActionRequest(input: VerifyActionRequestInput!): ActionRequest
 
   """
   Given a token, checks in the database whether token has been set and has not expired yet
@@ -1431,7 +1568,7 @@ type Mutation {
 }
 
 type NodeEntry {
-  creationDate: String
+  creationDate: Date
   depth: Int
   id: ID
   relatedEdgeId: String
@@ -1664,6 +1801,7 @@ type Query {
   getJob(id: String): CreateWorkspaceJobType
   getJobProcessLocations: JobProcessLocations
   getPreviewData(id: String): PreviewDataType
+  issue(actionableFilter: ActionRequestFilterInput, input: GetIssueResolverInput!): IssueModel
   me: UserType
   question(where: QuestionWhereUniqueInput): QuestionNode
   refreshAccessToken: RefreshAccessTokenOutput
@@ -1700,7 +1838,7 @@ enum QuestionImpactScoreType {
 
 type QuestionNode {
   children: [Edge!]
-  creationDate: String
+  creationDate: Date
   extraContent: String
 
   """FormNode resolver"""
@@ -1723,6 +1861,7 @@ type QuestionNode {
   title: String!
   type: QuestionNodeTypeEnum
   updatedAt: String
+  videoEmbeddedNodeId: String
 }
 
 """The different types a node can assume"""
@@ -1751,6 +1890,7 @@ type QuestionOption {
   id: Int
   isTopic: Boolean
   overrideLeaf: QuestionNode
+  overrideLeafId: String
   position: Int
   publicValue: String
   questionId: String
@@ -1969,6 +2109,12 @@ input SessionWhereUniqueInput {
   id: ID
 }
 
+input SetActionRequestStatusInput {
+  actionRequestId: String!
+  status: ActionRequestState!
+  workspaceId: String!
+}
+
 input SetDialoguePrivacyInput {
   customerId: String!
   dialogueSlug: String!
@@ -2047,6 +2193,8 @@ enum StatusType {
 
 enum SystemPermission {
   CAN_ACCESS_ADMIN_PANEL
+  CAN_ACCESS_ALL_ACTION_REQUESTS
+  CAN_ACCESS_ALL_DIALOGUES
   CAN_ACCESS_REPORT_PAGE
   CAN_ADD_USERS
   CAN_ASSIGN_USERS_TO_DIALOGUE
@@ -2066,6 +2214,7 @@ enum SystemPermission {
   CAN_GENERATE_WORKSPACE_FROM_CSV
   CAN_RESET_WORKSPACE_DATA
   CAN_UPDATE_AUTOMATIONS
+  CAN_VIEW_ACTION_REQUESTS
   CAN_VIEW_AUTOMATIONS
   CAN_VIEW_CAMPAIGNS
   CAN_VIEW_DIALOGUE
@@ -2250,6 +2399,7 @@ input UpdateQuestionNodeInputType {
   title: String
   type: String
   unhappyText: String
+  updateSameTemplate: Boolean = false
 }
 
 """The `Upload` scalar type represents a file upload."""
@@ -2356,6 +2506,11 @@ type UserType {
   role: RoleType
   roleId: String
   userCustomers: [UserCustomer]
+}
+
+input VerifyActionRequestInput {
+  actionRequestId: String!
+  workspaceId: String!
 }
 
 type VerifyUserTokenOutput {

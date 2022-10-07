@@ -1,4 +1,4 @@
-import { Customer, PrismaClient, CustomerSettings, DialogueImpactScore, ChoiceNodeEntry, NodeEntry, RoleTypeEnum, Role, DialogueTemplateType } from '@prisma/client';
+import { Customer, PrismaClient, CustomerSettings, DialogueImpactScore, ChoiceNodeEntry, NodeEntry, RoleTypeEnum, Role, DialogueTemplateType } from 'prisma/prisma-client';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import { clone, groupBy, maxBy, meanBy, orderBy, uniq } from 'lodash';
 import cuid from 'cuid';
@@ -192,8 +192,8 @@ export class CustomerService {
       }
 
       const nrVotes = optionSessionArray.length
-      const averageCurrent = meanBy(optionSessionArray, (entry) => entry.mainScore);
-      const averagePrevious = meanBy(optionPrevSessionArray, (entry) => entry.mainScore);
+      const averageCurrent = meanBy(optionSessionArray, (entry) => entry.mainScore) || 0;
+      const averagePrevious = meanBy(optionPrevSessionArray, (entry) => entry.mainScore) || 0;
       const delta = Math.max(averageCurrent, averagePrevious) - Math.min(averageCurrent, averagePrevious);
       const percentageChanged = ((averageCurrent - averagePrevious) / averagePrevious) * 100;
 
@@ -276,7 +276,7 @@ export class CustomerService {
       return entry[1].length;
     })
 
-    const averageScore = meanBy(mostPrevalent?.[1], (entry) => entry.mainScore);
+    const averageScore = meanBy(mostPrevalent?.[1], (entry) => entry.mainScore) || 0;
     const nrVotes = mostPrevalent?.[1].length;
     const dialogueNodeEntryValue = mostPrevalent?.[0]?.split('_');
     const dialogueId = dialogueNodeEntryValue?.[0] as string;

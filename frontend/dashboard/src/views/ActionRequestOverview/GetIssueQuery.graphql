@@ -1,0 +1,40 @@
+query GetIssue($input: GetIssueResolverInput, $actionableFilter: ActionRequestConnectionFilterInput) {
+	issue(input: $input) {
+		id
+		topicId
+		topic {
+      id
+			name
+		}
+    actionRequestConnection(input: $actionableFilter) {
+      actionRequests {
+        id
+        createdAt
+        isVerified
+        dialogueId
+        session {
+          id
+          mainScore
+        }
+        dialogue {
+          id
+          title
+          slug
+        }
+        status
+        assignee {
+          id
+          email
+        }
+      }
+      totalPages
+      pageInfo {
+        hasNextPage
+        hasPrevPage
+        nextPageOffset
+        pageIndex
+        prevPageOffset
+      }
+    }
+	}
+}

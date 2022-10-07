@@ -24,30 +24,42 @@ export const parseGroupNames = (title: string): string[] => {
   return groups;
 };
 
-interface GroupToChild {
+/**
+ * The GroupToChildEdge dictates a relationship between a parent Group and a Child Group/Dialogue fragment.
+ * - One Group Fragment can likely have multiple GroupToChild nodes.
+ */
+interface GroupToChildEdge {
+  /** The height of a child: increments along the dialogue names go. */
   height: number;
+  /** The title of the original title. */
   dialogueTitle: string;
-  groupName: string;
-  groupFragments: string;
-  childGroupFragments: string | null;
+  /** The name of the current group. */
+  parentGroupName: string;
+  /** The fragments of the current group up to the root of the `dialogueTitle`. Includes `groupName` */
+  parentGroupFragments: string;
+  /** The name of the given child group (only the stem). */
   childGroupName: string | null;
+  /** The fragments of the child group up to the root (including `childGroupName`)  */
+  childGroupFragments: string | null;
 }
 
 /**
  * Parses a dialogue-group into a list of group relations.
  */
-export const parseDialogueGroup = (dialogueGroup: DialogueGroup): GroupToChild[] => (
+export const parseDialogueGroup = (dialogueGroup: DialogueGroup): GroupToChildEdge[] => (
   dialogueGroup.groupFragments.map((groupFragment, index) => ({
-    height: dialogueGroup.groupFragments.length - index - 1,
+    height: index,
     dialogueTitle: dialogueGroup.dialogueTitle,
-    groupName: groupFragment,
-    groupFragments: dialogueGroup.groupFragments.slice(0, index + 1).join(' - '),
+    parentGroupName: groupFragment,
+    parentGroupFragments: dialogueGroup.groupFragments.slice(0, index + 1).join(' - '),
     childGroupFragments: (
       index === dialogueGroup.groupFragments.length - 1
         ? null
         : dialogueGroup.groupFragments.slice(0, index + 2).join(' - ')
     ),
-    childGroupName: index === dialogueGroup.groupFragments.length - 1 ? null : dialogueGroup.groupFragments[index + 1],
+    childGroupName: index === dialogueGroup.groupFragments.length - 1
+      ? null
+      : dialogueGroup.groupFragments[index + 1],
   }))
 );
 
@@ -63,7 +75,7 @@ export const calcGroupAverage = (group: HexagonGroupNode): number => {
     }
 
     return 0;
-  });
+  }) || 0;
 };
 
 export const calcGroupTotal = (group: HexagonGroupNode): number => {
@@ -101,7 +113,7 @@ export const calcGroupStatistics = (dialogues: Dialogue[]): HexagonGroupNodeStat
     && dialogue?.impactScore > 0);
 
   const average = voteCount > 0
-    ? meanBy(filteredDialogues, (dialogue) => dialogue?.impactScore)
+    ? meanBy(filteredDialogues, (dialogue) => dialogue?.impactScore) || 0
     : 0;
 
   return {
@@ -117,15 +129,21 @@ export const recursiveBuildGroup = (
   groupName: string,
   groupFragments: string,
   dialogueTitle: string,
-  allGroups: GroupToChild[],
+  allGroups: GroupToChildEdge[],
   dialogues: Dialogue[],
 ): HexagonGroupNode | HexagonDialogueNode => {
-  const groupToChilds = allGroups.filter((group) => group.groupFragments === groupFragments);
-  // Ensure only unique groups are considered
+  /**
+   * Find all parent-children edges matching the current `groupFragments` path to the root.
+   * This means that we will get for parent A, all childrenGroups A->B, A->C, A->D.
+   */
+  const groupToChilds = allGroups.filter((group) => group.parentGroupFragments === groupFragments);
+
+  // Ensure only unique groups are considered.
   const uniqueGroupToChilds = uniqBy(groupToChilds, 'childGroupFragments');
 
-  // If no child groups, we are at the "dialogue title" level: return a dialogue node
-  if (groupToChilds.length === 0 || groupToChilds[0].height === 0) {
+  // If there are no more child groups, we are at the "dialogue title" level: return a dialogue node
+  const hasNoChild = groupToChilds.length === 1 && !groupToChilds[0].childGroupName;
+  if (hasNoChild) {
     const relevantDialogue = dialogues.find((dialogue) => dialogue.title === dialogueTitle) as Dialogue;
 
     return {
@@ -174,20 +192,19 @@ export const groupsFromDialogues = (dialogues: Dialogue[]): HexagonNode[] => {
     dialogueTitle: dialogue.title || '',
   }));
 
-  const groupToChild: GroupToChild[] = dialogueGroups.flatMap(parseDialogueGroup);
-
-  const maxHeight = Math.max(...groupToChild.map((group) => group.height));
+  const allGroupToChilds: GroupToChildEdge[] = dialogueGroups.flatMap(parseDialogueGroup);
+  const maxHeight = Math.max(...allGroupToChilds.map((group) => group.height));
 
   if (maxHeight === 0) return dialogues.map((dialogue) => dialogueToNode(dialogue));
 
-  const topGroups = uniqBy(groupToChild.filter((group) => group.height === maxHeight), 'groupName');
+  const topGroups = uniqBy(allGroupToChilds.filter((group) => group.height === 0), 'parentGroupName');
 
   const topGroupNodes = topGroups.map((group) => (
     recursiveBuildGroup(
-      group.groupName,
-      group.groupFragments,
+      group.parentGroupName,
+      group.parentGroupFragments,
       group.dialogueTitle,
-      groupToChild,
+      allGroupToChilds,
       dialogues,
     )
   ));

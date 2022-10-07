@@ -1,5 +1,5 @@
 import { GraphQLYogaError } from '@graphql-yoga/node';
-import { AutomationActionType, AutomationConditionBuilderType, AutomationConditionOperatorType, AutomationConditionScopeType, AutomationScheduled } from '@prisma/client';
+import { AutomationActionType, AutomationConditionBuilderType, AutomationConditionOperatorType, AutomationConditionScopeType, AutomationScheduled } from 'prisma/prisma-client';
 import { UserInputError } from 'apollo-server-express';
 import { format } from 'date-fns';
 import { NexusGenInputs } from 'generated/nexus';

@@ -38,9 +38,14 @@ export const RangeDatePickerButton = React.forwardRef<HTMLButtonElement, CustomI
             -
           </UI.Span>
           {valueEndDate}
-          <UI.Icon ml={1}>
-            <ChevronDown />
-          </UI.Icon>
+
+        </UI.Div>
+        <UI.Div flexGrow={1}>
+          <UI.Flex justifyContent="flex-end">
+            <UI.Icon ml={1}>
+              <ChevronDown />
+            </UI.Icon>
+          </UI.Flex>
         </UI.Div>
       </UI.Flex>
     </LS.DatePickerButton>

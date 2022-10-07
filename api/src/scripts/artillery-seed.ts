@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from 'prisma/prisma-client';
 import cuid from 'cuid';
 import { company } from 'faker';
 import * as yargs from 'yargs';

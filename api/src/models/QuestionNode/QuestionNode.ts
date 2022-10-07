@@ -1,4 +1,4 @@
-import { PrismaClient, NodeType } from '@prisma/client';
+import { PrismaClient, NodeType } from 'prisma/prisma-client';
 import { enumType, extendType, inputObjectType, objectType, queryField } from 'nexus';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 
@@ -32,14 +32,10 @@ export const QuestionOptionType = objectType({
     // TODO: Make this required in prisma.
     t.string('questionId', {
       nullable: true,
-      resolve(parent) {
-        if (!parent.questionId) return '';
-
-        return parent.questionId;
-      },
     });
 
     t.string('publicValue', { nullable: true });
+    t.string('overrideLeafId');
 
     t.field('overrideLeaf', {
       type: 'QuestionNode',
@@ -54,11 +50,6 @@ export const QuestionOptionType = objectType({
 
     t.int('position', {
       nullable: true,
-      resolve(parent) {
-        if (!parent.position) return null;
-
-        return parent.position;
-      },
     });
   },
 });
@@ -116,7 +107,7 @@ export const FormNodeFieldInput = inputObjectType({
 
 export const FormNodeStepType = enumType({
   name: 'FormNodeStepType',
-  members: ['GENERIC_FIELDS', 'INPUT_DATA'],
+  members: ['GENERIC_FIELDS'],
 })
 
 export const FormNodeStepInput = inputObjectType({
@@ -170,9 +161,6 @@ export const FormNodeField = objectType({
     t.int('position');
     t.string('placeholder', {
       nullable: true,
-      resolve(root) {
-        return root.placeholder;
-      },
     });
 
     t.list.field('contacts', {
@@ -287,6 +275,8 @@ export const QuestionNodeType = objectType({
     t.nonNull.string('title');
     t.string('updatedAt');
 
+    t.string('videoEmbeddedNodeId');
+
     t.string('extraContent', {
       nullable: true,
       resolve: async (parent, args, ctx) => {
@@ -295,13 +285,13 @@ export const QuestionNodeType = objectType({
         return node?.videoUrl || null;
       },
     });
-    t.string('creationDate', { nullable: true });
+    t.date('creationDate', { nullable: true });
     t.field('type', { type: QuestionNodeTypeEnum });
     t.string('overrideLeafId', { nullable: true });
 
     t.string('updatedAt', {
       nullable: true,
-      resolve: (parent) => parent.updatedAt?.toString() || '',
+      resolve: (parent) => (parent as any).updatedAt?.toString() || '',
     });
 
     t.field('indepthQuestionStatisticsSummary', {
@@ -430,11 +420,6 @@ export const QuestionNodeType = objectType({
     // TODO: Make this required in prisma.
     t.string('questionDialogueId', {
       nullable: true,
-      resolve(parent) {
-        if (!parent.questionDialogueId) return '';
-
-        return parent.questionDialogueId;
-      },
     });
 
     t.nonNull.list.nonNull.field('links', {
@@ -688,7 +673,6 @@ export const QuestionNodeMutations = extendType({
       },
       // TODO: Remove the any
       async resolve(parent: any, args: any, ctx) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
         // eslint-disable-next-line max-len
         const { customerId, dialogueSlug, title, type, overrideLeafId, parentQuestionId, optionEntries, edgeCondition, extraContent } = args.input;
         const { options } = optionEntries;

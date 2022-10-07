@@ -1,7 +1,7 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from 'prisma/prisma-client';
 declare global {
   namespace NodeJS {
-    interface Global {}
+    interface Global { }
   }
 }
 

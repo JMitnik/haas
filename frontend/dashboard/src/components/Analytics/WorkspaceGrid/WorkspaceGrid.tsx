@@ -15,11 +15,11 @@ import { DateFormat, useDate } from 'hooks/useDate';
 import { DatePicker } from 'components/Common/DatePicker';
 import {
   DialogueImpactScoreType,
-  useGetIssuesQuery,
+  useGetProblemsPerDialogueQuery,
   useGetWorkspaceSummaryDetailsQuery,
   useResetWorkspaceDataMutation,
 } from 'types/generated-types';
-import { InteractionModalCard } from 'views/InteractionsOverview/InteractionModalCard';
+import { InteractionModalCard } from 'views/FeedbackView/InteractionModalCard';
 import { SimpleIssueTable } from 'components/Analytics/Issues/SimpleIssueTable';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useNavigator } from 'hooks/useNavigator';
@@ -309,7 +309,7 @@ export const WorkspaceGrid = ({
 
   const summary = data?.customer?.statistics;
 
-  const { data: issuesData, loading: issuesLoading } = useGetIssuesQuery({
+  const { data: issuesData, loading: issuesLoading } = useGetProblemsPerDialogueQuery({
     fetchPolicy: 'no-cache',
     variables: {
       workspaceId: activeCustomer?.id || '',
@@ -321,7 +321,7 @@ export const WorkspaceGrid = ({
     },
   });
 
-  const issues = issuesData?.customer?.issues || [];
+  const issues = issuesData?.customer?.issueDialogues || [];
   const issueStats = issues.reduce((acc, issue) => {
     acc.problems += (issue?.basicStats?.responseCount || 0);
     acc.actionsRequested += (issue?.actionRequiredCount || 0);
@@ -454,7 +454,7 @@ export const WorkspaceGrid = ({
                   inPreview
                   onResetFilter={() => popToIndex(0)}
                   isFilterEnabled={historyQueue.length > 0}
-                  issues={issues.filter(isPresent)}
+                  issues={issues?.filter(isPresent)}
                   onIssueClick={handleIssueClick}
                   isLoading={issuesLoading}
                   onOpenIssueModal={() => setIssuesModalIsOpen(true)}
@@ -510,7 +510,7 @@ export const WorkspaceGrid = ({
       <Modal.Root open={issuesModalIsOpen} onClose={() => setIssuesModalIsOpen(false)}>
         <IssuesModal
           onResetFilters={() => popToIndex(0)}
-          issues={issues.filter(isPresent)}
+          issues={issues?.filter(isPresent)}
           onIssueClick={(issue) => {
             handleIssueClick(issue);
             setIssuesModalIsOpen(false);

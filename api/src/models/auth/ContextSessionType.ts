@@ -1,4 +1,4 @@
-import { SystemPermissionEnum, User, UserOfCustomer } from '@prisma/client';
+import { SystemPermissionEnum, User, UserOfCustomer } from 'prisma/prisma-client';
 
 export interface CustomerAndPermission {
   permissions?: SystemPermissionEnum[];
@@ -6,7 +6,7 @@ export interface CustomerAndPermission {
 }
 
 export interface UserWithDependencies extends User {
-  customers: UserOfCustomer[]
+  customers: UserOfCustomer[];
 }
 
 export interface ActiveWorkspaceType {

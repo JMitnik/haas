@@ -1,4 +1,4 @@
-import { PrismaClient, UserOfCustomer, Prisma } from '@prisma/client';
+import { PrismaClient, UserOfCustomer, Prisma } from 'prisma/prisma-client';
 
 class UserOfCustomerPrismaAdapter {
   prisma: PrismaClient;

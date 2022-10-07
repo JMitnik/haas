@@ -8,7 +8,7 @@ import { NodeEntryFragmentFragment, QuestionNodeTypeEnum, SessionFragmentFragmen
 import { QuestionNodeIcon } from 'components/Dialogue/QuestionNodeIcon';
 import { Timeline, TimelineItem } from 'components/Common/Timeline';
 import { formatSliderValue } from 'components/Dialogue/utils/formatSliderValue';
-import FormNodeEntry from 'views/InteractionsOverview/FormNodeEntry';
+import FormNodeEntry from 'views/FeedbackView/FormNodeEntry';
 
 interface Interaction extends SessionFragmentFragment { }
 
@@ -168,7 +168,8 @@ export const InteractionTimeline = ({ interaction }: InteractionTimelineProps) =
             )}
           </Circle>
           <UI.Div>
-            {nodeEntry.relatedNode?.type === QuestionNodeTypeEnum.Form ? (
+            {nodeEntry.relatedNode?.type === QuestionNodeTypeEnum.Form
+              && nodeEntry.value?.formNodeEntry?.values?.find((value) => !!value?.email) ? (
               <UI.Flex justifyContent="space-between">
                 <UI.Helper color="blue.400">{nodeEntry.relatedNode?.type}</UI.Helper>
 

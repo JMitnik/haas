@@ -1,10 +1,9 @@
-import { PrismaClient, User, Prisma, UserOfCustomer } from '@prisma/client';
+import { PrismaClient, User, Prisma, UserOfCustomer } from 'prisma/prisma-client';
 import _, { cloneDeep, reject } from 'lodash';
 
 import { RegisterUserInput } from './UserPrismaAdapterType';
 import RoleService from '../role/RoleService';
 import { NexusGenInputs } from '../../generated/nexus';
-
 
 class UserPrismaAdapter {
   prisma: PrismaClient;
@@ -13,6 +12,21 @@ class UserPrismaAdapter {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
     this.roleService = new RoleService(prismaClient);
+  }
+
+  public async findMany(where: Prisma.UserWhereInput, include: Prisma.UserInclude) {
+    return this.prisma.user.findMany({
+      where,
+      include,
+    })
+  };
+
+  public async findUniqueByEmail(email: string) {
+    return this.prisma.user.findUnique({
+      where: {
+        email,
+      },
+    })
   }
 
   /**
@@ -428,7 +442,13 @@ class UserPrismaAdapter {
         customers: {
           create: {
             customer: { connect: { id: registerUserInput.workspaceId || undefined } },
-            role: { connect: { id: (await this.roleService.fetchDefaultRoleForCustomer(registerUserInput.workspaceId)).id || undefined } },
+            role: {
+              connect: {
+                id: (
+                  await this.roleService.fetchDefaultRoleForCustomer(registerUserInput.workspaceId)
+                ).id || undefined,
+              },
+            },
           },
         },
       },

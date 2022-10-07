@@ -1,13 +1,13 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from 'prisma/prisma-client';
 
 /** Utility for TableName */
 type IgnorePrismaBuiltins<S extends string> = string extends S
-? string
-: S extends ''
-? S
-: S extends `$${infer T}`
-? never
-: S;
+  ? string
+  : S extends ''
+  ? S
+  : S extends `$${infer T}`
+  ? never
+  : S;
 
 /** All table names of prisma as union */
 export type PrismaTableName = IgnorePrismaBuiltins<keyof PrismaClient>;

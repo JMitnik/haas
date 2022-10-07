@@ -1,4 +1,4 @@
-import { Dialogue, Edge, NodeType, PrismaClient, QuestionCondition, QuestionNode, SystemPermissionEnum } from '@prisma/client';
+import { Dialogue, Edge, NodeType, PrismaClient, QuestionCondition, QuestionNode, SystemPermissionEnum } from 'prisma/prisma-client';
 import { sample } from 'lodash';
 
 interface SeedSessionInput {

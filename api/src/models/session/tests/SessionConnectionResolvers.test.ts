@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from 'prisma/prisma-client';
 import { ApolloError } from 'apollo-server';
 
 import { clearDatabase } from './testUtils';

@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from 'prisma/prisma-client';
 
 interface CustomNodeJsGlobal extends NodeJS.Global {
   testPrisma: PrismaClient;

@@ -1,13 +1,13 @@
-import { LanguageEnum, NodeType } from '@prisma/client';
-import WorkspaceTemplate, { defaultAdminRole, defaultBotRole, defaultForm, defaultManagerRole, defaultUserRole, DemoWorkspaceTemplate } from './TemplateTypes';
+import { LanguageEnum, NodeType } from 'prisma/prisma-client';
+import { defaultAdminRole, defaultBotRole, defaultForm, defaultManagerRole, defaultUserRole, DemoWorkspaceTemplate } from './TemplateTypes';
 
 const studentOptionsNl = [
-  { value: 'Lichaam & Geest', position: 1 },
-  { value: 'Leraren', position: 2 },
-  { value: 'Thuis', position: 3 },
-  { value: 'Activiteiten buiten school / hobby', position: 4 },
-  { value: 'Klasgenoten', position: 5 },
-  { value: 'Eigen Prestatie', position: 6 },
+  { value: 'Lichaam & Geest', position: 1, topic: 'Physical & Mental' },
+  { value: 'Leraren', position: 2, topic: 'Teacher' },
+  { value: 'Thuis', position: 3, topic: 'Home' },
+  { value: 'Activiteiten buiten school / hobby', position: 4, topic: 'Activity Outside School' },
+  { value: 'Klasgenoten', position: 5, topic: 'Classmates' },
+  { value: 'Eigen Prestatie', position: 6, topic: 'Own Performance' },
 ]
 
 const sportWorkspaceTemplate: DemoWorkspaceTemplate = {
@@ -21,6 +21,9 @@ const sportWorkspaceTemplate: DemoWorkspaceTemplate = {
       children: [
         {
           title: 'Fijn om te horen! Waar ben je het meest tevreden over?',
+          topic: {
+            name: 'VERY_POSITIVE',
+          },
           type: NodeType.CHOICE,
           edge: {
             conditionType: 'valueBoundary',
@@ -33,6 +36,9 @@ const sportWorkspaceTemplate: DemoWorkspaceTemplate = {
         },
         {
           title: 'Je bent niet helemaal tevreden dus. Wat kan er beter?',
+          topic: {
+            name: 'POSITIVE',
+          },
           type: NodeType.CHOICE,
           edge: {
             conditionType: 'valueBoundary',
@@ -45,6 +51,9 @@ const sportWorkspaceTemplate: DemoWorkspaceTemplate = {
         },
         {
           title: 'Wat vervelend! Wat is er aan de hand?',
+          topic: {
+            name: 'NEGATIVE',
+          },
           type: NodeType.CHOICE,
           edge: {
             conditionType: 'valueBoundary',
@@ -57,6 +66,9 @@ const sportWorkspaceTemplate: DemoWorkspaceTemplate = {
         },
         {
           title: 'Wat vervelend! Wat is er aan de hand?',
+          topic: {
+            name: 'VERY_NEGATIVE',
+          },
           type: NodeType.CHOICE,
           edge: {
             conditionType: 'valueBoundary',
@@ -145,7 +157,7 @@ const sportWorkspaceTemplate: DemoWorkspaceTemplate = {
     {
       leafMatchId: 'ContactFormNode',
       title:
-        'Jouw feedback blijft altijd anoniem, tenzij je er met iemand over wil praten. Als je dat wil, laat dan je gegevens achter achter.',
+        'Jouw feedback blijft altijd anoniem, tenzij je er met iemand over wil praten. Als je dat wil, laat dan je gegevens achter.',
       type: NodeType.FORM,
       form: defaultForm,
     },

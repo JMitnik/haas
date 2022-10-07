@@ -1,7 +1,7 @@
 import {
   AutomationType,
   Prisma, PrismaClient,
-} from '@prisma/client';
+} from 'prisma/prisma-client';
 import { cloneDeep } from 'lodash';
 import { NexusGenInputs } from '../../generated/nexus';
 

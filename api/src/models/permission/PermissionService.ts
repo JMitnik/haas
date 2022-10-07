@@ -1,4 +1,4 @@
-import { Permission, PrismaClient } from '@prisma/client';
+import { Permission, PrismaClient } from 'prisma/prisma-client';
 
 import PermissionPrismaAdapter from './PermissionPrismaAdapter';
 

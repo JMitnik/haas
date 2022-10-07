@@ -21,16 +21,19 @@ import { useCustomer } from 'providers/CustomerProvider';
 import { useFormatter } from 'hooks/useFormatter';
 import { useGetWorkspaceLayoutDetailsQuery } from 'types/generated-types';
 import { useNavigator } from 'hooks/useNavigator';
+import useAuth from 'hooks/useAuth';
 
+import { NavLinkContainer } from './WorkpaceLayout.styles';
 import { TopSubNavBarContainer } from './TopSubNavBar.styles';
 
 export const WorkspaceTopNavBar = () => {
   const { t } = useTranslation();
+  const { canViewActionRequests, canAccessAllActionRequests } = useAuth();
   const { activeCustomer } = useCustomer();
   const { formatFractionToPercentage } = useFormatter();
   const { getNWeekAgo, format, getTomorrow } = useDate();
 
-  const { dashboardPath, workspaceInteractionsPath } = useNavigator();
+  const { dashboardPath, workspaceInteractionsPath, workspaceActionRequestsPath } = useNavigator();
 
   const { data } = useGetWorkspaceLayoutDetailsQuery({
     fetchPolicy: 'no-cache',
@@ -77,6 +80,11 @@ export const WorkspaceTopNavBar = () => {
                         {formatFractionToPercentage(score / 100)}
                       </>
                     )}
+                    {score === 0 && (
+                      <>
+                        0%
+                      </>
+                    )}
                   </UI.Text>
                 </ProgressCircle>
               </UI.Div>
@@ -117,6 +125,15 @@ export const WorkspaceTopNavBar = () => {
                 <NavLink to={workspaceInteractionsPath}>
                   {t('interactions')}
                 </NavLink>
+              </UI.Span>
+
+              <UI.Span>
+                <NavLinkContainer
+                  $isDisabled={!canViewActionRequests && !canAccessAllActionRequests}
+                  to={workspaceActionRequestsPath}
+                >
+                  {t('action_requests')}
+                </NavLinkContainer>
               </UI.Span>
             </UI.Div>
           </UI.Div>

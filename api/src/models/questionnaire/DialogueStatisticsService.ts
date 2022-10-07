@@ -1,4 +1,4 @@
-import { DialogueImpactScore, DialogueStatisticsSummaryCache, NodeEntry, PrismaClient, Session, SliderNodeEntry } from '@prisma/client';
+import { DialogueImpactScore, DialogueStatisticsSummaryCache, NodeEntry, PrismaClient, Session, SliderNodeEntry } from 'prisma/prisma-client';
 import { isPresent } from 'ts-is-present';
 import { groupBy, mean, meanBy } from 'lodash';
 import { addDays, differenceInHours } from 'date-fns';
@@ -95,7 +95,7 @@ class DialogueStatisticsService {
       endDateTimeSet
     );
 
-    const average = meanBy(scopedSessions, (session) => session.mainScore);
+    const average = meanBy(scopedSessions, (session) => session.mainScore) || 0;
     const nrVotes = scopedSessions.length;
     const sessionsHigherThanTreshold = scopedSessions.filter((session) => session.mainScore >= threshold);
 
@@ -203,7 +203,7 @@ class DialogueStatisticsService {
   ) => {
     switch (type) {
       case DialogueImpactScore.AVERAGE:
-        const average = meanBy(nodeEntries, (entry) => entry?.sliderNodeEntry?.value);
+        const average = meanBy(nodeEntries, (entry) => entry?.sliderNodeEntry?.value) || 0;
         return average;
 
       default:

@@ -128,6 +128,8 @@ describe('DialogueOverview', () => {
         ],
       };
 
+      // hmm?
+
       res.customer?.dialogueConnection?.dialogues?.splice(0, 1, adjustedDialogue as any);
       return ({
         ...res,

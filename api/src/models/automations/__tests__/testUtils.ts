@@ -1,4 +1,4 @@
-import { AutomationConditionBuilderType, PrismaClient, SystemPermissionEnum } from '@prisma/client';
+import { AutomationConditionBuilderType, PrismaClient, SystemPermissionEnum } from 'prisma/prisma-client';
 
 export const clearDatabase = async (prisma: PrismaClient) => {
   if (process.env.NODE_ENV === 'test') {

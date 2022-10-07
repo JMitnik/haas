@@ -1,4 +1,4 @@
-import { AutomationActionType, AutomationConditionBuilderType, AutomationEventType, Customer, Dialogue, QuestionNode } from '@prisma/client';
+import { AutomationActionType, AutomationConditionBuilderType, AutomationEventType, Customer, Dialogue, QuestionNode } from 'prisma/prisma-client';
 import { NexusGenInputs } from '../../../generated/nexus';
 import { AutomationCondition, AutomationTrigger, FullAutomationWithRels, SetupQuestionCompareDataInput } from '../AutomationTypes';
 
@@ -182,7 +182,6 @@ export const constructValidUpdateAutomationInputData = (
   const sendSmsAction = actions.find((action) => action.type === 'SEND_EMAIL');
   const generateReportAction = actions.find((action) => action.type === 'WEEK_REPORT');
 
-  const condition = conditionBuilder.conditions?.[0];
 
   return {
     'id': automation.id,

@@ -1,4 +1,4 @@
-import { UserOfCustomer, PrismaClient, Customer, Prisma, User } from '@prisma/client';
+import { UserOfCustomer, PrismaClient, Customer, Prisma, User } from 'prisma/prisma-client';
 import { UserInputError } from 'apollo-server';
 import _ from 'lodash';
 
@@ -10,7 +10,7 @@ import makeRoleUpdateTemplate from '../../services/mailings/templates/makeRoleUp
 import UserPrismaAdapter from './UserPrismaAdapter';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import UserOfCustomerPrismaAdapter from './UserOfCustomerPrismaAdapter';
-import { DeletedUserOutput, GenerateReportPayload, UserWithWorkspaces } from './UserServiceTypes';
+import { DeletedUserOutput, GenerateReportPayload, UserWithAssignedDialogues, UserWithWorkspaces } from './UserServiceTypes';
 import { offsetPaginate } from '../general/PaginationHelpers';
 import CustomerService from '../../models/customer/CustomerService';
 import { assertNonNullish } from '../../utils/assertNonNullish';
@@ -29,6 +29,24 @@ class UserService {
     this.userOfCustomerPrismaAdapter = new UserOfCustomerPrismaAdapter(prismaClient);
     this.customerService = new CustomerService(prismaClient);
   };
+
+  public async findAssignedUsers(workspaceSlug: string) {
+    const whereInput: Prisma.UserWhereInput = {
+      isAssignedTo: {
+        some: {
+          customer: {
+            slug: workspaceSlug,
+          },
+        },
+      },
+    };
+
+    const users = await this.userPrismaAdapter.findMany(whereInput, {
+      isAssignedTo: true,
+    }) as UserWithAssignedDialogues[];
+
+    return users;
+  }
 
   /**
    * Finds all users based on a AutomationAction payload
@@ -386,7 +404,11 @@ class UserService {
   };
 
   async inviteExistingUserToCustomer(userId: string, newRoleId: string, workspaceId: string) {
-    const invitedUser = await this.userOfCustomerPrismaAdapter.createExistingUserForInvitingWorkspace(workspaceId, newRoleId, userId);
+    const invitedUser = await this.userOfCustomerPrismaAdapter.createExistingUserForInvitingWorkspace(
+      workspaceId,
+      newRoleId,
+      userId
+    );
 
     // TODO: Make instance
     const inviteLoginToken = AuthService.createUserToken(userId);

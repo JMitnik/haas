@@ -3,6 +3,7 @@ import { Redirect, Route, Switch } from 'react-router-dom';
 import { ViewContainer } from '@haas/ui';
 import React, { FC } from 'react';
 
+import { ActionRequestOverview } from 'views/ActionRequestOverview/ActionRequestOverview';
 import { AppProviders } from 'config/AppProviders';
 import { CampaignView } from 'views/CampaignView/CampaignView';
 import { DashboardView } from 'views/DashboardView';
@@ -11,7 +12,6 @@ import { DialogueProvider } from 'providers/DialogueProvider';
 import { FeedbackOverview } from 'views/FeedbackView/index';
 import { FirstTimeView } from 'views/FirstTimeView';
 import { GenerateWorkspaceView } from 'views/GenerateWorkspaceView';
-import { InteractionsOverview } from 'views/InteractionsOverview';
 import { ROUTES } from 'hooks/useNavigator';
 import { SystemPermission } from 'types/generated-types';
 import { VerifyTokenView } from 'views/VerifyTokenView';
@@ -80,11 +80,6 @@ const CustomerRoutes = () => (
                         allowedPermission={SystemPermission.CanEditDialogue}
                         path="/dashboard/b/:customerSlug/d/:dialogueSlug/edit"
                         render={() => <EditDialogueView />}
-                      />
-
-                      <GuardedRoute
-                        path="/dashboard/b/:customerSlug/d/:dialogueSlug/interactions"
-                        render={() => <InteractionsOverview />}
                       />
 
                       <GuardedRoute
@@ -196,6 +191,11 @@ const CustomerRoutes = () => (
                     <GuardedRoute
                       path="/dashboard/b/:customerSlug/d"
                       render={() => <DialogueOverview />}
+                    />
+
+                    <GuardedRoute
+                      path="/dashboard/b/:customerSlug/dashboard/action_requests"
+                      render={() => <ActionRequestOverview />}
                     />
 
                     <GuardedRoute

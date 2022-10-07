@@ -1,4 +1,4 @@
-import { Customer, PrismaClient } from '@prisma/client';
+import { Customer, PrismaClient } from 'prisma/prisma-client';
 
 import { clearDatabase } from './testUtils';
 import { makeTestContext } from '../../../test/utils/makeTestContext';

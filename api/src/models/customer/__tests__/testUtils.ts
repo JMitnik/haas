@@ -1,4 +1,4 @@
-import { Dialogue, Edge, PrismaClient, QuestionCondition, QuestionNode } from '@prisma/client';
+import { Dialogue, Edge, PrismaClient, QuestionCondition, QuestionNode } from 'prisma/prisma-client';
 
 export const clearDatabase = async (prisma: PrismaClient) => {
   await prisma.$transaction([

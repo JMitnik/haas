@@ -1,4 +1,4 @@
-import { Customer, Dialogue, PrismaClient } from '@prisma/client';
+import { Customer, Dialogue, PrismaClient } from 'prisma/prisma-client';
 import { range } from 'lodash';
 
 import { clearDatabase, prepDefaultCreateData, seedAutomation } from './testUtils';
@@ -10,28 +10,27 @@ jest.setTimeout(30000);
 
 const ctx = makeTestContext(prisma);
 
-
 const Query = `
-query getPaginatedAutomations($customerSlug: String!, $filter: AutomationConnectionFilterInput) {
-  customer(slug: $customerSlug) {
-    id
-    automationConnection(filter: $filter) {
-      automations {
-        label
-        type
-        updatedAt
-      }
-      totalPages
-      pageInfo {
-        hasPrevPage
-        hasNextPage
-        prevPageOffset
-        nextPageOffset
-        pageIndex
+  query getPaginatedAutomations($customerSlug: String!, $filter: AutomationConnectionFilterInput) {
+    customer(slug: $customerSlug) {
+      id
+      automationConnection(filter: $filter) {
+        automations {
+          label
+          type
+          updatedAt
+        }
+        totalPages
+        pageInfo {
+          hasPrevPage
+          hasNextPage
+          prevPageOffset
+          nextPageOffset
+          pageIndex
+        }
       }
     }
   }
-}
 `;
 
 const seedAutomations = async (prisma: PrismaClient, workspace: Customer, dialogue: Dialogue, amount?: number) => {
@@ -54,16 +53,11 @@ const seedAutomations = async (prisma: PrismaClient, workspace: Customer, dialog
 describe('AutomationConnection resolvers', () => {
   afterEach(async () => {
     await clearDatabase(prisma);
-    await prisma.$disconnect();
-  });
-
-  afterAll(async () => {
-    await clearDatabase(prisma);
-    await prisma.$disconnect();
   });
 
   test('unable to query automation-connection unauthorized', async () => {
     const { user, workspace, dialogue, userRole } = await prepDefaultCreateData(prisma);
+
     await seedAutomations(prisma, workspace, dialogue, 1);
 
     await prisma.role.update({
@@ -157,9 +151,11 @@ describe('AutomationConnection resolvers', () => {
 
     expect(resAsc.customer.automationConnection.totalPages).toBeGreaterThanOrEqual(1);
     expect(resAsc.customer.automationConnection.automations.length).toEqual(3);
+
     const firstAutomation = resAsc.customer.automationConnection.automations?.[0]
     const secondAutomation = resAsc.customer.automationConnection.automations?.[1]
     const thirdAutomation = resAsc.customer.automationConnection.automations?.[2]
+
     expect(firstAutomation?.updatedAt).toBeLessThan(secondAutomation?.updatedAt);
     expect(secondAutomation?.updatedAt).toBeLessThan(thirdAutomation?.updatedAt);
 
@@ -173,14 +169,15 @@ describe('AutomationConnection resolvers', () => {
         },
       },
     }, { 'Authorization': `Bearer ${token}` });
+
     expect(resDesc.customer.automationConnection.totalPages).toBeGreaterThanOrEqual(1);
     expect(resDesc.customer.automationConnection.automations.length).toEqual(3);
+
     const firstAutomationDesc = resDesc.customer.automationConnection.automations?.[0]
     const secondAutomationDesc = resDesc.customer.automationConnection.automations?.[1]
     const thirdAutomationDesc = resDesc.customer.automationConnection.automations?.[2]
+
     expect(firstAutomationDesc?.updatedAt).toBeGreaterThan(secondAutomationDesc?.updatedAt);
     expect(secondAutomationDesc?.updatedAt).toBeGreaterThan(thirdAutomationDesc?.updatedAt);
   });
-
-
 });

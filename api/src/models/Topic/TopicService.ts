@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from 'prisma/prisma-client';
 
 import { SessionWithEntries } from '../session/Session.types';
 import SessionService from '../session/SessionService';

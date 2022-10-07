@@ -1,4 +1,4 @@
-import { PrismaClient, Role } from '@prisma/client';
+import { PrismaClient, Role } from 'prisma/prisma-client';
 import * as yargs from 'yargs';
 import * as papaparse from 'papaparse';
 import * as fs from 'fs';

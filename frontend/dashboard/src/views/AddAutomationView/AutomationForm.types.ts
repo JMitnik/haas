@@ -104,7 +104,9 @@ export const schema = yup.object({
                 type: yup.string().required(),
               }).required(),
               aspect: yup.string().required(),
-              aggregate: yup.mixed<ConditionPropertyAggregateType>().oneOf(Object.values(ConditionPropertyAggregateType)),
+              aggregate: yup.mixed<ConditionPropertyAggregateType>().oneOf(
+                Object.values(ConditionPropertyAggregateType),
+              ),
               latest: yup.number().required(),
               questionOption: yup.string().notRequired().nullable(false),
             }).required(),
@@ -187,7 +189,16 @@ export const schema = yup.object({
         channelId: yup.string(),
         id: yup.string(),
         type: yup.mixed<AutomationActionType>().oneOf(Object.values(AutomationActionType)),
-        targets: yup.array().required().of(
+        targets: yup.array().when('type', {
+          is: (actionType) => actionType !== AutomationActionType.SendDialogueLink,
+          then: yup.array().required().of(
+            yup.object().required().shape({
+              label: yup.string().required(),
+              type: yup.string().required(),
+              value: yup.string().required(),
+            }),
+          ),
+        }).of(
           yup.object().shape({
             label: yup.string(),
             type: yup.string(),

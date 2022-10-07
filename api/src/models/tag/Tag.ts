@@ -1,4 +1,4 @@
-import { TagEnum } from '@prisma/client';
+import { TagEnum } from 'prisma/prisma-client';
 import { UserInputError } from 'apollo-server-express';
 import { enumType, extendType, inputObjectType, objectType } from 'nexus';
 import { isPresent } from 'ts-is-present';
