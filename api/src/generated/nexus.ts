@@ -269,10 +269,23 @@ export interface NexusGenInputs {
     subTopics?: Array<NexusGenInputs['CreateTopicInput'] | null> | null; // [CreateTopicInput]
     type: NexusGenEnums['TopicEnumType'] | null; // TopicEnumType
   }
+  CreateTourStepInput: { // input type
+    helperKey: string; // String!
+    imageUrlKey?: string | null; // String
+    titleKey: string; // String!
+    userTourId?: string | null; // String
+  }
   CreateTriggerInputType: { // input type
     customerSlug?: string | null; // String
     recipients?: NexusGenInputs['RecipientsInputType'] | null; // RecipientsInputType
     trigger?: NexusGenInputs['TriggerInputType'] | null; // TriggerInputType
+  }
+  CreateUserTourInput: { // input type
+    id?: string | null; // String
+    steps: Array<NexusGenInputs['CreateTourStepInput'] | null>; // [CreateTourStepInput]!
+    triggerPage?: string | null; // String
+    triggerVersion?: string | null; // String
+    type: NexusGenEnums['TourType']; // TourType!
   }
   CreateWorkspaceInput: { // input type
     isDemo?: boolean | null; // Boolean
@@ -2119,6 +2132,7 @@ export interface NexusGenFieldTypes {
     authenticateLambda: string | null; // String
     confirmCreateWorkspaceJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
     copyDialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
+    createAndDispatchUserTour: NexusGenRootTypes['UserTour'] | null; // UserTour
     createAutomation: NexusGenRootTypes['AutomationModel'] | null; // AutomationModel
     createAutomationToken: string | null; // String
     createBatchDeliveries: NexusGenRootTypes['CreateBatchDeliveriesOutputType'] | null; // CreateBatchDeliveriesOutputType
@@ -2527,6 +2541,7 @@ export interface NexusGenFieldTypes {
     phone: string | null; // String
     role: NexusGenRootTypes['RoleType'] | null; // RoleType
     roleId: string | null; // String
+    tours: Array<NexusGenRootTypes['TourOfUser'] | null> | null; // [TourOfUser]
     userCustomers: Array<NexusGenRootTypes['UserCustomer'] | null> | null; // [UserCustomer]
   }
   VerifyUserTokenOutput: { // field return type
@@ -3075,6 +3090,7 @@ export interface NexusGenFieldTypeNames {
     authenticateLambda: 'String'
     confirmCreateWorkspaceJob: 'CreateWorkspaceJobType'
     copyDialogue: 'Dialogue'
+    createAndDispatchUserTour: 'UserTour'
     createAutomation: 'AutomationModel'
     createAutomationToken: 'String'
     createBatchDeliveries: 'CreateBatchDeliveriesOutputType'
@@ -3483,6 +3499,7 @@ export interface NexusGenFieldTypeNames {
     phone: 'String'
     role: 'RoleType'
     roleId: 'String'
+    tours: 'TourOfUser'
     userCustomers: 'UserCustomer'
   }
   VerifyUserTokenOutput: { // field return type name
@@ -3650,6 +3667,9 @@ export interface NexusGenArgTypes {
     }
     copyDialogue: { // args
       input?: NexusGenInputs['CreateDialogueInputType'] | null; // CreateDialogueInputType
+    }
+    createAndDispatchUserTour: { // args
+      input: NexusGenInputs['CreateUserTourInput']; // CreateUserTourInput!
     }
     createAutomation: { // args
       input?: NexusGenInputs['CreateAutomationInput'] | null; // CreateAutomationInput

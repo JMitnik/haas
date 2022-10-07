@@ -15,6 +15,10 @@ class UserPrismaAdapter {
     this.roleService = new RoleService(prismaClient);
   }
 
+  public async findAll() {
+    return this.prisma.user.findMany();
+  }
+
   /**
    * Upserts a user by checking if the email already exists or not
    * @param input

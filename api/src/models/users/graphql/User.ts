@@ -117,6 +117,17 @@ export const UserType = objectType({
       },
     });
 
+    // t.list.field('tours', {
+    //   type: 'TourOfUser',
+
+    //   async resolve(parent, args, ctx) {
+    //     if (!parent.id) return null;
+
+    //     return ctx.services.userService.getUserCustomers(parent.id);
+    //   },
+    // });
+
+
     t.list.field('userCustomers', {
       type: UserCustomerType,
 

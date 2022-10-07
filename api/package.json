@@ -35,6 +35,7 @@
     "seed:basic": "ts-node src/scripts/seed.ts",
     "db:backfill-session": "ts-node src/scripts/mapSliderScoreToSession.ts",
     "db-seed": "ts-node src/scripts/seed-template.ts",
+    "dispatch-tour": "ts-node src/scripts/dispatch-tour.ts",
     "artillery:seed": "ts-node src/scripts/artillery-seed.ts",
     "artillery:generateUsersPayload": "ts-node src/scripts/generateArtilleryUsersPayload.ts",
     "types": "tsc --noEmit -p ./tsconfig.json",

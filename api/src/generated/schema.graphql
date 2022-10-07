@@ -541,10 +541,25 @@ input CreateTopicInput {
   type: TopicEnumType = SYSTEM
 }
 
+input CreateTourStepInput {
+  helperKey: String!
+  imageUrlKey: String
+  titleKey: String!
+  userTourId: String
+}
+
 input CreateTriggerInputType {
   customerSlug: String
   recipients: RecipientsInputType
   trigger: TriggerInputType
+}
+
+input CreateUserTourInput {
+  id: String
+  steps: [CreateTourStepInput]!
+  triggerPage: String
+  triggerVersion: String
+  type: TourType!
 }
 
 """Creates a workspace"""
@@ -1352,6 +1367,7 @@ type Mutation {
   authenticateLambda(input: AuthenticateLambdaInput): String
   confirmCreateWorkspaceJob(input: GenerateAutodeckInput): CreateWorkspaceJobType
   copyDialogue(input: CreateDialogueInputType): Dialogue
+  createAndDispatchUserTour(input: CreateUserTourInput!): UserTour
 
   """Creates a new automation."""
   createAutomation(input: CreateAutomationInput): AutomationModel
@@ -2392,6 +2408,7 @@ type UserType {
   phone: String
   role: RoleType
   roleId: String
+  tours: [TourOfUser]
   userCustomers: [UserCustomer]
 }
 

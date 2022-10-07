@@ -14,47 +14,15 @@ enum TourType {
   GUIDE
 }
 
-enum Route {
-  GENERATE_WORKSPACE_VIEW
-  WORKSPACE_ROOT
-  DIALOGUES_VIEW
-  DIALOGUE_ROOT
-  DIALOGUE_FEEDBACK_OVERVIEW
-  DIALOGUE_CTA_OVERVIEW
-  DIALOGUE_CONFIG_VIEW
-  INTERACTIONS_VIEW
-  DASHBOARD_VIEW
-  INTERACTION_VIEW
-  WORKSPACE_INTERACTIONS_VIEW
-  WORKSPACE_INTERACTION_VIEW
-  CAMPAIGNS_VIEW
-  CAMPAIGN_VIEW
-  DELIVERY_VIEW
-  AUTODECK_OVERVIEW
-  ADMIN_OVERVIEW
-  USER_VIEW
-  ROLE_USER_VIEW
-  WORKSPACE_REPORT_VIEW
-  DIALOGUE_REPORT_VIEW
-  USERS_OVERVIEW
-  ALERTS_OVERVIEW
-  DIALOGUE_BUILDER_OVERVIEW
-  NEW_QUESTION_CTA_VIEW
-  NEW_OPTION_CTA_VIEW
-  AUTOMATION_OVERVIEW
-  NEW_AUTOMATION_VIEW
-  EDIT_AUTOMATION_VIEW
-}
-
 model TourStep {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  translationTitle  String
-  translationHelper String
+  titleKey  String
+  helperKey String
 
-  imageUrl String?
+  imageUrlKey String?
 
   userTour   UserTour @relation(fields: [userTourId], references: [id])
   userTourId String
@@ -79,8 +47,9 @@ model UserTour {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  type  TourType
-  route Route?
+  type           TourType
+  triggerPage    String?
+  triggerVersion String?
 
   steps       TourStep[]
   usersOfTour TourOfUser[]
