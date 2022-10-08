@@ -1919,7 +1919,7 @@ export type MutationDeleteAutomationArgs = {
 
 
 export type MutationSendAutomationDialogueLinkArgs = {
-  input?: Maybe<SendAutomationDialogueLinkInput>;
+  input: SendAutomationDialogueLinkInput;
 };
 
 
@@ -2436,7 +2436,7 @@ export type QueryTagsArgs = {
 
 
 export type QueryIssueArgs = {
-  input?: Maybe<GetIssueResolverInput>;
+  input: GetIssueResolverInput;
   actionableFilter?: Maybe<ActionRequestFilterInput>;
 };
 
@@ -2937,6 +2937,7 @@ export enum StatusType {
 }
 
 export enum SystemPermission {
+  CanAccessAllDialogues = 'CAN_ACCESS_ALL_DIALOGUES',
   CanViewActionRequests = 'CAN_VIEW_ACTION_REQUESTS',
   CanAccessAllActionRequests = 'CAN_ACCESS_ALL_ACTION_REQUESTS',
   CanResetWorkspaceData = 'CAN_RESET_WORKSPACE_DATA',
@@ -3841,7 +3842,7 @@ export type AssignUserToActionRequestMutation = (
 );
 
 export type GetIssueQueryVariables = Exact<{
-  input?: Maybe<GetIssueResolverInput>;
+  input: GetIssueResolverInput;
   actionableFilter?: Maybe<ActionRequestConnectionFilterInput>;
 }>;
 
@@ -5750,7 +5751,7 @@ export type AssignUserToActionRequestMutationHookResult = ReturnType<typeof useA
 export type AssignUserToActionRequestMutationResult = Apollo.MutationResult<AssignUserToActionRequestMutation>;
 export type AssignUserToActionRequestMutationOptions = Apollo.BaseMutationOptions<AssignUserToActionRequestMutation, AssignUserToActionRequestMutationVariables>;
 export const GetIssueDocument = gql`
-    query GetIssue($input: GetIssueResolverInput, $actionableFilter: ActionRequestConnectionFilterInput) {
+    query GetIssue($input: GetIssueResolverInput!, $actionableFilter: ActionRequestConnectionFilterInput) {
   issue(input: $input) {
     id
     topicId
@@ -5809,7 +5810,7 @@ export const GetIssueDocument = gql`
  *   },
  * });
  */
-export function useGetIssueQuery(baseOptions?: Apollo.QueryHookOptions<GetIssueQuery, GetIssueQueryVariables>) {
+export function useGetIssueQuery(baseOptions: Apollo.QueryHookOptions<GetIssueQuery, GetIssueQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetIssueQuery, GetIssueQueryVariables>(GetIssueDocument, options);
       }

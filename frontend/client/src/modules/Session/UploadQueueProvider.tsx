@@ -27,6 +27,8 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
 
   const [uploadQueue, setUploadQueue] = useState([] as SessionEvent[]);
 
+  console.log('uploadQUeue: ', uploadQueue);
+
   const [createSession, {
     data: interactionData,
     loading: isCreatingSession,

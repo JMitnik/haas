@@ -81,7 +81,7 @@ export const Dialogue = () => {
     if (hasCreatedSession && (isAtPreUploadStage || postLeafToCallToAction)) return true;
 
     return false;
-  // eslint-disable-next-line
+    // eslint-disable-next-line
   }, [session?.id, activeEvent, globalStateType]);
 
   /**
@@ -93,6 +93,7 @@ export const Dialogue = () => {
    * 3. Upload the events to our server (batched or not) if we arrive at the CALL-to-ACTION or POST-LEAF.
    */
   const handleAction = useCallback((input: SessionEvent) => {
+    console.log(applyEvent, popEventQueue, transition, queueEvents, isUploadDisabled);
     const newEvent = applyEvent(input, isUploadDisabled);
     transition(newEvent?.state?.nodeId);
 

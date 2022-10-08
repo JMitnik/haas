@@ -122,8 +122,6 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
 
   const { isValid } = formState;
 
-  console.log('node.form.preForm', node.form?.preForm);
-
   const step = node.form?.steps?.[activeStep] || undefined;
   const fields = node.form?.steps?.[activeStep].fields || [];
 
