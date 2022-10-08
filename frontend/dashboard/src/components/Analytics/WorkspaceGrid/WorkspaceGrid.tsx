@@ -347,6 +347,8 @@ export const WorkspaceGrid = ({
     },
   });
 
+  console.log('Hello');
+
   return (
     <LS.WorkspaceGridContainer backgroundColor={backgroundColor}>
       {isLoading && (

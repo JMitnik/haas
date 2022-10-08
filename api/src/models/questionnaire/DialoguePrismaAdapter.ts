@@ -814,10 +814,33 @@ class DialoguePrismaAdapter {
     });
   };
 
-  async findDialoguesByCustomerId(customerId: string, userId: string, searchTerm?: string) {
-    const whereInput: Prisma.DialogueWhereInput = {
-      customerId,
+  async findDialoguesByCustomerId(
+    customerId: string,
+    userId: string,
+    searchTerm?: string,
+    canAccessAllDialogues: boolean = false
+  ) {
+
+    const searchQueries: Prisma.DialogueWhereInput = {
       OR: [
+        { title: { contains: searchTerm, mode: 'insensitive' } },
+        { description: { contains: searchTerm, mode: 'insensitive' } },
+        {
+          tags: {
+            some: {
+              name: {
+                contains: searchTerm,
+                mode: 'insensitive',
+              },
+            },
+          },
+        },
+      ],
+    }
+
+    const whereInput: Prisma.DialogueWhereInput = {
+      customerId: customerId,
+      OR: !canAccessAllDialogues ? [
         {
           isPrivate: true,
           assignees: {
@@ -825,39 +848,58 @@ class DialoguePrismaAdapter {
               id: userId,
             },
           },
+          AND: searchTerm ? searchQueries : undefined,
         },
         {
           isPrivate: false,
+          AND: searchTerm ? searchQueries : undefined,
         },
-      ],
+      ] : searchTerm ? searchQueries.OR : undefined,
     }
 
-    if (searchTerm) {
-      whereInput.OR = [
-        {
-          tags: {
-            some: {
-              name: {
-                mode: 'insensitive',
-                contains: searchTerm,
-              },
-            },
-          },
-        },
-        {
-          title: {
-            mode: 'insensitive',
-            contains: searchTerm,
-          },
-        },
-        {
-          publicTitle: {
-            mode: 'insensitive',
-            contains: searchTerm,
-          },
-        },
-      ];
-    };
+    // const whereInput: Prisma.DialogueWhereInput = {
+    //   customerId,
+    //   OR: [
+    //     {
+    //       isPrivate: true,
+    //       assignees: {
+    //         some: {
+    //           id: userId,
+    //         },
+    //       },
+    //     },
+    //     {
+    //       isPrivate: false,
+    //     },
+    //   ],
+    // }
+
+    // if (searchTerm) {
+    //   whereInput.OR = [
+    //     {
+    //       tags: {
+    //         some: {
+    //           name: {
+    //             mode: 'insensitive',
+    //             contains: searchTerm,
+    //           },
+    //         },
+    //       },
+    //     },
+    //     {
+    //       title: {
+    //         mode: 'insensitive',
+    //         contains: searchTerm,
+    //       },
+    //     },
+    //     {
+    //       publicTitle: {
+    //         mode: 'insensitive',
+    //         contains: searchTerm,
+    //       },
+    //     },
+    //   ];
+    // };
 
     return this.prisma.dialogue.findMany({
       where: whereInput,

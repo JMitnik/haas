@@ -391,7 +391,6 @@ class GenerateWorkspaceService {
         );
       }
 
-      if (makeDialoguesPrivate) await this.userService.assignUserToAllPrivateDialogues(userId as string, workspace.id);
       if (managerCsv) await this.addManagersToWorkspace(managerCsv, workspace);
 
       try {

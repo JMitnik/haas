@@ -297,12 +297,19 @@ class DialogueStatisticsService {
    */
   findWorkspaceStatisticsSummary = async (
     customerId: string,
+    canAccessAllDialogues: boolean,
     userId: string,
     impactScoreType: DialogueImpactScore,
     startDateTime: Date,
     endDateTime?: Date,
   ) => {
-    const dialogues = await this.dialogueService.findDialoguesByCustomerId(customerId, userId);
+    const dialogues = await this.dialogueService.findDialoguesByCustomerId(
+      customerId,
+      userId,
+      undefined,
+      canAccessAllDialogues
+    );
+    console.log('Dialogues', dialogues);
     const dialogueIds = dialogues.map((dialogue) => dialogue.id);
     const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
 
@@ -324,7 +331,7 @@ class DialogueStatisticsService {
 
     const summaries = Object.entries(sessionContext).map((context) => {
       const dialogueId = context[0];
-      const sessions = context[1];
+      const sessions = context[1] || [];
       const impactScore = this.calculateImpactScoreBySessions(
         impactScoreType,
         sessions
@@ -335,7 +342,7 @@ class DialogueStatisticsService {
         dialogueId,
         updatedAt: toUTC(new Date(Date.now())),
         impactScore: impactScore || 0,
-        nrVotes: sessions.length || 0,
+        nrVotes: sessions?.length || 0,
         dialogue: dialogues.find((dialogue) => dialogue.id === dialogueId) || null,
       }
 

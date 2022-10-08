@@ -15,6 +15,7 @@ import { WorkspaceStatisticsValidator } from '../WorkspaceStatisticsValidator';
 import { DialogueStatisticsSummaryModel } from '../../../models/questionnaire';
 import { assertNonNullish } from '../../../utils/assertNonNullish';
 import { DateHistogram } from '../../Common/Analytics/graphql/DateHistogram.graphql';
+import { DialogueValidator } from '../../../models/questionnaire/DialogueValidator';
 
 export const WorkspaceStatistics = objectType({
   name: 'WorkspaceStatistics',
@@ -45,10 +46,15 @@ export const WorkspaceStatistics = objectType({
 
         assertNonNullish(utcStartDateTime, 'Provided date range is invalid');
         assertNonNullish(ctx.session?.user?.id, 'No user ID provided');
+        assertNonNullish(parent.id, 'No workspace ID available');
+
+        const canAccessAllDialogues = DialogueValidator.canAccessAllDialogues(parent.id, ctx.session);
+        const userId = ctx.session.user.id;
 
         return ctx.services.dialogueStatisticsService.findWorkspaceStatisticsSummary(
-          parent.id || '',
-          ctx.session.user.id,
+          parent.id,
+          canAccessAllDialogues,
+          userId,
           DialogueImpactScore.AVERAGE,
           utcStartDateTime,
           utcEndDateTime,

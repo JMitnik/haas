@@ -3,6 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { DateFormat, useDate } from 'hooks/useDate';
 import { useCustomer } from 'providers/CustomerProvider';
 import {
+  useGetSessionPathsLazyQuery,
   useGetSessionPathsQuery,
   useGetWorkspaceDialogueStatisticsQuery,
 } from 'types/generated-types';
@@ -54,7 +55,7 @@ export const WorkspaceGridAdapter = ({
     },
   });
 
-  const { refetch: fetchGetSessions } = useGetSessionPathsQuery({ skip: true });
+  const [fetchGetSessions] = useGetSessionPathsLazyQuery();
 
   /**
    * Fetches the various loading data requirements for the underlying WorkspaceGrid.
@@ -62,6 +63,7 @@ export const WorkspaceGridAdapter = ({
    * Returns a Tuple consisting of Nodes and a View Mode
    */
   const handleLoadData = async (options: DataLoadOptions): Promise<[HexagonNode[], HexagonViewMode]> => {
+    console.log('Options: ', options);
     // Checkpoint one: If we clicked a group, return its subgroups (Groups or Dialogues)
     if (options.clickedGroup) {
       const subGroupType = options.clickedGroup.subGroups[0].type;
@@ -70,17 +72,19 @@ export const WorkspaceGridAdapter = ({
 
     // Checkpoint three: Fetch all sessions for the current selected topics
     const { data: sessionData } = await fetchGetSessions({
-      input: {
-        startDateTime: format(selectedStartDate, DateFormat.DayFormat),
-        endDateTime: format(selectedEndDate, DateFormat.DayFormat),
-        path: options.topics || [],
-        refresh: true,
-        issueOnly: options.issueOnly,
+      variables: {
+        input: {
+          startDateTime: format(selectedStartDate, DateFormat.DayFormat),
+          endDateTime: format(selectedEndDate, DateFormat.DayFormat),
+          path: options.topics || [],
+          refresh: true,
+          issueOnly: options.issueOnly,
+        },
+        dialogueId: options.dialogueId as string,
       },
-      dialogueId: options.dialogueId,
     });
 
-    const fetchNodes: HexagonNode[] = sessionData.dialogue?.pathedSessionsConnection?.pathedSessions?.map(
+    const fetchNodes: HexagonNode[] = sessionData?.dialogue?.pathedSessionsConnection?.pathedSessions?.map(
       (session) => ({
         id: session.id,
         label: session.id,
@@ -98,6 +102,8 @@ export const WorkspaceGridAdapter = ({
 
   const initialData = useMemo(() => groupsFromDialogues(dialogues), [dialogues]);
   const initialViewMode = HexagonViewMode.Workspace;
+
+  console.log('dialogues.length: ', dialogues.length);
 
   // TODO: Add spinner
   if (!dialogues.length) return null;
