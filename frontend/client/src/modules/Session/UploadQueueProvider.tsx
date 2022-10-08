@@ -32,7 +32,7 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
     loading: isCreatingSession,
     reset: resetSessionCache,
   }] = useCreateSessionMutation();
-  const [appendToInteraction] = useAppendToInteractionMutation();
+  const [appendToInteraction, { loading: isAppendingToInteraction }] = useAppendToInteractionMutation();
   const ref = qs.parse(location.search, { ignoreQueryPrefix: true })?.ref?.toString() || '';
 
   /**
@@ -112,7 +112,7 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
    * Effect responsible for cleaning up the UploadQueue whenever a new event is appended to it.
    */
   useInterval(() => {
-    if (uploadQueue.length > 0) {
+    if (uploadQueue.length > 0 && !isAppendingToInteraction) {
       console.log('in useInterval and uploadQUeue more than one entry: ', uploadQueue);
       const event = uploadQueue[0];
 
@@ -120,7 +120,7 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
         setUploadQueue((prev) => prev.slice(1));
       });
     }
-  }, uploadQueue.length > 0 ? 1000 : null);
+  }, uploadQueue.length > 0 ? 300 : null);
 
   const session = interactionData?.createSession || undefined;
 
