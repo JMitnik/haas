@@ -27,8 +27,6 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
 
   const [uploadQueue, setUploadQueue] = useState([] as SessionEvent[]);
 
-  console.log('uploadQUeue: ', uploadQueue);
-
   const [createSession, {
     data: interactionData,
     loading: isCreatingSession,
@@ -115,13 +113,14 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
    */
   useInterval(() => {
     if (uploadQueue.length > 0) {
+      console.log('in useInterval and uploadQUeue more than one entry: ', uploadQueue);
       const event = uploadQueue[0];
 
       handleAppendEventToSession(event).then(() => {
         setUploadQueue((prev) => prev.slice(1));
       });
     }
-  }, uploadQueue.length > 0 ? 300 : null);
+  }, uploadQueue.length > 0 ? 1000 : null);
 
   const session = interactionData?.createSession || undefined;
 
