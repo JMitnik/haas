@@ -199,7 +199,6 @@ export const AppendToInteractionMutation = mutationField('appendToInteraction', 
     if (!args?.input) throw new UserInputError('No valid new interaction data provided');
     if (!args?.input.sessionId) throw new UserInputError('No valid existing interaction found');
 
-    console.log('in append to interaction mutation:');
     const updatedInteraction = await ctx.services.nodeEntryService.handleNodeEntryAppend(
       args.input.sessionId,
       args.input

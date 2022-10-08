@@ -94,7 +94,7 @@ class NodeEntryService {
     const loginBody = makeEmergencyTemplate({
       recipientMail: email,
       dialogueTitle: dialogue.title,
-      dashboardUrl: `${config.dashboardUrl}/dashboard/b/${dialogue.customer.slug}/dashboard`,
+      dashboardUrl: `${config.dashboardUrl}/dashboard/b/${dialogue.customer.slug}/dashboard/action_requests`,
       comment: comment,
     });
 
@@ -128,6 +128,14 @@ class NodeEntryService {
           },
         } : undefined,
         requestEmail: emergencyEmail,
+      }
+
+      if (emergencyContact) {
+        await this.sendEmergencyMail(
+          actionable.dialogueId,
+          emergencyContact,
+
+        )
       }
 
       if (emergencyEmail) {

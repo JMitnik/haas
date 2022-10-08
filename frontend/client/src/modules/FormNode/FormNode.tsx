@@ -134,8 +134,6 @@ const FormNode = ({ node, onRunAction }: FormNodeProps) => {
       [fields?.[index]?.type || '']: !ignoreFields ? getFieldValue(fieldEntry, fields?.[index]) : undefined,
     })));
 
-    console.log('formFieldValues: ', formFieldValues);
-
     // TODO: Think of some logic
     const childEdge = undefined;
     const childNode = undefined;

@@ -113,7 +113,6 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
    */
   useInterval(() => {
     if (uploadQueue.length > 0 && !isAppendingToInteraction) {
-      console.log('in useInterval and uploadQUeue more than one entry: ', uploadQueue);
       const event = uploadQueue[0];
 
       handleAppendEventToSession(event).then(() => {
