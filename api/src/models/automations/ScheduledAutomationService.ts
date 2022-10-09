@@ -16,11 +16,9 @@ import { AutomationActionService } from './AutomationActionService';
 import CustomerService from '../../models/customer/CustomerService';
 import {
   buildFrequencyCronString,
-  findLambdaArnByAction,
   findLambdaParamsByActionType,
   findReportQueryParamsByCron,
 } from './AutomationService.helpers';
-import { GraphQLYogaError } from '@graphql-yoga/node';
 import { ScheduledAutomationPrismaAdapter } from './ScheduledAutomationPrismaAdapter';
 
 class ScheduledAutomationService {
@@ -99,8 +97,7 @@ class ScheduledAutomationService {
     const generalDLQ = this.awsServiceMap.getSQSResource(this.awsServiceMap.Report_Eventbridge_DLQName);
 
     return Promise.all(actions.map(async (action, index) => {
-      const lambdaTargetArn = findLambdaArnByAction(action.type);
-      if (!lambdaTargetArn) throw new GraphQLYogaError('No lambda target arn found in env file');
+      const actionARN = this.getActionARN(action.type);
 
       const queryParams = await this.findReportQueryParamsByActionType(action);
       const reportUrl = dialogueSlug
@@ -136,13 +133,31 @@ class ScheduledAutomationService {
 
       return {
         Id: `${automationScheduledId}-${index}-action`,
-        Arn: lambdaTargetArn,
+        Arn: actionARN,
         Input: JSON.stringify(lambdaInput),
         DeadLetterConfig: {
           Arn: generalDLQ,
         },
       }
     }))
+  }
+
+  /**
+   * Gets the appropriate ARN based on the action type.
+   */
+  private getActionARN(type: AutomationActionType) {
+    switch (type) {
+      case AutomationActionType.SEND_DIALOGUE_LINK:
+        return this.awsServiceMap.getSNSResource(this.awsServiceMap.DialogueSender_SNS_PubTopic);
+      case AutomationActionType.WEEK_REPORT:
+        return this.awsServiceMap.getSNSResource(this.awsServiceMap.Report_SNS_PubTopic);
+      case AutomationActionType.MONTH_REPORT:
+        return this.awsServiceMap.getSNSResource(this.awsServiceMap.Report_SNS_PubTopic);
+      case AutomationActionType.YEAR_REPORT:
+        return this.awsServiceMap.getSNSResource(this.awsServiceMap.DialogueSender_SNS_PubTopic);
+      default:
+        return this.awsServiceMap.getSNSResource(this.awsServiceMap.DialogueSender_SNS_PubTopic);
+    }
   }
 }
 
