@@ -142,17 +142,27 @@ class GenerateWorkspaceService {
     for (let i = 0; i < records.length; i++) {
       const record = records[i];
       const userEmailEntry = Object.entries(record).find((entry) => entry[0] === 'email');
+      const userRoleEntry = Object.entries(record).find((entry) => entry[0] === 'role');
       const userPhoneEntry = Object.entries(record).find((entry) => entry[0] === 'phone_number?');
       const userLastNameEntry = Object.entries(record).find((entry) => entry[0] === 'last_name?');
       const userFirstNameEntry = Object.entries(record).find((entry) => entry[0] === 'first_name?');
-
+      const sendInviteEntry = Object.entries(record).find((entry) => entry[0] === 'send_invite?');
       const hasEmailAssignee = !!userEmailEntry?.[1];
+      const hasSendInviteInfo = !!userEmailEntry?.[1]
       const emailAssignee = userEmailEntry?.[1] as string;
       const phoneAssignee = userPhoneEntry?.[1] as string | undefined;
       const firstNameAssignee = userFirstNameEntry?.[1] as string | undefined;
       const lastNameAssignee = userLastNameEntry?.[1] as string | undefined;
+      const roleAssignee = userRoleEntry?.[1] as RoleTypeEnum | undefined;
+      const sendInviteToAssignee = hasSendInviteInfo ?
+        (sendInviteEntry?.[1] as string)?.toUpperCase() === 'NO' ? false : true
+        : true as boolean;
 
-      if (!hasEmailAssignee || !emailAssignee || !managerRole) continue;
+      const dbRole = roleAssignee && Object.keys(workspace.roles.map((role) => role.type).includes(roleAssignee))
+        ? workspace.roles.find((role) => role.type === roleAssignee) as Role
+        : managerRole;
+
+      if (!hasEmailAssignee || !emailAssignee || !dbRole) continue;
 
       const user = await this.userService.upsertUserByEmail({
         email: emailAssignee,
@@ -164,12 +174,13 @@ class GenerateWorkspaceService {
       const invitedUser = await this.userOfCustomerPrismaAdapter.upsertUserOfCustomer(
         workspace.id,
         user.id,
-        managerRole.id,
+        dbRole.id,
       );
 
       await this.userService.connectPrivateDialoguesToUser(user.id, workspace.id);
-
-      void this.userService.sendInvitationMail(invitedUser, true);
+      if (sendInviteToAssignee) {
+        void this.userService.sendInvitationMail(invitedUser, true);
+      }
     }
   }
 
