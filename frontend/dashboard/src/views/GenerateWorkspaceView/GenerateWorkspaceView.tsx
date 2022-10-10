@@ -67,7 +67,7 @@ export const GenerateWorkspaceView = () => {
   const form = useForm<FormProps>({
     mode: 'all',
     defaultValues: {
-      dialogueType: DialogueTemplateType.Default,
+      dialogueType: DialogueTemplateType.BusinessEng,
     },
   });
   const logger = useLogger();

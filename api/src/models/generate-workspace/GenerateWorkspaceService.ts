@@ -17,6 +17,7 @@ import UserService from '../../models/users/UserService';
 import { GenerateWorkspaceCSVInput, Workspace } from './GenerateWorkspace.types';
 import CustomerService from '../../models/customer/CustomerService';
 import { GraphQLYogaError } from '@graphql-yoga/node';
+import { logger } from '../../config/logger';
 
 class GenerateWorkspaceService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -369,7 +370,7 @@ class GenerateWorkspaceService {
     }, template);
 
     // create bot role
-    await this.customerService.createBotUser(workspace.id, workspace.slug, workspace.roles);
+    const botUser = await this.customerService.createBotUser(workspace.id, workspace.slug, workspace.roles);
 
     try {
       const adminRole = workspace.roles.find((role) => role.type === RoleTypeEnum.ADMIN) as Role;
@@ -412,6 +413,7 @@ class GenerateWorkspaceService {
 
       return workspace;
     } catch (error) {
+      await this.userOfCustomerPrismaAdapter.delete(botUser.userId, workspace.id).catch((err) => logger.error('Failed removing bot using', err));
       await this.customerService.deleteWorkspace(workspace.id);
       throw new GraphQLYogaError('Something went wrong generating generating workspace. All changes have been reverted');
     }
