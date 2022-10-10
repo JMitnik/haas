@@ -1,11 +1,20 @@
 import { PrismaClient, Prisma } from 'prisma/prisma-client';
-import { CreateDialogueScheduleInput } from './DialogueSchedule.types';
+import { CreateDialogueScheduleInput, defaultDialogueSchedule } from './DialogueSchedule.types';
 
 export class DialogueSchedulePrismaAdapter {
   private prisma: PrismaClient;
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
+  }
+
+  public async findByWorkspaceID(
+    workspaceID: string
+  ) {
+    return this.prisma.dialogueSchedule.findUnique({
+      where: { workspaceID },
+      include: { ...defaultDialogueSchedule.include },
+    })
   }
 
   public async create(
@@ -20,9 +29,9 @@ export class DialogueSchedulePrismaAdapter {
           },
         },
         workspace: {
-          connect: { id: input.workspaceId }
-        }
-      }
+          connect: { id: input.workspaceId },
+        },
+      },
     };
 
     // Optionally, add an evaluation period
@@ -31,7 +40,7 @@ export class DialogueSchedulePrismaAdapter {
         create: {
           startDateExpression: input.evaluationPeriod.startDateExpression,
           endDateExpression: input.evaluationPeriod.endDateExpression || '',
-        }
+        },
       }
     }
 

@@ -701,6 +701,7 @@ type Customer {
   campaigns: [CampaignType]
   dialogue(where: DialogueWhereUniqueInput): Dialogue
   dialogueConnection(filter: DialogueConnectionFilterInput): DialogueConnection
+  dialogueSchedule: DialogueSchedule
   dialogues(filter: DialogueFilterInputType): [Dialogue]
   id: ID
   isDemo: Boolean
@@ -738,6 +739,17 @@ type CustomerSettings {
 
 input CustomerWhereUniqueInput {
   id: ID!
+}
+
+"""
+
+    A data period schedule defines the general
+  
+"""
+type DataPeriodSchedule {
+  endInDeltaMinutes: Int
+  id: ID
+  startDateExpression: String
 }
 
 """Date custom scalar type"""
@@ -895,6 +907,13 @@ type Dialogue {
   edges: [Edge]
   healthScore(input: HealthScoreInput): HealthScore
   id: String!
+
+  """
+  
+          A dialogue can be online or offline, depending on the configurations (schedule) or manual work.
+        
+  """
+  isOnline: Boolean
   isPrivate: Boolean
   isWithoutGenData: Boolean
   issues(filter: IssueFilterInput): Issue
@@ -986,6 +1005,8 @@ enum DialogueImpactScoreType {
   
 """
 type DialogueSchedule {
+  dataPeriodSchedule: DataPeriodSchedule
+  evaluationPeriodSchedule: EvaluationPeriodSchedule
   id: ID
 }
 
@@ -1089,6 +1110,19 @@ input EnableAutomationInput {
   automationId: String!
   state: Boolean!
   workspaceId: String!
+}
+
+"""
+
+    The Evaluation Period Schedule is used to define an opening and closing range for our dialogues.
+
+    Currently workspace-wide.
+  
+"""
+type EvaluationPeriodSchedule {
+  endInDeltaMinutes: Int
+  id: ID
+  startDateExpression: String
 }
 
 type FailedDeliveryModel {

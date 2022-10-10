@@ -267,9 +267,9 @@ model DialogueSchedule {
 model DataPeriodSchedule {
   id String @id @default(cuid())
 
-  // The start and end date expressions are summarized CRON expressions.
+  // The start and end date expressions are summarized as a CRON expression, and an end range in minutes.
   startDateExpression String
-  endDateExpression String
+  endInDeltaMinutes Int
 
   dialogueScheduleId  String @unique
   dialogueSchedule DialogueSchedule @relation(fields: [dialogueScheduleId], references: [id])
@@ -278,9 +278,9 @@ model DataPeriodSchedule {
 model EvaluationPeriodSchedule {
   id String @id @default(cuid())
 
-  // The start and end date expressions are summarized CRON expressions.
+  // The start and end date expressions are summarized as a CRON expression, and an end range in minutes.
   startDateExpression String
-  endDateExpression String
+  endInDeltaMinutes Int
 
   dialogueScheduleId  String @unique
   dialogueSchedule DialogueSchedule @relation(fields: [dialogueScheduleId], references: [id])

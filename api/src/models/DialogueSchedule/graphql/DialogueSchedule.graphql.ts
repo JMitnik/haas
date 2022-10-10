@@ -1,5 +1,8 @@
 import { objectType } from 'nexus';
 
+import { EvaluationPeriodSchedule } from './EvaluationPeriodSchedule.graphql';
+import { DataPeriodSchedule } from './DataPeriodSchedule.graphql';
+
 export const DialogueSchedule = objectType({
   name: 'DialogueSchedule',
   description: `
@@ -9,5 +12,8 @@ export const DialogueSchedule = objectType({
 
   definition(t) {
     t.id('id');
-  }
+
+    t.field('evaluationPeriodSchedule', { type: EvaluationPeriodSchedule });
+    t.field('dataPeriodSchedule', { type: DataPeriodSchedule });
+  },
 })

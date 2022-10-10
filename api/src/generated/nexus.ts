@@ -1159,6 +1159,11 @@ export interface NexusGenObjects {
     id?: number | null; // Int
     logoUrl?: string | null; // String
   }
+  DataPeriodSchedule: { // root type
+    endInDeltaMinutes?: number | null; // Int
+    id?: string | null; // ID
+    startDateExpression?: string | null; // String
+  }
   DateHistogram: { // root type
     id?: string | null; // ID
     items: NexusGenRootTypes['DateHistogramItem'][]; // [DateHistogramItem!]!
@@ -1236,6 +1241,8 @@ export interface NexusGenObjects {
     subtext?: string | null; // String
   }
   DialogueSchedule: { // root type
+    dataPeriodSchedule?: NexusGenRootTypes['DataPeriodSchedule'] | null; // DataPeriodSchedule
+    evaluationPeriodSchedule?: NexusGenRootTypes['EvaluationPeriodSchedule'] | null; // EvaluationPeriodSchedule
     id?: string | null; // ID
   }
   DialogueStatistics: { // root type
@@ -1269,6 +1276,11 @@ export interface NexusGenObjects {
     matchValue?: string | null; // String
     renderMax?: number | null; // Int
     renderMin?: number | null; // Int
+  }
+  EvaluationPeriodSchedule: { // root type
+    endInDeltaMinutes?: number | null; // Int
+    id?: string | null; // ID
+    startDateExpression?: string | null; // String
   }
   FailedDeliveryModel: { // root type
     error?: string | null; // String
@@ -1929,6 +1941,7 @@ export interface NexusGenFieldTypes {
     campaigns: Array<NexusGenRootTypes['CampaignType'] | null> | null; // [CampaignType]
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogueConnection: NexusGenRootTypes['DialogueConnection'] | null; // DialogueConnection
+    dialogueSchedule: NexusGenRootTypes['DialogueSchedule'] | null; // DialogueSchedule
     dialogues: Array<NexusGenRootTypes['Dialogue'] | null> | null; // [Dialogue]
     id: string | null; // ID
     isDemo: boolean | null; // Boolean
@@ -1959,6 +1972,11 @@ export interface NexusGenFieldTypes {
     id: number | null; // Int
     logoOpacity: number | null; // Int
     logoUrl: string | null; // String
+  }
+  DataPeriodSchedule: { // field return type
+    endInDeltaMinutes: number | null; // Int
+    id: string | null; // ID
+    startDateExpression: string | null; // String
   }
   DateHistogram: { // field return type
     id: string | null; // ID
@@ -2017,6 +2035,7 @@ export interface NexusGenFieldTypes {
     edges: Array<NexusGenRootTypes['Edge'] | null> | null; // [Edge]
     healthScore: NexusGenRootTypes['HealthScore'] | null; // HealthScore
     id: string; // String!
+    isOnline: boolean | null; // Boolean
     isPrivate: boolean | null; // Boolean
     isWithoutGenData: boolean | null; // Boolean
     issues: NexusGenRootTypes['Issue'] | null; // Issue
@@ -2060,6 +2079,8 @@ export interface NexusGenFieldTypes {
     subtext: string | null; // String
   }
   DialogueSchedule: { // field return type
+    dataPeriodSchedule: NexusGenRootTypes['DataPeriodSchedule'] | null; // DataPeriodSchedule
+    evaluationPeriodSchedule: NexusGenRootTypes['EvaluationPeriodSchedule'] | null; // EvaluationPeriodSchedule
     id: string | null; // ID
   }
   DialogueStatistics: { // field return type
@@ -2097,6 +2118,11 @@ export interface NexusGenFieldTypes {
     matchValue: string | null; // String
     renderMax: number | null; // Int
     renderMin: number | null; // Int
+  }
+  EvaluationPeriodSchedule: { // field return type
+    endInDeltaMinutes: number | null; // Int
+    id: string | null; // ID
+    startDateExpression: string | null; // String
   }
   FailedDeliveryModel: { // field return type
     error: string | null; // String
@@ -2916,6 +2942,7 @@ export interface NexusGenFieldTypeNames {
     campaigns: 'CampaignType'
     dialogue: 'Dialogue'
     dialogueConnection: 'DialogueConnection'
+    dialogueSchedule: 'DialogueSchedule'
     dialogues: 'Dialogue'
     id: 'ID'
     isDemo: 'Boolean'
@@ -2946,6 +2973,11 @@ export interface NexusGenFieldTypeNames {
     id: 'Int'
     logoOpacity: 'Int'
     logoUrl: 'String'
+  }
+  DataPeriodSchedule: { // field return type name
+    endInDeltaMinutes: 'Int'
+    id: 'ID'
+    startDateExpression: 'String'
   }
   DateHistogram: { // field return type name
     id: 'ID'
@@ -3004,6 +3036,7 @@ export interface NexusGenFieldTypeNames {
     edges: 'Edge'
     healthScore: 'HealthScore'
     id: 'String'
+    isOnline: 'Boolean'
     isPrivate: 'Boolean'
     isWithoutGenData: 'Boolean'
     issues: 'Issue'
@@ -3047,6 +3080,8 @@ export interface NexusGenFieldTypeNames {
     subtext: 'String'
   }
   DialogueSchedule: { // field return type name
+    dataPeriodSchedule: 'DataPeriodSchedule'
+    evaluationPeriodSchedule: 'EvaluationPeriodSchedule'
     id: 'ID'
   }
   DialogueStatistics: { // field return type name
@@ -3084,6 +3119,11 @@ export interface NexusGenFieldTypeNames {
     matchValue: 'String'
     renderMax: 'Int'
     renderMin: 'Int'
+  }
+  EvaluationPeriodSchedule: { // field return type name
+    endInDeltaMinutes: 'Int'
+    id: 'ID'
+    startDateExpression: 'String'
   }
   FailedDeliveryModel: { // field return type name
     error: 'String'

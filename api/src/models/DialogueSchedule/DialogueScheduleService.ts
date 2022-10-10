@@ -1,7 +1,11 @@
 import { PrismaClient } from 'prisma/prisma-client';
 
 import { DialogueSchedulePrismaAdapter } from './DialogueSchedulePrismaAdapter';
-import { CreateDialogueScheduleInput, CreateDialogueScheduleOutput } from './DialogueSchedule.types';
+import {
+  CreateDialogueScheduleInput,
+  CreateDialogueScheduleOutput,
+} from './DialogueSchedule.types';
+import { DialogueSchedule } from './DialogueSchedule.helper';
 
 export class DialogueScheduleService {
   private prisma: PrismaClient;
@@ -10,6 +14,12 @@ export class DialogueScheduleService {
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
     this.prismaAdapter = new DialogueSchedulePrismaAdapter(prisma);
+  }
+
+  public async findByWorkspaceID(workspaceID: string): Promise<DialogueSchedule | null> {
+    const fields = await this.prismaAdapter.findByWorkspaceID(workspaceID);
+
+    return fields ? new DialogueSchedule(fields) : null;
   }
 
   /**
