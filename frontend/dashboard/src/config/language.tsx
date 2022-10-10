@@ -11,6 +11,14 @@ const language = {
     },
   },
   general: {
+    send_invite_email: {
+      en: 'Send invite email',
+      de: 'Einladungs-E-Mail senden',
+    },
+    send_invite_email_helper: {
+      en: 'Do you want the invited user to receive an email?',
+      de: 'Soll der eingeladene Benutzer eine E-Mail erhalten?',
+    },
     save_template_related_questions: {
       en: 'Save for template-related questions?',
       de: 'Für vorlagenbezogene Fragen speichern?',
@@ -572,8 +580,8 @@ const language = {
       de: 'Benutzer filtern',
     },
     invite_user_description: {
-      en: 'Invite a new user to your workspace. The user will receive an email with a notification of this.',
-      de: 'Einen neuen Benutzer in Ihre Arbeitsumgebung einladen. Der Benutzer erhält eine Benachrichtigung darüber.',
+      en: 'Adds a new user to your workspace. The user will receive an email with a notification if specified.',
+      de: 'Laden Sie einen neuen Benutzer in Ihren Arbeitsbereich ein. Der Benutzer erhält eine E-Mail mit einer Benachrichtigung, falls angegeben.',
     },
     filter_by_role_name: {
       en: 'Filter by role name',
@@ -1298,8 +1306,8 @@ const language = {
       de: 'Link',
     },
     invite_user: {
-      en: 'Invite user',
-      de: 'Benutzer einladen',
+      en: 'Add user',
+      de: 'Nutzer hinzufügen',
     },
     date_range: {
       en: 'Date range',

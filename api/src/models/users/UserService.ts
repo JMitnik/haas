@@ -366,44 +366,48 @@ class UserService {
   /**
    * Invites a new user to a current customer, and mails them with a login-token.
    */
-  async inviteNewUserToCustomer(email: string, customerId: string, roleId: string) {
+  async inviteNewUserToCustomer(email: string, customerId: string, roleId: string, sendInviteEmail: boolean) {
     const createdUser = await this.userPrismaAdapter.createWorkspaceUser(customerId, roleId, email)
 
     const inviteLoginToken = AuthService.createUserToken(createdUser.id);
 
     await this.userPrismaAdapter.setLoginToken(createdUser.id, inviteLoginToken);
 
-    const emailBody = makeInviteTemplate({
-      customerName: createdUser.customers[0].customer.name,
-      recipientMail: email,
-      token: inviteLoginToken,
-      bgColor: createdUser.customers[0].customer.settings?.colourSettings?.primary,
-    });
+    if (sendInviteEmail) {
+      const emailBody = makeInviteTemplate({
+        customerName: createdUser.customers[0].customer.name,
+        recipientMail: email,
+        token: inviteLoginToken,
+        bgColor: createdUser.customers[0].customer.settings?.colourSettings?.primary,
+      });
 
-    mailService.send({
-      recipient: email,
-      subject: 'Welcome to HAAS!',
-      body: emailBody,
-    });
+      mailService.send({
+        recipient: email,
+        subject: 'Welcome to HAAS!',
+        body: emailBody,
+      });
+    }
   };
 
-  async updateUserRole(userId: string, newRoleId: string, workspaceId: string) {
+  async updateUserRole(userId: string, newRoleId: string, workspaceId: string, sendInviteEmail: boolean) {
     const updatedUser = await this.userOfCustomerPrismaAdapter.updateWorkspaceUserRole(userId, workspaceId, newRoleId);
 
-    const emailBody = makeRoleUpdateTemplate({
-      customerName: updatedUser.customer.name,
-      recipientMail: updatedUser.user.email,
-      newRoleName: updatedUser.role.name,
-    });
+    if (sendInviteEmail) {
+      const emailBody = makeRoleUpdateTemplate({
+        customerName: updatedUser.customer.name,
+        recipientMail: updatedUser.user.email,
+        newRoleName: updatedUser.role.name,
+      });
 
-    mailService.send({
-      recipient: updatedUser.user.email,
-      subject: 'HAAS: New role assigned to you.',
-      body: emailBody,
-    });
+      mailService.send({
+        recipient: updatedUser.user.email,
+        subject: 'HAAS: New role assigned to you.',
+        body: emailBody,
+      });
+    }
   };
 
-  async inviteExistingUserToCustomer(userId: string, newRoleId: string, workspaceId: string) {
+  async inviteExistingUserToCustomer(userId: string, newRoleId: string, workspaceId: string, sendInviteEmail: boolean) {
     const invitedUser = await this.userOfCustomerPrismaAdapter.createExistingUserForInvitingWorkspace(
       workspaceId,
       newRoleId,
@@ -414,18 +418,20 @@ class UserService {
     const inviteLoginToken = AuthService.createUserToken(userId);
     await this.userPrismaAdapter.setLoginToken(userId, inviteLoginToken);
 
-    const emailBody = makeInviteTemplate({
-      customerName: invitedUser.customer.name,
-      recipientMail: invitedUser.user.email,
-      token: inviteLoginToken,
-      bgColor: invitedUser.customer.settings?.colourSettings?.primary,
-    });
+    if (sendInviteEmail) {
+      const emailBody = makeInviteTemplate({
+        customerName: invitedUser.customer.name,
+        recipientMail: invitedUser.user.email,
+        token: inviteLoginToken,
+        bgColor: invitedUser.customer.settings?.colourSettings?.primary,
+      });
 
-    mailService.send({
-      recipient: invitedUser.user.email,
-      subject: `HAAS: You have been invited to ${invitedUser.customer.name}`,
-      body: emailBody,
-    });
+      mailService.send({
+        recipient: invitedUser.user.email,
+        subject: `HAAS: You have been invited to ${invitedUser.customer.name}`,
+        body: emailBody,
+      });
+    }
   };
 
 
