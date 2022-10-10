@@ -269,6 +269,10 @@ export interface NexusGenInputs {
     weight?: number | null; // Float
     workspaceId: string; // ID!
   }
+  CreateDataPeriodInput: { // input type
+    endDateExpression: string; // String!
+    startDateExpression: string; // String!
+  }
   CreateDialogueInputType: { // input type
     contentType?: string | null; // String
     customerSlug?: string | null; // String
@@ -280,6 +284,15 @@ export interface NexusGenInputs {
     tags?: NexusGenInputs['TagsInputObjectType'] | null; // TagsInputObjectType
     templateDialogueId?: string | null; // String
     title?: string | null; // String
+  }
+  CreateDialogueScheduleInput: { // input type
+    dataPeriod: NexusGenInputs['CreateDataPeriodInput']; // CreateDataPeriodInput!
+    evaluationPeriod?: NexusGenInputs['CreateEvaluationPeriodInput'] | null; // CreateEvaluationPeriodInput
+    workspaceId: string; // String!
+  }
+  CreateEvaluationPeriodInput: { // input type
+    endDateExpression?: string | null; // String
+    startDateExpression: string; // String!
   }
   CreateQuestionNodeInputType: { // input type
     customerId?: string | null; // ID
@@ -1110,6 +1123,9 @@ export interface NexusGenObjects {
     failedDeliveries?: Array<NexusGenRootTypes['FailedDeliveryModel'] | null> | null; // [FailedDeliveryModel]
     nrDeliveries?: number | null; // Int
   }
+  CreateDialogueScheduleOutput: { // root type
+    dialogueSchedule?: NexusGenRootTypes['DialogueSchedule'] | null; // DialogueSchedule
+  }
   CreateWorkspaceJobType: { // root type
     createdAt?: string | null; // String
     errorMessage?: string | null; // String
@@ -1218,6 +1234,9 @@ export interface NexusGenObjects {
     header?: string | null; // String
     id?: string | null; // ID
     subtext?: string | null; // String
+  }
+  DialogueSchedule: { // root type
+    id?: string | null; // ID
   }
   DialogueStatistics: { // root type
     history?: Array<NexusGenRootTypes['lineChartDataType'] | null> | null; // [lineChartDataType]
@@ -1877,6 +1896,9 @@ export interface NexusGenFieldTypes {
     failedDeliveries: Array<NexusGenRootTypes['FailedDeliveryModel'] | null> | null; // [FailedDeliveryModel]
     nrDeliveries: number | null; // Int
   }
+  CreateDialogueScheduleOutput: { // field return type
+    dialogueSchedule: NexusGenRootTypes['DialogueSchedule'] | null; // DialogueSchedule
+  }
   CreateWorkspaceJobType: { // field return type
     createdAt: string | null; // String
     errorMessage: string | null; // String
@@ -2036,6 +2058,9 @@ export interface NexusGenFieldTypes {
     header: string | null; // String
     id: string | null; // ID
     subtext: string | null; // String
+  }
+  DialogueSchedule: { // field return type
+    id: string | null; // ID
   }
   DialogueStatistics: { // field return type
     history: Array<NexusGenRootTypes['lineChartDataType'] | null> | null; // [lineChartDataType]
@@ -2239,6 +2264,7 @@ export interface NexusGenFieldTypes {
     createCTA: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     createCampaign: NexusGenRootTypes['CampaignType'] | null; // CampaignType
     createDialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
+    createDialogueSchedule: NexusGenRootTypes['CreateDialogueScheduleOutput'] | null; // CreateDialogueScheduleOutput
     createJobProcessLocation: NexusGenRootTypes['JobProcessLocation'] | null; // JobProcessLocation
     createPermission: NexusGenRootTypes['PermssionType'] | null; // PermssionType
     createQuestion: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
@@ -2857,6 +2883,9 @@ export interface NexusGenFieldTypeNames {
     failedDeliveries: 'FailedDeliveryModel'
     nrDeliveries: 'Int'
   }
+  CreateDialogueScheduleOutput: { // field return type name
+    dialogueSchedule: 'DialogueSchedule'
+  }
   CreateWorkspaceJobType: { // field return type name
     createdAt: 'String'
     errorMessage: 'String'
@@ -3016,6 +3045,9 @@ export interface NexusGenFieldTypeNames {
     header: 'String'
     id: 'ID'
     subtext: 'String'
+  }
+  DialogueSchedule: { // field return type name
+    id: 'ID'
   }
   DialogueStatistics: { // field return type name
     history: 'lineChartDataType'
@@ -3219,6 +3251,7 @@ export interface NexusGenFieldTypeNames {
     createCTA: 'QuestionNode'
     createCampaign: 'CampaignType'
     createDialogue: 'Dialogue'
+    createDialogueSchedule: 'CreateDialogueScheduleOutput'
     createJobProcessLocation: 'JobProcessLocation'
     createPermission: 'PermssionType'
     createQuestion: 'QuestionNode'
@@ -3802,6 +3835,9 @@ export interface NexusGenArgTypes {
     }
     createDialogue: { // args
       input?: NexusGenInputs['CreateDialogueInputType'] | null; // CreateDialogueInputType
+    }
+    createDialogueSchedule: { // args
+      input: NexusGenInputs['CreateDialogueScheduleInput']; // CreateDialogueScheduleInput!
     }
     createJobProcessLocation: { // args
       input?: NexusGenInputs['createJobProcessLocationInput'] | null; // createJobProcessLocationInput

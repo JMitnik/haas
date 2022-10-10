@@ -588,6 +588,12 @@ input CreateCampaignVariantInputType {
   workspaceId: ID!
 }
 
+"""Input for creating a dialogue schedule."""
+input CreateDataPeriodInput {
+  endDateExpression: String!
+  startDateExpression: String!
+}
+
 input CreateDialogueInputType {
   contentType: String
   customerSlug: String
@@ -599,6 +605,24 @@ input CreateDialogueInputType {
   tags: TagsInputObjectType
   templateDialogueId: String
   title: String
+}
+
+"""Input for creating a dialogue schedule."""
+input CreateDialogueScheduleInput {
+  dataPeriod: CreateDataPeriodInput!
+  evaluationPeriod: CreateEvaluationPeriodInput
+  workspaceId: String!
+}
+
+"""Result of creating dialogue schedule"""
+type CreateDialogueScheduleOutput {
+  dialogueSchedule: DialogueSchedule
+}
+
+"""Input for creating a dialogue schedule."""
+input CreateEvaluationPeriodInput {
+  endDateExpression: String
+  startDateExpression: String!
 }
 
 input CreateQuestionNodeInputType {
@@ -953,6 +977,16 @@ type DialogueFinisherObjectType {
 
 enum DialogueImpactScoreType {
   AVERAGE
+}
+
+"""
+
+    A dialogue schedule defines the data period (period of time whilst data is good),
+    and evaluation period (period of time when a dialogue may be enabled).
+  
+"""
+type DialogueSchedule {
+  id: ID
 }
 
 type DialogueStatistics {
@@ -1495,6 +1529,9 @@ type Mutation {
   createCTA(input: CreateCTAInputType): QuestionNode
   createCampaign(input: CreateCampaignInputType): CampaignType
   createDialogue(input: CreateDialogueInputType): Dialogue
+
+  """Creates a dialogue schedule in the backend"""
+  createDialogueSchedule(input: CreateDialogueScheduleInput!): CreateDialogueScheduleOutput
   createJobProcessLocation(input: createJobProcessLocationInput): JobProcessLocation
   createPermission(data: PermissionInput): PermssionType
   createQuestion(input: CreateQuestionNodeInputType): QuestionNode
