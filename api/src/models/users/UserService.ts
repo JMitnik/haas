@@ -41,8 +41,15 @@ class UserService {
       },
     };
 
+    // Only Find assigned dialogues
     const users = await this.userPrismaAdapter.findMany(whereInput, {
-      isAssignedTo: true,
+      isAssignedTo: {
+        where: {
+          customer: {
+            slug: workspaceSlug,
+          },
+        },
+      },
     }) as UserWithAssignedDialogues[];
 
     return users;
