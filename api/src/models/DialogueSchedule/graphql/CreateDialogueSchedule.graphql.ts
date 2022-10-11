@@ -8,7 +8,7 @@ export const CreateDataPeriodInput = inputObjectType({
 
   definition(t) {
     t.nonNull.string('startDateExpression');
-    t.nonNull.string('endDateExpression');
+    t.nonNull.int('endInDeltaMinutes');
   },
 });
 
@@ -18,7 +18,7 @@ export const CreateEvaluationPeriodInput = inputObjectType({
 
   definition(t) {
     t.nonNull.string('startDateExpression');
-    t.string('endDateExpression');
+    t.int('endInDeltaMinutes');
   },
 });
 

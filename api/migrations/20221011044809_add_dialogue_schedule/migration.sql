@@ -13,7 +13,7 @@ CREATE TABLE "DialogueSchedule" (
 CREATE TABLE "DataPeriodSchedule" (
     "id" TEXT NOT NULL,
     "startDateExpression" TEXT NOT NULL,
-    "endDateExpression" TEXT NOT NULL,
+    "endInDeltaMinutes" INTEGER NOT NULL,
     "dialogueScheduleId" TEXT NOT NULL,
 
     CONSTRAINT "DataPeriodSchedule_pkey" PRIMARY KEY ("id")
@@ -23,7 +23,7 @@ CREATE TABLE "DataPeriodSchedule" (
 CREATE TABLE "EvaluationPeriodSchedule" (
     "id" TEXT NOT NULL,
     "startDateExpression" TEXT NOT NULL,
-    "endDateExpression" TEXT NOT NULL,
+    "endInDeltaMinutes" INTEGER NOT NULL,
     "dialogueScheduleId" TEXT NOT NULL,
 
     CONSTRAINT "EvaluationPeriodSchedule_pkey" PRIMARY KEY ("id")

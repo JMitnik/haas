@@ -590,7 +590,7 @@ input CreateCampaignVariantInputType {
 
 """Input for creating a dialogue schedule."""
 input CreateDataPeriodInput {
-  endDateExpression: String!
+  endInDeltaMinutes: Int!
   startDateExpression: String!
 }
 
@@ -621,7 +621,7 @@ type CreateDialogueScheduleOutput {
 
 """Input for creating a dialogue schedule."""
 input CreateEvaluationPeriodInput {
-  endDateExpression: String
+  endInDeltaMinutes: Int
   startDateExpression: String!
 }
 

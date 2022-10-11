@@ -270,7 +270,7 @@ export interface NexusGenInputs {
     workspaceId: string; // ID!
   }
   CreateDataPeriodInput: { // input type
-    endDateExpression: string; // String!
+    endInDeltaMinutes: number; // Int!
     startDateExpression: string; // String!
   }
   CreateDialogueInputType: { // input type
@@ -291,7 +291,7 @@ export interface NexusGenInputs {
     workspaceId: string; // String!
   }
   CreateEvaluationPeriodInput: { // input type
-    endDateExpression?: string | null; // String
+    endInDeltaMinutes?: number | null; // Int
     startDateExpression: string; // String!
   }
   CreateQuestionNodeInputType: { // input type

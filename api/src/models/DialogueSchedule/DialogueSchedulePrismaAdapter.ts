@@ -25,13 +25,14 @@ export class DialogueSchedulePrismaAdapter {
         dataPeriodSchedule: {
           create: {
             startDateExpression: input.dataPeriod.startDateExpression,
-            endDateExpression: input.dataPeriod.endDateExpression,
+            endInDeltaMinutes: input.dataPeriod.endInDeltaMinutes,
           },
         },
         workspace: {
           connect: { id: input.workspaceId },
         },
       },
+      include: { ...defaultDialogueSchedule.include },
     };
 
     // Optionally, add an evaluation period
@@ -39,7 +40,7 @@ export class DialogueSchedulePrismaAdapter {
       query.data.evaluationPeriodSchedule = {
         create: {
           startDateExpression: input.evaluationPeriod.startDateExpression,
-          endDateExpression: input.evaluationPeriod.endDateExpression || '',
+          endInDeltaMinutes: input.evaluationPeriod.endInDeltaMinutes || -1,
         },
       }
     }
