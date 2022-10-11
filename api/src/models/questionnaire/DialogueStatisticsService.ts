@@ -309,7 +309,7 @@ class DialogueStatisticsService {
       undefined,
       canAccessAllDialogues
     );
-    console.log('Dialogues', dialogues);
+
     const dialogueIds = dialogues.map((dialogue) => dialogue.id);
     const endDateTimeSet = !endDateTime ? addDays(startDateTime as Date, 7) : endDateTime;
 
