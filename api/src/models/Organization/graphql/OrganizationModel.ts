@@ -3,6 +3,7 @@ import { UserInputError } from 'apollo-server-express';
 
 import { OrganizationLayer } from './OrganizationLayer';
 import { assertNonNullish } from '../../../utils/assertNonNullish';
+import { DialogueValidator } from '../../../models/questionnaire/DialogueValidator';
 
 export const Organization = objectType({
   name: 'Organization',
@@ -22,10 +23,15 @@ export const Organization = objectType({
         if (!info.variableValues.workspaceId) throw new UserInputError('No workspaceId provided to get organization layers');
 
         assertNonNullish(ctx.session?.user?.id, 'No user ID provided!');
+        const canAccessAllDialogues = DialogueValidator.canAccessAllDialogues(
+          (parent as any).id as string,
+          ctx.session
+        );
 
         return ctx.services.organizationService.getOrganizationLayers(
           info.variableValues.workspaceId,
-          ctx.session.user.id
+          ctx.session.user.id,
+          canAccessAllDialogues,
         );
       },
     });
