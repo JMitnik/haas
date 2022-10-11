@@ -178,7 +178,6 @@ class GenerateWorkspaceService {
         dbRole.id,
       );
 
-      await this.userService.connectPrivateDialoguesToUser(user.id, workspace.id);
       if (sendInviteToAssignee) {
         void this.userService.sendInvitationMail(invitedUser, true);
       }
@@ -240,19 +239,12 @@ class GenerateWorkspaceService {
 
       const userEmailEntry = Object.entries(record).find((entry) => entry[0] === 'limited_access_assignee_email?');
       const userPhoneEntry = Object.entries(record).find((entry) => entry[0] === 'limited_access_assignee_phone?');
-      // const customTemplateEntry = Object.entries(record).find((entry) => entry[0]?.toLowerCase() === 'template');
 
       const hasEmailAssignee = !!userEmailEntry?.[1];
       const emailAssignee = userEmailEntry?.[1] as string;
       const phoneAssignee = userPhoneEntry?.[1] as string | undefined;
-      // const customDialogueTemplate = customTemplateEntry?.[1] as DialogueTemplateType | undefined;
-      // const hasValidCustomDialogueTemplate = (customDialogueTemplate
-      //   && Object.values(DialogueTemplateType).includes(customDialogueTemplate)
-      // ) || false;
-      // const validatedTemplateType = hasValidCustomDialogueTemplate ? customDialogueTemplate : type;
 
       const userRole = workspace.roles.find((role) => role.type === RoleTypeEnum.USER);
-      // const overrideTemplate = this.templateService.findTemplate(validatedTemplateType as DialogueTemplateType)
 
       const dialogueInput: CreateDialogueInput = {
         slug: dialogueSlug,
@@ -321,7 +313,7 @@ class GenerateWorkspaceService {
         phone: phoneAssignee,
       });
 
-      const invitedUser = await this.userOfCustomerPrismaAdapter.upsertUserOfCustomer(
+      await this.userOfCustomerPrismaAdapter.upsertUserOfCustomer(
         workspace.id,
         limitedUser.id,
         limitedUser.id === userId ? adminRole?.id as string : userRole.id, // If user generating is upserted => give admin role
@@ -332,8 +324,6 @@ class GenerateWorkspaceService {
         dialogue.id,
         phoneAssignee
       );
-
-      void this.userService.sendInvitationMail(invitedUser, true);
     };
   };
 
