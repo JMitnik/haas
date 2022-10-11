@@ -6,6 +6,7 @@ import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';
 export type Topic = NexusGenFieldTypes['TopicType'];
 export type DialogueStatisticsSummaryFilterInput = NexusGenInputs['DialogueStatisticsSummaryFilterInput'];
 export type DialogueConnectionFilterInput = NexusGenInputs['DialogueConnectionFilterInput'];
+export type DialogueWhereUniqueInput = NexusGenInputs['DialogueWhereUniqueInput'];
 
 export interface ChildNodeEntry {
   id: number;

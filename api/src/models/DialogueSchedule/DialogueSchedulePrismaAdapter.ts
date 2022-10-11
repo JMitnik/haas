@@ -22,6 +22,7 @@ export class DialogueSchedulePrismaAdapter {
   ) {
     let query: Prisma.DialogueScheduleCreateArgs = {
       data: {
+        isEnabled: true,
         dataPeriodSchedule: {
           create: {
             startDateExpression: input.dataPeriod.startDateExpression,

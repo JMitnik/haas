@@ -480,6 +480,7 @@ export const DialogueType = objectType({
         if (!parent.customerId) {
           return true;
         }
+
         return services.dialogueService.isOnline(parent.customerId);
       },
     });

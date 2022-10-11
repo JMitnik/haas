@@ -21,8 +21,7 @@ export class SchedulePeriod {
   }
 
   public get isActive(): boolean {
-    const current = new Date();
-
+    const current = new Date(Date.now());
     return this.activeStartDate < current && this.activeEndDate > current;
   }
 

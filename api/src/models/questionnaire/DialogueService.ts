@@ -646,6 +646,7 @@ class DialogueService {
    */
   public async isOnline(workspaceId: string) {
     const schedule = await this.dialogueScheduleService.findByWorkspaceID(workspaceId);
+
     return schedule ? schedule.enabledEvaluation : true;
   }
 
