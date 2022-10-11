@@ -134,7 +134,6 @@ class NodeEntryService {
         await this.sendEmergencyMail(
           actionable.dialogueId,
           emergencyContact,
-
         )
       }
 

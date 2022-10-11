@@ -261,7 +261,7 @@ export class AutomationActionService {
       // TODO: Add support for multiple client URLs if a user is assinged to multipled dialogues
       const assignedDialogues = user?.isAssignedTo;
       if (!assignedDialogues?.length) { return };
-      console.log('user and assigned Dialogues: ', user?.email, user.isAssignedTo.map((dialogue) => dialogue.title));
+
       mailService.send({
         body: makeDialogueLinkReminderTemplate({
           recipientName: user.firstName || 'User',

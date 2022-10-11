@@ -181,9 +181,7 @@ const InviteUserForm = ({ onClose, onRefetch }: InviteUserFormProps) => {
                       )}
                     />
                   </UI.Div>
-
                 </UI.Flex>
-
               </UI.FormControl>
 
               <UI.Stack isInline>

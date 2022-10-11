@@ -15,7 +15,6 @@ export const SendAutomationDialogueLinkResolver = mutationField('sendAutomationD
   },
   nullable: true,
   resolve: async (parent, args, ctx) => {
-    console.log('In SendAutomationDialogueLinkResolver');
     return ctx.services.automationActionService.sendDialogueLink(
       args.input.workspaceSlug, args.input.automationActionId
     );

@@ -70,8 +70,6 @@ const sendAutomationDialogueLink = async (apiUrl: string, accessToken: string, a
 }
 
 exports.main = async function (event: any, context: any) {
-  // const message = event;
-  console.log('EVENT: ', event.Records?.[0]?.body);
   const message = JSON.parse(event.Records?.[0]?.body)
   const apiUrl: string = message.API_URL;
   const authenticateEmail: string = message.AUTHENTICATE_EMAIL;

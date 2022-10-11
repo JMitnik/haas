@@ -4,7 +4,6 @@ import { DateFormat, useDate } from 'hooks/useDate';
 import { useCustomer } from 'providers/CustomerProvider';
 import {
   useGetSessionPathsLazyQuery,
-  useGetSessionPathsQuery,
   useGetWorkspaceDialogueStatisticsQuery,
 } from 'types/generated-types';
 
@@ -25,8 +24,6 @@ export interface WorkspaceGridAdapterProps {
  * @returns
  */
 export const WorkspaceGridAdapter = ({
-  height,
-  width,
   backgroundColor,
 }: WorkspaceGridAdapterProps) => {
   const { getOneWeekAgo, format, getEndOfToday } = useDate();
@@ -63,7 +60,6 @@ export const WorkspaceGridAdapter = ({
    * Returns a Tuple consisting of Nodes and a View Mode
    */
   const handleLoadData = async (options: DataLoadOptions): Promise<[HexagonNode[], HexagonViewMode]> => {
-    console.log('Options: ', options);
     // Checkpoint one: If we clicked a group, return its subgroups (Groups or Dialogues)
     if (options.clickedGroup) {
       const subGroupType = options.clickedGroup.subGroups[0].type;
@@ -102,8 +98,6 @@ export const WorkspaceGridAdapter = ({
 
   const initialData = useMemo(() => groupsFromDialogues(dialogues), [dialogues]);
   const initialViewMode = HexagonViewMode.Workspace;
-
-  console.log('dialogues.length: ', dialogues.length);
 
   // TODO: Add spinner
   if (!dialogues.length) return null;
