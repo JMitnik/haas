@@ -3,7 +3,6 @@ import * as yup from 'yup';
 import { Controller, useForm } from 'react-hook-form';
 import { FormErrorMessage, useToast } from '@chakra-ui/core';
 import { Mail } from 'react-feather';
-import { gql, useMutation } from '@apollo/client';
 import { useHistory, useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -11,29 +10,21 @@ import React from 'react';
 import Select from 'react-select';
 
 import { useCustomer } from 'providers/CustomerProvider';
-import { useGetRolesQuery } from 'types/generated-types';
+import { useGetRolesQuery, useInviteUserMutation } from 'types/generated-types';
 import getUsersQuery from 'queries/getUsers';
+import intToBool from 'utils/intToBool';
 
 interface SelectType {
   label: string;
   value: string;
 }
-
-const inviteUserMutation = gql`
-  mutation inviteUser($input: InviteUserInput) {
-    inviteUser(input: $input) {
-      didInvite
-      didAlreadyExist
-    }
-  }
-`;
-
 interface FormDataProps {
   firstName?: string;
   lastName?: string;
   email: string;
   phone?: string;
   role: SelectType;
+  sendInviteEmail: number;
 }
 
 const schema = yup.object().shape({
@@ -41,6 +32,7 @@ const schema = yup.object().shape({
   role: yup.object().shape({
     value: yup.string().required(),
   }),
+  sendInviteEmail: yup.number(),
 });
 
 interface InviteUserFormProps {
@@ -65,7 +57,7 @@ const InviteUserForm = ({ onClose, onRefetch }: InviteUserFormProps) => {
 
   const selectRoles = roleData?.customer?.roles?.map((role) => ({ label: role?.name, value: role?.id }));
 
-  const [addUser, { loading: isLoading }] = useMutation(inviteUserMutation, {
+  const [addUser, { loading: isLoading }] = useInviteUserMutation({
     onCompleted: (resData) => {
       const userDidExist = resData?.inviteUser?.didAlreadyExist;
       const didInviteUser = resData?.inviteUser?.didInvite;
@@ -115,15 +107,16 @@ const InviteUserForm = ({ onClose, onRefetch }: InviteUserFormProps) => {
   });
 
   const handleSubmit = (formData: FormDataProps) => {
-    const optionInput = {
-      customerId: activeCustomer?.id,
-      roleId: formData.role?.value || null,
-      email: formData.email || '',
-    };
+    const sendInviteEmailCheck = intToBool(formData.sendInviteEmail) || false;
 
     addUser({
       variables: {
-        input: optionInput,
+        input: {
+          customerId: activeCustomer?.id as string,
+          roleId: formData.role?.value,
+          email: formData.email || '',
+          sendInviteEmail: sendInviteEmailCheck,
+        },
       },
     });
   };
@@ -165,6 +158,32 @@ const InviteUserForm = ({ onClose, onRefetch }: InviteUserFormProps) => {
                 </UI.FormControl>
               </UI.Div>
 
+              <UI.FormControl>
+                <UI.Flex alignItems="center">
+                  <UI.Div>
+                    <UI.FormLabel>{t('send_invite_email')}</UI.FormLabel>
+                    <UI.InputHelper>{t('send_invite_email_helper')}</UI.InputHelper>
+                  </UI.Div>
+
+                  <UI.Div ml={120}>
+                    <Controller
+                      control={form.control}
+                      name="sendInviteEmail"
+                      defaultValue={0}
+                      render={({ field: { onChange, value, onBlur } }) => (
+                        <UI.Toggle
+                          isChecked={value === 1}
+                          size="lg"
+                          onChange={() => (value === 1 ? onChange(0) : onChange(1))}
+                          value={value}
+                          onBlur={onBlur}
+                        />
+                      )}
+                    />
+                  </UI.Div>
+                </UI.Flex>
+              </UI.FormControl>
+
               <UI.Stack isInline>
                 <UI.Button
                   isLoading={isLoading}
@@ -172,7 +191,7 @@ const InviteUserForm = ({ onClose, onRefetch }: InviteUserFormProps) => {
                   variantColor="teal"
                   type="submit"
                 >
-                  Send invite
+                  {t('invite_user')}
                 </UI.Button>
                 <UI.Button variant="outline" onClick={() => onClose()}>Cancel</UI.Button>
               </UI.Stack>

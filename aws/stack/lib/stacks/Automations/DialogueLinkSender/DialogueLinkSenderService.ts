@@ -42,6 +42,7 @@ export class DialogueLinkSenderService extends BaseLambdaService {
 
     this.addErrorLogging(lambda);
     this.addDLQ(lambda);
+    this.addSQS('dialogueLinkSender', lambda);
 
     // Store the ARN of the Lambda which sends links to people.
     this.saveLambdaARN(lambda.functionArn);

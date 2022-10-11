@@ -1,0 +1,5 @@
+mutation VerifyActionRequest($input: VerifyActionRequestInput!) {
+  verifyActionRequest(input: $input) {
+    id
+  }
+}

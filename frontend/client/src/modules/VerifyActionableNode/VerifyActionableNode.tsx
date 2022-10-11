@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import React, { useEffect } from 'react';
 
 import { FullScreenLayout } from 'layouts/FullScreenLayout';
-import { LanguageEnumType, useVerifyActionableMutation } from 'types/generated-types';
+import { LanguageEnumType, useVerifyActionRequestMutation } from 'types/generated-types';
 import { MainHeader, SubHeader, Text } from 'components/Type/Headers';
 import { useDialogueState } from 'modules/Dialogue/DialogueState';
 import DialogueTreeLayout from 'layouts/DialogueTreeLayout';
@@ -64,7 +64,7 @@ const VerifyActionableNode = () => {
   const header = getHeaderText(dialogue?.language || undefined);
   const subHeader = getSubHeaderText(dialogue?.language || undefined);
 
-  const [verifyActionable] = useVerifyActionableMutation({
+  const [verifyActionable] = useVerifyActionRequestMutation({
     onError: (error) => {
       Sentry.captureException(error);
     },
@@ -75,7 +75,7 @@ const VerifyActionableNode = () => {
       verifyActionable({
         variables: {
           input: {
-            actionableId,
+            actionRequestId: actionableId,
             workspaceId: dialogue?.customerId as string,
           },
         },

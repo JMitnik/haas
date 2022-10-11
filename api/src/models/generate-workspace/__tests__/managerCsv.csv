@@ -1,5 +1,5 @@
-email;first_name?;last_name?;phone_number?
-cofounder1@test.com;Co;Founder;
-cofounder2@test.com;;;3161233254351
-rick@haas.live;Rickster;Scoopy;
-admin@haas.com;;;
+email;role;first_name?;last_name?;phone_number?;send_invite?
+account3@haas.live;USER;Co;Founder;;no
+cofounder2@test.com;MANAGER;;;3161233254351;NO
+rick@haas.live;ADMIN;Rickster;Scoopy;;NO
+admin@haas.com;;;;;NO

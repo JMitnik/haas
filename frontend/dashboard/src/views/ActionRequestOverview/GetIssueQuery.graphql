@@ -1,4 +1,4 @@
-query GetIssue($input: GetIssueResolverInput, $actionableFilter: ActionRequestConnectionFilterInput) {
+query GetIssue($input: GetIssueResolverInput!, $actionableFilter: ActionRequestConnectionFilterInput) {
 	issue(input: $input) {
 		id
 		topicId
