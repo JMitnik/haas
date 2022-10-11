@@ -44,8 +44,14 @@ export class CustomerService {
     this.templateService = new TemplateService(prismaClient);
   }
 
-  async getDialogues(workspaceId: string, userId: string, dialogueFragments?: string[]) {
-    return this.customerPrismaAdapter.getDialogues(workspaceId, userId, dialogueFragments);
+  async getDialogues(
+    workspaceId: string,
+    userId: string,
+    dialogueFragments?: string[],
+    canAccessAllDialogues: boolean = false
+  ) {
+    // TODO: Add helper function that checks if userId can access all dialogues instead of having it as parameter
+    return this.customerPrismaAdapter.getDialogues(workspaceId, userId, dialogueFragments, canAccessAllDialogues);
   }
 
   /**

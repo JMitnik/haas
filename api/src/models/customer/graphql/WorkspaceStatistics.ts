@@ -185,6 +185,7 @@ export const WorkspaceStatistics = objectType({
         const topicFilter = args.input.topicFilter || undefined;
 
         assertNonNullish(ctx.session?.user?.id, 'No user ID provided!');
+        const canAccessAllDialogues = DialogueValidator.canAccessAllDialogues(parent.id as string, ctx.session);
 
         return ctx.services.dialogueStatisticsService.findWorkspaceHealthScore(
           parent.id || '',
@@ -193,6 +194,7 @@ export const WorkspaceStatistics = objectType({
           utcEndDateTime,
           topicFilter,
           threshold || undefined,
+          canAccessAllDialogues,
         );
       },
     });

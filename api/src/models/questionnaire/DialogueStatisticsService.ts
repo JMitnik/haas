@@ -80,12 +80,14 @@ class DialogueStatisticsService {
     endDateTime?: Date,
     topicFilter?: TopicFilterInput,
     threshold: number = 70,
+    canAccessAllDialogues: boolean = false,
   ) => {
     const endDateTimeSet = !endDateTime ? addDays(startDateTime, 7) : endDateTime;
     const dialogues = await this.workspaceService.getDialogues(
       workspaceId,
       userId,
-      topicFilter?.dialogueStrings || undefined
+      topicFilter?.dialogueStrings || undefined,
+      canAccessAllDialogues
     );
     const mappedDialogueIds = dialogues.map((dialogue) => dialogue.id);
 

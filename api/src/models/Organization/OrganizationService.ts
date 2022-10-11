@@ -18,8 +18,12 @@ export class OrganizationService {
    * @param workspaceId
    * @returns
    */
-  public async getOrganizationLayers(workspaceId: string, userId: string): Promise<OrganizationLayer[]> {
-    const dialogues = await this.workspaceService.getDialogues(workspaceId, userId);
+  public async getOrganizationLayers(
+    workspaceId: string,
+    userId: string,
+    canAccessAllDialogues: boolean = false,
+  ): Promise<OrganizationLayer[]> {
+    const dialogues = await this.workspaceService.getDialogues(workspaceId, userId, undefined, canAccessAllDialogues);
     const dialogueTitles = dialogues.map((dialogue) => dialogue.title.split('-'));
 
     // Find the dialogue with the most amount of layers
