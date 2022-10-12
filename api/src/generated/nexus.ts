@@ -860,7 +860,7 @@ export interface NexusGenEnums {
   SessionConnectionOrder: "createdAt" | "dialogueId"
   SessionDeliveryType: "campaigns" | "noCampaigns"
   StatusType: "CLOSED" | "IN_PROGRESS" | "OPEN"
-  SystemPermission: "CAN_ACCESS_ADMIN_PANEL" | "CAN_ACCESS_REPORT_PAGE" | "CAN_ADD_USERS" | "CAN_ASSIGN_USERS_TO_DIALOGUE" | "CAN_BUILD_DIALOGUE" | "CAN_CREATE_AUTOMATIONS" | "CAN_CREATE_CAMPAIGNS" | "CAN_CREATE_DELIVERIES" | "CAN_CREATE_TRIGGERS" | "CAN_DELETE_DIALOGUE" | "CAN_DELETE_TRIGGERS" | "CAN_DELETE_USERS" | "CAN_DELETE_WORKSPACE" | "CAN_DOWNLOAD_REPORTS" | "CAN_EDIT_DIALOGUE" | "CAN_EDIT_USERS" | "CAN_EDIT_WORKSPACE" | "CAN_GENERATE_WORKSPACE_FROM_CSV" | "CAN_RESET_WORKSPACE_DATA" | "CAN_UPDATE_AUTOMATIONS" | "CAN_VIEW_AUTOMATIONS" | "CAN_VIEW_CAMPAIGNS" | "CAN_VIEW_DIALOGUE" | "CAN_VIEW_DIALOGUE_ANALYTICS" | "CAN_VIEW_USERS"
+  SystemPermission: "CAN_ACCESS_ADMIN_PANEL" | "CAN_ACCESS_ALL_ACTION_REQUESTS" | "CAN_ACCESS_ALL_DIALOGUES" | "CAN_ACCESS_REPORT_PAGE" | "CAN_ADD_USERS" | "CAN_ASSIGN_USERS_TO_DIALOGUE" | "CAN_BUILD_DIALOGUE" | "CAN_CREATE_AUTOMATIONS" | "CAN_CREATE_CAMPAIGNS" | "CAN_CREATE_DELIVERIES" | "CAN_CREATE_TRIGGERS" | "CAN_DELETE_DIALOGUE" | "CAN_DELETE_TRIGGERS" | "CAN_DELETE_USERS" | "CAN_DELETE_WORKSPACE" | "CAN_DOWNLOAD_REPORTS" | "CAN_EDIT_DIALOGUE" | "CAN_EDIT_USERS" | "CAN_EDIT_WORKSPACE" | "CAN_GENERATE_WORKSPACE_FROM_CSV" | "CAN_RESET_WORKSPACE_DATA" | "CAN_UPDATE_AUTOMATIONS" | "CAN_VIEW_ACTION_REQUESTS" | "CAN_VIEW_AUTOMATIONS" | "CAN_VIEW_CAMPAIGNS" | "CAN_VIEW_DIALOGUE" | "CAN_VIEW_DIALOGUE_ANALYTICS" | "CAN_VIEW_USERS"
   TagTypeEnum: "AGENT" | "DEFAULT" | "LOCATION"
   TopicEnumType: "SYSTEM" | "WORKSPACE"
   TourType: "GUIDE" | "RELEASE"
@@ -2541,7 +2541,6 @@ export interface NexusGenFieldTypes {
     phone: string | null; // String
     role: NexusGenRootTypes['RoleType'] | null; // RoleType
     roleId: string | null; // String
-    tours: Array<NexusGenRootTypes['TourOfUser'] | null> | null; // [TourOfUser]
     userCustomers: Array<NexusGenRootTypes['UserCustomer'] | null> | null; // [UserCustomer]
   }
   VerifyUserTokenOutput: { // field return type
@@ -3499,7 +3498,6 @@ export interface NexusGenFieldTypeNames {
     phone: 'String'
     role: 'RoleType'
     roleId: 'String'
-    tours: 'TourOfUser'
     userCustomers: 'UserCustomer'
   }
   VerifyUserTokenOutput: { // field return type name
