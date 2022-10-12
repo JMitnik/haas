@@ -999,6 +999,10 @@ input FindRoleInput {
   userId: String
 }
 
+input FinishTourOfUserInput {
+  userTourId: String!
+}
+
 type FontSettings {
   id: Int
 }
@@ -1410,6 +1414,7 @@ type Mutation {
   editUser(input: EditUserInput, userId: String): UserType
   editWorkspace(input: EditWorkspaceInput): Customer
   enableAutomation(input: EnableAutomationInput): AutomationModel
+  finishTourOfUser(input: FinishTourOfUserInput!): TourOfUser
   generateAutodeck(input: GenerateAutodeckInput): CreateWorkspaceJobType
   generateWorkspaceFromCSV(input: GenerateWorkspaceCSVInputType): Customer
   handleUserStateInWorkspace(input: HandleUserStateInWorkspaceInput): UserCustomer
@@ -2067,8 +2072,6 @@ enum StatusType {
 
 enum SystemPermission {
   CAN_ACCESS_ADMIN_PANEL
-  CAN_ACCESS_ALL_ACTION_REQUESTS
-  CAN_ACCESS_ALL_DIALOGUES
   CAN_ACCESS_REPORT_PAGE
   CAN_ADD_USERS
   CAN_ASSIGN_USERS_TO_DIALOGUE
@@ -2088,7 +2091,6 @@ enum SystemPermission {
   CAN_GENERATE_WORKSPACE_FROM_CSV
   CAN_RESET_WORKSPACE_DATA
   CAN_UPDATE_AUTOMATIONS
-  CAN_VIEW_ACTION_REQUESTS
   CAN_VIEW_AUTOMATIONS
   CAN_VIEW_CAMPAIGNS
   CAN_VIEW_DIALOGUE
@@ -2181,6 +2183,7 @@ type TopicType {
 type TourOfUser {
   createdAt: Date!
   seenAt: Date
+  tour: UserTour
   updatedAt: Date!
   user: UserType
   userId: String!
@@ -2189,10 +2192,10 @@ type TourOfUser {
 
 type TourStep {
   createdAt: Date!
+  helperKey: String!
   id: String!
-  imageUrl: String
-  translationHelper: String!
-  translationTitle: String!
+  imageUrlKey: String
+  titleKey: String!
   updatedAt: Date!
 }
 
@@ -2393,6 +2396,8 @@ type UserTour {
   createdAt: Date!
   id: String!
   steps: [TourStep]
+  triggerPage: String
+  triggerVersion: String
   type: TourType!
   updatedAt: Date!
   usersOfTour: [TourOfUser]
@@ -2411,6 +2416,7 @@ type UserType {
   phone: String
   role: RoleType
   roleId: String
+  tours: [TourOfUser]
   userCustomers: [UserCustomer]
 }
 

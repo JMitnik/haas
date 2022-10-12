@@ -16,6 +16,13 @@ export const TourOfUserType = objectType({
 
         return ctx.services.userService.getUserById(parent.userId);
       },
+    });
+
+    t.field('tour', {
+      type: 'UserTour',
+      async resolve(parent, _, ctx) {
+        return ctx.services.userTourService.findUserTour(parent.userTourId);
+      },
     })
 
     t.nonNull.string('userTourId');

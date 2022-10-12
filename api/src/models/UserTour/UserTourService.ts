@@ -3,6 +3,7 @@ import { UserTourPrismaAdapter } from './UserTourPrismaAdapter';
 import { CreateUserTourInput } from './UserTour.types';
 import { buildCreateTourStepInput } from './UserTourPrismaAdapter.helpers';
 import UserPrismaAdapter from '../../models/users/UserPrismaAdapter';
+
 export class UserTourService {
   private userTourPrismaAdapter: UserTourPrismaAdapter;
   private userPrismaAdapter: UserPrismaAdapter;
@@ -10,6 +11,11 @@ export class UserTourService {
   constructor(prisma: PrismaClient) {
     this.userTourPrismaAdapter = new UserTourPrismaAdapter(prisma);
     this.userPrismaAdapter = new UserPrismaAdapter(prisma);
+  }
+
+  public async finishTourOfUser(userTourId: string, userId: string) {
+    const updateInput: Prisma.TourOfUserUpdateInput = { seenAt: new Date() }
+    return this.userTourPrismaAdapter.updateTourOfUser(userTourId, userId, updateInput);
   }
 
   /**
@@ -52,16 +58,18 @@ export class UserTourService {
     return this.userTourPrismaAdapter.findUserTour(userTourId);
   }
 
+  /**  Finds all current tours of a user */
   public async findUserToursByUserId(userId: string) {
-    const user = await this.userPrismaAdapter.getUserById(userId);
-
     // TODO: Further priortize which tours should be seen 
     // e.g. only get the one release with latest version
+    // TourOfUser entries won't be created when a new user is created so no need to filter out old RELEASE tours
+    // 
     const tourOfUserWhereInput: Prisma.TourOfUserWhereInput = {
       userId,
       seenAt: null,
     };
 
+    return this.userTourPrismaAdapter.findManyToursOfUser(tourOfUserWhereInput);
   }
 
   /**

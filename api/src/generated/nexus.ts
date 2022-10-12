@@ -405,6 +405,9 @@ export interface NexusGenInputs {
     roleId?: string | null; // String
     userId?: string | null; // String
   }
+  FinishTourOfUserInput: { // input type
+    userTourId: string; // String!
+  }
   FormNodeEntryFieldInput: { // input type
     contacts?: string | null; // String
     email?: string | null; // String
@@ -860,7 +863,7 @@ export interface NexusGenEnums {
   SessionConnectionOrder: "createdAt" | "dialogueId"
   SessionDeliveryType: "campaigns" | "noCampaigns"
   StatusType: "CLOSED" | "IN_PROGRESS" | "OPEN"
-  SystemPermission: "CAN_ACCESS_ADMIN_PANEL" | "CAN_ACCESS_ALL_ACTION_REQUESTS" | "CAN_ACCESS_ALL_DIALOGUES" | "CAN_ACCESS_REPORT_PAGE" | "CAN_ADD_USERS" | "CAN_ASSIGN_USERS_TO_DIALOGUE" | "CAN_BUILD_DIALOGUE" | "CAN_CREATE_AUTOMATIONS" | "CAN_CREATE_CAMPAIGNS" | "CAN_CREATE_DELIVERIES" | "CAN_CREATE_TRIGGERS" | "CAN_DELETE_DIALOGUE" | "CAN_DELETE_TRIGGERS" | "CAN_DELETE_USERS" | "CAN_DELETE_WORKSPACE" | "CAN_DOWNLOAD_REPORTS" | "CAN_EDIT_DIALOGUE" | "CAN_EDIT_USERS" | "CAN_EDIT_WORKSPACE" | "CAN_GENERATE_WORKSPACE_FROM_CSV" | "CAN_RESET_WORKSPACE_DATA" | "CAN_UPDATE_AUTOMATIONS" | "CAN_VIEW_ACTION_REQUESTS" | "CAN_VIEW_AUTOMATIONS" | "CAN_VIEW_CAMPAIGNS" | "CAN_VIEW_DIALOGUE" | "CAN_VIEW_DIALOGUE_ANALYTICS" | "CAN_VIEW_USERS"
+  SystemPermission: "CAN_ACCESS_ADMIN_PANEL" | "CAN_ACCESS_REPORT_PAGE" | "CAN_ADD_USERS" | "CAN_ASSIGN_USERS_TO_DIALOGUE" | "CAN_BUILD_DIALOGUE" | "CAN_CREATE_AUTOMATIONS" | "CAN_CREATE_CAMPAIGNS" | "CAN_CREATE_DELIVERIES" | "CAN_CREATE_TRIGGERS" | "CAN_DELETE_DIALOGUE" | "CAN_DELETE_TRIGGERS" | "CAN_DELETE_USERS" | "CAN_DELETE_WORKSPACE" | "CAN_DOWNLOAD_REPORTS" | "CAN_EDIT_DIALOGUE" | "CAN_EDIT_USERS" | "CAN_EDIT_WORKSPACE" | "CAN_GENERATE_WORKSPACE_FROM_CSV" | "CAN_RESET_WORKSPACE_DATA" | "CAN_UPDATE_AUTOMATIONS" | "CAN_VIEW_AUTOMATIONS" | "CAN_VIEW_CAMPAIGNS" | "CAN_VIEW_DIALOGUE" | "CAN_VIEW_DIALOGUE_ANALYTICS" | "CAN_VIEW_USERS"
   TagTypeEnum: "AGENT" | "DEFAULT" | "LOCATION"
   TopicEnumType: "SYSTEM" | "WORKSPACE"
   TourType: "GUIDE" | "RELEASE"
@@ -1529,10 +1532,10 @@ export interface NexusGenObjects {
   }
   TourStep: { // root type
     createdAt: NexusGenScalars['Date']; // Date!
+    helperKey: string; // String!
     id: string; // String!
-    imageUrl?: string | null; // String
-    translationHelper: string; // String!
-    translationTitle: string; // String!
+    imageUrlKey?: string | null; // String
+    titleKey: string; // String!
     updatedAt: NexusGenScalars['Date']; // Date!
   }
   TriggerConditionType: { // root type
@@ -1580,7 +1583,8 @@ export interface NexusGenObjects {
   UserTour: { // root type
     createdAt: NexusGenScalars['Date']; // Date!
     id: string; // String!
-    steps?: Array<NexusGenRootTypes['TourStep'] | null> | null; // [TourStep]
+    triggerPage?: string | null; // String
+    triggerVersion?: string | null; // String
     type: NexusGenEnums['TourType']; // TourType!
     updatedAt: NexusGenScalars['Date']; // Date!
     usersOfTour?: Array<NexusGenRootTypes['TourOfUser'] | null> | null; // [TourOfUser]
@@ -2163,6 +2167,7 @@ export interface NexusGenFieldTypes {
     editUser: NexusGenRootTypes['UserType'] | null; // UserType
     editWorkspace: NexusGenRootTypes['Customer'] | null; // Customer
     enableAutomation: NexusGenRootTypes['AutomationModel'] | null; // AutomationModel
+    finishTourOfUser: NexusGenRootTypes['TourOfUser'] | null; // TourOfUser
     generateAutodeck: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
     generateWorkspaceFromCSV: NexusGenRootTypes['Customer'] | null; // Customer
     handleUserStateInWorkspace: NexusGenRootTypes['UserCustomer'] | null; // UserCustomer
@@ -2460,6 +2465,7 @@ export interface NexusGenFieldTypes {
   TourOfUser: { // field return type
     createdAt: NexusGenScalars['Date']; // Date!
     seenAt: NexusGenScalars['Date'] | null; // Date
+    tour: NexusGenRootTypes['UserTour'] | null; // UserTour
     updatedAt: NexusGenScalars['Date']; // Date!
     user: NexusGenRootTypes['UserType'] | null; // UserType
     userId: string; // String!
@@ -2467,10 +2473,10 @@ export interface NexusGenFieldTypes {
   }
   TourStep: { // field return type
     createdAt: NexusGenScalars['Date']; // Date!
+    helperKey: string; // String!
     id: string; // String!
-    imageUrl: string | null; // String
-    translationHelper: string; // String!
-    translationTitle: string; // String!
+    imageUrlKey: string | null; // String
+    titleKey: string; // String!
     updatedAt: NexusGenScalars['Date']; // Date!
   }
   TriggerConditionType: { // field return type
@@ -2524,6 +2530,8 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars['Date']; // Date!
     id: string; // String!
     steps: Array<NexusGenRootTypes['TourStep'] | null> | null; // [TourStep]
+    triggerPage: string | null; // String
+    triggerVersion: string | null; // String
     type: NexusGenEnums['TourType']; // TourType!
     updatedAt: NexusGenScalars['Date']; // Date!
     usersOfTour: Array<NexusGenRootTypes['TourOfUser'] | null> | null; // [TourOfUser]
@@ -2541,6 +2549,7 @@ export interface NexusGenFieldTypes {
     phone: string | null; // String
     role: NexusGenRootTypes['RoleType'] | null; // RoleType
     roleId: string | null; // String
+    tours: Array<NexusGenRootTypes['TourOfUser'] | null> | null; // [TourOfUser]
     userCustomers: Array<NexusGenRootTypes['UserCustomer'] | null> | null; // [UserCustomer]
   }
   VerifyUserTokenOutput: { // field return type
@@ -3120,6 +3129,7 @@ export interface NexusGenFieldTypeNames {
     editUser: 'UserType'
     editWorkspace: 'Customer'
     enableAutomation: 'AutomationModel'
+    finishTourOfUser: 'TourOfUser'
     generateAutodeck: 'CreateWorkspaceJobType'
     generateWorkspaceFromCSV: 'Customer'
     handleUserStateInWorkspace: 'UserCustomer'
@@ -3417,6 +3427,7 @@ export interface NexusGenFieldTypeNames {
   TourOfUser: { // field return type name
     createdAt: 'Date'
     seenAt: 'Date'
+    tour: 'UserTour'
     updatedAt: 'Date'
     user: 'UserType'
     userId: 'String'
@@ -3424,10 +3435,10 @@ export interface NexusGenFieldTypeNames {
   }
   TourStep: { // field return type name
     createdAt: 'Date'
+    helperKey: 'String'
     id: 'String'
-    imageUrl: 'String'
-    translationHelper: 'String'
-    translationTitle: 'String'
+    imageUrlKey: 'String'
+    titleKey: 'String'
     updatedAt: 'Date'
   }
   TriggerConditionType: { // field return type name
@@ -3481,6 +3492,8 @@ export interface NexusGenFieldTypeNames {
     createdAt: 'Date'
     id: 'String'
     steps: 'TourStep'
+    triggerPage: 'String'
+    triggerVersion: 'String'
     type: 'TourType'
     updatedAt: 'Date'
     usersOfTour: 'TourOfUser'
@@ -3498,6 +3511,7 @@ export interface NexusGenFieldTypeNames {
     phone: 'String'
     role: 'RoleType'
     roleId: 'String'
+    tours: 'TourOfUser'
     userCustomers: 'UserCustomer'
   }
   VerifyUserTokenOutput: { // field return type name
@@ -3774,6 +3788,9 @@ export interface NexusGenArgTypes {
     }
     enableAutomation: { // args
       input?: NexusGenInputs['EnableAutomationInput'] | null; // EnableAutomationInput
+    }
+    finishTourOfUser: { // args
+      input: NexusGenInputs['FinishTourOfUserInput']; // FinishTourOfUserInput!
     }
     generateAutodeck: { // args
       input?: NexusGenInputs['GenerateAutodeckInput'] | null; // GenerateAutodeckInput

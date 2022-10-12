@@ -7,6 +7,18 @@ export class UserTourPrismaAdapter {
     this.prisma = prisma;
   }
 
+  public async updateTourOfUser(userTourId: string, userId: string, data: Prisma.TourOfUserUpdateInput) {
+    return this.prisma.tourOfUser.update({
+      where: {
+        userId_userTourId: {
+          userId,
+          userTourId,
+        },
+      },
+      data,
+    })
+  }
+
   public async createManyTourOfUser(data: Prisma.TourOfUserCreateManyInput[]) {
     return this.prisma.tourOfUser.createMany({
       data,
@@ -33,11 +45,18 @@ export class UserTourPrismaAdapter {
     });
   };
 
-  // public async findManyToursOfUser() {
-  //   return this.prisma.tourOfUser.findMany({
-  //     wh
-  //   })
-  // }
+  public async findManyToursOfUser(where: Prisma.TourOfUserWhereInput) {
+    return this.prisma.tourOfUser.findMany({
+      where,
+      include: {
+        userTour: {
+          include: {
+            steps: true,
+          },
+        },
+      },
+    });
+  };
 
   public async findManyUserTours(where: Prisma.UserTourWhereInput) {
     return this.prisma.userTour.findMany({

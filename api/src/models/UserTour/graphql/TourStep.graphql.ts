@@ -7,9 +7,9 @@ export const TourStep = objectType({
     t.nonNull.date('createdAt');
     t.nonNull.date('updatedAt');
 
-    t.nonNull.string('translationTitle');
-    t.nonNull.string('translationHelper');
-    t.string('imageUrl');
+    t.nonNull.string('titleKey');
+    t.nonNull.string('helperKey');
+    t.string('imageUrlKey');
 
   },
 })
