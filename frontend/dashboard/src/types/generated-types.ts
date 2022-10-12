@@ -1493,6 +1493,7 @@ export type InviteUserInput = {
   roleId: Scalars['String'];
   email: Scalars['String'];
   customerId: Scalars['String'];
+  sendInviteEmail: Scalars['Boolean'];
 };
 
 export type InviteUserOutput = {
@@ -1919,7 +1920,7 @@ export type MutationDeleteAutomationArgs = {
 
 
 export type MutationSendAutomationDialogueLinkArgs = {
-  input?: Maybe<SendAutomationDialogueLinkInput>;
+  input: SendAutomationDialogueLinkInput;
 };
 
 
@@ -2436,7 +2437,7 @@ export type QueryTagsArgs = {
 
 
 export type QueryIssueArgs = {
-  input?: Maybe<GetIssueResolverInput>;
+  input: GetIssueResolverInput;
   actionableFilter?: Maybe<ActionRequestFilterInput>;
 };
 
@@ -2937,6 +2938,7 @@ export enum StatusType {
 }
 
 export enum SystemPermission {
+  CanAccessAllDialogues = 'CAN_ACCESS_ALL_DIALOGUES',
   CanViewActionRequests = 'CAN_VIEW_ACTION_REQUESTS',
   CanAccessAllActionRequests = 'CAN_ACCESS_ALL_ACTION_REQUESTS',
   CanResetWorkspaceData = 'CAN_RESET_WORKSPACE_DATA',
@@ -3841,7 +3843,7 @@ export type AssignUserToActionRequestMutation = (
 );
 
 export type GetIssueQueryVariables = Exact<{
-  input?: Maybe<GetIssueResolverInput>;
+  input: GetIssueResolverInput;
   actionableFilter?: Maybe<ActionRequestConnectionFilterInput>;
 }>;
 
@@ -4815,6 +4817,19 @@ export type HandleUserStateInWorkspaceMutation = (
   )> }
 );
 
+export type InviteUserMutationVariables = Exact<{
+  input?: Maybe<InviteUserInput>;
+}>;
+
+
+export type InviteUserMutation = (
+  { __typename?: 'Mutation' }
+  & { inviteUser?: Maybe<(
+    { __typename?: 'InviteUserOutput' }
+    & Pick<InviteUserOutput, 'didInvite' | 'didAlreadyExist'>
+  )> }
+);
+
 export type UpdatePermissionsMutationVariables = Exact<{
   input: UpdatePermissionsInput;
 }>;
@@ -5750,7 +5765,7 @@ export type AssignUserToActionRequestMutationHookResult = ReturnType<typeof useA
 export type AssignUserToActionRequestMutationResult = Apollo.MutationResult<AssignUserToActionRequestMutation>;
 export type AssignUserToActionRequestMutationOptions = Apollo.BaseMutationOptions<AssignUserToActionRequestMutation, AssignUserToActionRequestMutationVariables>;
 export const GetIssueDocument = gql`
-    query GetIssue($input: GetIssueResolverInput, $actionableFilter: ActionRequestConnectionFilterInput) {
+    query GetIssue($input: GetIssueResolverInput!, $actionableFilter: ActionRequestConnectionFilterInput) {
   issue(input: $input) {
     id
     topicId
@@ -5809,7 +5824,7 @@ export const GetIssueDocument = gql`
  *   },
  * });
  */
-export function useGetIssueQuery(baseOptions?: Apollo.QueryHookOptions<GetIssueQuery, GetIssueQueryVariables>) {
+export function useGetIssueQuery(baseOptions: Apollo.QueryHookOptions<GetIssueQuery, GetIssueQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetIssueQuery, GetIssueQueryVariables>(GetIssueDocument, options);
       }
@@ -7942,6 +7957,40 @@ export function useHandleUserStateInWorkspaceMutation(baseOptions?: Apollo.Mutat
 export type HandleUserStateInWorkspaceMutationHookResult = ReturnType<typeof useHandleUserStateInWorkspaceMutation>;
 export type HandleUserStateInWorkspaceMutationResult = Apollo.MutationResult<HandleUserStateInWorkspaceMutation>;
 export type HandleUserStateInWorkspaceMutationOptions = Apollo.BaseMutationOptions<HandleUserStateInWorkspaceMutation, HandleUserStateInWorkspaceMutationVariables>;
+export const InviteUserDocument = gql`
+    mutation inviteUser($input: InviteUserInput) {
+  inviteUser(input: $input) {
+    didInvite
+    didAlreadyExist
+  }
+}
+    `;
+export type InviteUserMutationFn = Apollo.MutationFunction<InviteUserMutation, InviteUserMutationVariables>;
+
+/**
+ * __useInviteUserMutation__
+ *
+ * To run a mutation, you first call `useInviteUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useInviteUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [inviteUserMutation, { data, loading, error }] = useInviteUserMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useInviteUserMutation(baseOptions?: Apollo.MutationHookOptions<InviteUserMutation, InviteUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<InviteUserMutation, InviteUserMutationVariables>(InviteUserDocument, options);
+      }
+export type InviteUserMutationHookResult = ReturnType<typeof useInviteUserMutation>;
+export type InviteUserMutationResult = Apollo.MutationResult<InviteUserMutation>;
+export type InviteUserMutationOptions = Apollo.BaseMutationOptions<InviteUserMutation, InviteUserMutationVariables>;
 export const UpdatePermissionsDocument = gql`
     mutation updatePermissions($input: UpdatePermissionsInput!) {
   updatePermissions(input: $input) {
@@ -8661,6 +8710,13 @@ export namespace HandleUserStateInWorkspace {
   export type HandleUserStateInWorkspace = (NonNullable<HandleUserStateInWorkspaceMutation['handleUserStateInWorkspace']>);
   export type User = (NonNullable<(NonNullable<HandleUserStateInWorkspaceMutation['handleUserStateInWorkspace']>)['user']>);
   export const Document = HandleUserStateInWorkspaceDocument;
+}
+
+export namespace InviteUser {
+  export type Variables = InviteUserMutationVariables;
+  export type Mutation = InviteUserMutation;
+  export type InviteUser = (NonNullable<InviteUserMutation['inviteUser']>);
+  export const Document = InviteUserDocument;
 }
 
 export namespace UpdatePermissions {

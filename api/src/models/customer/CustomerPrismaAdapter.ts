@@ -15,10 +15,15 @@ export class CustomerPrismaAdapter {
   /**
    * Fetches all dialogues
    */
-  async getDialogues(workspaceId: string, userId: string, dialogueFragments?: string[]) {
+  async getDialogues(
+    workspaceId: string,
+    userId: string,
+    dialogueFragments?: string[],
+    canAccessAllDialogues: boolean = false
+  ) {
     let query: Prisma.DialogueWhereInput = {
       customerId: workspaceId,
-      OR: [
+      OR: !canAccessAllDialogues ? [
         {
           isPrivate: true,
           assignees: {
@@ -30,7 +35,7 @@ export class CustomerPrismaAdapter {
         {
           isPrivate: false,
         },
-      ],
+      ] : undefined,
     };
 
     if (dialogueFragments?.length) {

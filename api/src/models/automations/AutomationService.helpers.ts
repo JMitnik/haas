@@ -63,23 +63,6 @@ export const findLambdaParamsByActionType = (
       return generateLambdaParams;
   }
 }
-/**
- * Finds the correct deployed lambdaArn based on automation action
- */
-export const findLambdaArnByAction = (type: AutomationActionType) => {
-  switch (type) {
-    case AutomationActionType.SEND_DIALOGUE_LINK:
-      return process.env.SEND_DIALOGUE_LINK_LAMBDA_ARN as string;
-    case AutomationActionType.WEEK_REPORT:
-      return process.env.GENERATE_REPORT_LAMBDA_ARN as string
-    case AutomationActionType.MONTH_REPORT:
-      return process.env.GENERATE_REPORT_LAMBDA_ARN as string
-    case AutomationActionType.YEAR_REPORT:
-      return process.env.GENERATE_REPORT_LAMBDA_ARN as string
-    default:
-      return process.env.GENERATE_REPORT_LAMBDA_ARN as string
-  }
-}
 
 /**
  * Converts a dayOfWeek cron entry into an array of day entries

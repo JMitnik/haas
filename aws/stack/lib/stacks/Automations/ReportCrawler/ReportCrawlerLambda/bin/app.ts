@@ -8,7 +8,7 @@ export const authenticateLambda = async (
   authenticateEmail: string,
   workspaceEmail: string,
   authToken: string
- ) => {
+) => {
   return axios.post(url, {
     query: `
     mutation authenticateLambda($input: AuthenticateLambdaInput) {
@@ -23,13 +23,13 @@ export const authenticateLambda = async (
       lambda: authToken,
     },
   })
-  .then(function (response) {
-    console.log('RESPONSE: ', response.data);
-    return response.data;
-  })
-  .catch(function (error) {
-    console.log('ERROR AXIOS', error);
-  });
+    .then(function (response) {
+      console.log('RESPONSE: ', response.data);
+      return response.data;
+    })
+    .catch(function (error) {
+      console.log('ERROR AXIOS', error);
+    });
 }
 
 const verifyToken = async (apiUrl: string, token: string) => {

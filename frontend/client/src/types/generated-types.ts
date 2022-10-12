@@ -4,7 +4,7 @@ export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-const defaultOptions = {}
+const defaultOptions =  {}
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -44,21 +44,21 @@ export type ActionRequest = {
   issueId?: Maybe<Scalars['String']>;
   requestEmail?: Maybe<Scalars['String']>;
   isVerified: Scalars['Boolean'];
-  status: ActionableState;
+  status: ActionRequestState;
   assignee?: Maybe<UserType>;
   dialogue?: Maybe<Dialogue>;
   issue?: Maybe<IssueModel>;
   session?: Maybe<Session>;
 };
 
-export type ActionableConnection = ConnectionInterface & {
-  __typename?: 'ActionableConnection';
+export type ActionRequestConnection = ConnectionInterface & {
+  __typename?: 'ActionRequestConnection';
   totalPages?: Maybe<Scalars['Int']>;
   pageInfo?: Maybe<PaginationPageInfo>;
   actionRequests?: Maybe<Array<Maybe<ActionRequest>>>;
 };
 
-export type ActionableConnectionFilterInput = {
+export type ActionRequestConnectionFilterInput = {
   search?: Maybe<Scalars['String']>;
   startDate?: Maybe<Scalars['DateString']>;
   endDate?: Maybe<Scalars['DateString']>;
@@ -67,41 +67,41 @@ export type ActionableConnectionFilterInput = {
   isVerified?: Maybe<Scalars['Boolean']>;
   topic?: Maybe<Scalars['String']>;
   dialogueId?: Maybe<Scalars['String']>;
-  status?: Maybe<ActionableState>;
-  orderBy?: Maybe<ActionableConnectionOrderByInput>;
+  status?: Maybe<ActionRequestState>;
+  orderBy?: Maybe<ActionRequestConnectionOrderByInput>;
   offset: Scalars['Int'];
   perPage?: Scalars['Int'];
 };
 
 /** Sorting of ActionableConnection */
-export type ActionableConnectionOrderByInput = {
-  by: ActionableConnectionOrderType;
+export type ActionRequestConnectionOrderByInput = {
+  by: ActionRequestConnectionOrderType;
   desc?: Maybe<Scalars['Boolean']>;
 };
 
 /** Fields to order ActionableConnection by. */
-export enum ActionableConnectionOrderType {
+export enum ActionRequestConnectionOrderType {
   CreatedAt = 'createdAt'
 }
 
-export type ActionableFilterInput = {
+export type ActionRequestFilterInput = {
   startDate?: Maybe<Scalars['DateString']>;
   endDate?: Maybe<Scalars['DateString']>;
   assigneeId?: Maybe<Scalars['String']>;
   withFollowUpAction?: Maybe<Scalars['Boolean']>;
-  status?: Maybe<ActionableState>;
+  status?: Maybe<ActionRequestState>;
 };
 
-export enum ActionableState {
+export enum ActionRequestState {
   Pending = 'PENDING',
   Stale = 'STALE',
   Completed = 'COMPLETED',
   Dropped = 'DROPPED'
 }
 
-/** Basic statistics for actionRequests of an issue */
-export type ActionableStatistics = {
-  __typename?: 'ActionableStatistics';
+/** Basic statistics for action requests of an issue */
+export type ActionRequestStatistics = {
+  __typename?: 'ActionRequestStatistics';
   /** Number of responses */
   responseCount: Scalars['Int'];
   /** Average value of summarizable statistic */
@@ -125,10 +125,10 @@ export type AppendToInteractionInput = {
   data?: Maybe<NodeEntryDataInput>;
 };
 
-export type AssignUserToActionableInput = {
+export type AssignUserToActionRequestInput = {
   workspaceId: Scalars['String'];
   assigneeId?: Maybe<Scalars['String']>;
-  actionableId: Scalars['String'];
+  actionRequestId: Scalars['String'];
 };
 
 export type AssignUserToDialogueInput = {
@@ -731,7 +731,7 @@ export type Customer = {
   sessionConnection?: Maybe<SessionConnection>;
   /** Workspace statistics */
   statistics?: Maybe<WorkspaceStatistics>;
-  actionRequestConnection?: Maybe<ActionableConnection>;
+  actionRequestConnection?: Maybe<ActionRequestConnection>;
   issueConnection?: Maybe<IssueConnection>;
   issueDialogues?: Maybe<Array<Maybe<Issue>>>;
   issueTopics?: Maybe<Array<Maybe<Issue>>>;
@@ -762,7 +762,7 @@ export type CustomerSessionConnectionArgs = {
 
 
 export type CustomerActionRequestConnectionArgs = {
-  input?: Maybe<ActionableConnectionFilterInput>;
+  input?: Maybe<ActionRequestConnectionFilterInput>;
 };
 
 
@@ -1570,19 +1570,19 @@ export type IssueModel = {
   topic: Topic;
   /** Number of different teams issue exists for */
   teamCount: Scalars['Int'];
-  basicStats?: Maybe<ActionableStatistics>;
-  actionRequestConnection?: Maybe<ActionableConnection>;
+  basicStats?: Maybe<ActionRequestStatistics>;
+  actionRequestConnection?: Maybe<ActionRequestConnection>;
   actionRequests: Array<Maybe<ActionRequest>>;
 };
 
 
 export type IssueModelActionRequestConnectionArgs = {
-  input?: Maybe<ActionableConnectionFilterInput>;
+  input?: Maybe<ActionRequestConnectionFilterInput>;
 };
 
 
 export type IssueModelActionRequestsArgs = {
-  input?: Maybe<ActionableFilterInput>;
+  input?: Maybe<ActionRequestFilterInput>;
 };
 
 
@@ -1711,8 +1711,8 @@ export type MostTrendingTopic = {
 export type Mutation = {
   __typename?: 'Mutation';
   assignUserToActionRequest?: Maybe<ActionRequest>;
-  setActionableStatus?: Maybe<ActionRequest>;
-  verifyActionable?: Maybe<ActionRequest>;
+  setActionRequestStatus?: Maybe<ActionRequest>;
+  verifyActionRequest?: Maybe<ActionRequest>;
   sandbox?: Maybe<Scalars['String']>;
   generateWorkspaceFromCSV?: Maybe<Customer>;
   resetWorkspaceData?: Maybe<Scalars['Boolean']>;
@@ -1788,18 +1788,18 @@ export type Mutation = {
 };
 
 
-export type MutationAssignUserToActionableArgs = {
-  input: AssignUserToActionableInput;
+export type MutationAssignUserToActionRequestArgs = {
+  input: AssignUserToActionRequestInput;
 };
 
 
-export type MutationSetActionableStatusArgs = {
-  input: SetActionableStatusInput;
+export type MutationSetActionRequestStatusArgs = {
+  input: SetActionRequestStatusInput;
 };
 
 
-export type MutationVerifyActionableArgs = {
-  input: VerifyActionableInput;
+export type MutationVerifyActionRequestArgs = {
+  input: VerifyActionRequestInput;
 };
 
 
@@ -1919,7 +1919,7 @@ export type MutationDeleteAutomationArgs = {
 
 
 export type MutationSendAutomationDialogueLinkArgs = {
-  input?: Maybe<SendAutomationDialogueLinkInput>;
+  input: SendAutomationDialogueLinkInput;
 };
 
 
@@ -2436,8 +2436,8 @@ export type QueryTagsArgs = {
 
 
 export type QueryIssueArgs = {
-  input?: Maybe<GetIssueResolverInput>;
-  actionableFilter?: Maybe<ActionableFilterInput>;
+  input: GetIssueResolverInput;
+  actionableFilter?: Maybe<ActionRequestFilterInput>;
 };
 
 
@@ -2850,9 +2850,9 @@ export type SessionWhereUniqueInput = {
   dialogueId?: Maybe<Scalars['ID']>;
 };
 
-export type SetActionableStatusInput = {
-  status: ActionableState;
-  actionableId: Scalars['String'];
+export type SetActionRequestStatusInput = {
+  status: ActionRequestState;
+  actionRequestId: Scalars['String'];
   workspaceId: Scalars['String'];
 };
 
@@ -2937,6 +2937,7 @@ export enum StatusType {
 }
 
 export enum SystemPermission {
+  CanAccessAllDialogues = 'CAN_ACCESS_ALL_DIALOGUES',
   CanViewActionRequests = 'CAN_VIEW_ACTION_REQUESTS',
   CanAccessAllActionRequests = 'CAN_ACCESS_ALL_ACTION_REQUESTS',
   CanResetWorkspaceData = 'CAN_RESET_WORKSPACE_DATA',
@@ -3264,9 +3265,9 @@ export type UserTypeAssignedDialoguesArgs = {
   input?: Maybe<UserOfCustomerInput>;
 };
 
-export type VerifyActionableInput = {
+export type VerifyActionRequestInput = {
   workspaceId: Scalars['String'];
-  actionableId: Scalars['String'];
+  actionRequestId: Scalars['String'];
 };
 
 export type VerifyUserTokenOutput = {
@@ -3389,27 +3390,21 @@ export type GetDeliveryQueryVariables = Exact<{
 
 export type GetDeliveryQuery = (
   { __typename?: 'Query' }
-  & {
-    delivery?: Maybe<(
-      { __typename?: 'DeliveryType' }
-      & Pick<DeliveryType, 'id'>
-      & {
-        campaignVariant?: Maybe<(
-          { __typename?: 'CampaignVariantType' }
-          & Pick<CampaignVariantType, 'id'>
-          & {
-            dialogue?: Maybe<(
-              { __typename?: 'Dialogue' }
-              & Pick<Dialogue, 'slug'>
-            )>, workspace?: Maybe<(
-              { __typename?: 'Customer' }
-              & Pick<Customer, 'slug'>
-            )>
-          }
-        )>
-      }
-    )>
-  }
+  & { delivery?: Maybe<(
+    { __typename?: 'DeliveryType' }
+    & Pick<DeliveryType, 'id'>
+    & { campaignVariant?: Maybe<(
+      { __typename?: 'CampaignVariantType' }
+      & Pick<CampaignVariantType, 'id'>
+      & { dialogue?: Maybe<(
+        { __typename?: 'Dialogue' }
+        & Pick<Dialogue, 'slug'>
+      )>, workspace?: Maybe<(
+        { __typename?: 'Customer' }
+        & Pick<Customer, 'slug'>
+      )> }
+    )> }
+  )> }
 );
 
 export type UpdateDeliveryStatusMutationVariables = Exact<{
@@ -3430,12 +3425,10 @@ export type AppendToInteractionMutationVariables = Exact<{
 
 export type AppendToInteractionMutation = (
   { __typename?: 'Mutation' }
-  & {
-    appendToInteraction?: Maybe<(
-      { __typename?: 'Session' }
-      & Pick<Session, 'id'>
-    )>
-  }
+  & { appendToInteraction?: Maybe<(
+    { __typename?: 'Session' }
+    & Pick<Session, 'id'>
+  )> }
 );
 
 export type CreateSessionMutationVariables = Exact<{
@@ -3445,70 +3438,58 @@ export type CreateSessionMutationVariables = Exact<{
 
 export type CreateSessionMutation = (
   { __typename?: 'Mutation' }
-  & {
-    createSession?: Maybe<(
-      { __typename?: 'Session' }
-      & Pick<Session, 'id'>
-    )>
-  }
+  & { createSession?: Maybe<(
+    { __typename?: 'Session' }
+    & Pick<Session, 'id'>
+  )> }
 );
 
-export type VerifyActionableMutationVariables = Exact<{
-  input: VerifyActionableInput;
+export type VerifyActionRequestMutationVariables = Exact<{
+  input: VerifyActionRequestInput;
 }>;
 
 
-export type VerifyActionableMutation = (
+export type VerifyActionRequestMutation = (
   { __typename?: 'Mutation' }
-  & {
-    verifyActionable?: Maybe<(
-      { __typename?: 'ActionRequest' }
-      & Pick<ActionRequest, 'id'>
-    )>
-  }
+  & { verifyActionRequest?: Maybe<(
+    { __typename?: 'ActionRequest' }
+    & Pick<ActionRequest, 'id'>
+  )> }
 );
 
 export type CustomerFragmentFragment = (
   { __typename?: 'Customer' }
   & Pick<Customer, 'id' | 'name' | 'slug'>
-  & {
-    settings?: Maybe<(
-      { __typename?: 'CustomerSettings' }
-      & Pick<CustomerSettings, 'id' | 'logoUrl' | 'logoOpacity'>
-      & {
-        colourSettings?: Maybe<(
-          { __typename?: 'ColourSettings' }
-          & Pick<ColourSettings, 'id' | 'primary' | 'primaryAlt' | 'secondary'>
-        )>
-      }
-    )>, dialogues?: Maybe<Array<Maybe<(
-      { __typename?: 'Dialogue' }
-      & Pick<Dialogue, 'id' | 'slug' | 'description' | 'title' | 'publicTitle'>
-    )>>>
-  }
+  & { settings?: Maybe<(
+    { __typename?: 'CustomerSettings' }
+    & Pick<CustomerSettings, 'id' | 'logoUrl' | 'logoOpacity'>
+    & { colourSettings?: Maybe<(
+      { __typename?: 'ColourSettings' }
+      & Pick<ColourSettings, 'id' | 'primary' | 'primaryAlt' | 'secondary'>
+    )> }
+  )>, dialogues?: Maybe<Array<Maybe<(
+    { __typename?: 'Dialogue' }
+    & Pick<Dialogue, 'id' | 'slug' | 'description' | 'title' | 'publicTitle'>
+  )>>> }
 );
 
 export type EdgeFragmentFragment = (
   { __typename?: 'Edge' }
   & Pick<Edge, 'id'>
-  & {
-    conditions?: Maybe<Array<(
-      { __typename?: 'EdgeCondition' }
-      & Pick<EdgeCondition, 'id' | 'conditionType' | 'matchValue' | 'renderMin' | 'renderMax'>
-    )>>, parentNode?: Maybe<(
-      { __typename?: 'QuestionNode' }
-      & Pick<QuestionNode, 'id' | 'title'>
-    )>, childNode?: Maybe<(
-      { __typename?: 'QuestionNode' }
-      & Pick<QuestionNode, 'id' | 'title' | 'isRoot' | 'type'>
-      & {
-        children?: Maybe<Array<(
-          { __typename?: 'Edge' }
-          & Pick<Edge, 'id'>
-        )>>
-      }
-    )>
-  }
+  & { conditions?: Maybe<Array<(
+    { __typename?: 'EdgeCondition' }
+    & Pick<EdgeCondition, 'id' | 'conditionType' | 'matchValue' | 'renderMin' | 'renderMax'>
+  )>>, parentNode?: Maybe<(
+    { __typename?: 'QuestionNode' }
+    & Pick<QuestionNode, 'id' | 'title'>
+  )>, childNode?: Maybe<(
+    { __typename?: 'QuestionNode' }
+    & Pick<QuestionNode, 'id' | 'title' | 'isRoot' | 'type'>
+    & { children?: Maybe<Array<(
+      { __typename?: 'Edge' }
+      & Pick<Edge, 'id'>
+    )>> }
+  )> }
 );
 
 export type GetCustomerQueryVariables = Exact<{
@@ -3519,131 +3500,105 @@ export type GetCustomerQueryVariables = Exact<{
 
 export type GetCustomerQuery = (
   { __typename?: 'Query' }
-  & {
-    customer?: Maybe<(
-      { __typename?: 'Customer' }
-      & Pick<Customer, 'id' | 'name' | 'slug'>
-      & {
-        dialogue?: Maybe<(
-          { __typename?: 'Dialogue' }
-          & Pick<Dialogue, 'id' | 'title' | 'slug' | 'publicTitle' | 'language' | 'creationDate' | 'updatedAt' | 'customerId'>
-          & {
-            postLeafNode?: Maybe<(
-              { __typename?: 'DialogueFinisherObjectType' }
-              & Pick<DialogueFinisherObjectType, 'header' | 'subtext'>
-            )>, leafs?: Maybe<Array<(
-              { __typename?: 'QuestionNode' }
-              & QuestionFragmentFragment
-            )>>, rootQuestion?: Maybe<(
-              { __typename?: 'QuestionNode' }
-              & QuestionFragmentFragment
-            )>, questions?: Maybe<Array<(
-              { __typename?: 'QuestionNode' }
-              & QuestionFragmentFragment
-            )>>, edges?: Maybe<Array<Maybe<(
-              { __typename?: 'Edge' }
-              & EdgeFragmentFragment
-            )>>>
-          }
-        )>, settings?: Maybe<(
-          { __typename?: 'CustomerSettings' }
-          & Pick<CustomerSettings, 'id' | 'logoUrl' | 'logoOpacity'>
-          & {
-            colourSettings?: Maybe<(
-              { __typename?: 'ColourSettings' }
-              & Pick<ColourSettings, 'id' | 'primary' | 'primaryAlt' | 'secondary'>
-            )>
-          }
-        )>
-      }
-    )>
-  }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id' | 'name' | 'slug'>
+    & { dialogue?: Maybe<(
+      { __typename?: 'Dialogue' }
+      & Pick<Dialogue, 'id' | 'title' | 'slug' | 'publicTitle' | 'language' | 'creationDate' | 'updatedAt' | 'customerId'>
+      & { postLeafNode?: Maybe<(
+        { __typename?: 'DialogueFinisherObjectType' }
+        & Pick<DialogueFinisherObjectType, 'header' | 'subtext'>
+      )>, leafs?: Maybe<Array<(
+        { __typename?: 'QuestionNode' }
+        & QuestionFragmentFragment
+      )>>, rootQuestion?: Maybe<(
+        { __typename?: 'QuestionNode' }
+        & QuestionFragmentFragment
+      )>, questions?: Maybe<Array<(
+        { __typename?: 'QuestionNode' }
+        & QuestionFragmentFragment
+      )>>, edges?: Maybe<Array<Maybe<(
+        { __typename?: 'Edge' }
+        & EdgeFragmentFragment
+      )>>> }
+    )>, settings?: Maybe<(
+      { __typename?: 'CustomerSettings' }
+      & Pick<CustomerSettings, 'id' | 'logoUrl' | 'logoOpacity'>
+      & { colourSettings?: Maybe<(
+        { __typename?: 'ColourSettings' }
+        & Pick<ColourSettings, 'id' | 'primary' | 'primaryAlt' | 'secondary'>
+      )> }
+    )> }
+  )> }
 );
 
 export type QuestionFragmentFragment = (
   { __typename?: 'QuestionNode' }
   & Pick<QuestionNode, 'id' | 'title' | 'isRoot' | 'isLeaf' | 'type' | 'extraContent'>
-  & {
-    children?: Maybe<Array<(
-      { __typename?: 'Edge' }
-      & {
-        parentNode?: Maybe<(
-          { __typename?: 'QuestionNode' }
-          & Pick<QuestionNode, 'id'>
-        )>, childNode?: Maybe<(
-          { __typename?: 'QuestionNode' }
-          & Pick<QuestionNode, 'id'>
-        )>
-      }
-      & EdgeFragmentFragment
-    )>>, overrideLeaf?: Maybe<(
+  & { children?: Maybe<Array<(
+    { __typename?: 'Edge' }
+    & { parentNode?: Maybe<(
       { __typename?: 'QuestionNode' }
-      & Pick<QuestionNode, 'id' | 'title' | 'type'>
-    )>, share?: Maybe<(
-      { __typename?: 'ShareNodeType' }
-      & Pick<ShareNodeType, 'id' | 'title' | 'url' | 'tooltip'>
-    )>, form?: Maybe<(
-      { __typename?: 'FormNodeType' }
-      & Pick<FormNodeType, 'id' | 'helperText'>
-      & {
-        preForm?: Maybe<(
-          { __typename?: 'PreFormNodeType' }
-          & Pick<PreFormNodeType, 'id' | 'header' | 'helper' | 'nextText' | 'finishText'>
-        )>, steps?: Maybe<Array<(
-          { __typename?: 'FormNodeStep' }
-          & Pick<FormNodeStep, 'id' | 'header' | 'helper' | 'subHelper' | 'position' | 'type'>
-          & {
-            fields?: Maybe<Array<(
-              { __typename?: 'FormNodeField' }
-              & Pick<FormNodeField, 'id' | 'label' | 'type' | 'placeholder' | 'isRequired' | 'position'>
-              & {
-                contacts?: Maybe<Array<Maybe<(
-                  { __typename?: 'UserType' }
-                  & Pick<UserType, 'id' | 'email' | 'firstName' | 'lastName'>
-                )>>>
-              }
-            )>>
-          }
-        )>>, fields?: Maybe<Array<(
-          { __typename?: 'FormNodeField' }
-          & Pick<FormNodeField, 'id' | 'label' | 'type' | 'placeholder' | 'isRequired' | 'position'>
-          & {
-            contacts?: Maybe<Array<Maybe<(
-              { __typename?: 'UserType' }
-              & Pick<UserType, 'id' | 'email' | 'firstName' | 'lastName'>
-            )>>>
-          }
-        )>>
-      }
-    )>, links: Array<(
-      { __typename?: 'LinkType' }
-      & Pick<LinkType, 'url' | 'type' | 'title' | 'iconUrl' | 'backgroundColor' | 'buttonText' | 'header' | 'subHeader' | 'imageUrl'>
-    )>, sliderNode?: Maybe<(
-      { __typename?: 'SliderNodeType' }
-      & Pick<SliderNodeType, 'id' | 'happyText' | 'unhappyText'>
-      & {
-        markers?: Maybe<Array<(
-          { __typename?: 'SliderNodeMarkerType' }
-          & Pick<SliderNodeMarkerType, 'id' | 'label' | 'subLabel'>
-          & {
-            range?: Maybe<(
-              { __typename?: 'SliderNodeRangeType' }
-              & Pick<SliderNodeRangeType, 'id' | 'start' | 'end'>
-            )>
-          }
-        )>>
-      }
-    )>, options?: Maybe<Array<Maybe<(
-      { __typename?: 'QuestionOption' }
-      & Pick<QuestionOption, 'id' | 'value' | 'publicValue'>
-      & {
-        overrideLeaf?: Maybe<(
-          { __typename?: 'QuestionNode' }
-          & Pick<QuestionNode, 'id'>
-        )>
-      }
-    )>>>
-  }
+      & Pick<QuestionNode, 'id'>
+    )>, childNode?: Maybe<(
+      { __typename?: 'QuestionNode' }
+      & Pick<QuestionNode, 'id'>
+    )> }
+    & EdgeFragmentFragment
+  )>>, overrideLeaf?: Maybe<(
+    { __typename?: 'QuestionNode' }
+    & Pick<QuestionNode, 'id' | 'title' | 'type'>
+  )>, share?: Maybe<(
+    { __typename?: 'ShareNodeType' }
+    & Pick<ShareNodeType, 'id' | 'title' | 'url' | 'tooltip'>
+  )>, form?: Maybe<(
+    { __typename?: 'FormNodeType' }
+    & Pick<FormNodeType, 'id' | 'helperText'>
+    & { preForm?: Maybe<(
+      { __typename?: 'PreFormNodeType' }
+      & Pick<PreFormNodeType, 'id' | 'header' | 'helper' | 'nextText' | 'finishText'>
+    )>, steps?: Maybe<Array<(
+      { __typename?: 'FormNodeStep' }
+      & Pick<FormNodeStep, 'id' | 'header' | 'helper' | 'subHelper' | 'position' | 'type'>
+      & { fields?: Maybe<Array<(
+        { __typename?: 'FormNodeField' }
+        & Pick<FormNodeField, 'id' | 'label' | 'type' | 'placeholder' | 'isRequired' | 'position'>
+        & { contacts?: Maybe<Array<Maybe<(
+          { __typename?: 'UserType' }
+          & Pick<UserType, 'id' | 'email' | 'firstName' | 'lastName'>
+        )>>> }
+      )>> }
+    )>>, fields?: Maybe<Array<(
+      { __typename?: 'FormNodeField' }
+      & Pick<FormNodeField, 'id' | 'label' | 'type' | 'placeholder' | 'isRequired' | 'position'>
+      & { contacts?: Maybe<Array<Maybe<(
+        { __typename?: 'UserType' }
+        & Pick<UserType, 'id' | 'email' | 'firstName' | 'lastName'>
+      )>>> }
+    )>> }
+  )>, links: Array<(
+    { __typename?: 'LinkType' }
+    & Pick<LinkType, 'url' | 'type' | 'title' | 'iconUrl' | 'backgroundColor' | 'buttonText' | 'header' | 'subHeader' | 'imageUrl'>
+  )>, sliderNode?: Maybe<(
+    { __typename?: 'SliderNodeType' }
+    & Pick<SliderNodeType, 'id' | 'happyText' | 'unhappyText'>
+    & { markers?: Maybe<Array<(
+      { __typename?: 'SliderNodeMarkerType' }
+      & Pick<SliderNodeMarkerType, 'id' | 'label' | 'subLabel'>
+      & { range?: Maybe<(
+        { __typename?: 'SliderNodeRangeType' }
+        & Pick<SliderNodeRangeType, 'id' | 'start' | 'end'>
+      )> }
+    )>> }
+  )>, options?: Maybe<Array<Maybe<(
+    { __typename?: 'QuestionOption' }
+    & Pick<QuestionOption, 'id' | 'value' | 'publicValue'>
+    & { overrideLeaf?: Maybe<(
+      { __typename?: 'QuestionNode' }
+      & Pick<QuestionNode, 'id'>
+    )> }
+  )>>> }
 );
 
 export const CustomerFragmentFragmentDoc = gql`
@@ -3841,19 +3796,19 @@ export const GetDeliveryDocument = gql`
  * });
  */
 export function useGetDeliveryQuery(baseOptions?: Apollo.QueryHookOptions<GetDeliveryQuery, GetDeliveryQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useQuery<GetDeliveryQuery, GetDeliveryQueryVariables>(GetDeliveryDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetDeliveryQuery, GetDeliveryQueryVariables>(GetDeliveryDocument, options);
+      }
 export function useGetDeliveryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDeliveryQuery, GetDeliveryQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useLazyQuery<GetDeliveryQuery, GetDeliveryQueryVariables>(GetDeliveryDocument, options);
-}
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetDeliveryQuery, GetDeliveryQueryVariables>(GetDeliveryDocument, options);
+        }
 export type GetDeliveryQueryHookResult = ReturnType<typeof useGetDeliveryQuery>;
 export type GetDeliveryLazyQueryHookResult = ReturnType<typeof useGetDeliveryLazyQuery>;
 export type GetDeliveryQueryResult = Apollo.QueryResult<GetDeliveryQuery, GetDeliveryQueryVariables>;
 export function refetchGetDeliveryQuery(variables?: GetDeliveryQueryVariables) {
-  return { query: GetDeliveryDocument, variables: variables }
-}
+      return { query: GetDeliveryDocument, variables: variables }
+    }
 export const UpdateDeliveryStatusDocument = gql`
     mutation UpdateDeliveryStatus($deliveryId: String!, $status: DeliveryStatusEnum!) {
   updateDeliveryStatus(deliveryId: $deliveryId, status: $status)
@@ -3880,9 +3835,9 @@ export type UpdateDeliveryStatusMutationFn = Apollo.MutationFunction<UpdateDeliv
  * });
  */
 export function useUpdateDeliveryStatusMutation(baseOptions?: Apollo.MutationHookOptions<UpdateDeliveryStatusMutation, UpdateDeliveryStatusMutationVariables>) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useMutation<UpdateDeliveryStatusMutation, UpdateDeliveryStatusMutationVariables>(UpdateDeliveryStatusDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateDeliveryStatusMutation, UpdateDeliveryStatusMutationVariables>(UpdateDeliveryStatusDocument, options);
+      }
 export type UpdateDeliveryStatusMutationHookResult = ReturnType<typeof useUpdateDeliveryStatusMutation>;
 export type UpdateDeliveryStatusMutationResult = Apollo.MutationResult<UpdateDeliveryStatusMutation>;
 export type UpdateDeliveryStatusMutationOptions = Apollo.BaseMutationOptions<UpdateDeliveryStatusMutation, UpdateDeliveryStatusMutationVariables>;
@@ -3913,9 +3868,9 @@ export type AppendToInteractionMutationFn = Apollo.MutationFunction<AppendToInte
  * });
  */
 export function useAppendToInteractionMutation(baseOptions?: Apollo.MutationHookOptions<AppendToInteractionMutation, AppendToInteractionMutationVariables>) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useMutation<AppendToInteractionMutation, AppendToInteractionMutationVariables>(AppendToInteractionDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AppendToInteractionMutation, AppendToInteractionMutationVariables>(AppendToInteractionDocument, options);
+      }
 export type AppendToInteractionMutationHookResult = ReturnType<typeof useAppendToInteractionMutation>;
 export type AppendToInteractionMutationResult = Apollo.MutationResult<AppendToInteractionMutation>;
 export type AppendToInteractionMutationOptions = Apollo.BaseMutationOptions<AppendToInteractionMutation, AppendToInteractionMutationVariables>;
@@ -3946,45 +3901,45 @@ export type CreateSessionMutationFn = Apollo.MutationFunction<CreateSessionMutat
  * });
  */
 export function useCreateSessionMutation(baseOptions?: Apollo.MutationHookOptions<CreateSessionMutation, CreateSessionMutationVariables>) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useMutation<CreateSessionMutation, CreateSessionMutationVariables>(CreateSessionDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateSessionMutation, CreateSessionMutationVariables>(CreateSessionDocument, options);
+      }
 export type CreateSessionMutationHookResult = ReturnType<typeof useCreateSessionMutation>;
 export type CreateSessionMutationResult = Apollo.MutationResult<CreateSessionMutation>;
 export type CreateSessionMutationOptions = Apollo.BaseMutationOptions<CreateSessionMutation, CreateSessionMutationVariables>;
-export const VerifyActionableDocument = gql`
-    mutation VerifyActionable($input: VerifyActionableInput!) {
-  verifyActionable(input: $input) {
+export const VerifyActionRequestDocument = gql`
+    mutation VerifyActionRequest($input: VerifyActionRequestInput!) {
+  verifyActionRequest(input: $input) {
     id
   }
 }
     `;
-export type VerifyActionableMutationFn = Apollo.MutationFunction<VerifyActionableMutation, VerifyActionableMutationVariables>;
+export type VerifyActionRequestMutationFn = Apollo.MutationFunction<VerifyActionRequestMutation, VerifyActionRequestMutationVariables>;
 
 /**
- * __useVerifyActionableMutation__
+ * __useVerifyActionRequestMutation__
  *
- * To run a mutation, you first call `useVerifyActionableMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useVerifyActionableMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useVerifyActionRequestMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useVerifyActionRequestMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [verifyActionableMutation, { data, loading, error }] = useVerifyActionableMutation({
+ * const [verifyActionRequestMutation, { data, loading, error }] = useVerifyActionRequestMutation({
  *   variables: {
  *      input: // value for 'input'
  *   },
  * });
  */
-export function useVerifyActionableMutation(baseOptions?: Apollo.MutationHookOptions<VerifyActionableMutation, VerifyActionableMutationVariables>) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useMutation<VerifyActionableMutation, VerifyActionableMutationVariables>(VerifyActionableDocument, options);
-}
-export type VerifyActionableMutationHookResult = ReturnType<typeof useVerifyActionableMutation>;
-export type VerifyActionableMutationResult = Apollo.MutationResult<VerifyActionableMutation>;
-export type VerifyActionableMutationOptions = Apollo.BaseMutationOptions<VerifyActionableMutation, VerifyActionableMutationVariables>;
+export function useVerifyActionRequestMutation(baseOptions?: Apollo.MutationHookOptions<VerifyActionRequestMutation, VerifyActionRequestMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<VerifyActionRequestMutation, VerifyActionRequestMutationVariables>(VerifyActionRequestDocument, options);
+      }
+export type VerifyActionRequestMutationHookResult = ReturnType<typeof useVerifyActionRequestMutation>;
+export type VerifyActionRequestMutationResult = Apollo.MutationResult<VerifyActionRequestMutation>;
+export type VerifyActionRequestMutationOptions = Apollo.BaseMutationOptions<VerifyActionRequestMutation, VerifyActionRequestMutationVariables>;
 export const GetCustomerDocument = gql`
     query GetCustomer($slug: String!, $dialogueSlug: String!) {
   customer(slug: $slug) {
@@ -4051,19 +4006,19 @@ ${EdgeFragmentFragmentDoc}`;
  * });
  */
 export function useGetCustomerQuery(baseOptions: Apollo.QueryHookOptions<GetCustomerQuery, GetCustomerQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useQuery<GetCustomerQuery, GetCustomerQueryVariables>(GetCustomerDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetCustomerQuery, GetCustomerQueryVariables>(GetCustomerDocument, options);
+      }
 export function useGetCustomerLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCustomerQuery, GetCustomerQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useLazyQuery<GetCustomerQuery, GetCustomerQueryVariables>(GetCustomerDocument, options);
-}
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetCustomerQuery, GetCustomerQueryVariables>(GetCustomerDocument, options);
+        }
 export type GetCustomerQueryHookResult = ReturnType<typeof useGetCustomerQuery>;
 export type GetCustomerLazyQueryHookResult = ReturnType<typeof useGetCustomerLazyQuery>;
 export type GetCustomerQueryResult = Apollo.QueryResult<GetCustomerQuery, GetCustomerQueryVariables>;
 export function refetchGetCustomerQuery(variables?: GetCustomerQueryVariables) {
-  return { query: GetCustomerDocument, variables: variables }
-}
+      return { query: GetCustomerDocument, variables: variables }
+    }
 export namespace GetDelivery {
   export type Variables = GetDeliveryQueryVariables;
   export type Query = GetDeliveryQuery;
@@ -4094,11 +4049,11 @@ export namespace CreateSession {
   export const Document = CreateSessionDocument;
 }
 
-export namespace VerifyActionable {
-  export type Variables = VerifyActionableMutationVariables;
-  export type Mutation = VerifyActionableMutation;
-  export type VerifyActionable = (NonNullable<VerifyActionableMutation['verifyActionable']>);
-  export const Document = VerifyActionableDocument;
+export namespace VerifyActionRequest {
+  export type Variables = VerifyActionRequestMutationVariables;
+  export type Mutation = VerifyActionRequestMutation;
+  export type VerifyActionRequest = (NonNullable<VerifyActionRequestMutation['verifyActionRequest']>);
+  export const Document = VerifyActionRequestDocument;
 }
 
 export namespace CustomerFragment {

@@ -599,14 +599,15 @@ class SessionService {
   getWorkspaceSessionConnection = async (
     workspaceId: string,
     userId: string,
-    filter?: SessionConnectionFilterInput | null
+    filter?: SessionConnectionFilterInput | null,
+    canAccessAllDialogues: boolean = false,
   ): Promise<SessionConnection | null> => {
     const offset = filter?.offset ?? 0;
     const perPage = filter?.perPage ?? 5;
     let dialogueIds = filter?.dialogueIds;
 
     if (!dialogueIds?.length) {
-      const dialogues = await this.workspaceService.getDialogues(workspaceId, userId);
+      const dialogues = await this.workspaceService.getDialogues(workspaceId, userId, undefined, canAccessAllDialogues);
       dialogueIds = dialogues.map((dialogue) => dialogue.id);
     }
 

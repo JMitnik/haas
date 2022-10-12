@@ -95,7 +95,6 @@ const CustomerRoutes = () => (
 
                       <GuardedRoute
                         allowedPermission={SystemPermission.CanViewDialogueAnalytics}
-                        redirectRoute="/dashboard/b/:customerSlug/d/:dialogueSlug/interactions"
                         path="/dashboard/b/:customerSlug/d/:dialogueSlug"
                         render={() => <DialoguePage />}
                       />
