@@ -7,7 +7,10 @@ import { SchedulePeriod } from './SchedulePeriod.helper';
 export class DialogueSchedule {
   constructor(public fields: DialogueScheduleFields) {}
 
-  public get enabledEvaluation(): boolean {
+  /**
+   * Calculates if `evaluation` of our dialogues according to this schedule is active.
+   */
+  public get evaluationIsActive(): boolean {
     // If the schedule is disabled, we always enable evaluation.
     if (!this.fields.isEnabled) return true;
 
@@ -22,6 +25,9 @@ export class DialogueSchedule {
     return schedule.isActive;
   }
 
+  /**
+   * Serializes class to GraphQL.
+   */
   public toGraphQL() {
     return {
       ...this.fields,

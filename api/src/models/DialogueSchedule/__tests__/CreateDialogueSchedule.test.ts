@@ -37,8 +37,8 @@ describe('CreateDialogueSchedule', () => {
 
     const res = await mutate({
       workspaceId,
-      dataPeriod: { startDateExpression: '59 23 * * 1', endDateExpression: '59 23 * * 1' },
-      evaluationPeriod: { startDateExpression: '59 23 * * 3', endDateExpression: '59 23 * * 5' },
+      dataPeriod: { startDateExpression: '59 23 * * 1', endInDeltaMinutes: 20 },
+      evaluationPeriod: { startDateExpression: '59 23 * * 3', endInDeltaMinutes: 20 },
     }, token);
 
     const dialogueSchedules = await prisma.dialogueSchedule.findMany({

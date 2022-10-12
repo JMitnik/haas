@@ -43,3 +43,14 @@ export const ModalHead = ({ children }: ModalHeadProps) => (
     {children}
   </ModalHeadContainer>
 )
+
+interface ModalFooterProps {
+  noPadding?: boolean;
+}
+
+export const ModalFooter = styled(Div)<ModalFooterProps>`
+  ${({ theme, noPadding }) => css`
+    padding: ${noPadding ? 0 : `${theme.gutter * 1.5}px`};
+    border-top: 1px solid ${theme.colors.neutral[500]};
+  `}
+`;

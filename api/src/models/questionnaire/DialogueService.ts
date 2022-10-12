@@ -647,7 +647,7 @@ class DialogueService {
   public async isOnline(workspaceId: string) {
     const schedule = await this.dialogueScheduleService.findByWorkspaceID(workspaceId);
 
-    return schedule ? schedule.enabledEvaluation : true;
+    return schedule ? schedule.evaluationIsActive : true;
   }
 
   /**
@@ -658,7 +658,7 @@ class DialogueService {
 
     return dialogues.map(dialogue => ({
       ...dialogue,
-      isOnline: schedule ? schedule.enabledEvaluation : true,
+      isOnline: schedule ? schedule.evaluationIsActive : true,
     }))
   }
 

@@ -11,6 +11,34 @@ const language = {
     },
   },
   general: {
+    weekday_mon: {
+      en: 'Monday',
+      de: 'Montag',
+    },
+    weekday_tue: {
+      en: 'Tuesday',
+      de: 'Dinstag',
+    },
+    weekday_wed: {
+      en: 'Wednesday',
+      de: 'Mittwoch',
+    },
+    weekday_thu: {
+      en: 'Thursday',
+      de: 'Donnerstag',
+    },
+    weekday_fri: {
+      en: 'Friday',
+      de: 'Freitag',
+    },
+    weekday_sat: {
+      en: 'Saturday',
+      de: 'Samstag',
+    },
+    weekday_sun: {
+      en: 'Sunday',
+      de: 'Sonntag',
+    },
     save_template_related_questions: {
       en: 'Save for template-related questions?',
       de: 'Für vorlagenbezogene Fragen speichern?',

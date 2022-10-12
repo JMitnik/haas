@@ -3786,7 +3786,17 @@ export type AutomationConnectionQuery = (
   & { customer?: Maybe<(
     { __typename?: 'Customer' }
     & Pick<Customer, 'id' | 'slug'>
-    & { automationConnection?: Maybe<(
+    & { dialogueSchedule?: Maybe<(
+      { __typename?: 'DialogueSchedule' }
+      & Pick<DialogueSchedule, 'id'>
+      & { dataPeriodSchedule?: Maybe<(
+        { __typename?: 'DataPeriodSchedule' }
+        & Pick<DataPeriodSchedule, 'id' | 'startDateExpression' | 'endInDeltaMinutes'>
+      )>, evaluationPeriodSchedule?: Maybe<(
+        { __typename?: 'EvaluationPeriodSchedule' }
+        & Pick<EvaluationPeriodSchedule, 'id' | 'startDateExpression' | 'endInDeltaMinutes'>
+      )> }
+    )>, automationConnection?: Maybe<(
       { __typename?: 'AutomationConnection' }
       & Pick<AutomationConnection, 'totalPages'>
       & { pageInfo?: Maybe<(
@@ -4205,6 +4215,22 @@ export type WhitifyImageMutation = (
   & { whitifyImage?: Maybe<(
     { __typename?: 'AWSImageType' }
     & Pick<AwsImageType, 'url'>
+  )> }
+);
+
+export type CreateDialogueScheduleMutationVariables = Exact<{
+  input: CreateDialogueScheduleInput;
+}>;
+
+
+export type CreateDialogueScheduleMutation = (
+  { __typename?: 'Mutation' }
+  & { createDialogueSchedule?: Maybe<(
+    { __typename?: 'CreateDialogueScheduleOutput' }
+    & { dialogueSchedule?: Maybe<(
+      { __typename?: 'DialogueSchedule' }
+      & Pick<DialogueSchedule, 'id'>
+    )> }
   )> }
 );
 
@@ -5576,6 +5602,19 @@ export const AutomationConnectionDocument = gql`
   customer(slug: $customerSlug) {
     id
     slug
+    dialogueSchedule {
+      id
+      dataPeriodSchedule {
+        id
+        startDateExpression
+        endInDeltaMinutes
+      }
+      evaluationPeriodSchedule {
+        id
+        startDateExpression
+        endInDeltaMinutes
+      }
+    }
     automationConnection(filter: $filter) {
       totalPages
       pageInfo {
@@ -6550,6 +6589,41 @@ export function useWhitifyImageMutation(baseOptions?: Apollo.MutationHookOptions
 export type WhitifyImageMutationHookResult = ReturnType<typeof useWhitifyImageMutation>;
 export type WhitifyImageMutationResult = Apollo.MutationResult<WhitifyImageMutation>;
 export type WhitifyImageMutationOptions = Apollo.BaseMutationOptions<WhitifyImageMutation, WhitifyImageMutationVariables>;
+export const CreateDialogueScheduleDocument = gql`
+    mutation CreateDialogueSchedule($input: CreateDialogueScheduleInput!) {
+  createDialogueSchedule(input: $input) {
+    dialogueSchedule {
+      id
+    }
+  }
+}
+    `;
+export type CreateDialogueScheduleMutationFn = Apollo.MutationFunction<CreateDialogueScheduleMutation, CreateDialogueScheduleMutationVariables>;
+
+/**
+ * __useCreateDialogueScheduleMutation__
+ *
+ * To run a mutation, you first call `useCreateDialogueScheduleMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateDialogueScheduleMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createDialogueScheduleMutation, { data, loading, error }] = useCreateDialogueScheduleMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateDialogueScheduleMutation(baseOptions?: Apollo.MutationHookOptions<CreateDialogueScheduleMutation, CreateDialogueScheduleMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateDialogueScheduleMutation, CreateDialogueScheduleMutationVariables>(CreateDialogueScheduleDocument, options);
+      }
+export type CreateDialogueScheduleMutationHookResult = ReturnType<typeof useCreateDialogueScheduleMutation>;
+export type CreateDialogueScheduleMutationResult = Apollo.MutationResult<CreateDialogueScheduleMutation>;
+export type CreateDialogueScheduleMutationOptions = Apollo.BaseMutationOptions<CreateDialogueScheduleMutation, CreateDialogueScheduleMutationVariables>;
 export const DeleteAutomationDocument = gql`
     mutation deleteAutomation($input: DeleteAutomationInput) {
   deleteAutomation(input: $input) {
@@ -8258,6 +8332,9 @@ export namespace AutomationConnection {
   export type Variables = AutomationConnectionQueryVariables;
   export type Query = AutomationConnectionQuery;
   export type Customer = (NonNullable<AutomationConnectionQuery['customer']>);
+  export type DialogueSchedule = (NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['dialogueSchedule']>);
+  export type DataPeriodSchedule = (NonNullable<(NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['dialogueSchedule']>)['dataPeriodSchedule']>);
+  export type EvaluationPeriodSchedule = (NonNullable<(NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['dialogueSchedule']>)['evaluationPeriodSchedule']>);
   export type AutomationConnection = (NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['automationConnection']>);
   export type PageInfo = (NonNullable<(NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['automationConnection']>)['pageInfo']>);
   export type Automations = NonNullable<(NonNullable<(NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['automationConnection']>)['automations']>)[number]>;
@@ -8445,6 +8522,14 @@ export namespace WhitifyImage {
   export type Mutation = WhitifyImageMutation;
   export type WhitifyImage = (NonNullable<WhitifyImageMutation['whitifyImage']>);
   export const Document = WhitifyImageDocument;
+}
+
+export namespace CreateDialogueSchedule {
+  export type Variables = CreateDialogueScheduleMutationVariables;
+  export type Mutation = CreateDialogueScheduleMutation;
+  export type CreateDialogueSchedule = (NonNullable<CreateDialogueScheduleMutation['createDialogueSchedule']>);
+  export type DialogueSchedule = (NonNullable<(NonNullable<CreateDialogueScheduleMutation['createDialogueSchedule']>)['dialogueSchedule']>);
+  export const Document = CreateDialogueScheduleDocument;
 }
 
 export namespace DeleteAutomation {
