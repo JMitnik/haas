@@ -637,6 +637,12 @@ export type CreateCampaignVariantInputType = {
   customVariables?: Maybe<Array<Maybe<CreateCampaignCustomVariable>>>;
 };
 
+/** Input for creating a dialogue schedule. */
+export type CreateDataPeriodInput = {
+  startDateExpression: Scalars['String'];
+  endInDeltaMinutes: Scalars['Int'];
+};
+
 export type CreateDialogueInputType = {
   customerSlug?: Maybe<Scalars['String']>;
   title?: Maybe<Scalars['String']>;
@@ -648,6 +654,25 @@ export type CreateDialogueInputType = {
   publicTitle?: Maybe<Scalars['String']>;
   tags?: Maybe<TagsInputObjectType>;
   language?: Maybe<LanguageEnumType>;
+};
+
+/** Input for creating a dialogue schedule. */
+export type CreateDialogueScheduleInput = {
+  workspaceId: Scalars['String'];
+  dataPeriod: CreateDataPeriodInput;
+  evaluationPeriod?: Maybe<CreateEvaluationPeriodInput>;
+};
+
+/** Result of creating dialogue schedule */
+export type CreateDialogueScheduleOutput = {
+  __typename?: 'CreateDialogueScheduleOutput';
+  dialogueSchedule?: Maybe<DialogueSchedule>;
+};
+
+/** Input for creating a dialogue schedule. */
+export type CreateEvaluationPeriodInput = {
+  startDateExpression: Scalars['String'];
+  endInDeltaMinutes?: Maybe<Scalars['Int']>;
 };
 
 export type CreateQuestionNodeInputType = {
@@ -732,6 +757,7 @@ export type Customer = {
   /** Workspace statistics */
   statistics?: Maybe<WorkspaceStatistics>;
   actionRequestConnection?: Maybe<ActionRequestConnection>;
+  dialogueSchedule?: Maybe<DialogueSchedule>;
   issueConnection?: Maybe<IssueConnection>;
   issueDialogues?: Maybe<Array<Maybe<Issue>>>;
   issueTopics?: Maybe<Array<Maybe<Issue>>>;
@@ -854,6 +880,14 @@ export type CustomerSettings = {
 
 export type CustomerWhereUniqueInput = {
   id: Scalars['ID'];
+};
+
+/** A data period schedule defines the general */
+export type DataPeriodSchedule = {
+  __typename?: 'DataPeriodSchedule';
+  id?: Maybe<Scalars['ID']>;
+  startDateExpression?: Maybe<Scalars['String']>;
+  endInDeltaMinutes?: Maybe<Scalars['Int']>;
 };
 
 
@@ -1027,6 +1061,8 @@ export type Dialogue = {
   statistics?: Maybe<DialogueStatistics>;
   sessionConnection?: Maybe<SessionConnection>;
   tags?: Maybe<Array<Maybe<Tag>>>;
+  /** A dialogue can be online or offline, depending on the configurations (schedule) or manual work. */
+  isOnline?: Maybe<Scalars['Boolean']>;
   customerId?: Maybe<Scalars['String']>;
   customer?: Maybe<Customer>;
   rootQuestion?: Maybe<QuestionNode>;
@@ -1162,6 +1198,17 @@ export enum DialogueImpactScoreType {
   Average = 'AVERAGE'
 }
 
+/**
+ * A dialogue schedule defines the data period (period of time whilst data is good),
+ * and evaluation period (period of time when a dialogue may be enabled).
+ */
+export type DialogueSchedule = {
+  __typename?: 'DialogueSchedule';
+  id?: Maybe<Scalars['ID']>;
+  evaluationPeriodSchedule?: Maybe<EvaluationPeriodSchedule>;
+  dataPeriodSchedule?: Maybe<DataPeriodSchedule>;
+};
+
 export type DialogueStatistics = {
   __typename?: 'DialogueStatistics';
   nrInteractions?: Maybe<Scalars['Int']>;
@@ -1266,6 +1313,18 @@ export type EnableAutomationInput = {
   workspaceId: Scalars['String'];
   automationId: Scalars['String'];
   state: Scalars['Boolean'];
+};
+
+/**
+ * The Evaluation Period Schedule is used to define an opening and closing range for our dialogues.
+ *
+ * Currently workspace-wide.
+ */
+export type EvaluationPeriodSchedule = {
+  __typename?: 'EvaluationPeriodSchedule';
+  id?: Maybe<Scalars['ID']>;
+  startDateExpression?: Maybe<Scalars['String']>;
+  endInDeltaMinutes?: Maybe<Scalars['Int']>;
 };
 
 export type FailedDeliveryModel = {
@@ -1713,6 +1772,8 @@ export type Mutation = {
   assignUserToActionRequest?: Maybe<ActionRequest>;
   setActionRequestStatus?: Maybe<ActionRequest>;
   verifyActionRequest?: Maybe<ActionRequest>;
+  /** Creates a dialogue schedule in the backend */
+  createDialogueSchedule?: Maybe<CreateDialogueScheduleOutput>;
   sandbox?: Maybe<Scalars['String']>;
   generateWorkspaceFromCSV?: Maybe<Customer>;
   resetWorkspaceData?: Maybe<Scalars['Boolean']>;
@@ -1800,6 +1861,11 @@ export type MutationSetActionRequestStatusArgs = {
 
 export type MutationVerifyActionRequestArgs = {
   input: VerifyActionRequestInput;
+};
+
+
+export type MutationCreateDialogueScheduleArgs = {
+  input: CreateDialogueScheduleInput;
 };
 
 
@@ -1919,7 +1985,7 @@ export type MutationDeleteAutomationArgs = {
 
 
 export type MutationSendAutomationDialogueLinkArgs = {
-  input?: Maybe<SendAutomationDialogueLinkInput>;
+  input: SendAutomationDialogueLinkInput;
 };
 
 
@@ -2436,7 +2502,7 @@ export type QueryTagsArgs = {
 
 
 export type QueryIssueArgs = {
-  input?: Maybe<GetIssueResolverInput>;
+  input: GetIssueResolverInput;
   actionableFilter?: Maybe<ActionRequestFilterInput>;
 };
 
@@ -2937,6 +3003,7 @@ export enum StatusType {
 }
 
 export enum SystemPermission {
+  CanAccessAllDialogues = 'CAN_ACCESS_ALL_DIALOGUES',
   CanViewActionRequests = 'CAN_VIEW_ACTION_REQUESTS',
   CanAccessAllActionRequests = 'CAN_ACCESS_ALL_ACTION_REQUESTS',
   CanResetWorkspaceData = 'CAN_RESET_WORKSPACE_DATA',
@@ -3841,7 +3908,7 @@ export type AssignUserToActionRequestMutation = (
 );
 
 export type GetIssueQueryVariables = Exact<{
-  input?: Maybe<GetIssueResolverInput>;
+  input: GetIssueResolverInput;
   actionableFilter?: Maybe<ActionRequestConnectionFilterInput>;
 }>;
 
@@ -5750,7 +5817,7 @@ export type AssignUserToActionRequestMutationHookResult = ReturnType<typeof useA
 export type AssignUserToActionRequestMutationResult = Apollo.MutationResult<AssignUserToActionRequestMutation>;
 export type AssignUserToActionRequestMutationOptions = Apollo.BaseMutationOptions<AssignUserToActionRequestMutation, AssignUserToActionRequestMutationVariables>;
 export const GetIssueDocument = gql`
-    query GetIssue($input: GetIssueResolverInput, $actionableFilter: ActionRequestConnectionFilterInput) {
+    query GetIssue($input: GetIssueResolverInput!, $actionableFilter: ActionRequestConnectionFilterInput) {
   issue(input: $input) {
     id
     topicId
@@ -5809,7 +5876,7 @@ export const GetIssueDocument = gql`
  *   },
  * });
  */
-export function useGetIssueQuery(baseOptions?: Apollo.QueryHookOptions<GetIssueQuery, GetIssueQueryVariables>) {
+export function useGetIssueQuery(baseOptions: Apollo.QueryHookOptions<GetIssueQuery, GetIssueQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<GetIssueQuery, GetIssueQueryVariables>(GetIssueDocument, options);
       }

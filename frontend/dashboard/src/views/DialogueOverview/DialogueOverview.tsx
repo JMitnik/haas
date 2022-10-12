@@ -5,6 +5,7 @@ import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
+import * as Modal from 'components/Common/Modal';
 import * as Popover from 'components/Common/Popover';
 import * as Table from 'components/Common/Table';
 import {
@@ -20,6 +21,7 @@ import { View } from 'layouts/View';
 import Searchbar from 'components/Common/SearchBar';
 import useAuth from 'hooks/useAuth';
 
+import { DialogueScheduleModalBody } from './DialogueScheduleModalBody';
 import { useClipboard } from '@chakra-ui/core';
 import { useCustomer } from 'providers/CustomerProvider';
 import DialogueCard from './DialogueCard';
@@ -68,6 +70,8 @@ const DialogueOverview = () => {
   const filteredDialogues = activeDialogueConnection?.dialogues || [];
   const pageCount = activeDialogueConnection?.totalPages || 0;
 
+  const [openScheduleModal, setOpenScheduleModal] = useState(false);
+
   const [openShare, setOpenShare] = useState(false);
   const shareUrl = `${window.location.origin}/public/dialogue-link-fetch?workspaceId=${activeCustomer?.id}`;
   const { onCopy, hasCopied } = useClipboard(shareUrl);
@@ -86,6 +90,17 @@ const DialogueOverview = () => {
                   {t('teams_subtitle')}
                 </UI.ViewSubTitle>
               </UI.Div>
+
+              <UI.Button onClick={() => setOpenScheduleModal(true)}>
+                Schedule
+              </UI.Button>
+
+              <Modal.Root
+                open={openScheduleModal}
+                onClose={() => setOpenScheduleModal(false)}
+              >
+                <DialogueScheduleModalBody />
+              </Modal.Root>
 
               {canDeleteDialogue && (
                 <UI.Flex>
