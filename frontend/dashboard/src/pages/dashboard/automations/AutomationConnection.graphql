@@ -3,19 +3,19 @@ query automationConnection($customerSlug: String, $filter: AutomationConnectionF
     id
     slug
     dialogueSchedule {
+      id
+      isEnabled
+      dataPeriodSchedule {
         id
-        isEnabled
-        dataPeriodSchedule {
-          id
-          startDateExpression
-          endInDeltaMinutes
-        }
-        evaluationPeriodSchedule {
-          id
-          startDateExpression
-          endInDeltaMinutes
-        }
+        startDateExpression
+        endInDeltaMinutes
       }
+      evaluationPeriodSchedule {
+        id
+        startDateExpression
+        endInDeltaMinutes
+      }
+    }
     automationConnection(filter: $filter) {
       totalPages
       pageInfo {

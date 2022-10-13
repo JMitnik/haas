@@ -7,6 +7,7 @@ import { CustomerService } from '../customer/CustomerService';
 import SessionService from '../session/SessionService';
 import NodeService from '../QuestionNode/NodeService';
 import { PrismaCacheService } from '../general/cache/PrismaCacheService';
+import { AnalyticsFilter } from '../Common/Analytics/AnalyticsFilter.helper';
 import DialoguePrismaAdapter from './DialoguePrismaAdapter';
 import { NexusGenFieldTypes } from '../../generated/nexus';
 import DialogueService from './DialogueService';
@@ -15,6 +16,7 @@ import { TopicService } from '../Topic/TopicService';
 import { TopicFilterInput } from '../Topic/Topic.types';
 import { Topic } from './Dialogue.types';
 import { toUTC } from '../../utils/dateUtils';
+import { DialogueScheduleService } from '../DialogueSchedule/DialogueScheduleService';
 
 type BasicStatistic = NexusGenFieldTypes['BasicStatistics'];
 
@@ -28,6 +30,7 @@ class DialogueStatisticsService {
   sessionService: SessionService;
   topicService: TopicService;
   prisma: PrismaClient;
+  private dialogueScheduleService: DialogueScheduleService;
 
   constructor(prismaClient: PrismaClient) {
     this.nodeEntryService = new NodeEntryService(prismaClient);
@@ -38,6 +41,7 @@ class DialogueStatisticsService {
     this.sessionService = new SessionService(prismaClient);
     this.topicService = new TopicService(prismaClient);
     this.cacheService = new PrismaCacheService(prismaClient);
+    this.dialogueScheduleService = new DialogueScheduleService(prismaClient);
     this.prisma = prismaClient;
   }
 
@@ -82,6 +86,13 @@ class DialogueStatisticsService {
     threshold: number = 70,
   ) => {
     const endDateTimeSet = !endDateTime ? addDays(startDateTime, 7) : endDateTime;
+    const filter = new AnalyticsFilter(startDateTime, endDateTimeSet);
+    const dialogueSchedule = await this.dialogueScheduleService.findByWorkspaceID(workspaceId);
+
+    if (dialogueSchedule) {
+      filter.withSchedule(dialogueSchedule);
+    }
+
     const dialogues = await this.workspaceService.getDialogues(
       workspaceId,
       userId,
@@ -91,8 +102,8 @@ class DialogueStatisticsService {
 
     const scopedSessions = await this.sessionService.findSessionsForDialogues(
       mappedDialogueIds,
-      startDateTime,
-      endDateTimeSet
+      filter.startDate,
+      filter.endDate as Date,
     );
 
     const average = meanBy(scopedSessions, (session) => session.mainScore) || 0;

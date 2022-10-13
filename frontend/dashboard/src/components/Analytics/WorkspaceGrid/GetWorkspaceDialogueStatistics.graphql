@@ -1,5 +1,14 @@
 query GetWorkspaceDialogueStatistics($workspaceId: ID!, $startDateTime: String!, $endDateTime: String!) {
   customer(id: $workspaceId) {
+    dialogueSchedule {
+      id
+      isEnabled
+      dataPeriodSchedule {
+        id
+        startDateExpression
+        endInDeltaMinutes
+      }
+    }
     organization {
       id
       layers {
@@ -9,7 +18,7 @@ query GetWorkspaceDialogueStatistics($workspaceId: ID!, $startDateTime: String!,
       }
     }
     statistics {
-			workspaceStatisticsSummary(input: { startDateTime: $startDateTime, endDateTime: $endDateTime, impactType: AVERAGE, refresh: true 
+			workspaceStatisticsSummary(input: { startDateTime: $startDateTime, endDateTime: $endDateTime, impactType: AVERAGE, refresh: true
 			}) {
 				id
 				nrVotes

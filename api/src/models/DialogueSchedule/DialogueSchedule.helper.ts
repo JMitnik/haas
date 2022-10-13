@@ -7,6 +7,17 @@ import { SchedulePeriod } from './SchedulePeriod.helper';
 export class DialogueSchedule {
   constructor(public fields: DialogueScheduleFields) {}
 
+  public get dataPeriodSchedule(): SchedulePeriod | undefined {
+    if (!this.fields.dataPeriodSchedule) return undefined;
+
+    const schedule = new SchedulePeriod(
+      this.fields.dataPeriodSchedule?.startDateExpression,
+      this.fields.dataPeriodSchedule?.endInDeltaMinutes,
+    );
+
+    return schedule;
+  }
+
   /**
    * Calculates if `evaluation` of our dialogues according to this schedule is active.
    */

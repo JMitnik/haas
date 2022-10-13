@@ -3066,8 +3066,8 @@ export type TextboxNodeEntryInput = {
 
 /** Toggle status of dialogue schedule */
 export type ToggleDialogueScheduleInput = {
-  dialogueScheduleId?: Maybe<Scalars['ID']>;
-  status?: Maybe<Scalars['Boolean']>;
+  dialogueScheduleId: Scalars['ID'];
+  status: Scalars['Boolean'];
 };
 
 /** Model for topic */
@@ -3560,7 +3560,14 @@ export type GetWorkspaceDialogueStatisticsQuery = (
   { __typename?: 'Query' }
   & { customer?: Maybe<(
     { __typename?: 'Customer' }
-    & { organization?: Maybe<(
+    & { dialogueSchedule?: Maybe<(
+      { __typename?: 'DialogueSchedule' }
+      & Pick<DialogueSchedule, 'id' | 'isEnabled'>
+      & { dataPeriodSchedule?: Maybe<(
+        { __typename?: 'DataPeriodSchedule' }
+        & Pick<DataPeriodSchedule, 'id' | 'startDateExpression' | 'endInDeltaMinutes'>
+      )> }
+    )>, organization?: Maybe<(
       { __typename?: 'Organization' }
       & Pick<Organization, 'id'>
       & { layers?: Maybe<Array<Maybe<(
@@ -5344,6 +5351,15 @@ export function refetchGetSessionPathsQuery(variables?: GetSessionPathsQueryVari
 export const GetWorkspaceDialogueStatisticsDocument = gql`
     query GetWorkspaceDialogueStatistics($workspaceId: ID!, $startDateTime: String!, $endDateTime: String!) {
   customer(id: $workspaceId) {
+    dialogueSchedule {
+      id
+      isEnabled
+      dataPeriodSchedule {
+        id
+        startDateExpression
+        endInDeltaMinutes
+      }
+    }
     organization {
       id
       layers {
@@ -8292,6 +8308,8 @@ export namespace GetWorkspaceDialogueStatistics {
   export type Variables = GetWorkspaceDialogueStatisticsQueryVariables;
   export type Query = GetWorkspaceDialogueStatisticsQuery;
   export type Customer = (NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>);
+  export type DialogueSchedule = (NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['dialogueSchedule']>);
+  export type DataPeriodSchedule = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['dialogueSchedule']>)['dataPeriodSchedule']>);
   export type Organization = (NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['organization']>);
   export type Layers = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['organization']>)['layers']>)[number]>;
   export type Statistics = (NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['statistics']>);

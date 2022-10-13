@@ -1,34 +1,5 @@
 import { Dialogue, Edge, PrismaClient, QuestionCondition, QuestionNode } from 'prisma/prisma-client';
 
-export const clearDatabase = async (prisma: PrismaClient) => {
-  await prisma.$transaction([
-    prisma.sliderNodeEntry.deleteMany({}),
-    prisma.choiceNodeEntry.deleteMany({}),
-    prisma.nodeEntry.deleteMany({}),
-    prisma.session.deleteMany({}),
-    prisma.automation.deleteMany({}),
-    prisma.automationTrigger.deleteMany({}),
-    prisma.automationEvent.deleteMany({}),
-    prisma.automationConditionOperand.deleteMany({}),
-    prisma.dialogueConditionScope.deleteMany({}),
-    prisma.questionConditionScope.deleteMany({}),
-    prisma.workspaceConditionScope.deleteMany({}),
-    prisma.automationCondition.deleteMany({}),
-    prisma.automationConditionBuilder.deleteMany({}),
-    prisma.automationAction.deleteMany({}),
-    prisma.questionCondition.deleteMany({}),
-    prisma.edge.deleteMany({}),
-    prisma.questionOption.deleteMany({}),
-    prisma.userOfCustomer.deleteMany({}),
-    prisma.user.deleteMany({}),
-    prisma.questionStatisticsSummaryCache.deleteMany({}),
-    prisma.questionNode.deleteMany({}),
-    prisma.tag.deleteMany({}),
-    prisma.dialogue.deleteMany({}),
-    prisma.customer.deleteMany({}),
-  ]);
-}
-
 export const clearCustomerDatabase = async (prisma: PrismaClient) => {
   const deleteTags = prisma.tag.deleteMany({});
   const deleteRoles = prisma.role.deleteMany({});
