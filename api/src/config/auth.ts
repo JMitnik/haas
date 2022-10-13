@@ -17,8 +17,8 @@ const isSuperAdmin = rule({ cache: 'no_cache' })(
 
 const isSelf = rule({ cache: 'no_cache' })(
   async (parent, args, ctx: APIContext) => {
-    if (!ctx.session?.user?.id || !args.userId) return new ApolloError('Unauthenticated', 'UNAUTHENTICATED');
-    if (args.userId === ctx.session?.user?.id) return true;
+    if (!ctx.session?.user?.id || (!args.userId && !args.input?.userId)) return new ApolloError('Unauthenticated', 'UNAUTHENTICATED');
+    if (args.userId === ctx.session?.user?.id || args.input?.userId === ctx.session?.user?.id) return true;
 
     return false;
   },
@@ -104,6 +104,7 @@ const authShield = shield({
     verifyUserToken: allow,
     requestInvite: allow,
     authenticateLambda: allow,
+    finishTourOfUser: or(isSelf, isSuperAdmin),
     sendAutomationDialogueLink: or(isSuperAdmin, isVerifiedUser, containsWorkspacePermission(SystemPermissionEnum.CAN_ACCESS_REPORT_PAGE)),
     sendAutomationReport: or(isSuperAdmin, isVerifiedUser, containsWorkspacePermission(SystemPermissionEnum.CAN_ACCESS_REPORT_PAGE)),
     resetWorkspaceData: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_RESET_WORKSPACE_DATA)),

@@ -12,7 +12,7 @@ export const FinishTourOfUser = mutationField('finishTourOfUser', {
 
     return ctx.services.userTourService.finishTourOfUser(
       args.input.userTourId,
-      ctx.session.user.id
+      args.input.userId
     );
   },
 })

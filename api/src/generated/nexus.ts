@@ -406,6 +406,7 @@ export interface NexusGenInputs {
     userId?: string | null; // String
   }
   FinishTourOfUserInput: { // input type
+    userId: string; // String!
     userTourId: string; // String!
   }
   FormNodeEntryFieldInput: { // input type

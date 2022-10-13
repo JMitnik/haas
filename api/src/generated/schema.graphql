@@ -1000,6 +1000,7 @@ input FindRoleInput {
 }
 
 input FinishTourOfUserInput {
+  userId: String!
   userTourId: String!
 }
 

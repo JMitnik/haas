@@ -14,7 +14,10 @@ export class UserTours {
    */
   public getFeatureTours() {
     const featureTours = this.tours.filter((tour) => tour.type === TourType.GUIDE);
-    return featureTours;
+    const filteredFeatureTours = featureTours.filter(
+      (tour) => tour?.usersOfTour.length > 0 && tour?.usersOfTour?.[0]?.seenAt === null
+    )
+    return filteredFeatureTours;
   };
 
   /**
