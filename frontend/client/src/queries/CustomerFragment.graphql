@@ -2,6 +2,17 @@ fragment CustomerFragment on Customer {
   id
   name
   slug
+  dialogueSchedule {
+    id
+    isEnabled
+    dataPeriodSchedule {
+      id
+      activeStartDate
+      activeEndDate
+      startDateExpression
+      endInDeltaMinutes
+    }
+  }
   settings {
     id
     logoUrl

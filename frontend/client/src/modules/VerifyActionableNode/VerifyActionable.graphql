@@ -1,4 +1,4 @@
-mutation VerifyActionable($input: VerifyActionableInput!) {
+mutation VerifyActionable($input: VerifyActionRequestInput!) {
   verifyActionable(input: $input) {
     id
   }
