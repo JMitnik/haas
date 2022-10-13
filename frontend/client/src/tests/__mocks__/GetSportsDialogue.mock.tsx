@@ -4,8 +4,6 @@ import {
   GetCustomerQuery,
 } from 'types/generated-types';
 
-
-
 /**
  * Mock: GetCustomerQuery
  *
