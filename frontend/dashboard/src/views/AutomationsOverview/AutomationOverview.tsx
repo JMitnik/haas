@@ -153,7 +153,7 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
                           variables: {
                             input: {
                               status: !dialogueSchedule.isEnabled,
-                              dialogueScheduleId: dialogueSchedule.id,
+                              dialogueScheduleId: dialogueSchedule.id as string,
                             },
                           },
                         })}
