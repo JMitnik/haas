@@ -1,5 +1,5 @@
 import { Prisma, PrismaClient } from '@prisma/client';
-
+import { createUserTourInclude, defaultUserTourFields, UserTour } from './UserTour.types';
 export class UserTourPrismaAdapter {
   private prisma: PrismaClient;
 
@@ -58,9 +58,10 @@ export class UserTourPrismaAdapter {
     });
   };
 
-  public async findManyUserTours(where: Prisma.UserTourWhereInput) {
+  public async findManyUserTours(where: Prisma.UserTourWhereInput, userId: string): Promise<UserTour[]> {
     return this.prisma.userTour.findMany({
       where,
+      include: createUserTourInclude(userId).include,
     });
   }
 

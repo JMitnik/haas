@@ -20,7 +20,9 @@ export const UserTour = objectType({
 
     t.list.field('steps', {
       type: 'TourStep',
-      resolve(parent, _, ctx) {
+      resolve(parent: any, _, ctx) {
+        if (parent?.steps?.length) return parent.steps;
+
         return ctx.services.userTourService.findTourStepsByUserTour(parent.id);
       },
     });

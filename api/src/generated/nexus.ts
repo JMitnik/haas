@@ -1523,6 +1523,10 @@ export interface NexusGenObjects {
     nrVotes?: number | null; // Int
     subTopics?: Array<NexusGenRootTypes['TopicType'] | null> | null; // [TopicType]
   }
+  Tour: { // root type
+    featureTours?: Array<NexusGenRootTypes['UserTour'] | null> | null; // [UserTour]
+    releaseTour?: NexusGenRootTypes['UserTour'] | null; // UserTour
+  }
   TourOfUser: { // root type
     createdAt: NexusGenScalars['Date']; // Date!
     seenAt?: NexusGenScalars['Date'] | null; // Date
@@ -2462,6 +2466,10 @@ export interface NexusGenFieldTypes {
     nrVotes: number | null; // Int
     subTopics: Array<NexusGenRootTypes['TopicType'] | null> | null; // [TopicType]
   }
+  Tour: { // field return type
+    featureTours: Array<NexusGenRootTypes['UserTour'] | null> | null; // [UserTour]
+    releaseTour: NexusGenRootTypes['UserTour'] | null; // UserTour
+  }
   TourOfUser: { // field return type
     createdAt: NexusGenScalars['Date']; // Date!
     seenAt: NexusGenScalars['Date'] | null; // Date
@@ -2549,7 +2557,7 @@ export interface NexusGenFieldTypes {
     phone: string | null; // String
     role: NexusGenRootTypes['RoleType'] | null; // RoleType
     roleId: string | null; // String
-    tours: Array<NexusGenRootTypes['TourOfUser'] | null> | null; // [TourOfUser]
+    tours: NexusGenRootTypes['Tour'] | null; // Tour
     userCustomers: Array<NexusGenRootTypes['UserCustomer'] | null> | null; // [UserCustomer]
   }
   VerifyUserTokenOutput: { // field return type
@@ -3424,6 +3432,10 @@ export interface NexusGenFieldTypeNames {
     nrVotes: 'Int'
     subTopics: 'TopicType'
   }
+  Tour: { // field return type name
+    featureTours: 'UserTour'
+    releaseTour: 'UserTour'
+  }
   TourOfUser: { // field return type name
     createdAt: 'Date'
     seenAt: 'Date'
@@ -3511,7 +3523,7 @@ export interface NexusGenFieldTypeNames {
     phone: 'String'
     role: 'RoleType'
     roleId: 'String'
-    tours: 'TourOfUser'
+    tours: 'Tour'
     userCustomers: 'UserCustomer'
   }
   VerifyUserTokenOutput: { // field return type name

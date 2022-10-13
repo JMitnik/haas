@@ -5,6 +5,7 @@ import { Kind } from 'graphql';
 
 import { ConnectionInterface } from '../../general/Pagination';
 import { RoleType, SystemPermission } from '../../role/graphql/Role';
+import { Tour } from '../../../models/UserTour';
 
 export const UserCustomerType = objectType({
   name: 'UserCustomer',
@@ -117,13 +118,12 @@ export const UserType = objectType({
       },
     });
 
-    t.list.field('tours', {
-      type: 'TourOfUser',
-
+    t.field('tours', {
+      type: Tour,
       async resolve(parent, args, ctx) {
         if (!parent.id) return null;
 
-        return ctx.services.userTourService.findUserToursByUserId(parent.id);
+        return ctx.services.userTourService.findUserTours(parent.id);
       },
     });
 

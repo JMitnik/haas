@@ -2180,6 +2180,11 @@ type TopicType {
   subTopics: [TopicType]
 }
 
+type Tour {
+  featureTours: [UserTour]
+  releaseTour: UserTour
+}
+
 type TourOfUser {
   createdAt: Date!
   seenAt: Date
@@ -2416,7 +2421,7 @@ type UserType {
   phone: String
   role: RoleType
   roleId: String
-  tours: [TourOfUser]
+  tours: Tour
   userCustomers: [UserCustomer]
 }
 
