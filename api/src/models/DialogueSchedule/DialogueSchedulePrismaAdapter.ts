@@ -70,9 +70,15 @@ export class DialogueSchedulePrismaAdapter {
       update: {
         isEnabled: query.data.isEnabled,
         dataPeriodSchedule: {
-          update: {
-            startDateExpression: query.data.dataPeriodSchedule?.create?.startDateExpression,
-            endInDeltaMinutes: query.data.dataPeriodSchedule?.create?.endInDeltaMinutes,
+          upsert: {
+            create: {
+              startDateExpression: query.data.dataPeriodSchedule?.create?.startDateExpression || '',
+              endInDeltaMinutes: query.data.dataPeriodSchedule?.create?.endInDeltaMinutes || -1,
+            },
+            update: {
+              startDateExpression: query.data.dataPeriodSchedule?.create?.startDateExpression,
+              endInDeltaMinutes: query.data.dataPeriodSchedule?.create?.endInDeltaMinutes,
+            },
           },
         },
         evaluationPeriodSchedule: query.data.evaluationPeriodSchedule?.create ? {
@@ -88,6 +94,7 @@ export class DialogueSchedulePrismaAdapter {
           },
         } : undefined,
       },
+      include: query.include,
     })
   }
 }

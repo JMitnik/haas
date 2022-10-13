@@ -17,7 +17,10 @@ export class DialogueSchedule {
    * Calculates if `evaluation` of our dialogues according to this schedule is active.
    */
   public get evaluationIsActive(): boolean {
-    return this.evalPeriodSchedule?.isActive || true;
+    if (!this.fields.isEnabled) return true;
+
+    if (this.evalPeriodSchedule?.isActive === undefined) return true;
+    return this.evalPeriodSchedule?.isActive;
   }
 
   /**

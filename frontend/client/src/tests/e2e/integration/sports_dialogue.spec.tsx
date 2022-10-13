@@ -219,7 +219,7 @@ it('dialogue follows negative flow, not share details, and goes back', () => {
  * Flow follows:
  * 1. Immediate stop
  */
-it.only('dialogue can\'t be contineud if it is blocked', () => {
+it('dialogue can\'t be contineud if it is blocked', () => {
   mockQueryGetCustomer((res) => ({
     ...res,
     // @ts-ignore
