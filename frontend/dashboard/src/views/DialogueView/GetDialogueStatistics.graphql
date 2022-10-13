@@ -8,9 +8,21 @@ query GetDialogueStatistics(
 ) {
   customer(slug: $customerSlug) {
     id
+    dialogueSchedule {
+      id
+      isEnabled
+      dataPeriodSchedule {
+        id
+        activeStartDate
+        activeEndDate
+        startDateExpression
+        endInDeltaMinutes
+      }
+    }
     dialogue(where: { slug: $dialogueSlug }) {
       id
       title
+
       healthScore(input: $healthInput) {
         nrVotes
         negativeResponseCount

@@ -105,7 +105,11 @@ export const DialogueType = objectType({
 
       resolve: async (parent, args, { services, session }) => {
         const filter = IssueValidator.resolveFilter(args.filter);
-        return await services.issueService.getProblemsByDialogue(parent.id, (session?.user?.id as string), filter) as any;
+        return await services.issueService.getProblemsByDialogue(
+          parent.id,
+          (session?.user?.id as string),
+          filter
+        ) as any;
       },
     });
 
@@ -466,6 +470,21 @@ export const DialogueType = objectType({
       },
     });
 
+    t.field('isOnline', {
+      type: 'Boolean',
+      useParentResolve: true,
+      description: `
+        A dialogue can be online or offline, depending on the configurations (schedule) or manual work.
+      `,
+      resolve(parent, args, { services }) {
+        if (!parent.customerId) {
+          return true;
+        }
+
+        return services.dialogueService.isOnline(parent.customerId);
+      },
+    });
+
     t.string('customerId');
     t.field('customer', {
       type: CustomerType,
@@ -583,9 +602,27 @@ export const DialogueMutations = extendType({
 
       async resolve(parent, args: any, ctx) {
         const {
-          input: { dialogueSlug, customerSlug, title, publicTitle, description, tags = [], templateDialogueId, language },
+          input: {
+            dialogueSlug,
+            customerSlug,
+            title,
+            publicTitle,
+            description,
+            tags = [],
+            templateDialogueId,
+            language,
+          },
         } = args;
-        const copyDialogueInput: CopyDialogueInputType = { customerSlug, dialogueSlug, templateId: templateDialogueId, title, publicTitle, description, dialogueTags: tags, language };
+        const copyDialogueInput: CopyDialogueInputType = {
+          customerSlug,
+          dialogueSlug,
+          templateId: templateDialogueId,
+          title,
+          publicTitle,
+          description,
+          dialogueTags: tags,
+          language,
+        };
 
         return ctx.services.dialogueService.copyDialogue(copyDialogueInput);
       },

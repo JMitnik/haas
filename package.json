@@ -78,6 +78,7 @@
     "db-connect-bastion:prod": "bash aws/stack/scripts/connect_to_bastion_prod.sh",
     "db-migrate-create": "yarn workspace @haas/api db-migrate-create",
     "db:migrate": "yarn workspace @haas/api migrate",
+    "db:migrate:push": "yarn workspace @haas/api db:migrate:push",
     "db:migrate:prod": "~/.config/yarn/global/node_modules/.bin/dotenv -e api/.env.prod -- yarn workspace @haas/api db-migrate:prod",
     "db:migrate:staging": "~/.config/yarn/global/node_modules/.bin/dotenv -e api/.env.staging -- yarn workspace @haas/api db-migrate:staging",
     "migrate": "yarn workspace @haas/api migrate",

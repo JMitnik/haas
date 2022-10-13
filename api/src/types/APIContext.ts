@@ -32,6 +32,7 @@ import { IssueService } from '../models/Issue/IssueService';
 import ScheduledAutomationService from '../models/automations/ScheduledAutomationService';
 import { WorkspaceStatisticsService } from '../models/customer/WorkspaceStatisticsService';
 import ActionRequestService from '../models/ActionRequest/ActionRequestService';
+import { DialogueScheduleService } from '../models/DialogueSchedule/DialogueScheduleService';
 
 export interface APIServiceContainer {
   actionRequestService: ActionRequestService;
@@ -53,6 +54,7 @@ export interface APIServiceContainer {
   edgeService: EdgeService;
   nodeEntryService: NodeEntryService;
   permissionService: PermissionService;
+  dialogueScheduleService: DialogueScheduleService;
   roleService: RoleService;
   sessionService: SessionService;
   tagService: TagService;

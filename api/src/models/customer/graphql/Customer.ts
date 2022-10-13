@@ -27,6 +27,7 @@ import { ActionRequestConnection, ActionRequestConnectionFilterInput } from '../
 import { assertNonNullish } from '../../../utils/assertNonNullish';
 import { DialogueValidator } from '../../questionnaire/DialogueValidator';
 import { WorkspaceValidator } from '../WorkspaceValidator';
+import { DialogueSchedule } from '../../DialogueSchedule/graphql';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -120,6 +121,18 @@ export const CustomerType = objectType({
       },
     });
 
+    t.field('dialogueSchedule', {
+      type: DialogueSchedule,
+      nullable: true,
+
+      async resolve(parent, args, { services }) {
+        assertNonNullish(parent.id, 'Cannot find parent ID!');
+        const schedule = await services.dialogueScheduleService.findByWorkspaceID(parent.id);
+
+        return schedule?.toGraphQL() || null;
+      },
+    })
+
     /**
      * Issues Connection
      *
@@ -179,7 +192,6 @@ export const CustomerType = objectType({
       },
     });
 
-
     t.field('dialogueConnection', {
       type: DialogueConnection,
       args: { filter: DialogueConnectionFilterInput },
@@ -191,11 +203,12 @@ export const CustomerType = objectType({
         const canAccessAllDialogues = DialogueValidator.canAccessAllDialogues(parent.id, ctx.session);
         const userId = ctx.session.user.id;
 
-        let dialogues = await ctx.services.dialogueService.paginatedDialogues(
+        const dialogues = await ctx.services.dialogueService.paginatedDialogues(
           parent.slug,
+          parent.id,
           canAccessAllDialogues,
           userId,
-          args.filter
+          args.filter,
         );
         return dialogues;
       },

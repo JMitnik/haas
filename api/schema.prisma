@@ -186,6 +186,8 @@ model Customer {
   users           UserOfCustomer[]
   topics          Topic[]
   issues          Issue[]
+
+  dialogueSchedule  DialogueSchedule?
 }
 
 model Tag {
@@ -203,6 +205,10 @@ model PostLeafNode {
   subtext  String
   dialogue Dialogue?
 }
+
+///
+// Dialogue-related fields
+///
 
 model Dialogue {
   id                          String                           @id @default(cuid())
@@ -237,6 +243,47 @@ model Dialogue {
   AutomationScheduled AutomationScheduled[]
 
   @@unique([slug, customerId], map: "Dialogue.slug_customerId_unique")
+}
+
+model DialogueSchedule {
+  id String @id @default(cuid())
+
+  // A schedule can be turned on or off.
+  isEnabled Boolean @default(false)
+
+  // A dialogue schedule belongs to a workspace, and to one at most.
+  workspaceID String @unique
+  workspace Customer @relation(fields: [workspaceID], references: [id])
+
+  // Data period schedule summarizes how often we re-interpret new data.
+  dataPeriodScheduleId  String?
+  dataPeriodSchedule DataPeriodSchedule?
+
+  // Evaluation period schedule summarizes how often we open and close the dialogues.
+  evaluationPeriodScheduleId  String?
+  evaluationPeriodSchedule EvaluationPeriodSchedule?
+}
+
+model DataPeriodSchedule {
+  id String @id @default(cuid())
+
+  // The start and end date expressions are summarized as a CRON expression, and an end range in minutes.
+  startDateExpression String
+  endInDeltaMinutes Int
+
+  dialogueScheduleId  String @unique
+  dialogueSchedule DialogueSchedule @relation(fields: [dialogueScheduleId], references: [id])
+}
+
+model EvaluationPeriodSchedule {
+  id String @id @default(cuid())
+
+  // The start and end date expressions are summarized as a CRON expression, and an end range in minutes.
+  startDateExpression String
+  endInDeltaMinutes Int
+
+  dialogueScheduleId  String @unique
+  dialogueSchedule DialogueSchedule @relation(fields: [dialogueScheduleId], references: [id])
 }
 
 enum FormNodeStepType {

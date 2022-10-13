@@ -1,9 +1,11 @@
 import { createReadStream } from 'fs';
 
 import { makeTestContext } from '../../../test/utils/makeTestContext';
-import { clearDatabase, prepDefaultCreateData } from './testUtils';
+import { prepDefaultCreateData } from './testUtils';
 import AuthService from '../../auth/AuthService';
 import { prisma } from '../../../test/setup/singletonDeps';
+
+import { clearDatabase } from '../../../test/utils/clearDatabase';
 
 jest.setTimeout(30000);
 

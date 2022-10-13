@@ -1,9 +1,11 @@
 import { makeTestContext } from '../../../test/utils/makeTestContext';
-import { clearDatabase, prepDefaultCreateData } from './testUtils';
+import { prepDefaultCreateData } from './testUtils';
 import AuthService from '../../auth/AuthService';
 import { constructValidCreateAutomationInputData } from './testData';
 
+import { clearDatabase } from '../../../test/utils/clearDatabase';
 import { prisma } from '../../../test/setup/singletonDeps';
+
 const ctx = makeTestContext(prisma);
 
 

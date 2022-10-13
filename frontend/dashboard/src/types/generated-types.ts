@@ -637,6 +637,12 @@ export type CreateCampaignVariantInputType = {
   customVariables?: Maybe<Array<Maybe<CreateCampaignCustomVariable>>>;
 };
 
+/** Input for creating a dialogue schedule. */
+export type CreateDataPeriodInput = {
+  startDateExpression: Scalars['String'];
+  endInDeltaMinutes: Scalars['Int'];
+};
+
 export type CreateDialogueInputType = {
   customerSlug?: Maybe<Scalars['String']>;
   title?: Maybe<Scalars['String']>;
@@ -648,6 +654,25 @@ export type CreateDialogueInputType = {
   publicTitle?: Maybe<Scalars['String']>;
   tags?: Maybe<TagsInputObjectType>;
   language?: Maybe<LanguageEnumType>;
+};
+
+/** Input for creating a dialogue schedule. */
+export type CreateDialogueScheduleInput = {
+  workspaceId: Scalars['String'];
+  dataPeriod: CreateDataPeriodInput;
+  evaluationPeriod?: Maybe<CreateEvaluationPeriodInput>;
+};
+
+/** Result of creating dialogue schedule */
+export type CreateDialogueScheduleOutput = {
+  __typename?: 'CreateDialogueScheduleOutput';
+  dialogueSchedule?: Maybe<DialogueSchedule>;
+};
+
+/** Input for creating a dialogue schedule. */
+export type CreateEvaluationPeriodInput = {
+  startDateExpression: Scalars['String'];
+  endInDeltaMinutes?: Maybe<Scalars['Int']>;
 };
 
 export type CreateQuestionNodeInputType = {
@@ -732,6 +757,7 @@ export type Customer = {
   /** Workspace statistics */
   statistics?: Maybe<WorkspaceStatistics>;
   actionRequestConnection?: Maybe<ActionRequestConnection>;
+  dialogueSchedule?: Maybe<DialogueSchedule>;
   issueConnection?: Maybe<IssueConnection>;
   issueDialogues?: Maybe<Array<Maybe<Issue>>>;
   issueTopics?: Maybe<Array<Maybe<Issue>>>;
@@ -854,6 +880,16 @@ export type CustomerSettings = {
 
 export type CustomerWhereUniqueInput = {
   id: Scalars['ID'];
+};
+
+/** A data period schedule defines the general */
+export type DataPeriodSchedule = {
+  __typename?: 'DataPeriodSchedule';
+  id?: Maybe<Scalars['ID']>;
+  activeStartDate?: Maybe<Scalars['DateString']>;
+  activeEndDate?: Maybe<Scalars['DateString']>;
+  startDateExpression?: Maybe<Scalars['String']>;
+  endInDeltaMinutes?: Maybe<Scalars['Int']>;
 };
 
 
@@ -1027,6 +1063,8 @@ export type Dialogue = {
   statistics?: Maybe<DialogueStatistics>;
   sessionConnection?: Maybe<SessionConnection>;
   tags?: Maybe<Array<Maybe<Tag>>>;
+  /** A dialogue can be online or offline, depending on the configurations (schedule) or manual work. */
+  isOnline?: Maybe<Scalars['Boolean']>;
   customerId?: Maybe<Scalars['String']>;
   customer?: Maybe<Customer>;
   rootQuestion?: Maybe<QuestionNode>;
@@ -1162,6 +1200,18 @@ export enum DialogueImpactScoreType {
   Average = 'AVERAGE'
 }
 
+/**
+ * A dialogue schedule defines the data period (period of time whilst data is good),
+ * and evaluation period (period of time when a dialogue may be enabled).
+ */
+export type DialogueSchedule = {
+  __typename?: 'DialogueSchedule';
+  id?: Maybe<Scalars['ID']>;
+  isEnabled?: Maybe<Scalars['Boolean']>;
+  evaluationPeriodSchedule?: Maybe<EvaluationPeriodSchedule>;
+  dataPeriodSchedule?: Maybe<DataPeriodSchedule>;
+};
+
 export type DialogueStatistics = {
   __typename?: 'DialogueStatistics';
   nrInteractions?: Maybe<Scalars['Int']>;
@@ -1266,6 +1316,19 @@ export type EnableAutomationInput = {
   workspaceId: Scalars['String'];
   automationId: Scalars['String'];
   state: Scalars['Boolean'];
+};
+
+/**
+ * The Evaluation Period Schedule is used to define an opening and closing range for our dialogues.
+ *
+ * Currently workspace-wide.
+ */
+export type EvaluationPeriodSchedule = {
+  __typename?: 'EvaluationPeriodSchedule';
+  id?: Maybe<Scalars['ID']>;
+  isActive?: Maybe<Scalars['Boolean']>;
+  startDateExpression?: Maybe<Scalars['String']>;
+  endInDeltaMinutes?: Maybe<Scalars['Int']>;
 };
 
 export type FailedDeliveryModel = {
@@ -1714,6 +1777,10 @@ export type Mutation = {
   assignUserToActionRequest?: Maybe<ActionRequest>;
   setActionRequestStatus?: Maybe<ActionRequest>;
   verifyActionRequest?: Maybe<ActionRequest>;
+  /** Creates a dialogue schedule in the backend */
+  createDialogueSchedule?: Maybe<CreateDialogueScheduleOutput>;
+  /** Creates a dialogue schedule in the backend */
+  toggleDialogueSchedule?: Maybe<DialogueSchedule>;
   sandbox?: Maybe<Scalars['String']>;
   generateWorkspaceFromCSV?: Maybe<Customer>;
   resetWorkspaceData?: Maybe<Scalars['Boolean']>;
@@ -1801,6 +1868,16 @@ export type MutationSetActionRequestStatusArgs = {
 
 export type MutationVerifyActionRequestArgs = {
   input: VerifyActionRequestInput;
+};
+
+
+export type MutationCreateDialogueScheduleArgs = {
+  input: CreateDialogueScheduleInput;
+};
+
+
+export type MutationToggleDialogueScheduleArgs = {
+  input: ToggleDialogueScheduleInput;
 };
 
 
@@ -2991,6 +3068,12 @@ export type TextboxNodeEntryInput = {
   value?: Maybe<Scalars['String']>;
 };
 
+/** Toggle status of dialogue schedule */
+export type ToggleDialogueScheduleInput = {
+  dialogueScheduleId: Scalars['ID'];
+  status: Scalars['Boolean'];
+};
+
 /** Model for topic */
 export type Topic = {
   __typename?: 'Topic';
@@ -3481,7 +3564,14 @@ export type GetWorkspaceDialogueStatisticsQuery = (
   { __typename?: 'Query' }
   & { customer?: Maybe<(
     { __typename?: 'Customer' }
-    & { organization?: Maybe<(
+    & { dialogueSchedule?: Maybe<(
+      { __typename?: 'DialogueSchedule' }
+      & Pick<DialogueSchedule, 'id' | 'isEnabled'>
+      & { dataPeriodSchedule?: Maybe<(
+        { __typename?: 'DataPeriodSchedule' }
+        & Pick<DataPeriodSchedule, 'id' | 'activeStartDate' | 'activeEndDate' | 'startDateExpression' | 'endInDeltaMinutes'>
+      )> }
+    )>, organization?: Maybe<(
       { __typename?: 'Organization' }
       & Pick<Organization, 'id'>
       & { layers?: Maybe<Array<Maybe<(
@@ -3721,7 +3811,17 @@ export type AutomationConnectionQuery = (
   & { customer?: Maybe<(
     { __typename?: 'Customer' }
     & Pick<Customer, 'id' | 'slug'>
-    & { automationConnection?: Maybe<(
+    & { dialogueSchedule?: Maybe<(
+      { __typename?: 'DialogueSchedule' }
+      & Pick<DialogueSchedule, 'id' | 'isEnabled'>
+      & { dataPeriodSchedule?: Maybe<(
+        { __typename?: 'DataPeriodSchedule' }
+        & Pick<DataPeriodSchedule, 'id' | 'startDateExpression' | 'endInDeltaMinutes'>
+      )>, evaluationPeriodSchedule?: Maybe<(
+        { __typename?: 'EvaluationPeriodSchedule' }
+        & Pick<EvaluationPeriodSchedule, 'id' | 'startDateExpression' | 'endInDeltaMinutes'>
+      )> }
+    )>, automationConnection?: Maybe<(
       { __typename?: 'AutomationConnection' }
       & Pick<AutomationConnection, 'totalPages'>
       & { pageInfo?: Maybe<(
@@ -4143,6 +4243,35 @@ export type WhitifyImageMutation = (
   )> }
 );
 
+export type CreateDialogueScheduleMutationVariables = Exact<{
+  input: CreateDialogueScheduleInput;
+}>;
+
+
+export type CreateDialogueScheduleMutation = (
+  { __typename?: 'Mutation' }
+  & { createDialogueSchedule?: Maybe<(
+    { __typename?: 'CreateDialogueScheduleOutput' }
+    & { dialogueSchedule?: Maybe<(
+      { __typename?: 'DialogueSchedule' }
+      & Pick<DialogueSchedule, 'id'>
+    )> }
+  )> }
+);
+
+export type ToggleDialogueScheduleMutationVariables = Exact<{
+  input: ToggleDialogueScheduleInput;
+}>;
+
+
+export type ToggleDialogueScheduleMutation = (
+  { __typename?: 'Mutation' }
+  & { toggleDialogueSchedule?: Maybe<(
+    { __typename?: 'DialogueSchedule' }
+    & Pick<DialogueSchedule, 'id'>
+  )> }
+);
+
 export type DeleteAutomationMutationVariables = Exact<{
   input?: Maybe<DeleteAutomationInput>;
 }>;
@@ -4456,7 +4585,14 @@ export type GetDialogueStatisticsQuery = (
   & { customer?: Maybe<(
     { __typename?: 'Customer' }
     & Pick<Customer, 'id'>
-    & { dialogue?: Maybe<(
+    & { dialogueSchedule?: Maybe<(
+      { __typename?: 'DialogueSchedule' }
+      & Pick<DialogueSchedule, 'id' | 'isEnabled'>
+      & { dataPeriodSchedule?: Maybe<(
+        { __typename?: 'DataPeriodSchedule' }
+        & Pick<DataPeriodSchedule, 'id' | 'activeStartDate' | 'activeEndDate' | 'startDateExpression' | 'endInDeltaMinutes'>
+      )> }
+    )>, dialogue?: Maybe<(
       { __typename?: 'Dialogue' }
       & Pick<Dialogue, 'id' | 'title'>
       & { healthScore?: Maybe<(
@@ -4627,7 +4763,14 @@ export type GetWorkspaceSessionsQuery = (
   & { customer?: Maybe<(
     { __typename?: 'Customer' }
     & Pick<Customer, 'id'>
-    & { sessionConnection?: Maybe<(
+    & { dialogueSchedule?: Maybe<(
+      { __typename?: 'DialogueSchedule' }
+      & Pick<DialogueSchedule, 'id' | 'isEnabled'>
+      & { dataPeriodSchedule?: Maybe<(
+        { __typename?: 'DataPeriodSchedule' }
+        & Pick<DataPeriodSchedule, 'id' | 'activeStartDate' | 'activeEndDate' | 'startDateExpression' | 'endInDeltaMinutes'>
+      )> }
+    )>, sessionConnection?: Maybe<(
       { __typename?: 'SessionConnection' }
       & Pick<SessionConnection, 'totalPages'>
       & { sessions: Array<(
@@ -5239,6 +5382,17 @@ export function refetchGetSessionPathsQuery(variables?: GetSessionPathsQueryVari
 export const GetWorkspaceDialogueStatisticsDocument = gql`
     query GetWorkspaceDialogueStatistics($workspaceId: ID!, $startDateTime: String!, $endDateTime: String!) {
   customer(id: $workspaceId) {
+    dialogueSchedule {
+      id
+      isEnabled
+      dataPeriodSchedule {
+        id
+        activeStartDate
+        activeEndDate
+        startDateExpression
+        endInDeltaMinutes
+      }
+    }
     organization {
       id
       layers {
@@ -5524,6 +5678,20 @@ export const AutomationConnectionDocument = gql`
   customer(slug: $customerSlug) {
     id
     slug
+    dialogueSchedule {
+      id
+      isEnabled
+      dataPeriodSchedule {
+        id
+        startDateExpression
+        endInDeltaMinutes
+      }
+      evaluationPeriodSchedule {
+        id
+        startDateExpression
+        endInDeltaMinutes
+      }
+    }
     automationConnection(filter: $filter) {
       totalPages
       pageInfo {
@@ -6498,6 +6666,74 @@ export function useWhitifyImageMutation(baseOptions?: Apollo.MutationHookOptions
 export type WhitifyImageMutationHookResult = ReturnType<typeof useWhitifyImageMutation>;
 export type WhitifyImageMutationResult = Apollo.MutationResult<WhitifyImageMutation>;
 export type WhitifyImageMutationOptions = Apollo.BaseMutationOptions<WhitifyImageMutation, WhitifyImageMutationVariables>;
+export const CreateDialogueScheduleDocument = gql`
+    mutation CreateDialogueSchedule($input: CreateDialogueScheduleInput!) {
+  createDialogueSchedule(input: $input) {
+    dialogueSchedule {
+      id
+    }
+  }
+}
+    `;
+export type CreateDialogueScheduleMutationFn = Apollo.MutationFunction<CreateDialogueScheduleMutation, CreateDialogueScheduleMutationVariables>;
+
+/**
+ * __useCreateDialogueScheduleMutation__
+ *
+ * To run a mutation, you first call `useCreateDialogueScheduleMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateDialogueScheduleMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createDialogueScheduleMutation, { data, loading, error }] = useCreateDialogueScheduleMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateDialogueScheduleMutation(baseOptions?: Apollo.MutationHookOptions<CreateDialogueScheduleMutation, CreateDialogueScheduleMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateDialogueScheduleMutation, CreateDialogueScheduleMutationVariables>(CreateDialogueScheduleDocument, options);
+      }
+export type CreateDialogueScheduleMutationHookResult = ReturnType<typeof useCreateDialogueScheduleMutation>;
+export type CreateDialogueScheduleMutationResult = Apollo.MutationResult<CreateDialogueScheduleMutation>;
+export type CreateDialogueScheduleMutationOptions = Apollo.BaseMutationOptions<CreateDialogueScheduleMutation, CreateDialogueScheduleMutationVariables>;
+export const ToggleDialogueScheduleDocument = gql`
+    mutation ToggleDialogueSchedule($input: ToggleDialogueScheduleInput!) {
+  toggleDialogueSchedule(input: $input) {
+    id
+  }
+}
+    `;
+export type ToggleDialogueScheduleMutationFn = Apollo.MutationFunction<ToggleDialogueScheduleMutation, ToggleDialogueScheduleMutationVariables>;
+
+/**
+ * __useToggleDialogueScheduleMutation__
+ *
+ * To run a mutation, you first call `useToggleDialogueScheduleMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useToggleDialogueScheduleMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [toggleDialogueScheduleMutation, { data, loading, error }] = useToggleDialogueScheduleMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useToggleDialogueScheduleMutation(baseOptions?: Apollo.MutationHookOptions<ToggleDialogueScheduleMutation, ToggleDialogueScheduleMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ToggleDialogueScheduleMutation, ToggleDialogueScheduleMutationVariables>(ToggleDialogueScheduleDocument, options);
+      }
+export type ToggleDialogueScheduleMutationHookResult = ReturnType<typeof useToggleDialogueScheduleMutation>;
+export type ToggleDialogueScheduleMutationResult = Apollo.MutationResult<ToggleDialogueScheduleMutation>;
+export type ToggleDialogueScheduleMutationOptions = Apollo.BaseMutationOptions<ToggleDialogueScheduleMutation, ToggleDialogueScheduleMutationVariables>;
 export const DeleteAutomationDocument = gql`
     mutation deleteAutomation($input: DeleteAutomationInput) {
   deleteAutomation(input: $input) {
@@ -7190,6 +7426,17 @@ export const GetDialogueStatisticsDocument = gql`
     query GetDialogueStatistics($customerSlug: String!, $dialogueSlug: String!, $startDateTime: String!, $endDateTime: String, $issueFilter: IssueFilterInput, $healthInput: HealthScoreInput) {
   customer(slug: $customerSlug) {
     id
+    dialogueSchedule {
+      id
+      isEnabled
+      dataPeriodSchedule {
+        id
+        activeStartDate
+        activeEndDate
+        startDateExpression
+        endInDeltaMinutes
+      }
+    }
     dialogue(where: {slug: $dialogueSlug}) {
       id
       title
@@ -7514,6 +7761,17 @@ export const GetWorkspaceSessionsDocument = gql`
     query GetWorkspaceSessions($workspaceId: ID, $filter: SessionConnectionFilterInput) {
   customer(id: $workspaceId) {
     id
+    dialogueSchedule {
+      id
+      isEnabled
+      dataPeriodSchedule {
+        id
+        activeStartDate
+        activeEndDate
+        startDateExpression
+        endInDeltaMinutes
+      }
+    }
     sessionConnection(filter: $filter) {
       sessions {
         ...SessionFragment
@@ -8139,6 +8397,8 @@ export namespace GetWorkspaceDialogueStatistics {
   export type Variables = GetWorkspaceDialogueStatisticsQueryVariables;
   export type Query = GetWorkspaceDialogueStatisticsQuery;
   export type Customer = (NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>);
+  export type DialogueSchedule = (NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['dialogueSchedule']>);
+  export type DataPeriodSchedule = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['dialogueSchedule']>)['dataPeriodSchedule']>);
   export type Organization = (NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['organization']>);
   export type Layers = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['organization']>)['layers']>)[number]>;
   export type Statistics = (NonNullable<(NonNullable<GetWorkspaceDialogueStatisticsQuery['customer']>)['statistics']>);
@@ -8240,6 +8500,9 @@ export namespace AutomationConnection {
   export type Variables = AutomationConnectionQueryVariables;
   export type Query = AutomationConnectionQuery;
   export type Customer = (NonNullable<AutomationConnectionQuery['customer']>);
+  export type DialogueSchedule = (NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['dialogueSchedule']>);
+  export type DataPeriodSchedule = (NonNullable<(NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['dialogueSchedule']>)['dataPeriodSchedule']>);
+  export type EvaluationPeriodSchedule = (NonNullable<(NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['dialogueSchedule']>)['evaluationPeriodSchedule']>);
   export type AutomationConnection = (NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['automationConnection']>);
   export type PageInfo = (NonNullable<(NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['automationConnection']>)['pageInfo']>);
   export type Automations = NonNullable<(NonNullable<(NonNullable<(NonNullable<AutomationConnectionQuery['customer']>)['automationConnection']>)['automations']>)[number]>;
@@ -8429,6 +8692,21 @@ export namespace WhitifyImage {
   export const Document = WhitifyImageDocument;
 }
 
+export namespace CreateDialogueSchedule {
+  export type Variables = CreateDialogueScheduleMutationVariables;
+  export type Mutation = CreateDialogueScheduleMutation;
+  export type CreateDialogueSchedule = (NonNullable<CreateDialogueScheduleMutation['createDialogueSchedule']>);
+  export type DialogueSchedule = (NonNullable<(NonNullable<CreateDialogueScheduleMutation['createDialogueSchedule']>)['dialogueSchedule']>);
+  export const Document = CreateDialogueScheduleDocument;
+}
+
+export namespace ToggleDialogueSchedule {
+  export type Variables = ToggleDialogueScheduleMutationVariables;
+  export type Mutation = ToggleDialogueScheduleMutation;
+  export type ToggleDialogueSchedule = (NonNullable<ToggleDialogueScheduleMutation['toggleDialogueSchedule']>);
+  export const Document = ToggleDialogueScheduleDocument;
+}
+
 export namespace DeleteAutomation {
   export type Variables = DeleteAutomationMutationVariables;
   export type Mutation = DeleteAutomationMutation;
@@ -8565,6 +8843,8 @@ export namespace GetDialogueStatistics {
   export type Variables = GetDialogueStatisticsQueryVariables;
   export type Query = GetDialogueStatisticsQuery;
   export type Customer = (NonNullable<GetDialogueStatisticsQuery['customer']>);
+  export type DialogueSchedule = (NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogueSchedule']>);
+  export type DataPeriodSchedule = (NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogueSchedule']>)['dataPeriodSchedule']>);
   export type Dialogue = (NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>);
   export type HealthScore = (NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['healthScore']>);
   export type Statistics = (NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['statistics']>);
@@ -8627,6 +8907,8 @@ export namespace GetWorkspaceSessions {
   export type Variables = GetWorkspaceSessionsQueryVariables;
   export type Query = GetWorkspaceSessionsQuery;
   export type Customer = (NonNullable<GetWorkspaceSessionsQuery['customer']>);
+  export type DialogueSchedule = (NonNullable<(NonNullable<GetWorkspaceSessionsQuery['customer']>)['dialogueSchedule']>);
+  export type DataPeriodSchedule = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceSessionsQuery['customer']>)['dialogueSchedule']>)['dataPeriodSchedule']>);
   export type SessionConnection = (NonNullable<(NonNullable<GetWorkspaceSessionsQuery['customer']>)['sessionConnection']>);
   export type Sessions = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceSessionsQuery['customer']>)['sessionConnection']>)['sessions']>)[number]>;
   export type PageInfo = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceSessionsQuery['customer']>)['sessionConnection']>)['pageInfo']>);
