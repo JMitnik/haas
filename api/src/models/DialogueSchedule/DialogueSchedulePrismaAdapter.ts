@@ -46,6 +46,30 @@ export class DialogueSchedulePrismaAdapter {
       }
     }
 
-    return this.prisma.dialogueSchedule.create({ ...query });
+    return this.prisma.dialogueSchedule.upsert({
+      create: query.data,
+      where: { workspaceID: input.workspaceId },
+      update: {
+        isEnabled: query.data.isEnabled,
+        dataPeriodSchedule: {
+          update: {
+            startDateExpression: query.data.dataPeriodSchedule?.create?.startDateExpression,
+            endInDeltaMinutes: query.data.dataPeriodSchedule?.create?.endInDeltaMinutes,
+          },
+        },
+        evaluationPeriodSchedule: query.data.evaluationPeriodSchedule?.create ? {
+          upsert: {
+            create: {
+              startDateExpression: query.data.evaluationPeriodSchedule?.create?.startDateExpression,
+              endInDeltaMinutes: query.data.evaluationPeriodSchedule?.create?.endInDeltaMinutes,
+            },
+            update: {
+              startDateExpression: query.data.evaluationPeriodSchedule?.create?.startDateExpression,
+              endInDeltaMinutes: query.data.evaluationPeriodSchedule?.create?.endInDeltaMinutes,
+            },
+          },
+        } : undefined,
+      },
+    })
   }
 }

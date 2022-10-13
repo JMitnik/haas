@@ -8,7 +8,11 @@ import React, { useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import * as Switch from 'components/Common/Switch';
-import { CreateDialogueScheduleInput, DialogueSchedule, useCreateDialogueScheduleMutation } from 'types/generated-types';
+import {
+  CreateDialogueScheduleInput,
+  DialogueSchedule,
+  useCreateDialogueScheduleMutation,
+} from 'types/generated-types';
 import { CustomRecurringType } from 'views/AddAutomationView/AutomationForm.types';
 import { Day, DayPicker } from 'components/Common/DatePicker/DayPicker';
 import { RecurringDatePicker } from 'components/Common/DatePicker/RecurringDatePicker';
@@ -20,7 +24,13 @@ import {
 } from 'components/Common/DatePicker/RecurringDatePicker.helper';
 import { useCustomer } from 'providers/CustomerProvider';
 
-import { deltaPeriodsInMinutes, parseCronPeriod } from './DialogueScheduleModalBody.helper';
+import {
+  addMinutesToPeriod,
+  deltaPeriodsInMinutes,
+  parseCronToPeriod,
+  parseCronToRecurring,
+  parsePeriodToCron,
+} from './DialogueScheduleModalBody.helper';
 
 export enum DialogueScheduleStep {
   INTRO = 'intro',
@@ -222,11 +232,11 @@ const EvalPeriodStep = ({ state, onSave, onNextStep, onPrevStep }: StepProps) =>
   const form = useForm({
     resolver: yupResolver(evalPeriodSchema),
     defaultValues: {
-      isEnabled: false,
-      startDay: 'MON' as Day,
-      endDay: 'Fri' as Day,
-      startTime: '09:00AM',
-      endTime: '09:00AM',
+      isEnabled: !!state.evalPeriod,
+      startDay: state.evalPeriod?.startDay || 'MON' as Day,
+      endDay: state.evalPeriod?.endDay || 'Fri' as Day,
+      startTime: state.evalPeriod?.startTime || '09:00AM',
+      endTime: state.evalPeriod?.endTime || '09:00AM',
     },
   });
 
@@ -392,7 +402,32 @@ export const DialogueScheduleModalBody = ({
 }: DialogueScheduleModalBodyProps) => {
   const inEdit = !!dialogueSchedule;
   const [activeStepIndex, setActiveStepIndex] = useState(0);
-  const [state, setState] = useState<DialogueScheduleState>(defaultState);
+  const [state, setState] = useState<DialogueScheduleState>(() => {
+    if (!dialogueSchedule) return defaultState;
+
+    const evalPeriodStartPeriod = dialogueSchedule.evaluationPeriodSchedule?.startDateExpression
+      ? parseCronToPeriod(dialogueSchedule.evaluationPeriodSchedule.startDateExpression)
+      : undefined;
+    const evalPeriodEndPeriod = evalPeriodStartPeriod
+      ? addMinutesToPeriod(evalPeriodStartPeriod, dialogueSchedule.evaluationPeriodSchedule?.endInDeltaMinutes || 0)
+      : undefined;
+
+    const schedule = dialogueSchedule.dataPeriodSchedule?.startDateExpression
+      ? parseCronToRecurring(dialogueSchedule.dataPeriodSchedule?.startDateExpression)
+      : CustomRecurringType.WEEKLY;
+
+    return {
+      dataPeriod: {
+        schedule,
+      },
+      evalPeriod: {
+        startDay: evalPeriodStartPeriod?.day,
+        startTime: evalPeriodStartPeriod?.time,
+        endDay: evalPeriodEndPeriod?.day,
+        endTime: evalPeriodEndPeriod?.time,
+      },
+    };
+  });
   const { activeCustomer } = useCustomer();
 
   const [create, { loading: isLoading, error }] = useCreateDialogueScheduleMutation({
@@ -425,7 +460,7 @@ export const DialogueScheduleModalBody = ({
       endInDeltaMinutes: recurringDateToEndDeltaMinutes(activeState.dataPeriod.schedule),
     },
     evaluationPeriod: {
-      startDateExpression: parseCronPeriod({
+      startDateExpression: parsePeriodToCron({
         day: activeState.evalPeriod?.startDay,
         time: activeState.evalPeriod?.startTime,
       }),
@@ -439,15 +474,13 @@ export const DialogueScheduleModalBody = ({
   const submit = (newState: DialogueScheduleState) => {
     setState(newState);
 
-    if (inEdit) {
-      console.log('BUILD IN EDIT RESOLVER!');
-    } else {
-      create({
-        variables: {
-          input: stateToCreate(newState),
-        },
-      });
-    }
+    console.log({ newState });
+
+    create({
+      variables: {
+        input: stateToCreate(newState),
+      },
+    });
   };
 
   return (

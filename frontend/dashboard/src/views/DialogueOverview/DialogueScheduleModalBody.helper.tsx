@@ -1,10 +1,33 @@
+import { addMinutes, differenceInMinutes } from 'date-fns';
+
+import { CustomRecurringType } from 'views/AddAutomationView/AutomationForm.types';
 import { Day, days } from 'components/Common/DatePicker/DayPicker';
-import { differenceInMinutes } from 'date-fns';
 
 export interface Period {
   day?: Day;
   time?: string;
 }
+
+export const parseCronToRecurring = (cronExpression: string): CustomRecurringType => {
+  if (!cronExpression) return CustomRecurringType.WEEKLY;
+  if (cronExpression === '0 8 * * *') {
+    return CustomRecurringType.DAILY;
+  }
+
+  if (cronExpression === '0 8 * * 1') {
+    return CustomRecurringType.WEEKLY;
+  }
+
+  if (cronExpression === '0 8 1 * *') {
+    return CustomRecurringType.MONTHLY;
+  }
+
+  if (cronExpression === '0 8 1 1 *') {
+    return CustomRecurringType.YEARLY;
+  }
+
+  return CustomRecurringType.WEEKLY;
+};
 
 /**
  * Parse a day to a cron format.
@@ -19,7 +42,7 @@ export const parseCronDay = (day: Day) => {
 /**
  * Parses time of format 09:00AM (7 characters)
  */
-export const parseCronTime = (time: string) => {
+export const parseTimeToCron = (time: string) => {
   const hour = parseInt(time.slice(0, 2), 10) ?? '*';
   const minute = parseInt(time.slice(3, 5), 10) ?? '*';
 
@@ -27,11 +50,38 @@ export const parseCronTime = (time: string) => {
 };
 
 /**
+ * Extract Period from cron
+ */
+export const parseCronToPeriod = (cronExpression: string) => {
+  const cronCharacters = cronExpression.split(' ');
+
+  const minute = cronCharacters[0].padStart(2, '0');
+  const hour = cronCharacters[1].padStart(2, '0');
+  const med = parseInt(cronCharacters[1], 10) >= 12 ? 'PM' : 'AM';
+  const time = `${hour}:${minute}${med}`;
+
+  const dayIndex = parseInt(cronCharacters[cronCharacters.length - 1], 10) - 1;
+  const day = days[dayIndex];
+
+  return { time, day };
+};
+
+export const parseDateToCron = (date: Date) => {
+  const minute = date.getMinutes();
+  const hour = date.getHours();
+  const day = date.getDay();
+
+  console.log({ minute, hour, day });
+
+  return `${minute} ${hour} * * ${day}`;
+};
+
+/**
  * Parse a period to a cron format.
  */
-export const parseCronPeriod = (period: Period) => {
+export const parsePeriodToCron = (period: Period) => {
   const dayCron = period.day !== undefined ? parseCronDay(period.day) : '*';
-  const timeCron = period.time !== undefined ? parseCronTime(period.time) : '* *';
+  const timeCron = period.time !== undefined ? parseTimeToCron(period.time) : '* *';
 
   return `${timeCron} * * ${dayCron}`;
 };
@@ -46,7 +96,7 @@ export const parseDate = (period: Period) => {
   const hour = period.time ? parseInt(period?.time.slice(0, 2), 10) : 0;
   const minute = period.time ? parseInt(period?.time.slice(3, 5), 10) : 0;
 
-  const date = new Date(Date.UTC(2022, 9, dayIndex, hour, minute));
+  const date = new Date(Date.UTC(2022, 7, dayIndex, hour, minute) + new Date().getTimezoneOffset() * 60 * 1000);
   return date;
 };
 
@@ -58,4 +108,14 @@ export const deltaPeriodsInMinutes = (periodA: Period, periodB: Period) => {
   const dateB = parseDate(periodB);
 
   return Math.abs(Math.ceil(differenceInMinutes(dateA, dateB)));
+};
+
+/**
+ * Calculates the absolute difference between two periods, in minutes.
+ */
+export const addMinutesToPeriod = (periodA: Period, minutes: number): Period => {
+  const dateA = parseDate(periodA);
+  const dateB = addMinutes(dateA, minutes);
+
+  return parseCronToPeriod(parseDateToCron(dateB));
 };
