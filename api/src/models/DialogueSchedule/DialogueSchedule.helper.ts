@@ -5,8 +5,8 @@ import { SchedulePeriod } from './SchedulePeriod.helper';
  * The DialogueSchedule is a wrapper class.
  */
 export class DialogueSchedule {
-  private dataPeriodSchedule: SchedulePeriod | undefined;
-  private evalPeriodSchedule: SchedulePeriod | undefined;
+  public dataPeriodSchedule: SchedulePeriod | undefined;
+  public evalPeriodSchedule: SchedulePeriod | undefined;
 
   constructor(public fields: DialogueScheduleFields) {
     this.dataPeriodSchedule = this.makeDataPeriodSchedule();
