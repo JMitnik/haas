@@ -1,4 +1,4 @@
-import '@lumigo/opentelemetry';
+import * as lumigo from "@lumigo/opentelemetry";
 import prisma from './config/prisma';
 import config from './config/config';
 import { makeServer } from './config/server';
@@ -15,6 +15,11 @@ process.on('SIGTERM', async () => {
   await redis.quit();
   process.exit(0);
 });
+
+try {
+  console.log(process.env.LUMIGO_TRACER_TOKEN);
+} catch (error) {
+}
 
 try {
   makeServer(config.port, prisma);
