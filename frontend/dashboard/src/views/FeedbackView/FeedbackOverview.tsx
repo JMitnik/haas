@@ -79,7 +79,6 @@ export const FeedbackOverview = () => {
   });
 
   const [startDate, endDate] = dateRange;
-  console.log(dateRange);
 
   const [filter, setFilter] = useQueryParams({
     startDate: withDefault(StringParam, dateFormat(startDate, DateFormat.DayTimeFormat)),

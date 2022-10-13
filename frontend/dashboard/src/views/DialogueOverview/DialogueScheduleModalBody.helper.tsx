@@ -71,8 +71,6 @@ export const parseDateToCron = (date: Date) => {
   const hour = date.getHours();
   const day = date.getDay();
 
-  console.log({ minute, hour, day });
-
   return `${minute} ${hour} * * ${day}`;
 };
 
