@@ -47,7 +47,7 @@ describe('ToggleDialogueSchedule', () => {
     expect(dialogueSchedule?.isEnabled).toBeTruthy();
 
     await mutate({
-      dialogueScheduleId: dialogueSchedule!.id,
+      dialogueScheduleId: dialogueSchedule!.id || '',
       status: false,
     }, token);
 
