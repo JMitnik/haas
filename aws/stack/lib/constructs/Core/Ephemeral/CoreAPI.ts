@@ -33,6 +33,12 @@ interface CoreApiProps {
   apiOptions: APIOptions;
 }
 
+/**
+ * CoreAPI construct.
+ *
+ * Preconditions:
+ * - Ensure a LUMIGO_TRACER_TOKEN secret is set.
+ */
 export class CoreAPI extends Construct {
   service: ecs.FargateService;
 
@@ -50,6 +56,9 @@ export class CoreAPI extends Construct {
 
     const jwtSecret = secretsmanager.Secret.fromSecretNameV2(this, 'CORE_JWT_SECRET', 'JWT_SECRET');
     const apiSecret = secretsmanager.Secret.fromSecretNameV2(this, 'CORE_API_SECRET', 'API_SECRET');
+    const lumigoTracerSecret = secretsmanager.Secret.fromSecretNameV2(
+      this, 'LUMIGO_TRACER_TOKEN', 'LUMIGO_TRACER_TOKEN'
+    );
 
     const runAllLambdasEventBridgeRoleArn = ssm.StringParameter.fromStringParameterName(
       this,
@@ -116,6 +125,7 @@ export class CoreAPI extends Construct {
           DB_STRING: ecs.Secret.fromSecretsManager(dbUrlSecret, 'url'),
           JWT_SECRET: ecs.Secret.fromSecretsManager(jwtSecret),
           API_SECRET: ecs.Secret.fromSecretsManager(apiSecret),
+          LUMIGO_TRACER_TOKEN: ecs.Secret.fromSecretsManager(lumigoTracerSecret),
         },
       },
     });

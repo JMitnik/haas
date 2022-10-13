@@ -1,3 +1,4 @@
+import '@lumigo/opentelemetry';
 import prisma from './config/prisma';
 import config from './config/config';
 import { makeServer } from './config/server';
