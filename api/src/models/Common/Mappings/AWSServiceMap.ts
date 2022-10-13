@@ -10,6 +10,8 @@ export class AWSServiceMap {
   public Report_SNS_PubTopic: string = 'haasApiReport'
   public Report_Eventbridge_DLQName: string = 'ReportCrawler_EventBridge_DLQ';
 
+  public DialogueSender_SNS_PubTopic: string = 'dialogueLinkSender';
+
   constructor(accountId: string, awsConfig: AWSSDK.Config) {
     this.accountId = accountId;
     this.awsConfig = awsConfig;

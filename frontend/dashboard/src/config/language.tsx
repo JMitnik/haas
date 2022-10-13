@@ -39,6 +39,14 @@ const language = {
       en: 'Sunday',
       de: 'Sonntag',
     },
+    send_invite_email: {
+      en: 'Send invite email',
+      de: 'Einladungs-E-Mail senden',
+    },
+    send_invite_email_helper: {
+      en: 'Do you want the invited user to receive an email?',
+      de: 'Soll der eingeladene Benutzer eine E-Mail erhalten?',
+    },
     save_template_related_questions: {
       en: 'Save for template-related questions?',
       de: 'Für vorlagenbezogene Fragen speichern?',
@@ -600,8 +608,8 @@ const language = {
       de: 'Benutzer filtern',
     },
     invite_user_description: {
-      en: 'Invite a new user to your workspace. The user will receive an email with a notification of this.',
-      de: 'Einen neuen Benutzer in Ihre Arbeitsumgebung einladen. Der Benutzer erhält eine Benachrichtigung darüber.',
+      en: 'Adds a new user to your workspace. The user will receive an email with a notification if specified.',
+      de: 'Laden Sie einen neuen Benutzer in Ihren Arbeitsbereich ein. Der Benutzer erhält eine E-Mail mit einer Benachrichtigung, falls angegeben.',
     },
     filter_by_role_name: {
       en: 'Filter by role name',
@@ -967,9 +975,9 @@ const language = {
     },
     upload_user_csv_helper: {
       en:
-        'Upload a CSV file with details about your top down users. \n - The appropriate format is to use ";" as delimiter \n - Use email;first_name?;last_name?;phone_number? as your columns \n - Prefix the phone numbers with their country code: for example +49 30901820',
+        'Upload a CSV file with details about your top down users. \n - The appropriate format is to use ";" as delimiter \n - Use email;role;first_name?;last_name?;phone_number?;send_invite? as your columns \n - Prefix the phone numbers with their country code: for example +49 30901820 \n - Role options are: ADMIN, MANAGER & USER. If none provided will automatically assign MANAGER role \n - Send invite options are: YES or NO',
       de:
-        'Laden Sie eine CSV-Datei mit Details zu Ihren Top-Down-Benutzern hoch. \n - Das geeignete Format ist ";" als Trennzeichen zu verwenden. \n - Verwenden Sie email;first_name?;last_name?;phone_number? als Ihre Spalten. \n - Stellen Sie den Telefonnummern die Ländervorwahl voran: zum Beispiel +49 30901820',
+        'Laden Sie eine CSV-Datei mit Details zu Ihren Top-Down-Benutzern hoch. \n - Das geeignete Format ist ";" als Trennzeichen zu verwenden. \n - Verwenden Sie email;role;first_name?;last_name?;phone_number?;send_invite? als Ihre Spalten. \n - Stellen Sie den Telefonnummern die Ländervorwahl voran: zum Beispiel +49 30901820 \n - Rollenoptionen sind: ADMIN, MANAGER & USER. Wenn keine angegeben wird, wird automatisch die MANAGER-Rolle zugewiesen',
     },
     upload_workspace_csv: {
       en: 'Upload workspace generation csv',
@@ -1326,8 +1334,8 @@ const language = {
       de: 'Link',
     },
     invite_user: {
-      en: 'Invite user',
-      de: 'Benutzer einladen',
+      en: 'Add user',
+      de: 'Nutzer hinzufügen',
     },
     date_range: {
       en: 'Date range',

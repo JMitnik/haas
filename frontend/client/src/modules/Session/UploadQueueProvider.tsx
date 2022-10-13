@@ -32,7 +32,7 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
     loading: isCreatingSession,
     reset: resetSessionCache,
   }] = useCreateSessionMutation();
-  const [appendToInteraction] = useAppendToInteractionMutation();
+  const [appendToInteraction, { loading: isAppendingToInteraction }] = useAppendToInteractionMutation();
   const ref = qs.parse(location.search, { ignoreQueryPrefix: true })?.ref?.toString() || '';
 
   /**
@@ -112,7 +112,7 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
    * Effect responsible for cleaning up the UploadQueue whenever a new event is appended to it.
    */
   useInterval(() => {
-    if (uploadQueue.length > 0) {
+    if (uploadQueue.length > 0 && !isAppendingToInteraction) {
       const event = uploadQueue[0];
 
       handleAppendEventToSession(event).then(() => {

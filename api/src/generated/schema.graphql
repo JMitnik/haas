@@ -1347,6 +1347,7 @@ input InviteUserInput {
   customerId: String!
   email: String!
   roleId: String!
+  sendInviteEmail: Boolean!
 }
 
 type InviteUserOutput {

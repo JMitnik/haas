@@ -19,6 +19,7 @@ import { CreateDialogueInput } from '../questionnaire/DialoguePrismaAdapterType'
 import SessionPrismaAdapter from '../session/SessionPrismaAdapter';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import TemplateService from '../templates/TemplateService';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 export class CustomerService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -43,8 +44,14 @@ export class CustomerService {
     this.templateService = new TemplateService(prismaClient);
   }
 
-  async getDialogues(workspaceId: string, userId: string, dialogueFragments?: string[]) {
-    return this.customerPrismaAdapter.getDialogues(workspaceId, userId, dialogueFragments);
+  async getDialogues(
+    workspaceId: string,
+    userId: string,
+    dialogueFragments?: string[],
+    canAccessAllDialogues: boolean = false
+  ) {
+    // TODO: Add helper function that checks if userId can access all dialogues instead of having it as parameter
+    return this.customerPrismaAdapter.getDialogues(workspaceId, userId, dialogueFragments, canAccessAllDialogues);
   }
 
   /**
@@ -515,7 +522,7 @@ export class CustomerService {
   createBotUser = async (workspaceId: string, workspaceSlug: string, roles: Role[]) => {
     const botRole = roles.find((role) => role.type === RoleTypeEnum.BOT);
 
-    if (!botRole) throw new ApolloError('No BOT role available for workspace!');
+    if (!botRole) throw new GraphQLYogaError('No BOT role available for workspace!');
 
     return this.userOfCustomerPrismaAdapter.create({
       customer: {
@@ -529,10 +536,15 @@ export class CustomerService {
         },
       },
       user: {
-        create: {
-          email: `${workspaceSlug}@haas.live`,
-          firstName: 'bot',
-          lastName: workspaceSlug,
+        connectOrCreate: {
+          create: {
+            email: `${workspaceSlug}@haas.live`,
+            firstName: 'bot',
+            lastName: workspaceSlug,
+          },
+          where: {
+            email: `${workspaceSlug}@haas.live`,
+          },
         },
       },
     })

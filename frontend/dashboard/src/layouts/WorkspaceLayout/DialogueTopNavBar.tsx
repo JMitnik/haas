@@ -65,6 +65,7 @@ export const DialogueTopNavBar = () => {
   } = useNavigator();
 
   const { data } = useGetDialogueLayoutDetailsQuery({
+    skip: !activeDialogue?.id,
     fetchPolicy: 'no-cache',
     variables: {
       workspaceId: activeCustomer?.id || '',
@@ -115,6 +116,11 @@ export const DialogueTopNavBar = () => {
                     {!!score && (
                       <>
                         {formatFractionToPercentage(score / 100)}
+                      </>
+                    )}
+                    {score === 0 && (
+                      <>
+                        0%
                       </>
                     )}
                   </UI.Text>

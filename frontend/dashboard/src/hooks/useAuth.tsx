@@ -54,6 +54,10 @@ const useAuth = (): UseAuthProps => {
     // Dialogue is not private => It is allowed to see dialogue
     if (!privateDialogue) return true;
 
+    // If super admin or has permission to see all dialogues => It is allowed to see dialogue
+    const canAccessAllDialogues = authPermissions?.includes(SystemPermission.CanAccessAllDialogues);
+    if (isSuperAdmin || canAccessAllDialogues) return true;
+
     const isPrivateDialogue = !!privateDialogue;
 
     // Dialogue is private && no assigned dialogues for user => Not allowed to see dialogue

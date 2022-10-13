@@ -245,6 +245,12 @@ export const defaultAdminRole: Prisma.RoleCreateInput = {
   isPrivate: true,
   permissions: {
     set: [
+      'CAN_CREATE_AUTOMATIONS',
+      'CAN_UPDATE_AUTOMATIONS',
+      'CAN_VIEW_AUTOMATIONS',
+      'CAN_ACCESS_REPORT_PAGE',
+      'CAN_DOWNLOAD_REPORTS',
+      'CAN_ACCESS_ALL_DIALOGUES',
       'CAN_ACCESS_ALL_ACTION_REQUESTS',
       'CAN_VIEW_ACTION_REQUESTS',
       'CAN_VIEW_USERS',

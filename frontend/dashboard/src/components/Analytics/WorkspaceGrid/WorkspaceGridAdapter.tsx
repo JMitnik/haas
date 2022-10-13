@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { DateFormat, useDate } from 'hooks/useDate';
 import { useCustomer } from 'providers/CustomerProvider';
 import {
-  useGetSessionPathsQuery,
+  useGetSessionPathsLazyQuery,
   useGetWorkspaceDialogueStatisticsQuery,
 } from 'types/generated-types';
 
@@ -24,8 +24,6 @@ export interface WorkspaceGridAdapterProps {
  * @returns
  */
 export const WorkspaceGridAdapter = ({
-  height,
-  width,
   backgroundColor,
 }: WorkspaceGridAdapterProps) => {
   const { getOneWeekAgo, format, getEndOfToday, parse } = useDate();
@@ -64,7 +62,7 @@ export const WorkspaceGridAdapter = ({
     },
   });
 
-  const { refetch: fetchGetSessions } = useGetSessionPathsQuery({ skip: true });
+  const [fetchGetSessions] = useGetSessionPathsLazyQuery();
 
   /**
    * Fetches the various loading data requirements for the underlying WorkspaceGrid.
@@ -80,17 +78,19 @@ export const WorkspaceGridAdapter = ({
 
     // Checkpoint three: Fetch all sessions for the current selected topics
     const { data: sessionData } = await fetchGetSessions({
-      input: {
-        startDateTime: format(selectedStartDate, DateFormat.DayFormat),
-        endDateTime: format(selectedEndDate, DateFormat.DayFormat),
-        path: options.topics || [],
-        refresh: true,
-        issueOnly: options.issueOnly,
+      variables: {
+        input: {
+          startDateTime: format(selectedStartDate, DateFormat.DayFormat),
+          endDateTime: format(selectedEndDate, DateFormat.DayFormat),
+          path: options.topics || [],
+          refresh: true,
+          issueOnly: options.issueOnly,
+        },
+        dialogueId: options.dialogueId as string,
       },
-      dialogueId: options.dialogueId,
     });
 
-    const fetchNodes: HexagonNode[] = sessionData.dialogue?.pathedSessionsConnection?.pathedSessions?.map(
+    const fetchNodes: HexagonNode[] = sessionData?.dialogue?.pathedSessionsConnection?.pathedSessions?.map(
       (session) => ({
         id: session.id,
         label: session.id,

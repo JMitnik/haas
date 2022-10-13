@@ -103,10 +103,11 @@ export class IssueService {
   public async getProblemDialoguesByWorkspace(
     workspaceId: string,
     filter: IssueFilterInput,
-    userId: string
+    userId: string,
+    canAccessAllDialogues: boolean = false,
   ): Promise<Issue[]> {
     const dialogues = await this.countNegativeWorkspaceInteractions(
-      workspaceId, filter.startDate, filter.endDate, userId, filter
+      workspaceId, filter.startDate, filter.endDate, userId, filter, canAccessAllDialogues
     );
     const issues = orderBy(this.calculateDialogueIssueScore(dialogues), (topic) => topic.rankScore, 'desc');
 
@@ -136,9 +137,14 @@ export class IssueService {
    * Retrieves all workspace issues. This can be filtered, based on the required filter (startDate, endDate).
    * @param workspaceId Workspace ID
    */
-  public async getWorkspaceIssues(workspaceId: string, filter: IssueFilterInput, userId: string): Promise<Issue[]> {
+  public async getWorkspaceIssues(
+    workspaceId: string,
+    filter: IssueFilterInput,
+    userId: string,
+    canAccessAllDialogues: boolean = false
+  ): Promise<Issue[]> {
     const topics = await this.topicService.countWorkspaceTopics(
-      workspaceId, filter.startDate, filter.endDate, userId, filter
+      workspaceId, filter.startDate, filter.endDate, userId, filter, canAccessAllDialogues
     );
     const issues = orderBy(this.extractIssues(topics), (topic) => topic.rankScore, 'desc');
 
@@ -185,10 +191,16 @@ export class IssueService {
     startDate: Date,
     endDate: Date,
     userId: string,
-    topicFilter: TopicFilterInput
+    topicFilter: TopicFilterInput,
+    canAccessAllDialogues: boolean = false,
   ): Promise<TopicStatisticsByDialogueId> {
     const dialogueIds = (
-      await this.workspaceService.getDialogues(workspaceId, userId, topicFilter.dialogueStrings || [])
+      await this.workspaceService.getDialogues(
+        workspaceId,
+        userId,
+        topicFilter.dialogueStrings || [],
+        canAccessAllDialogues
+      )
     ).map(dialogue => dialogue.id);
 
     // Fetch all sessions for the dialogues.

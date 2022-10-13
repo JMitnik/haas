@@ -73,10 +73,12 @@ export const CustomerType = objectType({
         if (!parent.id) return null;
 
         assertNonNullish(ctx.session?.user?.id, 'No user Id provided!');
+        const canAccessAllDialogues = DialogueValidator.canAccessAllDialogues(parent.id, ctx.session);
         const sessionConnection = await ctx.services.sessionService.getWorkspaceSessionConnection(
           parent.id,
           ctx.session.user.id,
-          args.filter
+          args.filter,
+          canAccessAllDialogues
         );
 
         return sessionConnection;
@@ -158,7 +160,14 @@ export const CustomerType = objectType({
         assertNonNullish(parent.id, 'Cannot find workspace id!');
         assertNonNullish(session?.user?.id, 'No user ID provided!');
 
-        return await services.issueService.getProblemDialoguesByWorkspace(parent.id, filter, session.user.id) as any;
+        const canAccessAllDialogues = DialogueValidator.canAccessAllDialogues(parent.id, session);
+
+        return await services.issueService.getProblemDialoguesByWorkspace(
+          parent.id,
+          filter,
+          session.user.id,
+          canAccessAllDialogues
+        ) as any;
       },
     });
 
@@ -175,7 +184,11 @@ export const CustomerType = objectType({
         assertNonNullish(parent.id, 'Cannot find workspace id!');
         assertNonNullish(session?.user?.id, 'No user ID provided!');
 
-        return await services.issueService.getWorkspaceIssues(parent.id, filter, session?.user.id) as any;
+        const canAccessAllDialogues = DialogueValidator.canAccessAllDialogues(parent.id, session);
+
+        return await services.issueService.getWorkspaceIssues(
+          parent.id, filter, session?.user.id, canAccessAllDialogues
+        ) as any;
       },
     });
 
@@ -255,6 +268,8 @@ export const CustomerType = objectType({
           utcEndDateTime = isValidDateTime(endDateTime, 'END_DATE');
         }
 
+        const canAccessAllDialogues = DialogueValidator.canAccessAllDialogues(parent.id, ctx.session);
+
         return ctx.services.dialogueStatisticsService.findWorkspaceHealthScore(
           parent.id,
           ctx.session?.user?.id as string,
@@ -262,6 +277,7 @@ export const CustomerType = objectType({
           utcEndDateTime,
           undefined,
           threshold || undefined,
+          canAccessAllDialogues
         );
       },
     });

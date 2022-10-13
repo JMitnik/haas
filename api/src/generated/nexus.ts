@@ -540,6 +540,7 @@ export interface NexusGenInputs {
     customerId: string; // String!
     email: string; // String!
     roleId: string; // String!
+    sendInviteEmail: boolean; // Boolean!
   }
   IssueConnectionFilterInput: { // input type
     endDate?: NexusGenScalars['DateString'] | null; // DateString

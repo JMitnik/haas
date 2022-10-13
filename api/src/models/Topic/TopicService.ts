@@ -103,10 +103,16 @@ export class TopicService {
     startDate: Date,
     endDate: Date,
     userId: string,
-    topicFilter?: TopicFilterInput
+    topicFilter?: TopicFilterInput,
+    canAccessAllDialogues: boolean = false,
   ): Promise<TopicByString> {
     const dialogueIds = (
-      await this.workspaceService.getDialogues(workspaceId, userId, topicFilter?.dialogueStrings || undefined)
+      await this.workspaceService.getDialogues(
+        workspaceId,
+        userId,
+        topicFilter?.dialogueStrings || undefined,
+        canAccessAllDialogues
+      )
     ).map(dialogue => dialogue.id);
 
     // Fetch all sessions for the dialogues.

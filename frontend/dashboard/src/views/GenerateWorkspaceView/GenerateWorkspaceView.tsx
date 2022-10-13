@@ -67,7 +67,7 @@ export const GenerateWorkspaceView = () => {
   const form = useForm<FormProps>({
     mode: 'all',
     defaultValues: {
-      dialogueType: DialogueTemplateType.Default,
+      dialogueType: DialogueTemplateType.BusinessEng,
     },
   });
   const logger = useLogger();
@@ -300,7 +300,7 @@ export const GenerateWorkspaceView = () => {
 
             <UI.FormControl>
               <UI.FormLabel>{t('upload_user_csv')}</UI.FormLabel>
-              <UI.FormLabelHelper>{t('upload_user_csv_helper')}</UI.FormLabelHelper>
+              <UI.FormLabelHelper style={{ maxWidth: '1200px' }}>{t('upload_user_csv_helper')}</UI.FormLabelHelper>
               <FileDropInput
                 onDrop={handleManagerDrop}
                 onCancel={handleManagerCancel}
