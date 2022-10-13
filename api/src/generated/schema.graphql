@@ -2321,8 +2321,8 @@ input TextboxNodeEntryInput {
 
 """Toggle status of dialogue schedule"""
 input ToggleDialogueScheduleInput {
-  dialogueScheduleId: ID
-  status: Boolean
+  dialogueScheduleId: ID!
+  status: Boolean!
 }
 
 """Model for topic"""

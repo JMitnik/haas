@@ -778,8 +778,8 @@ export interface NexusGenInputs {
     value?: string | null; // String
   }
   ToggleDialogueScheduleInput: { // input type
-    dialogueScheduleId?: string | null; // ID
-    status?: boolean | null; // Boolean
+    dialogueScheduleId: string; // ID!
+    status: boolean; // Boolean!
   }
   TopicFilterInput: { // input type
     dialogueStrings?: string[] | null; // [String!]

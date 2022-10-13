@@ -1,4 +1,4 @@
-import { inputObjectType, mutationField, objectType, nonNull } from 'nexus';
+import { inputObjectType, mutationField, nonNull } from 'nexus';
 
 import { DialogueSchedule } from './DialogueSchedule.graphql';
 
@@ -7,8 +7,8 @@ export const ToggleDialogueScheduleInput = inputObjectType({
   description: 'Toggle status of dialogue schedule',
 
   definition(t) {
-    t.id('dialogueScheduleId');
-    t.boolean('status');
+    t.nonNull.id('dialogueScheduleId');
+    t.nonNull.boolean('status');
   },
 });
 
