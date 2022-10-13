@@ -214,3 +214,29 @@ it('dialogue follows negative flow, not share details, and goes back', () => {
   cy.go('back');
   cy.findByText('Try again?');
 });
+
+/**
+ * Flow follows:
+ * 1. Immediate stop
+ */
+it.only('dialogue can\'t be contineud if it is blocked', () => {
+  mockQueryGetCustomer((res) => ({
+    ...res,
+    // @ts-ignore
+    customer: {
+      ...res.customer,
+      dialogueSchedule: {
+        id: 'a',
+        evaluationPeriodSchedule: {
+          id: 'a',
+          isActive: false,
+        },
+      },
+    },
+  }));
+
+  cy.visit('http://localhost:3000/club-hades/Female-U18-Team2');
+
+  cy.findByText('How are you feeling?');
+  cy.findByText('We are closed today!');
+});
