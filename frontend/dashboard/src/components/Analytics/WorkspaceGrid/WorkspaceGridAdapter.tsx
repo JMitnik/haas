@@ -28,7 +28,7 @@ export const WorkspaceGridAdapter = ({
   width,
   backgroundColor,
 }: WorkspaceGridAdapterProps) => {
-  const { getOneWeekAgo, format, getEndOfToday } = useDate();
+  const { getOneWeekAgo, format, getEndOfToday, parse } = useDate();
   const [dateRange, setDateRange] = useState<[Date, Date]>(() => {
     const startDate = getOneWeekAgo();
     const endDate = getEndOfToday();
@@ -50,6 +50,16 @@ export const WorkspaceGridAdapter = ({
     fetchPolicy: 'no-cache',
     skip: !(!!selectedStartDate && !!selectedEndDate),
     onCompleted: (data) => {
+      try {
+        if (data.customer?.dialogueSchedule?.isEnabled && data.customer.dialogueSchedule.dataPeriodSchedule) {
+          setDateRange([
+            parse(data.customer.dialogueSchedule.dataPeriodSchedule.activeStartDate, DateFormat.DayTimeFormat),
+            parse(data.customer.dialogueSchedule.dataPeriodSchedule.activeEndDate, DateFormat.DayTimeFormat),
+          ]);
+        }
+      } catch (error) {
+        console.log(error);
+      }
       setDialogues(data.customer?.statistics?.workspaceStatisticsSummary || []);
     },
   });

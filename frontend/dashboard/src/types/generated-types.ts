@@ -886,6 +886,8 @@ export type CustomerWhereUniqueInput = {
 export type DataPeriodSchedule = {
   __typename?: 'DataPeriodSchedule';
   id?: Maybe<Scalars['ID']>;
+  activeStartDate?: Maybe<Scalars['DateString']>;
+  activeEndDate?: Maybe<Scalars['DateString']>;
   startDateExpression?: Maybe<Scalars['String']>;
   endInDeltaMinutes?: Maybe<Scalars['Int']>;
 };
@@ -3565,7 +3567,7 @@ export type GetWorkspaceDialogueStatisticsQuery = (
       & Pick<DialogueSchedule, 'id' | 'isEnabled'>
       & { dataPeriodSchedule?: Maybe<(
         { __typename?: 'DataPeriodSchedule' }
-        & Pick<DataPeriodSchedule, 'id' | 'startDateExpression' | 'endInDeltaMinutes'>
+        & Pick<DataPeriodSchedule, 'id' | 'activeStartDate' | 'activeEndDate' | 'startDateExpression' | 'endInDeltaMinutes'>
       )> }
     )>, organization?: Maybe<(
       { __typename?: 'Organization' }
@@ -4581,7 +4583,14 @@ export type GetDialogueStatisticsQuery = (
   & { customer?: Maybe<(
     { __typename?: 'Customer' }
     & Pick<Customer, 'id'>
-    & { dialogue?: Maybe<(
+    & { dialogueSchedule?: Maybe<(
+      { __typename?: 'DialogueSchedule' }
+      & Pick<DialogueSchedule, 'id' | 'isEnabled'>
+      & { dataPeriodSchedule?: Maybe<(
+        { __typename?: 'DataPeriodSchedule' }
+        & Pick<DataPeriodSchedule, 'id' | 'activeStartDate' | 'activeEndDate' | 'startDateExpression' | 'endInDeltaMinutes'>
+      )> }
+    )>, dialogue?: Maybe<(
       { __typename?: 'Dialogue' }
       & Pick<Dialogue, 'id' | 'title'>
       & { healthScore?: Maybe<(
@@ -4752,7 +4761,14 @@ export type GetWorkspaceSessionsQuery = (
   & { customer?: Maybe<(
     { __typename?: 'Customer' }
     & Pick<Customer, 'id'>
-    & { sessionConnection?: Maybe<(
+    & { dialogueSchedule?: Maybe<(
+      { __typename?: 'DialogueSchedule' }
+      & Pick<DialogueSchedule, 'id' | 'isEnabled'>
+      & { dataPeriodSchedule?: Maybe<(
+        { __typename?: 'DataPeriodSchedule' }
+        & Pick<DataPeriodSchedule, 'id' | 'activeStartDate' | 'activeEndDate' | 'startDateExpression' | 'endInDeltaMinutes'>
+      )> }
+    )>, sessionConnection?: Maybe<(
       { __typename?: 'SessionConnection' }
       & Pick<SessionConnection, 'totalPages'>
       & { sessions: Array<(
@@ -5356,6 +5372,8 @@ export const GetWorkspaceDialogueStatisticsDocument = gql`
       isEnabled
       dataPeriodSchedule {
         id
+        activeStartDate
+        activeEndDate
         startDateExpression
         endInDeltaMinutes
       }
@@ -7393,6 +7411,17 @@ export const GetDialogueStatisticsDocument = gql`
     query GetDialogueStatistics($customerSlug: String!, $dialogueSlug: String!, $startDateTime: String!, $endDateTime: String, $issueFilter: IssueFilterInput, $healthInput: HealthScoreInput) {
   customer(slug: $customerSlug) {
     id
+    dialogueSchedule {
+      id
+      isEnabled
+      dataPeriodSchedule {
+        id
+        activeStartDate
+        activeEndDate
+        startDateExpression
+        endInDeltaMinutes
+      }
+    }
     dialogue(where: {slug: $dialogueSlug}) {
       id
       title
@@ -7717,6 +7746,17 @@ export const GetWorkspaceSessionsDocument = gql`
     query GetWorkspaceSessions($workspaceId: ID, $filter: SessionConnectionFilterInput) {
   customer(id: $workspaceId) {
     id
+    dialogueSchedule {
+      id
+      isEnabled
+      dataPeriodSchedule {
+        id
+        activeStartDate
+        activeEndDate
+        startDateExpression
+        endInDeltaMinutes
+      }
+    }
     sessionConnection(filter: $filter) {
       sessions {
         ...SessionFragment
@@ -8754,6 +8794,8 @@ export namespace GetDialogueStatistics {
   export type Variables = GetDialogueStatisticsQueryVariables;
   export type Query = GetDialogueStatisticsQuery;
   export type Customer = (NonNullable<GetDialogueStatisticsQuery['customer']>);
+  export type DialogueSchedule = (NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogueSchedule']>);
+  export type DataPeriodSchedule = (NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogueSchedule']>)['dataPeriodSchedule']>);
   export type Dialogue = (NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>);
   export type HealthScore = (NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['healthScore']>);
   export type Statistics = (NonNullable<(NonNullable<(NonNullable<GetDialogueStatisticsQuery['customer']>)['dialogue']>)['statistics']>);
@@ -8816,6 +8858,8 @@ export namespace GetWorkspaceSessions {
   export type Variables = GetWorkspaceSessionsQueryVariables;
   export type Query = GetWorkspaceSessionsQuery;
   export type Customer = (NonNullable<GetWorkspaceSessionsQuery['customer']>);
+  export type DialogueSchedule = (NonNullable<(NonNullable<GetWorkspaceSessionsQuery['customer']>)['dialogueSchedule']>);
+  export type DataPeriodSchedule = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceSessionsQuery['customer']>)['dialogueSchedule']>)['dataPeriodSchedule']>);
   export type SessionConnection = (NonNullable<(NonNullable<GetWorkspaceSessionsQuery['customer']>)['sessionConnection']>);
   export type Sessions = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetWorkspaceSessionsQuery['customer']>)['sessionConnection']>)['sessions']>)[number]>;
   export type PageInfo = (NonNullable<(NonNullable<(NonNullable<GetWorkspaceSessionsQuery['customer']>)['sessionConnection']>)['pageInfo']>);

@@ -5,9 +5,14 @@ import { SchedulePeriod } from './SchedulePeriod.helper';
  * The DialogueSchedule is a wrapper class.
  */
 export class DialogueSchedule {
-  constructor(public fields: DialogueScheduleFields) {}
+  private dataPeriodSchedule: SchedulePeriod;
+  private evalPeriodSchedule: SchedulePeriod;
 
-  public get dataPeriodSchedule(): SchedulePeriod | undefined {
+  constructor(public fields: DialogueScheduleFields) {
+    this.dataPeriodSchedule = this.makeDataPeriodSchedule();
+  }
+
+  public makeDataPeriodSchedule(): SchedulePeriod | undefined {
     if (!this.fields.dataPeriodSchedule) return undefined;
 
     const schedule = new SchedulePeriod(
@@ -42,6 +47,10 @@ export class DialogueSchedule {
   public toGraphQL() {
     return {
       ...this.fields,
+      dataPeriodSchedule: {
+        ...this.fields.dataPeriodSchedule,
+        ...this.dataPeriodSchedule.toGraphQL(),
+      },
     }
   }
 }

@@ -25,6 +25,13 @@ export class SchedulePeriod {
     return this.activeStartDate < current && this.activeEndDate > current;
   }
 
+  public toGraphQL() {
+    return {
+      activeStartDate: this.activeStartDate,
+      activeEndDate: this.activeEndDate,
+    }
+  }
+
   private parseNextStartDate(expression: string) {
     return parseExpression(expression).iterate(1)[0].toDate();
   }

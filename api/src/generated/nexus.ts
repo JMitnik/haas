@@ -1164,6 +1164,8 @@ export interface NexusGenObjects {
     logoUrl?: string | null; // String
   }
   DataPeriodSchedule: { // root type
+    activeEndDate?: NexusGenScalars['DateString'] | null; // DateString
+    activeStartDate?: NexusGenScalars['DateString'] | null; // DateString
     endInDeltaMinutes?: number | null; // Int
     id?: string | null; // ID
     startDateExpression?: string | null; // String
@@ -1979,6 +1981,8 @@ export interface NexusGenFieldTypes {
     logoUrl: string | null; // String
   }
   DataPeriodSchedule: { // field return type
+    activeEndDate: NexusGenScalars['DateString'] | null; // DateString
+    activeStartDate: NexusGenScalars['DateString'] | null; // DateString
     endInDeltaMinutes: number | null; // Int
     id: string | null; // ID
     startDateExpression: string | null; // String
@@ -2982,6 +2986,8 @@ export interface NexusGenFieldTypeNames {
     logoUrl: 'String'
   }
   DataPeriodSchedule: { // field return type name
+    activeEndDate: 'DateString'
+    activeStartDate: 'DateString'
     endInDeltaMinutes: 'Int'
     id: 'ID'
     startDateExpression: 'String'

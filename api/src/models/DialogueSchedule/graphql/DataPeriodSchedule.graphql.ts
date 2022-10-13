@@ -9,6 +9,8 @@ export const DataPeriodSchedule = objectType({
   definition(t) {
     t.id('id');
 
+    t.dateString('activeStartDate');
+    t.dateString('activeEndDate');
     t.string('startDateExpression');
     t.int('endInDeltaMinutes');
   },

@@ -44,7 +44,7 @@ const DialogueView = () => {
   const height = Math.max(bounds.height, 500);
   const { dialogueSlug, customerSlug, goToDialogueFeedbackOverview } = useNavigator();
   const { t } = useTranslation();
-  const { format, getOneWeekAgo, getEndOfToday } = useDate();
+  const { format, getOneWeekAgo, getEndOfToday, parse } = useDate();
   const { activeDialogue } = useDialogue();
 
   // Session-id if currently being tracked.
@@ -134,6 +134,20 @@ const DialogueView = () => {
   useEffect(() => {
     if (data && !loading) {
       setCachedDialogueCustomer(data?.customer);
+
+      try {
+        if (
+          data.customer?.dialogueSchedule?.isEnabled
+          && data.customer.dialogueSchedule.dataPeriodSchedule
+        ) {
+          setDateRange([
+            parse(data.customer.dialogueSchedule.dataPeriodSchedule.activeStartDate, DateFormat.DayTimeFormat),
+            parse(data.customer.dialogueSchedule.dataPeriodSchedule.activeEndDate, DateFormat.DayTimeFormat),
+          ]);
+        }
+      } catch (error) {
+        console.log(error);
+      }
     }
   }, [data, loading]);
 

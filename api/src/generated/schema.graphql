@@ -747,6 +747,8 @@ input CustomerWhereUniqueInput {
   
 """
 type DataPeriodSchedule {
+  activeEndDate: DateString
+  activeStartDate: DateString
   endInDeltaMinutes: Int
   id: ID
   startDateExpression: String

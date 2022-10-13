@@ -5,6 +5,8 @@ query GetWorkspaceDialogueStatistics($workspaceId: ID!, $startDateTime: String!,
       isEnabled
       dataPeriodSchedule {
         id
+        activeStartDate
+        activeEndDate
         startDateExpression
         endInDeltaMinutes
       }
