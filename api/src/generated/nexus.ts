@@ -777,6 +777,10 @@ export interface NexusGenInputs {
   TextboxNodeEntryInput: { // input type
     value?: string | null; // String
   }
+  ToggleDialogueScheduleInput: { // input type
+    dialogueScheduleId?: string | null; // ID
+    status?: boolean | null; // Boolean
+  }
   TopicFilterInput: { // input type
     dialogueStrings?: string[] | null; // [String!]
     relatedSessionScoreLowerThreshold?: number | null; // Float
@@ -1244,6 +1248,7 @@ export interface NexusGenObjects {
     dataPeriodSchedule?: NexusGenRootTypes['DataPeriodSchedule'] | null; // DataPeriodSchedule
     evaluationPeriodSchedule?: NexusGenRootTypes['EvaluationPeriodSchedule'] | null; // EvaluationPeriodSchedule
     id?: string | null; // ID
+    isEnabled?: boolean | null; // Boolean
   }
   DialogueStatistics: { // root type
     history?: Array<NexusGenRootTypes['lineChartDataType'] | null> | null; // [lineChartDataType]
@@ -2082,6 +2087,7 @@ export interface NexusGenFieldTypes {
     dataPeriodSchedule: NexusGenRootTypes['DataPeriodSchedule'] | null; // DataPeriodSchedule
     evaluationPeriodSchedule: NexusGenRootTypes['EvaluationPeriodSchedule'] | null; // EvaluationPeriodSchedule
     id: string | null; // ID
+    isEnabled: boolean | null; // Boolean
   }
   DialogueStatistics: { // field return type
     history: Array<NexusGenRootTypes['lineChartDataType'] | null> | null; // [lineChartDataType]
@@ -2333,6 +2339,7 @@ export interface NexusGenFieldTypes {
     setActionRequestStatus: NexusGenRootTypes['ActionRequest'] | null; // ActionRequest
     setDialoguePrivacy: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     singleUpload: NexusGenRootTypes['ImageType'] | null; // ImageType
+    toggleDialogueSchedule: NexusGenRootTypes['DialogueSchedule'] | null; // DialogueSchedule
     updateAutomation: NexusGenRootTypes['AutomationModel'] | null; // AutomationModel
     updateCTA: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     updateCreateWorkspaceJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
@@ -3083,6 +3090,7 @@ export interface NexusGenFieldTypeNames {
     dataPeriodSchedule: 'DataPeriodSchedule'
     evaluationPeriodSchedule: 'EvaluationPeriodSchedule'
     id: 'ID'
+    isEnabled: 'Boolean'
   }
   DialogueStatistics: { // field return type name
     history: 'lineChartDataType'
@@ -3334,6 +3342,7 @@ export interface NexusGenFieldTypeNames {
     setActionRequestStatus: 'ActionRequest'
     setDialoguePrivacy: 'Dialogue'
     singleUpload: 'ImageType'
+    toggleDialogueSchedule: 'DialogueSchedule'
     updateAutomation: 'AutomationModel'
     updateCTA: 'QuestionNode'
     updateCreateWorkspaceJob: 'CreateWorkspaceJobType'
@@ -4017,6 +4026,9 @@ export interface NexusGenArgTypes {
     }
     singleUpload: { // args
       file: NexusGenScalars['Upload']; // Upload!
+    }
+    toggleDialogueSchedule: { // args
+      input: NexusGenInputs['ToggleDialogueScheduleInput']; // ToggleDialogueScheduleInput!
     }
     updateAutomation: { // args
       input?: NexusGenInputs['CreateAutomationInput'] | null; // CreateAutomationInput

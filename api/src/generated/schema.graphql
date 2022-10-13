@@ -1008,6 +1008,7 @@ type DialogueSchedule {
   dataPeriodSchedule: DataPeriodSchedule
   evaluationPeriodSchedule: EvaluationPeriodSchedule
   id: ID
+  isEnabled: Boolean
 }
 
 type DialogueStatistics {
@@ -1620,6 +1621,9 @@ type Mutation {
   setActionRequestStatus(input: SetActionRequestStatusInput!): ActionRequest
   setDialoguePrivacy(input: SetDialoguePrivacyInput): Dialogue
   singleUpload(file: Upload!): ImageType
+
+  """Creates a dialogue schedule in the backend"""
+  toggleDialogueSchedule(input: ToggleDialogueScheduleInput!): DialogueSchedule
   updateAutomation(input: CreateAutomationInput): AutomationModel
   updateCTA(input: UpdateCTAInputType): QuestionNode
   updateCreateWorkspaceJob(errorMessage: String, id: String, referenceId: String, resourceUrl: String, status: JobStatusType): CreateWorkspaceJobType
@@ -2313,6 +2317,12 @@ input TagsInputObjectType {
 """Input type for a textbox node"""
 input TextboxNodeEntryInput {
   value: String
+}
+
+"""Toggle status of dialogue schedule"""
+input ToggleDialogueScheduleInput {
+  dialogueScheduleId: ID
+  status: Boolean
 }
 
 """Model for topic"""

@@ -22,13 +22,20 @@ export class DialogueScheduleService {
     return fields ? new DialogueSchedule(fields) : null;
   }
 
+  public async toggleStatus(
+    dialogueScheduleId: string,
+    status: boolean
+  ) {
+    return this.prismaAdapter.toggleStatus(dialogueScheduleId, status);
+  }
+
   /**
    * Create a dialogue schedule.
    */
-  public async create(
+  public async save(
     input: CreateDialogueScheduleInput
   ): Promise<CreateDialogueScheduleOutput> {
-    const schedule = await this.prismaAdapter.create(input);
+    const schedule = await this.prismaAdapter.save(input);
 
     return { dialogueSchedule: schedule };
   }

@@ -11,11 +11,13 @@ import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
 import * as Modal from 'components/Common/Modal';
+import * as Switch from 'components/Common/Switch';
 import * as Table from 'components/Common/Table';
 import {
   AutomationConnection,
   AutomationConnectionOrderType,
   useAutomationConnectionQuery,
+  useToggleDialogueScheduleMutation,
 } from 'types/generated-types';
 import { ReactComponent as NoDataIll } from 'assets/images/undraw_no_data.svg';
 import { ReactComponent as SendoutThumbnail } from 'assets/images/thumbnails/sm/sendout.svg';
@@ -69,6 +71,10 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
   const pageCount = activeAutomationConnection.totalPages || 0;
 
   const dialogueSchedule = data?.customer?.dialogueSchedule;
+
+  const [toggle] = useToggleDialogueScheduleMutation({
+    refetchQueries: ['automationConnection'],
+  });
 
   return (
     <View documentTitle="haas | Automations">
@@ -126,16 +132,36 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
           >
             <UI.Card>
               <UI.CardBody>
-                <UI.Flex alignItems="center">
-                  <UI.Div maxWidth={50}>
-                    <UI.Thumbnail>
-                      <SendoutThumbnail />
-                    </UI.Thumbnail>
-                  </UI.Div>
-                  <UI.Div ml={4}>
-                    <UI.H4 fontSize="1.2rem" color="off.500" fontWeight={600}>
-                      Automated schedules
-                    </UI.H4>
+                <UI.Flex justifyContent="space-between" alignItems="center">
+                  <UI.Flex alignItems="center">
+                    <UI.Div maxWidth={50}>
+                      <UI.Thumbnail>
+                        <SendoutThumbnail />
+                      </UI.Thumbnail>
+                    </UI.Div>
+                    <UI.Div ml={4}>
+                      <UI.H4 fontSize="1.2rem" color="off.500" fontWeight={600}>
+                        Automated schedules
+                      </UI.H4>
+                    </UI.Div>
+                  </UI.Flex>
+
+                  <UI.Div>
+                    {!!dialogueSchedule && (
+                      <Switch.Root
+                        onChange={() => toggle({
+                          variables: {
+                            input: {
+                              status: !dialogueSchedule.isEnabled,
+                              dialogueScheduleId: dialogueSchedule.id,
+                            },
+                          },
+                        })}
+                        isChecked={dialogueSchedule.isEnabled as boolean}
+                      >
+                        <Switch.Thumb />
+                      </Switch.Root>
+                    )}
                   </UI.Div>
                 </UI.Flex>
 

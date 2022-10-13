@@ -12,6 +12,7 @@ export const DialogueSchedule = objectType({
 
   definition(t) {
     t.id('id');
+    t.boolean('isEnabled');
 
     t.field('evaluationPeriodSchedule', { type: EvaluationPeriodSchedule });
     t.field('dataPeriodSchedule', { type: DataPeriodSchedule });

@@ -1205,6 +1205,7 @@ export enum DialogueImpactScoreType {
 export type DialogueSchedule = {
   __typename?: 'DialogueSchedule';
   id?: Maybe<Scalars['ID']>;
+  isEnabled?: Maybe<Scalars['Boolean']>;
   evaluationPeriodSchedule?: Maybe<EvaluationPeriodSchedule>;
   dataPeriodSchedule?: Maybe<DataPeriodSchedule>;
 };
@@ -1774,6 +1775,8 @@ export type Mutation = {
   verifyActionRequest?: Maybe<ActionRequest>;
   /** Creates a dialogue schedule in the backend */
   createDialogueSchedule?: Maybe<CreateDialogueScheduleOutput>;
+  /** Creates a dialogue schedule in the backend */
+  toggleDialogueSchedule?: Maybe<DialogueSchedule>;
   sandbox?: Maybe<Scalars['String']>;
   generateWorkspaceFromCSV?: Maybe<Customer>;
   resetWorkspaceData?: Maybe<Scalars['Boolean']>;
@@ -1866,6 +1869,11 @@ export type MutationVerifyActionRequestArgs = {
 
 export type MutationCreateDialogueScheduleArgs = {
   input: CreateDialogueScheduleInput;
+};
+
+
+export type MutationToggleDialogueScheduleArgs = {
+  input: ToggleDialogueScheduleInput;
 };
 
 
@@ -3056,6 +3064,12 @@ export type TextboxNodeEntryInput = {
   value?: Maybe<Scalars['String']>;
 };
 
+/** Toggle status of dialogue schedule */
+export type ToggleDialogueScheduleInput = {
+  dialogueScheduleId?: Maybe<Scalars['ID']>;
+  status?: Maybe<Scalars['Boolean']>;
+};
+
 /** Model for topic */
 export type Topic = {
   __typename?: 'Topic';
@@ -3788,7 +3802,7 @@ export type AutomationConnectionQuery = (
     & Pick<Customer, 'id' | 'slug'>
     & { dialogueSchedule?: Maybe<(
       { __typename?: 'DialogueSchedule' }
-      & Pick<DialogueSchedule, 'id'>
+      & Pick<DialogueSchedule, 'id' | 'isEnabled'>
       & { dataPeriodSchedule?: Maybe<(
         { __typename?: 'DataPeriodSchedule' }
         & Pick<DataPeriodSchedule, 'id' | 'startDateExpression' | 'endInDeltaMinutes'>
@@ -4231,6 +4245,19 @@ export type CreateDialogueScheduleMutation = (
       { __typename?: 'DialogueSchedule' }
       & Pick<DialogueSchedule, 'id'>
     )> }
+  )> }
+);
+
+export type ToggleDialogueScheduleMutationVariables = Exact<{
+  input: ToggleDialogueScheduleInput;
+}>;
+
+
+export type ToggleDialogueScheduleMutation = (
+  { __typename?: 'Mutation' }
+  & { toggleDialogueSchedule?: Maybe<(
+    { __typename?: 'DialogueSchedule' }
+    & Pick<DialogueSchedule, 'id'>
   )> }
 );
 
@@ -5604,6 +5631,7 @@ export const AutomationConnectionDocument = gql`
     slug
     dialogueSchedule {
       id
+      isEnabled
       dataPeriodSchedule {
         id
         startDateExpression
@@ -6624,6 +6652,39 @@ export function useCreateDialogueScheduleMutation(baseOptions?: Apollo.MutationH
 export type CreateDialogueScheduleMutationHookResult = ReturnType<typeof useCreateDialogueScheduleMutation>;
 export type CreateDialogueScheduleMutationResult = Apollo.MutationResult<CreateDialogueScheduleMutation>;
 export type CreateDialogueScheduleMutationOptions = Apollo.BaseMutationOptions<CreateDialogueScheduleMutation, CreateDialogueScheduleMutationVariables>;
+export const ToggleDialogueScheduleDocument = gql`
+    mutation ToggleDialogueSchedule($input: ToggleDialogueScheduleInput!) {
+  toggleDialogueSchedule(input: $input) {
+    id
+  }
+}
+    `;
+export type ToggleDialogueScheduleMutationFn = Apollo.MutationFunction<ToggleDialogueScheduleMutation, ToggleDialogueScheduleMutationVariables>;
+
+/**
+ * __useToggleDialogueScheduleMutation__
+ *
+ * To run a mutation, you first call `useToggleDialogueScheduleMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useToggleDialogueScheduleMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [toggleDialogueScheduleMutation, { data, loading, error }] = useToggleDialogueScheduleMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useToggleDialogueScheduleMutation(baseOptions?: Apollo.MutationHookOptions<ToggleDialogueScheduleMutation, ToggleDialogueScheduleMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ToggleDialogueScheduleMutation, ToggleDialogueScheduleMutationVariables>(ToggleDialogueScheduleDocument, options);
+      }
+export type ToggleDialogueScheduleMutationHookResult = ReturnType<typeof useToggleDialogueScheduleMutation>;
+export type ToggleDialogueScheduleMutationResult = Apollo.MutationResult<ToggleDialogueScheduleMutation>;
+export type ToggleDialogueScheduleMutationOptions = Apollo.BaseMutationOptions<ToggleDialogueScheduleMutation, ToggleDialogueScheduleMutationVariables>;
 export const DeleteAutomationDocument = gql`
     mutation deleteAutomation($input: DeleteAutomationInput) {
   deleteAutomation(input: $input) {
@@ -8530,6 +8591,13 @@ export namespace CreateDialogueSchedule {
   export type CreateDialogueSchedule = (NonNullable<CreateDialogueScheduleMutation['createDialogueSchedule']>);
   export type DialogueSchedule = (NonNullable<(NonNullable<CreateDialogueScheduleMutation['createDialogueSchedule']>)['dialogueSchedule']>);
   export const Document = CreateDialogueScheduleDocument;
+}
+
+export namespace ToggleDialogueSchedule {
+  export type Variables = ToggleDialogueScheduleMutationVariables;
+  export type Mutation = ToggleDialogueScheduleMutation;
+  export type ToggleDialogueSchedule = (NonNullable<ToggleDialogueScheduleMutation['toggleDialogueSchedule']>);
+  export const Document = ToggleDialogueScheduleDocument;
 }
 
 export namespace DeleteAutomation {

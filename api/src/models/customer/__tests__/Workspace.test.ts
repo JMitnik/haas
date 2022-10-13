@@ -62,7 +62,7 @@ describe('Customer.graphql', () => {
     const workspaceId = (await makeTestWorkspace(prisma)).customerId;
 
     const dialogueScheduleService = new DialogueScheduleService(prisma);
-    const { dialogueSchedule } = await dialogueScheduleService.create({
+    const { dialogueSchedule } = await dialogueScheduleService.save({
       workspaceId,
       dataPeriod: {
         startDateExpression: '00 12 01 * 01', // Monday midday

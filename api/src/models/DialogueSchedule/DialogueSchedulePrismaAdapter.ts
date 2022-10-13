@@ -17,7 +17,25 @@ export class DialogueSchedulePrismaAdapter {
     })
   }
 
-  public async create(
+  public async toggleStatus(
+    dialogueScheduleId: string,
+    status: boolean,
+  ) {
+    return this.prisma.dialogueSchedule.update({
+      where: { id: dialogueScheduleId },
+      data: {
+        isEnabled: {
+          set: status,
+        },
+      },
+      include: { ...defaultDialogueSchedule.include },
+    })
+  }
+
+  /**
+   * Both creates and edits a dialogue schedule object
+   */
+  public async save(
     input: CreateDialogueScheduleInput
   ) {
     let query: Prisma.DialogueScheduleCreateArgs = {

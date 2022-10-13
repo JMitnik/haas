@@ -49,6 +49,6 @@ export const CreateDialogueSchedule = mutationField('createDialogueSchedule', {
 
   resolve(parent, args, ctx) {
     // TODO: Validate input
-    return ctx.services.dialogueScheduleService.create(args.input);
+    return ctx.services.dialogueScheduleService.save(args.input);
   },
 })

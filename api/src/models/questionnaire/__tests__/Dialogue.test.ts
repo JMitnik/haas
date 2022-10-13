@@ -61,7 +61,7 @@ describe('Dialogue.graphql', () => {
     const dialogue = (await seedDialogue(prisma, workspaceId, 'test', false, 'Test dialogue'));
 
     const dialogueScheduleService = new DialogueScheduleService(prisma);
-    await dialogueScheduleService.create({
+    await dialogueScheduleService.save({
       workspaceId,
       dataPeriod: {
         startDateExpression: '00 12 01 * 01', // Monday midday
@@ -99,7 +99,7 @@ describe('Dialogue.graphql', () => {
     const dialogue = (await seedDialogue(prisma, workspaceId, 'test', false, 'Test dialogue'));
 
     const dialogueScheduleService = new DialogueScheduleService(prisma);
-    await dialogueScheduleService.create({
+    await dialogueScheduleService.save({
       workspaceId,
       dataPeriod: {
         startDateExpression: '00 12 01 * 01', // Monday midday
