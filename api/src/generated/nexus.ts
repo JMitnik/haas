@@ -1288,6 +1288,7 @@ export interface NexusGenObjects {
   EvaluationPeriodSchedule: { // root type
     endInDeltaMinutes?: number | null; // Int
     id?: string | null; // ID
+    isActive?: boolean | null; // Boolean
     startDateExpression?: string | null; // String
   }
   FailedDeliveryModel: { // root type
@@ -2133,6 +2134,7 @@ export interface NexusGenFieldTypes {
   EvaluationPeriodSchedule: { // field return type
     endInDeltaMinutes: number | null; // Int
     id: string | null; // ID
+    isActive: boolean | null; // Boolean
     startDateExpression: string | null; // String
   }
   FailedDeliveryModel: { // field return type
@@ -3138,6 +3140,7 @@ export interface NexusGenFieldTypeNames {
   EvaluationPeriodSchedule: { // field return type name
     endInDeltaMinutes: 'Int'
     id: 'ID'
+    isActive: 'Boolean'
     startDateExpression: 'String'
   }
   FailedDeliveryModel: { // field return type name

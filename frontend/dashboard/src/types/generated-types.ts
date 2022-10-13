@@ -1326,6 +1326,7 @@ export type EnableAutomationInput = {
 export type EvaluationPeriodSchedule = {
   __typename?: 'EvaluationPeriodSchedule';
   id?: Maybe<Scalars['ID']>;
+  isActive?: Maybe<Scalars['Boolean']>;
   startDateExpression?: Maybe<Scalars['String']>;
   endInDeltaMinutes?: Maybe<Scalars['Int']>;
 };

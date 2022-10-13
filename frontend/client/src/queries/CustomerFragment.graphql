@@ -4,13 +4,9 @@ fragment CustomerFragment on Customer {
   slug
   dialogueSchedule {
     id
-    isEnabled
-    dataPeriodSchedule {
+    evaluationPeriodSchedule {
       id
-      activeStartDate
-      activeEndDate
-      startDateExpression
-      endInDeltaMinutes
+      isActive
     }
   }
   settings {

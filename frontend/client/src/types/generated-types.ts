@@ -637,6 +637,12 @@ export type CreateCampaignVariantInputType = {
   customVariables?: Maybe<Array<Maybe<CreateCampaignCustomVariable>>>;
 };
 
+/** Input for creating a dialogue schedule. */
+export type CreateDataPeriodInput = {
+  startDateExpression: Scalars['String'];
+  endInDeltaMinutes: Scalars['Int'];
+};
+
 export type CreateDialogueInputType = {
   customerSlug?: Maybe<Scalars['String']>;
   title?: Maybe<Scalars['String']>;
@@ -648,6 +654,25 @@ export type CreateDialogueInputType = {
   publicTitle?: Maybe<Scalars['String']>;
   tags?: Maybe<TagsInputObjectType>;
   language?: Maybe<LanguageEnumType>;
+};
+
+/** Input for creating a dialogue schedule. */
+export type CreateDialogueScheduleInput = {
+  workspaceId: Scalars['String'];
+  dataPeriod: CreateDataPeriodInput;
+  evaluationPeriod?: Maybe<CreateEvaluationPeriodInput>;
+};
+
+/** Result of creating dialogue schedule */
+export type CreateDialogueScheduleOutput = {
+  __typename?: 'CreateDialogueScheduleOutput';
+  dialogueSchedule?: Maybe<DialogueSchedule>;
+};
+
+/** Input for creating a dialogue schedule. */
+export type CreateEvaluationPeriodInput = {
+  startDateExpression: Scalars['String'];
+  endInDeltaMinutes?: Maybe<Scalars['Int']>;
 };
 
 export type CreateQuestionNodeInputType = {
@@ -732,6 +757,7 @@ export type Customer = {
   /** Workspace statistics */
   statistics?: Maybe<WorkspaceStatistics>;
   actionRequestConnection?: Maybe<ActionRequestConnection>;
+  dialogueSchedule?: Maybe<DialogueSchedule>;
   issueConnection?: Maybe<IssueConnection>;
   issueDialogues?: Maybe<Array<Maybe<Issue>>>;
   issueTopics?: Maybe<Array<Maybe<Issue>>>;
@@ -854,6 +880,16 @@ export type CustomerSettings = {
 
 export type CustomerWhereUniqueInput = {
   id: Scalars['ID'];
+};
+
+/** A data period schedule defines the general */
+export type DataPeriodSchedule = {
+  __typename?: 'DataPeriodSchedule';
+  id?: Maybe<Scalars['ID']>;
+  activeStartDate?: Maybe<Scalars['DateString']>;
+  activeEndDate?: Maybe<Scalars['DateString']>;
+  startDateExpression?: Maybe<Scalars['String']>;
+  endInDeltaMinutes?: Maybe<Scalars['Int']>;
 };
 
 
@@ -1027,6 +1063,8 @@ export type Dialogue = {
   statistics?: Maybe<DialogueStatistics>;
   sessionConnection?: Maybe<SessionConnection>;
   tags?: Maybe<Array<Maybe<Tag>>>;
+  /** A dialogue can be online or offline, depending on the configurations (schedule) or manual work. */
+  isOnline?: Maybe<Scalars['Boolean']>;
   customerId?: Maybe<Scalars['String']>;
   customer?: Maybe<Customer>;
   rootQuestion?: Maybe<QuestionNode>;
@@ -1162,6 +1200,18 @@ export enum DialogueImpactScoreType {
   Average = 'AVERAGE'
 }
 
+/**
+ * A dialogue schedule defines the data period (period of time whilst data is good),
+ * and evaluation period (period of time when a dialogue may be enabled).
+ */
+export type DialogueSchedule = {
+  __typename?: 'DialogueSchedule';
+  id?: Maybe<Scalars['ID']>;
+  isEnabled?: Maybe<Scalars['Boolean']>;
+  evaluationPeriodSchedule?: Maybe<EvaluationPeriodSchedule>;
+  dataPeriodSchedule?: Maybe<DataPeriodSchedule>;
+};
+
 export type DialogueStatistics = {
   __typename?: 'DialogueStatistics';
   nrInteractions?: Maybe<Scalars['Int']>;
@@ -1266,6 +1316,19 @@ export type EnableAutomationInput = {
   workspaceId: Scalars['String'];
   automationId: Scalars['String'];
   state: Scalars['Boolean'];
+};
+
+/**
+ * The Evaluation Period Schedule is used to define an opening and closing range for our dialogues.
+ *
+ * Currently workspace-wide.
+ */
+export type EvaluationPeriodSchedule = {
+  __typename?: 'EvaluationPeriodSchedule';
+  id?: Maybe<Scalars['ID']>;
+  isActive?: Maybe<Scalars['Boolean']>;
+  startDateExpression?: Maybe<Scalars['String']>;
+  endInDeltaMinutes?: Maybe<Scalars['Int']>;
 };
 
 export type FailedDeliveryModel = {
@@ -1493,6 +1556,7 @@ export type InviteUserInput = {
   roleId: Scalars['String'];
   email: Scalars['String'];
   customerId: Scalars['String'];
+  sendInviteEmail: Scalars['Boolean'];
 };
 
 export type InviteUserOutput = {
@@ -1713,6 +1777,10 @@ export type Mutation = {
   assignUserToActionRequest?: Maybe<ActionRequest>;
   setActionRequestStatus?: Maybe<ActionRequest>;
   verifyActionRequest?: Maybe<ActionRequest>;
+  /** Creates a dialogue schedule in the backend */
+  createDialogueSchedule?: Maybe<CreateDialogueScheduleOutput>;
+  /** Creates a dialogue schedule in the backend */
+  toggleDialogueSchedule?: Maybe<DialogueSchedule>;
   sandbox?: Maybe<Scalars['String']>;
   generateWorkspaceFromCSV?: Maybe<Customer>;
   resetWorkspaceData?: Maybe<Scalars['Boolean']>;
@@ -1800,6 +1868,16 @@ export type MutationSetActionRequestStatusArgs = {
 
 export type MutationVerifyActionRequestArgs = {
   input: VerifyActionRequestInput;
+};
+
+
+export type MutationCreateDialogueScheduleArgs = {
+  input: CreateDialogueScheduleInput;
+};
+
+
+export type MutationToggleDialogueScheduleArgs = {
+  input: ToggleDialogueScheduleInput;
 };
 
 
@@ -2990,6 +3068,12 @@ export type TextboxNodeEntryInput = {
   value?: Maybe<Scalars['String']>;
 };
 
+/** Toggle status of dialogue schedule */
+export type ToggleDialogueScheduleInput = {
+  dialogueScheduleId: Scalars['ID'];
+  status: Scalars['Boolean'];
+};
+
 /** Model for topic */
 export type Topic = {
   __typename?: 'Topic';
@@ -3460,7 +3544,14 @@ export type VerifyActionRequestMutation = (
 export type CustomerFragmentFragment = (
   { __typename?: 'Customer' }
   & Pick<Customer, 'id' | 'name' | 'slug'>
-  & { settings?: Maybe<(
+  & { dialogueSchedule?: Maybe<(
+    { __typename?: 'DialogueSchedule' }
+    & Pick<DialogueSchedule, 'id'>
+    & { evaluationPeriodSchedule?: Maybe<(
+      { __typename?: 'EvaluationPeriodSchedule' }
+      & Pick<EvaluationPeriodSchedule, 'id' | 'isActive'>
+    )> }
+  )>, settings?: Maybe<(
     { __typename?: 'CustomerSettings' }
     & Pick<CustomerSettings, 'id' | 'logoUrl' | 'logoOpacity'>
     & { colourSettings?: Maybe<(
@@ -3503,7 +3594,14 @@ export type GetCustomerQuery = (
   & { customer?: Maybe<(
     { __typename?: 'Customer' }
     & Pick<Customer, 'id' | 'name' | 'slug'>
-    & { dialogue?: Maybe<(
+    & { dialogueSchedule?: Maybe<(
+      { __typename?: 'DialogueSchedule' }
+      & Pick<DialogueSchedule, 'id'>
+      & { evaluationPeriodSchedule?: Maybe<(
+        { __typename?: 'EvaluationPeriodSchedule' }
+        & Pick<EvaluationPeriodSchedule, 'id' | 'isActive'>
+      )> }
+    )>, dialogue?: Maybe<(
       { __typename?: 'Dialogue' }
       & Pick<Dialogue, 'id' | 'title' | 'slug' | 'publicTitle' | 'language' | 'creationDate' | 'updatedAt' | 'customerId'>
       & { postLeafNode?: Maybe<(
@@ -3606,6 +3704,13 @@ export const CustomerFragmentFragmentDoc = gql`
   id
   name
   slug
+  dialogueSchedule {
+    id
+    evaluationPeriodSchedule {
+      id
+      isActive
+    }
+  }
   settings {
     id
     logoUrl
@@ -3946,6 +4051,13 @@ export const GetCustomerDocument = gql`
     id
     name
     slug
+    dialogueSchedule {
+      id
+      evaluationPeriodSchedule {
+        id
+        isActive
+      }
+    }
     dialogue(where: {slug: $dialogueSlug}) {
       id
       title
@@ -4058,6 +4170,8 @@ export namespace VerifyActionRequest {
 
 export namespace CustomerFragment {
   export type Fragment = CustomerFragmentFragment;
+  export type DialogueSchedule = (NonNullable<CustomerFragmentFragment['dialogueSchedule']>);
+  export type EvaluationPeriodSchedule = (NonNullable<(NonNullable<CustomerFragmentFragment['dialogueSchedule']>)['evaluationPeriodSchedule']>);
   export type Settings = (NonNullable<CustomerFragmentFragment['settings']>);
   export type ColourSettings = (NonNullable<(NonNullable<CustomerFragmentFragment['settings']>)['colourSettings']>);
   export type Dialogues = NonNullable<(NonNullable<CustomerFragmentFragment['dialogues']>)[number]>;
@@ -4075,6 +4189,8 @@ export namespace GetCustomer {
   export type Variables = GetCustomerQueryVariables;
   export type Query = GetCustomerQuery;
   export type Customer = (NonNullable<GetCustomerQuery['customer']>);
+  export type DialogueSchedule = (NonNullable<(NonNullable<GetCustomerQuery['customer']>)['dialogueSchedule']>);
+  export type EvaluationPeriodSchedule = (NonNullable<(NonNullable<(NonNullable<GetCustomerQuery['customer']>)['dialogueSchedule']>)['evaluationPeriodSchedule']>);
   export type Dialogue = (NonNullable<(NonNullable<GetCustomerQuery['customer']>)['dialogue']>);
   export type PostLeafNode = (NonNullable<(NonNullable<(NonNullable<GetCustomerQuery['customer']>)['dialogue']>)['postLeafNode']>);
   export type Leafs = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetCustomerQuery['customer']>)['dialogue']>)['leafs']>)[number]>;

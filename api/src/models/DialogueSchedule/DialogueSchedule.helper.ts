@@ -5,40 +5,19 @@ import { SchedulePeriod } from './SchedulePeriod.helper';
  * The DialogueSchedule is a wrapper class.
  */
 export class DialogueSchedule {
-  private dataPeriodSchedule: SchedulePeriod;
-  private evalPeriodSchedule: SchedulePeriod;
+  private dataPeriodSchedule: SchedulePeriod | undefined;
+  private evalPeriodSchedule: SchedulePeriod | undefined;
 
   constructor(public fields: DialogueScheduleFields) {
     this.dataPeriodSchedule = this.makeDataPeriodSchedule();
-  }
-
-  public makeDataPeriodSchedule(): SchedulePeriod | undefined {
-    if (!this.fields.dataPeriodSchedule) return undefined;
-
-    const schedule = new SchedulePeriod(
-      this.fields.dataPeriodSchedule?.startDateExpression,
-      this.fields.dataPeriodSchedule?.endInDeltaMinutes,
-    );
-
-    return schedule;
+    this.evalPeriodSchedule = this.makeEvalPeriodSchedule();
   }
 
   /**
    * Calculates if `evaluation` of our dialogues according to this schedule is active.
    */
   public get evaluationIsActive(): boolean {
-    // If the schedule is disabled, we always enable evaluation.
-    if (!this.fields.isEnabled) return true;
-
-    // If there is no evaluation period, we also enable evaluation
-    if (!this.fields.evaluationPeriodSchedule) return true;
-
-    const schedule = new SchedulePeriod(
-      this.fields.evaluationPeriodSchedule.startDateExpression,
-      this.fields.evaluationPeriodSchedule.endInDeltaMinutes,
-    );
-
-    return schedule.isActive;
+    return this.evalPeriodSchedule?.isActive || true;
   }
 
   /**
@@ -49,8 +28,35 @@ export class DialogueSchedule {
       ...this.fields,
       dataPeriodSchedule: {
         ...this.fields.dataPeriodSchedule,
-        ...this.dataPeriodSchedule.toGraphQL(),
+        ...this.dataPeriodSchedule?.toGraphQL(),
+      },
+      evaluationPeriodSchedule: {
+        ...this.fields.evaluationPeriodSchedule,
+        ...this.evalPeriodSchedule?.toGraphQL(),
       },
     }
+  }
+
+  private makeDataPeriodSchedule(): SchedulePeriod | undefined {
+    if (!this.fields.dataPeriodSchedule) return undefined;
+
+    const schedule = new SchedulePeriod(
+      this.fields.dataPeriodSchedule?.startDateExpression,
+      this.fields.dataPeriodSchedule?.endInDeltaMinutes,
+    );
+
+    return schedule;
+  }
+
+  private makeEvalPeriodSchedule(): SchedulePeriod | undefined {
+    // If there is no evaluation period, we also enable evaluation
+    if (!this.fields.evaluationPeriodSchedule) return undefined;
+
+    const schedule = new SchedulePeriod(
+      this.fields.evaluationPeriodSchedule.startDateExpression,
+      this.fields.evaluationPeriodSchedule.endInDeltaMinutes,
+    );
+
+    return schedule;
   }
 }

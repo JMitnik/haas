@@ -22,11 +22,13 @@ export class SchedulePeriod {
 
   public get isActive(): boolean {
     const current = new Date(Date.now());
+
     return this.activeStartDate < current && this.activeEndDate > current;
   }
 
   public toGraphQL() {
     return {
+      isActive: this.isActive,
       activeStartDate: this.activeStartDate,
       activeEndDate: this.activeEndDate,
     }

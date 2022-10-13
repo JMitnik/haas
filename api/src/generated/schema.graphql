@@ -1125,6 +1125,7 @@ input EnableAutomationInput {
 type EvaluationPeriodSchedule {
   endInDeltaMinutes: Int
   id: ID
+  isActive: Boolean
   startDateExpression: String
 }
 
