@@ -6,22 +6,76 @@ import { Nullable } from '../../types/generic';
 import { convertDatesToHistogramItems } from '../Common/Analytics/Analytics.helpers';
 import { TopicByString, TopicFilterInput, TopicStatistics, TopicStatisticsByDialogueId } from '../Topic/Topic.types';
 import { TopicService } from '../Topic/TopicService';
-import { Issue, IssueFilterInput } from './Issue.types';
+import { GetIssueResolverInput, Issue, IssueConnectionFilterInput, IssueFilterInput } from './Issue.types';
 import { SessionActionType, SessionWithEntries } from '../../models/session/Session.types';
 import SessionService from '../../models/session/SessionService';
 import CustomerService from '../../models/customer/CustomerService';
+import IssuePrismaAdapter from './IssuePrismaAdapter';
+import { offsetPaginate } from '../general/PaginationHelpers';
 
 export class IssueService {
   private prisma: PrismaClient;
   private topicService: TopicService;
   private workspaceService: CustomerService;
   private sessionService: SessionService;
+  private issuePrismaAdapter: IssuePrismaAdapter;
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
     this.topicService = new TopicService(prisma);
     this.workspaceService = new CustomerService(prisma);
     this.sessionService = new SessionService(prisma);
+    this.issuePrismaAdapter = new IssuePrismaAdapter(prisma);
+  }
+
+  /**
+   * Paginate through all issues of a workspace
+   * @param workpsaceId the ID of the workspace
+   * @param filter a filter object used to paginate through issues of a workspace
+   * @returns a list of paginated issues
+   */
+  public paginatedIssues = async (
+    workspaceId: string,
+    filter: IssueConnectionFilterInput,
+  ) => {
+    const offset = filter.offset;
+    const perPage = filter.perPage;
+
+    const issues = await this.issuePrismaAdapter.findPaginatedIssues(workspaceId, filter);
+    const totalIssues = await this.issuePrismaAdapter.countIssues(workspaceId, filter);
+    const { totalPages, ...pageInfo } = offsetPaginate(totalIssues, offset, perPage);
+
+    return {
+      issues: issues,
+      totalPages,
+      pageInfo,
+    };
+  };
+
+  /**
+  * Finds all issues by a workspace ID
+  */
+  public async findIssuesByWorkspaceId(workspaceId: string, filter: IssueFilterInput) {
+    return this.issuePrismaAdapter.findIssuesByWorkspaceId(workspaceId, filter);
+  }
+
+  /**
+  * Finds an issue be either the issue or topic ID
+  */
+  public async findIssueById(input: GetIssueResolverInput) {
+    if (input.issueId) {
+      return this.issuePrismaAdapter.findIssueById(input.issueId);
+    }
+
+    if (input.topicId) {
+      return this.issuePrismaAdapter.findIssueByTopicId(input.topicId);
+    }
+
+    return null;
+  }
+
+  public async createIssueIfNotExists(workspaceId: string, topicId: string) {
+    return this.issuePrismaAdapter.upsertIssueByTopicId(workspaceId, topicId);
   }
 
   /**
@@ -49,10 +103,11 @@ export class IssueService {
   public async getProblemDialoguesByWorkspace(
     workspaceId: string,
     filter: IssueFilterInput,
-    userId: string
+    userId: string,
+    canAccessAllDialogues: boolean = false,
   ): Promise<Issue[]> {
     const dialogues = await this.countNegativeWorkspaceInteractions(
-      workspaceId, filter.startDate, filter.endDate, userId, filter
+      workspaceId, filter.startDate, filter.endDate, userId, filter, canAccessAllDialogues
     );
     const issues = orderBy(this.calculateDialogueIssueScore(dialogues), (topic) => topic.rankScore, 'desc');
 
@@ -61,13 +116,13 @@ export class IssueService {
   }
 
   /**
-   * Calculate the issue score based on the underlying topics statistics.
-   *
-   * We follow a certain heuristic:
-   * - A single negative ranking is a simple inverse addition. A "1" (or 10) gets us 10 points, 3 gets us 3,3 points. Therefore,
-   * we calculate the
-   * - A "contact" me adds a single extra 100 points.
-   */
+  * Calculate the issue score based on the underlying topics statistics.
+  *
+  * We follow a certain heuristic:
+  * - A single negative ranking is a simple inverse addition. A "1" (or 10) gets us 10 points, 3 gets us 3,3 points. Therefore,
+  * we calculate the
+  * - A "contact" me adds a single extra 100 points.
+  */
   public calculateScore(relatedTopicStatistics: TopicStatistics): number {
     // We weigh the score by the count; not clean heuristic
     const scoreRanking = (1 / ((relatedTopicStatistics.score + 0.01) / 100)) * relatedTopicStatistics.count;
@@ -82,9 +137,14 @@ export class IssueService {
    * Retrieves all workspace issues. This can be filtered, based on the required filter (startDate, endDate).
    * @param workspaceId Workspace ID
    */
-  public async getWorkspaceIssues(workspaceId: string, filter: IssueFilterInput, userId: string): Promise<Issue[]> {
+  public async getWorkspaceIssues(
+    workspaceId: string,
+    filter: IssueFilterInput,
+    userId: string,
+    canAccessAllDialogues: boolean = false
+  ): Promise<Issue[]> {
     const topics = await this.topicService.countWorkspaceTopics(
-      workspaceId, filter.startDate, filter.endDate, userId, filter
+      workspaceId, filter.startDate, filter.endDate, userId, filter, canAccessAllDialogues
     );
     const issues = orderBy(this.extractIssues(topics), (topic) => topic.rankScore, 'desc');
 
@@ -131,10 +191,16 @@ export class IssueService {
     startDate: Date,
     endDate: Date,
     userId: string,
-    topicFilter: TopicFilterInput
+    topicFilter: TopicFilterInput,
+    canAccessAllDialogues: boolean = false,
   ): Promise<TopicStatisticsByDialogueId> {
     const dialogueIds = (
-      await this.workspaceService.getDialogues(workspaceId, userId, topicFilter.dialogueStrings || [])
+      await this.workspaceService.getDialogues(
+        workspaceId,
+        userId,
+        topicFilter.dialogueStrings || [],
+        canAccessAllDialogues
+      )
     ).map(dialogue => dialogue.id);
 
     // Fetch all sessions for the dialogues.
@@ -176,10 +242,10 @@ export class IssueService {
   }
 
   /**
-   * Extracts all issues from a topic-by-string map.
-   *
-   * Warning: Potentially costly due to the `convertDatesToHistogramItems` call.
-   */
+  * Extracts all issues from a topic-by-string map.
+  *
+  * Warning: Potentially costly due to the `convertDatesToHistogramItems` call.
+  */
   private calculateDialogueIssueScore(dialogues: TopicStatisticsByDialogueId): Issue[] {
     let issues: Issue[] = [];
 
@@ -212,10 +278,10 @@ export class IssueService {
   }
 
   /**
-   * Extracts all issues from a topic-by-string map.
-   *
-   * Warning: Potentially costly due to the `convertDatesToHistogramItems` call.
-   */
+  * Extracts all issues from a topic-by-string map.
+  *
+  * Warning: Potentially costly due to the `convertDatesToHistogramItems` call.
+  */
   private extractIssues(topics: TopicByString): Issue[] {
     let issues: Issue[] = [];
 

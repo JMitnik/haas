@@ -2,13 +2,13 @@ import { ProvidedZoom, TransformMatrix } from '@visx/zoom/lib/types';
 
 import {
   GetDialogueTopics,
-  GetIssues,
+  GetProblemsPerDialogue,
   GetSessionPaths,
   GetWorkspaceDialogueStatistics,
   WorkspaceStatistics,
 } from 'types/generated-types';
 
-export type Issue = GetIssues.Issues;
+export type Issue = GetProblemsPerDialogue.IssueDialogues;
 export type Topic = GetDialogueTopics.Topic;
 export type Dialogue = GetWorkspaceDialogueStatistics.WorkspaceStatisticsSummary;
 export type Session = GetSessionPaths.PathedSessions;

@@ -32,9 +32,11 @@ import { IssueService } from '../models/Issue/IssueService';
 import ScheduledAutomationService from '../models/automations/ScheduledAutomationService';
 import { WorkspaceStatisticsService } from '../models/customer/WorkspaceStatisticsService';
 import { UserTourService } from '../models/UserTour/UserTourService';
+import ActionRequestService from '../models/ActionRequest/ActionRequestService';
 
 export interface APIServiceContainer {
   userTourService: UserTourService;
+  actionRequestService: ActionRequestService;
   scheduledAutomationService: ScheduledAutomationService;
   automationActionService: AutomationActionService;
   organizationService: OrganizationService;

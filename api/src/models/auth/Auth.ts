@@ -157,6 +157,7 @@ export const InviteUserInput = inputObjectType({
     t.nonNull.string('roleId');
     t.nonNull.string('email');
     t.nonNull.string('customerId');
+    t.nonNull.boolean('sendInviteEmail');
   },
 });
 
@@ -256,7 +257,7 @@ export const InviteUserMutation = mutationField('inviteUser', {
 
   async resolve(parent, args, ctx: APIContext) {
     if (!args.input) throw new GraphQLYogaError('No input provided');
-    const { customerId, email, roleId } = args.input;
+    const { customerId, email, roleId, sendInviteEmail } = args.input;
 
     // Check if email already has been created
     const user = await ctx.services.userService.findEmailWithinWorkspace(email, customerId);
@@ -264,7 +265,7 @@ export const InviteUserMutation = mutationField('inviteUser', {
     // Case 1: If user completely does not exist in our database yet,
     //  create a new entry and login-token
     if (!user) {
-      await ctx.services.userService.inviteNewUserToCustomer(email, customerId, roleId);
+      await ctx.services.userService.inviteNewUserToCustomer(email, customerId, roleId, sendInviteEmail);
 
       return {
         didAlreadyExist: false,
@@ -277,7 +278,7 @@ export const InviteUserMutation = mutationField('inviteUser', {
     // Case 2: If user-customer relation already exists,
     // just update the role itself
     if (user.customers.length) {
-      await ctx.services.userService.updateUserRole(user.id, roleId, customerId);
+      await ctx.services.userService.updateUserRole(user.id, roleId, customerId, sendInviteEmail);
 
       return {
         didInvite: false,
@@ -286,7 +287,7 @@ export const InviteUserMutation = mutationField('inviteUser', {
     }
 
     // Case 3: Invite existing user to customer
-    await ctx.services.userService.inviteExistingUserToCustomer(user.id, roleId, customerId);
+    await ctx.services.userService.inviteExistingUserToCustomer(user.id, roleId, customerId, sendInviteEmail);
 
     return {
       didAlreadyExist: true,

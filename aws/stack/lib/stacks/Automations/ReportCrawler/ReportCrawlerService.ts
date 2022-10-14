@@ -133,7 +133,7 @@ export class ReportCrawlerService extends BaseLambdaService {
     }));
 
     canInvokeAllLambdasRole.addToPrincipalPolicy(new iam.PolicyStatement({
-      resources: ['arn:aws:sns:eu-central-1:*:haasApiReport'],
+      resources: ['arn:aws:sns:eu-central-1:*:haasApiReport', 'arn:aws:sns:eu-central-1:*:dialogueLinkSender'],
       actions: ['sns:Publish'],
       effect: iam.Effect.ALLOW,
     }));

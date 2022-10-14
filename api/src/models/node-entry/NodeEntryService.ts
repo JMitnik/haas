@@ -14,20 +14,26 @@ import SessionPrismaAdapter from '../../models/session/SessionPrismaAdapter';
 import DialoguePrismaAdapter from '../../models/questionnaire/DialoguePrismaAdapter';
 import { DialogueWithCustomer } from '../../models/session/Session.types';
 import makeEmergencyTemplate from '../../services/mailings/templates/makeEmergencyTemplate';
+import makeActionRequestConfirmationTemplate from '../../services/mailings/templates/makeActionRequestConfirmationTemplate';
 import config from '../../config/config';
 import MailService from '../../services/mailings/MailService';
-import Sentry from '../../config/sentry';
+import { ActionRequestPrismaAdapter } from '../ActionRequest/ActionRequestPrismaAdapter';
+import UserPrismaAdapter from '../users/UserPrismaAdapter';
 
 class NodeEntryService {
   nodeEntryPrismaAdapter: NodeEntryPrismaAdapter;
   sessionPrismaAdapter: SessionPrismaAdapter;
   dialoguePrismaAdapter: DialoguePrismaAdapter;
+  actionRequestPrismaAdapter: ActionRequestPrismaAdapter;
+  userPrismaAdapter: UserPrismaAdapter;
   mailService: MailService;
 
   constructor(prismaClient: PrismaClient) {
     this.nodeEntryPrismaAdapter = new NodeEntryPrismaAdapter(prismaClient);
     this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
+    this.actionRequestPrismaAdapter = new ActionRequestPrismaAdapter(prismaClient);
+    this.userPrismaAdapter = new UserPrismaAdapter(prismaClient);
     this.mailService = new MailService();
   };
 
@@ -44,6 +50,39 @@ class NodeEntryService {
   }
 
   /**
+   * Builds the action request confirmation email body and sends the email to the provided email address
+   * @param dialogueId 
+   * @param email 
+   * @param comment the text entered by a user in the comment (longText) field
+   */
+  sendActionRequestConfirmationMail = async (
+    dialogueId: string,
+    email: string,
+    actionableId: string,
+    assigneeEmailAddress?: string | null
+  ) => {
+    const dialogue = await this.dialoguePrismaAdapter.getDialogueById(dialogueId, true) as DialogueWithCustomer;
+
+    const assignee = assigneeEmailAddress
+      ? await this.userPrismaAdapter.findUniqueByEmail(assigneeEmailAddress)
+      : null;
+    const assigneeName = assignee ? `${assignee?.firstName} ${assignee?.lastName}` : undefined;
+
+    const loginBody = makeActionRequestConfirmationTemplate({
+      recipientMail: email,
+      dialogueTitle: dialogue.title,
+      verifyUrl: `${config.clientUrl}/${dialogue.customer.slug}/${dialogue.slug}/v/${actionableId}`,
+      assigneeName,
+    });
+
+    this.mailService.send({
+      body: loginBody,
+      recipient: email,
+      subject: 'HAAS: please confirm your request!',
+    });
+  }
+
+  /**
    * Builds the emergency email body and sends the email to the provided email address
    * @param dialogueId 
    * @param email 
@@ -55,7 +94,7 @@ class NodeEntryService {
     const loginBody = makeEmergencyTemplate({
       recipientMail: email,
       dialogueTitle: dialogue.title,
-      dashboardUrl: `${config.dashboardUrl}/dashboard/b/${dialogue.customer.slug}/dashboard`,
+      dashboardUrl: `${config.dashboardUrl}/dashboard/b/${dialogue.customer.slug}/dashboard/action_requests`,
       comment: comment,
     });
 
@@ -67,45 +106,63 @@ class NodeEntryService {
   }
 
   /**
-   * Create node-entries. if node entry contains an emergency contact, send a email to the contact 
+   * Create node-entries. if node entry contains an emergency contact, send a confirmation email to requestor
    * */
   handleNodeEntryAppend = async (sessionId: string, nodeEntryInput: NexusGenInputs['NodeEntryInput']): Promise<NodeEntry> => {
     const createNodeEntryFragment = NodeEntryService.constructCreateNodeEntryFragment(nodeEntryInput);
-    const emergencyContact = nodeEntryInput.data?.form?.values?.find((value) => value?.contacts);
-    const emergencyComment = nodeEntryInput.data?.form?.values?.find((value) => value?.longText);
+    const emergencyContact = nodeEntryInput.data?.form?.values?.find((value) => value?.contacts)?.contacts;
+    const emergencyEmail = nodeEntryInput.data?.form?.values?.find((value) => value?.email)?.email;
     const nodeEntry = await this.nodeEntryPrismaAdapter.create({
       session: { connect: { id: sessionId } },
       ...createNodeEntryFragment,
     });
 
-    if (emergencyContact) {
-      try {
-        const emailAddress = emergencyContact.contacts;
-        const comment = emergencyComment?.longText;
-        const session = await this.sessionPrismaAdapter.findSessionById(sessionId);
-        await this.sendEmergencyMail(
-          session?.dialogueId as string,
-          emailAddress as string,
-          comment || undefined
-        )
-      } catch (error) {
-        Sentry.captureException(error);
+    const actionable = await this.actionRequestPrismaAdapter.findActionRequestBySessionId(sessionId);
+    const actionableExists = !!actionable?.id
+
+    if (nodeEntryInput.data?.form?.values?.length && actionableExists) {
+      const actionableUpdateArgs: Prisma.ActionRequestUpdateInput = {
+        assignee: emergencyContact ? {
+          connect: {
+            email: emergencyContact,
+          },
+        } : undefined,
+        requestEmail: emergencyEmail,
       }
+
+      if (emergencyContact) {
+        await this.sendEmergencyMail(
+          actionable.dialogueId,
+          emergencyContact,
+        )
+      }
+
+      if (emergencyEmail) {
+        await this.sendActionRequestConfirmationMail(
+          actionable.dialogueId,
+          emergencyEmail,
+          actionable.id,
+          emergencyContact,
+        )
+      }
+
+      await this.actionRequestPrismaAdapter.updateActionRequest(actionable.id, actionableUpdateArgs);
     }
 
     return nodeEntry;
-  };
+  }
+
 
   /**
-   * Fetch all node-entries by session id.
-   * */
+ * Fetch all node-entries by session id.
+ * */
   getNodeEntriesBySessionId(sessionId: string): Promise<NodeEntry[]> {
     return this.nodeEntryPrismaAdapter.getNodeEntriesBySessionId(sessionId);
   };
 
   /**
-   * Count node entries by session id.
-   * */
+ * Count node entries by session id.
+ * */
   countNodeEntriesBySessionid(sessionId: string): Promise<number> {
     return this.nodeEntryPrismaAdapter.countNodeEntriesBySessionId(sessionId);
   };

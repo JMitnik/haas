@@ -20,18 +20,29 @@ interface ContentProps {
   children: React.ReactNode;
   portalled?: boolean;
   style?: React.CSSProperties;
+  side?: 'bottom' | 'top' | 'right' | 'left';
+  alignOffset?: number;
+  align?: 'start' | 'center' | 'end';
 }
 
-export const Content = ({ isOpen, children, portalled, style }: ContentProps) => (
+export const Content = (
+  { isOpen,
+    children,
+    portalled,
+    style,
+    side,
+    alignOffset = 12,
+    align = 'start' }: ContentProps,
+) => (
   <AnimatePresence>
     {isOpen ? (
       <ContentContainer
         asChild
         forceMount
         forwardedAs={motion.div}
-        align="start"
-        alignOffset={12}
-        side="bottom"
+        align={align}
+        alignOffset={alignOffset}
+        side={side}
         portalled={portalled}
         {...slideUpFadeMotion}
         style={style}

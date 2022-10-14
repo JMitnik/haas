@@ -3,6 +3,8 @@ import { useCustomer } from 'providers/CustomerProvider';
 import { useUser } from 'providers/UserProvider';
 
 interface UseAuthProps {
+  canViewActionRequests: boolean;
+  canAccessAllActionRequests: boolean;
   canCreateAutomations: boolean;
   canUpdateAutomations: boolean;
   canViewAutomations: boolean;
@@ -52,6 +54,10 @@ const useAuth = (): UseAuthProps => {
     // Dialogue is not private => It is allowed to see dialogue
     if (!privateDialogue) return true;
 
+    // If super admin or has permission to see all dialogues => It is allowed to see dialogue
+    const canAccessAllDialogues = authPermissions?.includes(SystemPermission.CanAccessAllDialogues);
+    if (isSuperAdmin || canAccessAllDialogues) return true;
+
     const isPrivateDialogue = !!privateDialogue;
 
     // Dialogue is private && no assigned dialogues for user => Not allowed to see dialogue
@@ -81,6 +87,8 @@ const useAuth = (): UseAuthProps => {
   );
 
   return {
+    canViewActionRequests: hasPermission(SystemPermission.CanViewActionRequests),
+    canAccessAllActionRequests: hasPermission(SystemPermission.CanAccessAllActionRequests),
     canCreateAutomations: hasPermission(SystemPermission.CanCreateAutomations),
     canUpdateAutomations: hasPermission(SystemPermission.CanUpdateAutomations),
     canViewAutomations: hasPermission(SystemPermission.CanViewAutomations),

@@ -80,6 +80,7 @@ interface NodePickerProps {
   onClose?: () => void;
   isMulti?: boolean;
   currValues?: ConditionEntry[];
+  noRoles?: boolean;
 }
 
 export const UserNodePicker = ({
@@ -88,6 +89,7 @@ export const UserNodePicker = ({
   items,
   currValues,
   isMulti,
+  noRoles,
 }: NodePickerProps) => {
   const [filteredState, setFilteredState] = useState<TargetTypeEnum | null>(null);
   const [filteredItems, setFilteredItems] = useState(items);
@@ -105,7 +107,7 @@ export const UserNodePicker = ({
     <UI.List maxWidth={300}>
       <UI.CloseButton onClose={onClose} />
       <NodePickerHeader>
-        <UI.ListHeader style={{ borderBottom: 0 }}>{t('users_and_roles')}</UI.ListHeader>
+        <UI.ListHeader style={{ borderBottom: 0 }}>{noRoles ? t('users') : t('users_and_roles')}</UI.ListHeader>
       </NodePickerHeader>
 
       <UI.ListItem
@@ -129,12 +131,15 @@ export const UserNodePicker = ({
               >
                 {t('user')}
               </UI.SwitchItem>
-              <UI.SwitchItem
-                isActive={filteredState === TargetTypeEnum.Role}
-                onClick={() => setFilteredState(TargetTypeEnum.Role)}
-              >
-                {t('role')}
-              </UI.SwitchItem>
+              {!noRoles && (
+                <UI.SwitchItem
+                  isActive={filteredState === TargetTypeEnum.Role}
+                  onClick={() => setFilteredState(TargetTypeEnum.Role)}
+                >
+                  {t('role')}
+                </UI.SwitchItem>
+              )}
+
             </UI.Switch>
           </UI.Div>
           <UI.Div>

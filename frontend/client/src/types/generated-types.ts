@@ -34,6 +34,82 @@ export type AwsImageType = {
   url?: Maybe<Scalars['String']>;
 };
 
+export type ActionRequest = {
+  __typename?: 'ActionRequest';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['Date']>;
+  updatedAt?: Maybe<Scalars['Date']>;
+  dialogueId?: Maybe<Scalars['String']>;
+  assigneeId?: Maybe<Scalars['String']>;
+  issueId?: Maybe<Scalars['String']>;
+  requestEmail?: Maybe<Scalars['String']>;
+  isVerified: Scalars['Boolean'];
+  status: ActionRequestState;
+  assignee?: Maybe<UserType>;
+  dialogue?: Maybe<Dialogue>;
+  issue?: Maybe<IssueModel>;
+  session?: Maybe<Session>;
+};
+
+export type ActionRequestConnection = ConnectionInterface & {
+  __typename?: 'ActionRequestConnection';
+  totalPages?: Maybe<Scalars['Int']>;
+  pageInfo?: Maybe<PaginationPageInfo>;
+  actionRequests?: Maybe<Array<Maybe<ActionRequest>>>;
+};
+
+export type ActionRequestConnectionFilterInput = {
+  search?: Maybe<Scalars['String']>;
+  startDate?: Maybe<Scalars['DateString']>;
+  endDate?: Maybe<Scalars['DateString']>;
+  assigneeId?: Maybe<Scalars['String']>;
+  requestEmail?: Maybe<Scalars['String']>;
+  isVerified?: Maybe<Scalars['Boolean']>;
+  topic?: Maybe<Scalars['String']>;
+  dialogueId?: Maybe<Scalars['String']>;
+  status?: Maybe<ActionRequestState>;
+  orderBy?: Maybe<ActionRequestConnectionOrderByInput>;
+  offset: Scalars['Int'];
+  perPage?: Scalars['Int'];
+};
+
+/** Sorting of ActionableConnection */
+export type ActionRequestConnectionOrderByInput = {
+  by: ActionRequestConnectionOrderType;
+  desc?: Maybe<Scalars['Boolean']>;
+};
+
+/** Fields to order ActionableConnection by. */
+export enum ActionRequestConnectionOrderType {
+  CreatedAt = 'createdAt'
+}
+
+export type ActionRequestFilterInput = {
+  startDate?: Maybe<Scalars['DateString']>;
+  endDate?: Maybe<Scalars['DateString']>;
+  assigneeId?: Maybe<Scalars['String']>;
+  withFollowUpAction?: Maybe<Scalars['Boolean']>;
+  status?: Maybe<ActionRequestState>;
+};
+
+export enum ActionRequestState {
+  Pending = 'PENDING',
+  Stale = 'STALE',
+  Completed = 'COMPLETED',
+  Dropped = 'DROPPED'
+}
+
+/** Basic statistics for action requests of an issue */
+export type ActionRequestStatistics = {
+  __typename?: 'ActionRequestStatistics';
+  /** Number of responses */
+  responseCount: Scalars['Int'];
+  /** Average value of summarizable statistic */
+  average: Scalars['Float'];
+  /** Number of urgent actionRequests  */
+  urgentCount: Scalars['Int'];
+};
+
 export type AdjustedImageInput = {
   id?: Maybe<Scalars['String']>;
   key?: Maybe<Scalars['String']>;
@@ -47,6 +123,19 @@ export type AppendToInteractionInput = {
   nodeId?: Maybe<Scalars['String']>;
   edgeId?: Maybe<Scalars['String']>;
   data?: Maybe<NodeEntryDataInput>;
+};
+
+export type AssignUserToActionRequestInput = {
+  workspaceId: Scalars['String'];
+  assigneeId?: Maybe<Scalars['String']>;
+  actionRequestId: Scalars['String'];
+};
+
+export type AssignUserToDialogueInput = {
+  userId: Scalars['String'];
+  workspaceId: Scalars['String'];
+  dialogueId: Scalars['String'];
+  state: Scalars['Boolean'];
 };
 
 export type AssignUserToDialoguesInput = {
@@ -409,7 +498,7 @@ export enum CloudReferenceType {
 
 export type ColourSettings = {
   __typename?: 'ColourSettings';
-  id?: Maybe<Scalars['ID']>;
+  id?: Maybe<Scalars['Int']>;
   primary?: Maybe<Scalars['String']>;
   secondary?: Maybe<Scalars['String']>;
   primaryAlt?: Maybe<Scalars['String']>;
@@ -575,6 +664,13 @@ export type CreateQuestionNodeInputType = {
   edgeCondition?: Maybe<EdgeConditionInputType>;
 };
 
+/** Creates a topic (with subTopics) based on input */
+export type CreateTopicInput = {
+  name: Scalars['String'];
+  type?: Maybe<TopicEnumType>;
+  subTopics?: Maybe<Array<Maybe<CreateTopicInput>>>;
+};
+
 export type CreateTriggerInputType = {
   customerSlug?: Maybe<Scalars['String']>;
   recipients?: Maybe<RecipientsInputType>;
@@ -635,7 +731,10 @@ export type Customer = {
   sessionConnection?: Maybe<SessionConnection>;
   /** Workspace statistics */
   statistics?: Maybe<WorkspaceStatistics>;
-  issues?: Maybe<Array<Maybe<Issue>>>;
+  actionRequestConnection?: Maybe<ActionRequestConnection>;
+  issueConnection?: Maybe<IssueConnection>;
+  issueDialogues?: Maybe<Array<Maybe<Issue>>>;
+  issueTopics?: Maybe<Array<Maybe<Issue>>>;
   dialogueConnection?: Maybe<DialogueConnection>;
   automationConnection?: Maybe<AutomationConnection>;
   usersConnection?: Maybe<UserConnection>;
@@ -662,8 +761,23 @@ export type CustomerSessionConnectionArgs = {
 };
 
 
-export type CustomerIssuesArgs = {
+export type CustomerActionRequestConnectionArgs = {
+  input?: Maybe<ActionRequestConnectionFilterInput>;
+};
+
+
+export type CustomerIssueConnectionArgs = {
+  filter?: Maybe<IssueConnectionFilterInput>;
+};
+
+
+export type CustomerIssueDialoguesArgs = {
   filter?: Maybe<IssueFilterInput>;
+};
+
+
+export type CustomerIssueTopicsArgs = {
+  input?: Maybe<IssueFilterInput>;
 };
 
 
@@ -729,10 +843,12 @@ export type CustomerUserCustomerArgs = {
 
 export type CustomerSettings = {
   __typename?: 'CustomerSettings';
-  id?: Maybe<Scalars['ID']>;
+  id?: Maybe<Scalars['Int']>;
   logoUrl?: Maybe<Scalars['String']>;
   logoOpacity?: Maybe<Scalars['Int']>;
+  colourSettingsId?: Maybe<Scalars['Int']>;
   colourSettings?: Maybe<ColourSettings>;
+  fontSettingsId?: Maybe<Scalars['Int']>;
   fontSettings?: Maybe<FontSettings>;
 };
 
@@ -883,19 +999,22 @@ export type DeselectTopicInput = {
 
 export type Dialogue = {
   __typename?: 'Dialogue';
-  id: Scalars['ID'];
+  id: Scalars['String'];
   title: Scalars['String'];
   slug: Scalars['String'];
   description: Scalars['String'];
+  template?: Maybe<Scalars['String']>;
   isWithoutGenData?: Maybe<Scalars['Boolean']>;
   wasGeneratedWithGenData?: Maybe<Scalars['Boolean']>;
   language?: Maybe<LanguageEnumType>;
   isPrivate?: Maybe<Scalars['Boolean']>;
   publicTitle?: Maybe<Scalars['String']>;
-  creationDate?: Maybe<Scalars['String']>;
-  updatedAt?: Maybe<Scalars['String']>;
+  creationDate?: Maybe<Scalars['Date']>;
+  updatedAt?: Maybe<Scalars['Date']>;
   assignees?: Maybe<Array<Maybe<UserType>>>;
+  postLeafNodeId?: Maybe<Scalars['String']>;
   postLeafNode?: Maybe<DialogueFinisherObjectType>;
+  issues?: Maybe<Issue>;
   healthScore?: Maybe<HealthScore>;
   pathedSessionsConnection?: Maybe<PathedSessionsType>;
   topic?: Maybe<TopicType>;
@@ -915,6 +1034,11 @@ export type Dialogue = {
   questions?: Maybe<Array<QuestionNode>>;
   leafs?: Maybe<Array<QuestionNode>>;
   campaignVariants?: Maybe<Array<CampaignVariantType>>;
+};
+
+
+export type DialogueIssuesArgs = {
+  filter?: Maybe<IssueFilterInput>;
 };
 
 
@@ -964,7 +1088,7 @@ export type DialogueSessionsArgs = {
 
 
 export type DialogueStatisticsArgs = {
-  input?: Maybe<DialogueFilterInputType>;
+  input?: Maybe<DialogueStatisticsSummaryFilterInput>;
 };
 
 
@@ -1023,8 +1147,8 @@ export type DialogueConnectionOrderByInput = {
 
 export type DialogueFilterInputType = {
   searchTerm?: Maybe<Scalars['String']>;
-  startDate?: Maybe<Scalars['String']>;
-  endDate?: Maybe<Scalars['String']>;
+  startDateTime?: Maybe<Scalars['String']>;
+  endDateTime?: Maybe<Scalars['String']>;
 };
 
 export type DialogueFinisherObjectType = {
@@ -1071,6 +1195,10 @@ export type DialogueStatisticsSummaryModel = {
 };
 
 export enum DialogueTemplateType {
+  TeacherNl = 'TEACHER_NL',
+  StudentNl = 'STUDENT_NL',
+  TeacherEng = 'TEACHER_ENG',
+  StudentEng = 'STUDENT_ENG',
   SportEng = 'SPORT_ENG',
   SportNl = 'SPORT_NL',
   BusinessEng = 'BUSINESS_ENG',
@@ -1087,8 +1215,8 @@ export type DialogueWhereUniqueInput = {
 export type Edge = {
   __typename?: 'Edge';
   id?: Maybe<Scalars['ID']>;
-  createdAt?: Maybe<Scalars['String']>;
-  updatedAt?: Maybe<Scalars['String']>;
+  createdAt?: Maybe<Scalars['Date']>;
+  updatedAt?: Maybe<Scalars['Date']>;
   parentNodeId?: Maybe<Scalars['String']>;
   childNodeId?: Maybe<Scalars['String']>;
   parentNode?: Maybe<QuestionNode>;
@@ -1153,7 +1281,7 @@ export type FindRoleInput = {
 
 export type FontSettings = {
   __typename?: 'FontSettings';
-  id?: Maybe<Scalars['ID']>;
+  id?: Maybe<Scalars['Int']>;
 };
 
 /** FormNodeEntryInput */
@@ -1187,6 +1315,7 @@ export type FormNodeEntryValueType = {
   url?: Maybe<Scalars['String']>;
   shortText?: Maybe<Scalars['String']>;
   longText?: Maybe<Scalars['String']>;
+  contacts?: Maybe<Scalars['String']>;
   number?: Maybe<Scalars['Int']>;
 };
 
@@ -1253,8 +1382,7 @@ export type FormNodeStepInput = {
 };
 
 export enum FormNodeStepType {
-  GenericFields = 'GENERIC_FIELDS',
-  InputData = 'INPUT_DATA'
+  GenericFields = 'GENERIC_FIELDS'
 }
 
 export type FormNodeType = {
@@ -1304,6 +1432,7 @@ export type GenerateWorkspaceCsvInputType = {
   type?: Scalars['String'];
   generateDemoData?: Maybe<Scalars['Boolean']>;
   isDemo?: Scalars['Boolean'];
+  makeDialoguesPrivate?: Maybe<Scalars['Boolean']>;
 };
 
 export type GetAutomationInput = {
@@ -1318,6 +1447,12 @@ export type GetCampaignsInput = {
   customerSlug?: Maybe<Scalars['String']>;
 };
 
+export type GetIssueResolverInput = {
+  workspaceId?: Maybe<Scalars['String']>;
+  issueId?: Maybe<Scalars['String']>;
+  topicId?: Maybe<Scalars['String']>;
+};
+
 export type HandleUserStateInWorkspaceInput = {
   userId?: Maybe<Scalars['String']>;
   workspaceId?: Maybe<Scalars['String']>;
@@ -1329,6 +1464,7 @@ export type HealthScore = {
   score: Scalars['Float'];
   negativeResponseCount: Scalars['Int'];
   nrVotes: Scalars['Int'];
+  average: Scalars['Float'];
 };
 
 export type HealthScoreInput = {
@@ -1387,12 +1523,66 @@ export type Issue = {
   updatedAt?: Maybe<Scalars['Date']>;
 };
 
+export type IssueConnection = ConnectionInterface & {
+  __typename?: 'IssueConnection';
+  totalPages?: Maybe<Scalars['Int']>;
+  pageInfo?: Maybe<PaginationPageInfo>;
+  issues?: Maybe<Array<Maybe<IssueModel>>>;
+};
+
+export type IssueConnectionFilterInput = {
+  label?: Maybe<Scalars['String']>;
+  search?: Maybe<Scalars['String']>;
+  startDate?: Maybe<Scalars['DateString']>;
+  endDate?: Maybe<Scalars['DateString']>;
+  topicStrings?: Maybe<Array<Scalars['String']>>;
+  orderBy?: Maybe<IssueConnectionOrderByInput>;
+  offset: Scalars['Int'];
+  perPage?: Scalars['Int'];
+};
+
+/** Sorting of IssueConnection */
+export type IssueConnectionOrderByInput = {
+  by: IssueConnectionOrderType;
+  desc?: Maybe<Scalars['Boolean']>;
+};
+
+/** Fields to order IssueConnection by. */
+export enum IssueConnectionOrderType {
+  Issue = 'issue'
+}
+
 /** Filter input for Issues */
 export type IssueFilterInput = {
   startDate?: Maybe<Scalars['String']>;
   endDate?: Maybe<Scalars['String']>;
   dialogueStrings?: Maybe<Array<Scalars['String']>>;
   topicStrings?: Maybe<Array<Scalars['String']>>;
+};
+
+export type IssueModel = {
+  __typename?: 'IssueModel';
+  id?: Maybe<Scalars['ID']>;
+  createdAt?: Maybe<Scalars['Date']>;
+  updatedAt?: Maybe<Scalars['Date']>;
+  topicId: Scalars['String'];
+  workspaceId: Scalars['String'];
+  topic: Topic;
+  /** Number of different teams issue exists for */
+  teamCount: Scalars['Int'];
+  basicStats?: Maybe<ActionRequestStatistics>;
+  actionRequestConnection?: Maybe<ActionRequestConnection>;
+  actionRequests: Array<Maybe<ActionRequest>>;
+};
+
+
+export type IssueModelActionRequestConnectionArgs = {
+  input?: Maybe<ActionRequestConnectionFilterInput>;
+};
+
+
+export type IssueModelActionRequestsArgs = {
+  input?: Maybe<ActionRequestFilterInput>;
 };
 
 
@@ -1520,6 +1710,9 @@ export type MostTrendingTopic = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  assignUserToActionRequest?: Maybe<ActionRequest>;
+  setActionRequestStatus?: Maybe<ActionRequest>;
+  verifyActionRequest?: Maybe<ActionRequest>;
   sandbox?: Maybe<Scalars['String']>;
   generateWorkspaceFromCSV?: Maybe<Customer>;
   resetWorkspaceData?: Maybe<Scalars['Boolean']>;
@@ -1536,6 +1729,9 @@ export type Mutation = {
   deleteTag?: Maybe<Tag>;
   /** Deselcting a topic implies that all question-options related to the topic string are disregarded as topic. */
   deselectTopic?: Maybe<Scalars['Boolean']>;
+  /** Creates a list of topics and its subtopics. */
+  createTopic?: Maybe<Scalars['Boolean']>;
+  revokeTopic?: Maybe<Topic>;
   /** Creates a new automation. */
   createAutomation?: Maybe<AutomationModel>;
   updateAutomation?: Maybe<AutomationModel>;
@@ -1561,6 +1757,7 @@ export type Mutation = {
   handleUserStateInWorkspace?: Maybe<UserCustomer>;
   editUser?: Maybe<UserType>;
   deleteUser?: Maybe<DeleteUserOutput>;
+  assignUserToDialogue?: Maybe<UserType>;
   assignUserToDialogues?: Maybe<UserType>;
   copyDialogue?: Maybe<Dialogue>;
   createDialogue?: Maybe<Dialogue>;
@@ -1588,6 +1785,21 @@ export type Mutation = {
   createCTA?: Maybe<QuestionNode>;
   updateCTA?: Maybe<QuestionNode>;
   updateQuestion?: Maybe<QuestionNode>;
+};
+
+
+export type MutationAssignUserToActionRequestArgs = {
+  input: AssignUserToActionRequestInput;
+};
+
+
+export type MutationSetActionRequestStatusArgs = {
+  input: SetActionRequestStatusInput;
+};
+
+
+export type MutationVerifyActionRequestArgs = {
+  input: VerifyActionRequestInput;
 };
 
 
@@ -1676,6 +1888,16 @@ export type MutationDeselectTopicArgs = {
 };
 
 
+export type MutationCreateTopicArgs = {
+  input?: Maybe<Array<CreateTopicInput>>;
+};
+
+
+export type MutationRevokeTopicArgs = {
+  input?: Maybe<RevokeTopicInput>;
+};
+
+
 export type MutationCreateAutomationArgs = {
   input?: Maybe<CreateAutomationInput>;
 };
@@ -1697,7 +1919,7 @@ export type MutationDeleteAutomationArgs = {
 
 
 export type MutationSendAutomationDialogueLinkArgs = {
-  input?: Maybe<SendAutomationDialogueLinkInput>;
+  input: SendAutomationDialogueLinkInput;
 };
 
 
@@ -1800,6 +2022,11 @@ export type MutationEditUserArgs = {
 
 export type MutationDeleteUserArgs = {
   input?: Maybe<DeleteUserInput>;
+};
+
+
+export type MutationAssignUserToDialogueArgs = {
+  input?: Maybe<AssignUserToDialogueInput>;
 };
 
 
@@ -1923,7 +2150,7 @@ export type MutationUpdateQuestionArgs = {
 
 export type NodeEntry = {
   __typename?: 'NodeEntry';
-  creationDate?: Maybe<Scalars['String']>;
+  creationDate?: Maybe<Scalars['Date']>;
   depth?: Maybe<Scalars['Int']>;
   id?: Maybe<Scalars['ID']>;
   relatedEdgeId?: Maybe<Scalars['String']>;
@@ -2155,6 +2382,7 @@ export type Query = {
   getAutodeckJobs?: Maybe<AutodeckConnectionType>;
   getAdjustedLogo?: Maybe<AwsImageType>;
   tags?: Maybe<Array<Maybe<Tag>>>;
+  issue?: Maybe<IssueModel>;
   automation?: Maybe<AutomationModel>;
   automations?: Maybe<Array<Maybe<AutomationModel>>>;
   delivery?: Maybe<DeliveryType>;
@@ -2204,6 +2432,12 @@ export type QueryGetAdjustedLogoArgs = {
 export type QueryTagsArgs = {
   customerSlug?: Maybe<Scalars['String']>;
   dialogueId?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryIssueArgs = {
+  input: GetIssueResolverInput;
+  actionableFilter?: Maybe<ActionRequestFilterInput>;
 };
 
 
@@ -2333,8 +2567,9 @@ export type QuestionNode = {
   isRoot?: Maybe<Scalars['Boolean']>;
   title: Scalars['String'];
   updatedAt?: Maybe<Scalars['String']>;
+  videoEmbeddedNodeId?: Maybe<Scalars['String']>;
   extraContent?: Maybe<Scalars['String']>;
-  creationDate?: Maybe<Scalars['String']>;
+  creationDate?: Maybe<Scalars['Date']>;
   type?: Maybe<QuestionNodeTypeEnum>;
   overrideLeafId?: Maybe<Scalars['String']>;
   indepthQuestionStatisticsSummary?: Maybe<Array<Maybe<IndepthQuestionStatisticsSummary>>>;
@@ -2391,6 +2626,7 @@ export type QuestionOption = {
   isTopic?: Maybe<Scalars['Boolean']>;
   questionId?: Maybe<Scalars['String']>;
   publicValue?: Maybe<Scalars['String']>;
+  overrideLeafId?: Maybe<Scalars['String']>;
   overrideLeaf?: Maybe<QuestionNode>;
   position?: Maybe<Scalars['Int']>;
 };
@@ -2470,6 +2706,12 @@ export type RequestInviteOutput = {
   didInvite?: Maybe<Scalars['Boolean']>;
   userExists?: Maybe<Scalars['Boolean']>;
   loginToken?: Maybe<Scalars['String']>;
+};
+
+/** Revokes a sub topic from a topic based on input */
+export type RevokeTopicInput = {
+  topic: Scalars['String'];
+  subTopic: Scalars['String'];
 };
 
 export type RoleConnection = DeprecatedConnectionInterface & {
@@ -2608,6 +2850,12 @@ export type SessionWhereUniqueInput = {
   dialogueId?: Maybe<Scalars['ID']>;
 };
 
+export type SetActionRequestStatusInput = {
+  status: ActionRequestState;
+  actionRequestId: Scalars['String'];
+  workspaceId: Scalars['String'];
+};
+
 export type SetDialoguePrivacyInput = {
   customerId: Scalars['String'];
   dialogueSlug: Scalars['String'];
@@ -2689,6 +2937,9 @@ export enum StatusType {
 }
 
 export enum SystemPermission {
+  CanAccessAllDialogues = 'CAN_ACCESS_ALL_DIALOGUES',
+  CanViewActionRequests = 'CAN_VIEW_ACTION_REQUESTS',
+  CanAccessAllActionRequests = 'CAN_ACCESS_ALL_ACTION_REQUESTS',
   CanResetWorkspaceData = 'CAN_RESET_WORKSPACE_DATA',
   CanAccessAdminPanel = 'CAN_ACCESS_ADMIN_PANEL',
   CanGenerateWorkspaceFromCsv = 'CAN_GENERATE_WORKSPACE_FROM_CSV',
@@ -2739,6 +2990,19 @@ export type TextboxNodeEntryInput = {
   value?: Maybe<Scalars['String']>;
 };
 
+/** Model for topic */
+export type Topic = {
+  __typename?: 'Topic';
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  type: Scalars['String'];
+  subTopics?: Maybe<Array<Maybe<Topic>>>;
+  parentTopics?: Maybe<Array<Maybe<Topic>>>;
+  workspace?: Maybe<Customer>;
+  /** A list of question options to which this topic is assigned to. */
+  usedByOptions?: Maybe<Array<Maybe<QuestionOption>>>;
+};
+
 export type TopicDelta = {
   __typename?: 'TopicDelta';
   topic?: Maybe<Scalars['String']>;
@@ -2749,6 +3013,12 @@ export type TopicDelta = {
   percentageChanged?: Maybe<Scalars['Float']>;
   group?: Maybe<Scalars['String']>;
 };
+
+/** All the different types a topic can be. */
+export enum TopicEnumType {
+  System = 'SYSTEM',
+  Workspace = 'WORKSPACE'
+}
 
 /** Generic filter object for filtering topics */
 export type TopicFilterInput = {
@@ -2878,6 +3148,7 @@ export type UpdateQuestionNodeInputType = {
   extraContent?: Maybe<Scalars['String']>;
   unhappyText?: Maybe<Scalars['String']>;
   happyText?: Maybe<Scalars['String']>;
+  updateSameTemplate?: Maybe<Scalars['Boolean']>;
   sliderNode?: Maybe<SliderNodeInputType>;
   optionEntries?: Maybe<OptionsInputType>;
   edgeCondition?: Maybe<EdgeConditionInputType>;
@@ -2994,6 +3265,11 @@ export type UserTypeAssignedDialoguesArgs = {
   input?: Maybe<UserOfCustomerInput>;
 };
 
+export type VerifyActionRequestInput = {
+  workspaceId: Scalars['String'];
+  actionRequestId: Scalars['String'];
+};
+
 export type VerifyUserTokenOutput = {
   __typename?: 'VerifyUserTokenOutput';
   accessToken?: Maybe<Scalars['String']>;
@@ -3028,6 +3304,10 @@ export type WorkspaceStatistics = {
   workspaceStatisticsSummary: Array<DialogueStatisticsSummaryModel>;
   /** Basic statistics of a workspace (e.g. number of responses, average general score, etc) */
   basicStats?: Maybe<BasicStatistics>;
+  /** Histogram of responses over time. */
+  responseHistogram?: Maybe<DateHistogram>;
+  /** Histogram of issues over time. */
+  issueHistogram?: Maybe<DateHistogram>;
   /** Topics of a workspace ranked by either impact score or number of responses */
   rankedTopics?: Maybe<Array<Maybe<TopicType>>>;
   /** Gets the health score of the workspace */
@@ -3045,6 +3325,16 @@ export type WorkspaceStatisticsWorkspaceStatisticsSummaryArgs = {
 
 
 export type WorkspaceStatisticsBasicStatsArgs = {
+  input?: Maybe<DialogueStatisticsSummaryFilterInput>;
+};
+
+
+export type WorkspaceStatisticsResponseHistogramArgs = {
+  input?: Maybe<DialogueStatisticsSummaryFilterInput>;
+};
+
+
+export type WorkspaceStatisticsIssueHistogramArgs = {
   input?: Maybe<DialogueStatisticsSummaryFilterInput>;
 };
 
@@ -3151,6 +3441,19 @@ export type CreateSessionMutation = (
   & { createSession?: Maybe<(
     { __typename?: 'Session' }
     & Pick<Session, 'id'>
+  )> }
+);
+
+export type VerifyActionRequestMutationVariables = Exact<{
+  input: VerifyActionRequestInput;
+}>;
+
+
+export type VerifyActionRequestMutation = (
+  { __typename?: 'Mutation' }
+  & { verifyActionRequest?: Maybe<(
+    { __typename?: 'ActionRequest' }
+    & Pick<ActionRequest, 'id'>
   )> }
 );
 
@@ -3604,6 +3907,39 @@ export function useCreateSessionMutation(baseOptions?: Apollo.MutationHookOption
 export type CreateSessionMutationHookResult = ReturnType<typeof useCreateSessionMutation>;
 export type CreateSessionMutationResult = Apollo.MutationResult<CreateSessionMutation>;
 export type CreateSessionMutationOptions = Apollo.BaseMutationOptions<CreateSessionMutation, CreateSessionMutationVariables>;
+export const VerifyActionRequestDocument = gql`
+    mutation VerifyActionRequest($input: VerifyActionRequestInput!) {
+  verifyActionRequest(input: $input) {
+    id
+  }
+}
+    `;
+export type VerifyActionRequestMutationFn = Apollo.MutationFunction<VerifyActionRequestMutation, VerifyActionRequestMutationVariables>;
+
+/**
+ * __useVerifyActionRequestMutation__
+ *
+ * To run a mutation, you first call `useVerifyActionRequestMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useVerifyActionRequestMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [verifyActionRequestMutation, { data, loading, error }] = useVerifyActionRequestMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useVerifyActionRequestMutation(baseOptions?: Apollo.MutationHookOptions<VerifyActionRequestMutation, VerifyActionRequestMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<VerifyActionRequestMutation, VerifyActionRequestMutationVariables>(VerifyActionRequestDocument, options);
+      }
+export type VerifyActionRequestMutationHookResult = ReturnType<typeof useVerifyActionRequestMutation>;
+export type VerifyActionRequestMutationResult = Apollo.MutationResult<VerifyActionRequestMutation>;
+export type VerifyActionRequestMutationOptions = Apollo.BaseMutationOptions<VerifyActionRequestMutation, VerifyActionRequestMutationVariables>;
 export const GetCustomerDocument = gql`
     query GetCustomer($slug: String!, $dialogueSlug: String!) {
   customer(slug: $slug) {
@@ -3711,6 +4047,13 @@ export namespace CreateSession {
   export type Mutation = CreateSessionMutation;
   export type CreateSession = (NonNullable<CreateSessionMutation['createSession']>);
   export const Document = CreateSessionDocument;
+}
+
+export namespace VerifyActionRequest {
+  export type Variables = VerifyActionRequestMutationVariables;
+  export type Mutation = VerifyActionRequestMutation;
+  export type VerifyActionRequest = (NonNullable<VerifyActionRequestMutation['verifyActionRequest']>);
+  export const Document = VerifyActionRequestDocument;
 }
 
 export namespace CustomerFragment {

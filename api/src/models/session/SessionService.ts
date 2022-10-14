@@ -1,5 +1,5 @@
 import {
-  NodeEntry, Session, Prisma, PrismaClient, ChoiceNodeEntry, QuestionNode, SliderNodeEntry, VideoNodeEntry,
+  NodeEntry, Session, Prisma, PrismaClient, ChoiceNodeEntry, QuestionNode, SliderNodeEntry, VideoNodeEntry, Dialogue,
 } from 'prisma/prisma-client';
 import { isPresent } from 'ts-is-present';
 import { sortBy } from 'lodash';
@@ -11,30 +11,74 @@ import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';
 import { Nullable, PaginationProps } from '../../types/generic';
-import { FollowUpAction, SessionActionType, SessionConnection, SessionConnectionFilterInput, SessionWithEntries } from './Session.types';
+import {
+  FollowUpAction,
+  SessionActionType,
+  SessionConnection,
+  SessionConnectionFilterInput,
+  SessionWithEntries,
+  SessionWithNodeEntries,
+} from './Session.types';
 import { TopicByString, TopicStatistics, TopicStatisticsByDialogueId } from '../Topic/Topic.types';
 import TriggerService from '../trigger/TriggerService';
 import prisma from '../../config/prisma';
 import Sentry from '../../config/sentry';
 import SessionPrismaAdapter from './SessionPrismaAdapter';
-import AutomationService from '../automations/AutomationService';
 
 import { CreateSessionInput } from './SessionPrismaAdapterType';
 import { CustomerService } from '../customer/CustomerService';
 import { logger } from '../../config/logger';
+import { ActionRequestPrismaAdapter } from '../ActionRequest/ActionRequestPrismaAdapter';
+import IssuePrismaAdapter from '../Issue/IssuePrismaAdapter';
+import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 
 class SessionService {
   private sessionPrismaAdapter: SessionPrismaAdapter;
   private triggerService: TriggerService;
-  private automationService: AutomationService;
   private workspaceService: CustomerService;
+  private ActionRequestPrismaAdapter: ActionRequestPrismaAdapter;
+  private issuePrismaAdapter: IssuePrismaAdapter;
+  private dialoguePrismaAdapter: DialoguePrismaAdapter;
 
   constructor(prismaClient: PrismaClient) {
     this.sessionPrismaAdapter = new SessionPrismaAdapter(prismaClient);
     this.triggerService = new TriggerService(prismaClient);
-    this.automationService = new AutomationService(prismaClient);
     this.workspaceService = new CustomerService(prismaClient);
+    this.ActionRequestPrismaAdapter = new ActionRequestPrismaAdapter(prismaClient);
+    this.issuePrismaAdapter = new IssuePrismaAdapter(prismaClient);
+    this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
   };
+
+  /**
+   * Creates an actionable (and potentially topic) for the first choice of a session
+   * NOTE: only supports creation of actionable based on first choice layer
+   * @param entries
+   * @param dialogueId
+   */
+  public async createSessionActionRequest(
+    session: SessionWithNodeEntries,
+    dialogueId: string,
+  ) {
+    const entry = session.nodeEntries.find((nodeEntry) => nodeEntry.choiceNodeEntry);
+
+    if (entry?.choiceNodeEntry?.value) {
+      const optionValue = entry?.choiceNodeEntry?.value;
+      const targetOption = entry.relatedNode?.options.find((option) => option.value === optionValue);
+      const topicId = targetOption?.topicId;
+
+      if (!topicId) {
+        logger.log(
+          `Trying to create actionable with topic value ${optionValue}
+            for dialogue ${dialogueId}, but no option(s) with such a topic found in database`
+        );
+        return;
+      }
+
+      const dialogue = await this.dialoguePrismaAdapter.getDialogueById(dialogueId) as Dialogue;
+      const issue = await this.issuePrismaAdapter.upsertIssueByTopicId(dialogue.customerId, topicId);
+      await this.ActionRequestPrismaAdapter.createActionRequest(dialogueId, issue.id, session.id);
+    }
+  }
 
   /**
    * Given a list of sessions with node-entries, return an object which maps negative dialogue interactions to their "frequency".
@@ -260,7 +304,7 @@ class SessionService {
     const nodeEntry = nodeEntries.find((nodeEntry) => nodeEntry.formNodeEntry);
 
     // @ts-ignore
-    return nodeEntry?.formNodeEntry || null;
+    return nodeEntry?.formNodeEntry?.values.find((value) => value.email) ? nodeEntry?.formNodeEntry : null;
   }
 
   /**
@@ -286,6 +330,10 @@ class SessionService {
       createdAt: sessionInput?.createdAt,
       mainScore: mainScore || undefined,
     });
+
+    if (session.mainScore <= 55) {
+      await this.createSessionActionRequest(session, dialogueId);
+    }
 
     try {
       if (sessionInput.deliveryId) {
@@ -551,14 +599,15 @@ class SessionService {
   getWorkspaceSessionConnection = async (
     workspaceId: string,
     userId: string,
-    filter?: SessionConnectionFilterInput | null
+    filter?: SessionConnectionFilterInput | null,
+    canAccessAllDialogues: boolean = false,
   ): Promise<SessionConnection | null> => {
     const offset = filter?.offset ?? 0;
     const perPage = filter?.perPage ?? 5;
     let dialogueIds = filter?.dialogueIds;
 
     if (!dialogueIds?.length) {
-      const dialogues = await this.workspaceService.getDialogues(workspaceId, userId);
+      const dialogues = await this.workspaceService.getDialogues(workspaceId, userId, undefined, canAccessAllDialogues);
       dialogueIds = dialogues.map((dialogue) => dialogue.id);
     }
 

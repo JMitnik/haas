@@ -29,8 +29,11 @@ import triggerNexus from '../models/trigger/Trigger';
 import uploadNexus from '../models/link/graphql/UploadUpsellFileResolver';
 import * as UserTourAPI from '../models/UserTour'
 
+import * as ActionRequestAPI from '../models/ActionRequest/graphql'
+
 const nexus = [
   ...Array(UserTourAPI),
+  ...Array(ActionRequestAPI),
   ...Array(OrganizationAPI),
   ...Array(CommonAnalyticsAPI),
   ...Array(DateAPI),

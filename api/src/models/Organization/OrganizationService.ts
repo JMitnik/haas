@@ -18,20 +18,24 @@ export class OrganizationService {
    * @param workspaceId
    * @returns
    */
-  public async getOrganizationLayers(workspaceId: string, userId: string): Promise<OrganizationLayer[]> {
-    const dialogues = await this.workspaceService.getDialogues(workspaceId, userId);
+  public async getOrganizationLayers(
+    workspaceId: string,
+    userId: string,
+    canAccessAllDialogues: boolean = false,
+  ): Promise<OrganizationLayer[]> {
+    const dialogues = await this.workspaceService.getDialogues(workspaceId, userId, undefined, canAccessAllDialogues);
     const dialogueTitles = dialogues.map((dialogue) => dialogue.title.split('-'));
 
     // Find the dialogue with the most amount of layers
-    const deepestLayers = maxBy(dialogueTitles, (splittedTitle) => splittedTitle.length) as string[];
+    const deepestLayers = maxBy(dialogueTitles, (splittedTitle) => splittedTitle?.length) as string[];
 
     // Every organization consists at least of a dialogue and interaction layer.
-    if (!deepestLayers.length) return [
+    if (!deepestLayers?.length) return [
       makeLayer(workspaceId, 0, OrganizationLayerTypeEnum.DIALOGUE),
       makeLayer(workspaceId, 1, OrganizationLayerTypeEnum.INTERACTION),
     ];
 
-    const groupLayers = [...Array(deepestLayers.length - 1)].map(
+    const groupLayers = [...Array(deepestLayers?.length - 1)].map(
       (_, index) => makeLayer(workspaceId, index, OrganizationLayerTypeEnum.GROUP)
     );
 
@@ -39,9 +43,9 @@ export class OrganizationService {
       // Fill starting layers with groups
       ...groupLayers,
       // Then add dialogue
-      makeLayer(workspaceId, deepestLayers.length, OrganizationLayerTypeEnum.DIALOGUE),
+      makeLayer(workspaceId, deepestLayers?.length, OrganizationLayerTypeEnum.DIALOGUE),
       // Then add interaction
-      makeLayer(workspaceId, deepestLayers.length + 1, OrganizationLayerTypeEnum.INTERACTION),
+      makeLayer(workspaceId, deepestLayers?.length + 1, OrganizationLayerTypeEnum.INTERACTION),
     ].filter(isPresent);
 
     return layers;

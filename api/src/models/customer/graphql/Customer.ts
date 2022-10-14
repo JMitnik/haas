@@ -1,8 +1,9 @@
-import { ColourSettings, Customer, CustomerSettings } from 'prisma/prisma-client';
-import { graphql, GraphQLError } from 'graphql';
+import { ColourSettings, Customer, CustomerSettings } from 'prisma/prisma-client'
+import { GraphQLError } from 'graphql';
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import { arg, extendType, inputObjectType, mutationField, nonNull, objectType, scalarType } from 'nexus';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 import { WorkspaceStatistics } from './WorkspaceStatistics';
 import { CustomerSettingsType } from '../../settings/CustomerSettings';
@@ -18,12 +19,14 @@ import { DialogueStatisticsSummaryFilterInput, DialogueStatisticsSummaryModel, M
 import { DialogueConnection, DialogueConnectionFilterInput } from '../../questionnaire';
 import { HealthScore, HealthScoreInput } from './HealthScore';
 import { Organization } from '../../Organization/graphql/OrganizationModel';
-import { Issue, IssueFilterInput } from '../../Issue/graphql';
+import { Issue, IssueFilterInput, IssueConnectionFilterInput, IssueConnection } from '../../Issue/graphql';
 import { IssueValidator } from '../../Issue/IssueValidator';
 import { SessionConnectionFilterInput } from '../../../models/session/graphql';
 import { SessionConnection } from '../../session/graphql/Session.graphql'
+import { ActionRequestConnection, ActionRequestConnectionFilterInput } from '../../ActionRequest/graphql';
 import { assertNonNullish } from '../../../utils/assertNonNullish';
-import { GraphQLYogaError } from '@graphql-yoga/node';
+import { DialogueValidator } from '../../questionnaire/DialogueValidator';
+import { WorkspaceValidator } from '../WorkspaceValidator';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -69,10 +72,12 @@ export const CustomerType = objectType({
         if (!parent.id) return null;
 
         assertNonNullish(ctx.session?.user?.id, 'No user Id provided!');
+        const canAccessAllDialogues = DialogueValidator.canAccessAllDialogues(parent.id, ctx.session);
         const sessionConnection = await ctx.services.sessionService.getWorkspaceSessionConnection(
           parent.id,
           ctx.session.user.id,
-          args.filter
+          args.filter,
+          canAccessAllDialogues
         );
 
         return sessionConnection;
@@ -94,13 +99,47 @@ export const CustomerType = objectType({
     });
 
     /**
+     * ActionableConnection
+     */
+    t.field('actionRequestConnection', {
+      type: ActionRequestConnection,
+      args: {
+        input: ActionRequestConnectionFilterInput,
+      },
+      async resolve(parent, args, ctx) {
+        assertNonNullish(parent.id, 'Cannot find actionable ID!');
+        const canAccessAllActionables = WorkspaceValidator.canAccessAllActionables(parent.id, ctx.session);
+        const userId = ctx.session?.user?.id as string;
+
+        return ctx.services.actionRequestService.findPaginatedWorkspaceActionRequests(
+          parent.id as string,
+          userId,
+          canAccessAllActionables,
+          args.input || undefined
+        );
+      },
+    });
+
+    /**
+     * Issues Connection
+     *
+     */
+    t.field('issueConnection', {
+      type: IssueConnection,
+      args: { filter: IssueConnectionFilterInput },
+      resolve: async (parent, args, { services }) => {
+        assertNonNullish(parent.id, 'Cannot find actionable ID!');
+        if (!args.filter) throw new GraphQLYogaError('No filter provided!');
+        return await services.issueService.paginatedIssues(parent.id, args.filter);
+      },
+    });
+
+    /**
      * Issues (by dialogue)
      *
-     * TODO: Refactor to refer to this as issueDialogues
      */
-    t.list.field('issues', {
+    t.list.field('issueDialogues', {
       type: Issue,
-      nullable: true,
       args: { filter: IssueFilterInput },
 
       resolve: async (parent, args, { services, session }) => {
@@ -108,7 +147,14 @@ export const CustomerType = objectType({
         assertNonNullish(parent.id, 'Cannot find workspace id!');
         assertNonNullish(session?.user?.id, 'No user ID provided!');
 
-        return await services.issueService.getProblemDialoguesByWorkspace(parent.id, filter, session.user.id);
+        const canAccessAllDialogues = DialogueValidator.canAccessAllDialogues(parent.id, session);
+
+        return await services.issueService.getProblemDialoguesByWorkspace(
+          parent.id,
+          filter,
+          session.user.id,
+          canAccessAllDialogues
+        ) as any;
       },
     });
 
@@ -125,7 +171,11 @@ export const CustomerType = objectType({
         assertNonNullish(parent.id, 'Cannot find workspace id!');
         assertNonNullish(session?.user?.id, 'No user ID provided!');
 
-        return await services.issueService.getWorkspaceIssues(parent.id, filter, session?.user.id);
+        const canAccessAllDialogues = DialogueValidator.canAccessAllDialogues(parent.id, session);
+
+        return await services.issueService.getWorkspaceIssues(
+          parent.id, filter, session?.user.id, canAccessAllDialogues
+        ) as any;
       },
     });
 
@@ -135,11 +185,16 @@ export const CustomerType = objectType({
       args: { filter: DialogueConnectionFilterInput },
       nullable: true,
       async resolve(parent, args, ctx) {
+        assertNonNullish(parent.id, 'Cannot find workspace id!');
         if (!ctx.session?.user?.id) throw new ApolloError('No user in session found!');
+
+        const canAccessAllDialogues = DialogueValidator.canAccessAllDialogues(parent.id, ctx.session);
+        const userId = ctx.session.user.id;
 
         let dialogues = await ctx.services.dialogueService.paginatedDialogues(
           parent.slug,
-          ctx.session?.user?.id,
+          canAccessAllDialogues,
+          userId,
           args.filter
         );
         return dialogues;
@@ -200,6 +255,8 @@ export const CustomerType = objectType({
           utcEndDateTime = isValidDateTime(endDateTime, 'END_DATE');
         }
 
+        const canAccessAllDialogues = DialogueValidator.canAccessAllDialogues(parent.id, ctx.session);
+
         return ctx.services.dialogueStatisticsService.findWorkspaceHealthScore(
           parent.id,
           ctx.session?.user?.id as string,
@@ -207,6 +264,7 @@ export const CustomerType = objectType({
           utcEndDateTime,
           undefined,
           threshold || undefined,
+          canAccessAllDialogues
         );
       },
     });

@@ -8,7 +8,7 @@ import { render, screen, waitFor } from 'test';
 
 import { WorkspaceReportView } from '../WorkspaceReportView';
 import {
-  mockGetIssuesQuery, mockGetWorkspaceReportQuery,
+  mockGetProblemsPerDialogueQuery, mockGetWorkspaceReportQuery,
 } from './helpers';
 
 /**
@@ -17,7 +17,7 @@ import {
 const getWidget = (headerText: string) => screen.getByText(headerText).parentElement?.parentElement?.parentElement;
 
 test('display bar chart', async () => {
-  mockGetIssuesQuery((res) => res);
+  mockGetProblemsPerDialogueQuery((res) => res);
   mockGetWorkspaceReportQuery((res) => res);
 
   render(

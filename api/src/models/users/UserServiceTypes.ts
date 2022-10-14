@@ -1,4 +1,12 @@
-import { Customer, Role, User, UserOfCustomer } from 'prisma/prisma-client';
+import { Customer, Prisma, Role, User, UserOfCustomer } from 'prisma/prisma-client';
+
+const userWithDialogues = Prisma.validator<Prisma.UserArgs>()({
+  include: {
+    isAssignedTo: true,
+  },
+});
+
+export type UserWithAssignedDialogues = Prisma.UserGetPayload<typeof userWithDialogues>;
 
 export interface DeletedUserOutput {
   deletedUser: boolean;
