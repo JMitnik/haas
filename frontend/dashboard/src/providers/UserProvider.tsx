@@ -1,8 +1,26 @@
-import { ApolloQueryResult, gql, useMutation, useQuery } from '@apollo/client';
+import {
+  ApolloCache,
+  ApolloQueryResult,
+  DefaultContext,
+  FetchResult,
+  MutationFunctionOptions,
+  gql,
+  useMutation,
+  useQuery,
+} from '@apollo/client';
 import { useHistory } from 'react-router';
 import React, { useContext, useEffect, useState } from 'react';
 
-import { Exact, MeQuery, useMeQuery } from 'types/generated-types';
+import {
+  Exact,
+  FinishTourOfUserInput,
+  FinishTourOfUserMutation,
+  GetUserToursQuery,
+  MeQuery,
+  useFinishTourOfUserMutation,
+  useGetUserToursLazyQuery,
+  useMeQuery,
+} from 'types/generated-types';
 
 const POLL_INTERVAL_SECONDS = 60;
 
@@ -26,6 +44,7 @@ interface AuthContextProps {
   user: MeUserType | null;
   userIsValid?: () => boolean;
   logout: () => void;
+  userTours: GetUserToursQuery['user'] | null;
   accessToken: string | null;
   isLoggedIn: boolean;
   isInitializingUser: boolean;
@@ -35,6 +54,10 @@ interface AuthContextProps {
     [key: string]: never;
   }>> | undefined) => Promise<ApolloQueryResult<MeQuery>>
   hardRefreshUser: () => void;
+  finishTour: (options?: MutationFunctionOptions<FinishTourOfUserMutation, Exact<{
+    input: FinishTourOfUserInput;
+    // eslint-disable-next-line max-len
+  }>, DefaultContext, ApolloCache<any>> | undefined) => Promise<FetchResult<FinishTourOfUserMutation, Record<string, any>, Record<string, any>>>
 }
 
 const UserContext = React.createContext({} as AuthContextProps);
@@ -57,6 +80,16 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
       stopInitializingUser();
     },
     fetchPolicy: 'network-only',
+  });
+
+  const [fetchUserTours, { data: toursData }] = useGetUserToursLazyQuery({
+    onCompleted: () => {
+      console.log('Finished fetching tour data');
+    },
+  });
+
+  const [finishTour] = useFinishTourOfUserMutation({
+    refetchQueries: ['GetUserTours'],
   });
 
   const setUser = () => { };
@@ -82,6 +115,16 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
+    if (data?.me?.id) {
+      fetchUserTours({
+        variables: {
+          userId: data.me.id,
+        },
+      });
+    }
+  }, [data?.me?.id]);
+
+  useEffect(() => {
     if (refreshTokenData) {
       setAccessToken(refreshTokenData?.refreshAccessToken.accessToken);
     }
@@ -96,9 +139,12 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [accessToken, getUser]);
 
+  console.log('Tour data: ', toursData);
+
   return (
     <UserContext.Provider value={{
       user: data?.me || null,
+      userTours: toursData?.user || null,
       isInitializingUser,
       isLoggedIn: !!(data?.me?.id && accessToken && localStorage.getItem('access_token')),
       accessToken,
@@ -107,6 +153,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
       refreshUser: getUser,
       hardRefreshUser: startInitializingUser,
       setAccessToken,
+      finishTour,
     }}
     >
       {children}

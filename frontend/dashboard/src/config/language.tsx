@@ -11,6 +11,10 @@ const language = {
     },
   },
   general: {
+    new_release: {
+      en: 'New Release',
+      de: 'Neue Version',
+    },
     send_invite_email: {
       en: 'Send invite email',
       de: 'Einladungs-E-Mail senden',

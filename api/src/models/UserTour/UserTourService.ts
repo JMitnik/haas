@@ -70,7 +70,7 @@ export class UserTourService {
 
     const userTours = await this.userTourPrismaAdapter.findManyUserTours(userTourWhereInput, userId);
     const userToursWrapper = new UserTours(userTours);
-    return { releaseTour: userToursWrapper.getLatestRelease(), featureTours: userToursWrapper.getFeatureTours() };
+    return userToursWrapper;
   }
 
   /**

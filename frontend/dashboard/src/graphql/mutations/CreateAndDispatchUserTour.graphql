@@ -1,0 +1,5 @@
+mutation CreateAndDispatchUserTour($input: CreateUserTourInput!) {
+	createAndDispatchUserTour(input: $input) {
+		id
+	}
+}

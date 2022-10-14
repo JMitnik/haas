@@ -3,12 +3,15 @@ import { useLocation } from 'react-router-dom';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+import * as Modal from 'components/Common/Modal';
 import { CustomThemeProviders } from 'providers/ThemeProvider';
 import { Loader } from 'components/Common/Loader/Loader';
 import { useCustomer } from 'providers/CustomerProvider';
+import { useUser } from 'providers/UserProvider';
 import useMediaDevice from 'hooks/useMediaDevice';
 
 import * as LS from './WorkpaceLayout.styles';
+import { ReleaseModalCard } from './ReleaseModalCard';
 import { TopSubNavBar } from './TopSubNavBar';
 import { TopbarContainer, WorkspaceTopbar } from './WorkspaceTopbar';
 
@@ -39,9 +42,13 @@ const WorkspaceLayout = ({ children }: WorskpaceLayoutProps) => {
   const { isLoading } = useCustomer();
   const location = useLocation();
 
+  const { userTours, finishTour, user } = useUser();
+
   const isReportView = location.pathname.includes('_reports');
 
   const hideTop = isReportView;
+
+  const hasReleaseTour = !!userTours?.tours?.releaseTour;
 
   return (
     <CustomThemeProviders>
@@ -64,6 +71,22 @@ const WorkspaceLayout = ({ children }: WorskpaceLayoutProps) => {
         </UI.Div>
       )}
       <WorkspaceLayoutContainer isMobile={device.isSmall}>
+        <Modal.Root
+          open={hasReleaseTour}
+          onClose={() => finishTour({
+            variables: {
+              input: {
+                userId: user?.id as string,
+                userTourId: userTours?.tours?.releaseTour?.id as string,
+              },
+            },
+          })}
+        >
+          <ReleaseModalCard
+            userId={user?.id as string}
+            release={userTours?.tours?.releaseTour}
+          />
+        </Modal.Root>
         <LS.DashboardViewContainer>
           {children}
         </LS.DashboardViewContainer>

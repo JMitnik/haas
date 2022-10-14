@@ -123,7 +123,8 @@ export const UserType = objectType({
       async resolve(parent, args, ctx) {
         if (!parent.id) return null;
 
-        return ctx.services.userTourService.findUserTours(parent.id);
+        const tours = await ctx.services.userTourService.findUserTours(parent.id);
+        return tours.toGraphQL();
       },
     });
 

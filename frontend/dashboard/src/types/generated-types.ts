@@ -671,10 +671,25 @@ export type CreateTopicInput = {
   subTopics?: Maybe<Array<Maybe<CreateTopicInput>>>;
 };
 
+export type CreateTourStepInput = {
+  titleKey: Scalars['String'];
+  helperKey: Scalars['String'];
+  imageUrlKey?: Maybe<Scalars['String']>;
+  userTourId?: Maybe<Scalars['String']>;
+};
+
 export type CreateTriggerInputType = {
   customerSlug?: Maybe<Scalars['String']>;
   recipients?: Maybe<RecipientsInputType>;
   trigger?: Maybe<TriggerInputType>;
+};
+
+export type CreateUserTourInput = {
+  id?: Maybe<Scalars['String']>;
+  type: TourType;
+  triggerPage?: Maybe<Scalars['String']>;
+  triggerVersion?: Maybe<Scalars['String']>;
+  steps: Array<Maybe<CreateTourStepInput>>;
 };
 
 /** Creates a workspace */
@@ -1279,6 +1294,11 @@ export type FindRoleInput = {
   userId?: Maybe<Scalars['String']>;
 };
 
+export type FinishTourOfUserInput = {
+  userTourId: Scalars['String'];
+  userId: Scalars['String'];
+};
+
 export type FontSettings = {
   __typename?: 'FontSettings';
   id?: Maybe<Scalars['Int']>;
@@ -1711,6 +1731,8 @@ export type MostTrendingTopic = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  createAndDispatchUserTour?: Maybe<UserTour>;
+  finishTourOfUser?: Maybe<TourOfUser>;
   assignUserToActionRequest?: Maybe<ActionRequest>;
   setActionRequestStatus?: Maybe<ActionRequest>;
   verifyActionRequest?: Maybe<ActionRequest>;
@@ -1786,6 +1808,16 @@ export type Mutation = {
   createCTA?: Maybe<QuestionNode>;
   updateCTA?: Maybe<QuestionNode>;
   updateQuestion?: Maybe<QuestionNode>;
+};
+
+
+export type MutationCreateAndDispatchUserTourArgs = {
+  input: CreateUserTourInput;
+};
+
+
+export type MutationFinishTourOfUserArgs = {
+  input: FinishTourOfUserInput;
 };
 
 
@@ -3054,6 +3086,38 @@ export type TopicType = {
   basicStats?: Maybe<BasicStatistics>;
 };
 
+export type Tour = {
+  __typename?: 'Tour';
+  releaseTour?: Maybe<UserTour>;
+  featureTours?: Maybe<Array<Maybe<UserTour>>>;
+};
+
+export type TourOfUser = {
+  __typename?: 'TourOfUser';
+  createdAt: Scalars['Date'];
+  updatedAt: Scalars['Date'];
+  seenAt?: Maybe<Scalars['Date']>;
+  userId: Scalars['String'];
+  user?: Maybe<UserType>;
+  tour?: Maybe<UserTour>;
+  userTourId: Scalars['String'];
+};
+
+export type TourStep = {
+  __typename?: 'TourStep';
+  id: Scalars['String'];
+  createdAt: Scalars['Date'];
+  updatedAt: Scalars['Date'];
+  titleKey: Scalars['String'];
+  helperKey: Scalars['String'];
+  imageUrlKey?: Maybe<Scalars['String']>;
+};
+
+export enum TourType {
+  Release = 'RELEASE',
+  Guide = 'GUIDE'
+}
+
 export enum TriggerConditionEnum {
   LowThreshold = 'LOW_THRESHOLD',
   HighThreshold = 'HIGH_THRESHOLD',
@@ -3244,6 +3308,18 @@ export type UserOfCustomerInput = {
   workspaceId?: Maybe<Scalars['String']>;
 };
 
+export type UserTour = {
+  __typename?: 'UserTour';
+  id: Scalars['String'];
+  createdAt: Scalars['Date'];
+  updatedAt: Scalars['Date'];
+  triggerVersion?: Maybe<Scalars['String']>;
+  triggerPage?: Maybe<Scalars['String']>;
+  type: TourType;
+  usersOfTour?: Maybe<Array<Maybe<TourOfUser>>>;
+  steps?: Maybe<Array<Maybe<TourStep>>>;
+};
+
 export type UserType = {
   __typename?: 'UserType';
   id: Scalars['ID'];
@@ -3255,6 +3331,7 @@ export type UserType = {
   lastActivity?: Maybe<Scalars['Date']>;
   assignedDialogues?: Maybe<AssignedDialogues>;
   globalPermissions?: Maybe<Array<Maybe<SystemPermission>>>;
+  tours?: Maybe<Tour>;
   userCustomers?: Maybe<Array<Maybe<UserCustomer>>>;
   customers?: Maybe<Array<Maybe<Customer>>>;
   roleId?: Maybe<Scalars['String']>;
@@ -3648,6 +3725,67 @@ export type SessionFragmentFragment = (
       { __typename?: 'FormNodeEntryValueType' }
       & Pick<FormNodeEntryValueType, 'shortText' | 'email'>
     )>>> }
+  )> }
+);
+
+export type UserTourFragmentFragment = (
+  { __typename?: 'UserTour' }
+  & Pick<UserTour, 'id' | 'type' | 'triggerPage' | 'triggerVersion'>
+  & { steps?: Maybe<Array<Maybe<(
+    { __typename?: 'TourStep' }
+    & Pick<TourStep, 'titleKey' | 'helperKey' | 'imageUrlKey'>
+  )>>> }
+);
+
+export type CreateAndDispatchUserTourMutationVariables = Exact<{
+  input: CreateUserTourInput;
+}>;
+
+
+export type CreateAndDispatchUserTourMutation = (
+  { __typename?: 'Mutation' }
+  & { createAndDispatchUserTour?: Maybe<(
+    { __typename?: 'UserTour' }
+    & Pick<UserTour, 'id'>
+  )> }
+);
+
+export type FinishTourOfUserMutationVariables = Exact<{
+  input: FinishTourOfUserInput;
+}>;
+
+
+export type FinishTourOfUserMutation = (
+  { __typename?: 'Mutation' }
+  & { finishTourOfUser?: Maybe<(
+    { __typename?: 'TourOfUser' }
+    & Pick<TourOfUser, 'seenAt'>
+    & { tour?: Maybe<(
+      { __typename?: 'UserTour' }
+      & Pick<UserTour, 'id' | 'triggerVersion' | 'triggerPage'>
+    )> }
+  )> }
+);
+
+export type GetUserToursQueryVariables = Exact<{
+  userId: Scalars['String'];
+}>;
+
+
+export type GetUserToursQuery = (
+  { __typename?: 'Query' }
+  & { user?: Maybe<(
+    { __typename?: 'UserType' }
+    & { tours?: Maybe<(
+      { __typename?: 'Tour' }
+      & { featureTours?: Maybe<Array<Maybe<(
+        { __typename?: 'UserTour' }
+        & UserTourFragmentFragment
+      )>>>, releaseTour?: Maybe<(
+        { __typename?: 'UserTour' }
+        & UserTourFragmentFragment
+      )> }
+    )> }
   )> }
 );
 
@@ -5043,6 +5181,19 @@ export const SessionFragmentFragmentDoc = gql`
 }
     ${NodeEntryFragmentFragmentDoc}
 ${DeliveryFragmentFragmentDoc}`;
+export const UserTourFragmentFragmentDoc = gql`
+    fragment UserTourFragment on UserTour {
+  id
+  type
+  triggerPage
+  triggerVersion
+  steps {
+    titleKey
+    helperKey
+    imageUrlKey
+  }
+}
+    `;
 export const DeselectTopicDocument = gql`
     mutation deselectTopic($input: DeselectTopicInput) {
   deselectTopic(input: $input)
@@ -5384,6 +5535,122 @@ export type GetWorkspaceSummaryDetailsLazyQueryHookResult = ReturnType<typeof us
 export type GetWorkspaceSummaryDetailsQueryResult = Apollo.QueryResult<GetWorkspaceSummaryDetailsQuery, GetWorkspaceSummaryDetailsQueryVariables>;
 export function refetchGetWorkspaceSummaryDetailsQuery(variables?: GetWorkspaceSummaryDetailsQueryVariables) {
       return { query: GetWorkspaceSummaryDetailsDocument, variables: variables }
+    }
+export const CreateAndDispatchUserTourDocument = gql`
+    mutation CreateAndDispatchUserTour($input: CreateUserTourInput!) {
+  createAndDispatchUserTour(input: $input) {
+    id
+  }
+}
+    `;
+export type CreateAndDispatchUserTourMutationFn = Apollo.MutationFunction<CreateAndDispatchUserTourMutation, CreateAndDispatchUserTourMutationVariables>;
+
+/**
+ * __useCreateAndDispatchUserTourMutation__
+ *
+ * To run a mutation, you first call `useCreateAndDispatchUserTourMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateAndDispatchUserTourMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createAndDispatchUserTourMutation, { data, loading, error }] = useCreateAndDispatchUserTourMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateAndDispatchUserTourMutation(baseOptions?: Apollo.MutationHookOptions<CreateAndDispatchUserTourMutation, CreateAndDispatchUserTourMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateAndDispatchUserTourMutation, CreateAndDispatchUserTourMutationVariables>(CreateAndDispatchUserTourDocument, options);
+      }
+export type CreateAndDispatchUserTourMutationHookResult = ReturnType<typeof useCreateAndDispatchUserTourMutation>;
+export type CreateAndDispatchUserTourMutationResult = Apollo.MutationResult<CreateAndDispatchUserTourMutation>;
+export type CreateAndDispatchUserTourMutationOptions = Apollo.BaseMutationOptions<CreateAndDispatchUserTourMutation, CreateAndDispatchUserTourMutationVariables>;
+export const FinishTourOfUserDocument = gql`
+    mutation FinishTourOfUser($input: FinishTourOfUserInput!) {
+  finishTourOfUser(input: $input) {
+    tour {
+      id
+      triggerVersion
+      triggerPage
+    }
+    seenAt
+  }
+}
+    `;
+export type FinishTourOfUserMutationFn = Apollo.MutationFunction<FinishTourOfUserMutation, FinishTourOfUserMutationVariables>;
+
+/**
+ * __useFinishTourOfUserMutation__
+ *
+ * To run a mutation, you first call `useFinishTourOfUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useFinishTourOfUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [finishTourOfUserMutation, { data, loading, error }] = useFinishTourOfUserMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useFinishTourOfUserMutation(baseOptions?: Apollo.MutationHookOptions<FinishTourOfUserMutation, FinishTourOfUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<FinishTourOfUserMutation, FinishTourOfUserMutationVariables>(FinishTourOfUserDocument, options);
+      }
+export type FinishTourOfUserMutationHookResult = ReturnType<typeof useFinishTourOfUserMutation>;
+export type FinishTourOfUserMutationResult = Apollo.MutationResult<FinishTourOfUserMutation>;
+export type FinishTourOfUserMutationOptions = Apollo.BaseMutationOptions<FinishTourOfUserMutation, FinishTourOfUserMutationVariables>;
+export const GetUserToursDocument = gql`
+    query GetUserTours($userId: String!) {
+  user(userId: $userId) {
+    tours {
+      featureTours {
+        ...UserTourFragment
+      }
+      releaseTour {
+        ...UserTourFragment
+      }
+    }
+  }
+}
+    ${UserTourFragmentFragmentDoc}`;
+
+/**
+ * __useGetUserToursQuery__
+ *
+ * To run a query within a React component, call `useGetUserToursQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserToursQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserToursQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useGetUserToursQuery(baseOptions: Apollo.QueryHookOptions<GetUserToursQuery, GetUserToursQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUserToursQuery, GetUserToursQueryVariables>(GetUserToursDocument, options);
+      }
+export function useGetUserToursLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserToursQuery, GetUserToursQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUserToursQuery, GetUserToursQueryVariables>(GetUserToursDocument, options);
+        }
+export type GetUserToursQueryHookResult = ReturnType<typeof useGetUserToursQuery>;
+export type GetUserToursLazyQueryHookResult = ReturnType<typeof useGetUserToursLazyQuery>;
+export type GetUserToursQueryResult = Apollo.QueryResult<GetUserToursQuery, GetUserToursQueryVariables>;
+export function refetchGetUserToursQuery(variables?: GetUserToursQueryVariables) {
+      return { query: GetUserToursDocument, variables: variables }
     }
 export const GetDialogueLayoutDetailsDocument = gql`
     query GetDialogueLayoutDetails($workspaceId: ID!, $dialogueId: ID!, $healthInput: HealthScoreInput!, $filter: DialogueFilterInputType) {
@@ -8209,6 +8476,36 @@ export namespace SessionFragment {
   export type Dialogue = (NonNullable<SessionFragmentFragment['dialogue']>);
   export type FollowUpAction = (NonNullable<SessionFragmentFragment['followUpAction']>);
   export type Values = NonNullable<(NonNullable<(NonNullable<SessionFragmentFragment['followUpAction']>)['values']>)[number]>;
+}
+
+export namespace UserTourFragment {
+  export type Fragment = UserTourFragmentFragment;
+  export type Steps = NonNullable<(NonNullable<UserTourFragmentFragment['steps']>)[number]>;
+}
+
+export namespace CreateAndDispatchUserTour {
+  export type Variables = CreateAndDispatchUserTourMutationVariables;
+  export type Mutation = CreateAndDispatchUserTourMutation;
+  export type CreateAndDispatchUserTour = (NonNullable<CreateAndDispatchUserTourMutation['createAndDispatchUserTour']>);
+  export const Document = CreateAndDispatchUserTourDocument;
+}
+
+export namespace FinishTourOfUser {
+  export type Variables = FinishTourOfUserMutationVariables;
+  export type Mutation = FinishTourOfUserMutation;
+  export type FinishTourOfUser = (NonNullable<FinishTourOfUserMutation['finishTourOfUser']>);
+  export type Tour = (NonNullable<(NonNullable<FinishTourOfUserMutation['finishTourOfUser']>)['tour']>);
+  export const Document = FinishTourOfUserDocument;
+}
+
+export namespace GetUserTours {
+  export type Variables = GetUserToursQueryVariables;
+  export type Query = GetUserToursQuery;
+  export type User = (NonNullable<GetUserToursQuery['user']>);
+  export type Tours = (NonNullable<(NonNullable<GetUserToursQuery['user']>)['tours']>);
+  export type FeatureTours = NonNullable<(NonNullable<(NonNullable<(NonNullable<GetUserToursQuery['user']>)['tours']>)['featureTours']>)[number]>;
+  export type ReleaseTour = (NonNullable<(NonNullable<(NonNullable<GetUserToursQuery['user']>)['tours']>)['releaseTour']>);
+  export const Document = GetUserToursDocument;
 }
 
 export namespace GetDialogueLayoutDetails {

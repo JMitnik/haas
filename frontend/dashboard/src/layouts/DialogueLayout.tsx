@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
-
 import { ViewContainer } from '@haas/ui';
 import { gql, useQuery } from '@apollo/client';
-import { useDialogue } from 'providers/DialogueProvider';
 import { useParams } from 'react-router';
+import React, { useEffect } from 'react';
+
+import { useDialogue } from 'providers/DialogueProvider';
 
 interface DialogueLayoutProps {
   children: React.ReactNode;
