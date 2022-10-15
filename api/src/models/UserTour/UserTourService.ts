@@ -15,6 +15,7 @@ export class UserTourService {
     this.userPrismaAdapter = new UserPrismaAdapter(prisma);
   }
 
+  /** Updates a user tour */
   public async updateUserTour(userTourId: string, input: CreateUserTourInput) {
     const stepIds = input.steps.map((step) => step?.id).filter(isPresent);
     const updateData: Prisma.UserTourUpdateInput = {
@@ -43,6 +44,7 @@ export class UserTourService {
 
   /**
    * Creates a TourOfUser entry for every user in the database, thus 'dispatching' the tour to the current users
+   * Note: if a tour already exists for a user it will be skipped.
    */
   public async dispatchTourToUsers(userTourId: string, userIds: string[]) {
     const createManyInput: Prisma.TourOfUserCreateManyInput[] = userIds.map((userId) => ({
@@ -79,8 +81,7 @@ export class UserTourService {
         : userIds;
       await this.dispatchTourToUsers(userTourId, dispatchUserIds);
       return true
-    } catch (e) {
-      console.log('Error: ', e);
+    } catch {
       return false;
     }
   }

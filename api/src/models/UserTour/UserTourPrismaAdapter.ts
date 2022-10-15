@@ -1,5 +1,5 @@
 import { Prisma, PrismaClient } from '@prisma/client';
-import { createUserTourInclude, defaultUserTourFields, UserTour } from './UserTour.types';
+import { createUserTourInclude, UserTour } from './UserTour.types';
 export class UserTourPrismaAdapter {
   private prisma: PrismaClient;
 
@@ -27,8 +27,6 @@ export class UserTourPrismaAdapter {
       data,
     })
   }
-
-
 
   public async createManyTourOfUser(data: Prisma.TourOfUserCreateManyInput[]) {
     return this.prisma.tourOfUser.createMany({
