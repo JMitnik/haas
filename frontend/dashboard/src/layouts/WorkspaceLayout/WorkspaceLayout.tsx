@@ -11,7 +11,7 @@ import { useUser } from 'providers/UserProvider';
 import useMediaDevice from 'hooks/useMediaDevice';
 
 import * as LS from './WorkpaceLayout.styles';
-import { ReleaseModalCard } from './ReleaseModalCard';
+import { ReleaseModalBody } from './ReleaseModalBody';
 import { TopSubNavBar } from './TopSubNavBar';
 import { TopbarContainer, WorkspaceTopbar } from './WorkspaceTopbar';
 
@@ -73,16 +73,9 @@ const WorkspaceLayout = ({ children }: WorskpaceLayoutProps) => {
       <WorkspaceLayoutContainer isMobile={device.isSmall}>
         <Modal.Root
           open={hasReleaseTour}
-          onClose={() => finishTour({
-            variables: {
-              input: {
-                userId: user?.id as string,
-                userTourId: userTours?.releaseTour?.id as string,
-              },
-            },
-          })}
+          onClose={() => setUserTourId(undefined)}
         >
-          <ReleaseModalCard
+          <ReleaseModalBody
             userId={user?.id as string}
             release={userTours?.releaseTour}
             onTourChange={setUserTourId}
