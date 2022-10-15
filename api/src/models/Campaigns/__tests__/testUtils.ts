@@ -20,22 +20,6 @@ export const prepData = async (
   }
 }
 
-export const clearDatabase = async (prisma: PrismaClient) => {
-  if (process.env.NODE_ENV === 'test') {
-    await prisma.$transaction([
-      prisma.userOfCustomer.deleteMany({}),
-      prisma.user.deleteMany({}),
-      prisma.delivery.deleteMany({}),
-      prisma.campaignVariantCustomVariable.deleteMany({}),
-      prisma.campaignVariantToCampaign.deleteMany({}),
-      prisma.campaignVariant.deleteMany({}),
-      prisma.campaign.deleteMany({}),
-      prisma.dialogue.deleteMany({}),
-      prisma.customer.deleteMany({}),
-    ]);
-  }
-}
-
 export const prepDefaultData = async (prisma: PrismaClient) => {
   const workspace = await prisma.customer.create({
     data: {

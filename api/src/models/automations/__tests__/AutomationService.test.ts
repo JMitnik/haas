@@ -1,7 +1,8 @@
-import { clearDatabase } from './testUtils';
+
 import { AutomationConditionBuilderType, AutomationType, NodeType, PrismaClient } from 'prisma/prisma-client';
 import { sample } from 'lodash';
 
+import { clearDatabase } from '../../../test/utils/clearDatabase';
 import { prisma } from '../../../test/setup/singletonDeps';
 
 export const seedWorkspace = async (prisma: PrismaClient) => {

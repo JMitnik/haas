@@ -15,6 +15,34 @@ const language = {
       en: 'New Release',
       de: 'Neue Version',
     },
+    weekday_mon: {
+      en: 'Monday',
+      de: 'Montag',
+    },
+    weekday_tue: {
+      en: 'Tuesday',
+      de: 'Dinstag',
+    },
+    weekday_wed: {
+      en: 'Wednesday',
+      de: 'Mittwoch',
+    },
+    weekday_thu: {
+      en: 'Thursday',
+      de: 'Donnerstag',
+    },
+    weekday_fri: {
+      en: 'Friday',
+      de: 'Freitag',
+    },
+    weekday_sat: {
+      en: 'Saturday',
+      de: 'Samstag',
+    },
+    weekday_sun: {
+      en: 'Sunday',
+      de: 'Sonntag',
+    },
     send_invite_email: {
       en: 'Send invite email',
       de: 'Einladungs-E-Mail senden',

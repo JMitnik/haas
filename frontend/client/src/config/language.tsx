@@ -1,6 +1,16 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    closed_title: {
+      en: 'We are closed today!',
+      de: 'Wir sind heute geschlossen!',
+      nl: 'Wij zijn vandaag gesloten!',
+    },
+    closed_description: {
+      en: 'This dialogue has been closed for today. Check back again later.',
+      de: 'Dieser Dialog wurde für heute geschlossen. Schauen Sie später noch einmal vorbei.',
+      nl: 'Deze dialoog is gesloten voor vandaag. Kom later nog eens terug.',
+    },
     slide_explainer: {
       en: 'Slide left or right',
       de: 'Nach links oder rechts schieben',

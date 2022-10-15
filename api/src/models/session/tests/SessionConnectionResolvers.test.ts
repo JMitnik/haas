@@ -1,7 +1,7 @@
 import { PrismaClient } from 'prisma/prisma-client';
 import { ApolloError } from 'apollo-server';
 
-import { clearDatabase } from './testUtils';
+import { clearDatabase } from '../../../test/utils/clearDatabase';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
 import { seedDialogue, seedSessions, seedUser, seedWorkspace } from '../../../test/utils/seedTestData';
 import AuthService from '../../auth/AuthService';

@@ -1,6 +1,6 @@
 import { Customer, PrismaClient } from 'prisma/prisma-client';
 
-import { clearDatabase } from './testUtils';
+import { clearDatabase } from '../../../test/utils/clearDatabase';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
 import { expectUnauthorizedErrorOnResolver } from '../../../test/utils/expects';
 import { seedDialogue, seedUser, seedWorkspace } from '../../../test/utils/seedTestData';

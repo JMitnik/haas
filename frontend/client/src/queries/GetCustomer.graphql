@@ -3,6 +3,13 @@ query GetCustomer($slug: String!, $dialogueSlug: String!) {
     id
     name
     slug
+    dialogueSchedule {
+      id
+      evaluationPeriodSchedule {
+        id
+        isActive
+      }
+    }
     dialogue(where: { slug: $dialogueSlug }) {
       id
       title
