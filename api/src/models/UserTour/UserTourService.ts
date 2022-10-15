@@ -2,9 +2,10 @@ import { Prisma, PrismaClient } from '@prisma/client';
 
 import { UserTourPrismaAdapter } from './UserTourPrismaAdapter';
 import { CreateUserTourInput } from './UserTour.types';
-import { buildCreateTourStepInput } from './UserTourPrismaAdapter.helpers';
+import { buildCreateTourStepInput, buildUpsertTourStepInput } from './UserTourPrismaAdapter.helpers';
 import UserPrismaAdapter from '../../models/users/UserPrismaAdapter';
 import { UserTours } from './UserTour.helper';
+import { isPresent } from 'ts-is-present';
 export class UserTourService {
   private userTourPrismaAdapter: UserTourPrismaAdapter;
   private userPrismaAdapter: UserPrismaAdapter;
@@ -12,6 +13,24 @@ export class UserTourService {
   constructor(prisma: PrismaClient) {
     this.userTourPrismaAdapter = new UserTourPrismaAdapter(prisma);
     this.userPrismaAdapter = new UserPrismaAdapter(prisma);
+  }
+
+  public async updateUserTour(userTourId: string, input: CreateUserTourInput) {
+    const stepIds = input.steps.map((step) => step?.id).filter(isPresent);
+    const updateData: Prisma.UserTourUpdateInput = {
+      type: input.type,
+      triggerPage: input.triggerPage,
+      triggerVersion: input.triggerVersion,
+      steps: {
+        deleteMany: {
+          id: {
+            notIn: stepIds,
+          },
+        },
+        upsert: buildUpsertTourStepInput(input.steps),
+      },
+    };
+    return this.userTourPrismaAdapter.updateUserTour(userTourId, updateData);
   }
 
   public async finishTourOfUser(userTourId: string, userId: string) {
@@ -31,10 +50,8 @@ export class UserTourService {
     return this.userTourPrismaAdapter.createManyTourOfUser(createManyInput);
   }
 
-  /**
-   * Create a user tour and dispatches it to all current users in database
-   */
-  public async createAndDispatchUserTour(input: CreateUserTourInput) {
+  /** Creates a user tour */
+  public async createUserTour(input: CreateUserTourInput) {
     const createData: Prisma.UserTourCreateInput = {
       id: input.id || undefined,
       type: input.type,
@@ -46,9 +63,23 @@ export class UserTourService {
     };
 
     const userTour = await this.userTourPrismaAdapter.createUserTour(createData);
+    return userTour;
+  }
 
+  /**
+   * Dispatches a user tour to all users within the database
+   */
+  public async dispatchUserTour(userTourId: string) {
     const userIds: string[] = (await this.userPrismaAdapter.findAll()).map((user) => user.id);
-    await this.dispatchTourToUsers(userTour.id, userIds);
+    await this.dispatchTourToUsers(userTourId, userIds);
+  }
+
+  /**
+   * Create a user tour and dispatches it to all current users in database
+   */
+  public async createAndDispatchUserTour(input: CreateUserTourInput) {
+    const userTour = await this.createUserTour(input);
+    await this.dispatchUserTour(userTour.id);
     return userTour;
   }
 
@@ -59,6 +90,10 @@ export class UserTourService {
     return this.userTourPrismaAdapter.findUserTour(userTourId);
   }
 
+  /**
+   * Finds all user tours of a specific user 
+   * @returns UserTour helper wrapper
+   */
   public async findUserTours(userId: string) {
     const userTourWhereInput: Prisma.UserTourWhereInput = {
       usersOfTour: {

@@ -41,7 +41,7 @@ const WorkspaceLayout = ({ children }: WorskpaceLayoutProps) => {
   const device = useMediaDevice();
   const { isLoading } = useCustomer();
   const location = useLocation();
-  const { userTours, finishTour, user } = useUser();
+  const { userTours, user } = useUser();
   const [userTourId, setUserTourId] = useState(userTours?.releaseTour?.id);
 
   const isReportView = location.pathname.includes('_reports');

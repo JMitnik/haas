@@ -314,6 +314,7 @@ export interface NexusGenInputs {
   }
   CreateTourStepInput: { // input type
     helperKey: string; // String!
+    id?: string | null; // String
     imageUrlKey?: string | null; // String
     titleKey: string; // String!
     userTourId?: string | null; // String
@@ -2402,6 +2403,7 @@ export interface NexusGenFieldTypes {
     updatePermissions: NexusGenRootTypes['RoleType'] | null; // RoleType
     updateQuestion: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     updateRoles: NexusGenRootTypes['RoleType'] | null; // RoleType
+    updateUserTour: NexusGenRootTypes['UserTour'] | null; // UserTour
     uploadJobImage: NexusGenRootTypes['AWSImageType'] | null; // AWSImageType
     uploadUpsellImage: NexusGenRootTypes['ImageType'] | null; // ImageType
     verifyActionRequest: NexusGenRootTypes['ActionRequest'] | null; // ActionRequest
@@ -3442,6 +3444,7 @@ export interface NexusGenFieldTypeNames {
     updatePermissions: 'RoleType'
     updateQuestion: 'QuestionNode'
     updateRoles: 'RoleType'
+    updateUserTour: 'UserTour'
     uploadJobImage: 'AWSImageType'
     uploadUpsellImage: 'ImageType'
     verifyActionRequest: 'ActionRequest'
@@ -4186,6 +4189,9 @@ export interface NexusGenArgTypes {
     updateRoles: { // args
       permissions?: NexusGenInputs['PermissionIdsInput'] | null; // PermissionIdsInput
       roleId?: string | null; // String
+    }
+    updateUserTour: { // args
+      input: NexusGenInputs['CreateUserTourInput']; // CreateUserTourInput!
     }
     uploadJobImage: { // args
       disapproved?: boolean | null; // Boolean

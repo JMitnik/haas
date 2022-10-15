@@ -648,6 +648,7 @@ input CreateTopicInput {
 
 input CreateTourStepInput {
   helperKey: String!
+  id: String
   imageUrlKey: String
   titleKey: String!
   userTourId: String
@@ -1657,6 +1658,7 @@ type Mutation {
   updatePermissions(input: UpdatePermissionsInput): RoleType
   updateQuestion(input: UpdateQuestionNodeInputType): QuestionNode
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType
+  updateUserTour(input: CreateUserTourInput!): UserTour
   uploadJobImage(disapproved: Boolean, file: Upload, jobId: String, type: UploadImageEnumType): AWSImageType
   uploadUpsellImage(input: UploadSellImageInputType): ImageType
   verifyActionRequest(input: VerifyActionRequestInput!): ActionRequest

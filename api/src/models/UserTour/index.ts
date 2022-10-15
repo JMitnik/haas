@@ -7,3 +7,4 @@ export * from './graphql/CreateUserTourResolver';
 export * from './graphql/CreateTourStepInput.graphql';
 export * from './graphql/FinishTourOfUserResolver';
 export * from './graphql/Tour.graphql';
+export * from './graphql/UpdateUserTourResolver';

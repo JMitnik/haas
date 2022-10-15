@@ -23,11 +23,7 @@ export const createUserTourInclude = (
 export const defaultUserTourFields = Prisma.validator<Prisma.UserTourArgs>()({
   include: {
     steps: true,
-    usersOfTour: {
-      where: {
-        seenAt: null,
-      },
-    },
+    usersOfTour: true,
   },
 });
 

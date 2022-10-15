@@ -7,6 +7,15 @@ export class UserTourPrismaAdapter {
     this.prisma = prisma;
   }
 
+  public async updateUserTour(userTourId: string, data: Prisma.UserTourUpdateInput) {
+    return this.prisma.userTour.update({
+      where: {
+        id: userTourId,
+      },
+      data,
+    })
+  }
+
   public async updateTourOfUser(userTourId: string, userId: string, data: Prisma.TourOfUserUpdateInput) {
     return this.prisma.tourOfUser.update({
       where: {
