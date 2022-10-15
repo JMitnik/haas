@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import { useLocation } from 'react-router-dom';
-import React from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import * as Modal from 'components/Common/Modal';
@@ -41,14 +41,14 @@ const WorkspaceLayout = ({ children }: WorskpaceLayoutProps) => {
   const device = useMediaDevice();
   const { isLoading } = useCustomer();
   const location = useLocation();
-
   const { userTours, finishTour, user } = useUser();
+  const [userTourId, setUserTourId] = useState(userTours?.releaseTour?.id);
 
   const isReportView = location.pathname.includes('_reports');
 
   const hideTop = isReportView;
 
-  const hasReleaseTour = !!userTours?.tours?.releaseTour;
+  const hasReleaseTour = !!userTourId;
 
   return (
     <CustomThemeProviders>
@@ -77,14 +77,15 @@ const WorkspaceLayout = ({ children }: WorskpaceLayoutProps) => {
             variables: {
               input: {
                 userId: user?.id as string,
-                userTourId: userTours?.tours?.releaseTour?.id as string,
+                userTourId: userTours?.releaseTour?.id as string,
               },
             },
           })}
         >
           <ReleaseModalCard
             userId={user?.id as string}
-            release={userTours?.tours?.releaseTour}
+            release={userTours?.releaseTour}
+            onTourChange={setUserTourId}
           />
         </Modal.Root>
         <LS.DashboardViewContainer>

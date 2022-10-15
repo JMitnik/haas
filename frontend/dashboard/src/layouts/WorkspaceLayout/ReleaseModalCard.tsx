@@ -7,9 +7,10 @@ import { useTranslation } from 'react-i18next';
 interface InteractionModalCardProps {
   userId: string;
   release?: UserTourFragmentFragment | null;
+  onTourChange: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
-export const ReleaseModalCard = ({ userId, release }: InteractionModalCardProps) => {
+export const ReleaseModalCard = ({ userId, release, onTourChange }: InteractionModalCardProps) => {
   const { t } = useTranslation();
   const [step, setStep] = useState(0);
 
@@ -32,6 +33,18 @@ export const ReleaseModalCard = ({ userId, release }: InteractionModalCardProps)
     }
   }, [finishTour, release]);
 
+  const goForward = () => {
+    setStep((prevValue) => (prevValue + 1));
+  };
+
+  const goBack = () => {
+    setStep((prevValue) => (prevValue - 1));
+  };
+
+  const finish = () => {
+    onTourChange(undefined);
+  };
+
   console.log('Release: ', release);
 
   return (
@@ -45,9 +58,13 @@ export const ReleaseModalCard = ({ userId, release }: InteractionModalCardProps)
           {release?.triggerVersion}
         </UI.ModalTitle>
       </UI.ModalHead>
-      <UI.ModalBody>
+      <UI.ModalBody display="flex" flexDirection="column" height="100%" flexGrow={1}>
         <UI.Div>{t(`${release?.triggerVersion}-title-${step}`)}</UI.Div>
         <UI.Div>{t(`${release?.triggerVersion}-helper-${step}`)}</UI.Div>
+        <UI.Flex flexGrow={1}>
+          <UI.Button onClick={finish}>Finish</UI.Button>
+        </UI.Flex>
+
       </UI.ModalBody>
     </>
   );

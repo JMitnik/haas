@@ -15,7 +15,7 @@ import {
   Exact,
   FinishTourOfUserInput,
   FinishTourOfUserMutation,
-  GetUserToursQuery,
+  GetUserTours,
   MeQuery,
   useFinishTourOfUserMutation,
   useGetUserToursLazyQuery,
@@ -44,7 +44,7 @@ interface AuthContextProps {
   user: MeUserType | null;
   userIsValid?: () => boolean;
   logout: () => void;
-  userTours: GetUserToursQuery['user'] | null;
+  userTours: GetUserTours.Tours | null;
   accessToken: string | null;
   isLoggedIn: boolean;
   isInitializingUser: boolean;
@@ -144,7 +144,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <UserContext.Provider value={{
       user: data?.me || null,
-      userTours: toursData?.user || null,
+      userTours: toursData?.user?.tours || null,
       isInitializingUser,
       isLoggedIn: !!(data?.me?.id && accessToken && localStorage.getItem('access_token')),
       accessToken,
