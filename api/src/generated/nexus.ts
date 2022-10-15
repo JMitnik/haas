@@ -2360,6 +2360,7 @@ export interface NexusGenFieldTypes {
     createTag: NexusGenRootTypes['Tag'] | null; // Tag
     createTopic: boolean | null; // Boolean
     createTrigger: NexusGenRootTypes['TriggerType'] | null; // TriggerType
+    createUserTour: NexusGenRootTypes['UserTour'] | null; // UserTour
     createWorkspace: NexusGenRootTypes['Customer'] | null; // Customer
     deleteAutomation: NexusGenRootTypes['AutomationModel'] | null; // AutomationModel
     deleteCTA: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
@@ -2370,6 +2371,7 @@ export interface NexusGenFieldTypes {
     deleteTrigger: NexusGenRootTypes['TriggerType'] | null; // TriggerType
     deleteUser: NexusGenRootTypes['DeleteUserOutput'] | null; // DeleteUserOutput
     deselectTopic: boolean | null; // Boolean
+    dispatchUserTour: boolean | null; // Boolean
     duplicateQuestion: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     editDialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     editTrigger: NexusGenRootTypes['TriggerType'] | null; // TriggerType
@@ -3401,6 +3403,7 @@ export interface NexusGenFieldTypeNames {
     createTag: 'Tag'
     createTopic: 'Boolean'
     createTrigger: 'TriggerType'
+    createUserTour: 'UserTour'
     createWorkspace: 'Customer'
     deleteAutomation: 'AutomationModel'
     deleteCTA: 'QuestionNode'
@@ -3411,6 +3414,7 @@ export interface NexusGenFieldTypeNames {
     deleteTrigger: 'TriggerType'
     deleteUser: 'DeleteUserOutput'
     deselectTopic: 'Boolean'
+    dispatchUserTour: 'Boolean'
     duplicateQuestion: 'QuestionNode'
     editDialogue: 'Dialogue'
     editTrigger: 'TriggerType'
@@ -4044,6 +4048,9 @@ export interface NexusGenArgTypes {
     createTrigger: { // args
       input?: NexusGenInputs['CreateTriggerInputType'] | null; // CreateTriggerInputType
     }
+    createUserTour: { // args
+      input: NexusGenInputs['CreateUserTourInput']; // CreateUserTourInput!
+    }
     createWorkspace: { // args
       input?: NexusGenInputs['CreateWorkspaceInput'] | null; // CreateWorkspaceInput
     }
@@ -4074,6 +4081,10 @@ export interface NexusGenArgTypes {
     }
     deselectTopic: { // args
       input?: NexusGenInputs['DeselectTopicInput'] | null; // DeselectTopicInput
+    }
+    dispatchUserTour: { // args
+      id: string; // String!
+      userIds?: string[] | null; // [String!]
     }
     duplicateQuestion: { // args
       questionId?: string | null; // String

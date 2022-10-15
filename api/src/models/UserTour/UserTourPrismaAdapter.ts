@@ -28,9 +28,12 @@ export class UserTourPrismaAdapter {
     })
   }
 
+
+
   public async createManyTourOfUser(data: Prisma.TourOfUserCreateManyInput[]) {
     return this.prisma.tourOfUser.createMany({
       data,
+      skipDuplicates: true,
     })
   }
 

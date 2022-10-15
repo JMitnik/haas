@@ -33,6 +33,9 @@ export class UserTourService {
     return this.userTourPrismaAdapter.updateUserTour(userTourId, updateData);
   }
 
+  /**
+   * Finishes a tour for a specific user
+   */
   public async finishTourOfUser(userTourId: string, userId: string) {
     const updateInput: Prisma.TourOfUserUpdateInput = { seenAt: new Date() }
     return this.userTourPrismaAdapter.updateTourOfUser(userTourId, userId, updateInput);
@@ -69,9 +72,17 @@ export class UserTourService {
   /**
    * Dispatches a user tour to all users within the database
    */
-  public async dispatchUserTour(userTourId: string) {
-    const userIds: string[] = (await this.userPrismaAdapter.findAll()).map((user) => user.id);
-    await this.dispatchTourToUsers(userTourId, userIds);
+  public async dispatchUserTour(userTourId: string, userIds?: string[]) {
+    try {
+      const dispatchUserIds: string[] = !userIds?.length
+        ? (await this.userPrismaAdapter.findAll()).map((user) => user.id)
+        : userIds;
+      await this.dispatchTourToUsers(userTourId, dispatchUserIds);
+      return true
+    } catch (e) {
+      console.log('Error: ', e);
+      return false;
+    }
   }
 
   /**
