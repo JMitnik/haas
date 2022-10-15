@@ -1,7 +1,8 @@
 import { Customer, Dialogue, PrismaClient } from 'prisma/prisma-client';
 import { range } from 'lodash';
 
-import { clearDatabase, prepDefaultCreateData, seedAutomation } from './testUtils';
+import { prepDefaultCreateData, seedAutomation } from './testUtils';
+import { clearDatabase } from '../../../test/utils/clearDatabase';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
 import { prisma } from '../../../test/setup/singletonDeps';
 import AuthService from '../../auth/AuthService';

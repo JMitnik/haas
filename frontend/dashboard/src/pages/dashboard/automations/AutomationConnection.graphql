@@ -2,6 +2,20 @@ query automationConnection($customerSlug: String, $filter: AutomationConnectionF
   customer(slug: $customerSlug) {
     id
     slug
+    dialogueSchedule {
+      id
+      isEnabled
+      dataPeriodSchedule {
+        id
+        startDateExpression
+        endInDeltaMinutes
+      }
+      evaluationPeriodSchedule {
+        id
+        startDateExpression
+        endInDeltaMinutes
+      }
+    }
     automationConnection(filter: $filter) {
       totalPages
       pageInfo {

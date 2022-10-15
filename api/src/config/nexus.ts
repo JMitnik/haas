@@ -1,5 +1,6 @@
 import * as AuthAPI from '../models/auth/Auth';
 import * as AutodeckAPI from '../models/autodeck/Autodeck';
+import * as DialogueScheduleAPI from '../models/DialogueSchedule/graphql';
 import * as AutomationAPI from '../models/automations';
 import * as CampaignAPI from '../models/Campaigns';
 import * as DebugAPI from '../models/debug/Debug';
@@ -27,11 +28,14 @@ import * as RoleAPI from '../models/role';
 import tagNexus from '../models/tag/Tag';
 import triggerNexus from '../models/trigger/Trigger';
 import uploadNexus from '../models/link/graphql/UploadUpsellFileResolver';
+import * as UserTourAPI from '../models/UserTour'
 
 import * as ActionRequestAPI from '../models/ActionRequest/graphql'
 
 const nexus = [
+  ...Array(UserTourAPI),
   ...Array(ActionRequestAPI),
+  ...Array(DialogueScheduleAPI),
   ...Array(OrganizationAPI),
   ...Array(CommonAnalyticsAPI),
   ...Array(DateAPI),

@@ -5,6 +5,7 @@ import { Kind } from 'graphql';
 
 import { ConnectionInterface } from '../../general/Pagination';
 import { RoleType, SystemPermission } from '../../role/graphql/Role';
+import { Tour } from '../../../models/UserTour';
 
 export const UserCustomerType = objectType({
   name: 'UserCustomer',
@@ -116,6 +117,17 @@ export const UserType = objectType({
         return ctx.services.userService.getGlobalPermissions(parent.id);
       },
     });
+
+    t.field('tours', {
+      type: Tour,
+      async resolve(parent, args, ctx) {
+        if (!parent.id) return null;
+
+        const tours = await ctx.services.userTourService.findUserTours(parent.id);
+        return tours.toGraphQL();
+      },
+    });
+
 
     t.list.field('userCustomers', {
       type: UserCustomerType,

@@ -39,7 +39,7 @@
     "react-lottie": "^1.2.3",
     "react-markdown": "^5.0.2",
     "react-popper": "^2.2.3",
-    "react-router-dom": "^6.3.0",
+    "react-router-dom": "6.3.0",
     "react-scripts": "^3.4.0",
     "react-select": "^3.0.8",
     "react-spring": "^8.0.27",

@@ -1,40 +1,5 @@
 import { PrismaClient } from 'prisma/prisma-client';
 
-export const clearDatabase = async (prisma: PrismaClient) => {
-  // const delUsers = prisma.user.deleteMany({});
-  // const delDialogues = prisma.dialogue.deleteMany({});
-  // const delWorkspaces = prisma.customer.deleteMany({});
-  // const delPermissions = prisma.permission.deleteMany({});
-  // const delUserRoles = prisma.role.deleteMany({});
-  // const delUserOfCustomer = prisma.userOfCustomer.deleteMany({});
-
-  return prisma.$transaction([
-    prisma.sliderNodeEntry.deleteMany({}),
-    prisma.choiceNodeEntry.deleteMany({}),
-    prisma.nodeEntry.deleteMany({}),
-    prisma.session.deleteMany({}),
-    prisma.automation.deleteMany({}),
-    prisma.automationTrigger.deleteMany({}),
-    prisma.automationEvent.deleteMany({}),
-    prisma.automationConditionOperand.deleteMany({}),
-    prisma.dialogueConditionScope.deleteMany({}),
-    prisma.questionConditionScope.deleteMany({}),
-    prisma.workspaceConditionScope.deleteMany({}),
-    prisma.automationCondition.deleteMany({}),
-    prisma.automationConditionBuilder.deleteMany({}),
-    prisma.dialogueTopicCache.deleteMany({}),
-    prisma.pathedSessionsCache.deleteMany({}),
-    prisma.automationAction.deleteMany({}),
-    prisma.userOfCustomer.deleteMany({}),
-    prisma.permission.deleteMany(),
-    prisma.role.deleteMany(),
-    prisma.user.deleteMany({}),
-    prisma.questionNode.deleteMany({}),
-    prisma.dialogue.deleteMany({}),
-    prisma.tag.deleteMany({}),
-    prisma.customer.deleteMany({}),
-  ]);
-}
 export const prepDefaultData = async (prisma: PrismaClient) => {
   const workspace = await prisma.customer.create({
     data: {

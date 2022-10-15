@@ -27,6 +27,7 @@ import { offsetPaginate } from '../general/PaginationHelpers';
 import config from '../../config/config';
 import TemplateService from '../templates/TemplateService';
 import { logger } from '../../config/logger';
+import { DialogueScheduleService } from '../DialogueSchedule/DialogueScheduleService';
 
 function getRandomIntFromInterval(min: number, max: number) { // min and max included
   return Math.floor(Math.random() * (max - min + 1) + min)
@@ -45,6 +46,7 @@ class DialogueService {
   questionNodePrismaAdapter: QuestionNodePrismaAdapter;
   templateService: TemplateService;
   nodeService: NodeService;
+  private dialogueScheduleService: DialogueScheduleService;
 
   constructor(prismaClient: PrismaClient) {
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
@@ -56,12 +58,13 @@ class DialogueService {
     this.questionNodePrismaAdapter = new QuestionNodePrismaAdapter(prismaClient);
     this.templateService = new TemplateService(prismaClient);
     this.nodeService = new NodeService(prismaClient);
+    this.dialogueScheduleService = new DialogueScheduleService(prismaClient);
   }
 
   /**
    * Finds dialogue by a question ID
-   * @param questionId 
-   * @returns 
+   * @param questionId
+   * @returns
    */
   findDialogueByQuestionId = async (questionId: string) => {
     return this.dialoguePrismaAdapter.getDialogueByQuestionNodeId(questionId);
@@ -639,6 +642,27 @@ class DialogueService {
   }
 
   /**
+   * Checks for a given dialogue (based on its workspace ID) if it is online or not.
+   */
+  public async isOnline(workspaceId: string) {
+    const schedule = await this.dialogueScheduleService.findByWorkspaceID(workspaceId);
+
+    return schedule ? schedule.evaluationIsActive : true;
+  }
+
+  /**
+   * Add online status to the dialogues.
+   */
+  private async withOnlineStatus(dialogues: Dialogue[], workspaceId: string) {
+    const schedule = await this.dialogueScheduleService.findByWorkspaceID(workspaceId);
+
+    return dialogues.map(dialogue => ({
+      ...dialogue,
+      isOnline: schedule ? schedule.evaluationIsActive : true,
+    }))
+  }
+
+  /**
    * Function to paginate through all automations of a workspace
    * @param workspaceSlug the slug of the workspace
    * @param filter a filter object used to paginate through automations of a workspace
@@ -646,6 +670,7 @@ class DialogueService {
    */
   public paginatedDialogues = async (
     workspaceSlug: string,
+    workspaceId: string,
     canAccessAllDialogues: boolean,
     userId: string,
     filter?: NexusGenInputs['DialogueConnectionFilterInput'] | null,
@@ -653,9 +678,12 @@ class DialogueService {
     const offset = filter?.offset ?? 0;
     const perPage = filter?.perPage ?? 15;
 
-    const dialogues = await this.dialoguePrismaAdapter.findPaginatedDialogues(
-      workspaceSlug, canAccessAllDialogues, userId, filter
+    const dialogues = await this.withOnlineStatus(
+      await this.dialoguePrismaAdapter.findPaginatedDialogues(
+        workspaceSlug, canAccessAllDialogues, userId, filter
+      ), workspaceId,
     );
+
     const totalDialogues = await this.dialoguePrismaAdapter.countDialogues(
       workspaceSlug, canAccessAllDialogues, userId, filter
     );
@@ -663,7 +691,7 @@ class DialogueService {
     const { totalPages, ...pageInfo } = offsetPaginate(totalDialogues, offset, perPage);
 
     return {
-      dialogues: dialogues,
+      dialogues,
       totalPages,
       pageInfo,
     };

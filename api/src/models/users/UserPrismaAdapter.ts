@@ -14,6 +14,10 @@ class UserPrismaAdapter {
     this.roleService = new RoleService(prismaClient);
   }
 
+  public async findAll() {
+    return this.prisma.user.findMany();
+  }
+
   public async findMany(where: Prisma.UserWhereInput, include: Prisma.UserInclude) {
     return this.prisma.user.findMany({
       where,

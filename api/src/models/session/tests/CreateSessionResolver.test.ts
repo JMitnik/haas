@@ -1,5 +1,6 @@
 import { makeTestContext } from '../../../test/utils/makeTestContext';
-import { clearDatabase, seedUser, seedWorkspace } from './testUtils';
+import { clearDatabase } from '../../../test/utils/clearDatabase';
+import { seedWorkspace } from './testUtils';
 import { prisma } from '../../../test/setup/singletonDeps';
 
 jest.setTimeout(30000);

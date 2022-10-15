@@ -6,6 +6,7 @@ import { RedisService } from '../models/general/cache/RedisService';
 import { mailService } from '../services/mailings/MailService'
 import { LoginService } from '../models/auth/LoginService'
 import { IssueService } from '../models/Issue/IssueService';
+import { DialogueScheduleService } from '../models/DialogueSchedule/DialogueScheduleService';
 import UserService from '../models/users/UserService'
 import { APIServiceContainer } from '../types/APIContext'
 import CustomerService from '../models/customer/CustomerService'
@@ -32,6 +33,7 @@ import { OrganizationService } from '../models/Organization/OrganizationService'
 import TemplateService from '../models/templates/TemplateService'
 import { TopicService } from '../models/Topic/TopicService'
 import ScheduledAutomationService from '../models/automations/ScheduledAutomationService';
+import { UserTourService } from '../models/UserTour/UserTourService';
 import ActionRequestService from '../models/ActionRequest/ActionRequestService';
 
 export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOptions, never>): APIServiceContainer => {
@@ -65,9 +67,12 @@ export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOption
   const organizationService = new OrganizationService(prisma);
   const scheduledAutomationService = new ScheduledAutomationService(prisma);
   const workspaceStatisticsService = new WorkspaceStatisticsService(prisma);
+  const userTourService = new UserTourService(prisma);
   const actionRequestService = new ActionRequestService(prisma);
+  const dialogueScheduleService = new DialogueScheduleService(prisma);
 
   return {
+    userTourService,
     actionRequestService,
     scheduledAutomationService,
     automationActionService,
@@ -98,5 +103,6 @@ export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOption
     topicService,
     issueService,
     workspaceStatisticsService,
+    dialogueScheduleService,
   }
 }

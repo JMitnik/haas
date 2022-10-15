@@ -269,6 +269,10 @@ export interface NexusGenInputs {
     weight?: number | null; // Float
     workspaceId: string; // ID!
   }
+  CreateDataPeriodInput: { // input type
+    endInDeltaMinutes: number; // Int!
+    startDateExpression: string; // String!
+  }
   CreateDialogueInputType: { // input type
     contentType?: string | null; // String
     customerSlug?: string | null; // String
@@ -280,6 +284,15 @@ export interface NexusGenInputs {
     tags?: NexusGenInputs['TagsInputObjectType'] | null; // TagsInputObjectType
     templateDialogueId?: string | null; // String
     title?: string | null; // String
+  }
+  CreateDialogueScheduleInput: { // input type
+    dataPeriod: NexusGenInputs['CreateDataPeriodInput']; // CreateDataPeriodInput!
+    evaluationPeriod?: NexusGenInputs['CreateEvaluationPeriodInput'] | null; // CreateEvaluationPeriodInput
+    workspaceId: string; // String!
+  }
+  CreateEvaluationPeriodInput: { // input type
+    endInDeltaMinutes?: number | null; // Int
+    startDateExpression: string; // String!
   }
   CreateQuestionNodeInputType: { // input type
     customerId?: string | null; // ID
@@ -299,10 +312,24 @@ export interface NexusGenInputs {
     subTopics?: Array<NexusGenInputs['CreateTopicInput'] | null> | null; // [CreateTopicInput]
     type: NexusGenEnums['TopicEnumType'] | null; // TopicEnumType
   }
+  CreateTourStepInput: { // input type
+    helperKey: string; // String!
+    id?: string | null; // String
+    imageUrlKey?: string | null; // String
+    titleKey: string; // String!
+    userTourId?: string | null; // String
+  }
   CreateTriggerInputType: { // input type
     customerSlug?: string | null; // String
     recipients?: NexusGenInputs['RecipientsInputType'] | null; // RecipientsInputType
     trigger?: NexusGenInputs['TriggerInputType'] | null; // TriggerInputType
+  }
+  CreateUserTourInput: { // input type
+    id?: string | null; // String
+    steps: Array<NexusGenInputs['CreateTourStepInput'] | null>; // [CreateTourStepInput]!
+    triggerPage?: string | null; // String
+    triggerVersion?: string | null; // String
+    type: NexusGenEnums['TourType']; // TourType!
   }
   CreateWorkspaceInput: { // input type
     isDemo?: boolean | null; // Boolean
@@ -421,6 +448,10 @@ export interface NexusGenInputs {
   FindRoleInput: { // input type
     roleId?: string | null; // String
     userId?: string | null; // String
+  }
+  FinishTourOfUserInput: { // input type
+    userId: string; // String!
+    userTourId: string; // String!
   }
   FormNodeEntryFieldInput: { // input type
     contacts?: string | null; // String
@@ -765,6 +796,10 @@ export interface NexusGenInputs {
   TextboxNodeEntryInput: { // input type
     value?: string | null; // String
   }
+  ToggleDialogueScheduleInput: { // input type
+    dialogueScheduleId: string; // ID!
+    status: boolean; // Boolean!
+  }
   TopicFilterInput: { // input type
     dialogueStrings?: string[] | null; // [String!]
     relatedSessionScoreLowerThreshold?: number | null; // Float
@@ -912,6 +947,7 @@ export interface NexusGenEnums {
   SystemPermission: "CAN_ACCESS_ADMIN_PANEL" | "CAN_ACCESS_ALL_ACTION_REQUESTS" | "CAN_ACCESS_ALL_DIALOGUES" | "CAN_ACCESS_REPORT_PAGE" | "CAN_ADD_USERS" | "CAN_ASSIGN_USERS_TO_DIALOGUE" | "CAN_BUILD_DIALOGUE" | "CAN_CREATE_AUTOMATIONS" | "CAN_CREATE_CAMPAIGNS" | "CAN_CREATE_DELIVERIES" | "CAN_CREATE_TRIGGERS" | "CAN_DELETE_DIALOGUE" | "CAN_DELETE_TRIGGERS" | "CAN_DELETE_USERS" | "CAN_DELETE_WORKSPACE" | "CAN_DOWNLOAD_REPORTS" | "CAN_EDIT_DIALOGUE" | "CAN_EDIT_USERS" | "CAN_EDIT_WORKSPACE" | "CAN_GENERATE_WORKSPACE_FROM_CSV" | "CAN_RESET_WORKSPACE_DATA" | "CAN_UPDATE_AUTOMATIONS" | "CAN_VIEW_ACTION_REQUESTS" | "CAN_VIEW_AUTOMATIONS" | "CAN_VIEW_CAMPAIGNS" | "CAN_VIEW_DIALOGUE" | "CAN_VIEW_DIALOGUE_ANALYTICS" | "CAN_VIEW_USERS"
   TagTypeEnum: "AGENT" | "DEFAULT" | "LOCATION"
   TopicEnumType: "SYSTEM" | "WORKSPACE"
+  TourType: "GUIDE" | "RELEASE"
   TriggerConditionEnum: "HIGH_THRESHOLD" | "INNER_RANGE" | "LOW_THRESHOLD" | "OUTER_RANGE" | "TEXT_MATCH"
   TriggerMediumEnum: "BOTH" | "EMAIL" | "PHONE"
   TriggerTypeEnum: "QUESTION" | "SCHEDULED"
@@ -1111,6 +1147,9 @@ export interface NexusGenObjects {
     failedDeliveries?: Array<NexusGenRootTypes['FailedDeliveryModel'] | null> | null; // [FailedDeliveryModel]
     nrDeliveries?: number | null; // Int
   }
+  CreateDialogueScheduleOutput: { // root type
+    dialogueSchedule?: NexusGenRootTypes['DialogueSchedule'] | null; // DialogueSchedule
+  }
   CreateWorkspaceJobType: { // root type
     createdAt?: string | null; // String
     errorMessage?: string | null; // String
@@ -1143,6 +1182,13 @@ export interface NexusGenObjects {
     fontSettingsId?: number | null; // Int
     id?: number | null; // Int
     logoUrl?: string | null; // String
+  }
+  DataPeriodSchedule: { // root type
+    activeEndDate?: NexusGenScalars['DateString'] | null; // DateString
+    activeStartDate?: NexusGenScalars['DateString'] | null; // DateString
+    endInDeltaMinutes?: number | null; // Int
+    id?: string | null; // ID
+    startDateExpression?: string | null; // String
   }
   DateHistogram: { // root type
     id?: string | null; // ID
@@ -1220,6 +1266,12 @@ export interface NexusGenObjects {
     id?: string | null; // ID
     subtext?: string | null; // String
   }
+  DialogueSchedule: { // root type
+    dataPeriodSchedule?: NexusGenRootTypes['DataPeriodSchedule'] | null; // DataPeriodSchedule
+    evaluationPeriodSchedule?: NexusGenRootTypes['EvaluationPeriodSchedule'] | null; // EvaluationPeriodSchedule
+    id?: string | null; // ID
+    isEnabled?: boolean | null; // Boolean
+  }
   DialogueStatistics: { // root type
     history?: Array<NexusGenRootTypes['lineChartDataType'] | null> | null; // [lineChartDataType]
     mostPopularPath?: NexusGenRootTypes['topPathType'] | null; // topPathType
@@ -1251,6 +1303,12 @@ export interface NexusGenObjects {
     matchValue?: string | null; // String
     renderMax?: number | null; // Int
     renderMin?: number | null; // Int
+  }
+  EvaluationPeriodSchedule: { // root type
+    endInDeltaMinutes?: number | null; // Int
+    id?: string | null; // ID
+    isActive?: boolean | null; // Boolean
+    startDateExpression?: string | null; // String
   }
   FailedDeliveryModel: { // root type
     error?: string | null; // String
@@ -1600,6 +1658,25 @@ export interface NexusGenObjects {
     nrVotes?: number | null; // Int
     subTopics?: Array<NexusGenRootTypes['TopicType'] | null> | null; // [TopicType]
   }
+  Tour: { // root type
+    featureTours?: Array<NexusGenRootTypes['UserTour'] | null> | null; // [UserTour]
+    releaseTour?: NexusGenRootTypes['UserTour'] | null; // UserTour
+  }
+  TourOfUser: { // root type
+    createdAt: NexusGenScalars['Date']; // Date!
+    seenAt?: NexusGenScalars['Date'] | null; // Date
+    updatedAt: NexusGenScalars['Date']; // Date!
+    userId: string; // String!
+    userTourId: string; // String!
+  }
+  TourStep: { // root type
+    createdAt: NexusGenScalars['Date']; // Date!
+    helperKey: string; // String!
+    id: string; // String!
+    imageUrlKey?: string | null; // String
+    titleKey: string; // String!
+    updatedAt: NexusGenScalars['Date']; // Date!
+  }
   TriggerConditionType: { // root type
     id?: number | null; // Int
     maxValue?: number | null; // Int
@@ -1641,6 +1718,15 @@ export interface NexusGenObjects {
     isActive?: boolean | null; // Boolean
     role?: NexusGenRootTypes['RoleType'] | null; // RoleType
     user?: NexusGenRootTypes['UserType'] | null; // UserType
+  }
+  UserTour: { // root type
+    createdAt: NexusGenScalars['Date']; // Date!
+    id: string; // String!
+    triggerPage?: string | null; // String
+    triggerVersion?: string | null; // String
+    type: NexusGenEnums['TourType']; // TourType!
+    updatedAt: NexusGenScalars['Date']; // Date!
+    usersOfTour?: Array<NexusGenRootTypes['TourOfUser'] | null> | null; // [TourOfUser]
   }
   UserType: { // root type
     email?: string | null; // String
@@ -1878,6 +1964,9 @@ export interface NexusGenFieldTypes {
     failedDeliveries: Array<NexusGenRootTypes['FailedDeliveryModel'] | null> | null; // [FailedDeliveryModel]
     nrDeliveries: number | null; // Int
   }
+  CreateDialogueScheduleOutput: { // field return type
+    dialogueSchedule: NexusGenRootTypes['DialogueSchedule'] | null; // DialogueSchedule
+  }
   CreateWorkspaceJobType: { // field return type
     createdAt: string | null; // String
     errorMessage: string | null; // String
@@ -1908,6 +1997,7 @@ export interface NexusGenFieldTypes {
     campaigns: Array<NexusGenRootTypes['CampaignType'] | null> | null; // [CampaignType]
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogueConnection: NexusGenRootTypes['DialogueConnection'] | null; // DialogueConnection
+    dialogueSchedule: NexusGenRootTypes['DialogueSchedule'] | null; // DialogueSchedule
     dialogues: Array<NexusGenRootTypes['Dialogue'] | null> | null; // [Dialogue]
     id: string | null; // ID
     isDemo: boolean | null; // Boolean
@@ -1938,6 +2028,13 @@ export interface NexusGenFieldTypes {
     id: number | null; // Int
     logoOpacity: number | null; // Int
     logoUrl: string | null; // String
+  }
+  DataPeriodSchedule: { // field return type
+    activeEndDate: NexusGenScalars['DateString'] | null; // DateString
+    activeStartDate: NexusGenScalars['DateString'] | null; // DateString
+    endInDeltaMinutes: number | null; // Int
+    id: string | null; // ID
+    startDateExpression: string | null; // String
   }
   DateHistogram: { // field return type
     id: string | null; // ID
@@ -1996,6 +2093,7 @@ export interface NexusGenFieldTypes {
     edges: Array<NexusGenRootTypes['Edge'] | null> | null; // [Edge]
     healthScore: NexusGenRootTypes['HealthScore'] | null; // HealthScore
     id: string; // String!
+    isOnline: boolean | null; // Boolean
     isPrivate: boolean | null; // Boolean
     isWithoutGenData: boolean | null; // Boolean
     issues: NexusGenRootTypes['Issue'] | null; // Issue
@@ -2038,6 +2136,12 @@ export interface NexusGenFieldTypes {
     id: string | null; // ID
     subtext: string | null; // String
   }
+  DialogueSchedule: { // field return type
+    dataPeriodSchedule: NexusGenRootTypes['DataPeriodSchedule'] | null; // DataPeriodSchedule
+    evaluationPeriodSchedule: NexusGenRootTypes['EvaluationPeriodSchedule'] | null; // EvaluationPeriodSchedule
+    id: string | null; // ID
+    isEnabled: boolean | null; // Boolean
+  }
   DialogueStatistics: { // field return type
     history: Array<NexusGenRootTypes['lineChartDataType'] | null> | null; // [lineChartDataType]
     mostPopularPath: NexusGenRootTypes['topPathType'] | null; // topPathType
@@ -2073,6 +2177,12 @@ export interface NexusGenFieldTypes {
     matchValue: string | null; // String
     renderMax: number | null; // Int
     renderMin: number | null; // Int
+  }
+  EvaluationPeriodSchedule: { // field return type
+    endInDeltaMinutes: number | null; // Int
+    id: string | null; // ID
+    isActive: boolean | null; // Boolean
+    startDateExpression: string | null; // String
   }
   FailedDeliveryModel: { // field return type
     error: string | null; // String
@@ -2234,12 +2344,14 @@ export interface NexusGenFieldTypes {
     authenticateLambda: string | null; // String
     confirmCreateWorkspaceJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
     copyDialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
+    createAndDispatchUserTour: NexusGenRootTypes['UserTour'] | null; // UserTour
     createAutomation: NexusGenRootTypes['AutomationModel'] | null; // AutomationModel
     createAutomationToken: string | null; // String
     createBatchDeliveries: NexusGenRootTypes['CreateBatchDeliveriesOutputType'] | null; // CreateBatchDeliveriesOutputType
     createCTA: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     createCampaign: NexusGenRootTypes['CampaignType'] | null; // CampaignType
     createDialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
+    createDialogueSchedule: NexusGenRootTypes['CreateDialogueScheduleOutput'] | null; // CreateDialogueScheduleOutput
     createJobProcessLocation: NexusGenRootTypes['JobProcessLocation'] | null; // JobProcessLocation
     createPermission: NexusGenRootTypes['PermssionType'] | null; // PermssionType
     createQuestion: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
@@ -2248,6 +2360,7 @@ export interface NexusGenFieldTypes {
     createTag: NexusGenRootTypes['Tag'] | null; // Tag
     createTopic: boolean | null; // Boolean
     createTrigger: NexusGenRootTypes['TriggerType'] | null; // TriggerType
+    createUserTour: NexusGenRootTypes['UserTour'] | null; // UserTour
     createWorkspace: NexusGenRootTypes['Customer'] | null; // Customer
     deleteAutomation: NexusGenRootTypes['AutomationModel'] | null; // AutomationModel
     deleteCTA: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
@@ -2258,12 +2371,14 @@ export interface NexusGenFieldTypes {
     deleteTrigger: NexusGenRootTypes['TriggerType'] | null; // TriggerType
     deleteUser: NexusGenRootTypes['DeleteUserOutput'] | null; // DeleteUserOutput
     deselectTopic: boolean | null; // Boolean
+    dispatchUserTour: boolean | null; // Boolean
     duplicateQuestion: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     editDialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     editTrigger: NexusGenRootTypes['TriggerType'] | null; // TriggerType
     editUser: NexusGenRootTypes['UserType'] | null; // UserType
     editWorkspace: NexusGenRootTypes['Customer'] | null; // Customer
     enableAutomation: NexusGenRootTypes['AutomationModel'] | null; // AutomationModel
+    finishTourOfUser: NexusGenRootTypes['TourOfUser'] | null; // TourOfUser
     generateAutodeck: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
     generateWorkspaceFromCSV: NexusGenRootTypes['Customer'] | null; // Customer
     handleUserStateInWorkspace: NexusGenRootTypes['UserCustomer'] | null; // UserCustomer
@@ -2282,6 +2397,7 @@ export interface NexusGenFieldTypes {
     setActionRequestStatus: NexusGenRootTypes['ActionRequest'] | null; // ActionRequest
     setDialoguePrivacy: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     singleUpload: NexusGenRootTypes['ImageType'] | null; // ImageType
+    toggleDialogueSchedule: NexusGenRootTypes['DialogueSchedule'] | null; // DialogueSchedule
     updateAutomation: NexusGenRootTypes['AutomationModel'] | null; // AutomationModel
     updateCTA: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     updateCreateWorkspaceJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
@@ -2289,6 +2405,7 @@ export interface NexusGenFieldTypes {
     updatePermissions: NexusGenRootTypes['RoleType'] | null; // RoleType
     updateQuestion: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     updateRoles: NexusGenRootTypes['RoleType'] | null; // RoleType
+    updateUserTour: NexusGenRootTypes['UserTour'] | null; // UserTour
     uploadJobImage: NexusGenRootTypes['AWSImageType'] | null; // AWSImageType
     uploadUpsellImage: NexusGenRootTypes['ImageType'] | null; // ImageType
     verifyActionRequest: NexusGenRootTypes['ActionRequest'] | null; // ActionRequest
@@ -2561,6 +2678,27 @@ export interface NexusGenFieldTypes {
     nrVotes: number | null; // Int
     subTopics: Array<NexusGenRootTypes['TopicType'] | null> | null; // [TopicType]
   }
+  Tour: { // field return type
+    featureTours: Array<NexusGenRootTypes['UserTour'] | null> | null; // [UserTour]
+    releaseTour: NexusGenRootTypes['UserTour'] | null; // UserTour
+  }
+  TourOfUser: { // field return type
+    createdAt: NexusGenScalars['Date']; // Date!
+    seenAt: NexusGenScalars['Date'] | null; // Date
+    tour: NexusGenRootTypes['UserTour'] | null; // UserTour
+    updatedAt: NexusGenScalars['Date']; // Date!
+    user: NexusGenRootTypes['UserType'] | null; // UserType
+    userId: string; // String!
+    userTourId: string; // String!
+  }
+  TourStep: { // field return type
+    createdAt: NexusGenScalars['Date']; // Date!
+    helperKey: string; // String!
+    id: string; // String!
+    imageUrlKey: string | null; // String
+    titleKey: string; // String!
+    updatedAt: NexusGenScalars['Date']; // Date!
+  }
   TriggerConditionType: { // field return type
     id: number | null; // Int
     maxValue: number | null; // Int
@@ -2608,6 +2746,16 @@ export interface NexusGenFieldTypes {
     role: NexusGenRootTypes['RoleType'] | null; // RoleType
     user: NexusGenRootTypes['UserType'] | null; // UserType
   }
+  UserTour: { // field return type
+    createdAt: NexusGenScalars['Date']; // Date!
+    id: string; // String!
+    steps: Array<NexusGenRootTypes['TourStep'] | null> | null; // [TourStep]
+    triggerPage: string | null; // String
+    triggerVersion: string | null; // String
+    type: NexusGenEnums['TourType']; // TourType!
+    updatedAt: NexusGenScalars['Date']; // Date!
+    usersOfTour: Array<NexusGenRootTypes['TourOfUser'] | null> | null; // [TourOfUser]
+  }
   UserType: { // field return type
     assignedDialogues: NexusGenRootTypes['AssignedDialogues'] | null; // AssignedDialogues
     customers: Array<NexusGenRootTypes['Customer'] | null> | null; // [Customer]
@@ -2621,6 +2769,7 @@ export interface NexusGenFieldTypes {
     phone: string | null; // String
     role: NexusGenRootTypes['RoleType'] | null; // RoleType
     roleId: string | null; // String
+    tours: NexusGenRootTypes['Tour'] | null; // Tour
     userCustomers: Array<NexusGenRootTypes['UserCustomer'] | null> | null; // [UserCustomer]
   }
   VerifyUserTokenOutput: { // field return type
@@ -2858,6 +3007,9 @@ export interface NexusGenFieldTypeNames {
     failedDeliveries: 'FailedDeliveryModel'
     nrDeliveries: 'Int'
   }
+  CreateDialogueScheduleOutput: { // field return type name
+    dialogueSchedule: 'DialogueSchedule'
+  }
   CreateWorkspaceJobType: { // field return type name
     createdAt: 'String'
     errorMessage: 'String'
@@ -2888,6 +3040,7 @@ export interface NexusGenFieldTypeNames {
     campaigns: 'CampaignType'
     dialogue: 'Dialogue'
     dialogueConnection: 'DialogueConnection'
+    dialogueSchedule: 'DialogueSchedule'
     dialogues: 'Dialogue'
     id: 'ID'
     isDemo: 'Boolean'
@@ -2918,6 +3071,13 @@ export interface NexusGenFieldTypeNames {
     id: 'Int'
     logoOpacity: 'Int'
     logoUrl: 'String'
+  }
+  DataPeriodSchedule: { // field return type name
+    activeEndDate: 'DateString'
+    activeStartDate: 'DateString'
+    endInDeltaMinutes: 'Int'
+    id: 'ID'
+    startDateExpression: 'String'
   }
   DateHistogram: { // field return type name
     id: 'ID'
@@ -2976,6 +3136,7 @@ export interface NexusGenFieldTypeNames {
     edges: 'Edge'
     healthScore: 'HealthScore'
     id: 'String'
+    isOnline: 'Boolean'
     isPrivate: 'Boolean'
     isWithoutGenData: 'Boolean'
     issues: 'Issue'
@@ -3018,6 +3179,12 @@ export interface NexusGenFieldTypeNames {
     id: 'ID'
     subtext: 'String'
   }
+  DialogueSchedule: { // field return type name
+    dataPeriodSchedule: 'DataPeriodSchedule'
+    evaluationPeriodSchedule: 'EvaluationPeriodSchedule'
+    id: 'ID'
+    isEnabled: 'Boolean'
+  }
   DialogueStatistics: { // field return type name
     history: 'lineChartDataType'
     mostPopularPath: 'topPathType'
@@ -3053,6 +3220,12 @@ export interface NexusGenFieldTypeNames {
     matchValue: 'String'
     renderMax: 'Int'
     renderMin: 'Int'
+  }
+  EvaluationPeriodSchedule: { // field return type name
+    endInDeltaMinutes: 'Int'
+    id: 'ID'
+    isActive: 'Boolean'
+    startDateExpression: 'String'
   }
   FailedDeliveryModel: { // field return type name
     error: 'String'
@@ -3214,12 +3387,14 @@ export interface NexusGenFieldTypeNames {
     authenticateLambda: 'String'
     confirmCreateWorkspaceJob: 'CreateWorkspaceJobType'
     copyDialogue: 'Dialogue'
+    createAndDispatchUserTour: 'UserTour'
     createAutomation: 'AutomationModel'
     createAutomationToken: 'String'
     createBatchDeliveries: 'CreateBatchDeliveriesOutputType'
     createCTA: 'QuestionNode'
     createCampaign: 'CampaignType'
     createDialogue: 'Dialogue'
+    createDialogueSchedule: 'CreateDialogueScheduleOutput'
     createJobProcessLocation: 'JobProcessLocation'
     createPermission: 'PermssionType'
     createQuestion: 'QuestionNode'
@@ -3228,6 +3403,7 @@ export interface NexusGenFieldTypeNames {
     createTag: 'Tag'
     createTopic: 'Boolean'
     createTrigger: 'TriggerType'
+    createUserTour: 'UserTour'
     createWorkspace: 'Customer'
     deleteAutomation: 'AutomationModel'
     deleteCTA: 'QuestionNode'
@@ -3238,12 +3414,14 @@ export interface NexusGenFieldTypeNames {
     deleteTrigger: 'TriggerType'
     deleteUser: 'DeleteUserOutput'
     deselectTopic: 'Boolean'
+    dispatchUserTour: 'Boolean'
     duplicateQuestion: 'QuestionNode'
     editDialogue: 'Dialogue'
     editTrigger: 'TriggerType'
     editUser: 'UserType'
     editWorkspace: 'Customer'
     enableAutomation: 'AutomationModel'
+    finishTourOfUser: 'TourOfUser'
     generateAutodeck: 'CreateWorkspaceJobType'
     generateWorkspaceFromCSV: 'Customer'
     handleUserStateInWorkspace: 'UserCustomer'
@@ -3262,6 +3440,7 @@ export interface NexusGenFieldTypeNames {
     setActionRequestStatus: 'ActionRequest'
     setDialoguePrivacy: 'Dialogue'
     singleUpload: 'ImageType'
+    toggleDialogueSchedule: 'DialogueSchedule'
     updateAutomation: 'AutomationModel'
     updateCTA: 'QuestionNode'
     updateCreateWorkspaceJob: 'CreateWorkspaceJobType'
@@ -3269,6 +3448,7 @@ export interface NexusGenFieldTypeNames {
     updatePermissions: 'RoleType'
     updateQuestion: 'QuestionNode'
     updateRoles: 'RoleType'
+    updateUserTour: 'UserTour'
     uploadJobImage: 'AWSImageType'
     uploadUpsellImage: 'ImageType'
     verifyActionRequest: 'ActionRequest'
@@ -3541,6 +3721,27 @@ export interface NexusGenFieldTypeNames {
     nrVotes: 'Int'
     subTopics: 'TopicType'
   }
+  Tour: { // field return type name
+    featureTours: 'UserTour'
+    releaseTour: 'UserTour'
+  }
+  TourOfUser: { // field return type name
+    createdAt: 'Date'
+    seenAt: 'Date'
+    tour: 'UserTour'
+    updatedAt: 'Date'
+    user: 'UserType'
+    userId: 'String'
+    userTourId: 'String'
+  }
+  TourStep: { // field return type name
+    createdAt: 'Date'
+    helperKey: 'String'
+    id: 'String'
+    imageUrlKey: 'String'
+    titleKey: 'String'
+    updatedAt: 'Date'
+  }
   TriggerConditionType: { // field return type name
     id: 'Int'
     maxValue: 'Int'
@@ -3588,6 +3789,16 @@ export interface NexusGenFieldTypeNames {
     role: 'RoleType'
     user: 'UserType'
   }
+  UserTour: { // field return type name
+    createdAt: 'Date'
+    id: 'String'
+    steps: 'TourStep'
+    triggerPage: 'String'
+    triggerVersion: 'String'
+    type: 'TourType'
+    updatedAt: 'Date'
+    usersOfTour: 'TourOfUser'
+  }
   UserType: { // field return type name
     assignedDialogues: 'AssignedDialogues'
     customers: 'Customer'
@@ -3601,6 +3812,7 @@ export interface NexusGenFieldTypeNames {
     phone: 'String'
     role: 'RoleType'
     roleId: 'String'
+    tours: 'Tour'
     userCustomers: 'UserCustomer'
   }
   VerifyUserTokenOutput: { // field return type name
@@ -3786,6 +3998,9 @@ export interface NexusGenArgTypes {
     copyDialogue: { // args
       input?: NexusGenInputs['CreateDialogueInputType'] | null; // CreateDialogueInputType
     }
+    createAndDispatchUserTour: { // args
+      input: NexusGenInputs['CreateUserTourInput']; // CreateUserTourInput!
+    }
     createAutomation: { // args
       input?: NexusGenInputs['CreateAutomationInput'] | null; // CreateAutomationInput
     }
@@ -3803,6 +4018,9 @@ export interface NexusGenArgTypes {
     }
     createDialogue: { // args
       input?: NexusGenInputs['CreateDialogueInputType'] | null; // CreateDialogueInputType
+    }
+    createDialogueSchedule: { // args
+      input: NexusGenInputs['CreateDialogueScheduleInput']; // CreateDialogueScheduleInput!
     }
     createJobProcessLocation: { // args
       input?: NexusGenInputs['createJobProcessLocationInput'] | null; // createJobProcessLocationInput
@@ -3829,6 +4047,9 @@ export interface NexusGenArgTypes {
     }
     createTrigger: { // args
       input?: NexusGenInputs['CreateTriggerInputType'] | null; // CreateTriggerInputType
+    }
+    createUserTour: { // args
+      input: NexusGenInputs['CreateUserTourInput']; // CreateUserTourInput!
     }
     createWorkspace: { // args
       input?: NexusGenInputs['CreateWorkspaceInput'] | null; // CreateWorkspaceInput
@@ -3861,6 +4082,10 @@ export interface NexusGenArgTypes {
     deselectTopic: { // args
       input?: NexusGenInputs['DeselectTopicInput'] | null; // DeselectTopicInput
     }
+    dispatchUserTour: { // args
+      id: string; // String!
+      userIds?: string[] | null; // [String!]
+    }
     duplicateQuestion: { // args
       questionId?: string | null; // String
     }
@@ -3891,6 +4116,9 @@ export interface NexusGenArgTypes {
     }
     enableAutomation: { // args
       input?: NexusGenInputs['EnableAutomationInput'] | null; // EnableAutomationInput
+    }
+    finishTourOfUser: { // args
+      input: NexusGenInputs['FinishTourOfUserInput']; // FinishTourOfUserInput!
     }
     generateAutodeck: { // args
       input?: NexusGenInputs['GenerateAutodeckInput'] | null; // GenerateAutodeckInput
@@ -3943,6 +4171,9 @@ export interface NexusGenArgTypes {
     singleUpload: { // args
       file: NexusGenScalars['Upload']; // Upload!
     }
+    toggleDialogueSchedule: { // args
+      input: NexusGenInputs['ToggleDialogueScheduleInput']; // ToggleDialogueScheduleInput!
+    }
     updateAutomation: { // args
       input?: NexusGenInputs['CreateAutomationInput'] | null; // CreateAutomationInput
     }
@@ -3969,6 +4200,9 @@ export interface NexusGenArgTypes {
     updateRoles: { // args
       permissions?: NexusGenInputs['PermissionIdsInput'] | null; // PermissionIdsInput
       roleId?: string | null; // String
+    }
+    updateUserTour: { // args
+      input: NexusGenInputs['CreateUserTourInput']; // CreateUserTourInput!
     }
     uploadJobImage: { // args
       disapproved?: boolean | null; // Boolean

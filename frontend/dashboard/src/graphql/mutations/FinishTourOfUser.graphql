@@ -1,0 +1,10 @@
+mutation FinishTourOfUser($input: FinishTourOfUserInput!) {
+	finishTourOfUser(input: $input) {
+		tour {
+			id
+			triggerVersion
+			triggerPage
+		}
+		seenAt
+	}
+}

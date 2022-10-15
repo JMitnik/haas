@@ -1,8 +1,10 @@
 import { makeTestContext } from '../../../test/utils/makeTestContext';
-import { clearDatabase, prepDefaultCreateData, prepDefaultUpdateData } from './testUtils';
+import {  prepDefaultCreateData, prepDefaultUpdateData } from './testUtils';
 import AuthService from '../../auth/AuthService';
 import { constructValidUpdateAutomationInputData } from './testData';
 import { prisma } from '../../../test/setup/singletonDeps';
+
+import { clearDatabase } from '../../../test/utils/clearDatabase';
 
 jest.setTimeout(30000);
 

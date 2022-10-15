@@ -4,6 +4,17 @@ query GetWorkspaceSessions(
 ) {
   customer(id: $workspaceId) {
     id
+    dialogueSchedule {
+      id
+      isEnabled
+      dataPeriodSchedule {
+        id
+        activeStartDate
+        activeEndDate
+        startDateExpression
+        endInDeltaMinutes
+      }
+    }
    	sessionConnection(filter: $filter) {
 			sessions {
 				...SessionFragment

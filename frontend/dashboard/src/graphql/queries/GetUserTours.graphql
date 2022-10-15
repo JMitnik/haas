@@ -1,0 +1,12 @@
+query GetUserTours($userId: String!) {
+  user(userId: $userId) {
+    tours {
+      featureTours {
+        ...UserTourFragment
+      }
+      releaseTour {
+        ...UserTourFragment
+      }
+    }
+  }
+}

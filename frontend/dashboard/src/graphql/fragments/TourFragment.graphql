@@ -1,0 +1,11 @@
+fragment UserTourFragment on UserTour {
+  id
+  type
+  triggerPage
+  triggerVersion
+  steps {
+    titleKey
+    helperKey
+    imageUrlKey
+  }
+}
