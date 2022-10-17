@@ -61,6 +61,7 @@ export class Cron {
     }
   }
 
+  /** Converts an ordinary CRON string into an AWS ready CRON string */
   toAWSCronString = (): string => {
     const { minutes, hours, dayOfMonth, dayOfWeek, month } = this.toSplitted();
 
