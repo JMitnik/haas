@@ -58,7 +58,7 @@ class AutomationService {
     const deleteAutomation = await this.automationPrismaAdapter.deleteAutomation(input);
 
     if (deleteAutomation.automationScheduledId) {
-      const eventBridgeWrapper = new EventBridge({ ...deleteAutomation, automationScheduled: null });
+      const eventBridgeWrapper = new EventBridge({ ...deleteAutomation, automationScheduled: null }, this.prisma);
       await eventBridgeWrapper.delete();
     }
 
@@ -73,7 +73,7 @@ class AutomationService {
     const enabledAutomation = await this.automationPrismaAdapter.enableAutomation(input);
 
     if (enabledAutomation.type === AutomationType.SCHEDULED && enabledAutomation.automationScheduledId) {
-      const eventBridgeWrapper = new EventBridge(enabledAutomation);
+      const eventBridgeWrapper = new EventBridge(enabledAutomation, this.prisma);
       await eventBridgeWrapper.enable(input.state);
     }
 
@@ -105,8 +105,8 @@ class AutomationService {
           ?.slug;
       }
 
-      const eventBridgeWrapper = new EventBridge(updatedAutomation);
-      await eventBridgeWrapper.upsert(botUser, workspace.slug, dialogueSlug);
+      const eventBridgeWrapper = new EventBridge(updatedAutomation, this.prisma);
+      await eventBridgeWrapper.upsert();
     }
 
     return updatedAutomation;
@@ -139,8 +139,8 @@ class AutomationService {
             ?.slug;
         }
 
-        const eventBridgeWrapper = new EventBridge(createdAutomation);
-        await eventBridgeWrapper.upsert(botUser, workspace.slug, dialogueSlug);
+        const eventBridgeWrapper = new EventBridge(createdAutomation, this.prisma);
+        await eventBridgeWrapper.upsert();
       }
     } catch {
       await this.automationPrismaAdapter.deleteAutomation({

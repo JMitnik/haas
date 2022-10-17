@@ -1,4 +1,4 @@
-import { AutomationType, PrismaClient } from 'prisma/prisma-client';
+import { PrismaClient } from 'prisma/prisma-client';
 
 import { DialogueSchedulePrismaAdapter } from './DialogueSchedulePrismaAdapter';
 import {
@@ -6,16 +6,19 @@ import {
   CreateDialogueScheduleOutput,
 } from './DialogueSchedule.types';
 import { DialogueSchedule } from './DialogueSchedule.helper';
-// import AutomationService from '../automations/AutomationService';
 import { AutomationPrismaAdapter } from '../automations/AutomationPrismaAdapter';
-import { Cron } from './Cron.helper';
-import { CreateAutomationInput } from 'models/automations/AutomationTypes';
-import { constructCreateAutomationInput } from 'models/automations/AutomationService.helpers';
+import { EventBridge } from '../automations/EventBridge.helper';
+import UserService from '../users/UserService';
+import CustomerService from '../customer/CustomerService';
+import { assertNonNullish } from '../../utils/assertNonNullish';
+import DialogueService from '../questionnaire/DialogueService';
+import { AutomationWithSchedule } from 'models/automations/AutomationService.types';
 
 export class DialogueScheduleService {
   private prisma: PrismaClient;
   private prismaAdapter: DialogueSchedulePrismaAdapter;
   private automationPrismaAdapter: AutomationPrismaAdapter;
+
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
@@ -46,15 +49,20 @@ export class DialogueScheduleService {
 
     const scheduleWrapper = new DialogueSchedule(schedule);
     // TODO: Actually create 1-1 relation with automation but for now they will have same ID as DialogueSchedule
-    const automation = await this.automationPrismaAdapter.findAutomationById(schedule.id);
+    let automation: AutomationWithSchedule | null = await this.automationPrismaAdapter.findAutomationById(schedule.id);
+
     if (!automation) {
-      const automationInput = scheduleWrapper.constructDialogueLinkCreateAutomationInput(input.workspaceId);
-      await this.automationPrismaAdapter.createAutomation(automationInput);
+      const automationInput = scheduleWrapper.constructDialogueLinkCreateAutomationInput(
+        schedule.id, input.workspaceId
+      );
+      automation = await this.automationPrismaAdapter.createAutomation(automationInput);
     } else {
       const automationInput = scheduleWrapper.constructDialogueLinkUpdateAutomationInput();
-      await this.automationPrismaAdapter.update(automation.id, automationInput);
+      automation = await this.automationPrismaAdapter.update(automation.id, automationInput);
     }
 
+    const eventBridgeWrapper = new EventBridge(automation, this.prisma);
+    await eventBridgeWrapper.upsert();
 
     return { dialogueSchedule: schedule };
   }

@@ -1,5 +1,5 @@
 import * as AWS from 'aws-sdk';
-import { AutomationAction, AutomationActionType, User } from 'prisma/prisma-client';
+import { AutomationAction, AutomationActionType, PrismaClient, User } from 'prisma/prisma-client';
 import { GraphQLYogaError } from '@graphql-yoga/node';
 
 import { dashboardDialogueUrl, workspaceDashboardUrl } from '../Common/Mappings/DashboardMappings.helpers';
@@ -16,37 +16,52 @@ import {
 import {
   buildFrequencyCronString, findReportQueryParamsByCron, parseScheduleToCron,
 } from '../automations/AutomationService.helpers';
+import input from 'inquirer/lib/prompts/input';
+import CustomerService from '../customer/CustomerService';
+import DialogueService from '../questionnaire/DialogueService';
+import UserService from '../users/UserService';
 
 export class EventBridge {
   private eventBridge: AWS.EventBridge;
   private awsServiceMap: AWSServiceMap;
+  private userService: UserService;
+  private customerService: CustomerService;
+  private dialogueService: DialogueService;
 
-  constructor(public automation: AutomationWithSchedule) {
+  constructor(public automation: AutomationWithSchedule, prisma: PrismaClient) {
     this.eventBridge = new AWS.EventBridge();
     this.awsServiceMap = new AWSServiceMap(process.env.AWS_ACCOUNT_ID as string, new AWS.Config());
+    this.userService = new UserService(prisma);
+    this.customerService = new CustomerService(prisma);
+    this.dialogueService = new DialogueService(prisma);
   }
 
   public async delete() {
     assertNonNullish(this.automation.automationScheduledId, 'No scheduled automation available!');
-    await this.eventBridge.disableRule({
-      Name: this.automation.automationScheduledId,
-    }).promise();
+    try {
+      await this.eventBridge.disableRule({
+        Name: this.automation.automationScheduledId,
+      }).promise();
 
-    const targets = await this.eventBridge.listTargetsByRule({
-      Rule: this.automation.automationScheduledId,
-    }).promise();
+      const targets = await this.eventBridge.listTargetsByRule({
+        Rule: this.automation.automationScheduledId,
+      }).promise();
 
-    const targetIds = targets.Targets?.map((target) => target.Id) || [];
+      const targetIds = targets.Targets?.map((target) => target.Id) || [];
 
-    await this.eventBridge.removeTargets({
-      Force: true,
-      Rule: this.automation.automationScheduledId,
-      Ids: targetIds,
-    }).promise();
+      await this.eventBridge.removeTargets({
+        Force: true,
+        Rule: this.automation.automationScheduledId,
+        Ids: targetIds,
+      }).promise();
 
-    await this.eventBridge.deleteRule({
-      Name: this.automation.automationScheduledId,
-    }).promise();
+      await this.eventBridge.deleteRule({
+        Name: this.automation.automationScheduledId,
+      }).promise();
+    } catch (e) {
+      logger.error('Something went wrong removing event bridge', e);
+    }
+
   }
 
   public async enable(state: boolean) {
@@ -69,13 +84,20 @@ export class EventBridge {
   /**
    * Upserts an AWS EventBridge (and its targets) based on a scheduled automation.
    */
-  public upsert = async (
-    botUser: User,
-    workspaceSlug: string,
-    dialogueSlug?: string,
-  ) => {
+  public upsert = async () => {
     assertNonNullish(this.automation.automationScheduled, 'No scheduled automation available!');
     assertNonNullish(this.automation.automationScheduledId, 'No scheduled automation available!');
+
+    const workspace = await this.customerService.findWorkspaceById(this.automation.workspaceId);
+    assertNonNullish(workspace, 'Cannot find workspace while updating automation');
+    const botUser = await this.userService.findBotByWorkspaceName(workspace?.slug);
+    assertNonNullish(botUser, 'Cannot find bot user while updating automation');
+    let dialogueSlug;
+
+    if (this.automation?.automationScheduled?.dialogueId) {
+      dialogueSlug = (await this.dialogueService.getDialogueById(this.automation.automationScheduled.dialogueId))
+        ?.slug;
+    }
 
     const cronExpression = parseScheduleToCron(this.automation.automationScheduled);
     // Find the state of the automation and adjust event bridge rule to that
@@ -86,7 +108,7 @@ export class EventBridge {
       this.automation.automationScheduledId,
       this.automation.automationScheduled?.actions || [],
       botUser,
-      workspaceSlug,
+      workspace.slug,
       dialogueSlug,
     );
 

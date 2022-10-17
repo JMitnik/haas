@@ -349,6 +349,13 @@ export class AutomationPrismaAdapter {
         id: automationId,
       },
       data,
+      include: {
+        automationScheduled: {
+          include: {
+            actions: true,
+          },
+        },
+      },
     })
   }
 
@@ -402,9 +409,11 @@ export class AutomationPrismaAdapter {
    * @returns an created Automation
    */
   createAutomation = async (input: CreateAutomationInput) => {
-    const { description, workspaceId, label, automationType } = input;
+    const { description, workspaceId, label, automationType, id, isActive } = input;
     return this.prisma.automation.create({
       data: {
+        id,
+        isActive,
         label: label,
         type: automationType,
         description,

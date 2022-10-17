@@ -1,6 +1,6 @@
 import { constructCreateAutomationInput } from '../automations/AutomationService.helpers';
 import { CreateAutomationInput } from '../automations/AutomationTypes';
-import { AutomationType, Prisma } from 'prisma/prisma-client';
+import { AutomationEventType, AutomationType, Prisma } from 'prisma/prisma-client';
 import { assertNonNullish } from '../../utils/assertNonNullish';
 import { Cron } from './Cron.helper';
 import { DialogueScheduleFields } from './DialogueSchedule.types';
@@ -31,14 +31,18 @@ export class DialogueSchedule {
     return updateAutomationInput;
   }
 
-  public constructDialogueLinkCreateAutomationInput(workspaceId: string) {
+  public constructDialogueLinkCreateAutomationInput(automationId: string, workspaceId: string): CreateAutomationInput {
     assertNonNullish(this.fields.evaluationPeriodSchedule?.startDateExpression, 'No evaluation time available');
     const cron = new Cron(this.fields.evaluationPeriodSchedule?.startDateExpression);
 
     const automationInput: CreateAutomationInput = constructCreateAutomationInput({
+      id: automationId,
       schedule: {
         ...cron.toSplitted(),
         type: 'CUSTOM',
+      },
+      event: {
+        eventType: AutomationEventType.RECURRING,
       },
       automationType: AutomationType.SCHEDULED,
       label: 'Dialogue Link',
@@ -49,7 +53,7 @@ export class DialogueSchedule {
       }],
     });
 
-    return automationInput;
+    return { ...automationInput, isActive: true };
   }
 
   /**
