@@ -288,6 +288,7 @@ export interface NexusGenInputs {
   CreateDialogueScheduleInput: { // input type
     dataPeriod: NexusGenInputs['CreateDataPeriodInput']; // CreateDataPeriodInput!
     evaluationPeriod?: NexusGenInputs['CreateEvaluationPeriodInput'] | null; // CreateEvaluationPeriodInput
+    id?: string | null; // String
     workspaceId: string; // String!
   }
   CreateEvaluationPeriodInput: { // input type

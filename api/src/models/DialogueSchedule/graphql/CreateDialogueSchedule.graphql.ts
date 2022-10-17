@@ -27,6 +27,7 @@ export const CreateDialogueScheduleInput = inputObjectType({
   description: 'Input for creating a dialogue schedule.',
 
   definition(t) {
+    t.string('id');
     t.nonNull.string('workspaceId');
     t.nonNull.field('dataPeriod', { type: CreateDataPeriodInput });
     t.field('evaluationPeriod', { type: CreateEvaluationPeriodInput });

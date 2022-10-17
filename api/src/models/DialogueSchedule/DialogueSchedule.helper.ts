@@ -1,3 +1,8 @@
+import { constructCreateAutomationInput } from '../automations/AutomationService.helpers';
+import { CreateAutomationInput } from '../automations/AutomationTypes';
+import { AutomationType, Prisma } from 'prisma/prisma-client';
+import { assertNonNullish } from '../../utils/assertNonNullish';
+import { Cron } from './Cron.helper';
 import { DialogueScheduleFields } from './DialogueSchedule.types';
 import { SchedulePeriod } from './SchedulePeriod.helper';
 
@@ -11,6 +16,40 @@ export class DialogueSchedule {
   constructor(public fields: DialogueScheduleFields) {
     this.dataPeriodSchedule = this.makeDataPeriodSchedule();
     this.evalPeriodSchedule = this.makeEvalPeriodSchedule();
+  }
+
+  public constructDialogueLinkUpdateAutomationInput() {
+    assertNonNullish(this.fields.evaluationPeriodSchedule?.startDateExpression, 'No evaluation time available');
+    const cron = new Cron(this.fields.evaluationPeriodSchedule?.startDateExpression);
+    const updateAutomationInput: Prisma.AutomationUpdateInput = {
+      automationScheduled: {
+        update: {
+          ...cron.toSplitted(),
+        },
+      },
+    }
+    return updateAutomationInput;
+  }
+
+  public constructDialogueLinkCreateAutomationInput(workspaceId: string) {
+    assertNonNullish(this.fields.evaluationPeriodSchedule?.startDateExpression, 'No evaluation time available');
+    const cron = new Cron(this.fields.evaluationPeriodSchedule?.startDateExpression);
+
+    const automationInput: CreateAutomationInput = constructCreateAutomationInput({
+      schedule: {
+        ...cron.toSplitted(),
+        type: 'CUSTOM',
+      },
+      automationType: AutomationType.SCHEDULED,
+      label: 'Dialogue Link',
+      description: 'Sends a dialogue link to team owners',
+      workspaceId: workspaceId,
+      actions: [{
+        type: 'SEND_DIALOGUE_LINK',
+      }],
+    });
+
+    return automationInput;
   }
 
   /**

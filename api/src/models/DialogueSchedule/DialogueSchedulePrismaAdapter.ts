@@ -94,7 +94,9 @@ export class DialogueSchedulePrismaAdapter {
           },
         } : undefined,
       },
-      include: query.include,
+      include: {
+        ...defaultDialogueSchedule.include,
+      },
     })
   }
 }

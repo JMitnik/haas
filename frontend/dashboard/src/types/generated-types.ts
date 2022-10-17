@@ -658,6 +658,7 @@ export type CreateDialogueInputType = {
 
 /** Input for creating a dialogue schedule. */
 export type CreateDialogueScheduleInput = {
+  id?: Maybe<Scalars['String']>;
   workspaceId: Scalars['String'];
   dataPeriod: CreateDataPeriodInput;
   evaluationPeriod?: Maybe<CreateEvaluationPeriodInput>;

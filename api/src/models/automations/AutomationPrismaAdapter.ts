@@ -336,6 +336,15 @@ export class AutomationPrismaAdapter {
     });
   };
 
+  update = async (automationId: string, data: Prisma.AutomationUpdateInput) => {
+    return this.prisma.automation.update({
+      where: {
+        id: automationId,
+      },
+      data,
+    })
+  }
+
   /**
    * Updates an automation based on provided input
    * @param input an object containing all information necessary to update an automation
