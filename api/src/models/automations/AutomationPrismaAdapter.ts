@@ -333,6 +333,13 @@ export class AutomationPrismaAdapter {
       data: {
         isActive: input.state,
       },
+      include: {
+        automationScheduled: {
+          include: {
+            actions: true,
+          },
+        },
+      },
     });
   };
 

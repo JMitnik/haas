@@ -4,6 +4,7 @@ import {
   AutomationScheduled,
 } from 'prisma/prisma-client';
 import * as AWS from 'aws-sdk';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 import { offsetPaginate } from '../general/PaginationHelpers';
 import { NexusGenInputs } from '../../generated/nexus';
@@ -17,13 +18,10 @@ import {
   getDayRange,
   constructUpdateAutomationInput,
   constructCreateAutomationInput,
-  parseScheduleToCron,
 } from './AutomationService.helpers';
-import { WorkspaceWithRoles } from './AutomationService.types';
-import { Automation } from './AutomationTypes';
 import ScheduledAutomationService from './ScheduledAutomationService';
-import { logger } from '../../config/logger';
-import { GraphQLYogaError } from '@graphql-yoga/node';
+import { EventBridge } from './EventBridge.helper';
+import { assertNonNullish } from '../../utils/assertNonNullish';
 
 class AutomationService {
   automationPrismaAdapter: AutomationPrismaAdapter;
@@ -52,58 +50,6 @@ class AutomationService {
   }
 
   /**
-   * Upserts an AWS EventBridge (and its targets) based on a scheduled automation.
-   */
-  upsertEventBridge = async (
-    workspaceId: string,
-    automationScheduled: AutomationScheduled,
-    automation: Automation,
-    dialogueId?: string
-  ) => {
-    const cronExpression = parseScheduleToCron(automationScheduled);
-
-    // Find the state of the automation and adjust event bridge rule to that
-    const state = automation?.isActive ? 'ENABLED' : 'DISABLED';
-
-    // Get relevant parameters
-    const workspace = await this.customerService.findWorkspaceById(workspaceId) as WorkspaceWithRoles;
-    const dialogue = dialogueId ? await this.dialogueService.getDialogueById(dialogueId) : undefined;
-
-    // If no bot user exists in the workspace => Create one
-    let botUser = await this.userService.findBotByWorkspaceName(workspace.slug);
-    if (!botUser) {
-      await this.customerService.createBotUser(workspace.id, workspace.slug, workspace.roles);
-      botUser = await this.userService.findBotByWorkspaceName(workspace.slug);
-    };
-
-    // Map actions to relevant Lambda ARNS for eventbridge to use as targets
-    const ruleTargets = await this.scheduledAutomationService.mapActionsToTargets(
-      automationScheduled.id,
-      automation.automationScheduled?.actions || [],
-      botUser!,
-      workspace.slug,
-      dialogue?.slug,
-    );
-
-    await this.eventBridge.putRule({
-      Name: automationScheduled.id,
-      ScheduleExpression: cronExpression,
-      State: state,
-    }).promise().catch((e) => {
-      logger.error(`Unable to put EventBridge rule to automation ${automationScheduled.id}`, e);
-      throw new GraphQLYogaError('Internal error');
-    });
-
-    await this.eventBridge.putTargets({
-      Rule: automationScheduled.id,
-      Targets: ruleTargets,
-    }).promise().catch((e) => {
-      logger.error(`Unable to add EventBridge targets to automation ${automationScheduled.id}`, e);
-      throw new GraphQLYogaError('Internal error');
-    });
-  }
-
-  /**
    * Deletes an automation as well as its related AWS resources
    * @param input
    * @returns the deleted automation
@@ -112,26 +58,8 @@ class AutomationService {
     const deleteAutomation = await this.automationPrismaAdapter.deleteAutomation(input);
 
     if (deleteAutomation.automationScheduledId) {
-      // Disable in case removing fails for some reason so we don't create orphan rules which still run
-      await this.eventBridge.disableRule({
-        Name: deleteAutomation.automationScheduledId,
-      }).promise();
-
-      const targets = await this.eventBridge.listTargetsByRule({
-        Rule: deleteAutomation.automationScheduledId,
-      }).promise();
-
-      const targetIds = targets.Targets?.map((target) => target.Id) || [];
-
-      await this.eventBridge.removeTargets({
-        Force: true,
-        Rule: deleteAutomation.automationScheduledId,
-        Ids: targetIds,
-      }).promise();
-
-      await this.eventBridge.deleteRule({
-        Name: deleteAutomation.automationScheduledId,
-      }).promise();
+      const eventBridgeWrapper = new EventBridge({ ...deleteAutomation, automationScheduled: null });
+      await eventBridgeWrapper.delete();
     }
 
     return deleteAutomation;
@@ -145,19 +73,8 @@ class AutomationService {
     const enabledAutomation = await this.automationPrismaAdapter.enableAutomation(input);
 
     if (enabledAutomation.type === AutomationType.SCHEDULED && enabledAutomation.automationScheduledId) {
-      if (input.state) {
-        await this.eventBridge.enableRule({
-          Name: enabledAutomation.automationScheduledId,
-        }).promise().catch((e) => {
-          logger.error('Unable to enable rule', e);
-        })
-      } else {
-        await this.eventBridge.disableRule({
-          Name: enabledAutomation.automationScheduledId,
-        }).promise().catch((e) => {
-          logger.error('Unable to disable rule', e);
-        });
-      }
+      const eventBridgeWrapper = new EventBridge(enabledAutomation);
+      await eventBridgeWrapper.enable(input.state);
     }
 
     return enabledAutomation;
@@ -177,12 +94,19 @@ class AutomationService {
     if (updatedAutomation.type === AutomationType.SCHEDULED
       && updatedAutomation.automationScheduled
     ) {
-      await this.upsertEventBridge(
-        input.workspaceId as string,
-        updatedAutomation.automationScheduled,
-        updatedAutomation,
-        input.schedule?.dialogueId || undefined,
-      );
+      const workspace = await this.customerService.findWorkspaceById(input.workspaceId as string);
+      assertNonNullish(workspace, 'Cannot find workspace while updating automation');
+      const botUser = await this.userService.findBotByWorkspaceName(workspace?.slug);
+      assertNonNullish(botUser, 'Cannot find bot user while updating automation');
+      let dialogueSlug;
+
+      if (updatedAutomation.automationScheduled.dialogueId) {
+        dialogueSlug = (await this.dialogueService.getDialogueById(updatedAutomation.automationScheduled.dialogueId))
+          ?.slug;
+      }
+
+      const eventBridgeWrapper = new EventBridge(updatedAutomation);
+      await eventBridgeWrapper.upsert(botUser, workspace.slug, dialogueSlug);
     }
 
     return updatedAutomation;
@@ -204,12 +128,19 @@ class AutomationService {
       if (createdAutomation.type === AutomationType.SCHEDULED
         && createdAutomation.automationScheduled
       ) {
-        await this.upsertEventBridge(
-          input.workspaceId as string,
-          createdAutomation.automationScheduled,
-          createdAutomation,
-          input.schedule?.dialogueId || undefined,
-        );
+        const workspace = await this.customerService.findWorkspaceById(input.workspaceId as string);
+        assertNonNullish(workspace, 'Cannot find workspace while updating automation');
+        const botUser = await this.userService.findBotByWorkspaceName(workspace?.slug);
+        assertNonNullish(botUser, 'Cannot find bot user while updating automation');
+        let dialogueSlug;
+
+        if (createdAutomation.automationScheduled.dialogueId) {
+          dialogueSlug = (await this.dialogueService.getDialogueById(createdAutomation.automationScheduled.dialogueId))
+            ?.slug;
+        }
+
+        const eventBridgeWrapper = new EventBridge(createdAutomation);
+        await eventBridgeWrapper.upsert(botUser, workspace.slug, dialogueSlug);
       }
     } catch {
       await this.automationPrismaAdapter.deleteAutomation({
