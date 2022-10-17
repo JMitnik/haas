@@ -16,7 +16,6 @@ import {
 import {
   buildFrequencyCronString, findReportQueryParamsByCron, parseScheduleToCron,
 } from '../automations/AutomationService.helpers';
-import input from 'inquirer/lib/prompts/input';
 import CustomerService from '../customer/CustomerService';
 import DialogueService from '../questionnaire/DialogueService';
 import UserService from '../users/UserService';
@@ -36,6 +35,9 @@ export class EventBridge {
     this.dialogueService = new DialogueService(prisma);
   }
 
+  /**
+   * Deletes an EventBridge rule and its targets based on automation schedule ID
+   */
   public async delete() {
     assertNonNullish(this.automation.automationScheduledId, 'No scheduled automation available!');
     try {
@@ -64,6 +66,9 @@ export class EventBridge {
 
   }
 
+  /**
+   * Enables/Disables an EventBridge rule
+   */
   public async enable(state: boolean) {
     assertNonNullish(this.automation.automationScheduledId, 'No scheduled automation available!');
     if (state) {

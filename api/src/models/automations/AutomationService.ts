@@ -94,17 +94,6 @@ class AutomationService {
     if (updatedAutomation.type === AutomationType.SCHEDULED
       && updatedAutomation.automationScheduled
     ) {
-      const workspace = await this.customerService.findWorkspaceById(input.workspaceId as string);
-      assertNonNullish(workspace, 'Cannot find workspace while updating automation');
-      const botUser = await this.userService.findBotByWorkspaceName(workspace?.slug);
-      assertNonNullish(botUser, 'Cannot find bot user while updating automation');
-      let dialogueSlug;
-
-      if (updatedAutomation.automationScheduled.dialogueId) {
-        dialogueSlug = (await this.dialogueService.getDialogueById(updatedAutomation.automationScheduled.dialogueId))
-          ?.slug;
-      }
-
       const eventBridgeWrapper = new EventBridge(updatedAutomation, this.prisma);
       await eventBridgeWrapper.upsert();
     }
@@ -128,17 +117,6 @@ class AutomationService {
       if (createdAutomation.type === AutomationType.SCHEDULED
         && createdAutomation.automationScheduled
       ) {
-        const workspace = await this.customerService.findWorkspaceById(input.workspaceId as string);
-        assertNonNullish(workspace, 'Cannot find workspace while updating automation');
-        const botUser = await this.userService.findBotByWorkspaceName(workspace?.slug);
-        assertNonNullish(botUser, 'Cannot find bot user while updating automation');
-        let dialogueSlug;
-
-        if (createdAutomation.automationScheduled.dialogueId) {
-          dialogueSlug = (await this.dialogueService.getDialogueById(createdAutomation.automationScheduled.dialogueId))
-            ?.slug;
-        }
-
         const eventBridgeWrapper = new EventBridge(createdAutomation, this.prisma);
         await eventBridgeWrapper.upsert();
       }
@@ -149,7 +127,6 @@ class AutomationService {
       });
       throw new GraphQLYogaError('Failed to create an automation in cloud');
     }
-
 
     return createdAutomation;
   }
