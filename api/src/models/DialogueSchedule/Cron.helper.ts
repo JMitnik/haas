@@ -12,13 +12,13 @@ export class Cron {
   public splitCron: SplitCron;
 
   constructor(public cron: string) {
-    this.splitCron = this.toSplitted();
+    this.splitCron = this.toSplit();
   }
 
   /**
    * Converts an ordinary CRON string into an AWS ready CRON string
    */
-  public toAWSCronString() {
+  public toAWSCronString(): string {
     const { minutes, hours, dayOfMonth, dayOfWeek, month } = this.splitCron;
 
     // Transform the CRON expression to one supported by AWS (? indicator is not part of cron-validator)
@@ -27,26 +27,10 @@ export class Cron {
   }
 
   /**
-   * Converts the dayOfWeek substring (range) from numerical representation of days to text representation
-   * @returns A Cron object but with text representation of days instead of numerical representation
-   */
-  public convertDayOfWeek(): SplitCron {
-    const splitted = this.splitCron.dayOfWeek.split('-');
-
-    if (splitted.length > 1) {
-      const startDay = this.dayOfWeekByIndex(splitted[0]);
-      const endDay = this.dayOfWeekByIndex(splitted[1]);
-      return { ...this.splitCron, dayOfWeek: `${startDay}-${endDay}` }
-    }
-
-    return { ...this.splitCron, dayOfWeek: this.dayOfWeekByIndex(this.splitCron.dayOfWeek) };
-  }
-
-  /**
    * Splits up a cron string into its separate parts
    * @returns
    */
-  public toSplitted(): SplitCron {
+  public toSplit(): SplitCron {
     const splitCron = this.cron.split(' ');
     if (splitCron.length !== 5) throw new GraphQLYogaError('Provided CRON is incorrect format');
 
@@ -57,6 +41,22 @@ export class Cron {
       month: splitCron[3],
       dayOfWeek: splitCron[4],
     }
+  }
+
+  /**
+   * Converts the dayOfWeek substring (range) from numerical representation of days to text representation
+   * @returns A Cron object but with text representation of days instead of numerical representation
+   */
+  private convertDayOfWeek(): SplitCron {
+    const splitted = this.splitCron.dayOfWeek.split('-');
+
+    if (splitted.length > 1) {
+      const startDay = this.dayOfWeekByIndex(splitted[0]);
+      const endDay = this.dayOfWeekByIndex(splitted[1]);
+      return { ...this.splitCron, dayOfWeek: `${startDay}-${endDay}` }
+    }
+
+    return { ...this.splitCron, dayOfWeek: this.dayOfWeekByIndex(this.splitCron.dayOfWeek) };
   }
 
   /**

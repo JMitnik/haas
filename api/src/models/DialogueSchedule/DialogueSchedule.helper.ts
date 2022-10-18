@@ -24,7 +24,7 @@ export class DialogueSchedule {
     const updateAutomationInput: Prisma.AutomationUpdateInput = {
       automationScheduled: {
         update: {
-          ...cron.toSplitted(),
+          ...cron.toSplit(),
         },
       },
     }
@@ -38,7 +38,7 @@ export class DialogueSchedule {
     const automationInput: CreateAutomationInput = constructCreateAutomationInput({
       id: automationId,
       schedule: {
-        ...cron.toSplitted(),
+        ...cron.toSplit(),
         type: 'CUSTOM',
       },
       event: {
