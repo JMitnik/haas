@@ -1,0 +1,8 @@
+name: (haas) Deploy AWS CDK - Core Temp (API)
+command: yarn aws:deploy:core-temp:{{Environment}}
+description: "Deploys the API stack to the AWS environment."
+tags: ["AWS", "haas", "core"]
+arguments:
+  - name: Environment
+    default_value: staging
+    description: The environment (staging / prod) to push to
