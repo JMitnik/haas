@@ -42,7 +42,7 @@ export class Cron {
    * Splits up a cron string into its separate parts
    * @returns 
    */
-  private toSplitted(): SplitCron {
+  public toSplitted(): SplitCron {
     const splitCron = this.cron.split(' ');
     if (splitCron.length !== 5) throw new GraphQLYogaError('Provided CRON is incorrect format');
 
