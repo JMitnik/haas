@@ -713,11 +713,11 @@ class SessionService {
    * @returns Which type the session alludes to
    */
   private getActionFromSession(session: SessionWithEntries): SessionActionType | null {
-    const contactAction = session.nodeEntries.find((nodeEntry) => (
-      nodeEntry.formNodeEntry?.values.find((val) => !!val.email || !!val.phoneNumber || !!val.shortText)
-    ));
+    // const contactAction = session.nodeEntries.find((nodeEntry) => (
+    //   nodeEntry.formNodeEntry?.values.find((val) => !!val.email || !!val.phoneNumber || !!val.shortText)
+    // ));
 
-    if (contactAction) return 'CONTACT';
+    if (session.actionRequestId) return 'CONTACT';
 
     return null;
   }

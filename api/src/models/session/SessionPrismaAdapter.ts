@@ -717,6 +717,9 @@ class SessionPrismaAdapter {
         ...cloneDeep(query),
         AND: [
           {
+            actionRequestId: {
+              not: undefined,
+            },
             nodeEntries: {
               some: {
                 AND: [
