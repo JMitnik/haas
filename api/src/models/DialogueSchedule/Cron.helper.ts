@@ -15,7 +15,9 @@ export class Cron {
     this.splitCron = this.toSplitted();
   }
 
-  /** Converts an ordinary CRON string into an AWS ready CRON string */
+  /**
+   * Converts an ordinary CRON string into an AWS ready CRON string
+   */
   public toAWSCronString() {
     const { minutes, hours, dayOfMonth, dayOfWeek, month } = this.splitCron;
 
@@ -30,17 +32,19 @@ export class Cron {
    */
   public convertDayOfWeek(): SplitCron {
     const splitted = this.splitCron.dayOfWeek.split('-');
+
     if (splitted.length > 1) {
-      const startDay = this.toDayOfWeek(splitted[0]);
-      const endDay = this.toDayOfWeek(splitted[1]);
+      const startDay = this.dayOfWeekByIndex(splitted[0]);
+      const endDay = this.dayOfWeekByIndex(splitted[1]);
       return { ...this.splitCron, dayOfWeek: `${startDay}-${endDay}` }
     }
-    return { ...this.splitCron, dayOfWeek: this.toDayOfWeek(this.splitCron.dayOfWeek) };
+
+    return { ...this.splitCron, dayOfWeek: this.dayOfWeekByIndex(this.splitCron.dayOfWeek) };
   }
 
   /**
    * Splits up a cron string into its separate parts
-   * @returns 
+   * @returns
    */
   public toSplitted(): SplitCron {
     const splitCron = this.cron.split(' ');
@@ -57,10 +61,10 @@ export class Cron {
 
   /**
    * Maps dayOfWeek cron sub string from number to day shorthand
-   * @param dayOfWeek 
-   * @returns 
+   * @param dayOfWeek
+   * @returns
    */
-  private toDayOfWeek(dayOfWeek: string) {
+  private dayOfWeekByIndex(dayOfWeek: string) {
     const parsedDayOfWeek = parseInt(dayOfWeek);
     switch (parsedDayOfWeek) {
       case 1:
