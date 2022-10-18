@@ -49,36 +49,36 @@ class SessionService {
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prismaClient);
   };
 
-  /**
-   * Creates an actionable (and potentially topic) for the first choice of a session
-   * NOTE: only supports creation of actionable based on first choice layer
-   * @param entries
-   * @param dialogueId
-   */
-  public async createSessionActionRequest(
-    session: SessionWithNodeEntries,
-    dialogueId: string,
-  ) {
-    const entry = session.nodeEntries.find((nodeEntry) => nodeEntry.choiceNodeEntry);
+  // /**
+  //  * Creates an actionable (and potentially topic) for the first choice of a session
+  //  * NOTE: only supports creation of actionable based on first choice layer
+  //  * @param entries
+  //  * @param dialogueId
+  //  */
+  // public async createSessionActionRequest(
+  //   session: SessionWithNodeEntries,
+  //   dialogueId: string,
+  // ) {
+  //   const entry = session.nodeEntries.find((nodeEntry) => nodeEntry.choiceNodeEntry);
 
-    if (entry?.choiceNodeEntry?.value) {
-      const optionValue = entry?.choiceNodeEntry?.value;
-      const targetOption = entry.relatedNode?.options.find((option) => option.value === optionValue);
-      const topicId = targetOption?.topicId;
+  //   if (entry?.choiceNodeEntry?.value) {
+  //     const optionValue = entry?.choiceNodeEntry?.value;
+  //     const targetOption = entry.relatedNode?.options.find((option) => option.value === optionValue);
+  //     const topicId = targetOption?.topicId;
 
-      if (!topicId) {
-        logger.log(
-          `Trying to create actionable with topic value ${optionValue}
-            for dialogue ${dialogueId}, but no option(s) with such a topic found in database`
-        );
-        return;
-      }
+  //     if (!topicId) {
+  //       logger.log(
+  //         `Trying to create actionable with topic value ${optionValue}
+  //           for dialogue ${dialogueId}, but no option(s) with such a topic found in database`
+  //       );
+  //       return;
+  //     }
 
-      const dialogue = await this.dialoguePrismaAdapter.getDialogueById(dialogueId) as Dialogue;
-      const issue = await this.issuePrismaAdapter.upsertIssueByTopicId(dialogue.customerId, topicId);
-      await this.ActionRequestPrismaAdapter.createActionRequest(dialogueId, issue.id, session.id);
-    }
-  }
+  //     const dialogue = await this.dialoguePrismaAdapter.getDialogueById(dialogueId) as Dialogue;
+  //     const issue = await this.issuePrismaAdapter.upsertIssueByTopicId(dialogue.customerId, topicId);
+  //     await this.ActionRequestPrismaAdapter.createActionRequest(dialogueId, issue.id, session.id);
+  //   }
+  // }
 
   /**
    * Given a list of sessions with node-entries, return an object which maps negative dialogue interactions to their "frequency".
@@ -331,9 +331,9 @@ class SessionService {
       mainScore: mainScore || undefined,
     });
 
-    if (session.mainScore <= 55) {
-      await this.createSessionActionRequest(session, dialogueId);
-    }
+    // if (session.mainScore <= 55) {
+    //   await this.createSessionActionRequest(session, dialogueId);
+    // }
 
     try {
       if (sessionInput.deliveryId) {

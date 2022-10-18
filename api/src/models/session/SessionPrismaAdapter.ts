@@ -1,12 +1,13 @@
 import { Prisma, PrismaClient, Session } from 'prisma/prisma-client';
 import { cloneDeep } from 'lodash';
-import { NexusGenInputs } from '../../generated/nexus';
+import { addDays } from 'date-fns';
 
+import { NexusGenInputs } from '../../generated/nexus';
 import NodeEntryService from '../node-entry/NodeEntryService';
 import { CreateSessionInput } from './SessionPrismaAdapterType';
 import { generateTimeSpent } from './Session.helpers';
-import { SessionConnectionFilterInput } from './Session.types';
-import { addDays } from 'date-fns';
+import { SessionConnectionFilterInput, defaultSessionFields } from './Session.types';
+
 
 class SessionPrismaAdapter {
   prisma: PrismaClient;
@@ -527,18 +528,7 @@ class SessionPrismaAdapter {
       include: {
         nodeEntries: {
           // TODO: Can we define these fields in one place (right now, it exists everywhere).
-          include: {
-            choiceNodeEntry: true,
-            linkNodeEntry: true,
-            registrationNodeEntry: true,
-            textboxNodeEntry: true,
-            relatedNode: {
-              include: { options: true },
-            },
-            formNodeEntry: { include: { values: true } },
-            videoNodeEntry: true,
-            sliderNodeEntry: true,
-          },
+          include: defaultSessionFields.include.nodeEntries.include,
         },
       },
     });
@@ -550,7 +540,7 @@ class SessionPrismaAdapter {
    * Notes:
    * - Includes node-entries
   */
-  findSessionById(sessionId: string): Promise<Session | null> {
+  findSessionById(sessionId: string) {
     return this.prisma.session.findUnique({
       where: {
         id: sessionId,
@@ -558,18 +548,7 @@ class SessionPrismaAdapter {
       include: {
         nodeEntries: {
           orderBy: { depth: 'asc' },
-          include: {
-            choiceNodeEntry: true,
-            linkNodeEntry: true,
-            registrationNodeEntry: true,
-            relatedNode: true,
-            sliderNodeEntry: true,
-            formNodeEntry: {
-              include: {
-                values: true,
-              },
-            },
-          },
+          include: defaultSessionFields.include.nodeEntries.include,
         },
       },
     });
