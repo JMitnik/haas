@@ -26,27 +26,8 @@ export const ChangeableEmailContainer = styled(UI.Div)`
  `}
 `;
 
-export const NewContainer = styled(UI.Div)`
-  ${({ theme }) => css`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    font-weight: 700;
-    text-align: center;
-
-    padding: 2px 6px;
-    border: 1px solid transparent;
-    border-radius: ${theme.borderRadiuses.md}px;
-    box-shadow: ${theme.boxShadows.sm};
-
-    background: ${theme.colors.blue[100]};
-    color: ${theme.colors.blue[500]};
-
-  `}
-`;
 interface StatusContainerProps {
-  status: ActionRequestState;
+  status: string;
   isSelected?: boolean;
 }
 
@@ -87,12 +68,19 @@ export const StatusContainer = styled(UI.Div) <StatusContainerProps>`
       background: ${theme.colors.red[100]};
       color: ${theme.colors.red[500]};
     `}
+
+    ${status === 'NEW' && css`
+      background: ${theme.colors.blue[100]};
+      color: ${theme.colors.blue[500]};
+      pointer-events: none ;
+      cursor: pointer;
+    `}
   `}
 `;
 
 interface StatusBoxProps {
   isSelected?: boolean;
-  status: ActionRequestState;
+  status: string;
   isVerified: boolean;
 }
 

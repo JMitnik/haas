@@ -39,7 +39,7 @@ import SearchBar from 'components/Common/SearchBar/SearchBar';
 import useAuth from 'hooks/useAuth';
 
 import { ActionRequestStatusPicker } from './ActionRequestStatusPicker';
-import { ChangeableEmailContainer, NewContainer } from './ActionRequestOverview.styles';
+import { ChangeableEmailContainer, StatusBox } from './ActionRequestOverview.styles';
 
 const isNewActionRequest = (
   startDate: Date,
@@ -416,7 +416,7 @@ export const ActionRequestOverview = () => {
                       </Table.Cell>
                       <Table.Cell>
                         {isNewActionRequest(dateRange[0], dateRange[1], actionRequest.createdAt) && (
-                          <NewContainer>NEW</NewContainer>
+                          <StatusBox status="NEW" isVerified={false} />
                         )}
                       </Table.Cell>
                     </Table.Row>
