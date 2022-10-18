@@ -25,16 +25,11 @@ import QuestionNodePrismaAdapter from '../QuestionNode/QuestionNodePrismaAdapter
 import EdgeService from '../edge/EdgeService';
 import { offsetPaginate } from '../general/PaginationHelpers';
 import config from '../../config/config';
+import { getRandomInt } from '../../utils/getRandomInt';
+import { getRandomIntFromInterval } from '../../utils/getRandomIntFromInterval';
 import TemplateService from '../templates/TemplateService';
 import { logger } from '../../config/logger';
 import { DialogueScheduleService } from '../DialogueSchedule/DialogueScheduleService';
-
-function getRandomIntFromInterval(min: number, max: number) { // min and max included
-  return Math.floor(Math.random() * (max - min + 1) + min)
-}
-function getRandomInt(max: number) {
-  return Math.floor(Math.random() * Math.floor(max));
-}
 
 class DialogueService {
   dialoguePrismaAdapter: DialoguePrismaAdapter;
@@ -663,10 +658,7 @@ class DialogueService {
   }
 
   /**
-   * Function to paginate through all automations of a workspace
-   * @param workspaceSlug the slug of the workspace
-   * @param filter a filter object used to paginate through automations of a workspace
-   * @returns a list of paginated automations
+   * Function to paginate through dialogues.
    */
   public paginatedDialogues = async (
     workspaceSlug: string,

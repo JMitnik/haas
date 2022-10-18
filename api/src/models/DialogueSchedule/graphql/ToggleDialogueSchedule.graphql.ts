@@ -4,7 +4,7 @@ import { DialogueSchedule } from './DialogueSchedule.graphql';
 
 export const ToggleDialogueScheduleInput = inputObjectType({
   name: 'ToggleDialogueScheduleInput',
-  description: 'Toggle status of dialogue schedule',
+  description: 'Input to Toggle status of dialogue schedule',
 
   definition(t) {
     t.nonNull.id('dialogueScheduleId');
@@ -15,7 +15,7 @@ export const ToggleDialogueScheduleInput = inputObjectType({
 export const ToggleDialogueSchedule = mutationField('toggleDialogueSchedule', {
   type: DialogueSchedule,
   args: { input: nonNull(ToggleDialogueScheduleInput) },
-  description: 'Creates a dialogue schedule in the backend',
+  description: 'Toggle status of dialogue',
 
   resolve(parent, args, ctx) {
     // TODO: Validate input

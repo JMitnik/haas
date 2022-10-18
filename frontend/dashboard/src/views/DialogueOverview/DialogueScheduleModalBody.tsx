@@ -474,8 +474,6 @@ export const DialogueScheduleModalBody = ({
   const submit = (newState: DialogueScheduleState) => {
     setState(newState);
 
-    console.log({ newState });
-
     create({
       variables: {
         input: stateToCreate(newState),

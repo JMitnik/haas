@@ -7,9 +7,9 @@ const language = {
       nl: 'Wij zijn vandaag gesloten!',
     },
     closed_description: {
-      en: 'This dialogue has been closed for today. Check back again later.',
-      de: 'Dieser Dialog wurde für heute geschlossen. Schauen Sie später noch einmal vorbei.',
-      nl: 'Deze dialoog is gesloten voor vandaag. Kom later nog eens terug.',
+      en: 'This dialogue has been closed for today.',
+      de: 'Dieser Dialog wurde für heute geschlossen.',
+      nl: 'Deze dialoog is gesloten voor vandaag.',
     },
     slide_explainer: {
       en: 'Slide left or right',
