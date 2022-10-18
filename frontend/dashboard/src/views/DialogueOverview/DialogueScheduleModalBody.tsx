@@ -64,11 +64,11 @@ const defaultState: DialogueScheduleState = {
 interface StepProps {
   state: DialogueScheduleState;
   onSave?: (state: DialogueScheduleState) => void;
-  onNextStep?: () => void;
-  onPrevStep?: () => void;
+  onNextStep?: (state: DialogueScheduleState) => void;
+  onPrevStep?: (state: DialogueScheduleState) => void;
 }
 
-const IntroStep = ({ onNextStep }: StepProps) => (
+const IntroStep = ({ state, onNextStep }: StepProps) => (
   <UI.ColumnFlex height="100%">
     <UI.ModalBody maxWidth={600} flex="100%" alignItems="center" display="flex">
       <UI.Div>
@@ -96,7 +96,7 @@ const IntroStep = ({ onNextStep }: StepProps) => (
     <UI.ModalFooter>
       <UI.Div>
         <UI.Div>
-          <UI.Button onClick={onNextStep} width="100%" size="md">
+          <UI.Button onClick={() => onNextStep?.(state)} width="100%" size="md">
             Get started
           </UI.Button>
         </UI.Div>
@@ -109,7 +109,7 @@ const dataPeriodSchema = yup.object({
   schedule: yup.string().ensure(),
 });
 
-const DataPeriodStep = ({ state, onSave, onNextStep, onPrevStep }: StepProps) => {
+const DataPeriodStep = ({ state, onNextStep, onPrevStep }: StepProps) => {
   const form = useForm({
     resolver: yupResolver(dataPeriodSchema),
     defaultValues: {
@@ -120,27 +120,23 @@ const DataPeriodStep = ({ state, onSave, onNextStep, onPrevStep }: StepProps) =>
   const { isValid } = form.formState;
   const { handleSubmit } = form;
 
-  const handleSave = () => {
+  const buildNewState = () => {
     const values = form.getValues();
 
-    if (onSave) {
-      onSave({
-        ...state,
-        dataPeriod: {
-          schedule: values.schedule || CustomRecurringType.WEEKLY,
-        },
-      });
-    }
+    return {
+      ...state,
+      dataPeriod: {
+        schedule: values.schedule || CustomRecurringType.WEEKLY,
+      },
+    };
   };
 
   const handleForward = () => {
-    handleSave();
-    onNextStep?.();
+    onNextStep?.(buildNewState());
   };
 
   const goBack = () => {
-    handleSave();
-    onPrevStep?.();
+    onPrevStep?.(buildNewState());
   };
 
   return (
@@ -227,7 +223,7 @@ const evalPeriodSchema = yup.object({
   }),
 });
 
-const EvalPeriodStep = ({ state, onSave, onNextStep, onPrevStep }: StepProps) => {
+const EvalPeriodStep = ({ state, onNextStep, onPrevStep }: StepProps) => {
   const { t } = useTranslation();
   const form = useForm({
     resolver: yupResolver(evalPeriodSchema),
@@ -243,32 +239,28 @@ const EvalPeriodStep = ({ state, onSave, onNextStep, onPrevStep }: StepProps) =>
   const { isValid } = form.formState;
   const { handleSubmit } = form;
 
-  const handleSave = () => {
+  const buildNewState = () => {
     const values = form.getValues();
 
-    if (onSave) {
-      onSave({
-        ...state,
-        evalPeriod: {
-          startDay: values.startDay,
-          startTime: values.startTime,
-          endDay: values.endDay,
-          endTime: values.endTime,
-        },
-      });
-    }
+    return {
+      ...state,
+      evalPeriod: {
+        startDay: values.startDay,
+        startTime: values.startTime,
+        endDay: values.endDay,
+        endTime: values.endTime,
+      },
+    };
   };
 
   const isEnabled = form.watch('isEnabled');
 
   const handleForward = () => {
-    handleSave();
-    onNextStep?.();
+    onNextStep?.(buildNewState());
   };
 
   const goBack = () => {
-    handleSave();
-    onPrevStep?.();
+    onPrevStep?.(buildNewState());
   };
 
   return (
@@ -441,15 +433,13 @@ export const DialogueScheduleModalBody = ({
 
   const activeStep = relevantSteps[activeStepIndex];
 
-  const saveState = (newState: DialogueScheduleState) => {
+  const prevStep = (newState: DialogueScheduleState) => {
     setState(newState);
-  };
-
-  const prevStep = () => {
     setActiveStepIndex((idx) => idx - 1);
   };
 
-  const nextStep = () => {
+  const nextStep = (newState: DialogueScheduleState) => {
+    setState(newState);
     setActiveStepIndex((idx) => idx + 1);
   };
 
@@ -515,11 +505,14 @@ export const DialogueScheduleModalBody = ({
             state={state}
             onNextStep={nextStep}
             onPrevStep={!inEdit ? prevStep : undefined}
-            onSave={saveState}
           />
         )}
         {activeStep === DialogueScheduleStep.EVAL_PERIOD && (
-          <EvalPeriodStep state={state} onPrevStep={prevStep} onSave={submit} />
+          <EvalPeriodStep
+            state={state}
+            onPrevStep={prevStep}
+            onNextStep={submit}
+          />
         )}
       </UI.Div>
     </UI.Div>

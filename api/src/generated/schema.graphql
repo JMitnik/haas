@@ -1626,7 +1626,7 @@ type Mutation {
   setDialoguePrivacy(input: SetDialoguePrivacyInput): Dialogue
   singleUpload(file: Upload!): ImageType
 
-  """Creates a dialogue schedule in the backend"""
+  """Toggle status of dialogue"""
   toggleDialogueSchedule(input: ToggleDialogueScheduleInput!): DialogueSchedule
   updateAutomation(input: CreateAutomationInput): AutomationModel
   updateCTA(input: UpdateCTAInputType): QuestionNode
@@ -2323,7 +2323,7 @@ input TextboxNodeEntryInput {
   value: String
 }
 
-"""Toggle status of dialogue schedule"""
+"""Input to Toggle status of dialogue schedule"""
 input ToggleDialogueScheduleInput {
   dialogueScheduleId: ID!
   status: Boolean!
