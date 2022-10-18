@@ -11,7 +11,7 @@ import {
   withDefault,
 } from 'use-query-params';
 import { Plus, Search } from 'react-feather';
-import { format } from 'date-fns';
+import { format, isWithinInterval } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
@@ -39,15 +39,30 @@ import SearchBar from 'components/Common/SearchBar/SearchBar';
 import useAuth from 'hooks/useAuth';
 
 import { ActionRequestStatusPicker } from './ActionRequestStatusPicker';
-import { ChangeableEmailContainer } from './ActionRequestOverview.styles';
+import { ChangeableEmailContainer, StatusBox } from './ActionRequestOverview.styles';
+
+const isNewActionRequest = (
+  startDate: Date,
+  endDate: Date,
+  createdActionRequestDate: Date,
+) => isWithinInterval(createdActionRequestDate, {
+  start: startDate,
+  end: endDate,
+});
 
 export const ActionRequestOverview = () => {
   const { t } = useTranslation();
   const { activeCustomer } = useCustomer();
   const { canAccessAllActionRequests } = useAuth();
-  const { parse } = useDate();
+  const { parse, getOneWeekAgo, getEndOfToday } = useDate();
   const [actionRequests, setactionRequests] = useState<ActionRequestFragmentFragment[]>(() => []);
   const [totalPages, setTotalPages] = useState<number>(0);
+  const [dateRange] = useState<[Date, Date]>(() => {
+    const startDate = getOneWeekAgo();
+    const endDate = getEndOfToday();
+
+    return [startDate, endDate];
+  });
 
   const [filter, setFilter] = useQueryParams({
     startDate: StringParam,
@@ -154,7 +169,7 @@ export const ActionRequestOverview = () => {
   };
 
   const columns = `minmax(100px, 0.35fr) minmax(150px, 1fr) minmax(100px, 0.5fr)
-  minmax(150px, 1fr) minmax(150px, 1fr) minmax(150px, 0.5fr)`;
+  minmax(150px, 1fr) minmax(150px, 1fr) minmax(100px, 0.3fr) 50px`;
 
   return (
     <View documentTitle="haas | Action Requests">
@@ -398,6 +413,11 @@ export const ActionRequestOverview = () => {
                       </Table.Cell>
                       <Table.Cell>
                         <Table.DateCell timestamp={actionRequest.createdAt as string} />
+                      </Table.Cell>
+                      <Table.Cell>
+                        {isNewActionRequest(dateRange[0], dateRange[1], actionRequest.createdAt) && (
+                          <StatusBox status="NEW" isVerified={false} />
+                        )}
                       </Table.Cell>
                     </Table.Row>
                   </ContextMenu.Trigger>

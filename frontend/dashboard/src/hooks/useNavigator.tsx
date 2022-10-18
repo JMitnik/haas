@@ -88,6 +88,14 @@ export const useNavigator = () => {
     history.push(path + location.search);
   };
 
+  const goToActionRequestOverview = () => {
+    const path = generatePath(ROUTES.WORKSPACE_ACTION_REQUESTS_VIEW, {
+      customerSlug,
+    });
+
+    history.push(path + location.search);
+  };
+
   const goToAutomationOverview = () => {
     const path = generatePath(ROUTES.AUTOMATION_OVERVIEW, {
       customerSlug,
@@ -269,6 +277,7 @@ export const useNavigator = () => {
   const goTo = (path: string) => history.push(path);
 
   return {
+    goToActionRequestOverview,
     workspaceActionRequestsPath,
     getDialogueConfigViewPath,
     getDialogueBuilderViewPath,

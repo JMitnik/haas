@@ -1526,6 +1526,7 @@ export interface NexusGenObjects {
     roleId?: string | null; // String
   }
   Session: { // root type
+    actionRequestId?: string | null; // String
     browser?: string | null; // String
     createdAt?: NexusGenScalars['Date'] | null; // Date
     deliveryId?: string | null; // String
@@ -2478,6 +2479,7 @@ export interface NexusGenFieldTypes {
     roleId: string | null; // String
   }
   Session: { // field return type
+    actionRequestId: string | null; // String
     browser: string | null; // String
     createdAt: NexusGenScalars['Date'] | null; // Date
     delivery: NexusGenRootTypes['DeliveryType'] | null; // DeliveryType
@@ -3458,6 +3460,7 @@ export interface NexusGenFieldTypeNames {
     roleId: 'String'
   }
   Session: { // field return type name
+    actionRequestId: 'String'
     browser: 'String'
     createdAt: 'Date'
     delivery: 'DeliveryType'

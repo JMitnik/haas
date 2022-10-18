@@ -3,7 +3,7 @@ import { NexusGenEnums, NexusGenFieldTypes, NexusGenInputs } from '../../generat
 
 import { NodeEntryWithTypes } from '../node-entry/NodeEntryServiceType';
 
-const session = Prisma.validator<Prisma.SessionArgs>()({
+export const defaultSessionFields = Prisma.validator<Prisma.SessionArgs>()({
   include: {
     nodeEntries: {
       include: {
@@ -32,7 +32,7 @@ export const sessionWithFormNodes = Prisma.validator<Prisma.SessionArgs>()({
   },
 });
 
-export type SessionWithNodeEntries = Prisma.SessionGetPayload<typeof session>;
+export type SessionWithNodeEntries = Prisma.SessionGetPayload<typeof defaultSessionFields>;
 
 const dialogue = Prisma.validator<Prisma.DialogueArgs>()({
   include: {

@@ -75,7 +75,7 @@ export const WorkspaceGrid = ({
   initialViewMode = HexagonViewMode.Workspace,
 }: WorkspaceGridProps) => {
   const { format } = useDate();
-  const { goToWorkspaceFeedbackOverview } = useNavigator();
+  const { goToWorkspaceFeedbackOverview, goToActionRequestOverview } = useNavigator();
   const { activeCustomer } = useCustomer();
   const { canResetWorkspaceData } = useAuth();
   const toast = useToast();
@@ -440,13 +440,7 @@ export const WorkspaceGrid = ({
                   name="Action Requests"
                   value={issueStats.actionsRequested}
                   isFilterEnabled={historyQueue.length > 0}
-                  onNavigate={() => goToWorkspaceFeedbackOverview(
-                    findDialoguesInGroup([currentState.currentNode as HexagonNode]),
-                    format(startOfDay(startDate), DateFormat.DayTimeFormat),
-                    format(endOfDay(endDate), DateFormat.DayTimeFormat),
-                    undefined,
-                    true,
-                  )}
+                  onNavigate={() => goToActionRequestOverview()}
                 />
               </UI.Grid>
               <UI.Div mt={4}>
