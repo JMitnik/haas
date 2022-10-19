@@ -20,8 +20,7 @@ import {
   constructCreateAutomationInput,
 } from './AutomationService.helpers';
 import ScheduledAutomationService from './ScheduledAutomationService';
-import { EventBridge } from './EventBridge.helper';
-import { assertNonNullish } from '../../utils/assertNonNullish';
+import { EventBridgeService } from './EventBridgeService';
 
 class AutomationService {
   automationPrismaAdapter: AutomationPrismaAdapter;
@@ -30,10 +29,10 @@ class AutomationService {
   automationActionService: AutomationActionService;
   customerService: CustomerService;
   prisma: PrismaClient;
-  eventBridge: AWS.EventBridge;
   lambda: AWS.Lambda;
   iam: AWS.IAM;
   scheduledAutomationService: ScheduledAutomationService;
+  eventBridgeService: EventBridgeService;
 
   constructor(prisma: PrismaClient) {
     this.automationPrismaAdapter = new AutomationPrismaAdapter(prisma);
@@ -43,9 +42,9 @@ class AutomationService {
     this.customerService = new CustomerService(prisma);
     this.scheduledAutomationService = new ScheduledAutomationService(prisma);
     this.prisma = prisma;
+    this.eventBridgeService = new EventBridgeService()
 
     this.iam = new AWS.IAM();
-    this.eventBridge = new AWS.EventBridge();
     this.lambda = new AWS.Lambda();
   }
 
@@ -58,8 +57,7 @@ class AutomationService {
     const deleteAutomation = await this.automationPrismaAdapter.deleteAutomation(input);
 
     if (deleteAutomation.automationScheduledId) {
-      const eventBridgeWrapper = new EventBridge({ ...deleteAutomation, automationScheduled: null }, this.prisma);
-      await eventBridgeWrapper.delete();
+      await this.eventBridgeService.delete(deleteAutomation.automationScheduledId);
     }
 
     return deleteAutomation;
@@ -73,8 +71,7 @@ class AutomationService {
     const enabledAutomation = await this.automationPrismaAdapter.enableAutomation(input);
 
     if (enabledAutomation.type === AutomationType.SCHEDULED && enabledAutomation.automationScheduledId) {
-      const eventBridgeWrapper = new EventBridge(enabledAutomation, this.prisma);
-      await eventBridgeWrapper.enable(input.state);
+      await this.eventBridgeService.enable(enabledAutomation.automationScheduledId, input.state);
     }
 
     return enabledAutomation;
@@ -94,8 +91,8 @@ class AutomationService {
     if (updatedAutomation.type === AutomationType.SCHEDULED
       && updatedAutomation.automationScheduled
     ) {
-      const eventBridgeWrapper = new EventBridge(updatedAutomation, this.prisma);
-      await eventBridgeWrapper.upsert();
+      const targets = await this.scheduledAutomationService.mapActionsToTargets(updatedAutomation)
+      await this.eventBridgeService.upsert(updatedAutomation, targets);
     }
 
     return updatedAutomation;
@@ -117,8 +114,8 @@ class AutomationService {
       if (createdAutomation.type === AutomationType.SCHEDULED
         && createdAutomation.automationScheduled
       ) {
-        const eventBridgeWrapper = new EventBridge(createdAutomation, this.prisma);
-        await eventBridgeWrapper.upsert();
+        const targets = await this.scheduledAutomationService.mapActionsToTargets(createdAutomation);
+        await this.eventBridgeService.upsert(createdAutomation, targets);
       }
     } catch {
       await this.automationPrismaAdapter.deleteAutomation({

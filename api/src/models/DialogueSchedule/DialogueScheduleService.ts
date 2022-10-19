@@ -7,20 +7,24 @@ import {
 } from './DialogueSchedule.types';
 import { DialogueSchedule } from './DialogueSchedule.helper';
 import { AutomationPrismaAdapter } from '../automations/AutomationPrismaAdapter';
-import { EventBridge } from '../automations/EventBridge.helper';
+import { EventBridgeService } from '../automations/EventBridgeService';
 import { AutomationWithSchedule } from '../automations/AutomationService.types';
 import { constructDialogueLinkCreateAutomationInput, constructDialogueLinkUpdateAutomationInput } from './DialogueSchedulePrismaAdapter.helper';
+import ScheduledAutomationService from '../automations/ScheduledAutomationService';
 
 export class DialogueScheduleService {
   private prisma: PrismaClient;
   private prismaAdapter: DialogueSchedulePrismaAdapter;
   private automationPrismaAdapter: AutomationPrismaAdapter;
-
+  private scheduledAutomationService: ScheduledAutomationService;
+  private eventBridgeService: EventBridgeService;
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
     this.prismaAdapter = new DialogueSchedulePrismaAdapter(prisma);
     this.automationPrismaAdapter = new AutomationPrismaAdapter(prisma);
+    this.eventBridgeService = new EventBridgeService();
+    this.scheduledAutomationService = new ScheduledAutomationService(prisma);
   }
 
   public async findByWorkspaceID(workspaceID: string): Promise<DialogueSchedule | null> {
@@ -58,9 +62,8 @@ export class DialogueScheduleService {
       );
       automation = await this.automationPrismaAdapter.update(automation.id, automationInput);
     }
-
-    const eventBridge = new EventBridge(automation, this.prisma);
-    await eventBridge.upsert();
+    const targets = await this.scheduledAutomationService.mapActionsToTargets(automation);
+    await this.eventBridgeService.upsert(automation, targets);
 
     return { dialogueSchedule: schedule };
   }

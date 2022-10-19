@@ -47,7 +47,7 @@ export class Cron {
    * Converts the dayOfWeek substring (range) from numerical representation of days to text representation
    * @returns A Cron object but with text representation of days instead of numerical representation
    */
-  private convertDayOfWeek(): SplitCron {
+  public convertDayOfWeek(): SplitCron {
     const splitted = this.splitCron.dayOfWeek.split('-');
 
     if (splitted.length > 1) {

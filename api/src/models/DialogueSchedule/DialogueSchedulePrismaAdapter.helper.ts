@@ -11,7 +11,7 @@ export const constructDialogueLinkUpdateAutomationInput = (cronString?: string) 
   const updateAutomationInput: Prisma.AutomationUpdateInput = {
     automationScheduled: {
       update: {
-        ...cron.toSplit(),
+        ...cron.convertDayOfWeek(),
       },
     },
   }
@@ -29,7 +29,7 @@ export const constructDialogueLinkCreateAutomationInput = (
   const automationInput: CreateAutomationInput = constructCreateAutomationInput({
     id: automationId,
     schedule: {
-      ...cron.toSplit(),
+      ...cron.convertDayOfWeek(),
       type: 'CUSTOM',
     },
     event: {

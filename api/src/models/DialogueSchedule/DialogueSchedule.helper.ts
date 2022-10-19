@@ -18,44 +18,6 @@ export class DialogueSchedule {
     this.evalPeriodSchedule = this.makeEvalPeriodSchedule();
   }
 
-  public constructDialogueLinkUpdateAutomationInput() {
-    assertNonNullish(this.fields.evaluationPeriodSchedule?.startDateExpression, 'No evaluation time available');
-    const cron = new Cron(this.fields.evaluationPeriodSchedule?.startDateExpression);
-    const updateAutomationInput: Prisma.AutomationUpdateInput = {
-      automationScheduled: {
-        update: {
-          ...cron.toSplit(),
-        },
-      },
-    }
-    return updateAutomationInput;
-  }
-
-  public constructDialogueLinkCreateAutomationInput(automationId: string, workspaceId: string): CreateAutomationInput {
-    assertNonNullish(this.fields.evaluationPeriodSchedule?.startDateExpression, 'No evaluation time available');
-    const cron = new Cron(this.fields.evaluationPeriodSchedule?.startDateExpression);
-
-    const automationInput: CreateAutomationInput = constructCreateAutomationInput({
-      id: automationId,
-      schedule: {
-        ...cron.toSplit(),
-        type: 'CUSTOM',
-      },
-      event: {
-        eventType: AutomationEventType.RECURRING,
-      },
-      automationType: AutomationType.SCHEDULED,
-      label: 'Dialogue Link',
-      description: 'Sends a dialogue link to team owners',
-      workspaceId: workspaceId,
-      actions: [{
-        type: 'SEND_DIALOGUE_LINK',
-      }],
-    });
-
-    return { ...automationInput, isActive: true };
-  }
-
   /**
    * Calculates if `evaluation` of our dialogues according to this schedule is active.
    */

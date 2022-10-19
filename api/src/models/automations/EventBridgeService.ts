@@ -9,56 +9,47 @@ import { logger } from '../../config/logger';
 import { assertNonNullish } from '../../utils/assertNonNullish';
 
 import {
-  AutomationWithSchedule,
   GenerateReportLambdaParams,
   SendDialogueLinkLambdaParams,
 } from './AutomationService.types';
 import {
   buildFrequencyCronString, findReportQueryParamsByCron, parseScheduleToCron,
-} from '../automations/AutomationService.helpers';
-import CustomerService from '../customer/CustomerService';
-import DialogueService from '../questionnaire/DialogueService';
-import UserService from '../users/UserService';
+} from './AutomationService.helpers';
+import { Automation } from './AutomationTypes';
 
-export class EventBridge {
+export class EventBridgeService {
   private eventBridge: AWS.EventBridge;
   private awsServiceMap: AWSServiceMap;
-  private userService: UserService;
-  private customerService: CustomerService;
-  private dialogueService: DialogueService;
 
-  constructor(public automation: AutomationWithSchedule, prisma: PrismaClient) {
+  constructor() {
     this.eventBridge = new AWS.EventBridge();
     this.awsServiceMap = new AWSServiceMap(process.env.AWS_ACCOUNT_ID as string, new AWS.Config());
-    this.userService = new UserService(prisma);
-    this.customerService = new CustomerService(prisma);
-    this.dialogueService = new DialogueService(prisma);
   }
 
   /**
    * Deletes an EventBridge rule and its targets based on automation schedule ID
    */
-  public async delete() {
-    assertNonNullish(this.automation.automationScheduledId, 'No scheduled automation available!');
+  public async delete(automationScheduleId: string) {
+    // assertNonNullish(automationScheduleId, 'No scheduled automation available!');
     try {
       await this.eventBridge.disableRule({
-        Name: this.automation.automationScheduledId,
+        Name: automationScheduleId,
       }).promise();
 
       const targets = await this.eventBridge.listTargetsByRule({
-        Rule: this.automation.automationScheduledId,
+        Rule: automationScheduleId,
       }).promise();
 
       const targetIds = targets.Targets?.map((target) => target.Id) || [];
 
       await this.eventBridge.removeTargets({
         Force: true,
-        Rule: this.automation.automationScheduledId,
+        Rule: automationScheduleId,
         Ids: targetIds,
       }).promise();
 
       await this.eventBridge.deleteRule({
-        Name: this.automation.automationScheduledId,
+        Name: automationScheduleId,
       }).promise();
     } catch (e) {
       logger.error('Something went wrong removing event bridge', e);
@@ -69,17 +60,17 @@ export class EventBridge {
   /**
    * Enables/Disables an EventBridge rule
    */
-  public async enable(state: boolean) {
-    assertNonNullish(this.automation.automationScheduledId, 'No scheduled automation available!');
+  public async enable(automationScheduledId: string, state: boolean) {
+    // assertNonNullish(this.automation.automationScheduledId, 'No scheduled automation available!');
     if (state) {
       await this.eventBridge.enableRule({
-        Name: this.automation.automationScheduledId,
+        Name: automationScheduledId,
       }).promise().catch((e) => {
         logger.error('Unable to enable rule', e);
       })
     } else {
       await this.eventBridge.disableRule({
-        Name: this.automation.automationScheduledId,
+        Name: automationScheduledId,
       }).promise().catch((e) => {
         logger.error('Unable to disable rule', e);
       });
@@ -89,48 +80,28 @@ export class EventBridge {
   /**
    * Upserts an AWS EventBridge (and its targets) based on a scheduled automation.
    */
-  public upsert = async () => {
-    assertNonNullish(this.automation.automationScheduled, 'No scheduled automation available!');
-    assertNonNullish(this.automation.automationScheduledId, 'No scheduled automation available!');
+  public upsert = async (automation: Automation, targets: AWS.EventBridge.TargetList) => {
+    assertNonNullish(automation.automationScheduled, 'No scheduled automation available!');
+    assertNonNullish(automation.automationScheduledId, 'No scheduled automation available!');
 
-    const workspace = await this.customerService.findWorkspaceById(this.automation.workspaceId);
-    assertNonNullish(workspace, 'Cannot find workspace while updating automation');
-    const botUser = await this.userService.findBotByWorkspaceName(workspace?.slug);
-    assertNonNullish(botUser, 'Cannot find bot user while updating automation');
-    let dialogueSlug;
-
-    if (this.automation?.automationScheduled?.dialogueId) {
-      dialogueSlug = (await this.dialogueService.getDialogueById(this.automation.automationScheduled.dialogueId))
-        ?.slug;
-    }
-
-    const cronExpression = parseScheduleToCron(this.automation.automationScheduled);
+    const cronExpression = parseScheduleToCron(automation.automationScheduled);
     // Find the state of the automation and adjust event bridge rule to that
-    const state = this.automation?.isActive ? 'ENABLED' : 'DISABLED';
-
-    // Map actions to relevant Lambda ARNS for eventbridge to use as targets
-    const ruleTargets = await this.mapActionsToTargets(
-      this.automation.automationScheduledId,
-      this.automation.automationScheduled?.actions || [],
-      botUser,
-      workspace.slug,
-      dialogueSlug,
-    );
+    const state = automation?.isActive ? 'ENABLED' : 'DISABLED';
 
     await this.eventBridge.putRule({
-      Name: this.automation.automationScheduledId,
+      Name: automation.automationScheduledId,
       ScheduleExpression: cronExpression,
       State: state,
     }).promise().catch((e) => {
-      logger.error(`Unable to put EventBridge rule to automation ${this.automation.automationScheduledId}`, e);
+      logger.error(`Unable to put EventBridge rule to automation ${automation.automationScheduledId}`, e);
       throw new GraphQLYogaError('Internal error');
     });
 
     await this.eventBridge.putTargets({
-      Rule: this.automation.automationScheduledId,
-      Targets: ruleTargets,
+      Rule: automation.automationScheduledId,
+      Targets: targets,
     }).promise().catch((e) => {
-      logger.error(`Unable to add EventBridge targets to automation ${this.automation.automationScheduledId}`, e);
+      logger.error(`Unable to add EventBridge targets to automation ${automation.automationScheduledId}`, e);
       throw new GraphQLYogaError('Internal error');
     });
   }
@@ -158,7 +129,7 @@ export class EventBridge {
    * @param automationAction
    * @returns an object containing info on the type of the report as well as date range
    */
-  private async findReportQueryParamsByActionType(automationAction: AutomationAction) {
+  private async findReportQueryParamsByActionType(automation: Automation, automationAction: AutomationAction) {
     switch (automationAction.type) {
       case AutomationActionType.WEEK_REPORT:
         return {
@@ -173,7 +144,7 @@ export class EventBridge {
           type: 'yearly',
         }
       default: // Customizeable Report
-        const frequency = buildFrequencyCronString(this.automation.automationScheduled!);
+        const frequency = buildFrequencyCronString(automation.automationScheduled!);
         return findReportQueryParamsByCron(frequency)
     }
   }
@@ -182,7 +153,7 @@ export class EventBridge {
   * Maps the actions of a scheduled automation to valid AWS EventBridge rule targets.
   */
   private async mapActionsToTargets(
-    automationScheduledId: string,
+    automation: Automation,
     actions: AutomationAction[],
     botUser: User,
     workspaceSlug: string,
@@ -193,7 +164,7 @@ export class EventBridge {
     return Promise.all(actions.map(async (action, index) => {
       const actionARN = this.getActionARN(action.type);
 
-      const queryParams = await this.findReportQueryParamsByActionType(action);
+      const queryParams = await this.findReportQueryParamsByActionType(automation, action);
       const reportUrl = dialogueSlug
         ? `${dashboardDialogueUrl(workspaceSlug, dialogueSlug)}/_reports/weekly`
         : `${workspaceDashboardUrl(workspaceSlug)}/_reports?type=${queryParams.type}`;
@@ -210,7 +181,7 @@ export class EventBridge {
       }
 
       const sendDialogueLinkParams = {
-        AUTOMATION_SCHEDULE_ID: automationScheduledId,
+        AUTOMATION_SCHEDULE_ID: automation.automationScheduledId as string,
         AUTOMATION_ACTION_ID: action.id,
         AUTHENTICATE_EMAIL: 'automations@haas.live',
         API_URL: `${config.baseUrl}/graphql`,
@@ -226,7 +197,7 @@ export class EventBridge {
       );
 
       return {
-        Id: `${automationScheduledId}-${index}-action`,
+        Id: `${automation.automationScheduledId}-${index}-action`,
         Arn: actionARN,
         Input: JSON.stringify(lambdaInput),
         DeadLetterConfig: {
