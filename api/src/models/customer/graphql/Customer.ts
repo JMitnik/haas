@@ -714,6 +714,9 @@ export const CustomerQuery = extendType({
       },
       nullable: true,
       async resolve(parent, args, ctx) {
+
+        await ctx.services.redisService.set('test', 'test');
+
         if (args.slug) {
           const customer = ctx.services.customerService.findWorkspaceBySlug(args.slug);
           return customer;
