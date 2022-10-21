@@ -2,6 +2,8 @@ import {
   NodeEntry,
   PrismaClient,
   Prisma,
+  Dialogue,
+  ActionRequest,
 } from 'prisma/prisma-client';
 import _ from 'lodash';
 
@@ -12,13 +14,15 @@ import NodeEntryPrismaAdapter from './NodeEntryPrismaAdapter';
 import { NodeEntryWithTypes } from './NodeEntryServiceType';
 import SessionPrismaAdapter from '../../models/session/SessionPrismaAdapter';
 import DialoguePrismaAdapter from '../../models/questionnaire/DialoguePrismaAdapter';
-import { DialogueWithCustomer } from '../../models/session/Session.types';
+import { DialogueWithCustomer, SessionWithNodeEntries } from '../../models/session/Session.types';
 import makeEmergencyTemplate from '../../services/mailings/templates/makeEmergencyTemplate';
 import makeActionRequestConfirmationTemplate from '../../services/mailings/templates/makeActionRequestConfirmationTemplate';
 import config from '../../config/config';
 import MailService from '../../services/mailings/MailService';
 import { ActionRequestPrismaAdapter } from '../ActionRequest/ActionRequestPrismaAdapter';
 import UserPrismaAdapter from '../users/UserPrismaAdapter';
+import { logger } from '../../config/logger';
+import IssuePrismaAdapter from '../Issue/IssuePrismaAdapter';
 
 class NodeEntryService {
   nodeEntryPrismaAdapter: NodeEntryPrismaAdapter;
@@ -27,6 +31,7 @@ class NodeEntryService {
   actionRequestPrismaAdapter: ActionRequestPrismaAdapter;
   userPrismaAdapter: UserPrismaAdapter;
   mailService: MailService;
+  private issuePrismaAdapter: IssuePrismaAdapter;
 
   constructor(prismaClient: PrismaClient) {
     this.nodeEntryPrismaAdapter = new NodeEntryPrismaAdapter(prismaClient);
@@ -35,6 +40,7 @@ class NodeEntryService {
     this.actionRequestPrismaAdapter = new ActionRequestPrismaAdapter(prismaClient);
     this.userPrismaAdapter = new UserPrismaAdapter(prismaClient);
     this.mailService = new MailService();
+    this.issuePrismaAdapter = new IssuePrismaAdapter(prismaClient);
   };
 
   findDialogueStatisticsRootEntries = async (
@@ -106,47 +112,83 @@ class NodeEntryService {
   }
 
   /**
+   * Creates an actionable (and potentially topic) for the first choice of a session
+   * NOTE: only supports creation of actionable based on first choice layer
+   * @param entries
+   * @param dialogueId
+   */
+  public async createSessionActionRequest(
+    session: SessionWithNodeEntries,
+    dialogueId: string,
+    data: Prisma.ActionRequestCreateInput
+  ) {
+    const entry = session.nodeEntries?.find((nodeEntry) => nodeEntry.choiceNodeEntry);
+
+    if (entry?.choiceNodeEntry?.value) {
+      const optionValue = entry?.choiceNodeEntry?.value;
+      const targetOption = entry.relatedNode?.options.find((option) => option.value === optionValue);
+      const topicId = targetOption?.topicId;
+
+      if (!topicId) {
+        logger.log(
+          `Trying to create actionable with topic value ${optionValue}
+            for dialogue ${dialogueId}, but no option(s) with such a topic found in database`
+        );
+        return;
+      }
+
+      const dialogue = await this.dialoguePrismaAdapter.getDialogueById(dialogueId) as Dialogue;
+      const issue = await this.issuePrismaAdapter.upsertIssueByTopicId(dialogue.customerId, topicId);
+      return await this.actionRequestPrismaAdapter.createActionRequest(issue.id, session.id, data);
+    }
+  }
+
+  /**
    * Create node-entries. if node entry contains an emergency contact, send a confirmation email to requestor
    * */
   handleNodeEntryAppend = async (sessionId: string, nodeEntryInput: NexusGenInputs['NodeEntryInput']): Promise<NodeEntry> => {
     const createNodeEntryFragment = NodeEntryService.constructCreateNodeEntryFragment(nodeEntryInput);
-    const emergencyContact = nodeEntryInput.data?.form?.values?.find((value) => value?.contacts)?.contacts;
-    const emergencyEmail = nodeEntryInput.data?.form?.values?.find((value) => value?.email)?.email;
     const nodeEntry = await this.nodeEntryPrismaAdapter.create({
       session: { connect: { id: sessionId } },
       ...createNodeEntryFragment,
     });
 
-    const actionable = await this.actionRequestPrismaAdapter.findActionRequestBySessionId(sessionId);
-    const actionableExists = !!actionable?.id
+    const session = await this.sessionPrismaAdapter.findSessionById(sessionId);
 
-    if (nodeEntryInput.data?.form?.values?.length && actionableExists) {
-      const actionableUpdateArgs: Prisma.ActionRequestUpdateInput = {
+    if (session && session.mainScore <= 55 && nodeEntryInput.data?.form?.values?.length) {
+      const emergencyContact = nodeEntryInput.data?.form?.values?.find((value) => value?.contacts)?.contacts;
+      const emergencyEmail = nodeEntryInput.data?.form?.values?.find((value) => value?.email)?.email;
+      const actionableCreateInput: Prisma.ActionRequestCreateInput = {
         assignee: emergencyContact ? {
           connect: {
             email: emergencyContact,
           },
         } : undefined,
         requestEmail: emergencyEmail,
-      }
+        dialogue: {
+          connect: {
+            id: session.dialogueId,
+          },
+        },
+      };
 
-      if (emergencyContact) {
+      const actionRequest = await this.createSessionActionRequest(session, session.dialogueId, actionableCreateInput);
+
+      if (actionRequest && emergencyContact) {
         await this.sendEmergencyMail(
-          actionable.dialogueId,
+          actionRequest.dialogueId,
           emergencyContact,
         )
       }
 
-      if (emergencyEmail) {
+      if (actionRequest && emergencyEmail) {
         await this.sendActionRequestConfirmationMail(
-          actionable.dialogueId,
+          actionRequest.dialogueId,
           emergencyEmail,
-          actionable.id,
+          actionRequest.id,
           emergencyContact,
         )
       }
-
-      await this.actionRequestPrismaAdapter.updateActionRequest(actionable.id, actionableUpdateArgs);
     }
 
     return nodeEntry;

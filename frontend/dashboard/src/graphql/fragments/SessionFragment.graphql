@@ -6,6 +6,7 @@ fragment SessionFragment on Session {
   totalTimeInSec
   device
   dialogueId
+  actionRequestId
 
   nodeEntries {
     ...NodeEntryFragment

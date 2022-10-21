@@ -15,6 +15,7 @@ export const SessionType = objectType({
     t.float('mainScore');
 
     t.string('browser');
+    t.string('actionRequestId');
 
     t.int('paths', {
       async resolve(parent, args, ctx) {

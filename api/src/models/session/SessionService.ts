@@ -50,37 +50,6 @@ class SessionService {
   };
 
   /**
-   * Creates an actionable (and potentially topic) for the first choice of a session
-   * NOTE: only supports creation of actionable based on first choice layer
-   * @param entries
-   * @param dialogueId
-   */
-  public async createSessionActionRequest(
-    session: SessionWithNodeEntries,
-    dialogueId: string,
-  ) {
-    const entry = session.nodeEntries.find((nodeEntry) => nodeEntry.choiceNodeEntry);
-
-    if (entry?.choiceNodeEntry?.value) {
-      const optionValue = entry?.choiceNodeEntry?.value;
-      const targetOption = entry.relatedNode?.options.find((option) => option.value === optionValue);
-      const topicId = targetOption?.topicId;
-
-      if (!topicId) {
-        logger.log(
-          `Trying to create actionable with topic value ${optionValue}
-            for dialogue ${dialogueId}, but no option(s) with such a topic found in database`
-        );
-        return;
-      }
-
-      const dialogue = await this.dialoguePrismaAdapter.getDialogueById(dialogueId) as Dialogue;
-      const issue = await this.issuePrismaAdapter.upsertIssueByTopicId(dialogue.customerId, topicId);
-      await this.ActionRequestPrismaAdapter.createActionRequest(dialogueId, issue.id, session.id);
-    }
-  }
-
-  /**
    * Given a list of sessions with node-entries, return an object which maps negative dialogue interactions to their "frequency".
    *
    * Note: this can be applied both within a workspace as well as outside.
@@ -330,10 +299,6 @@ class SessionService {
       createdAt: sessionInput?.createdAt,
       mainScore: mainScore || undefined,
     });
-
-    if (session.mainScore <= 55) {
-      await this.createSessionActionRequest(session, dialogueId);
-    }
 
     try {
       if (sessionInput.deliveryId) {
@@ -713,11 +678,7 @@ class SessionService {
    * @returns Which type the session alludes to
    */
   private getActionFromSession(session: SessionWithEntries): SessionActionType | null {
-    const contactAction = session.nodeEntries.find((nodeEntry) => (
-      nodeEntry.formNodeEntry?.values.find((val) => !!val.email || !!val.phoneNumber || !!val.shortText)
-    ));
-
-    if (contactAction) return 'CONTACT';
+    if (session.actionRequestId) return 'CONTACT';
 
     return null;
   }

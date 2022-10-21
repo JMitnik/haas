@@ -2028,6 +2028,7 @@ input SendAutomationReportInput {
 }
 
 type Session {
+  actionRequestId: String
   browser: String
   createdAt: Date
   delivery: DeliveryType

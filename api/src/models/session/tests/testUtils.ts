@@ -1,6 +1,51 @@
 import { NodeType, Prisma, PrismaClient } from '@prisma/client';
 import { internet } from 'faker';
+import { sample } from 'lodash';
 import AuthService from '../../auth/AuthService';
+
+export const seedSession = async (
+  prisma: PrismaClient,
+  dialogueId: string,
+  sliderQuestionId?: string,
+  sliderValue?: number,
+  choiceQuestionId?: string,
+  choiceValue?: string,
+) => {
+  const session = prisma.session.create({
+    data: {
+      browser: sample(['Firefox', 'IEEdge', 'Chrome', 'Safari']),
+      dialogueId,
+      device: sample(['iPhone', 'Android', 'Mac', 'Windows ']),
+      nodeEntries: {
+        create: [{
+          depth: 0,
+          relatedNode: {
+            create: !sliderQuestionId ? { title: 'Test', type: NodeType.SLIDER } : undefined,
+            connect: sliderQuestionId ? { id: sliderQuestionId } : undefined,
+          },
+          sliderNodeEntry: {
+            create: { value: sliderValue || Math.floor(Math.random() * 100) },
+          },
+        },
+        {
+          depth: 1,
+          choiceNodeEntry: {
+            create: {
+              value: choiceValue || sample(['Customer support', 'Facilities', 'Website', 'Application']),
+            },
+          },
+          relatedNode: {
+            create: !choiceQuestionId ? { title: 'What did you think of this?', type: NodeType.CHOICE } : undefined,
+            connect: choiceQuestionId ? { id: choiceQuestionId } : undefined,
+          },
+        },
+        ],
+      },
+    },
+  });
+
+  return session;
+}
 
 /**
  * Generates a user with given permissions for a workspace.

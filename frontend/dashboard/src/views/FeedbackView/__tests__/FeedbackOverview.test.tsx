@@ -21,6 +21,7 @@ import lang from 'config/i18n-config';
 
 import { DialogueProvider } from 'providers/DialogueProvider';
 import { FeedbackOverview } from '../FeedbackOverview';
+import { QuestionNodeTypeEnum } from 'types/generated-types';
 import {
   mockGetInteractionResponse,
   mockGetWorkspaceLayoutDetailsResponse,
@@ -233,6 +234,7 @@ describe('FeedbackOverview', () => {
               score: 13,
               createdAt: new Date(),
               totalTimeInSec: 42,
+              actionRequestId: 'actionId',
               dialogue: {
                 id: cuid(),
                 slug: 'urgent-dialogue-slug',
@@ -245,7 +247,7 @@ describe('FeedbackOverview', () => {
                   depth: 0,
                   relatedNode: {
                     title: 'How are you feeling?',
-                    type: 'SLIDER',
+                    type: QuestionNodeTypeEnum.Slider,
                     __typename: 'QuestionNode',
                   },
                   value: {
@@ -265,7 +267,7 @@ describe('FeedbackOverview', () => {
                   depth: 1,
                   relatedNode: {
                     title: "What's going well?",
-                    type: 'CHOICE',
+                    type: QuestionNodeTypeEnum.Choice,
                     __typename: 'QuestionNode',
                   },
                   value: {
@@ -295,7 +297,7 @@ describe('FeedbackOverview', () => {
           ],
         },
       },
-    }) as any);
+    }));
 
     const history = createMemoryHistory({ initialEntries: [{ search: '?minScore=0&maxScore=100' }] });
 

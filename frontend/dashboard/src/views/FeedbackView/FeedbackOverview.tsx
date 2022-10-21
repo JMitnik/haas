@@ -429,7 +429,7 @@ export const FeedbackOverview = () => {
                       </UI.Span>
                     </UI.Flex>
 
-                    {session.followUpAction && (
+                    {session.actionRequestId && (
                       <UI.Span fontWeight={600} color="red.500">
                         Action requested
                       </UI.Span>

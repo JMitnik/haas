@@ -122,17 +122,13 @@ export class ActionRequestPrismaAdapter {
   }
 
   public async createActionRequest(
-    dialogueId: string,
     issueId: string,
     sessionId: string,
+    data: Prisma.ActionRequestCreateInput
   ) {
     return this.prisma.actionRequest.create({
       data: {
-        dialogue: {
-          connect: {
-            id: dialogueId,
-          },
-        },
+        ...data,
         issue: {
           connect: {
             id: issueId,

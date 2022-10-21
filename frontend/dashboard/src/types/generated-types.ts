@@ -2773,6 +2773,7 @@ export type Session = {
   dialogueId?: Maybe<Scalars['String']>;
   mainScore?: Maybe<Scalars['Float']>;
   browser?: Maybe<Scalars['String']>;
+  actionRequestId?: Maybe<Scalars['String']>;
   paths?: Maybe<Scalars['Int']>;
   score: Scalars['Float'];
   dialogue?: Maybe<Dialogue>;
@@ -3632,7 +3633,7 @@ export type NodeEntryFragmentFragment = (
 
 export type SessionFragmentFragment = (
   { __typename?: 'Session' }
-  & Pick<Session, 'id' | 'createdAt' | 'score' | 'originUrl' | 'totalTimeInSec' | 'device' | 'dialogueId'>
+  & Pick<Session, 'id' | 'createdAt' | 'score' | 'originUrl' | 'totalTimeInSec' | 'device' | 'dialogueId' | 'actionRequestId'>
   & { nodeEntries?: Maybe<Array<(
     { __typename?: 'NodeEntry' }
     & NodeEntryFragmentFragment
@@ -5023,6 +5024,7 @@ export const SessionFragmentFragmentDoc = gql`
   totalTimeInSec
   device
   dialogueId
+  actionRequestId
   nodeEntries {
     ...NodeEntryFragment
   }
