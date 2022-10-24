@@ -13,6 +13,7 @@ query automationConnection($customerSlug: String, $filter: AutomationConnectionF
       evaluationPeriodSchedule {
         id
         startDateExpression
+        nextActiveStartDate
         endInDeltaMinutes
       }
     }

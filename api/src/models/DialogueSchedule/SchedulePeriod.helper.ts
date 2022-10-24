@@ -31,6 +31,7 @@ export class SchedulePeriod {
       isActive: this.isActive,
       activeStartDate: this.activeStartDate,
       activeEndDate: this.activeEndDate,
+      nextActiveStartDate: this.parseNextStartDate(this.startDateExpression),
     }
   }
 

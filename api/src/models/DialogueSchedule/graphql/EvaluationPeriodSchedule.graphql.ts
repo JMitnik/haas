@@ -12,6 +12,7 @@ export const EvaluationPeriodSchedule = objectType({
     t.id('id');
 
     t.boolean('isActive');
+    t.date('nextActiveStartDate');
     t.string('startDateExpression');
     t.int('endInDeltaMinutes');
   },

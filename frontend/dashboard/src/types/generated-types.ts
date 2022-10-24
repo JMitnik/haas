@@ -1328,6 +1328,7 @@ export type EvaluationPeriodSchedule = {
   __typename?: 'EvaluationPeriodSchedule';
   id?: Maybe<Scalars['ID']>;
   isActive?: Maybe<Scalars['Boolean']>;
+  nextActiveStartDate?: Maybe<Scalars['Date']>;
   startDateExpression?: Maybe<Scalars['String']>;
   endInDeltaMinutes?: Maybe<Scalars['Int']>;
 };
@@ -1778,7 +1779,10 @@ export type Mutation = {
   assignUserToActionRequest?: Maybe<ActionRequest>;
   setActionRequestStatus?: Maybe<ActionRequest>;
   verifyActionRequest?: Maybe<ActionRequest>;
-  /** Creates a dialogue schedule in the backend */
+  /**
+   * Creates a DialogueSchedule, consisting of an Evaluation and Data Period.
+   * - Input style: Declarative. This means that the Input describes what the eventual state should look like.
+   */
   createDialogueSchedule?: Maybe<CreateDialogueScheduleOutput>;
   sandbox?: Maybe<Scalars['String']>;
   generateWorkspaceFromCSV?: Maybe<Customer>;
@@ -3807,7 +3811,7 @@ export type AutomationConnectionQuery = (
         & Pick<DataPeriodSchedule, 'id' | 'startDateExpression' | 'endInDeltaMinutes'>
       )>, evaluationPeriodSchedule?: Maybe<(
         { __typename?: 'EvaluationPeriodSchedule' }
-        & Pick<EvaluationPeriodSchedule, 'id' | 'startDateExpression' | 'endInDeltaMinutes'>
+        & Pick<EvaluationPeriodSchedule, 'id' | 'startDateExpression' | 'nextActiveStartDate' | 'endInDeltaMinutes'>
       )> }
     )>, automationConnection?: Maybe<(
       { __typename?: 'AutomationConnection' }
@@ -5664,6 +5668,7 @@ export const AutomationConnectionDocument = gql`
       evaluationPeriodSchedule {
         id
         startDateExpression
+        nextActiveStartDate
         endInDeltaMinutes
       }
     }

@@ -1286,6 +1286,7 @@ export interface NexusGenObjects {
     endInDeltaMinutes?: number | null; // Int
     id?: string | null; // ID
     isActive?: boolean | null; // Boolean
+    nextActiveStartDate?: NexusGenScalars['Date'] | null; // Date
     startDateExpression?: string | null; // String
   }
   FailedDeliveryModel: { // root type
@@ -2132,6 +2133,7 @@ export interface NexusGenFieldTypes {
     endInDeltaMinutes: number | null; // Int
     id: string | null; // ID
     isActive: boolean | null; // Boolean
+    nextActiveStartDate: NexusGenScalars['Date'] | null; // Date
     startDateExpression: string | null; // String
   }
   FailedDeliveryModel: { // field return type
@@ -3137,6 +3139,7 @@ export interface NexusGenFieldTypeNames {
     endInDeltaMinutes: 'Int'
     id: 'ID'
     isActive: 'Boolean'
+    nextActiveStartDate: 'Date'
     startDateExpression: 'String'
   }
   FailedDeliveryModel: { // field return type name
