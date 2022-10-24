@@ -63,6 +63,7 @@ describe('Dialogue.graphql', () => {
     const dialogueScheduleService = new DialogueScheduleService(prisma);
     await dialogueScheduleService.save({
       workspaceId,
+      enable: true,
       dataPeriod: {
         startDateExpression: '00 12 01 * 01', // Monday midday
         endInDeltaMinutes: 60 * 24 * 7, // One week
@@ -101,6 +102,7 @@ describe('Dialogue.graphql', () => {
     const dialogueScheduleService = new DialogueScheduleService(prisma);
     await dialogueScheduleService.save({
       workspaceId,
+      enable: true,
       dataPeriod: {
         startDateExpression: '00 12 01 * 01', // Monday midday
         endInDeltaMinutes: 60 * 24 * 7, // One week
