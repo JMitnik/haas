@@ -68,48 +68,53 @@ interface StepProps {
   onPrevStep?: (state: DialogueScheduleState) => void;
 }
 
-const IntroStep = ({ state, onNextStep }: StepProps) => (
-  <UI.ColumnFlex height="100%">
-    <UI.ModalBody maxWidth={600} flex="100%" alignItems="center" display="flex">
-      <UI.Div>
-        <UI.H4 textAlign="center" color="off.600">
-          How it works
-        </UI.H4>
-        <UI.Text fontSize="1rem" color="off.600" textAlign="center">
-          This automation allows you to define
-          {' '}
-          <strong>opening</strong>
-          {' '}
-          and
-          {' '}
-          <strong>closing</strong>
-          {' '}
-          times
-          for your dialogues and data.
-          <br />
-          Any people
-          accessing your dialogue afterwards will be prompted
-          with a notification to come back later.
-        </UI.Text>
-      </UI.Div>
-    </UI.ModalBody>
-    <UI.ModalFooter>
-      <UI.Div>
+const IntroStep = ({ state, onNextStep }: StepProps) => {
+  const { t } = useTranslation();
+
+  return (
+    <UI.ColumnFlex height="100%">
+      <UI.ModalBody maxWidth={600} flex="100%" alignItems="center" display="flex">
         <UI.Div>
-          <UI.Button onClick={() => onNextStep?.(state)} width="100%" size="md">
-            Get started
-          </UI.Button>
+          <UI.H4 textAlign="center" color="off.600">
+            {t('how_it_works')}
+          </UI.H4>
+          <UI.Text fontSize="1rem" color="off.600" textAlign="center">
+            This automation allows you to define
+            {' '}
+            <strong>opening</strong>
+            {' '}
+            and
+            {' '}
+            <strong>closing</strong>
+            {' '}
+            times
+            for your dialogues and data.
+            <br />
+            Any people
+            accessing your dialogue afterwards will be prompted
+            with a notification to come back later.
+          </UI.Text>
         </UI.Div>
-      </UI.Div>
-    </UI.ModalFooter>
-  </UI.ColumnFlex>
-);
+      </UI.ModalBody>
+      <UI.ModalFooter>
+        <UI.Div>
+          <UI.Div>
+            <UI.Button onClick={() => onNextStep?.(state)} width="100%" size="md">
+              {t('get_started')}
+            </UI.Button>
+          </UI.Div>
+        </UI.Div>
+      </UI.ModalFooter>
+    </UI.ColumnFlex>
+  );
+};
 
 const dataPeriodSchema = yup.object({
   schedule: yup.string().ensure(),
 });
 
 const DataPeriodStep = ({ state, onNextStep, onPrevStep }: StepProps) => {
+  const { t } = useTranslation();
   const form = useForm({
     resolver: yupResolver(dataPeriodSchema),
     defaultValues: {
@@ -144,12 +149,12 @@ const DataPeriodStep = ({ state, onNextStep, onPrevStep }: StepProps) => {
       <UI.ColumnFlex height="100%">
         <UI.ModalBody maxWidth={600} flex="100%">
           <UI.H4 color="off.500">
-            Data period
+            {t('data_period')}
           </UI.H4>
           <UI.Div position="relative">
             <UI.FormControl>
               <UI.FormLabel fontWeight={400} color="off.500">
-                How often do you wish to refresh your data?
+                {t('data_period_description')}
               </UI.FormLabel>
               <Controller
                 name="schedule"
@@ -167,7 +172,7 @@ const DataPeriodStep = ({ state, onNextStep, onPrevStep }: StepProps) => {
             <UI.Div>
               {!!onPrevStep && (
                 <UI.Button onClick={goBack} width="100%" size="md" variant="outline" variantColor="off">
-                  Previous
+                  {t('previous')}
                 </UI.Button>
               )}
             </UI.Div>
@@ -178,7 +183,7 @@ const DataPeriodStep = ({ state, onNextStep, onPrevStep }: StepProps) => {
                 width="100%"
                 size="md"
               >
-                Next
+                {t('next')}
               </UI.Button>
             </UI.Div>
           </UI.Grid>
@@ -268,13 +273,13 @@ const EvalPeriodStep = ({ state, onNextStep, onPrevStep }: StepProps) => {
       <UI.ColumnFlex height="100%">
         <UI.ModalBody maxWidth={600} flex="100%">
           <UI.H4 color="off.500">
-            Automatic open and close
+            {t('automatic_open_close_header')}
           </UI.H4>
 
           <UI.FormControl>
             <UI.Flex justifyContent="space-between">
               <UI.FormLabel fontWeight={400} color="off.500">
-                Enable automatic open and closing of dialogue
+                {t('automatic_open_close_description')}
               </UI.FormLabel>
               <Controller
                 name="isEnabled"
@@ -295,7 +300,7 @@ const EvalPeriodStep = ({ state, onNextStep, onPrevStep }: StepProps) => {
             <UI.Div mt={4} position="relative">
               <UI.FormControl>
                 <UI.FormLabel fontWeight={400} color="off.500">
-                  Schedule
+                  {t('schedule')}
                 </UI.FormLabel>
 
                 <UI.Div color="off.600">
@@ -363,7 +368,7 @@ const EvalPeriodStep = ({ state, onNextStep, onPrevStep }: StepProps) => {
           <UI.Grid gridTemplateColumns="1fr 1fr">
             <UI.Div>
               <UI.Button onClick={goBack} width="100%" size="md" variant="outline" variantColor="off">
-                Previous
+                {t('previous')}
               </UI.Button>
             </UI.Div>
             <UI.Div>
@@ -373,7 +378,7 @@ const EvalPeriodStep = ({ state, onNextStep, onPrevStep }: StepProps) => {
                 width="100%"
                 size="md"
               >
-                Complete
+                {t('complete')}
               </UI.Button>
             </UI.Div>
           </UI.Grid>
@@ -392,6 +397,7 @@ export const DialogueScheduleModalBody = ({
   onClose,
   dialogueSchedule = undefined,
 }: DialogueScheduleModalBodyProps) => {
+  const { t } = useTranslation();
   const inEdit = !!dialogueSchedule;
   const [activeStepIndex, setActiveStepIndex] = useState(0);
   const [state, setState] = useState<DialogueScheduleState>(() => {
@@ -483,10 +489,10 @@ export const DialogueScheduleModalBody = ({
 
           <UI.Div>
             <UI.H3 color="off.500">
-              Automated schedules
+              {t('schedule_card_heading')}
             </UI.H3>
             <UI.Text fontSize="1.1rem" color="off.400">
-              Setup your automated schedules
+              {t('schedule_card_alt_description')}
             </UI.Text>
           </UI.Div>
         </UI.Flex>

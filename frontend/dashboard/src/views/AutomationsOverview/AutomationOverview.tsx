@@ -113,7 +113,7 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
         <UI.Div mb={96}>
           <UI.Div mb={4}>
             <UI.H3 color="off.400">
-              Highlighted automations
+              {t('highlighted_automations')}
             </UI.H3>
           </UI.Div>
 
@@ -143,7 +143,7 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
                     </UI.Div>
                     <UI.Div ml={4}>
                       <UI.H4 fontSize="1.2rem" color="off.500" fontWeight={600}>
-                        Automated schedules
+                        {t('schedule_card_heading')}
                       </UI.H4>
                     </UI.Div>
                   </UI.Flex>
@@ -169,17 +169,17 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
 
                 <UI.Div mt={2}>
                   <UI.Text fontSize="1rem" color="off.500">
-                    Automate the open and closing of dialogues and setup periodic data ranges.
+                    {t('schedule_card_description')}
                   </UI.Text>
                 </UI.Div>
 
                 {!dialogueSchedule ? (
                   <UI.Button onClick={() => setIsOpenScheduleModal(true)} mt={4} size="sm">
-                    Get started
+                    {t('get_started')}
                   </UI.Button>
                 ) : (
                   <UI.Button onClick={() => setIsOpenScheduleModal(true)} mt={4} size="sm">
-                    Edit
+                    {t('edit')}
                   </UI.Button>
                 )}
               </UI.CardBody>
@@ -190,18 +190,18 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
         <UI.Div mb={4}>
           <UI.Flex alignItems="center">
             <UI.H3 color="off.400">
-              Custom automations
+              {t('custom_automations')}
             </UI.H3>
             {canCreateAutomations && (
-            <UI.Div ml={4}>
-              <UI.NavButton
-                leftIcon={() => <Plus />}
-                size="sm"
-                to={`/dashboard/b/${customerSlug}/automation/add`}
-              >
-                {t('create_automation')}
-              </UI.NavButton>
-            </UI.Div>
+              <UI.Div ml={4}>
+                <UI.NavButton
+                  leftIcon={() => <Plus />}
+                  size="sm"
+                  to={`/dashboard/b/${customerSlug}/automation/add`}
+                >
+                  {t('create_automation')}
+                </UI.NavButton>
+              </UI.Div>
             )}
           </UI.Flex>
         </UI.Div>
