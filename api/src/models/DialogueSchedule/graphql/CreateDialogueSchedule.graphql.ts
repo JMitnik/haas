@@ -28,6 +28,7 @@ export const CreateDialogueScheduleInput = inputObjectType({
 
   definition(t) {
     t.nonNull.string('workspaceId');
+    t.boolean('enable', { default: true });
     t.nonNull.field('dataPeriod', { type: CreateDataPeriodInput });
     t.field('evaluationPeriod', { type: CreateEvaluationPeriodInput });
   },
@@ -45,7 +46,10 @@ export const CreateDialogueScheduleOutput = objectType({
 export const CreateDialogueSchedule = mutationField('createDialogueSchedule', {
   type: CreateDialogueScheduleOutput,
   args: { input: nonNull(CreateDialogueScheduleInput) },
-  description: 'Creates a dialogue schedule in the backend',
+  description: `
+    Creates a DialogueSchedule, consisting of an Evaluation and Data Period.
+    - Input style: Declarative. This means that the Input describes what the eventual state should look like.
+  `,
 
   resolve(parent, args, ctx) {
     // TODO: Validate input

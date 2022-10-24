@@ -287,6 +287,7 @@ export interface NexusGenInputs {
   }
   CreateDialogueScheduleInput: { // input type
     dataPeriod: NexusGenInputs['CreateDataPeriodInput']; // CreateDataPeriodInput!
+    enable: boolean | null; // Boolean
     evaluationPeriod?: NexusGenInputs['CreateEvaluationPeriodInput'] | null; // CreateEvaluationPeriodInput
     workspaceId: string; // String!
   }
@@ -777,10 +778,6 @@ export interface NexusGenInputs {
   }
   TextboxNodeEntryInput: { // input type
     value?: string | null; // String
-  }
-  ToggleDialogueScheduleInput: { // input type
-    dialogueScheduleId: string; // ID!
-    status: boolean; // Boolean!
   }
   TopicFilterInput: { // input type
     dialogueStrings?: string[] | null; // [String!]
@@ -2346,7 +2343,6 @@ export interface NexusGenFieldTypes {
     setActionRequestStatus: NexusGenRootTypes['ActionRequest'] | null; // ActionRequest
     setDialoguePrivacy: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     singleUpload: NexusGenRootTypes['ImageType'] | null; // ImageType
-    toggleDialogueSchedule: NexusGenRootTypes['DialogueSchedule'] | null; // DialogueSchedule
     updateAutomation: NexusGenRootTypes['AutomationModel'] | null; // AutomationModel
     updateCTA: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     updateCreateWorkspaceJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
@@ -3352,7 +3348,6 @@ export interface NexusGenFieldTypeNames {
     setActionRequestStatus: 'ActionRequest'
     setDialoguePrivacy: 'Dialogue'
     singleUpload: 'ImageType'
-    toggleDialogueSchedule: 'DialogueSchedule'
     updateAutomation: 'AutomationModel'
     updateCTA: 'QuestionNode'
     updateCreateWorkspaceJob: 'CreateWorkspaceJobType'
@@ -4036,9 +4031,6 @@ export interface NexusGenArgTypes {
     }
     singleUpload: { // args
       file: NexusGenScalars['Upload']; // Upload!
-    }
-    toggleDialogueSchedule: { // args
-      input: NexusGenInputs['ToggleDialogueScheduleInput']; // ToggleDialogueScheduleInput!
     }
     updateAutomation: { // args
       input?: NexusGenInputs['CreateAutomationInput'] | null; // CreateAutomationInput

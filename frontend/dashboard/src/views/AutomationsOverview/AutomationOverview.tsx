@@ -17,16 +17,17 @@ import {
   AutomationConnection,
   AutomationConnectionOrderType,
   useAutomationConnectionQuery,
-  useToggleDialogueScheduleMutation,
+  useCreateDialogueScheduleMutation,
 } from 'types/generated-types';
 import { ReactComponent as NoDataIll } from 'assets/images/undraw_no_data.svg';
 import { ReactComponent as SendoutThumbnail } from 'assets/images/thumbnails/sm/sendout.svg';
-
 import { View } from 'layouts/View';
+import { useCustomer } from 'providers/CustomerProvider';
 import Searchbar from 'components/Common/SearchBar';
 import useAuth from 'hooks/useAuth';
 
 import { DialogueScheduleModalBody } from '../DialogueOverview/DialogueScheduleModalBody';
+import { declareDialogueSchedule } from './AutomationOverview.helpers.tsx';
 import AutomationCard from './AutomationCard';
 
 interface AutomationOverviewProps {
@@ -36,6 +37,7 @@ interface AutomationOverviewProps {
 const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) => {
   const [isOpenScheduleModal, setIsOpenScheduleModal] = useState(false);
   const { customerSlug } = useParams<{ customerSlug: string }>();
+  const { activeCustomer } = useCustomer();
   const { t } = useTranslation();
   const [activeAutomationConnection, setAutomationConnection] = useState<AutomationConnection>(automationConnection);
   const [filter, setFilter] = useQueryParams({
@@ -72,7 +74,7 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
 
   const dialogueSchedule = data?.customer?.dialogueSchedule;
 
-  const [toggle] = useToggleDialogueScheduleMutation({
+  const [saveSchedule] = useCreateDialogueScheduleMutation({
     refetchQueries: ['automationConnection'],
   });
 
@@ -149,12 +151,12 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
                   <UI.Div>
                     {!!dialogueSchedule && (
                       <Switch.Root
-                        onChange={() => toggle({
+                        onChange={() => saveSchedule({
                           variables: {
-                            input: {
-                              status: !dialogueSchedule.isEnabled,
-                              dialogueScheduleId: dialogueSchedule.id as string,
-                            },
+                            input: declareDialogueSchedule({
+                              ...dialogueSchedule,
+                              isEnabled: !dialogueSchedule.isEnabled,
+                            }, activeCustomer?.id || ''),
                           },
                         })}
                         isChecked={dialogueSchedule.isEnabled as boolean}

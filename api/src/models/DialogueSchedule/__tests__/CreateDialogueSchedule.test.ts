@@ -37,6 +37,7 @@ describe('CreateDialogueSchedule', () => {
 
     const res = await mutate({
       workspaceId,
+      enable: true,
       dataPeriod: { startDateExpression: '59 23 * * 1', endInDeltaMinutes: 20 },
       evaluationPeriod: { startDateExpression: '59 23 * * 3', endInDeltaMinutes: 20 },
     }, token);
@@ -67,6 +68,7 @@ describe('CreateDialogueSchedule', () => {
 
     const res = await mutate({
       workspaceId,
+      enable: true,
       dataPeriod: { startDateExpression: '59 23 * * 1', endInDeltaMinutes: 20 },
       evaluationPeriod: { startDateExpression: '59 23 * * 3', endInDeltaMinutes: 20 },
     }, token);
@@ -91,6 +93,7 @@ describe('CreateDialogueSchedule', () => {
 
     await mutate({
       workspaceId,
+      enable: true,
       dataPeriod: { startDateExpression: '22 23 * * 1', endInDeltaMinutes: 20 },
       evaluationPeriod: { startDateExpression: '59 23 * * 3', endInDeltaMinutes: 20 },
     }, token);
@@ -108,6 +111,7 @@ describe('CreateDialogueSchedule', () => {
 
     await mutate({
       workspaceId,
+      enable: true,
       dataPeriod: { startDateExpression: '22 23 * * 1', endInDeltaMinutes: 20 },
       evaluationPeriod: { startDateExpression: '49 23 * * 1', endInDeltaMinutes: 20 },
     }, token);
@@ -122,5 +126,28 @@ describe('CreateDialogueSchedule', () => {
     expect(dialogueSchedulesFinal.length).toBe(1);
     expect(dialogueSchedulesFinal[0].dataPeriodSchedule?.startDateExpression).toBe('22 23 * * 1');
     expect(dialogueSchedulesFinal[0].evaluationPeriodSchedule?.startDateExpression).toBe('49 23 * * 1');
+  });
+
+  test('dialogue schedule can be toggled', async () => {
+    const user = await makeAdminUser(prisma);
+    const token = AuthService.createUserToken(user.id, 22);
+    const workspaceId = (await makeTestWorkspace(prisma)).customerId;
+
+    await mutate({
+      workspaceId,
+      enable: false,
+      dataPeriod: { startDateExpression: '59 23 * * 1', endInDeltaMinutes: 20 },
+      evaluationPeriod: { startDateExpression: '59 23 * * 3', endInDeltaMinutes: 20 },
+    }, token);
+
+    const dialogueSchedules = await prisma.dialogueSchedule.findMany({
+      include: {
+        dataPeriodSchedule: true,
+        evaluationPeriodSchedule: true,
+      },
+    });
+
+    expect(dialogueSchedules.length).toBe(1);
+    expect(dialogueSchedules[0].isEnabled).toBeFalsy();
   });
 })

@@ -610,6 +610,7 @@ input CreateDialogueInputType {
 """Input for creating a dialogue schedule."""
 input CreateDialogueScheduleInput {
   dataPeriod: CreateDataPeriodInput!
+  enable: Boolean = true
   evaluationPeriod: CreateEvaluationPeriodInput
   workspaceId: String!
 }
@@ -1569,7 +1570,12 @@ type Mutation {
   createCampaign(input: CreateCampaignInputType): CampaignType
   createDialogue(input: CreateDialogueInputType): Dialogue
 
-  """Creates a dialogue schedule in the backend"""
+  """
+  
+      Creates a DialogueSchedule, consisting of an Evaluation and Data Period.
+      - Input style: Declarative. This means that the Input describes what the eventual state should look like.
+    
+  """
   createDialogueSchedule(input: CreateDialogueScheduleInput!): CreateDialogueScheduleOutput
   createJobProcessLocation(input: createJobProcessLocationInput): JobProcessLocation
   createPermission(data: PermissionInput): PermssionType
@@ -1625,9 +1631,6 @@ type Mutation {
   setActionRequestStatus(input: SetActionRequestStatusInput!): ActionRequest
   setDialoguePrivacy(input: SetDialoguePrivacyInput): Dialogue
   singleUpload(file: Upload!): ImageType
-
-  """Toggle status of dialogue"""
-  toggleDialogueSchedule(input: ToggleDialogueScheduleInput!): DialogueSchedule
   updateAutomation(input: CreateAutomationInput): AutomationModel
   updateCTA(input: UpdateCTAInputType): QuestionNode
   updateCreateWorkspaceJob(errorMessage: String, id: String, referenceId: String, resourceUrl: String, status: JobStatusType): CreateWorkspaceJobType
@@ -2321,12 +2324,6 @@ input TagsInputObjectType {
 """Input type for a textbox node"""
 input TextboxNodeEntryInput {
   value: String
-}
-
-"""Input to Toggle status of dialogue schedule"""
-input ToggleDialogueScheduleInput {
-  dialogueScheduleId: ID!
-  status: Boolean!
 }
 
 """Model for topic"""

@@ -22,13 +22,6 @@ export class DialogueScheduleService {
     return fields ? new DialogueSchedule(fields) : null;
   }
 
-  public async toggleStatus(
-    dialogueScheduleId: string,
-    status: boolean
-  ) {
-    return this.prismaAdapter.toggleStatus(dialogueScheduleId, status);
-  }
-
   /**
    * Create a dialogue schedule.
    */

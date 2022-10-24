@@ -659,6 +659,7 @@ export type CreateDialogueInputType = {
 /** Input for creating a dialogue schedule. */
 export type CreateDialogueScheduleInput = {
   workspaceId: Scalars['String'];
+  enable?: Maybe<Scalars['Boolean']>;
   dataPeriod: CreateDataPeriodInput;
   evaluationPeriod?: Maybe<CreateEvaluationPeriodInput>;
 };
@@ -1777,10 +1778,11 @@ export type Mutation = {
   assignUserToActionRequest?: Maybe<ActionRequest>;
   setActionRequestStatus?: Maybe<ActionRequest>;
   verifyActionRequest?: Maybe<ActionRequest>;
-  /** Creates a dialogue schedule in the backend */
+  /**
+   * Creates a DialogueSchedule, consisting of an Evaluation and Data Period.
+   * - Input style: Declarative. This means that the Input describes what the eventual state should look like.
+   */
   createDialogueSchedule?: Maybe<CreateDialogueScheduleOutput>;
-  /** Creates a dialogue schedule in the backend */
-  toggleDialogueSchedule?: Maybe<DialogueSchedule>;
   sandbox?: Maybe<Scalars['String']>;
   generateWorkspaceFromCSV?: Maybe<Customer>;
   resetWorkspaceData?: Maybe<Scalars['Boolean']>;
@@ -1873,11 +1875,6 @@ export type MutationVerifyActionRequestArgs = {
 
 export type MutationCreateDialogueScheduleArgs = {
   input: CreateDialogueScheduleInput;
-};
-
-
-export type MutationToggleDialogueScheduleArgs = {
-  input: ToggleDialogueScheduleInput;
 };
 
 
@@ -3066,12 +3063,6 @@ export type TagsInputObjectType = {
 /** Input type for a textbox node */
 export type TextboxNodeEntryInput = {
   value?: Maybe<Scalars['String']>;
-};
-
-/** Toggle status of dialogue schedule */
-export type ToggleDialogueScheduleInput = {
-  dialogueScheduleId: Scalars['ID'];
-  status: Scalars['Boolean'];
 };
 
 /** Model for topic */

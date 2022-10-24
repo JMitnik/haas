@@ -1,5 +1,0 @@
-mutation ToggleDialogueSchedule($input: ToggleDialogueScheduleInput!) {
-  toggleDialogueSchedule(input: $input) {
-    id
-  }
-}
