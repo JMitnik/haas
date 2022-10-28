@@ -371,6 +371,14 @@ const language = {
       en: 'Clear filters',
       de: 'Clear filters',
     },
+    no_interactions_found: {
+      en: 'We could not find any interactions with the current filters.',
+      de: 'Wir konnten keine Wechselwirkungen mit den aktuellen Filtern feststellen.',
+    },
+    no_action_requests_found: {
+      en: 'We could not find any action requests with the current filters.',
+      de: 'Mit den aktuellen Filtern konnten wir keine Handlungsaufforderungen finden.',
+    },
     no_dialogues_found: {
       en: 'We could not find any dialogues with the current filters.',
       de: 'We could not find any dialogues with the current filters.',

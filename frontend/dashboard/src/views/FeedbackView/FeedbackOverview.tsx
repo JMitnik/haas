@@ -27,6 +27,7 @@ import {
   SessionConnectionOrder,
   SessionFragmentFragment, useGetWorkspaceSessionsQuery,
 } from 'types/generated-types';
+import { ReactComponent as NoDataIll } from 'assets/images/undraw_no_data.svg';
 import { PickerButton } from 'components/Common/Picker/PickerButton';
 import { ScoreBox } from 'components/ScoreBox';
 import { TabbedMenu } from 'components/Common/TabMenu';
@@ -444,6 +445,26 @@ export const FeedbackOverview = () => {
                 </Table.Cell>
               </Table.Row>
             ))}
+
+            {!isLoading && sessions.length === 0 && (
+              <UI.IllustrationCard
+                boxShadow="sm"
+                svg={<NoDataIll />}
+                text={t('no_interactions_found')}
+              >
+                <UI.Button
+                  variant="outline"
+                  onClick={() => setFilter({
+                    pageIndex: 0,
+                    search: '',
+                    minScore: 0,
+                    maxScore: 100,
+                  })}
+                >
+                  {t('clear_filters')}
+                </UI.Button>
+              </UI.IllustrationCard>
+            )}
           </UI.Div>
           <UI.Flex justifyContent="flex-end" mt={4}>
             {totalPages > 1 && (

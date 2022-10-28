@@ -28,6 +28,7 @@ import {
 } from 'types/generated-types';
 import { DateFormat, useDate } from 'hooks/useDate';
 import { ReactComponent as IconClose } from 'assets/icons/icon-close.svg';
+import { ReactComponent as NoDataIll } from 'assets/images/undraw_no_data.svg';
 import { PickerButton } from 'components/Common/Picker/PickerButton';
 import { TabbedMenu } from 'components/Common/TabMenu';
 import { UserNodePicker } from 'components/NodePicker/UserNodePicker';
@@ -461,6 +462,18 @@ export const ActionRequestOverview = () => {
                 </ContextMenu.Root>
               </UI.Div>
             ))}
+
+            {!loading && actionRequests.length === 0 && (
+              <UI.IllustrationCard
+                boxShadow="sm"
+                svg={<NoDataIll />}
+                text={t('no_action_requests_found')}
+              >
+                <UI.Button variant="outline" onClick={() => setFilter({ pageIndex: 0, search: '' })}>
+                  {t('clear_filters')}
+                </UI.Button>
+              </UI.IllustrationCard>
+            )}
           </UI.Div>
 
           <UI.Flex justifyContent="flex-end" mt={4}>
