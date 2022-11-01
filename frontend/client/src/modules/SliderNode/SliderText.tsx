@@ -11,12 +11,19 @@ interface SliderTextProps {
   isEarly: boolean;
   markers: Marker[];
   isNotStarted: boolean;
+  isValueValid: boolean;
 }
 
 /**
    * Renders adaptable SliderText based on current score, and relevant markers
    */
-export const SliderText = ({ color, adaptedColor, score, isEarly, markers, isNotStarted }: SliderTextProps) => {
+export const SliderText = ({ isValueValid,
+  color,
+  adaptedColor,
+  score,
+  isEarly,
+  markers,
+  isNotStarted }: SliderTextProps) => {
   const { t } = useTranslation();
   let text = '';
   let subText = '';
@@ -47,6 +54,13 @@ export const SliderText = ({ color, adaptedColor, score, isEarly, markers, isNot
 
     text = activeMarker?.label || t('thanks_for_voting');
     subText = activeMarker?.subLabel || '';
+  }
+
+  if (!isValueValid) {
+    text = t('no_slider_value');
+    subText = t('no_slider_value_helper');
+    color = 'red.700';
+    adaptedColor = 'red.600';
   }
 
   return (

@@ -78,6 +78,7 @@ const Slider = ({ form, onSubmit, markers }: SliderProps) => {
   const [isValid, setIsValid] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [showIsEarly, setShowIsEarly] = useState(false);
+  const [isValueValid, setValueValid] = useState(true);
   const animationControls = useAnimation();
   const timerProgressAbs = useMotionValue(0);
 
@@ -95,6 +96,11 @@ const Slider = ({ form, onSubmit, markers }: SliderProps) => {
     },
   });
 
+  const sliderValueWatch = useWatch({
+    control: form.control,
+    name: 'slider',
+  });
+
   // Initial timer for Client
   useTimer({
     endTime: initialWindUpSec,
@@ -104,9 +110,16 @@ const Slider = ({ form, onSubmit, markers }: SliderProps) => {
     },
   });
 
+  useEffect(() => {
+    if (!sliderValueWatch && !isComplete) {
+      return setValueValid(false);
+    }
+    return setValueValid(true);
+  }, [sliderValueWatch]);
+
   // Use-effect to submit: show the transition, and then submit the slider entry afterwards
   useEffect(() => {
-    if (isComplete) {
+    if (isComplete && isValueValid) {
       setTimeout(() => {
         onSubmit();
       }, 1000);
@@ -119,11 +132,6 @@ const Slider = ({ form, onSubmit, markers }: SliderProps) => {
       setIsValid(true);
     }
   }, [showIsEarly, setIsValid]);
-
-  const sliderValueWatch = useWatch({
-    control: form.control,
-    name: 'slider',
-  });
 
   // Hardcoded
   const timerProgress = useTransform(timerProgressAbs, [0, endTime], [151, 202]);
@@ -184,7 +192,7 @@ const Slider = ({ form, onSubmit, markers }: SliderProps) => {
   };
 
   const handleEarlyClick = () => {
-    if (showIsEarly) {
+    if (showIsEarly && isValueValid) {
       setIsComplete(true);
     }
   };
@@ -216,8 +224,9 @@ const Slider = ({ form, onSubmit, markers }: SliderProps) => {
         >
           <motion.div
             initial={{ opacity: 0, y: 70, x: 0 }}
-            animate={{ opacity: 1, y: 0 }}
+            animate={!isValueValid ? { rotate: [-1, 1.3, 0], opacity: 1, y: 0 } : { rotate: 0, opacity: 1, y: 0 }}
             whileHover={{ scale: 1.1 }}
+            transition={!isValueValid ? { ease: [0.16, 1, 0.3, 1], duration: 0.4 } : undefined}
           >
             <LS.SliderNodeValue
               initial="initial"
@@ -270,6 +279,7 @@ const Slider = ({ form, onSubmit, markers }: SliderProps) => {
               score={adjustedScore}
               isEarly={showIsEarly}
               isNotStarted={animationState.isStopped}
+              isValueValid={isValueValid}
             />
           </motion.div>
         </SliderSpeechWrapper>

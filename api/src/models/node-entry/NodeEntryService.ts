@@ -155,6 +155,17 @@ class NodeEntryService {
 
     const session = await this.sessionPrismaAdapter.findSessionById(sessionId);
 
+    // If for some reason no data is available set to negative
+    // TODO: This is a last resort and when we start to provide form for positive journeys needs to be fixed
+    // TODO: This will only set 0 values to non 0 value if journey is negative, 
+    // if values still come out as 0 we have to implement a fix for positive journey as well
+    if (!session?.mainScore) {
+      const updateSessionArgs: Prisma.SessionUpdateInput = {
+        mainScore: 40,
+      }
+      await this.sessionPrismaAdapter.updateSession(sessionId, updateSessionArgs);
+    }
+
     if (session && session.mainScore <= 55 && nodeEntryInput.data?.form?.values?.length) {
       const emergencyContact = nodeEntryInput.data?.form?.values?.find((value) => value?.contacts)?.contacts;
       const emergencyEmail = nodeEntryInput.data?.form?.values?.find((value) => value?.email)?.email;
