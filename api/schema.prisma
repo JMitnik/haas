@@ -11,6 +11,7 @@ datasource postgresql {
 
 enum AuditEventType {
   ASSIGN_ACTION_REQUEST
+  SEND_STALE_ACTION_REQUEST_REMINDER
 }
 
 model AuditEventOfActionRequest {
