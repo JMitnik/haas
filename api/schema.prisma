@@ -9,6 +9,31 @@ datasource postgresql {
   url      = env("DB_STRING")
 }
 
+enum AuditEventType {
+  ASSIGN_ACTION_REQUEST
+}
+
+model AuditEventOfActionRequest {
+  actionRequest   ActionRequest @relation(fields: [actionRequestId], references: [id])
+  actionRequestId String
+  auditEventId    String
+
+  @@unique([actionRequestId, auditEventId])
+}
+
+model AuditEvent {
+  id        String         @id @default(cuid())
+  createdAt DateTime       @default(now())
+  type      AuditEventType
+  version   Float
+  payload   Json
+  user      User?          @relation(fields: [userId], references: [id])
+  workspace Customer       @relation(fields: [workspaceId], references: [id])
+
+  userId      String?
+  workspaceId String
+}
+
 model Issue {
   id          String   @id @default(cuid())
   createdAt   DateTime @default(now())
@@ -39,22 +64,24 @@ enum ActionRequestState {
 }
 
 model ActionRequest {
-  id           String   @id @default(cuid())
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  dialogueId   String
-  assigneeId   String?
-  issueId      String?
-  requestEmail String?
-  isVerified   Boolean  @default(false)
+  id             String    @id @default(cuid())
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  lastRemindedAt DateTime?
+  dialogueId     String
+  assigneeId     String?
+  issueId        String?
+  requestEmail   String?
+  isVerified     Boolean   @default(false)
 
   status ActionRequestState @default(PENDING)
 
-  assignee User?     @relation(fields: [assigneeId], references: [id])
-  comments Comment[]
-  dialogue Dialogue  @relation(fields: [dialogueId], references: [id])
-  issue    Issue?    @relation(fields: [issueId], references: [id])
-  session  Session?
+  assignee    User?                       @relation(fields: [assigneeId], references: [id])
+  comments    Comment[]
+  dialogue    Dialogue                    @relation(fields: [dialogueId], references: [id])
+  issue       Issue?                      @relation(fields: [issueId], references: [id])
+  session     Session?
+  auditEvents AuditEventOfActionRequest[]
 }
 
 enum TopicType {
@@ -186,6 +213,7 @@ model Customer {
   users           UserOfCustomer[]
   topics          Topic[]
   issues          Issue[]
+  auditEvents     AuditEvent[]
 }
 
 model Tag {
@@ -591,6 +619,7 @@ model User {
   isAssignedTo         Dialogue[]
   isContactOfFormField FormNodeField[]
   actionRequests       ActionRequest[]
+  auditEvents          AuditEvent[]
 }
 
 model UserOfCustomer {
@@ -1222,6 +1251,7 @@ enum AutomationActionType {
   SEND_EMAIL
   API_CALL
   SEND_DIALOGUE_LINK
+  SEND_STALE_ACTION_REQUEST_REMINDER
   WEEK_REPORT
   MONTH_REPORT
   YEAR_REPORT
