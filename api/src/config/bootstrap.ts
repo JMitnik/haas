@@ -6,6 +6,7 @@ import { RedisService } from '../models/general/cache/RedisService';
 import { mailService } from '../services/mailings/MailService'
 import { LoginService } from '../models/auth/LoginService'
 import { IssueService } from '../models/Issue/IssueService';
+import { DialogueScheduleService } from '../models/DialogueSchedule/DialogueScheduleService';
 import UserService from '../models/users/UserService'
 import { APIServiceContainer } from '../types/APIContext'
 import CustomerService from '../models/customer/CustomerService'
@@ -66,6 +67,7 @@ export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOption
   const scheduledAutomationService = new ScheduledAutomationService(prisma);
   const workspaceStatisticsService = new WorkspaceStatisticsService(prisma);
   const actionRequestService = new ActionRequestService(prisma);
+  const dialogueScheduleService = new DialogueScheduleService(prisma);
 
   return {
     actionRequestService,
@@ -98,5 +100,6 @@ export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOption
     topicService,
     issueService,
     workspaceStatisticsService,
+    dialogueScheduleService,
   }
 }

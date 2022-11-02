@@ -588,6 +588,12 @@ input CreateCampaignVariantInputType {
   workspaceId: ID!
 }
 
+"""Input for creating a dialogue schedule."""
+input CreateDataPeriodInput {
+  endInDeltaMinutes: Int!
+  startDateExpression: String!
+}
+
 input CreateDialogueInputType {
   contentType: String
   customerSlug: String
@@ -599,6 +605,25 @@ input CreateDialogueInputType {
   tags: TagsInputObjectType
   templateDialogueId: String
   title: String
+}
+
+"""Input for creating a dialogue schedule."""
+input CreateDialogueScheduleInput {
+  dataPeriod: CreateDataPeriodInput!
+  enable: Boolean = true
+  evaluationPeriod: CreateEvaluationPeriodInput
+  workspaceId: String!
+}
+
+"""Result of creating dialogue schedule"""
+type CreateDialogueScheduleOutput {
+  dialogueSchedule: DialogueSchedule
+}
+
+"""Input for creating a dialogue schedule."""
+input CreateEvaluationPeriodInput {
+  endInDeltaMinutes: Int
+  startDateExpression: String!
 }
 
 input CreateQuestionNodeInputType {
@@ -677,6 +702,7 @@ type Customer {
   campaigns: [CampaignType]
   dialogue(where: DialogueWhereUniqueInput): Dialogue
   dialogueConnection(filter: DialogueConnectionFilterInput): DialogueConnection
+  dialogueSchedule: DialogueSchedule
   dialogues(filter: DialogueFilterInputType): [Dialogue]
   id: ID
   isDemo: Boolean
@@ -714,6 +740,19 @@ type CustomerSettings {
 
 input CustomerWhereUniqueInput {
   id: ID!
+}
+
+"""
+
+    A data period schedule defines the general
+  
+"""
+type DataPeriodSchedule {
+  activeEndDate: DateString
+  activeStartDate: DateString
+  endInDeltaMinutes: Int
+  id: ID
+  startDateExpression: String
 }
 
 """Date custom scalar type"""
@@ -871,6 +910,13 @@ type Dialogue {
   edges: [Edge]
   healthScore(input: HealthScoreInput): HealthScore
   id: String!
+
+  """
+  
+          A dialogue can be online or offline, depending on the configurations (schedule) or manual work.
+        
+  """
+  isOnline: Boolean
   isPrivate: Boolean
   isWithoutGenData: Boolean
   issues(filter: IssueFilterInput): Issue
@@ -953,6 +999,19 @@ type DialogueFinisherObjectType {
 
 enum DialogueImpactScoreType {
   AVERAGE
+}
+
+"""
+
+    A dialogue schedule defines the data period (period of time whilst data is good),
+    and evaluation period (period of time when a dialogue may be enabled).
+  
+"""
+type DialogueSchedule {
+  dataPeriodSchedule: DataPeriodSchedule
+  evaluationPeriodSchedule: EvaluationPeriodSchedule
+  id: ID
+  isEnabled: Boolean
 }
 
 type DialogueStatistics {
@@ -1055,6 +1114,20 @@ input EnableAutomationInput {
   automationId: String!
   state: Boolean!
   workspaceId: String!
+}
+
+"""
+
+    The Evaluation Period Schedule is used to define an opening and closing range for our dialogues.
+
+    Currently workspace-wide.
+  
+"""
+type EvaluationPeriodSchedule {
+  endInDeltaMinutes: Int
+  id: ID
+  isActive: Boolean
+  startDateExpression: String
 }
 
 type FailedDeliveryModel {
@@ -1496,6 +1569,14 @@ type Mutation {
   createCTA(input: CreateCTAInputType): QuestionNode
   createCampaign(input: CreateCampaignInputType): CampaignType
   createDialogue(input: CreateDialogueInputType): Dialogue
+
+  """
+  
+      Creates a DialogueSchedule, consisting of an Evaluation and Data Period.
+      - Input style: Declarative. This means that the Input describes what the eventual state should look like.
+    
+  """
+  createDialogueSchedule(input: CreateDialogueScheduleInput!): CreateDialogueScheduleOutput
   createJobProcessLocation(input: createJobProcessLocationInput): JobProcessLocation
   createPermission(data: PermissionInput): PermssionType
   createQuestion(input: CreateQuestionNodeInputType): QuestionNode

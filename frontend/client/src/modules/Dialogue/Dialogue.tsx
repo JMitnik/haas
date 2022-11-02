@@ -2,6 +2,7 @@ import { AnimatePresence } from 'framer-motion';
 import { useLocation, useNavigationType } from 'react-router-dom';
 import React, { useCallback, useEffect, useMemo } from 'react';
 
+import { ClosedDialogueModal } from 'modules/GuardModals/ClosedDialogueModal';
 import { DialogueStateType, QuestionNode, SessionEvent } from 'types/core-types';
 import { IllegalBackModal } from 'modules/GuardModals/IllegalBackModal';
 import { MapNode } from 'modules/Node/MapNode';
@@ -24,7 +25,8 @@ export const Dialogue = () => {
   }));
 
   // Get the current dialogue and node retrieval callback
-  const { dialogue, getCurrentNode } = useDialogueState((state) => ({
+  const { workspace, dialogue, getCurrentNode } = useDialogueState((state) => ({
+    workspace: state.workspace,
     dialogue: state.dialogue,
     getCurrentNode: state.getCurrentNode,
   }));
@@ -56,6 +58,8 @@ export const Dialogue = () => {
     detectUndoRedo(nodeId || '');
   }, [location, nodeId, detectUndoRedo, action]);
 
+  const isClosed = !workspace?.dialogueSchedule?.evaluationPeriodSchedule?.isActive;
+
   /**
    * Disable the upload queue if we already have created a session, and we are not in the final upload stages.
    *
@@ -78,7 +82,7 @@ export const Dialogue = () => {
       && activeEvent?.state?.stateType === DialogueStateType.CALL_TO_ACTION
     );
 
-    if (hasCreatedSession && (isAtPreUploadStage || postLeafToCallToAction)) return true;
+    if (hasCreatedSession && (isAtPreUploadStage || postLeafToCallToAction || isClosed)) return true;
 
     return false;
     // eslint-disable-next-line
@@ -93,6 +97,7 @@ export const Dialogue = () => {
    * 3. Upload the events to our server (batched or not) if we arrive at the CALL-to-ACTION or POST-LEAF.
    */
   const handleAction = useCallback((input: SessionEvent) => {
+    if (isClosed) return;
     const newEvent = applyEvent(input, isUploadDisabled);
     transition(newEvent?.state?.nodeId);
 
@@ -106,7 +111,7 @@ export const Dialogue = () => {
       // Upload the events to the server
       queueEvents(uploadBatch);
     }
-  }, [applyEvent, popEventQueue, transition, queueEvents, isUploadDisabled]);
+  }, [applyEvent, popEventQueue, transition, queueEvents, isUploadDisabled, isClosed]);
 
   const { restart, redoAll } = useDialogueState((state) => ({
     redoAll: state.redoAll,
@@ -152,6 +157,10 @@ export const Dialogue = () => {
         onRestart={handleRestart}
         open={isUploadDisabled}
         onRedo={handleRedoAll}
+      />
+
+      <ClosedDialogueModal
+        open={isClosed}
       />
 
       <AnimatePresence exitBeforeEnter>

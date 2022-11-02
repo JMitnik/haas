@@ -12,10 +12,10 @@ import {
   useQueryParams,
   withDefault,
 } from 'use-query-params';
-import { endOfDay, format, startOfDay } from 'date-fns';
+import { endOfDay, startOfDay } from 'date-fns';
 import { isPresent } from 'ts-is-present';
 import { useTranslation } from 'react-i18next';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import * as Menu from 'components/Common/Menu';
 import * as Modal from 'components/Common/Modal';
@@ -65,7 +65,7 @@ const setFilterDialogueIds = (activeDialogue?: Dialogue | null, dialogueIds?: (s
 
 export const FeedbackOverview = () => {
   const { t } = useTranslation();
-  const { format: dateFormat, getOneWeekAgo, getEndOfToday } = useDate();
+  const { format: dateFormat, getOneWeekAgo, getEndOfToday, parse } = useDate();
   const { activeCustomer } = useCustomer();
   const { formatScore } = useFormatter();
   const { activeDialogue } = useDialogue();
@@ -124,6 +124,20 @@ export const FeedbackOverview = () => {
       console.log('Error', e);
     },
     onCompleted: (fetchedData) => {
+      try {
+        if (
+          fetchedData.customer?.dialogueSchedule?.isEnabled
+          && fetchedData.customer.dialogueSchedule.dataPeriodSchedule
+        ) {
+          setDateRange([
+            parse(fetchedData.customer.dialogueSchedule.dataPeriodSchedule.activeStartDate, DateFormat.DayTimeFormat),
+            parse(fetchedData.customer.dialogueSchedule.dataPeriodSchedule.activeEndDate, DateFormat.DayTimeFormat),
+          ]);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+
       setSessions(
         fetchedData?.customer?.sessionConnection?.sessions || [],
       );
@@ -159,6 +173,9 @@ export const FeedbackOverview = () => {
   };
   const { menuProps, openMenu, closeMenu, activeItem: contextInteraction } = useMenu<SessionFragmentFragment>();
   const columns = '50px minmax(200px, 1fr) minmax(150px, 1fr) minmax(300px, 1fr) minmax(300px, 1fr)';
+
+  // TODO: Required because the range date picker otherwise is stuck with "wrong" default values. Not stable solution
+  if (isLoading) return <UI.Loader />;
 
   return (
     <View documentTitle="haas | Feedback">

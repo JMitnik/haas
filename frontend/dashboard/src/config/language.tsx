@@ -11,6 +11,94 @@ const language = {
     },
   },
   general: {
+    automatic_open_close_header: {
+      en: 'Automatic open and close',
+      de: 'Automatisches Öffnen und Schließen',
+    },
+    automatic_open_close_description: {
+      en: 'Enable automatic open and closing of dialogue',
+      de: 'Automatisches Öffnen und Schließen des Dialogs aktivieren',
+    },
+    how_it_works: {
+      en: 'How it works',
+      de: 'Wie es funktioniert',
+    },
+    schedule: {
+      en: 'Schedule',
+      de: 'Zeitplan',
+    },
+    complete: {
+      en: 'Complete',
+      de: 'Vollständig',
+    },
+    previous: {
+      en: 'Previous',
+      de: 'Vorherige',
+    },
+    next: {
+      en: 'Next',
+      de: 'Weiter',
+    },
+    data_period: {
+      en: 'Data period',
+      de: 'Datum Zeitraum',
+    },
+    data_period_description: {
+      en: 'How often do you wish to refresh your data?',
+      de: 'Wie oft möchten Sie Ihre Daten aktualisieren?',
+    },
+    highlighted_automations: {
+      en: 'Highlighted automations',
+      de: 'Hervorgehobene Automatisierungen',
+    },
+    schedule_card_heading: {
+      en: 'Automated schedules',
+      de: 'Automatisierte Zeitpläne',
+    },
+    schedule_card_alt_description: {
+      en: 'Setup your automated schedules',
+      de: 'Einrichten von automatischen Zeitplänen',
+    },
+    schedule_card_description: {
+      en: 'Automate the open and closing of dialogues and setup periodic data ranges.',
+      de: 'Automatisieren Sie das Öffnen und Schließen von Dialogen und richten Sie periodische Datenbereiche ein.',
+    },
+    get_started: {
+      en: 'Get started',
+      de: 'Anfangen',
+    },
+    custom_automations: {
+      en: 'Custom automations',
+      de: 'Benutzerdefinierte Automatisierungen',
+    },
+    weekday_mon: {
+      en: 'Monday',
+      de: 'Montag',
+    },
+    weekday_tue: {
+      en: 'Tuesday',
+      de: 'Dinstag',
+    },
+    weekday_wed: {
+      en: 'Wednesday',
+      de: 'Mittwoch',
+    },
+    weekday_thu: {
+      en: 'Thursday',
+      de: 'Donnerstag',
+    },
+    weekday_fri: {
+      en: 'Friday',
+      de: 'Freitag',
+    },
+    weekday_sat: {
+      en: 'Saturday',
+      de: 'Samstag',
+    },
+    weekday_sun: {
+      en: 'Sunday',
+      de: 'Sonntag',
+    },
     send_invite_email: {
       en: 'Send invite email',
       de: 'Einladungs-E-Mail senden',

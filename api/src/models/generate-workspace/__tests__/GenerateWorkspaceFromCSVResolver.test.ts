@@ -3,12 +3,14 @@ import { createReadStream } from 'fs';
 import { makeTestContext } from '../../../test/utils/makeTestContext';
 import AuthService from '../../auth/AuthService';
 import { prisma } from '../../../test/setup/singletonDeps';
-import { clearDatabase, createSuperAdmin, createUserWithAllRoles } from './testUtils';
+import { createSuperAdmin, createUserWithAllRoles } from './testUtils';
 import { DialogueTemplateType, FormNodeFieldType, RoleTypeEnum } from 'prisma/prisma-client';
 import businessWorkspaceTemplate from '../../../models/templates/businessWorkspaceTemplate';
 import englishSportWorkspaceTemplate from '../../../models/templates/sportWorkspaceEngTemplate';
 import dutchSportWorkspaceTemplate from '../../../models/templates/sportWorkspaceNlTemplate';
 import { generateCreateDialogueDataByTemplateLayers } from '../GenerateWorkspaceService.helpers';
+
+import { clearDatabase } from '../../../test/utils/clearDatabase';
 
 jest.setTimeout(30000);
 

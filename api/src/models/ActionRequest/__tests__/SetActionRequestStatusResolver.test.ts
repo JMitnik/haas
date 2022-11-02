@@ -1,9 +1,10 @@
 import { ActionRequestState } from '@prisma/client';
 
 import { makeTestContext } from '../../../test/utils/makeTestContext';
-import { clearDatabase, seedIssue, seedUser, seedWorkspace } from './testUtils';
+import { seedIssue, seedUser, seedWorkspace } from './testUtils';
 import { prisma } from '../../../test/setup/singletonDeps';
 import AuthService from '../../auth/AuthService';
+import { clearDatabase } from '../../../test/utils/clearDatabase';
 
 jest.setTimeout(30000);
 

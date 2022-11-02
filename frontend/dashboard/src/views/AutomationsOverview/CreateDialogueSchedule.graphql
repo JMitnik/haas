@@ -1,0 +1,7 @@
+mutation CreateDialogueSchedule($input: CreateDialogueScheduleInput!) {
+  createDialogueSchedule(input: $input) {
+    dialogueSchedule {
+      id
+    }
+  }
+}

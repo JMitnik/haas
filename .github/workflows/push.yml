@@ -22,7 +22,7 @@ jobs:
         env:
           SKIP_PREFLIGHT_CHECK: true
       - name: Start Testing Containers
-        run: yarn dock:up:test
+        run: yarn dock:test:up
       - name: Generate required artifacts
         run: yarn gen:api:prisma
         env:

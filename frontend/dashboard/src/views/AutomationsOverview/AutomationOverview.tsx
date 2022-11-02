@@ -10,17 +10,24 @@ import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
+import * as Modal from 'components/Common/Modal';
+import * as Switch from 'components/Common/Switch';
 import * as Table from 'components/Common/Table';
 import {
   AutomationConnection,
   AutomationConnectionOrderType,
   useAutomationConnectionQuery,
+  useCreateDialogueScheduleMutation,
 } from 'types/generated-types';
 import { ReactComponent as NoDataIll } from 'assets/images/undraw_no_data.svg';
+import { ReactComponent as SendoutThumbnail } from 'assets/images/thumbnails/sm/sendout.svg';
 import { View } from 'layouts/View';
+import { useCustomer } from 'providers/CustomerProvider';
 import Searchbar from 'components/Common/SearchBar';
 import useAuth from 'hooks/useAuth';
 
+import { DialogueScheduleModalBody } from '../DialogueOverview/DialogueScheduleModalBody';
+import { declareDialogueSchedule } from './AutomationOverview.helpers.tsx';
 import AutomationCard from './AutomationCard';
 
 interface AutomationOverviewProps {
@@ -28,7 +35,9 @@ interface AutomationOverviewProps {
 }
 
 const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) => {
+  const [isOpenScheduleModal, setIsOpenScheduleModal] = useState(false);
   const { customerSlug } = useParams<{ customerSlug: string }>();
+  const { activeCustomer } = useCustomer();
   const { t } = useTranslation();
   const [activeAutomationConnection, setAutomationConnection] = useState<AutomationConnection>(automationConnection);
   const [filter, setFilter] = useQueryParams({
@@ -37,7 +46,7 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
     perPage: withDefault(NumberParam, 7),
   });
 
-  const { loading: isLoading } = useAutomationConnectionQuery({
+  const { data, loading: isLoading } = useAutomationConnectionQuery({
     fetchPolicy: 'network-only',
     variables: {
       customerSlug,
@@ -63,6 +72,12 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
   const filteredAutomations = activeAutomationConnection.automations;
   const pageCount = activeAutomationConnection.totalPages || 0;
 
+  const dialogueSchedule = data?.customer?.dialogueSchedule;
+
+  const [saveSchedule] = useCreateDialogueScheduleMutation({
+    refetchQueries: ['automationConnection'],
+  });
+
   return (
     <View documentTitle="haas | Automations">
       <UI.ViewHead>
@@ -77,18 +92,6 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
                   {t('automations_subtitle')}
                 </UI.ViewSubTitle>
               </UI.Div>
-
-              {canCreateAutomations && (
-                <UI.Div>
-                  <UI.NavButton
-                    leftIcon={() => <Plus />}
-                    size="sm"
-                    to={`/dashboard/b/${customerSlug}/automation/add`}
-                  >
-                    {t('create_automation')}
-                  </UI.NavButton>
-                </UI.Div>
-              )}
             </UI.Flex>
           </UI.Div>
 
@@ -107,6 +110,101 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
         </UI.Flex>
       </UI.ViewHead>
       <UI.ViewBody>
+        <UI.Div mb={96}>
+          <UI.Div mb={4}>
+            <UI.H3 color="off.400">
+              {t('highlighted_automations')}
+            </UI.H3>
+          </UI.Div>
+
+          <Modal.Root
+            open={isOpenScheduleModal}
+            onClose={() => setIsOpenScheduleModal(false)}
+          >
+            <DialogueScheduleModalBody
+              dialogueSchedule={dialogueSchedule || undefined}
+              onClose={() => setIsOpenScheduleModal(false)}
+            />
+          </Modal.Root>
+
+          <UI.Grid
+            gridGap={4}
+            gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(350px, 1fr))']}
+            gridAutoRows="minmax(200px, 1fr)"
+          >
+            <UI.Card>
+              <UI.CardBody>
+                <UI.Flex justifyContent="space-between" alignItems="center">
+                  <UI.Flex alignItems="center">
+                    <UI.Div maxWidth={50}>
+                      <UI.Thumbnail>
+                        <SendoutThumbnail />
+                      </UI.Thumbnail>
+                    </UI.Div>
+                    <UI.Div ml={4}>
+                      <UI.H4 fontSize="1.2rem" color="off.500" fontWeight={600}>
+                        {t('schedule_card_heading')}
+                      </UI.H4>
+                    </UI.Div>
+                  </UI.Flex>
+
+                  <UI.Div>
+                    {!!dialogueSchedule && (
+                      <Switch.Root
+                        onChange={() => saveSchedule({
+                          variables: {
+                            input: declareDialogueSchedule({
+                              ...dialogueSchedule,
+                              isEnabled: !dialogueSchedule.isEnabled,
+                            }, activeCustomer?.id || ''),
+                          },
+                        })}
+                        isChecked={dialogueSchedule.isEnabled as boolean}
+                      >
+                        <Switch.Thumb />
+                      </Switch.Root>
+                    )}
+                  </UI.Div>
+                </UI.Flex>
+
+                <UI.Div mt={2}>
+                  <UI.Text fontSize="1rem" color="off.500">
+                    {t('schedule_card_description')}
+                  </UI.Text>
+                </UI.Div>
+
+                {!dialogueSchedule ? (
+                  <UI.Button onClick={() => setIsOpenScheduleModal(true)} mt={4} size="sm">
+                    {t('get_started')}
+                  </UI.Button>
+                ) : (
+                  <UI.Button onClick={() => setIsOpenScheduleModal(true)} mt={4} size="sm">
+                    {t('edit')}
+                  </UI.Button>
+                )}
+              </UI.CardBody>
+            </UI.Card>
+          </UI.Grid>
+        </UI.Div>
+
+        <UI.Div mb={4}>
+          <UI.Flex alignItems="center">
+            <UI.H3 color="off.400">
+              {t('custom_automations')}
+            </UI.H3>
+            {canCreateAutomations && (
+              <UI.Div ml={4}>
+                <UI.NavButton
+                  leftIcon={() => <Plus />}
+                  size="sm"
+                  to={`/dashboard/b/${customerSlug}/automation/add`}
+                >
+                  {t('create_automation')}
+                </UI.NavButton>
+              </UI.Div>
+            )}
+          </UI.Flex>
+        </UI.Div>
         <UI.Grid
           gridGap={4}
           gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(350px, 1fr))']}
