@@ -11,6 +11,18 @@ const language = {
     },
   },
   general: {
+    stale_request_reminder_card_heading: {
+      en: 'Automated reminders',
+      de: 'Automatisierte Erinnerungen',
+    },
+    stale_request_reminder_card_alt_description: {
+      en: 'Setup your automated reminders',
+      de: 'Richten Sie Ihre automatischen Erinnerungen ein',
+    },
+    stale_request_reminder_card_description: {
+      en: 'Automate sending reminders to the people in charge of your action requests.',
+      de: 'Automatisieren Sie das Versenden von Erinnerungen an die Verantwortlichen für Ihre Aktionsanfragen.',
+    },
     automatic_open_close_header: {
       en: 'Automatic open and close',
       de: 'Automatisches Öffnen und Schließen',

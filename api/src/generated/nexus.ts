@@ -703,6 +703,11 @@ export interface NexusGenInputs {
     reportUrl: string; // String!
     workspaceSlug: string; // String!
   }
+  SendStaleRequestReminderInput: { // input type
+    automationActionId: string; // String!
+    daysNoAction: number; // Int!
+    workspaceSlug: string; // String!
+  }
   SessionConnectionFilterInput: { // input type
     campaignVariantId?: string | null; // String
     deliveryType?: NexusGenEnums['SessionDeliveryType'] | null; // SessionDeliveryType
@@ -2341,6 +2346,7 @@ export interface NexusGenFieldTypes {
     sandbox: string | null; // String
     sendAutomationDialogueLink: boolean | null; // Boolean
     sendAutomationReport: boolean | null; // Boolean
+    sendStaleRequestReminder: boolean | null; // Boolean
     setActionRequestStatus: NexusGenRootTypes['ActionRequest'] | null; // ActionRequest
     setDialoguePrivacy: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     singleUpload: NexusGenRootTypes['ImageType'] | null; // ImageType
@@ -3347,6 +3353,7 @@ export interface NexusGenFieldTypeNames {
     sandbox: 'String'
     sendAutomationDialogueLink: 'Boolean'
     sendAutomationReport: 'Boolean'
+    sendStaleRequestReminder: 'Boolean'
     setActionRequestStatus: 'ActionRequest'
     setDialoguePrivacy: 'Dialogue'
     singleUpload: 'ImageType'
@@ -4025,6 +4032,9 @@ export interface NexusGenArgTypes {
     }
     sendAutomationReport: { // args
       input?: NexusGenInputs['SendAutomationReportInput'] | null; // SendAutomationReportInput
+    }
+    sendStaleRequestReminder: { // args
+      input: NexusGenInputs['SendStaleRequestReminderInput']; // SendStaleRequestReminderInput!
     }
     setActionRequestStatus: { // args
       input: NexusGenInputs['SetActionRequestStatusInput']; // SetActionRequestStatusInput!

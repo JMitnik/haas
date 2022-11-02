@@ -11,6 +11,7 @@ export class AWSServiceMap {
   public Report_Eventbridge_DLQName: string = 'ReportCrawler_EventBridge_DLQ';
 
   public DialogueSender_SNS_PubTopic: string = 'dialogueLinkSender';
+  public StaleRequestReminder_SNS_PubTopic: string = 'staleRequestReminder';
 
   constructor(accountId: string, awsConfig: AWSSDK.Config) {
     this.accountId = accountId;

@@ -4,6 +4,7 @@ import {
 } from 'aws-cdk-lib'
 import { DialogueLinkSenderService } from './DialogueLinkSender/DialogueLinkSenderService';
 import { ReportCrawlerService } from './ReportCrawler/ReportCrawlerService';
+import { StaleRequestReminderService } from './StaleRequestReminder/StaleRequestReminderService';
 
 /**
  * Preconditions:
@@ -21,6 +22,11 @@ export class Automations extends Stack {
     new ReportCrawlerService(this, 'ReportCrawlerService', {});
 
     new DialogueLinkSenderService(this, 'DialogueLinkSender', {
+      // TODO: No-go
+      AUTOMATION_API_KEY: jwtSecret.secretValueFromJson('AUTOMATION_API_KEY').toString()
+    });
+
+    new StaleRequestReminderService(this, 'StaleRequestReminder', {
       // TODO: No-go
       AUTOMATION_API_KEY: jwtSecret.secretValueFromJson('AUTOMATION_API_KEY').toString()
     });

@@ -49,8 +49,11 @@ export const findLambdaParamsByActionType = (
   type: AutomationActionType,
   generateLambdaParams: GenerateReportLambdaParams,
   sendDialogueLinkParams: SendDialogueLinkLambdaParams,
+  sendStaleReminderParams: any,
 ) => {
   switch (type) {
+    case AutomationActionType.SEND_STALE_ACTION_REQUEST_REMINDER:
+      return sendStaleReminderParams;
     case AutomationActionType.SEND_DIALOGUE_LINK:
       return sendDialogueLinkParams;
     case AutomationActionType.WEEK_REPORT:

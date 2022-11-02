@@ -115,6 +115,7 @@ const authShield = shield({
     authenticateLambda: allow,
     assignUserToActionRequest: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_ACCESS_ALL_ACTION_REQUESTS)),
     setActionRequestStatus: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_ACCESS_ALL_ACTION_REQUESTS)),
+    sendStaleRequestReminder: or(isSuperAdmin, isVerifiedUser),
     sendAutomationDialogueLink: or(isSuperAdmin, isVerifiedUser, containsWorkspacePermission(SystemPermissionEnum.CAN_ACCESS_REPORT_PAGE)),
     sendAutomationReport: or(isSuperAdmin, isVerifiedUser, containsWorkspacePermission(SystemPermissionEnum.CAN_ACCESS_REPORT_PAGE)),
     resetWorkspaceData: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_RESET_WORKSPACE_DATA)),

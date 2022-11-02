@@ -26,7 +26,10 @@ import { useCustomer } from 'providers/CustomerProvider';
 import Searchbar from 'components/Common/SearchBar';
 import useAuth from 'hooks/useAuth';
 
+import { DialogueScheduleCard } from './DialogueScheduleCard';
 import { DialogueScheduleModalBody } from '../DialogueOverview/DialogueScheduleModalBody';
+import { StaleReminderModalBody } from './StaleReminderModalBody';
+import { StaleRequestReminderCard } from './StaleRequestReminderCard';
 import { declareDialogueSchedule } from './AutomationOverview.helpers.tsx';
 import AutomationCard from './AutomationCard';
 
@@ -36,6 +39,7 @@ interface AutomationOverviewProps {
 
 const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) => {
   const [isOpenScheduleModal, setIsOpenScheduleModal] = useState(false);
+  const [isOpenReminderModal, setIsOpenReminderModal] = useState(false);
   const { customerSlug } = useParams<{ customerSlug: string }>();
   const { activeCustomer } = useCustomer();
   const { t } = useTranslation();
@@ -127,63 +131,23 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
             />
           </Modal.Root>
 
+          <Modal.Root
+            open={isOpenReminderModal}
+            onClose={() => setIsOpenReminderModal(false)}
+          >
+            <StaleReminderModalBody
+              dialogueSchedule={dialogueSchedule || undefined}
+              onClose={() => setIsOpenReminderModal(false)}
+            />
+          </Modal.Root>
+
           <UI.Grid
             gridGap={4}
             gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(350px, 1fr))']}
             gridAutoRows="minmax(200px, 1fr)"
           >
-            <UI.Card>
-              <UI.CardBody>
-                <UI.Flex justifyContent="space-between" alignItems="center">
-                  <UI.Flex alignItems="center">
-                    <UI.Div maxWidth={50}>
-                      <UI.Thumbnail>
-                        <SendoutThumbnail />
-                      </UI.Thumbnail>
-                    </UI.Div>
-                    <UI.Div ml={4}>
-                      <UI.H4 fontSize="1.2rem" color="off.500" fontWeight={600}>
-                        {t('schedule_card_heading')}
-                      </UI.H4>
-                    </UI.Div>
-                  </UI.Flex>
-
-                  <UI.Div>
-                    {!!dialogueSchedule && (
-                      <Switch.Root
-                        onChange={() => saveSchedule({
-                          variables: {
-                            input: declareDialogueSchedule({
-                              ...dialogueSchedule,
-                              isEnabled: !dialogueSchedule.isEnabled,
-                            }, activeCustomer?.id || ''),
-                          },
-                        })}
-                        isChecked={dialogueSchedule.isEnabled as boolean}
-                      >
-                        <Switch.Thumb />
-                      </Switch.Root>
-                    )}
-                  </UI.Div>
-                </UI.Flex>
-
-                <UI.Div mt={2}>
-                  <UI.Text fontSize="1rem" color="off.500">
-                    {t('schedule_card_description')}
-                  </UI.Text>
-                </UI.Div>
-
-                {!dialogueSchedule ? (
-                  <UI.Button onClick={() => setIsOpenScheduleModal(true)} mt={4} size="sm">
-                    {t('get_started')}
-                  </UI.Button>
-                ) : (
-                  <UI.Button onClick={() => setIsOpenScheduleModal(true)} mt={4} size="sm">
-                    {t('edit')}
-                  </UI.Button>
-                )}
-              </UI.CardBody>
-            </UI.Card>
+            <DialogueScheduleCard onOpenModalChange={setIsOpenScheduleModal} dialogueSchedule={dialogueSchedule} />
+            <StaleRequestReminderCard onOpenModalChange={setIsOpenReminderModal} dialogueSchedule={dialogueSchedule} />
           </UI.Grid>
         </UI.Div>
 

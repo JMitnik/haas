@@ -124,11 +124,22 @@ class ScheduledAutomationService {
         WORKSPACE_SLUG: workspaceSlug,
       }
 
+      const sendStaleReminderParams = {
+        AUTOMATION_SCHEDULE_ID: automationScheduledId,
+        AUTOMATION_ACTION_ID: action.id,
+        AUTHENTICATE_EMAIL: 'automations@haas.live',
+        API_URL: `${config.baseUrl}/graphql`,
+        WORKSPACE_EMAIL: botUser.email,
+        WORKSPACE_SLUG: workspaceSlug,
+        DAYS_NO_ACTION: 7,
+      }
+
       // Lambda input is passed directly to
       const lambdaInput = findLambdaParamsByActionType(
         action.type,
         extraGenerateParams,
-        sendDialogueLinkParams
+        sendDialogueLinkParams,
+        sendStaleReminderParams
       );
 
       return {
@@ -147,6 +158,8 @@ class ScheduledAutomationService {
    */
   private getActionARN(type: AutomationActionType) {
     switch (type) {
+      case AutomationActionType.SEND_STALE_ACTION_REQUEST_REMINDER:
+        return this.awsServiceMap.getSNSResource(this.awsServiceMap.StaleRequestReminder_SNS_PubTopic);
       case AutomationActionType.SEND_DIALOGUE_LINK:
         return this.awsServiceMap.getSNSResource(this.awsServiceMap.DialogueSender_SNS_PubTopic);
       case AutomationActionType.WEEK_REPORT:
