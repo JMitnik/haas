@@ -3,7 +3,7 @@ import { inputObjectType, mutationField, nonNull } from 'nexus';
 export const SendStaleRequestReminderInput = inputObjectType({
   name: 'SendStaleRequestReminderInput',
   definition(t) {
-    t.string('workspaceSlug', { required: true });
+    t.string('workspaceId', { required: true });
     t.string('automationActionId', { required: true });
     t.nonNull.int('daysNoAction');
   },
@@ -16,8 +16,8 @@ export const SendStaleRequestReminderResolver = mutationField('sendStaleRequestR
   },
   nullable: true,
   resolve: async (parent, args, ctx) => {
-    return ctx.services.automationActionService.sendDialogueLink(
-      args.input.workspaceSlug, args.input.automationActionId
+    return ctx.services.automationActionService.sendStaleRequestReminder(
+      args.input.workspaceId, args.input.automationActionId, args.input.daysNoAction
     );
   },
 });

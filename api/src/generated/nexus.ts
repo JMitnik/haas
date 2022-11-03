@@ -706,7 +706,7 @@ export interface NexusGenInputs {
   SendStaleRequestReminderInput: { // input type
     automationActionId: string; // String!
     daysNoAction: number; // Int!
-    workspaceSlug: string; // String!
+    workspaceId: string; // String!
   }
   SessionConnectionFilterInput: { // input type
     campaignVariantId?: string | null; // String

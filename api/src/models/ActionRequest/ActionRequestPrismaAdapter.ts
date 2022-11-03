@@ -12,6 +12,22 @@ export class ActionRequestPrismaAdapter {
     this.prisma = prisma;
   }
 
+  public async updateMany(
+    whereInput: Prisma.ActionRequestWhereInput,
+    updateManyInput: Prisma.ActionRequestUpdateManyMutationInput
+  ) {
+    return this.prisma.actionRequest.updateMany({
+      data: updateManyInput,
+      where: whereInput,
+    })
+  }
+
+  public async findMany(where: Prisma.ActionRequestWhereInput) {
+    return this.prisma.actionRequest.findMany({
+      where,
+    });
+  };
+
   public async findById(actionRequestId: string) {
     return this.prisma.actionRequest.findUnique({
       where: {

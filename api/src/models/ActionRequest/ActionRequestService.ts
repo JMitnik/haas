@@ -2,6 +2,7 @@ import {
   Prisma,
   PrismaClient,
 } from '@prisma/client';
+import { differenceInDays, sub, subDays } from 'date-fns'
 
 import { ActionRequestPrismaAdapter } from './ActionRequestPrismaAdapter';
 import {
@@ -18,6 +19,51 @@ class ActionRequestService {
 
   constructor(prisma: PrismaClient) {
     this.actionRequestPrismaAdapter = new ActionRequestPrismaAdapter(prisma);
+  }
+
+  public async updateLastRemindedStaleRequests(requestIds: string[]) {
+    const updateManyInput: Prisma.ActionRequestUpdateManyMutationInput = {
+      lastRemindedAt: new Date(),
+    };
+
+    const whereInput: Prisma.ActionRequestWhereInput = {
+      id: {
+        in: requestIds,
+      },
+    };
+
+    return this.actionRequestPrismaAdapter.updateMany(whereInput, updateManyInput);
+  }
+
+  public async findStaleWorkspaceActionRequests(workspaceId: string, daysNoAction: number) {
+    const currentDate = new Date();
+    const isStaleDate = subDays(currentDate, daysNoAction);
+
+    const whereInput: Prisma.ActionRequestWhereInput = {
+      dialogue: {
+        customerId: workspaceId,
+      },
+      status: {
+        notIn: ['DROPPED', 'COMPLETED'],
+      },
+      assigneeId: {
+        not: null,
+      },
+      OR: [
+        {
+          updatedAt: {
+            lte: isStaleDate,
+          },
+        },
+        {
+          lastRemindedAt: {
+            lte: isStaleDate,
+          },
+        },
+      ],
+    };
+
+    return this.actionRequestPrismaAdapter.findMany(whereInput);
   }
 
   public async verifyActionRequest(input: VerifyActionRequestInput) {

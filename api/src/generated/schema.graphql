@@ -2112,7 +2112,7 @@ input SendAutomationReportInput {
 input SendStaleRequestReminderInput {
   automationActionId: String!
   daysNoAction: Int!
-  workspaceSlug: String!
+  workspaceId: String!
 }
 
 type Session {

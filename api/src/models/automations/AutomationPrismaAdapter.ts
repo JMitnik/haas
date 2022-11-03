@@ -21,6 +21,18 @@ export class AutomationPrismaAdapter {
     this.scheduledAutomationPrismaAdapter = new ScheduledAutomationPrismaAdapter(prisma);
   }
 
+  public async findAutomationActionById(automationActionId: string) {
+    return this.prisma.automationAction.findUnique({
+      where: {
+        id: automationActionId,
+      },
+      include: {
+        channels: true,
+      },
+    });
+  }
+
+
   /**
    * Deletes an automation from the database
    * @param input

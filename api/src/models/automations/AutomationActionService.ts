@@ -1,5 +1,5 @@
 import { AutomationAction, AutomationActionChannel, AutomationActionChannelType, AutomationActionType, PrismaClient, UserOfCustomer } from 'prisma/prisma-client';
-import { uniqBy } from 'lodash';
+import { groupBy, uniqBy } from 'lodash';
 
 import UserService from '../users/UserService';
 import config from '../../config/config';
@@ -7,12 +7,14 @@ import { ReportLambdaInput, ReportService } from './ReportService';
 import { GenerateReportPayload, UserWithAssignedDialogues } from '../../models/users/UserServiceTypes';
 import makeDialogueLinkReminderTemplate from '../../services/mailings/templates/makeDialogueLinkReminderTemplate';
 import makeReportMailTemplate from '../../services/mailings/templates/makeReportTemplate';
+import makeStaleRequestReminderTemplate from '../../services/mailings/templates/makeStaleRequestReminderTemplate';
 import { mailService } from '../../services/mailings/MailService';
 import { AutomationPrismaAdapter } from './AutomationPrismaAdapter';
 import { CustomerPrismaAdapter } from '../../models/customer/CustomerPrismaAdapter';
 import UserPrismaAdapter from '../../models/users/UserPrismaAdapter';
 import { ScheduledAutomationPrismaAdapter } from './ScheduledAutomationPrismaAdapter';
 import { GraphQLYogaError } from '@graphql-yoga/node';
+import ActionRequestService from '../ActionRequest/ActionRequestService';
 
 export class AutomationActionService {
   private prisma: PrismaClient;
@@ -22,6 +24,7 @@ export class AutomationActionService {
   customerPrismaAdapter: CustomerPrismaAdapter;
   userPrismaAdapter: UserPrismaAdapter;
   scheduledAutomationPrismaAdapter: ScheduledAutomationPrismaAdapter;
+  actionRequestService: ActionRequestService;
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
@@ -31,6 +34,26 @@ export class AutomationActionService {
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prisma);
     this.userPrismaAdapter = new UserPrismaAdapter(prisma);
     this.scheduledAutomationPrismaAdapter = new ScheduledAutomationPrismaAdapter(prisma);
+    this.actionRequestService = new ActionRequestService(prisma);
+  }
+
+  /**
+   * Sends a reminder to all users in a workspace who have stale action requests 
+   */
+  public async sendStaleRequestReminder(automationActionId: string, workspaceId: string, daysNoAction: number) {
+    const automationAction = await this.automationPrismaAdapter.findAutomationActionById(automationActionId);
+
+    if (!automationAction) throw new GraphQLYogaError('No automation action found for ID!');
+
+    try {
+      for (const channel of automationAction.channels) {
+        await this.handleStaleActionReminderChannel(channel, workspaceId, daysNoAction);
+      }
+    } catch {
+      return false
+    }
+
+    return true;
   }
 
   /**
@@ -39,14 +62,7 @@ export class AutomationActionService {
    * report.
    */
   public async sendReport(automationActionId: string, workspaceSlug: string, reportUrl: string) {
-    const automationAction = await this.prisma.automationAction.findUnique({
-      where: {
-        id: automationActionId,
-      },
-      include: {
-        channels: true,
-      },
-    });
+    const automationAction = await this.automationPrismaAdapter.findAutomationActionById(automationActionId);
 
     if (!automationAction) throw new GraphQLYogaError('No automation action found for ID!');
 
@@ -56,48 +72,6 @@ export class AutomationActionService {
 
     return true;
   };
-
-  /**
-   * Runs an action lambda based on the specified AutomationActionType
-   * @param automationAction an Prisma AutomationAction object
-   * @param workspaceSlug the slug of the workspace the automation belongs to
-   * @param dialogueSlug the slug of the pertaining dialogue (OPTIONAL)
-   * @returns the succesfull running of a SNS related to the action
-   */
-  public async handleAutomationAction(
-    automationAction: AutomationAction & { channels: AutomationActionChannel[] },
-    workspaceSlug: string,
-    dialogueSlug?: string
-  ) {
-    switch (automationAction.type) {
-      case AutomationActionType.SEND_DIALOGUE_LINK:
-        return this.sendDialogueLink(
-          automationAction.automationScheduledId as string, workspaceSlug
-        );
-      case AutomationActionType.WEEK_REPORT:
-        return this.dispatchGenerateReportJob(
-          automationAction.id,
-          workspaceSlug,
-          dialogueSlug,
-        );
-      case AutomationActionType.MONTH_REPORT:
-        return this.dispatchGenerateReportJob(
-          automationAction.id,
-          workspaceSlug,
-          dialogueSlug,
-        );
-      case AutomationActionType.YEAR_REPORT:
-        return this.dispatchGenerateReportJob(
-          automationAction.id,
-          workspaceSlug,
-          dialogueSlug,
-        );
-
-      default: {
-        return new Promise((resolve) => resolve(''));
-      }
-    };
-  }
 
   /**
    * Finds all AutomationAction Channels by an automation action ID
@@ -122,6 +96,23 @@ export class AutomationActionService {
       await this.handleSendDialogueChannel(channel, workspaceSlug)
     }
     return true;
+  }
+
+  private async dispatchStaleRequestReminderJob(workspaceSlug: string, userId: string, totalRequests: number) {
+    const user = await this.userService.getUserById(userId);
+
+    if (!user) return;
+
+    mailService.send({
+      body: makeStaleRequestReminderTemplate({
+        recipientName: user.firstName || 'User',
+        totalRequests,
+        userId: user.id,
+        workspaceSlug,
+      }),
+      recipient: user.email,
+      subject: 'A new HAAS survey has been released for your team',
+    });
   }
 
   /**
@@ -341,5 +332,50 @@ export class AutomationActionService {
     }
 
     return this.reportService.dispatchJob(reportInput);
+  }
+
+  private async handleStaleActionReminderEmailChannel(
+    workspaceId: string,
+    daysNoAction: number
+  ) {
+    const workspace = await this.customerPrismaAdapter.findWorkspaceById(workspaceId);
+    const actionRequests = await this.actionRequestService.findStaleWorkspaceActionRequests(
+      workspaceId,
+      daysNoAction
+    );
+
+    if (!workspace || !actionRequests.length) return;
+
+    const requestsGroupedUserId = groupBy(actionRequests, (request) => request.assigneeId);
+
+    for (const [userId, requests] of Object.entries(requestsGroupedUserId)) {
+      const totalRequests = requests.length;
+      await this.dispatchStaleRequestReminderJob(workspace.slug, userId, totalRequests);
+    }
+
+    // Update lastReminded for all stale requests
+    const actionRequestIds = actionRequests.map((request) => request.id)
+    await this.actionRequestService.updateLastRemindedStaleRequests(actionRequestIds);
+  }
+
+  private async handleStaleActionReminderChannel(
+    channel: AutomationActionChannel,
+    workspaceId: string,
+    daysNoAction: number
+  ) {
+    switch (channel.type) {
+      case AutomationActionChannelType.EMAIL:
+        await this.handleStaleActionReminderEmailChannel(workspaceId, daysNoAction);
+        break;
+      case AutomationActionChannelType.SMS:
+        // TODO: Implement
+        break;
+      case AutomationActionChannelType.SLACK:
+        // TODO: Implement
+        break;
+      default:
+        await this.handleStaleActionReminderEmailChannel(workspaceId, daysNoAction);
+        break;
+    }
   }
 }
