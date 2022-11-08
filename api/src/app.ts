@@ -5,19 +5,34 @@ import { makeServer } from './config/server';
 import { redis } from './config/redis';
 import { logger } from './config/logger';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
+import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { PrismaInstrumentation } from '@prisma/instrumentation';
 import { RedisInstrumentation } from '@opentelemetry/instrumentation-redis';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-otlp-http';
 
 void (async () => {
   const { tracerProvider } = await init;
 
+  const exporter = new OTLPTraceExporter({
+    headers: {
+      Authorization: `LumigoToken ${process.env.LUMIGO_TRACER_TOKEN}`,
+    },
+  })
+
   registerInstrumentations({
     tracerProvider,
-    instrumentations: [new PrismaInstrumentation(), new RedisInstrumentation()],
+    instrumentations: [
+      new PrismaInstrumentation(),
+      new RedisInstrumentation(),
+    ],
   });
 
+  tracerProvider.addSpanProcessor(
+    new BatchSpanProcessor(exporter),
+  );
+
   try {
-    makeServer(config.port, prisma);
+    await makeServer(config.port, prisma);
   } catch (e: unknown) {
     logger.error('Error in lifecycle', e);
   }
