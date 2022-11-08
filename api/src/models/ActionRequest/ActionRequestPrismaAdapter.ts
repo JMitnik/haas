@@ -12,6 +12,12 @@ export class ActionRequestPrismaAdapter {
     this.prisma = prisma;
   }
 
+  public async deleteMany(where: Prisma.ActionRequestWhereInput) {
+    return this.prisma.actionRequest.deleteMany({
+      where,
+    });
+  }
+
   public async findById(actionRequestId: string) {
     return this.prisma.actionRequest.findUnique({
       where: {

@@ -1,5 +1,6 @@
 import { DialogueTemplateType, PrismaClient, Role, RoleTypeEnum } from 'prisma/prisma-client';
 import { ApolloError } from 'apollo-server-express';
+import { GraphQLYogaError } from '@graphql-yoga/node';
 
 import TemplateService from '../templates/TemplateService';
 import { NexusGenEnums } from '../../generated/nexus';
@@ -16,8 +17,8 @@ import { DemoWorkspaceTemplate } from '../templates/TemplateTypes';
 import UserService from '../../models/users/UserService';
 import { GenerateWorkspaceCSVInput, Workspace } from './GenerateWorkspace.types';
 import CustomerService from '../../models/customer/CustomerService';
-import { GraphQLYogaError } from '@graphql-yoga/node';
 import { logger } from '../../config/logger';
+import { ActionRequestPrismaAdapter } from '../ActionRequest/ActionRequestPrismaAdapter';
 
 class GenerateWorkspaceService {
   customerPrismaAdapter: CustomerPrismaAdapter;
@@ -29,6 +30,7 @@ class GenerateWorkspaceService {
   dialogueService: DialogueService;
   customerService: CustomerService;
   userService: UserService;
+  actionRequestPrismaAdapter: ActionRequestPrismaAdapter;
 
   constructor(prismaClient: PrismaClient) {
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prismaClient);
@@ -40,6 +42,7 @@ class GenerateWorkspaceService {
     this.dialogueService = new DialogueService(prismaClient);
     this.customerService = new CustomerService(prismaClient);
     this.userService = new UserService(prismaClient);
+    this.actionRequestPrismaAdapter = new ActionRequestPrismaAdapter(prismaClient);
   };
 
   /**
@@ -57,6 +60,16 @@ class GenerateWorkspaceService {
     // Find all sessions
     const sessions = await this.sessionPrismaAdapter.findCustomerSessions(workspaceId);
     const sessionIds = sessions.map((session) => session.id);
+
+    // Delete all action requests connected prev sessions
+    await this.actionRequestPrismaAdapter.deleteMany({
+      session: {
+        id: {
+          in: sessionIds,
+        },
+      },
+    });
+
     await this.sessionPrismaAdapter.deleteMany(sessionIds);
 
     const dialogues = await this.dialogueService.findDialoguesByCustomerId(workspaceId);
