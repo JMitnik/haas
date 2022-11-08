@@ -7,6 +7,11 @@ export const DEPTH_BACKGROUND_COLORS = [
 
 export const ACTION_OPTIONS = [
   {
+    label: 'Stale request reminder',
+    description: 'Sending out a reminder when action requests hav not been updated for a week',
+    value: AutomationActionType.SendStaleActionRequestReminder,
+  },
+  {
     label: 'Customizable report',
     description: 'Sending out a report based on a customer schedule to requested stakeholder',
     value: AutomationActionType.CustomReport,

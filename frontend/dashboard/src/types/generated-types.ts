@@ -215,7 +215,8 @@ export enum AutomationActionType {
   MonthReport = 'MONTH_REPORT',
   YearReport = 'YEAR_REPORT',
   CustomReport = 'CUSTOM_REPORT',
-  Webhook = 'WEBHOOK'
+  Webhook = 'WEBHOOK',
+  SendStaleActionRequestReminder = 'SEND_STALE_ACTION_REQUEST_REMINDER'
 }
 
 export type AutomationConditionBuilderInput = {
@@ -1778,7 +1779,10 @@ export type Mutation = {
   assignUserToActionRequest?: Maybe<ActionRequest>;
   setActionRequestStatus?: Maybe<ActionRequest>;
   verifyActionRequest?: Maybe<ActionRequest>;
-  /** Creates a dialogue schedule in the backend */
+  /**
+   * Creates a DialogueSchedule, consisting of an Evaluation and Data Period.
+   * - Input style: Declarative. This means that the Input describes what the eventual state should look like.
+   */
   createDialogueSchedule?: Maybe<CreateDialogueScheduleOutput>;
   sandbox?: Maybe<Scalars['String']>;
   generateWorkspaceFromCSV?: Maybe<Customer>;
@@ -1806,6 +1810,7 @@ export type Mutation = {
   deleteAutomation?: Maybe<AutomationModel>;
   sendAutomationDialogueLink?: Maybe<Scalars['Boolean']>;
   sendAutomationReport?: Maybe<Scalars['Boolean']>;
+  sendStaleRequestReminder?: Maybe<Scalars['Boolean']>;
   createCampaign?: Maybe<CampaignType>;
   createBatchDeliveries?: Maybe<CreateBatchDeliveriesOutputType>;
   updateDeliveryStatus?: Maybe<Scalars['String']>;
@@ -1997,6 +2002,11 @@ export type MutationSendAutomationDialogueLinkArgs = {
 
 export type MutationSendAutomationReportArgs = {
   input?: Maybe<SendAutomationReportInput>;
+};
+
+
+export type MutationSendStaleRequestReminderArgs = {
+  input: SendStaleRequestReminderInput;
 };
 
 
@@ -2835,6 +2845,12 @@ export type SendAutomationReportInput = {
   workspaceSlug: Scalars['String'];
   automationActionId: Scalars['String'];
   reportUrl: Scalars['String'];
+};
+
+export type SendStaleRequestReminderInput = {
+  workspaceId: Scalars['String'];
+  automationActionId: Scalars['String'];
+  daysNoAction: Scalars['Int'];
 };
 
 export type Session = {

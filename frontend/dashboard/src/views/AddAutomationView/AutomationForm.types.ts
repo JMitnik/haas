@@ -190,7 +190,8 @@ export const schema = yup.object({
         id: yup.string(),
         type: yup.mixed<AutomationActionType>().oneOf(Object.values(AutomationActionType)),
         targets: yup.array().when('type', {
-          is: (actionType) => actionType !== AutomationActionType.SendDialogueLink,
+          is: (actionType) => actionType !== AutomationActionType.SendDialogueLink
+            && actionType !== AutomationActionType.SendStaleActionRequestReminder,
           then: yup.array().required().of(
             yup.object().required().shape({
               label: yup.string().required(),

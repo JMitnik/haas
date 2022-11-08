@@ -263,9 +263,12 @@ export const AutomationForm = ({
             </UI.FormSection>
           )}
 
-          {activeActionType && activeActionType !== AutomationActionType.SendDialogueLink && (
-            <RecipientsFragment recipientEntries={userPickerEntries} />
-          )}
+          {activeActionType
+            && activeActionType !== AutomationActionType.SendDialogueLink
+            && activeActionType !== AutomationActionType.SendStaleActionRequestReminder
+            && (
+              <RecipientsFragment recipientEntries={userPickerEntries} />
+            )}
 
           <UI.Flex>
             <UI.Button

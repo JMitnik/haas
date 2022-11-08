@@ -26,7 +26,7 @@ export const StaleRequestReminderCard = ({ dialogueSchedule, onOpenModalChange }
     <UI.Card>
       <UI.CardBody>
         <UI.Flex justifyContent="space-between" alignItems="center">
-          <UI.Flex alignItems="center">
+          <UI.Flex width="100%" alignItems="center">
             <UI.Div maxWidth={50}>
               <UI.Thumbnail>
                 <SendoutThumbnail />
@@ -37,6 +37,14 @@ export const StaleRequestReminderCard = ({ dialogueSchedule, onOpenModalChange }
                 {t('stale_request_reminder_card_heading')}
               </UI.H4>
             </UI.Div>
+            <UI.Flex flexGrow={1} justifyContent="flex-end">
+              <Switch.Root
+                isChecked
+                onChange={() => null}
+              >
+                <Switch.Thumb />
+              </Switch.Root>
+            </UI.Flex>
           </UI.Flex>
 
           <UI.Div>

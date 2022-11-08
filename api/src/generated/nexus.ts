@@ -893,7 +893,7 @@ export interface NexusGenEnums {
   ActionRequestConnectionOrderType: "createdAt"
   ActionRequestState: "COMPLETED" | "DROPPED" | "PENDING" | "STALE"
   AutomationActionChannelType: "EMAIL" | "SLACK" | "SMS"
-  AutomationActionType: "API_CALL" | "CUSTOM_REPORT" | "MONTH_REPORT" | "SEND_DIALOGUE_LINK" | "SEND_EMAIL" | "SEND_SMS" | "WEBHOOK" | "WEEK_REPORT" | "YEAR_REPORT"
+  AutomationActionType: "API_CALL" | "CUSTOM_REPORT" | "MONTH_REPORT" | "SEND_DIALOGUE_LINK" | "SEND_EMAIL" | "SEND_SMS" | "SEND_STALE_ACTION_REQUEST_REMINDER" | "WEBHOOK" | "WEEK_REPORT" | "YEAR_REPORT"
   AutomationConditionBuilderType: "AND" | "OR"
   AutomationConditionOperatorType: "EVERY_N_TH_TIME" | "GREATER_OR_EQUAL_THAN" | "GREATER_THAN" | "INNER_RANGE" | "IS_EQUAL" | "IS_FALSE" | "IS_NOT_EQUAL" | "IS_TRUE" | "OUTER_RANGE" | "SMALLER_OR_EQUAL_THAN" | "SMALLER_THAN"
   AutomationConditionScopeType: "DIALOGUE" | "QUESTION" | "WORKSPACE"

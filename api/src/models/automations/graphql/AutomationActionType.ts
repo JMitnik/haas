@@ -12,5 +12,6 @@ export const AutomationActionType = enumType({
     'YEAR_REPORT',
     'CUSTOM_REPORT',
     'WEBHOOK',
+    'SEND_STALE_ACTION_REQUEST_REMINDER',
   ],
 });
