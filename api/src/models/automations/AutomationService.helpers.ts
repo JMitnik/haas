@@ -376,6 +376,7 @@ export const constructCreateAutomationInput = (input: NexusGenInputs['CreateAuto
   //   : undefined;
 
   return {
+    id: validatedInput.id,
     label: validatedInput.label,
     workspaceId: validatedInput.workspaceId,
     automationType: validatedInput.automationType,

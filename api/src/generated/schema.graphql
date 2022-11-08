@@ -612,6 +612,7 @@ input CreateDialogueScheduleInput {
   dataPeriod: CreateDataPeriodInput!
   enable: Boolean = true
   evaluationPeriod: CreateEvaluationPeriodInput
+  id: String
   workspaceId: String!
 }
 
