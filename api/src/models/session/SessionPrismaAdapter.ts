@@ -16,6 +16,15 @@ class SessionPrismaAdapter {
     this.prisma = prismaClient;
   };
 
+  public async updateSession(sessionId: string, data: Prisma.SessionUpdateInput) {
+    return this.prisma.session.update({
+      where: {
+        id: sessionId,
+      },
+      data,
+    })
+  }
+
   /**
    * Finds sessions within a workspace based on a set of filters
    * @param dialogueIds

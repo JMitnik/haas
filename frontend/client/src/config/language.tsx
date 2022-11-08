@@ -1,6 +1,14 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    no_slider_value: {
+      en: 'Oops, my bad',
+      nl: 'Oeps, mijn fout',
+    },
+    no_slider_value_helper: {
+      en: 'Please slide again',
+      nl: 'Slide opnieuw alsjeblieft',
+    },
     slide_explainer: {
       en: 'Slide left or right',
       de: 'Nach links oder rechts schieben',
