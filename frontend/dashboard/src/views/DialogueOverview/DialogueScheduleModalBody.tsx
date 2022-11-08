@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unused-prop-types */
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useMemo, useState } from 'react';
@@ -23,6 +23,7 @@ import {
   recurringDateToEndDeltaMinutes,
 } from 'components/Common/DatePicker/RecurringDatePicker.helper';
 import { useCustomer } from 'providers/CustomerProvider';
+import useCronSchedule from 'views/AddAutomationView/useCronSchedule';
 
 import {
   addMinutesToPeriod,
@@ -244,6 +245,20 @@ const EvalPeriodStep = ({ state, onNextStep, onPrevStep }: StepProps) => {
   const { isValid } = form.formState;
   const { handleSubmit } = form;
 
+  const evalPeriod = useWatch({
+    control: form.control,
+  });
+
+  const startDates = useCronSchedule(
+    parsePeriodToCron({ day: evalPeriod?.startDay, time: evalPeriod?.startTime }),
+  );
+
+  const endDates = useCronSchedule(
+    parsePeriodToCron({ day: evalPeriod?.startDay, time: evalPeriod?.startTime }),
+  );
+
+  console.log({ startDates, endDates });
+
   const buildNewState = () => {
     const values = form.getValues();
 
@@ -426,6 +441,7 @@ export const DialogueScheduleModalBody = ({
       },
     };
   });
+
   const { activeCustomer } = useCustomer();
 
   const [create, { loading: isLoading, error }] = useCreateDialogueScheduleMutation({

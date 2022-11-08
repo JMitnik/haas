@@ -5,6 +5,7 @@ import later from '@breejs/later';
 // Hook
 function useCronSchedule(cronString: string) {
   const [schedule, setSchedule] = useState<Date[] | undefined>();
+
   useEffect(
     () => {
       if (cronString) {
