@@ -289,6 +289,7 @@ export interface NexusGenInputs {
     dataPeriod: NexusGenInputs['CreateDataPeriodInput']; // CreateDataPeriodInput!
     enable: boolean | null; // Boolean
     evaluationPeriod?: NexusGenInputs['CreateEvaluationPeriodInput'] | null; // CreateEvaluationPeriodInput
+    id?: string | null; // String
     workspaceId: string; // String!
   }
   CreateEvaluationPeriodInput: { // input type

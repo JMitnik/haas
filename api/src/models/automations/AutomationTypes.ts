@@ -113,6 +113,8 @@ export interface UpdateConditionBuilderInput extends CreateConditionBuilderInput
 }
 
 export interface CreateAutomationInput {
+  id?: string;
+  isActive?: boolean;
   label: string;
   workspaceId: string;
   automationType: AutomationType;

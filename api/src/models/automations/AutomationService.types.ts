@@ -1,5 +1,17 @@
 import { Prisma } from 'prisma/prisma-client';
 
+const automation = Prisma.validator<Prisma.AutomationArgs>()({
+  include: {
+    automationScheduled: {
+      include: {
+        actions: true,
+      },
+    },
+  },
+});
+
+export type AutomationWithSchedule = Prisma.AutomationGetPayload<typeof automation>;
+
 const workspace = Prisma.validator<Prisma.CustomerArgs>()({
   include: {
     roles: true,

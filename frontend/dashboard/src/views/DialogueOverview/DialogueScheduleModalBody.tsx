@@ -466,6 +466,7 @@ export const DialogueScheduleModalBody = ({
   };
 
   const stateToCreate = (activeState: DialogueScheduleState): CreateDialogueScheduleInput => ({
+    id: dialogueSchedule?.id,
     workspaceId: activeCustomer?.id || '-1',
     dataPeriod: {
       startDateExpression: recurringDateToCron(activeState.dataPeriod.schedule),

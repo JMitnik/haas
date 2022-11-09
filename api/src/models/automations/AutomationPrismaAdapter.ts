@@ -333,8 +333,31 @@ export class AutomationPrismaAdapter {
       data: {
         isActive: input.state,
       },
+      include: {
+        automationScheduled: {
+          include: {
+            actions: true,
+          },
+        },
+      },
     });
   };
+
+  update = async (automationId: string, data: Prisma.AutomationUpdateInput) => {
+    return this.prisma.automation.update({
+      where: {
+        id: automationId,
+      },
+      data,
+      include: {
+        automationScheduled: {
+          include: {
+            actions: true,
+          },
+        },
+      },
+    })
+  }
 
   /**
    * Updates an automation based on provided input
@@ -386,9 +409,11 @@ export class AutomationPrismaAdapter {
    * @returns an created Automation
    */
   createAutomation = async (input: CreateAutomationInput) => {
-    const { description, workspaceId, label, automationType } = input;
+    const { description, workspaceId, label, automationType, id, isActive } = input;
     return this.prisma.automation.create({
       data: {
+        id,
+        isActive,
         label: label,
         type: automationType,
         description,
