@@ -52,7 +52,7 @@ const sendStaleRequestReminder = async (
   apiUrl: string,
   accessToken: string,
   automationActionId: string,
-  workspaceSlug: string,
+  workspaceId: string,
   daysNoAction: number = 7,
 ) => {
   const res = await fetch(apiUrl, {
@@ -63,11 +63,11 @@ const sendStaleRequestReminder = async (
       mutation SendStaleRequestReminder($input: SendStaleRequestReminderInput!) {
         sendStaleRequestReminder(input: $input)
       }`,
-      operationName: "sendAutomationDialogueLink",
+      operationName: "sendStaleRequestReminder",
       variables: {
         input: {
           automationActionId,
-          workspaceSlug,
+          workspaceId,
           daysNoAction
         }
       }
@@ -85,6 +85,7 @@ exports.main = async function (event: any, context: any) {
   const authorizationKey = process.env.AUTOMATION_API_KEY;
   const automationActionId: string = message.AUTOMATION_ACTION_ID;
   const daysNoAction: number = message.DAYS_NO_ACTION;
+  const workspaceId: string = message.WORKSPACE_ID;
 
   if (!apiUrl) throw new JSONInputError('apiUrl');
   if (!authenticateEmail) throw new JSONInputError('authenticateEmail');
@@ -99,7 +100,7 @@ exports.main = async function (event: any, context: any) {
   const verifyTokenMutation = await verifyToken(apiUrl, token);
   const accessToken = verifyTokenMutation?.data?.verifyUserToken?.accessToken;
   console.log('Access token: ', accessToken);
-  const resultTwo = await sendStaleRequestReminder(apiUrl, accessToken, automationActionId, workspaceSlug, daysNoAction);
+  const resultTwo = await sendStaleRequestReminder(apiUrl, accessToken, automationActionId, workspaceId, daysNoAction);
   console.log('Result two: ', resultTwo);
   return accessToken;
 }

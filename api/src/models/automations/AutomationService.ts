@@ -82,6 +82,7 @@ class AutomationService {
       automation.automationScheduled?.actions || [],
       botUser!,
       workspace.slug,
+      workspace.id,
       dialogue?.slug,
     );
 

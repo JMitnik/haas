@@ -92,6 +92,7 @@ class ScheduledAutomationService {
     actions: AutomationAction[],
     botUser: User,
     workspaceSlug: string,
+    workspaceId: string,
     dialogueSlug?: string,
   ): Promise<AWS.EventBridge.TargetList> {
     const generalDLQ = this.awsServiceMap.getSQSResource(this.awsServiceMap.Report_Eventbridge_DLQName);
@@ -132,6 +133,7 @@ class ScheduledAutomationService {
         WORKSPACE_EMAIL: botUser.email,
         WORKSPACE_SLUG: workspaceSlug,
         DAYS_NO_ACTION: 7,
+        WORKSPACE_ID: workspaceId,
       }
 
       // Lambda input is passed directly to
