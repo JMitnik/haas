@@ -41,6 +41,7 @@ export class AutomationActionService {
    * Sends a reminder to all users in a workspace who have stale action requests 
    */
   public async sendStaleRequestReminder(automationActionId: string, workspaceId: string, daysNoAction: number) {
+    console.log('automationActionId: ', automationActionId);
     const automationAction = await this.automationPrismaAdapter.findAutomationActionById(automationActionId);
 
     if (!automationAction) throw new GraphQLYogaError('No automation action found for ID!');
