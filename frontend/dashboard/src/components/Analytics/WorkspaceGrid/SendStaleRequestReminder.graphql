@@ -1,0 +1,3 @@
+mutation SendStaleRequestReminder($input: SendStaleRequestReminderInput!) {
+	sendStaleRequestReminder(input: $input)
+}

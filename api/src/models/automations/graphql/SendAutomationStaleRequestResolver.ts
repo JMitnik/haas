@@ -17,7 +17,7 @@ export const SendStaleRequestReminderResolver = mutationField('sendStaleRequestR
   nullable: true,
   resolve: async (parent, args, ctx) => {
     return ctx.services.automationActionService.sendStaleRequestReminder(
-      args.input.workspaceId, args.input.automationActionId, args.input.daysNoAction
+      args.input.automationActionId, args.input.workspaceId, args.input.daysNoAction
     );
   },
 });

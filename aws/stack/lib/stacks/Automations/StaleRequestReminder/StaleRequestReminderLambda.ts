@@ -52,8 +52,7 @@ const sendStaleRequestReminder = async (
   apiUrl: string,
   accessToken: string,
   automationActionId: string,
-  workspaceId: string,
-  daysNoAction: number = 7,
+  workspaceSlug: string,
 ) => {
   const res = await fetch(apiUrl, {
     method: 'POST',
@@ -63,12 +62,12 @@ const sendStaleRequestReminder = async (
       mutation SendStaleRequestReminder($input: SendStaleRequestReminderInput!) {
         sendStaleRequestReminder(input: $input)
       }`,
-      operationName: "sendStaleRequestReminder",
+      operationName: "SendStaleRequestReminder",
       variables: {
         input: {
           automationActionId,
-          workspaceId,
-          daysNoAction
+          workspaceId: workspaceSlug,
+          daysNoAction: 7
         }
       }
     })
@@ -96,11 +95,12 @@ exports.main = async function (event: any, context: any) {
 
   const result = await authenticateLambda(apiUrl, authenticateEmail, workspaceEmail, authorizationKey);
   console.log('result: ', result);
+  console.log('message: ', message);
   const token = result?.data.authenticateLambda;
   const verifyTokenMutation = await verifyToken(apiUrl, token);
   const accessToken = verifyTokenMutation?.data?.verifyUserToken?.accessToken;
   console.log('Access token: ', accessToken);
-  const resultTwo = await sendStaleRequestReminder(apiUrl, accessToken, automationActionId, workspaceId, daysNoAction);
+  const resultTwo = await sendStaleRequestReminder(apiUrl, accessToken, automationActionId, workspaceId);
   console.log('Result two: ', resultTwo);
   return accessToken;
 }

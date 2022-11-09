@@ -3607,6 +3607,16 @@ export type ResetWorkspaceDataMutation = (
   & Pick<Mutation, 'resetWorkspaceData'>
 );
 
+export type SendStaleRequestReminderMutationVariables = Exact<{
+  input: SendStaleRequestReminderInput;
+}>;
+
+
+export type SendStaleRequestReminderMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'sendStaleRequestReminder'>
+);
+
 export type GetWorkspaceSummaryDetailsQueryVariables = Exact<{
   id?: Maybe<Scalars['ID']>;
   summaryInput: DialogueStatisticsSummaryFilterInput;
@@ -5476,6 +5486,37 @@ export function useResetWorkspaceDataMutation(baseOptions?: Apollo.MutationHookO
 export type ResetWorkspaceDataMutationHookResult = ReturnType<typeof useResetWorkspaceDataMutation>;
 export type ResetWorkspaceDataMutationResult = Apollo.MutationResult<ResetWorkspaceDataMutation>;
 export type ResetWorkspaceDataMutationOptions = Apollo.BaseMutationOptions<ResetWorkspaceDataMutation, ResetWorkspaceDataMutationVariables>;
+export const SendStaleRequestReminderDocument = gql`
+    mutation SendStaleRequestReminder($input: SendStaleRequestReminderInput!) {
+  sendStaleRequestReminder(input: $input)
+}
+    `;
+export type SendStaleRequestReminderMutationFn = Apollo.MutationFunction<SendStaleRequestReminderMutation, SendStaleRequestReminderMutationVariables>;
+
+/**
+ * __useSendStaleRequestReminderMutation__
+ *
+ * To run a mutation, you first call `useSendStaleRequestReminderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSendStaleRequestReminderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [sendStaleRequestReminderMutation, { data, loading, error }] = useSendStaleRequestReminderMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useSendStaleRequestReminderMutation(baseOptions?: Apollo.MutationHookOptions<SendStaleRequestReminderMutation, SendStaleRequestReminderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SendStaleRequestReminderMutation, SendStaleRequestReminderMutationVariables>(SendStaleRequestReminderDocument, options);
+      }
+export type SendStaleRequestReminderMutationHookResult = ReturnType<typeof useSendStaleRequestReminderMutation>;
+export type SendStaleRequestReminderMutationResult = Apollo.MutationResult<SendStaleRequestReminderMutation>;
+export type SendStaleRequestReminderMutationOptions = Apollo.BaseMutationOptions<SendStaleRequestReminderMutation, SendStaleRequestReminderMutationVariables>;
 export const GetWorkspaceSummaryDetailsDocument = gql`
     query GetWorkspaceSummaryDetails($id: ID, $summaryInput: DialogueStatisticsSummaryFilterInput!, $healthInput: HealthScoreInput!) {
   customer(id: $id) {
@@ -8371,6 +8412,12 @@ export namespace ResetWorkspaceData {
   export type Variables = ResetWorkspaceDataMutationVariables;
   export type Mutation = ResetWorkspaceDataMutation;
   export const Document = ResetWorkspaceDataDocument;
+}
+
+export namespace SendStaleRequestReminder {
+  export type Variables = SendStaleRequestReminderMutationVariables;
+  export type Mutation = SendStaleRequestReminderMutation;
+  export const Document = SendStaleRequestReminderDocument;
 }
 
 export namespace GetWorkspaceSummaryDetails {
