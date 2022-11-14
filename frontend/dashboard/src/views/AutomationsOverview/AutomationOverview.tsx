@@ -11,26 +11,19 @@ import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
 import * as Modal from 'components/Common/Modal';
-import * as Switch from 'components/Common/Switch';
 import * as Table from 'components/Common/Table';
 import {
   AutomationConnection,
   AutomationConnectionOrderType,
   useAutomationConnectionQuery,
-  useCreateDialogueScheduleMutation,
 } from 'types/generated-types';
 import { ReactComponent as NoDataIll } from 'assets/images/undraw_no_data.svg';
-import { ReactComponent as SendoutThumbnail } from 'assets/images/thumbnails/sm/sendout.svg';
 import { View } from 'layouts/View';
-import { useCustomer } from 'providers/CustomerProvider';
 import Searchbar from 'components/Common/SearchBar';
 import useAuth from 'hooks/useAuth';
 
 import { DialogueScheduleCard } from './DialogueScheduleCard';
 import { DialogueScheduleModalBody } from '../DialogueOverview/DialogueScheduleModalBody';
-import { StaleReminderModalBody } from './StaleReminderModalBody';
-import { StaleRequestReminderCard } from './StaleRequestReminderCard';
-import { declareDialogueSchedule } from './AutomationOverview.helpers.tsx';
 import AutomationCard from './AutomationCard';
 
 interface AutomationOverviewProps {
@@ -39,9 +32,7 @@ interface AutomationOverviewProps {
 
 const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) => {
   const [isOpenScheduleModal, setIsOpenScheduleModal] = useState(false);
-  const [isOpenReminderModal, setIsOpenReminderModal] = useState(false);
   const { customerSlug } = useParams<{ customerSlug: string }>();
-  const { activeCustomer } = useCustomer();
   const { t } = useTranslation();
   const [activeAutomationConnection, setAutomationConnection] = useState<AutomationConnection>(automationConnection);
   const [filter, setFilter] = useQueryParams({
@@ -77,10 +68,6 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
   const pageCount = activeAutomationConnection.totalPages || 0;
 
   const dialogueSchedule = data?.customer?.dialogueSchedule;
-
-  const [saveSchedule] = useCreateDialogueScheduleMutation({
-    refetchQueries: ['automationConnection'],
-  });
 
   return (
     <View documentTitle="haas | Automations">
@@ -131,23 +118,12 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
             />
           </Modal.Root>
 
-          <Modal.Root
-            open={isOpenReminderModal}
-            onClose={() => setIsOpenReminderModal(false)}
-          >
-            <StaleReminderModalBody
-              dialogueSchedule={dialogueSchedule || undefined}
-              onClose={() => setIsOpenReminderModal(false)}
-            />
-          </Modal.Root>
-
           <UI.Grid
             gridGap={4}
             gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(350px, 1fr))']}
             gridAutoRows="minmax(200px, 1fr)"
           >
             <DialogueScheduleCard onOpenModalChange={setIsOpenScheduleModal} dialogueSchedule={dialogueSchedule} />
-            <StaleRequestReminderCard onOpenModalChange={setIsOpenReminderModal} dialogueSchedule={dialogueSchedule} />
           </UI.Grid>
         </UI.Div>
 

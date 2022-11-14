@@ -1,6 +1,5 @@
 import Color from 'color';
 import mjml2html from 'mjml';
-import { ActionRequest, Dialogue } from 'prisma/prisma-client';
 
 import config from '../../../config/config';
 
@@ -38,7 +37,7 @@ const makeStaleRequestReminderTemplate = ({ workspaceSlug, userId, totalRequests
             <mj-section border-radius="5px 5px 0 0"  background-color=${lighterBg}>
                 <mj-column>
                     <mj-text font-size="20px" color="white" align="left">
-                        ✨ Your team link is ready!
+                        ✨ Get in touch with your people!
                     </mj-text>
                 </mj-column>
             </mj-section>
@@ -52,7 +51,7 @@ const makeStaleRequestReminderTemplate = ({ workspaceSlug, userId, totalRequests
               To access it, please click on the following link:
               </mj-text>
               <mj-button href="${config.dashboardUrl}/dashboard/b/${workspaceSlug}/dashboard/action_requests?assigneeId=${userId}" background-color="#36d399">
-              ✨ haas survey link
+              ✨ Go to overview
               </mj-button>
           
             </mj-column>

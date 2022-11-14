@@ -12,6 +12,12 @@ class AuditEventService {
     this.auditEventPrismaAdapter = new AuditEventPrismaAdapter(prisma);
   }
 
+  /**
+   * Adds an audit event to indicate a change to action request
+   * @param requestId 
+   * @param auditEventInput 
+   * @returns 
+   */
   public async addAuditEventToActionRequest(requestId: string, auditEventInput: Prisma.AuditEventCreateInput) {
     const auditEvent = await this.auditEventPrismaAdapter.createAuditEvent(auditEventInput);
     return this.auditEventPrismaAdapter.createAuditEventOfActionRequest(auditEvent.id, requestId);

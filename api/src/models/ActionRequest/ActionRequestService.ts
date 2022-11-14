@@ -26,6 +26,9 @@ class ActionRequestService {
     this.auditEventService = new AuditEventService(prisma);
   }
 
+  /**
+   * Set last reminded field of stale requests (and adds an audit event)
+   */
   public async updateLastRemindedStaleRequests(requestIds: string[], workspace: Customer) {
     const updateManyInput: Prisma.ActionRequestUpdateManyMutationInput = {
       lastRemindedAt: new Date(),
@@ -65,11 +68,12 @@ class ActionRequestService {
     }
   }
 
+  /**
+   * Finds all stale action requests within a workspace 
+   */
   public async findStaleWorkspaceActionRequests(workspaceId: string, daysNoAction: number) {
     const currentDate = new Date();
     const isStaleDate = subDays(currentDate, daysNoAction);
-
-    console.log('Stale date: ', isStaleDate);
 
     const whereInput: Prisma.ActionRequestWhereInput = {
       dialogue: {
@@ -89,6 +93,9 @@ class ActionRequestService {
     return this.actionRequestPrismaAdapter.findMany(whereInput);
   }
 
+  /**
+   * Verify an action request
+   */
   public async verifyActionRequest(input: VerifyActionRequestInput) {
     const actionRequest = await this.actionRequestPrismaAdapter.findById(input.actionRequestId);
 

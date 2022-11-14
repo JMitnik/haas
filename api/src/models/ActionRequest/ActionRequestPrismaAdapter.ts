@@ -12,7 +12,6 @@ export class ActionRequestPrismaAdapter {
     this.prisma = prisma;
   }
 
-  // TODO: Add AuditEventService & Adapter so can actually get an auditEventId
   public createAuditEventOfActionRequest(
     actionRequestId: string,
     auditEventId: string,

@@ -41,7 +41,6 @@ export class AutomationActionService {
    * Sends a reminder to all users in a workspace who have stale action requests 
    */
   public async sendStaleRequestReminder(automationActionId: string, workspaceId: string, daysNoAction: number) {
-    console.log('automationActionId: ', automationActionId);
     const automationAction = await this.automationPrismaAdapter.findAutomationActionById(automationActionId);
 
     if (!automationAction) throw new GraphQLYogaError('No automation action found for ID!');
@@ -99,6 +98,9 @@ export class AutomationActionService {
     return true;
   }
 
+  /**
+   * Sends stale request email to a particular user
+   */
   private async dispatchStaleRequestReminderJob(workspaceSlug: string, userId: string, totalRequests: number) {
     const user = await this.userService.getUserById(userId);
 
@@ -335,6 +337,9 @@ export class AutomationActionService {
     return this.reportService.dispatchJob(reportInput);
   }
 
+  /**
+   * Executes stale action reminder flow for the email channel
+   */
   private async handleStaleActionReminderEmailChannel(
     workspaceId: string,
     daysNoAction: number
@@ -344,8 +349,6 @@ export class AutomationActionService {
       workspaceId,
       daysNoAction
     );
-
-    console.log('actionRequests: ', actionRequests);
 
     if (!workspace || !actionRequests.length) return;
 
@@ -361,6 +364,9 @@ export class AutomationActionService {
     await this.actionRequestService.updateLastRemindedStaleRequests(actionRequestIds, workspace);
   }
 
+  /**
+   *  Executes stale action reminder flow for a specific channel
+   */
   private async handleStaleActionReminderChannel(
     channel: AutomationActionChannel,
     workspaceId: string,
