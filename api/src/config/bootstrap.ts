@@ -34,6 +34,7 @@ import TemplateService from '../models/templates/TemplateService'
 import { TopicService } from '../models/Topic/TopicService'
 import ScheduledAutomationService from '../models/automations/ScheduledAutomationService';
 import ActionRequestService from '../models/ActionRequest/ActionRequestService';
+import AuditEventService from '../models/AuditEvent/AuditEventService';
 
 export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOptions, never>): APIServiceContainer => {
   const loginService = new LoginService(mailService);
@@ -68,8 +69,10 @@ export const bootstrapServices = (prisma: PrismaClient<Prisma.PrismaClientOption
   const workspaceStatisticsService = new WorkspaceStatisticsService(prisma);
   const actionRequestService = new ActionRequestService(prisma);
   const dialogueScheduleService = new DialogueScheduleService(prisma);
+  const auditEventService = new AuditEventService(prisma);
 
   return {
+    auditEventService,
     actionRequestService,
     scheduledAutomationService,
     automationActionService,

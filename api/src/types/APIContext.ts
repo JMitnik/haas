@@ -33,8 +33,10 @@ import ScheduledAutomationService from '../models/automations/ScheduledAutomatio
 import { WorkspaceStatisticsService } from '../models/customer/WorkspaceStatisticsService';
 import ActionRequestService from '../models/ActionRequest/ActionRequestService';
 import { DialogueScheduleService } from '../models/DialogueSchedule/DialogueScheduleService';
+import AuditEventService from '../models/AuditEvent/AuditEventService';
 
 export interface APIServiceContainer {
+  auditEventService: AuditEventService;
   actionRequestService: ActionRequestService;
   scheduledAutomationService: ScheduledAutomationService;
   automationActionService: AutomationActionService;

@@ -112,7 +112,7 @@ export class AutomationActionService {
         workspaceSlug,
       }),
       recipient: user.email,
-      subject: 'A new HAAS survey has been released for your team',
+      subject: 'You have people waiting for your assistance!',
     });
   }
 
@@ -345,6 +345,8 @@ export class AutomationActionService {
       daysNoAction
     );
 
+    console.log('actionRequests: ', actionRequests);
+
     if (!workspace || !actionRequests.length) return;
 
     const requestsGroupedUserId = groupBy(actionRequests, (request) => request.assigneeId);
@@ -356,7 +358,7 @@ export class AutomationActionService {
 
     // Update lastReminded for all stale requests
     const actionRequestIds = actionRequests.map((request) => request.id)
-    await this.actionRequestService.updateLastRemindedStaleRequests(actionRequestIds);
+    await this.actionRequestService.updateLastRemindedStaleRequests(actionRequestIds, workspace);
   }
 
   private async handleStaleActionReminderChannel(

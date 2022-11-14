@@ -51,7 +51,7 @@ const makeStaleRequestReminderTemplate = ({ workspaceSlug, userId, totalRequests
               <mj-text>
               To access it, please click on the following link:
               </mj-text>
-              <mj-button href="${config.clientUrl}/${workspaceSlug}/dashboard/action_requests?assigneeId=${userId}" background-color="#36d399">
+              <mj-button href="${config.dashboardUrl}/dashboard/b/${workspaceSlug}/dashboard/action_requests?assigneeId=${userId}" background-color="#36d399">
               ✨ haas survey link
               </mj-button>
           

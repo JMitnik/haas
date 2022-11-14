@@ -12,6 +12,19 @@ export class ActionRequestPrismaAdapter {
     this.prisma = prisma;
   }
 
+  // TODO: Add AuditEventService & Adapter so can actually get an auditEventId
+  public createAuditEventOfActionRequest(
+    actionRequestId: string,
+    auditEventId: string,
+  ) {
+    return this.prisma.auditEventOfActionRequest.create({
+      data: {
+        actionRequestId,
+        auditEventId,
+      },
+    })
+  }
+
   public async updateMany(
     whereInput: Prisma.ActionRequestWhereInput,
     updateManyInput: Prisma.ActionRequestUpdateManyMutationInput

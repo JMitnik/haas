@@ -1,4 +1,6 @@
 import {
+  AuditEventType,
+  Customer,
   Prisma,
   PrismaClient,
 } from '@prisma/client';
@@ -13,15 +15,18 @@ import {
   VerifyActionRequestInput,
 } from './ActionRequest.types';
 import { offsetPaginate } from '../general/PaginationHelpers';
+import AuditEventService from '../AuditEvent/AuditEventService';
 
 class ActionRequestService {
   private actionRequestPrismaAdapter: ActionRequestPrismaAdapter;
+  auditEventService: AuditEventService
 
   constructor(prisma: PrismaClient) {
     this.actionRequestPrismaAdapter = new ActionRequestPrismaAdapter(prisma);
+    this.auditEventService = new AuditEventService(prisma);
   }
 
-  public async updateLastRemindedStaleRequests(requestIds: string[]) {
+  public async updateLastRemindedStaleRequests(requestIds: string[], workspace: Customer) {
     const updateManyInput: Prisma.ActionRequestUpdateManyMutationInput = {
       lastRemindedAt: new Date(),
     };
@@ -32,12 +37,39 @@ class ActionRequestService {
       },
     };
 
-    return this.actionRequestPrismaAdapter.updateMany(whereInput, updateManyInput);
+    await this.actionRequestPrismaAdapter.updateMany(whereInput, updateManyInput);
+
+    const auditEventInput: Prisma.AuditEventCreateInput = {
+      type: AuditEventType.SEND_STALE_ACTION_REQUEST_REMINDER,
+      version: 1.0,
+      payload: Prisma.JsonNull,
+      user: {
+        connectOrCreate: {
+          create: {
+            email: `${workspace.slug}@haas.live`,
+          },
+          where: {
+            email: `${workspace.slug}@haas.live`,
+          },
+        },
+      },
+      workspace: {
+        connect: {
+          id: workspace.id,
+        },
+      },
+    }
+
+    for (const requestId of requestIds) {
+      await this.auditEventService.addAuditEventToActionRequest(requestId, auditEventInput);
+    }
   }
 
   public async findStaleWorkspaceActionRequests(workspaceId: string, daysNoAction: number) {
     const currentDate = new Date();
     const isStaleDate = subDays(currentDate, daysNoAction);
+
+    console.log('Stale date: ', isStaleDate);
 
     const whereInput: Prisma.ActionRequestWhereInput = {
       dialogue: {
@@ -49,18 +81,9 @@ class ActionRequestService {
       assigneeId: {
         not: null,
       },
-      OR: [
-        {
-          updatedAt: {
-            lte: isStaleDate,
-          },
-        },
-        {
-          lastRemindedAt: {
-            lte: isStaleDate,
-          },
-        },
-      ],
+      updatedAt: {
+        lte: isStaleDate,
+      },
     };
 
     return this.actionRequestPrismaAdapter.findMany(whereInput);
