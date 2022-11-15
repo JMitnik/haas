@@ -137,7 +137,7 @@ const AutomationOverview = ({ automationConnection }: AutomationOverviewProps) =
                 <UI.Flex justifyContent="space-between" alignItems="center">
                   <UI.Flex alignItems="center">
                     <UI.Div maxWidth={50}>
-                      <UI.Thumbnail>
+                      <UI.Thumbnail size="sm">
                         <SendoutThumbnail />
                       </UI.Thumbnail>
                     </UI.Div>

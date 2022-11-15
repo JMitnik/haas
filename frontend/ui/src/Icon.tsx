@@ -52,10 +52,13 @@ type Size = 'sm' | 'md' | 'lg';
 
 interface ThumbnailProps {
   size?: Size
+  bc?: string;
 }
 
 export const Thumbnail = styled(Span)<ThumbnailProps>`
   ${({ size = 'md' }) => css`
+    display: inline-block;
+
     svg {
       width: 100%;
       height: 100%;
@@ -64,6 +67,39 @@ export const Thumbnail = styled(Span)<ThumbnailProps>`
     ${size === 'sm' && css`
       width: 60px;
       height: 60px;
+    `}
+
+    ${size === 'md' && css`
+      width: 70px;
+      height: 70px;
+    `}
+  `}
+`;
+
+export const Squircle = styled(Span)<ThumbnailProps>`
+  ${({ theme, bc, size = 'md' }) => css`
+    display: inline-block;
+    border-radius: ${theme.borderRadiuses.md}px;
+    border-width: 1px;
+    border-style: solid;
+
+    ${!bc && css`
+      border-color: transparent;
+    `}
+
+    ${!!bc && css`
+      border-color: ${theme.colors[bc]};
+    `}
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    ${size === 'sm' && css`
+      padding: 4px 6px;
+      width: 40px;
+      height: 40px;
     `}
 
     ${size === 'md' && css`

@@ -25,6 +25,9 @@ import {
 import { useCustomer } from 'providers/CustomerProvider';
 import useCronSchedule from 'views/AddAutomationView/useCronSchedule';
 
+import { FutureScheduledDatesFragment } from 'views/AddAutomationView/FutureScheduledDatesFragment';
+import { Lock, Unlock } from 'react-feather';
+import { addDays, addHours } from 'date-fns';
 import {
   addMinutesToPeriod,
   deltaPeriodsInMinutes,
@@ -141,6 +144,33 @@ const DataPeriodStep = ({ state, onNextStep, onPrevStep }: StepProps) => {
     onNextStep?.(buildNewState());
   };
 
+  /**
+   * Schedule recurring type refers to the type of the Schedule (WEEKLY, MONTHLY, DAILY)
+   */
+  const scheduleRecurringType = form.watch('schedule');
+
+  const dataPeriodCron = recurringDateToCron(scheduleRecurringType);
+
+  const startDates = useCronSchedule(dataPeriodCron, 1);
+  const endDate = useMemo(() => {
+    const startDate = startDates[0];
+    if (!startDate) return new Date();
+
+    switch (scheduleRecurringType) {
+      case (CustomRecurringType.WEEKLY): {
+        return addDays(startDate, 7);
+      }
+
+      case (CustomRecurringType.DAILY): {
+        return addHours(startDate, 24);
+      }
+
+      default: {
+        return startDate;
+      }
+    }
+  }, [startDates, scheduleRecurringType]);
+
   const goBack = () => {
     onPrevStep?.(buildNewState());
   };
@@ -152,20 +182,71 @@ const DataPeriodStep = ({ state, onNextStep, onPrevStep }: StepProps) => {
           <UI.H4 color="off.500">
             {t('data_period')}
           </UI.H4>
-          <UI.Div position="relative">
-            <UI.FormControl>
-              <UI.FormLabel fontWeight={400} color="off.500">
-                {t('data_period_description')}
-              </UI.FormLabel>
-              <Controller
-                name="schedule"
-                control={form.control}
-                render={({ field: { value, onChange } }) => (
-                  <RecurringDatePicker value={value} onChange={onChange} />
-                )}
-              />
-            </UI.FormControl>
-          </UI.Div>
+
+          <UI.Stack spacing={2}>
+            <UI.Div position="relative">
+              <UI.FormControl>
+                <UI.FormLabel fontWeight={400} color="off.500">
+                  {t('data_period_description')}
+                </UI.FormLabel>
+                <Controller
+                  name="schedule"
+                  control={form.control}
+                  render={({ field: { value, onChange } }) => (
+                    <RecurringDatePicker value={value} onChange={onChange} />
+                  )}
+                />
+              </UI.FormControl>
+            </UI.Div>
+            <UI.Div mt={2}>
+              <UI.Flex justifyContent="space-between">
+                <UI.Div>
+                  <UI.Squircle
+                    bc="green.300"
+                    color="green.600"
+                    bg="green.200"
+                    size="sm"
+                  >
+                    <Unlock />
+                  </UI.Squircle>
+                  <UI.Div>
+                    <UI.Div style={{ lineHeight: 1.2 }}>
+                      <UI.Div>
+                        <UI.Strong fontSize="1rem" color="off.500">
+                          22:30
+                        </UI.Strong>
+                      </UI.Div>
+                      <UI.Div color="off.500">
+                        Mon 17 Jun
+                      </UI.Div>
+                    </UI.Div>
+                  </UI.Div>
+                </UI.Div>
+                <UI.Div style={{ textAlign: 'right' }}>
+                  <UI.Squircle
+                    bc="red.300"
+                    color="red.600"
+                    bg="red.200"
+                    size="sm"
+                  >
+                    <Lock />
+                  </UI.Squircle>
+                  <UI.Div>
+                    <UI.Div style={{ lineHeight: 1.2 }}>
+                      <UI.Div>
+                        <UI.Strong fontSize="1rem" color="off.500">
+                          22:30
+                        </UI.Strong>
+                      </UI.Div>
+                      <UI.Div color="off.500">
+                        Mon 17 Jun
+                      </UI.Div>
+                    </UI.Div>
+                  </UI.Div>
+                </UI.Div>
+              </UI.Flex>
+            </UI.Div>
+          </UI.Stack>
 
         </UI.ModalBody>
         <UI.ModalFooter>
