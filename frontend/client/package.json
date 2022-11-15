@@ -102,6 +102,7 @@
     "uws": "^200.0.0"
   },
   "scripts": {
+    "inspect-audit": "npx graphql-inspector audit -d './src/**/*.graphql'",
     "start": "vite --host",
     "build": "tsc --noEmit && vite build",
     "serve": "vite build && vite preview",

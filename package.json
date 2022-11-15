@@ -27,6 +27,8 @@
     "**/@typescript-eslint/parser": "^4.1.1"
   },
   "scripts": {
+    "audit:dashboard": "yarn workspace @haas/dashboard inspect-audit",
+    "audit:client": "yarn workspace @haas/client inspect-audit",
     "aws:install": "cd aws/stack && yarn",
     "aws:deploy-pipeline": "cd aws/stack && cdk deploy haasSvcPipeline --profile haas-prod",
     "aws:deploy:campaign": "cd aws/commands && bash deploy-campaign.bash",
@@ -107,15 +109,16 @@
     "tunnel:api": "ngrok http https://localhost:4000"
   },
   "devDependencies": {
-    "concurrently": "^5.1.0",
-    "eslint": "^7.25.0",
+    "@graphql-inspector/cli": "^3.4.0",
     "@typescript-eslint/eslint-plugin": "^4.22.1",
     "@typescript-eslint/parser": "^4.22.1",
+    "concurrently": "^5.1.0",
+    "eslint": "^7.25.0",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-config-airbnb-typescript": "12.3.1",
-    "eslint-plugin-jsx-a11y": "6.4.1",
     "eslint-import-resolver-typescript": "^2.4.0",
     "eslint-plugin-import": "2.22.1",
+    "eslint-plugin-jsx-a11y": "6.4.1",
     "eslint-plugin-react": "^7.23.2",
     "eslint-plugin-react-hooks": "^4.2.0",
     "eslint-plugin-sort-imports-es6-autofix": "^0.6.0"
