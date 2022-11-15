@@ -1,6 +1,7 @@
+import config from './config/config';
+
 import { init } from '@lumigo/opentelemetry';
 import prisma from './config/prisma';
-import config from './config/config';
 import { makeServer } from './config/server';
 import { redis } from './config/redis';
 import { logger } from './config/logger';
