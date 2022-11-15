@@ -125,7 +125,7 @@ export class CoreAPI extends Construct {
           DB_STRING: ecs.Secret.fromSecretsManager(dbUrlSecret, 'url'),
           JWT_SECRET: ecs.Secret.fromSecretsManager(jwtSecret),
           API_SECRET: ecs.Secret.fromSecretsManager(apiSecret),
-          LUMIGO_TRACER_TOKEN: ecs.Secret.fromSecretsManager(lumigoTracerSecret),
+          LUMIGO_TRACER_TOKEN: ecs.Secret.fromSecretsManager(lumigoTracerSecret, 'LUMIGO_TRACER_TOKEN'),
         },
       },
     });
