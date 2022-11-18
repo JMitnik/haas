@@ -5,3 +5,4 @@ export type AssignUserToActionRequestInput = NexusGenInputs['AssignUserToActionR
 export type ActionRequestConnectionFilterInput = NexusGenInputs['ActionRequestConnectionFilterInput'];
 export type SetActionRequestStatusInput = NexusGenInputs['SetActionRequestStatusInput'];
 export type VerifyActionRequestInput = NexusGenInputs['VerifyActionRequestInput'];
+export type ConfirmActionRequestInput = NexusGenInputs['ConfirmActionRequestInput'];

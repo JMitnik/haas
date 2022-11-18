@@ -208,6 +208,11 @@ export interface NexusGenInputs {
     aspect?: NexusGenEnums['WorkspaceAspectType'] | null; // WorkspaceAspectType
     id?: string | null; // ID
   }
+  ConfirmActionRequestInput: { // input type
+    actionRequestId: string; // String!
+    agree?: boolean | null; // Boolean
+    workspaceId: string; // String!
+  }
   CreateAutomationCondition: { // input type
     dialogueId?: string | null; // String
     id?: string | null; // ID
@@ -2298,6 +2303,7 @@ export interface NexusGenFieldTypes {
     assignUserToDialogue: NexusGenRootTypes['UserType'] | null; // UserType
     assignUserToDialogues: NexusGenRootTypes['UserType'] | null; // UserType
     authenticateLambda: string | null; // String
+    confirmActionRequest: NexusGenRootTypes['ActionRequest'] | null; // ActionRequest
     confirmCreateWorkspaceJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
     copyDialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     createAutomation: NexusGenRootTypes['AutomationModel'] | null; // AutomationModel
@@ -3305,6 +3311,7 @@ export interface NexusGenFieldTypeNames {
     assignUserToDialogue: 'UserType'
     assignUserToDialogues: 'UserType'
     authenticateLambda: 'String'
+    confirmActionRequest: 'ActionRequest'
     confirmCreateWorkspaceJob: 'CreateWorkspaceJobType'
     copyDialogue: 'Dialogue'
     createAutomation: 'AutomationModel'
@@ -3875,6 +3882,9 @@ export interface NexusGenArgTypes {
     }
     authenticateLambda: { // args
       input?: NexusGenInputs['AuthenticateLambdaInput'] | null; // AuthenticateLambdaInput
+    }
+    confirmActionRequest: { // args
+      input: NexusGenInputs['ConfirmActionRequestInput']; // ConfirmActionRequestInput!
     }
     confirmCreateWorkspaceJob: { // args
       input?: NexusGenInputs['GenerateAutodeckInput'] | null; // GenerateAutodeckInput

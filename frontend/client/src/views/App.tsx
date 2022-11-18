@@ -1,10 +1,13 @@
+import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { ErrorBoundary } from 'react-error-boundary';
 import { I18nextProvider } from 'react-i18next';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { QueryParamProvider } from 'use-query-params';
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 import React, { useLayoutEffect } from 'react';
 
 import { Dialogue } from 'modules/Dialogue/Dialogue';
 import AppProviders from 'config/AppProviders';
+import ConfirmActionRequestNode from 'modules/ConfirmActionRequestNode/ConfirmActionRequestNode';
 import GlobalAppLayout from 'layouts/GlobalAppLayout';
 import VerifyActionableNode from 'modules/VerifyActionableNode/VerifyActionableNode';
 
@@ -23,15 +26,18 @@ const AppRoutes = () => {
   const location = useLocation();
 
   return (
+
     <Routes location={location}>
       <Route path="/_r" element={<CampaignRedirectView />} />
       <Route path="/:workspaceSlug/:dialogueSlug">
         <Route path="n/:nodeId" element={<Dialogue />} />
         <Route path="v/:actionableId" element={<VerifyActionableNode />} />
+        <Route path="c/:actionableId" element={<ConfirmActionRequestNode />} />
         <Route index element={<DialogueNodelessView />} />
       </Route>
       <Route index element={<LandingView />} />
     </Routes>
+
   );
 };
 
@@ -53,7 +59,9 @@ const App = () => {
       <AppProviders>
         <GlobalAppLayout>
           <ErrorBoundary FallbackComponent={ErrorPage}>
-            <AppRoutes />
+            <QueryParamProvider adapter={ReactRouter6Adapter}>
+              <AppRoutes />
+            </QueryParamProvider>
           </ErrorBoundary>
         </GlobalAppLayout>
       </AppProviders>

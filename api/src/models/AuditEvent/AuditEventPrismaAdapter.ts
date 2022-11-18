@@ -11,9 +11,21 @@ class AuditEventPrismaAdapter {
     this.prisma = prisma;
   }
 
+  public findManyAuditEventOfActionRequest(where: Prisma.AuditEventOfActionRequestWhereInput) {
+    return this.prisma.auditEventOfActionRequest.findMany({
+      where,
+    });
+  };
+
+  public findMany(where: Prisma.AuditEventWhereInput) {
+    return this.prisma.auditEvent.findMany({
+      where,
+    })
+  }
+
   public createAuditEvent(data: Prisma.AuditEventCreateInput) {
     return this.prisma.auditEvent.create({
-      data
+      data,
     });
   };
 
@@ -23,10 +35,10 @@ class AuditEventPrismaAdapter {
         auditEventId,
         actionRequest: {
           connect: {
-            id: actionRequestId
-          }
-        }
-      }
+            id: actionRequestId,
+          },
+        },
+      },
     });
   };
 

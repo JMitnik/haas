@@ -507,6 +507,12 @@ input ConditionWorkspaceScopeInput {
   id: ID
 }
 
+input ConfirmActionRequestInput {
+  actionRequestId: String!
+  agree: Boolean
+  workspaceId: String!
+}
+
 """Interface all pagination-based models should implement"""
 interface ConnectionInterface {
   pageInfo: PaginationPageInfo
@@ -1558,6 +1564,7 @@ type Mutation {
   assignUserToDialogue(input: AssignUserToDialogueInput): UserType
   assignUserToDialogues(input: AssignUserToDialoguesInput): UserType
   authenticateLambda(input: AuthenticateLambdaInput): String
+  confirmActionRequest(input: ConfirmActionRequestInput!): ActionRequest
   confirmCreateWorkspaceJob(input: GenerateAutodeckInput): CreateWorkspaceJobType
   copyDialogue(input: CreateDialogueInputType): Dialogue
 

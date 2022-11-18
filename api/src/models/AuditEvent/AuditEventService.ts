@@ -1,4 +1,5 @@
 import {
+  ActionRequestState,
   Prisma,
   PrismaClient,
 } from '@prisma/client';
@@ -10,6 +11,26 @@ class AuditEventService {
 
   constructor(prisma: PrismaClient) {
     this.auditEventPrismaAdapter = new AuditEventPrismaAdapter(prisma);
+  }
+
+  public async findManyByActionRequestId(actionRequestId: string) {
+    const auditEventOfActionRequestManyInput: Prisma.AuditEventOfActionRequestWhereInput = {
+      actionRequestId,
+    }
+
+    const auditEventsOfActionRequest = await this.auditEventPrismaAdapter.findManyAuditEventOfActionRequest(
+      auditEventOfActionRequestManyInput
+    );
+
+    const auditEventIds = auditEventsOfActionRequest.map((entry) => entry.auditEventId);
+
+    const whereInput: Prisma.AuditEventWhereInput = {
+      id: {
+        in: auditEventIds,
+      },
+    }
+
+    return this.auditEventPrismaAdapter.findMany(whereInput);
   }
 
   /**

@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "AuditEventType" ADD VALUE 'SET_ACTION_REQUEST_STATUS';

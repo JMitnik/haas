@@ -105,6 +105,7 @@ const authShield = shield({
   },
   Mutation: {
     '*': isSuperAdmin,
+    confirmActionRequest: allow,
     verifyActionRequest: allow,
     logout: allow,
     createSession: allow,

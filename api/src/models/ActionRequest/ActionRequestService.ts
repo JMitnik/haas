@@ -1,29 +1,48 @@
 import {
+  ActionRequestState,
   AuditEventType,
   Customer,
   Prisma,
   PrismaClient,
-} from '@prisma/client';
-import { differenceInDays, sub, subDays } from 'date-fns'
+} from 'prisma/prisma-client';
+import { subDays } from 'date-fns'
 
 import { ActionRequestPrismaAdapter } from './ActionRequestPrismaAdapter';
 import {
   ActionRequestConnectionFilterInput,
   ActionRequestFilterInput,
   AssignUserToActionRequestInput,
+  ConfirmActionRequestInput,
   SetActionRequestStatusInput,
   VerifyActionRequestInput,
 } from './ActionRequest.types';
 import { offsetPaginate } from '../general/PaginationHelpers';
 import AuditEventService from '../AuditEvent/AuditEventService';
+import { assertNonNullish } from '../../utils/assertNonNullish';
+import { mailService } from '../../services/mailings/MailService';
+import IssuePrismaAdapter from '../Issue/IssuePrismaAdapter';
+import makeConfirmCompletedRequestTemplate, { makeConfirmCompletedRequestTemplateProps } from '../../services/mailings/templates/makeConfirmCompletedRequestTemplate';
+import makeRejectedCompletedRequestTemplate, { makeRejectedCompletedRequestProps } from '../../services/mailings/templates/makeRejectedCompletedRequestTemplate';
+import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
+import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
+import { lasActionRequestAuditEventNeedsConfirm } from './ActionRequestService.helpers';
+import UserPrismaAdapter from 'models/users/UserPrismaAdapter';
 
 class ActionRequestService {
   private actionRequestPrismaAdapter: ActionRequestPrismaAdapter;
-  auditEventService: AuditEventService
+  private auditEventService: AuditEventService;
+  private issuePrismaAdapter: IssuePrismaAdapter;
+  private dialoguePrismaAdapter: DialoguePrismaAdapter;
+  private customerPrismaAdapter: CustomerPrismaAdapter;
+  private userPrismaAdapter: UserPrismaAdapter;
 
   constructor(prisma: PrismaClient) {
     this.actionRequestPrismaAdapter = new ActionRequestPrismaAdapter(prisma);
     this.auditEventService = new AuditEventService(prisma);
+    this.issuePrismaAdapter = new IssuePrismaAdapter(prisma);
+    this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prisma);
+    this.customerPrismaAdapter = new CustomerPrismaAdapter(prisma);
+    this.userPrismaAdapter = new UserPrismaAdapter(prisma);
   }
 
   /**
@@ -105,12 +124,117 @@ class ActionRequestService {
     return this.actionRequestPrismaAdapter.updateActionRequest(input.actionRequestId, updateArgs);
   }
 
+  public async confirmActionRequest(input: ConfirmActionRequestInput) {
+    // Check if actionRequest is still completed 
+    const actionRequest = await this.actionRequestPrismaAdapter.findById(input.actionRequestId);
+    if (actionRequest?.status !== ActionRequestState.COMPLETED) return null;
+
+    // Check if there is already a completed AuditEvent with payload agree = true before doing anything
+    const auditEvents = await this.auditEventService.findManyByActionRequestId(input.actionRequestId);
+    if (!lasActionRequestAuditEventNeedsConfirm(auditEvents)) return null;
+
+    // User doesn't agree action request has been correctly set to COMPLETED
+    if (!input.agree) {
+      await this.auditEventService.addAuditEventToActionRequest(input.actionRequestId, {
+        type: AuditEventType.ACTION_REQUEST_REJECTED_COMPLETED,
+        version: 1.0,
+        workspace: {
+          connect: {
+            id: input.workspaceId,
+          },
+        },
+        payload: Prisma.JsonNull,
+      });
+
+      // Set actionable back to pending 
+      const updatedActionRequest = await this.setActionRequestStatus({
+        actionRequestId: input.actionRequestId,
+        status: ActionRequestState.PENDING,
+        workspaceId: input.workspaceId,
+      });
+
+      const workspace = await this.customerPrismaAdapter.findWorkspaceById(input.workspaceId);
+
+      // TODO: Send email to assignee user
+      if (actionRequest.assigneeId && workspace) {
+        const user = await this.userPrismaAdapter.getUserById(actionRequest.assigneeId);
+        if (user) {
+          this.dispatchRejectCompletedRequestJob({
+            recipientEmail: user.email,
+            recipientName: `${user.firstName} ${user.lastName}`,
+            userId: user.id,
+            workspaceSlug: workspace.slug,
+          });
+        };
+      };
+
+      return updatedActionRequest;
+    };
+
+    // User has agreed so create an confirm audit event
+    await this.auditEventService.addAuditEventToActionRequest(input.actionRequestId, {
+      type: AuditEventType.ACTION_REQUEST_CONFIRMED_COMPLETED,
+      version: 1.0,
+      workspace: {
+        connect: {
+          id: input.workspaceId,
+        },
+      },
+      payload: Prisma.JsonNull,
+    });
+
+    return actionRequest;
+  }
+
   /**
    * Sets the status of an actionRequest
    */
   public async setActionRequestStatus(input: SetActionRequestStatusInput) {
     const updateArgs: Prisma.ActionRequestUpdateInput = { status: input.status };
     const result = await this.actionRequestPrismaAdapter.updateActionRequest(input.actionRequestId, updateArgs);
+
+    // Send email to user so they can confirm/reject request if finalized
+    if (input.status === ActionRequestState.COMPLETED) {
+      const actionRequest = await this.actionRequestPrismaAdapter.findById(input.actionRequestId);
+      if (actionRequest?.requestEmail) {
+        assertNonNullish(actionRequest?.dialogueId, 'Could not find dialogue id of action request');
+
+        const dialogue = await this.dialoguePrismaAdapter.getDialogueById(actionRequest.dialogueId);
+        const workspace = await this.customerPrismaAdapter.findWorkspaceById(input.workspaceId);
+
+        assertNonNullish(workspace, 'Could not find workspace');
+        assertNonNullish(dialogue, 'Could not find dialogue');
+        assertNonNullish(actionRequest, 'Could not find action request');
+        assertNonNullish(actionRequest.issueId, 'Could not find issue ID for request');
+
+        const issue = await this.issuePrismaAdapter.findIssueById(actionRequest.issueId);
+        const topic = issue?.topic.name || '';
+
+        this.dispatchConfirmCompletedRequestJob({
+          actionRequestId: actionRequest.id,
+          dialogueSlug: dialogue.slug,
+          requestCreatedDate: actionRequest.createdAt,
+          requestEmail: actionRequest.requestEmail,
+          topic,
+          workspaceSlug: workspace.slug,
+        })
+      }
+    }
+
+    await this.auditEventService.addAuditEventToActionRequest(input.actionRequestId, {
+      type: AuditEventType.SET_ACTION_REQUEST_STATUS,
+      version: 1.0,
+      workspace: {
+        connect: {
+          id: input.workspaceId,
+        },
+      },
+      payload: {
+        status: input.status,
+        actionRequestId: input.actionRequestId,
+      },
+    });
+
     return result;
   };
 
@@ -182,6 +306,32 @@ class ActionRequestService {
       totalPages,
       pageInfo,
     };
+  }
+
+  /**
+   * Sends stale request email to a particular user
+   */
+  private dispatchRejectCompletedRequestJob(
+    props: makeRejectedCompletedRequestProps
+  ) {
+    mailService.send({
+      body: makeRejectedCompletedRequestTemplate(props),
+      recipient: props.recipientEmail,
+      subject: 'Someone has denied the completion of their action request!',
+    });
+  }
+
+  /**
+   * Sends stale request email to a particular user
+   */
+  private dispatchConfirmCompletedRequestJob(
+    props: makeConfirmCompletedRequestTemplateProps
+  ) {
+    mailService.send({
+      body: makeConfirmCompletedRequestTemplate(props),
+      recipient: props.requestEmail,
+      subject: 'Please approve a completed action request!',
+    });
   }
 
 }

@@ -215,7 +215,8 @@ export enum AutomationActionType {
   MonthReport = 'MONTH_REPORT',
   YearReport = 'YEAR_REPORT',
   CustomReport = 'CUSTOM_REPORT',
-  Webhook = 'WEBHOOK'
+  Webhook = 'WEBHOOK',
+  SendStaleActionRequestReminder = 'SEND_STALE_ACTION_REQUEST_REMINDER'
 }
 
 export type AutomationConditionBuilderInput = {
@@ -553,6 +554,12 @@ export type ConditionWorkspaceScopeInput = {
   id?: Maybe<Scalars['ID']>;
   aspect?: Maybe<WorkspaceAspectType>;
   aggregate?: Maybe<ConditionPropertyAggregateInput>;
+};
+
+export type ConfirmActionRequestInput = {
+  workspaceId: Scalars['String'];
+  agree?: Maybe<Scalars['Boolean']>;
+  actionRequestId: Scalars['String'];
 };
 
 /** Interface all pagination-based models should implement */
@@ -1778,6 +1785,7 @@ export type Mutation = {
   assignUserToActionRequest?: Maybe<ActionRequest>;
   setActionRequestStatus?: Maybe<ActionRequest>;
   verifyActionRequest?: Maybe<ActionRequest>;
+  confirmActionRequest?: Maybe<ActionRequest>;
   /**
    * Creates a DialogueSchedule, consisting of an Evaluation and Data Period.
    * - Input style: Declarative. This means that the Input describes what the eventual state should look like.
@@ -1809,6 +1817,7 @@ export type Mutation = {
   deleteAutomation?: Maybe<AutomationModel>;
   sendAutomationDialogueLink?: Maybe<Scalars['Boolean']>;
   sendAutomationReport?: Maybe<Scalars['Boolean']>;
+  sendStaleRequestReminder?: Maybe<Scalars['Boolean']>;
   createCampaign?: Maybe<CampaignType>;
   createBatchDeliveries?: Maybe<CreateBatchDeliveriesOutputType>;
   updateDeliveryStatus?: Maybe<Scalars['String']>;
@@ -1870,6 +1879,11 @@ export type MutationSetActionRequestStatusArgs = {
 
 export type MutationVerifyActionRequestArgs = {
   input: VerifyActionRequestInput;
+};
+
+
+export type MutationConfirmActionRequestArgs = {
+  input: ConfirmActionRequestInput;
 };
 
 
@@ -2000,6 +2014,11 @@ export type MutationSendAutomationDialogueLinkArgs = {
 
 export type MutationSendAutomationReportArgs = {
   input?: Maybe<SendAutomationReportInput>;
+};
+
+
+export type MutationSendStaleRequestReminderArgs = {
+  input: SendStaleRequestReminderInput;
 };
 
 
@@ -2840,6 +2859,12 @@ export type SendAutomationReportInput = {
   reportUrl: Scalars['String'];
 };
 
+export type SendStaleRequestReminderInput = {
+  workspaceId: Scalars['String'];
+  automationActionId: Scalars['String'];
+  daysNoAction: Scalars['Int'];
+};
+
 export type Session = {
   __typename?: 'Session';
   id: Scalars['ID'];
@@ -2847,6 +2872,7 @@ export type Session = {
   dialogueId?: Maybe<Scalars['String']>;
   mainScore?: Maybe<Scalars['Float']>;
   browser?: Maybe<Scalars['String']>;
+  actionRequestId?: Maybe<Scalars['String']>;
   paths?: Maybe<Scalars['Int']>;
   score: Scalars['Float'];
   dialogue?: Maybe<Dialogue>;
@@ -3493,6 +3519,19 @@ export type UpdateDeliveryStatusMutation = (
   & Pick<Mutation, 'updateDeliveryStatus'>
 );
 
+export type ConfirmActionRequestMutationVariables = Exact<{
+  input: ConfirmActionRequestInput;
+}>;
+
+
+export type ConfirmActionRequestMutation = (
+  { __typename?: 'Mutation' }
+  & { confirmActionRequest?: Maybe<(
+    { __typename?: 'ActionRequest' }
+    & Pick<ActionRequest, 'id'>
+  )> }
+);
+
 export type AppendToInteractionMutationVariables = Exact<{
   input?: Maybe<AppendToInteractionInput>;
 }>;
@@ -3937,6 +3976,39 @@ export function useUpdateDeliveryStatusMutation(baseOptions?: Apollo.MutationHoo
 export type UpdateDeliveryStatusMutationHookResult = ReturnType<typeof useUpdateDeliveryStatusMutation>;
 export type UpdateDeliveryStatusMutationResult = Apollo.MutationResult<UpdateDeliveryStatusMutation>;
 export type UpdateDeliveryStatusMutationOptions = Apollo.BaseMutationOptions<UpdateDeliveryStatusMutation, UpdateDeliveryStatusMutationVariables>;
+export const ConfirmActionRequestDocument = gql`
+    mutation ConfirmActionRequest($input: ConfirmActionRequestInput!) {
+  confirmActionRequest(input: $input) {
+    id
+  }
+}
+    `;
+export type ConfirmActionRequestMutationFn = Apollo.MutationFunction<ConfirmActionRequestMutation, ConfirmActionRequestMutationVariables>;
+
+/**
+ * __useConfirmActionRequestMutation__
+ *
+ * To run a mutation, you first call `useConfirmActionRequestMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useConfirmActionRequestMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [confirmActionRequestMutation, { data, loading, error }] = useConfirmActionRequestMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useConfirmActionRequestMutation(baseOptions?: Apollo.MutationHookOptions<ConfirmActionRequestMutation, ConfirmActionRequestMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ConfirmActionRequestMutation, ConfirmActionRequestMutationVariables>(ConfirmActionRequestDocument, options);
+      }
+export type ConfirmActionRequestMutationHookResult = ReturnType<typeof useConfirmActionRequestMutation>;
+export type ConfirmActionRequestMutationResult = Apollo.MutationResult<ConfirmActionRequestMutation>;
+export type ConfirmActionRequestMutationOptions = Apollo.BaseMutationOptions<ConfirmActionRequestMutation, ConfirmActionRequestMutationVariables>;
 export const AppendToInteractionDocument = gql`
     mutation appendToInteraction($input: AppendToInteractionInput) {
   appendToInteraction(input: $input) {
@@ -4136,6 +4208,13 @@ export namespace UpdateDeliveryStatus {
   export type Variables = UpdateDeliveryStatusMutationVariables;
   export type Mutation = UpdateDeliveryStatusMutation;
   export const Document = UpdateDeliveryStatusDocument;
+}
+
+export namespace ConfirmActionRequest {
+  export type Variables = ConfirmActionRequestMutationVariables;
+  export type Mutation = ConfirmActionRequestMutation;
+  export type ConfirmActionRequest = (NonNullable<ConfirmActionRequestMutation['confirmActionRequest']>);
+  export const Document = ConfirmActionRequestDocument;
 }
 
 export namespace AppendToInteraction {

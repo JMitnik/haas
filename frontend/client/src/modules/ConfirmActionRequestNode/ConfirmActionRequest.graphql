@@ -1,0 +1,5 @@
+mutation ConfirmActionRequest($input: ConfirmActionRequestInput!) {
+  confirmActionRequest(input: $input) {
+    id
+  }
+}
