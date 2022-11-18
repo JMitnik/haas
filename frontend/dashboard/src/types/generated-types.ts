@@ -45,6 +45,7 @@ export type ActionRequest = {
   requestEmail?: Maybe<Scalars['String']>;
   isVerified: Scalars['Boolean'];
   status: ActionRequestState;
+  auditEvents?: Maybe<Array<Maybe<AuditEvent>>>;
   assignee?: Maybe<UserType>;
   dialogue?: Maybe<Dialogue>;
   issue?: Maybe<IssueModel>;
@@ -149,6 +150,24 @@ export type AssignedDialogues = {
   privateWorkspaceDialogues?: Maybe<Array<Dialogue>>;
   assignedDialogues?: Maybe<Array<Dialogue>>;
 };
+
+export type AuditEvent = {
+  __typename?: 'AuditEvent';
+  id: Scalars['ID'];
+  createdAt: Scalars['Date'];
+  version: Scalars['Float'];
+  payload?: Maybe<Scalars['JSONObject']>;
+  user?: Maybe<UserType>;
+  type: AuditEventType;
+};
+
+export enum AuditEventType {
+  AssignActionRequest = 'ASSIGN_ACTION_REQUEST',
+  SendStaleActionRequestReminder = 'SEND_STALE_ACTION_REQUEST_REMINDER',
+  SetActionRequestStatus = 'SET_ACTION_REQUEST_STATUS',
+  ActionRequestConfirmedCompleted = 'ACTION_REQUEST_CONFIRMED_COMPLETED',
+  ActionRequestRejectedCompleted = 'ACTION_REQUEST_REJECTED_COMPLETED'
+}
 
 export type AuthenticateLambdaInput = {
   authenticateEmail?: Maybe<Scalars['String']>;
@@ -554,6 +573,12 @@ export type ConditionWorkspaceScopeInput = {
   id?: Maybe<Scalars['ID']>;
   aspect?: Maybe<WorkspaceAspectType>;
   aggregate?: Maybe<ConditionPropertyAggregateInput>;
+};
+
+export type ConfirmActionRequestInput = {
+  workspaceId: Scalars['String'];
+  agree?: Maybe<Scalars['Boolean']>;
+  actionRequestId: Scalars['String'];
 };
 
 /** Interface all pagination-based models should implement */
@@ -1500,6 +1525,11 @@ export type GenerateWorkspaceCsvInputType = {
   makeDialoguesPrivate?: Maybe<Scalars['Boolean']>;
 };
 
+export type GetActionRequestInput = {
+  workspaceId: Scalars['String'];
+  actionRequestId: Scalars['String'];
+};
+
 export type GetAutomationInput = {
   id?: Maybe<Scalars['String']>;
 };
@@ -1779,6 +1809,7 @@ export type Mutation = {
   assignUserToActionRequest?: Maybe<ActionRequest>;
   setActionRequestStatus?: Maybe<ActionRequest>;
   verifyActionRequest?: Maybe<ActionRequest>;
+  confirmActionRequest?: Maybe<ActionRequest>;
   /**
    * Creates a DialogueSchedule, consisting of an Evaluation and Data Period.
    * - Input style: Declarative. This means that the Input describes what the eventual state should look like.
@@ -1872,6 +1903,11 @@ export type MutationSetActionRequestStatusArgs = {
 
 export type MutationVerifyActionRequestArgs = {
   input: VerifyActionRequestInput;
+};
+
+
+export type MutationConfirmActionRequestArgs = {
+  input: ConfirmActionRequestInput;
 };
 
 
@@ -2458,6 +2494,7 @@ export type PublicDialogueInfo = {
 
 export type Query = {
   __typename?: 'Query';
+  getActionRequest?: Maybe<ActionRequest>;
   getJobProcessLocations?: Maybe<JobProcessLocations>;
   getPreviewData?: Maybe<PreviewDataType>;
   getJob?: Maybe<CreateWorkspaceJobType>;
@@ -2488,6 +2525,11 @@ export type Query = {
   session?: Maybe<Session>;
   question?: Maybe<QuestionNode>;
   edge?: Maybe<Edge>;
+};
+
+
+export type QueryGetActionRequestArgs = {
+  input: GetActionRequestInput;
 };
 
 
@@ -2943,6 +2985,7 @@ export type SetActionRequestStatusInput = {
   status: ActionRequestState;
   actionRequestId: Scalars['String'];
   workspaceId: Scalars['String'];
+  userId?: Maybe<Scalars['String']>;
 };
 
 export type SetDialoguePrivacyInput = {
@@ -3668,6 +3711,15 @@ export type ActionRequestFragmentFragment = (
   )> }
 );
 
+export type AuditEventFragmentFragment = (
+  { __typename?: 'AuditEvent' }
+  & Pick<AuditEvent, 'id' | 'createdAt' | 'type' | 'payload' | 'version'>
+  & { user?: Maybe<(
+    { __typename?: 'UserType' }
+    & Pick<UserType, 'email'>
+  )> }
+);
+
 export type DeliveryEventFragmentFragment = (
   { __typename?: 'DeliveryEventType' }
   & Pick<DeliveryEventType, 'id' | 'status' | 'createdAt' | 'failureMessage'>
@@ -3954,6 +4006,23 @@ export type AssignUserToActionRequestMutation = (
       { __typename?: 'UserType' }
       & Pick<UserType, 'email'>
     )> }
+  )> }
+);
+
+export type GetActionRequestQueryVariables = Exact<{
+  input: GetActionRequestInput;
+}>;
+
+
+export type GetActionRequestQuery = (
+  { __typename?: 'Query' }
+  & { getActionRequest?: Maybe<(
+    { __typename?: 'ActionRequest' }
+    & Pick<ActionRequest, 'id' | 'createdAt' | 'updatedAt' | 'status'>
+    & { auditEvents?: Maybe<Array<Maybe<(
+      { __typename?: 'AuditEvent' }
+      & AuditEventFragmentFragment
+    )>>> }
   )> }
 );
 
@@ -5062,6 +5131,18 @@ export const ActionRequestFragmentFragmentDoc = gql`
   }
 }
     `;
+export const AuditEventFragmentFragmentDoc = gql`
+    fragment AuditEventFragment on AuditEvent {
+  id
+  createdAt
+  type
+  payload
+  version
+  user {
+    email
+  }
+}
+    `;
 export const DeliveryEventFragmentFragmentDoc = gql`
     fragment DeliveryEventFragment on DeliveryEventType {
   id
@@ -5966,6 +6047,50 @@ export function useAssignUserToActionRequestMutation(baseOptions?: Apollo.Mutati
 export type AssignUserToActionRequestMutationHookResult = ReturnType<typeof useAssignUserToActionRequestMutation>;
 export type AssignUserToActionRequestMutationResult = Apollo.MutationResult<AssignUserToActionRequestMutation>;
 export type AssignUserToActionRequestMutationOptions = Apollo.BaseMutationOptions<AssignUserToActionRequestMutation, AssignUserToActionRequestMutationVariables>;
+export const GetActionRequestDocument = gql`
+    query GetActionRequest($input: GetActionRequestInput!) {
+  getActionRequest(input: $input) {
+    id
+    createdAt
+    updatedAt
+    status
+    auditEvents {
+      ...AuditEventFragment
+    }
+  }
+}
+    ${AuditEventFragmentFragmentDoc}`;
+
+/**
+ * __useGetActionRequestQuery__
+ *
+ * To run a query within a React component, call `useGetActionRequestQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetActionRequestQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetActionRequestQuery({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useGetActionRequestQuery(baseOptions: Apollo.QueryHookOptions<GetActionRequestQuery, GetActionRequestQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetActionRequestQuery, GetActionRequestQueryVariables>(GetActionRequestDocument, options);
+      }
+export function useGetActionRequestLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetActionRequestQuery, GetActionRequestQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetActionRequestQuery, GetActionRequestQueryVariables>(GetActionRequestDocument, options);
+        }
+export type GetActionRequestQueryHookResult = ReturnType<typeof useGetActionRequestQuery>;
+export type GetActionRequestLazyQueryHookResult = ReturnType<typeof useGetActionRequestLazyQuery>;
+export type GetActionRequestQueryResult = Apollo.QueryResult<GetActionRequestQuery, GetActionRequestQueryVariables>;
+export function refetchGetActionRequestQuery(variables?: GetActionRequestQueryVariables) {
+      return { query: GetActionRequestDocument, variables: variables }
+    }
 export const GetIssueDocument = gql`
     query GetIssue($input: GetIssueResolverInput!, $actionableFilter: ActionRequestConnectionFilterInput) {
   issue(input: $input) {
@@ -8440,6 +8565,11 @@ export namespace ActionRequestFragment {
   export type Assignee = (NonNullable<ActionRequestFragmentFragment['assignee']>);
 }
 
+export namespace AuditEventFragment {
+  export type Fragment = AuditEventFragmentFragment;
+  export type User = (NonNullable<AuditEventFragmentFragment['user']>);
+}
+
 export namespace DeliveryEventFragment {
   export type Fragment = DeliveryEventFragmentFragment;
 }
@@ -8556,6 +8686,14 @@ export namespace AssignUserToActionRequest {
   export type Dialogue = (NonNullable<(NonNullable<AssignUserToActionRequestMutation['assignUserToActionRequest']>)['dialogue']>);
   export type Assignee = (NonNullable<(NonNullable<AssignUserToActionRequestMutation['assignUserToActionRequest']>)['assignee']>);
   export const Document = AssignUserToActionRequestDocument;
+}
+
+export namespace GetActionRequest {
+  export type Variables = GetActionRequestQueryVariables;
+  export type Query = GetActionRequestQuery;
+  export type GetActionRequest = (NonNullable<GetActionRequestQuery['getActionRequest']>);
+  export type AuditEvents = NonNullable<(NonNullable<(NonNullable<GetActionRequestQuery['getActionRequest']>)['auditEvents']>)[number]>;
+  export const Document = GetActionRequestDocument;
 }
 
 export namespace GetIssue {

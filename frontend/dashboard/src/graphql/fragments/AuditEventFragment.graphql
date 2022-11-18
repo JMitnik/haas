@@ -1,0 +1,10 @@
+fragment AuditEventFragment on AuditEvent {
+  id
+  createdAt
+  type
+  payload
+  version
+  user {
+    email
+  }
+}

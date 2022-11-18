@@ -79,6 +79,7 @@ const authShield = shield({
     dialogueLinks: allow,
     users: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_USERS)),
     user: or(isSelf, containsWorkspacePermission(SystemPermissionEnum.CAN_VIEW_USERS)),
+    getActionRequest: or(isSuperAdmin, containsWorkspacePermission(SystemPermissionEnum.CAN_ACCESS_ALL_ACTION_REQUESTS)),
   },
   Customer: {
     dialogueConnection: or(

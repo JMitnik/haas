@@ -20,7 +20,10 @@ class AuditEventPrismaAdapter {
   public findMany(where: Prisma.AuditEventWhereInput) {
     return this.prisma.auditEvent.findMany({
       where,
-    })
+      include: {
+        user: true,
+      },
+    });
   }
 
   public createAuditEvent(data: Prisma.AuditEventCreateInput) {

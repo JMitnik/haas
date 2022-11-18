@@ -26,7 +26,7 @@ import makeRejectedCompletedRequestTemplate, { makeRejectedCompletedRequestProps
 import DialoguePrismaAdapter from '../questionnaire/DialoguePrismaAdapter';
 import { CustomerPrismaAdapter } from '../customer/CustomerPrismaAdapter';
 import { lasActionRequestAuditEventNeedsConfirm } from './ActionRequestService.helpers';
-import UserPrismaAdapter from 'models/users/UserPrismaAdapter';
+import UserPrismaAdapter from '../users/UserPrismaAdapter';
 
 class ActionRequestService {
   private actionRequestPrismaAdapter: ActionRequestPrismaAdapter;
@@ -43,6 +43,17 @@ class ActionRequestService {
     this.dialoguePrismaAdapter = new DialoguePrismaAdapter(prisma);
     this.customerPrismaAdapter = new CustomerPrismaAdapter(prisma);
     this.userPrismaAdapter = new UserPrismaAdapter(prisma);
+  }
+
+  public async getActionRequest(actionRequestId: string) {
+    const request = await this.actionRequestPrismaAdapter.findById(actionRequestId);
+    const auditEventIds = request?.auditEvents.map((eventOfRequest) => eventOfRequest.auditEventId);
+    const auditEvents = await this.auditEventService.findMany({
+      id: {
+        in: auditEventIds,
+      },
+    });
+    return { ...request, auditEvents };
   }
 
   /**
@@ -233,6 +244,11 @@ class ActionRequestService {
         status: input.status,
         actionRequestId: input.actionRequestId,
       },
+      user: input.userId ? {
+        connect: {
+          id: input.userId,
+        },
+      } : undefined,
     });
 
     return result;

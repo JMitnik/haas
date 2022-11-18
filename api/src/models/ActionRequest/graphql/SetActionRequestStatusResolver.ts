@@ -8,6 +8,7 @@ export const SetActionRequestStatusInput = inputObjectType({
     t.nonNull.field('status', { type: ActionRequestState });
     t.nonNull.string('actionRequestId');
     t.nonNull.string('workspaceId');
+    t.string('userId');
   },
 })
 

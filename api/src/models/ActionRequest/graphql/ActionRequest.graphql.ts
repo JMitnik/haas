@@ -5,6 +5,7 @@ import { UserType } from '../../users/graphql/User';
 import { DialogueType } from '../../questionnaire/Dialogue'
 import { IssueModel } from '../../Issue/graphql/IssueModel.graphql';
 import { SessionType } from '../../session/graphql';
+import { AuditEvent } from '../../AuditEvent/graphql/AuditEvent.graphql';
 
 export const ActionRequestType = objectType({
   name: 'ActionRequest',
@@ -26,6 +27,10 @@ export const ActionRequestType = objectType({
 
     t.nonNull.field('status', {
       type: ActionRequestState,
+    });
+
+    t.list.field('auditEvents', {
+      type: AuditEvent,
     });
 
     t.field('assignee', {

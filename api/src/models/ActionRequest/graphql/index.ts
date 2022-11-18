@@ -6,3 +6,4 @@ export * from './ActionRequestConnection.graphql';
 export * from './SetActionRequestStatusResolver';
 export * from './VerifyActionRequestResolver';
 export * from './ConfirmActionRequestResolver';
+export * from './GetActionRequestResolver';

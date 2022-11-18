@@ -1,0 +1,11 @@
+query GetActionRequest($input: GetActionRequestInput!) {
+	getActionRequest(input: $input) {
+		id
+    createdAt
+    updatedAt
+		status
+		auditEvents {
+      ...AuditEventFragment
+		}
+	}
+}

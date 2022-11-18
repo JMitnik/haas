@@ -45,6 +45,9 @@ export class ActionRequestPrismaAdapter {
       where: {
         id: actionRequestId,
       },
+      include: {
+        auditEvents: true,
+      },
     });
   };
 

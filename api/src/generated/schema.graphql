@@ -12,6 +12,7 @@ type AWSImageType {
 type ActionRequest {
   assignee: UserType
   assigneeId: String
+  auditEvents: [AuditEvent]
   createdAt: Date
   dialogue: Dialogue
   dialogueId: String
@@ -121,6 +122,23 @@ input AssignUserToDialoguesInput {
 type AssignedDialogues {
   assignedDialogues: [Dialogue!]
   privateWorkspaceDialogues: [Dialogue!]
+}
+
+type AuditEvent {
+  createdAt: Date!
+  id: ID!
+  payload: JSONObject
+  type: AuditEventType!
+  user: UserType
+  version: Float!
+}
+
+enum AuditEventType {
+  ACTION_REQUEST_CONFIRMED_COMPLETED
+  ACTION_REQUEST_REJECTED_COMPLETED
+  ASSIGN_ACTION_REQUEST
+  SEND_STALE_ACTION_REQUEST_REMINDER
+  SET_ACTION_REQUEST_STATUS
 }
 
 input AuthenticateLambdaInput {
@@ -1301,6 +1319,11 @@ input GenerateWorkspaceCSVInputType {
   workspaceTitle: String!
 }
 
+input GetActionRequestInput {
+  actionRequestId: String!
+  workspaceId: String!
+}
+
 input GetAutomationInput {
   id: String
 }
@@ -1887,6 +1910,7 @@ type Query {
   dialogueLinks(filter: DialogueConnectionFilterInput, workspaceId: String): PublicDialogueConnection
   dialogues(filter: DialogueFilterInputType): [Dialogue]
   edge(id: String): Edge
+  getActionRequest(input: GetActionRequestInput!): ActionRequest
   getAdjustedLogo(input: AdjustedImageInput): AWSImageType
   getAutodeckJobs(filter: PaginationWhereInput): AutodeckConnectionType
   getJob(id: String): CreateWorkspaceJobType
@@ -2210,6 +2234,7 @@ input SessionWhereUniqueInput {
 input SetActionRequestStatusInput {
   actionRequestId: String!
   status: ActionRequestState!
+  userId: String
   workspaceId: String!
 }
 

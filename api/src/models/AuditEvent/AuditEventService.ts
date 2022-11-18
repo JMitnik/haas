@@ -1,5 +1,4 @@
 import {
-  ActionRequestState,
   Prisma,
   PrismaClient,
 } from '@prisma/client';
@@ -11,6 +10,10 @@ class AuditEventService {
 
   constructor(prisma: PrismaClient) {
     this.auditEventPrismaAdapter = new AuditEventPrismaAdapter(prisma);
+  }
+
+  public async findMany(where: Prisma.AuditEventWhereInput) {
+    return this.auditEventPrismaAdapter.findMany(where);
   }
 
   public async findManyByActionRequestId(actionRequestId: string) {

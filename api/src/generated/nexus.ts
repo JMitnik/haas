@@ -517,6 +517,10 @@ export interface NexusGenInputs {
     workspaceSlug: string; // String!
     workspaceTitle: string; // String!
   }
+  GetActionRequestInput: { // input type
+    actionRequestId: string; // String!
+    workspaceId: string; // String!
+  }
   GetAutomationInput: { // input type
     id?: string | null; // String
   }
@@ -750,6 +754,7 @@ export interface NexusGenInputs {
   SetActionRequestStatusInput: { // input type
     actionRequestId: string; // String!
     status: NexusGenEnums['ActionRequestState']; // ActionRequestState!
+    userId?: string | null; // String
     workspaceId: string; // String!
   }
   SetDialoguePrivacyInput: { // input type
@@ -897,6 +902,7 @@ export interface NexusGenInputs {
 export interface NexusGenEnums {
   ActionRequestConnectionOrderType: "createdAt"
   ActionRequestState: "COMPLETED" | "DROPPED" | "PENDING" | "STALE"
+  AuditEventType: "ACTION_REQUEST_CONFIRMED_COMPLETED" | "ACTION_REQUEST_REJECTED_COMPLETED" | "ASSIGN_ACTION_REQUEST" | "SEND_STALE_ACTION_REQUEST_REMINDER" | "SET_ACTION_REQUEST_STATUS"
   AutomationActionChannelType: "EMAIL" | "SLACK" | "SMS"
   AutomationActionType: "API_CALL" | "CUSTOM_REPORT" | "MONTH_REPORT" | "SEND_DIALOGUE_LINK" | "SEND_EMAIL" | "SEND_SMS" | "SEND_STALE_ACTION_REQUEST_REMINDER" | "WEBHOOK" | "WEEK_REPORT" | "YEAR_REPORT"
   AutomationConditionBuilderType: "AND" | "OR"
@@ -966,6 +972,7 @@ export interface NexusGenObjects {
   ActionRequest: { // root type
     assignee?: NexusGenRootTypes['UserType'] | null; // UserType
     assigneeId?: string | null; // String
+    auditEvents?: Array<NexusGenRootTypes['AuditEvent'] | null> | null; // [AuditEvent]
     createdAt?: NexusGenScalars['Date'] | null; // Date
     dialogue?: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogueId?: string | null; // String
@@ -990,6 +997,14 @@ export interface NexusGenObjects {
   AssignedDialogues: { // root type
     assignedDialogues?: NexusGenRootTypes['Dialogue'][] | null; // [Dialogue!]
     privateWorkspaceDialogues?: NexusGenRootTypes['Dialogue'][] | null; // [Dialogue!]
+  }
+  AuditEvent: { // root type
+    createdAt: NexusGenScalars['Date']; // Date!
+    id: string; // ID!
+    payload?: NexusGenScalars['JSONObject'] | null; // JSONObject
+    type: NexusGenEnums['AuditEventType']; // AuditEventType!
+    user?: NexusGenRootTypes['UserType'] | null; // UserType
+    version: number; // Float!
   }
   AutodeckConnectionType: { // root type
     cursor?: string | null; // String
@@ -1748,6 +1763,7 @@ export interface NexusGenFieldTypes {
   ActionRequest: { // field return type
     assignee: NexusGenRootTypes['UserType'] | null; // UserType
     assigneeId: string | null; // String
+    auditEvents: Array<NexusGenRootTypes['AuditEvent'] | null> | null; // [AuditEvent]
     createdAt: NexusGenScalars['Date'] | null; // Date
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogueId: string | null; // String
@@ -1773,6 +1789,14 @@ export interface NexusGenFieldTypes {
   AssignedDialogues: { // field return type
     assignedDialogues: NexusGenRootTypes['Dialogue'][] | null; // [Dialogue!]
     privateWorkspaceDialogues: NexusGenRootTypes['Dialogue'][] | null; // [Dialogue!]
+  }
+  AuditEvent: { // field return type
+    createdAt: NexusGenScalars['Date']; // Date!
+    id: string; // ID!
+    payload: NexusGenScalars['JSONObject'] | null; // JSONObject
+    type: NexusGenEnums['AuditEventType']; // AuditEventType!
+    user: NexusGenRootTypes['UserType'] | null; // UserType
+    version: number; // Float!
   }
   AutodeckConnectionType: { // field return type
     cursor: string | null; // String
@@ -2459,6 +2483,7 @@ export interface NexusGenFieldTypes {
     dialogueLinks: NexusGenRootTypes['PublicDialogueConnection'] | null; // PublicDialogueConnection
     dialogues: Array<NexusGenRootTypes['Dialogue'] | null> | null; // [Dialogue]
     edge: NexusGenRootTypes['Edge'] | null; // Edge
+    getActionRequest: NexusGenRootTypes['ActionRequest'] | null; // ActionRequest
     getAdjustedLogo: NexusGenRootTypes['AWSImageType'] | null; // AWSImageType
     getAutodeckJobs: NexusGenRootTypes['AutodeckConnectionType'] | null; // AutodeckConnectionType
     getJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
@@ -2756,6 +2781,7 @@ export interface NexusGenFieldTypeNames {
   ActionRequest: { // field return type name
     assignee: 'UserType'
     assigneeId: 'String'
+    auditEvents: 'AuditEvent'
     createdAt: 'Date'
     dialogue: 'Dialogue'
     dialogueId: 'String'
@@ -2781,6 +2807,14 @@ export interface NexusGenFieldTypeNames {
   AssignedDialogues: { // field return type name
     assignedDialogues: 'Dialogue'
     privateWorkspaceDialogues: 'Dialogue'
+  }
+  AuditEvent: { // field return type name
+    createdAt: 'Date'
+    id: 'ID'
+    payload: 'JSONObject'
+    type: 'AuditEventType'
+    user: 'UserType'
+    version: 'Float'
   }
   AutodeckConnectionType: { // field return type name
     cursor: 'String'
@@ -3467,6 +3501,7 @@ export interface NexusGenFieldTypeNames {
     dialogueLinks: 'PublicDialogueConnection'
     dialogues: 'Dialogue'
     edge: 'Edge'
+    getActionRequest: 'ActionRequest'
     getAdjustedLogo: 'AWSImageType'
     getAutodeckJobs: 'AutodeckConnectionType'
     getJob: 'CreateWorkspaceJobType'
@@ -4130,6 +4165,9 @@ export interface NexusGenArgTypes {
     }
     edge: { // args
       id?: string | null; // String
+    }
+    getActionRequest: { // args
+      input: NexusGenInputs['GetActionRequestInput']; // GetActionRequestInput!
     }
     getAdjustedLogo: { // args
       input?: NexusGenInputs['AdjustedImageInput'] | null; // AdjustedImageInput

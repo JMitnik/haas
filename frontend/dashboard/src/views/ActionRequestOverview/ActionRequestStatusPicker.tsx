@@ -12,6 +12,7 @@ import {
 } from 'types/generated-types';
 import { useCustomer } from 'providers/CustomerProvider';
 
+import { useUser } from 'providers/UserProvider';
 import { StatusBox } from './ActionRequestOverview.styles';
 
 interface ActionableStatusPickerProps {
@@ -34,6 +35,7 @@ export const ActionableStatusPickerContent = (
 ) => {
   const { activeCustomer } = useCustomer();
   const [selected, setSelected] = useState<ActionRequestState>(value);
+  const { user } = useUser();
 
   const handleStatusChange = (entry: ActionRequestState) => {
     setSelected(entry);
@@ -43,6 +45,7 @@ export const ActionableStatusPickerContent = (
           workspaceId: activeCustomer?.id as string,
           status: entry,
           actionRequestId,
+          userId: user?.id as string,
         },
       },
     });

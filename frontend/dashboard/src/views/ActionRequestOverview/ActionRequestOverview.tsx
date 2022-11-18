@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
 import * as ContextMenu from 'components/Common/ContextMenu';
+import * as Modal from 'components/Common/Modal';
 import * as Table from 'components/Common/Table';
 import {
   ActionRequestConnectionOrderType,
@@ -39,6 +40,7 @@ import Dropdown from 'components/Dropdown';
 import SearchBar from 'components/Common/SearchBar/SearchBar';
 import useAuth from 'hooks/useAuth';
 
+import { ActionRequestModalCard } from './ActionRequestModalCard';
 import { ActionRequestStatusPicker } from './ActionRequestStatusPicker';
 import { ChangeableEmailContainer, StatusBox } from './ActionRequestOverview.styles';
 
@@ -56,6 +58,7 @@ export const ActionRequestOverview = () => {
   const { activeCustomer } = useCustomer();
   const { canAccessAllActionRequests } = useAuth();
   const { parse, getOneWeekAgo, getEndOfToday } = useDate();
+  const [modalIsOpen, setModalIsOpen] = useState({ isOpen: false, actionRequestId: '' });
   const [actionRequests, setactionRequests] = useState<ActionRequestFragmentFragment[]>(() => []);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [dateRange] = useState<[Date, Date]>(() => {
@@ -311,6 +314,9 @@ export const ActionRequestOverview = () => {
                       isLoading={loading}
                       gridTemplateColumns={columns}
                       key={actionRequest.id}
+                      onClick={() => {
+                        setModalIsOpen({ isOpen: true, actionRequestId: actionRequest.id as string });
+                      }}
                     >
                       <Table.Cell maxWidth={300}>
                         <UI.ColumnFlex justifyContent="flex-start">
@@ -488,6 +494,11 @@ export const ActionRequestOverview = () => {
             )}
           </UI.Flex>
         </UI.Div>
+        <Modal.Root onClose={() => setModalIsOpen({ isOpen: false, actionRequestId: '' })} open={modalIsOpen.isOpen}>
+          <ActionRequestModalCard
+            actionRequestId={modalIsOpen.actionRequestId}
+          />
+        </Modal.Root>
       </UI.ViewBody>
     </View>
   );
