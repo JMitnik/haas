@@ -13,8 +13,6 @@ import { Dialogue, HexagonNode, HexagonNodeType, HexagonViewMode } from './Works
 import { groupsFromDialogues, mapNodeTypeToViewType } from './WorkspaceGrid.helpers';
 
 export interface WorkspaceGridAdapterProps {
-  height: number;
-  width: number;
   backgroundColor: string;
 }
 
@@ -39,7 +37,7 @@ export const WorkspaceGridAdapter = ({
 
   const { activeCustomer } = useCustomer();
 
-  const { loading: workspaceLoading } = useGetWorkspaceDialogueStatisticsQuery({
+  useGetWorkspaceDialogueStatisticsQuery({
     variables: {
       startDateTime: format(selectedStartDate, DateFormat.DayFormat),
       endDateTime: format(selectedEndDate, DateFormat.DayFormat),
@@ -101,8 +99,6 @@ export const WorkspaceGridAdapter = ({
 
   // TODO: Add spinner
   if (!dialogues.length) return null;
-
-  const isServerLoading = workspaceLoading;
 
   return (
     <LS.WorkspaceGridAdapterContainer>

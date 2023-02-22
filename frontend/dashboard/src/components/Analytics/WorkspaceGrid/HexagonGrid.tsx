@@ -6,7 +6,7 @@ import { ProvidedZoom } from '@visx/zoom/lib/types';
 import { TooltipWithBounds, useTooltip } from '@visx/tooltip';
 import { localPoint } from '@visx/event';
 import { useTranslation } from 'react-i18next';
-import React, { useState } from 'react';
+import React, { Ref, useState } from 'react';
 import useMeasure from 'react-use-measure';
 
 import * as Tooltip from 'components/Common/Tooltip/Tooltip';
@@ -71,7 +71,7 @@ export const HexagonGrid = ({
   children,
 }: HexagonGridProps) => {
   const { t } = useTranslation();
-  const [ref, bounds] = useMeasure({
+  const [ref] = useMeasure({
     debounce: {
       resize: 2,
       scroll: 1,
@@ -116,7 +116,9 @@ export const HexagonGrid = ({
       <svg
         width={width}
         height={height}
+        ref={zoom.containerRef as Ref<SVGSVGElement>}
         style={{
+          cursor: zoom.isDragging ? 'grabbing' : 'grab',
           touchAction: 'none',
           borderRadius: '10px',
           border: '1px solid #D6DCF2',
@@ -148,14 +150,11 @@ export const HexagonGrid = ({
         )}
         <motion.g
           initial={{ transform: 'matrix(1, 0, 0, 1, 0, 0', opacity: 0 }}
-          style={{ transform: 'matrix(1, 0, 0, 1, 0, 0' }}
           animate={{ transform: zoom.toString(), opacity: 1 }}
         >
-          <Group top={130} left={130}>
+          <Group>
             <motion.g
               ref={ref}
-              x={-10 + (width - bounds.width) / 2}
-              y={(height - bounds.height) / 2}
             >
               <AnimatePresence>
                 <motion.g

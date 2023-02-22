@@ -11,8 +11,6 @@ export const DashboardView = () => (
       <UI.Div>
         <WorkspaceGridAdapter
           backgroundColor={theme.colors.neutral[500]}
-          height={600}
-          width={900}
         />
       </UI.Div>
     </UI.Div>

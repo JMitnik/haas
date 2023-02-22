@@ -304,7 +304,7 @@ export const createGrid = (nrItems: number, windowHeight: number, windowWidth: n
   const ratioWindow = windowWidth / windowHeight;
   const itemsPerRow = Math.ceil(squareRoot * ratioWindow) || 1;
   const itemsPerColumn = Math.ceil(squareRoot) || 1;
-  const dimensions = Math.floor((windowWidth / itemsPerRow) / 2);
+  const dimensions = Math.floor((windowWidth / itemsPerRow) / 3.5);
 
   const hexPrototype = createHexPrototype({
     dimensions,
