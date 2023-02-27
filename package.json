@@ -44,6 +44,7 @@
     "start:dashboard": "yarn workspace @haas/dashboard start",
     "deploy:aws:campaign": "cd aws/commands && bash deploy-campaign.bash",
     "deploy:api:staging": "bash aws/stack/scripts/update_ecs.sh",
+    "dock:build": "cd api && docker build -t haas-api .",
     "dock:up": "cd container/api && docker-compose up -d",
     "dock:down": "cd container/api && docker-compose down",
     "dock:test": "bash scripts/dock-test.sh",
