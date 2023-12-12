@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 export interface ConfigProps {
+  jeagerEndpoint: string;
   baseUrl: string;
   apiSecret: string;
   jwtSecret: string;
@@ -33,6 +34,7 @@ if (!process.env.API_SECRET) throw new Error('Ensure you set a API secret in you
 if (!process.env.MAIL_SENDER) console.log('Mail sender not defined; wont send mails as a result');
 
 const config: ConfigProps = {
+  jeagerEndpoint: process.env.JAEGER_TRACING_ENDPOINT || 'http://localhost:14268/api/traces',
   baseUrl: process.env.BASE_URL || 'http://localhost:4000',
   apiSecret: process.env.API_SECRET,
   jwtSecret: process.env.JWT_SECRET,
