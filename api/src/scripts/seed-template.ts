@@ -49,6 +49,13 @@ const argv = yargs
     type: 'number',
     default: 1,
   })
+  .option('range', {
+    alias: 'r',
+    array: true,
+    type: 'array',
+    default: [70, 80],
+    description: 'The range of scores for the generated sessions',
+  })
   .help()
   .alias('help', 'h').argv as any;
 
@@ -72,6 +79,9 @@ export const seedBusinessTemplate = async () => {
   const ownEmail = argv.email;
   const templateType = argv.templateType;
   const generateData = argv.generateData;
+  let scoreRange = argv.range;
+
+  if (scoreRange.length <= 1) scoreRange = [70, 80]
 
   let user = await userService.upsertUserByEmail({
     email: ownEmail,
@@ -113,7 +123,7 @@ export const seedBusinessTemplate = async () => {
   );
 
   return generateWorkspaceService.generateDialoguesByTemplateLayers(
-    workspace, templateType, amtSessions, generateData
+    workspace, templateType, amtSessions, generateData, false, scoreRange[0], scoreRange[1]
   );
 };
 

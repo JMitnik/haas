@@ -57,8 +57,6 @@ describe('ActionOverview', () => {
 
     await new Promise((r) => setTimeout(r, 2000));
 
-    debug();
-
     const select = screen.getByLabelText('ctaTypeTwo');
 
     fireEvent.click(select);
@@ -112,7 +110,6 @@ describe('ActionOverview', () => {
 
     expect(screen.queryByText((text) => includesText(text, `Page 1: ${headerTestString}`))).toBeInTheDocument();
     expect(screen.queryByText((text) => includesText(text, '1 field'))).toBeInTheDocument();
-    // debug();
 
     expect(screen.getByText('Save')).not.toBeDisabled();
   });
@@ -171,8 +168,6 @@ describe('ActionOverview', () => {
     fireEvent.click(savePreFormNodeButton);
 
     await new Promise((r) => setTimeout(r, 2000));
-
-    debug();
 
     expect(screen.getByText('Pre-Form Header Test')).toBeInTheDocument();
 
